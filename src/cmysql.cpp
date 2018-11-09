@@ -17,8 +17,6 @@ int CMysqlSkel::InitDB(const char *dbName, const char *user = "root", const char
         return(-1);
     }
 
-// --- here is my bug fix
-
     db = mysql_real_connect(db, DB_HOST, user, pass, dbName, 0, NULL, CLIENT_MULTI_STATEMENTS | CLIENT_MULTI_RESULTS);
 
     if( db == NULL )
