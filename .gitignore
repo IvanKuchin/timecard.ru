@@ -74,5 +74,5 @@ doc
 supplemental/
 ftpsync.settings
 sql
-localy.h
+localy.h*
 sublime/
