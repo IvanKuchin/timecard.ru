@@ -1,0 +1,2006 @@
+#include "subcontractor.h"
+
+/*
+bool AssignLineToExpenseByRandom(C_ExpenseLine expense_line, vector<C_Expense> &expenses)
+{
+	bool	result = false;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(expense_line.GetParentRandom().length())
+	{
+		for(auto &expense: expenses)
+		{
+			if(expense.GetRandom() == expense_line.GetParentRandom())
+			{
+				expense.AddExpenseLine(expense_line);
+				MESSAGE_DEBUG("", "", "expense_line(" + expense_line.GetRandom() + ") assigned to expense(" + expense.GetRandom() + ")");
+				result = true;
+			}
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "parent_random expense_line(id/random - " + expense_line.GetID() + "/" + expense_line.GetRandom() + ") is empty");
+	}
+
+	MESSAGE_DEBUG("", "", "finish (result is " + to_string(result) + ")");
+
+	return result;
+}
+*/
+string	GetTimecardsSOWTaskAssignement_Reusable_InJSONFormat(string date, CMysql *db, CUser *user)
+{
+	string		result = "";
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(date.length())
+	{
+		if(user)
+		{
+			if(db)
+			{
+				result =
+						"\"timecards\":[" + GetTimecardsInJSONFormat(
+								"SELECT * FROM `timecards` WHERE "
+									"`contract_sow_id` IN (SELECT `id` FROM `contracts_sow` WHERE `subcontractor_company_id` IN (SELECT `id` FROM `company` WHERE `admin_userID` = \"" + user->GetID() + "\")) "
+									"AND "
+									"`period_start`<=\"" + date + "\" "
+									"AND "
+									"`period_end`>=\"" + date + "\""
+								";", db, user) + "],"
+						"\"sow\":[" + GetSOWInJSONFormat(
+								"SELECT * FROM `contracts_sow` WHERE "
+									"`subcontractor_company_id` IN (SELECT `id` FROM `company` WHERE `admin_userID` = \"" + user->GetID() + "\") "
+									"AND "
+									"`start_date`<=\"" + date + "\" "
+									"AND "
+									"`end_date`>=\"" + date + "\""
+								";", db, user) + "],"
+						"\"task_assignments\":[" + GetTimecardTaskAssignmentInJSONFormat(
+								"SELECT * FROM `timecard_task_assignment` WHERE "
+									"`contract_sow_id` IN (SELECT `id` FROM `contracts_sow` WHERE "
+																"`subcontractor_company_id` IN (SELECT `id` FROM `company` WHERE `admin_userID` = \"" + user->GetID() + "\") "
+																"AND "
+																"`start_date`<=\"" + date + "\" "
+																"AND "
+																"`end_date`>=\"" + date + "\""
+															");", db, user) + "]";
+			}
+			else
+			{
+				MESSAGE_ERROR("", "", "user is empty");
+			}
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "user is empty");
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "date is empty");
+	}
+
+
+
+	MESSAGE_DEBUG("", "", "finish (result length is " + to_string(result.length()) + " symbols)");
+
+	return result;
+}
+
+int main()
+{
+	CStatistics		appStat;  // --- CStatistics must be firts statement to measure end2end param's
+	CCgi			indexPage(EXTERNAL_TEMPLATE);
+	CUser			user;
+	string			action, partnerID;
+	CMysql			db;
+	struct timeval	tv;
+
+	{
+		MESSAGE_DEBUG("", action, __FILE__);
+	}
+
+	signal(SIGSEGV, crash_handler);
+
+	gettimeofday(&tv, NULL);
+	srand(tv.tv_sec * tv.tv_usec * 100000);
+
+	try
+	{
+
+	indexPage.ParseURL();
+	indexPage.AddCookie("lng", "ru", "", "", "/");
+
+	if(!indexPage.SetTemplate("index.htmlt"))
+	{
+		MESSAGE_DEBUG("", action, "template file was missing");
+		throw CException("Template file was missing");
+	}
+
+	if(db.Connect(DB_NAME, DB_LOGIN, DB_PASSWORD) < 0)
+	{
+		MESSAGE_DEBUG("", action, "Can not connect to mysql database");
+		throw CExceptionHTML("MySql connection");
+	}
+
+	indexPage.SetDB(&db);
+
+#ifndef MYSQL_3
+	db.Query("set names cp1251");
+#endif
+
+	action = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("action"));
+	{
+		MESSAGE_DEBUG("", "", " action = " + action);
+	}
+
+	// --- generate common parts
+	{
+#ifndef IMAGEMAGICK_DISABLE
+		Magick::InitializeMagick(NULL);
+#endif
+
+		// --- it has to be run before session, because session relay upon Apache environment variable
+		if(RegisterInitialVariables(&indexPage, &db, &user))
+		{
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "RegisterInitialVariables failed, throwing exception");
+			throw CExceptionHTML("environment variable error");
+		}
+
+		//------- Generate session
+		action = GenerateSession(action, &indexPage, &db, &user);
+
+	/*
+		ostringstream		query, ost1, ost2;
+		string				partNum;
+		string				content;
+		// Menu				m;
+
+		indexPage.RegisterVariableForce("rand", GetRandom(10));
+		indexPage.RegisterVariableForce("random", GetRandom(10));
+		indexPage.RegisterVariableForce("style", "style.css");
+
+
+		// --- Generate session
+		{
+			string			lng, sessidHTTP;
+			ostringstream	ost;
+
+
+			sessidHTTP = indexPage.SessID_Get_FromHTTP();
+			if(sessidHTTP.length() < 5)
+			{
+				{
+					MESSAGE_DEBUG("", action, "session cookie is not exist, generating new session.");
+				}
+				sessidHTTP = indexPage.SessID_Create_HTTP_DB();
+				if(sessidHTTP.length() < 5)
+				{
+					MESSAGE_ERROR("", action, "error in generating session ID");
+					throw CExceptionHTML("session can't be created");
+				}
+			}
+			else {
+				if(indexPage.SessID_Load_FromDB(sessidHTTP))
+				{
+					if(indexPage.SessID_CheckConsistency())
+					{
+						if(indexPage.SessID_Update_HTTP_DB())
+						{
+							indexPage.RegisterVariableForce("loginUser", "");
+							indexPage.RegisterVariableForce("loginUserID", "");
+
+							user.SetDB(&db);
+							if(indexPage.SessID_Get_UserFromDB() != "Guest")
+							{
+								// --- place 2change user from user.email to user.id
+								if(user.GetFromDBbyEmail(indexPage.SessID_Get_UserFromDB()))
+								{
+									ostringstream	ost1;
+									string			avatarPath;
+
+									indexPage.RegisterVariableForce("loginUser", indexPage.SessID_Get_UserFromDB());
+									indexPage.RegisterVariableForce("loginUserID", user.GetID());
+									indexPage.RegisterVariableForce("myLogin", user.GetLogin());
+									indexPage.RegisterVariableForce("myFirstName", user.GetName());
+									indexPage.RegisterVariableForce("myLastName", user.GetNameLast());
+
+									// --- Get user avatars
+									ost1.str("");
+									ost1 << "select * from `users_avatars` where `userid`='" << user.GetID() << "' and `isActive`='1';";
+									avatarPath = "empty";
+									if(db.Query(ost1.str()))
+									{
+										ost1.str("");
+										ost1 << "/images/avatars/avatars" << db.Get(0, "folder") << "/" << db.Get(0, "filename");
+										avatarPath = ost1.str();
+									}
+									indexPage.RegisterVariableForce("myUserAvatar", avatarPath);
+
+									{
+										MESSAGE_DEBUG("", "", "user [" + user.GetLogin() + "] logged in");
+									}
+								}
+								else
+								{
+									// --- enforce to close session
+									action = "logout";
+
+									{
+										MESSAGE_DEBUG("", "", "user [" + indexPage.SessID_Get_UserFromDB() + "] session exists on client device, but not in the DB. Change the [action = logout]");
+									}
+
+								}
+							}
+							else
+							{
+								{
+									MESSAGE_DEBUG("", action, "user [" + user.GetLogin() + "] surfing");
+								}
+
+								if(user.GetFromDBbyLogin(user.GetLogin()))
+								{
+									indexPage.RegisterVariableForce("loginUser", user.GetLogin());
+									indexPage.RegisterVariableForce("loginUserID", user.GetID());
+									indexPage.RegisterVariableForce("myLogin", user.GetLogin());
+									indexPage.RegisterVariableForce("myFirstName", user.GetName());
+									indexPage.RegisterVariableForce("myLastName", user.GetNameLast());
+								}
+								else
+								{
+									// --- enforce to close session
+									action = "logout";
+
+									{
+										MESSAGE_DEBUG("", action, "user [" + indexPage.SessID_Get_UserFromDB() + "] session exists on client device, but not in the DB. Change the [action = logout].");
+									}
+
+								}
+
+							}
+
+
+						}
+						else
+						{
+							MESSAGE_ERROR("", action, "error update session in HTTP or DB failed");
+						}
+					}
+					else {
+						MESSAGE_ERROR("", action, "error session consistency check failed");
+					}
+				}
+				else
+				{
+					ostringstream	ost;
+
+					{
+						MESSAGE_DEBUG("", action, "cookie session and DB session is not equal. Need to recreate session");
+					}
+
+					ost.str("");
+					ost << "/?rand=" << GetRandom(10);
+
+					if(!indexPage.Cookie_Expire()) {
+						MESSAGE_ERROR("", action, "error in session expiration");
+					} // --- if(!indexPage.Cookie_Expire())
+					indexPage.Redirect(ost.str());
+				} // --- if(indexPage.SessID_Load_FromDB(sessidHTTP))
+			} // --- if(sessidHTTP.length() < 5)
+		}
+//------- End generate session
+
+
+//------- Register html META-tags
+		if(db.Query("select `value` from `settings_default` where `setting`=\"keywords_head\"") > 0)
+			indexPage.RegisterVariable("keywords_head", db.Get(0, "value"));
+		else
+		{
+			MESSAGE_ERROR("", action, "error getting keywords_head from settings_default");
+		}
+
+		if(db.Query("select `value` from `settings_default` where `setting`=\"title_head\"") > 0)
+			indexPage.RegisterVariable("title_head", db.Get(0, "value"));
+		else
+		{
+			MESSAGE_ERROR("", action, "error getting title_head from settings_default");
+		}
+
+		if(db.Query("select `value` from `settings_default` where `setting`=\"description_head\"") > 0)
+			indexPage.RegisterVariable("description_head", db.Get(0, "value"));
+		else
+		{
+			MESSAGE_ERROR("", action, "error getting description_head from settings_default");
+		}
+
+		if(db.Query("select `value` from `settings_default` where `setting`=\"NewsOnSinglePage\"") > 0)
+			indexPage.RegisterVariable("NewsOnSinglePage", db.Get(0, "value"));
+		else
+		{
+			MESSAGE_ERROR("", action, "error getting NewsOnSinglePage from settings_default");
+
+			indexPage.RegisterVariable("NewsOnSinglePage", to_string(NEWS_ON_SINGLE_PAGE));
+		}
+
+		if(db.Query("select `value` from `settings_default` where `setting`=\"FriendsOnSinglePage\"") > 0)
+			indexPage.RegisterVariable("FriendsOnSinglePage", db.Get(0, "value"));
+		else
+		{
+			MESSAGE_ERROR("", action, "error getting FriendsOnSinglePage from settings_default");
+
+			indexPage.RegisterVariable("FriendsOnSinglePage", to_string(FRIENDS_ON_SINGLE_PAGE));
+		}
+
+		if(action.empty() and user.GetLogin().length() and (user.GetLogin() != "Guest"))
+		{
+			action = GetDefaultActionFromUserType(user.GetType(), &db);
+
+			{
+				MESSAGE_DEBUG("", action, "META-registration: 'logged-in user' action has been overriden to [" + action + "]");
+			}
+
+		}
+		else if(!action.length())
+		{
+			action = GUEST_USER_DEFAULT_ACTION;
+
+			{
+				MESSAGE_DEBUG("", action, "META-registration: 'guest user' action has been overriden to [" + action + "]");
+			} // --- log block
+		} // --- default action
+//------- End register html META-tags
+	*/}
+// ------------ end generate common parts
+
+	{
+		MESSAGE_DEBUG("", "", "pre-condition if(action == \"" + action + "\")");
+	}
+
+	if((action.length() > 10) && (action.compare(action.length() - 9, 9, "_template") == 0))
+	{
+		ostringstream	ost;
+		string			strPageToGet, strFriendsOnSinglePage;
+
+		{
+			MESSAGE_DEBUG("", action, "start");
+		}
+
+		if(user.GetLogin() == "Guest")
+		{
+			{
+				MESSAGE_DEBUG("", action, "re-login required");
+			}
+
+			indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
+		}
+		else
+		{
+			string		template_name = action.substr(0, action.length() - 9) + ".htmlt";
+
+			if(!indexPage.SetTemplate(template_name))
+			{
+				MESSAGE_ERROR("", action, "can't find template " + template_name);
+			} // if(!indexPage.SetTemplate("my_network.htmlt"))
+		}
+
+		{
+			MESSAGE_DEBUG("", action, "finish");
+		}
+	}
+
+	if(action == "AJAX_getMyTimecard")
+	{
+		string			strPageToGet, strFriendsOnSinglePage;
+		ostringstream	ostResult;
+
+		{
+			MESSAGE_DEBUG("", action, "start");
+		}
+
+		ostResult.str("");
+		if(user.GetLogin() == "Guest")
+		{
+			{
+				MESSAGE_DEBUG("", action, "re-login required");
+			}
+
+			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
+		}
+		else
+		{
+			string			template_name = "json_response.htmlt";
+			string			period_start_date, period_start_month, period_start_year;
+			string			period_length;
+			string			dbQuery;
+
+			period_start_date = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("period_start_date"));
+			period_start_month = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("period_start_month"));
+			period_start_year = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("period_start_year"));
+
+			if(period_start_date.length() && period_start_month.length() && period_start_year.length())
+			{
+				int		affected = 0;
+
+				// --- 0-0-0 means today
+				if(period_start_year == "0")
+				{
+				    time_t t = time(0);   // get time now
+				    tm* now = localtime(&t);
+
+				    period_start_year = to_string(now->tm_year + 1900);
+				    period_start_month = to_string(now->tm_mon + 1);
+				    period_start_date = to_string(now->tm_mday);
+
+				}
+
+				affected = db.Query("SELECT `id` FROM `company` WHERE `admin_userID`=\"" + user.GetID() + "\";");
+				if(affected)
+				{
+					string		companies_list= "";
+					string		temp = GetTimecardsSOWTaskAssignement_Reusable_InJSONFormat(period_start_year + "-" + period_start_month + "-" + period_start_date, &db, &user);
+
+/*
+					for(int i = 0; i < affected; ++i)
+					{
+						if(companies_list.length()) companies_list += ",";
+						companies_list += db.Get(i, "id");
+					}
+*/
+					if(temp.empty())
+					{
+						MESSAGE_ERROR("", action, "timecard object is empty. check previous error message.")
+						ostResult << "{\"status\":\"error\",\"description\":\"Ошибка в алгоритме.\"}";
+					}
+					else
+					{
+						ostResult	<< "{"
+									<< "\"status\":\"success\","
+									<< temp
+									<< "}";
+/*
+					ostResult << "{"
+									"\"status\":\"success\","
+									"\"timecards\":[" << GetTimecardsInJSONFormat(
+											"SELECT * FROM `timecards` WHERE "
+												"`contract_sow_id` IN (SELECT `id` FROM `contracts_sow` WHERE `subcontractor_company_id` IN (" + companies_list + ")) "
+												"AND "
+												"`period_start`<=\"" + period_start_year + "-" + period_start_month + "-" + period_start_date + "\" "
+												"AND "
+												"`period_end`>=\"" + period_start_year + "-" + period_start_month + "-" + period_start_date + "\""
+											";", &db, &user) << "],"
+									"\"sow\":[" << GetSOWInJSONFormat(
+											"SELECT * FROM `contracts_sow` WHERE "
+												"`subcontractor_company_id` IN (" + companies_list + ") "
+												"AND "
+												"`start_date`<=\"" + period_start_year + "-" + period_start_month + "-" + period_start_date + "\" "
+												"AND "
+												"`end_date`>=\"" + period_start_year + "-" + period_start_month + "-" + period_start_date + "\""
+											";", &db, &user) << "],"
+									"\"task_assignments\":[" << GetTimecardTaskAssignmentInJSONFormat(
+											"SELECT * FROM `timecard_task_assignment` WHERE "
+												"`contract_sow_id` IN (SELECT `id` FROM `contracts_sow` WHERE "
+																			"`subcontractor_company_id` IN (" + companies_list + ") "
+																			"AND "
+																			"`start_date`<=\"" + period_start_year + "-" + period_start_month + "-" + period_start_date + "\" "
+																			"AND "
+																			"`end_date`>=\"" + period_start_year + "-" + period_start_month + "-" + period_start_date + "\""
+																		");", &db, &user) << "]"
+								"}";
+*/
+					}
+
+				}
+				else
+				{
+					MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't owns company");
+				}
+
+			}
+			else
+			{
+				{
+					MESSAGE_DEBUG("", action, "period_start or period_length missed");
+				}
+				ostResult << "{\"status\":\"error\",\"description\":\"Пропущены обязательные параметры. Обратитьесь в тех. поддержку\"}";
+			}
+
+			indexPage.RegisterVariableForce("result", ostResult.str());
+
+			if(!indexPage.SetTemplate(template_name))
+			{
+				MESSAGE_ERROR("", action, "can't find template " + template_name);
+			} // if(!indexPage.SetTemplate("my_network.htmlt"))
+		}
+
+
+		{
+			MESSAGE_DEBUG("", action, "finish");
+		}
+	}
+
+	if(action == "AJAX_getSoWList")
+	{
+		string			strPageToGet, strFriendsOnSinglePage;
+		ostringstream	ostResult;
+
+		{
+			MESSAGE_DEBUG("", action, "start");
+		}
+
+		ostResult.str("");
+		if(user.GetLogin() == "Guest")
+		{
+			{
+				MESSAGE_DEBUG("", action, "re-login required");
+			}
+
+			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
+		}
+		else
+		{
+			string			template_name = "json_response.htmlt";
+			int				affected = db.Query("SELECT `id` FROM `company` WHERE `admin_userID`=\"" + user.GetID() + "\";");
+			bool			include_bt = indexPage.GetVarsHandler()->Get("include_bt") == "true";
+			bool			include_tasks = true;
+
+			if(string(indexPage.GetVarsHandler()->Get("include_tasks")) == "false") include_tasks = false;
+
+			if(affected)
+			{
+				string		companies_list= "";
+
+				for(int i = 0; i < affected; ++i)
+				{
+					if(companies_list.length()) companies_list += ",";
+					companies_list += db.Get(i, "id");
+				}
+
+
+
+				ostResult << "{"
+								"\"status\":\"success\","
+								"\"sow\":[" << GetSOWInJSONFormat(
+										"SELECT * FROM `contracts_sow` WHERE "
+											"`subcontractor_company_id` IN (" + companies_list + ") "
+										";", &db, &user, include_tasks, include_bt) << "]";
+
+				if(include_tasks)
+					ostResult <<	","
+									"\"task_assignments\":[" << GetTimecardTaskAssignmentInJSONFormat(
+											"SELECT * FROM `timecard_task_assignment` WHERE "
+												"`contract_sow_id` IN (SELECT `id` FROM `contracts_sow` WHERE "
+													"`subcontractor_company_id` IN (" + companies_list + ") "
+											");", &db, &user) << "]";
+				ostResult << "}";
+			}
+			else
+			{
+				MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't owns company");
+				ostResult << "{\"status\":\"error\",\"description\":\"Вы не создали компанию\"}";
+			}
+
+			indexPage.RegisterVariableForce("result", ostResult.str());
+
+			if(!indexPage.SetTemplate(template_name))
+			{
+				MESSAGE_ERROR("", action, "can't find template " + template_name);
+			} // if(!indexPage.SetTemplate("my_network.htmlt"))
+		}
+
+
+		{
+			MESSAGE_DEBUG("", action, "finish");
+		}
+	}
+
+	if(action == "AJAX_getCurrencyRateList")
+	{
+		string			strPageToGet, strFriendsOnSinglePage;
+		ostringstream	ostResult;
+
+		{
+			MESSAGE_DEBUG("", action, "start");
+		}
+
+		ostResult.str("");
+		if(user.GetLogin() == "Guest")
+		{
+			{
+				MESSAGE_DEBUG("", action, "re-login required");
+			}
+
+			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
+		}
+		else
+		{
+			string			template_name = "json_response.htmlt";
+			string			date = indexPage.GetVarsHandler()->Get("date");
+			string			error_message = "";
+			string			rates_array = "";
+
+			if(regex_match(date, regex("^[[:alnum:]]{4}\\-[[:alnum:]]{1,2}\\-[[:alnum:]]{1,2}$") ))
+			{
+				rates_array = GetCurrencyRatesInJSONFormat("SELECT * FROM `currency_rate` WHERE `date`=\"" + date + "\";", &db, &user);
+			}
+			else
+			{
+				error_message = "date format wrong(YYYY-MM-DD not matches " + date + ")";
+			}
+
+			if(error_message.empty())
+			{
+
+				ostResult << "{\"status\":\"success\",\"rates\":[" + rates_array + "]}";
+			}
+			else
+			{
+				MESSAGE_ERROR("", action, error_message);
+				ostResult << "{\"status\":\"error\",\"description\":\"" + error_message + "\"}";
+			}
+
+			indexPage.RegisterVariableForce("result", ostResult.str());
+
+			if(!indexPage.SetTemplate(template_name))
+			{
+				MESSAGE_ERROR("", action, "can't find template " + template_name);
+			} // if(!indexPage.SetTemplate("my_network.htmlt"))
+		}
+
+
+		{
+			MESSAGE_DEBUG("", action, "finish");
+		}
+	}
+
+	if(action == "AJAX_getBTList")
+	{
+
+		string			strPageToGet, strFriendsOnSinglePage;
+		ostringstream	ostResult;
+
+		{
+			MESSAGE_DEBUG("", action, "start");
+		}
+
+		ostResult.str("");
+		if(user.GetLogin() == "Guest")
+		{
+			{
+				MESSAGE_DEBUG("", action, "re-login required");
+			}
+
+			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
+		}
+		else
+		{
+			string			template_name = "json_response.htmlt";
+			int				affected = db.Query("SELECT `id` FROM `company` WHERE `admin_userID`=\"" + user.GetID() + "\";");
+
+			if(affected)
+			{
+				string		companies_list= "";
+
+				for(int i = 0; i < affected; ++i)
+				{
+					if(companies_list.length()) companies_list += ",";
+					companies_list += db.Get(i, "id");
+				}
+
+				ostResult << "{"
+								"\"status\":\"success\","
+								"\"sow\":[" << GetSOWInJSONFormat(
+										"SELECT * FROM `contracts_sow` WHERE "
+											"`subcontractor_company_id` IN (" + companies_list + ") "
+										";", &db, &user) << "],"
+								"\"bt\":[" << GetBTsInJSONFormat(
+										"SELECT * FROM `bt` WHERE "
+											"`contract_sow_id` IN ( SELECT `id` FROM `contracts_sow` WHERE `subcontractor_company_id` IN (" + companies_list + "))"
+										";", &db, &user, false) << "]"
+							"}";
+			}
+			else
+			{
+				MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't owns company");
+				ostResult << "{\"status\":\"error\",\"description\":\"Вы не создали компанию\"}";
+			}
+
+			indexPage.RegisterVariableForce("result", ostResult.str());
+
+			if(!indexPage.SetTemplate(template_name))
+			{
+				MESSAGE_ERROR("", action, "can't find template " + template_name);
+			} // if(!indexPage.SetTemplate("my_network.htmlt"))
+		}
+
+
+		{
+			MESSAGE_DEBUG("", action, "finish");
+		}
+	}
+
+	// --- this AJAX might be used by any user role 
+	if(action == "AJAX_getBTEntry")
+	{
+
+		string			strPageToGet, strFriendsOnSinglePage;
+		ostringstream	ostResult;
+
+		{
+			MESSAGE_DEBUG("", action, "start");
+		}
+
+		ostResult.str("");
+		if(user.GetLogin() == "Guest")
+		{
+			{
+				MESSAGE_DEBUG("", action, "re-login required");
+			}
+
+			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
+		}
+		else
+		{
+			string			template_name = "json_response.htmlt";
+
+			string			bt_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("bt_id"));
+
+			if(bt_id.length())
+			{
+				string	error_message = isUserAllowedAccessToBT(bt_id, &db, &user);
+				if(error_message.empty())
+				{
+					ostResult << "{"
+									"\"status\":\"success\","
+									"\"bt\":[" << GetBTsInJSONFormat("SELECT * FROM `bt` WHERE ""(`id`=\"" + bt_id + "\");", &db, &user, INCLUDE_ADDITIONAL_INFO) << "]"
+								"}";
+/*
+					int				affected = db.Query("SELECT `id` FROM `company` WHERE `admin_userID`=\"" + user.GetID() + "\";");
+
+					if(affected)
+					{
+						string		companies_list= "";
+
+						for(int i = 0; i < affected; ++i)
+						{
+							if(companies_list.length()) companies_list += ",";
+							companies_list += db.Get(i, "id");
+						}
+
+						ostResult << "{"
+										"\"status\":\"success\","
+										"\"bt\":[" << GetBTsInJSONFormat(
+												"SELECT * FROM `bt` WHERE "
+													"(`id`=\"" + bt_id + "\") "
+													"AND "
+													"(`contract_sow_id` IN ( SELECT `id` FROM `contracts_sow` WHERE `subcontractor_company_id` IN (" + companies_list + ")))"
+												";", &db, &user, INCLUDE_ADDITIONAL_INFO) << "]"
+									"}";
+					}
+					else
+					{
+						MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't owns company");
+						ostResult << "{\"status\":\"error\",\"description\":\"Вы не создали компанию\"}";
+					}
+*/
+				}
+				else
+				{
+					MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't have accee to bt.id(" + bt_id + ")");
+					ostResult << "{\"status\":\"error\",\"description\":\"У Вас нет доступа\"}";
+				}
+			}
+			else
+			{
+				MESSAGE_ERROR("", action, "bt_id is empty")
+				ostResult << "{\"status\":\"error\",\"description\":\"Некорректные параметры\"}";
+			}
+
+			indexPage.RegisterVariableForce("result", ostResult.str());
+
+			if(!indexPage.SetTemplate(template_name))
+			{
+				MESSAGE_ERROR("", action, "can't find template " + template_name);
+			} // if(!indexPage.SetTemplate("my_network.htmlt"))
+		}
+
+
+		{
+			MESSAGE_DEBUG("", action, "finish");
+		}
+	}
+
+	if(action == "AJAX_getTimecardList")
+	{
+		string			strPageToGet, strFriendsOnSinglePage;
+		ostringstream	ostResult;
+
+		{
+			MESSAGE_DEBUG("", action, "start");
+		}
+
+		ostResult.str("");
+		if(user.GetLogin() == "Guest")
+		{
+			{
+				MESSAGE_DEBUG("", action, "re-login required");
+			}
+
+			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
+		}
+		else
+		{
+			string			template_name = "json_response.htmlt";
+			int				affected = db.Query("SELECT `id` FROM `company` WHERE `admin_userID`=\"" + user.GetID() + "\";");
+
+			if(affected)
+			{
+				string		companies_list= "";
+
+				for(int i = 0; i < affected; ++i)
+				{
+					if(companies_list.length()) companies_list += ",";
+					companies_list += db.Get(i, "id");
+				}
+
+				ostResult << "{"
+								"\"status\":\"success\","
+								"\"sow\":[" << GetSOWInJSONFormat(
+										"SELECT * FROM `contracts_sow` WHERE "
+											"`subcontractor_company_id` IN (" + companies_list + ") "
+										";", &db, &user) << "],"
+								"\"timecards\":[" << GetTimecardsInJSONFormat(
+										"SELECT * FROM `timecards` WHERE "
+											"`contract_sow_id` IN ( SELECT `id` FROM `contracts_sow` WHERE `subcontractor_company_id` IN (" + companies_list + "))"
+										";", &db, &user) << "]"
+							"}";
+			}
+			else
+			{
+				MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't owns company");
+				ostResult << "{\"status\":\"error\",\"description\":\"Вы не создали компанию\"}";
+			}
+
+			indexPage.RegisterVariableForce("result", ostResult.str());
+
+			if(!indexPage.SetTemplate(template_name))
+			{
+				MESSAGE_ERROR("", action, "can't find template " + template_name);
+			} // if(!indexPage.SetTemplate("my_network.htmlt"))
+		}
+
+
+		{
+			MESSAGE_DEBUG("", action, "finish");
+		}
+	}
+
+	if(action == "AJAX_getTimecardEntry")
+	{
+		string			strPageToGet, strFriendsOnSinglePage;
+		ostringstream	ostResult;
+
+		{
+			MESSAGE_DEBUG("", action, "start");
+		}
+
+		ostResult.str("");
+		if(user.GetLogin() == "Guest")
+		{
+			{
+				MESSAGE_DEBUG("", action, "re-login required");
+			}
+
+			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
+		}
+		else
+		{
+			string			template_name = "json_response.htmlt";
+			int				affected = 0;
+			string			timecard_id = "";
+
+			timecard_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("timecard_id"));
+
+			if(timecard_id.length())
+			{
+				affected = db.Query("SELECT `id` FROM `company` WHERE `admin_userID`=\"" + user.GetID() + "\";");
+
+				if(affected)
+				{
+					string		companies_list= "";
+
+					for(int i = 0; i < affected; ++i)
+					{
+						if(companies_list.length()) companies_list += ",";
+						companies_list += db.Get(i, "id");
+					}
+
+					// --- check ability to see this timecard
+					if(db.Query("SELECT `id` FROM `timecards` WHERE `id`=\"" + timecard_id + "\" AND `contract_sow_id` IN (SELECT `id` FROM `contracts_sow` WHERE `subcontractor_company_id` IN (" + companies_list + "))"))
+					{
+						ostResult << "{"
+										"\"status\":\"success\","
+										"\"timecards\":[" << GetTimecardsInJSONFormat("SELECT * FROM `timecards` WHERE `id`=\"" + timecard_id + "\";", &db, &user, true) << "]"
+									"}";
+					}
+					else
+					{
+						MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't allow to see this timecard");
+						ostResult << "{\"status\":\"error\",\"description\":\"У Вас нет доступа к этой таймкарте\"}";
+					}
+				}
+				else
+				{
+					MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't owns company");
+					ostResult << "{\"status\":\"error\",\"description\":\"Вы не создали компанию\"}";
+				}
+			}
+			else
+			{
+				MESSAGE_ERROR("", action, "parameter timecard_id is empty");
+				ostResult << "{\"status\":\"error\",\"description\":\"Некорректые параметры\"}";
+			}
+
+
+			indexPage.RegisterVariableForce("result", ostResult.str());
+
+			if(!indexPage.SetTemplate(template_name))
+			{
+				MESSAGE_ERROR("", action, "can't find template " + template_name);
+			} // if(!indexPage.SetTemplate("my_network.htmlt"))
+		}
+
+
+		{
+			MESSAGE_DEBUG("", action, "finish");
+		}
+	}
+
+	if(action == "AJAX_saveMyTimecard")
+	{
+		string			strPageToGet, strFriendsOnSinglePage;
+		ostringstream	ostResult;
+		struct ItemClass
+		{
+			string	customer;
+			string	project;
+			string	task;
+			string	timereports;
+		};
+		vector<ItemClass>		itemsList;
+
+		{
+			MESSAGE_DEBUG("", action, "start");
+		}
+
+		ostResult.str("");
+		if(user.GetLogin() == "Guest")
+		{
+			{
+				MESSAGE_DEBUG("", action, "re-login required");
+			}
+
+			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
+		}
+		else
+		{
+			string			template_name = "json_response.htmlt";
+
+			string			requested_status = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("status"));
+			string			sow_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("sow_id"));
+			string			current_period_start_year = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("current_period_start_year"));
+			string			current_period_start_month = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("current_period_start_month"));
+			string			current_period_start_date = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("current_period_start_date"));
+			string			current_period_finish_year = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("current_period_finish_year"));
+			string			current_period_finish_month = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("current_period_finish_month"));
+			string			current_period_finish_date = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("current_period_finish_date"));
+
+			if(sow_id.length() && requested_status.length() && current_period_start_year.length() && current_period_start_month.length() && current_period_start_date.length() && current_period_finish_year.length() && current_period_finish_month.length() && current_period_finish_date.length())
+			{
+				string		error_description = "";
+				string		success_description = "";
+
+				if(isUserAssignedToSoW(user.GetID(), sow_id, &db))
+				{
+					string		period_start = current_period_start_year + "-" + current_period_start_month + "-" + current_period_start_date;
+					string		period_end = current_period_finish_year + "-" + current_period_finish_month + "-" + current_period_finish_date;
+					string		timecard_id = "";
+					string		timecard_status = "";
+					string		agency_id = "";
+
+					timecard_id = GetTimecardID(sow_id, period_start, period_end, &db);
+					timecard_status = GetTimecardStatus(timecard_id, &db);
+					agency_id = GetAgencyID(sow_id, &db);
+
+
+					if(timecard_id.length() && timecard_status.length() && agency_id.length())
+					{
+						int			i = 0;
+						bool		isAgain;
+
+						// --- task aggregation
+						do
+						{
+							string	task = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("task_" + to_string(i)));
+							string	project = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("project_" + to_string(i)));
+							string	customer = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("customer_" + to_string(i)));
+
+							isAgain = false;
+
+							if(task.length() && project.length() && customer.length())
+							{
+								string 		timereports = CheckHTTPParam_Timeentry(indexPage.GetVarsHandler()->Get("timereports_" + to_string(i)));
+
+								isAgain = true;
+
+								if(timereports.length())
+								{
+									bool	isDuplicate = false;
+
+									for (auto& item : itemsList)
+									{
+										if((item.task == task) && (item.project == project) && (item.customer == customer))
+										{
+											MESSAGE_DEBUG("", action, "http post parameter duplicate found (" + customer + " / " + project + " / " + task + ")");
+											isDuplicate = true;
+
+											item.timereports = SummarizeTimereports(item.timereports, timereports);
+										}
+									}
+
+									if(!isDuplicate)
+									{
+										ItemClass	item;
+
+										item.customer = customer;
+										item.project = project;
+										item.task = task;
+										item.timereports = timereports;
+
+										itemsList.push_back(item);
+									}
+								}
+								else
+								{
+									MESSAGE_DEBUG("", action, "emtpy timereport on step " + to_string(i) + "");
+								}
+							}
+							else
+							{
+								MESSAGE_DEBUG("", action, "http post paramters walkthrough: stop on " + to_string(i) + "");
+							}
+
+							++i;
+						} while(isAgain);
+
+
+						// --- save timeentries in DB
+						for(auto item: itemsList)
+						{
+							if(isTimecardEntryEmpty(item.timereports))
+							{
+								MESSAGE_DEBUG("", action, "timecard entry (" + item.timereports + ") is empty, don't add it to DB");
+							}
+							else
+							{
+								string		task_id = GetTaskIDFromSOW(item.customer, item.project, item.task, sow_id, &db);
+								string		timecard_line_id;
+
+								if(task_id.empty())
+								{
+									MESSAGE_DEBUG("", action, "task (" + item.customer + " / " + item.project + " / " + item.task + ") doesn't assigned to SoW (" + sow_id + ")");
+
+									if(isSoWAllowedToCreateTask(sow_id, &db))
+									{
+										if(db.Query("SELECT `start_date`, `end_date` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";"))
+										{
+											string	sow_start_date = db.Get(0, "start_date");
+											string	sow_end_date = db.Get(0, "end_date");
+											string	task_assignment_id = "";
+											bool	notify_about_task_creation = false;
+
+											task_id = GetTaskIDFromAgency(item.customer, item.project, item.task, agency_id, &db);
+											if(task_id.empty())
+											{
+												task_id = CreateTaskBelongsToAgency(item.customer, item.project, item.task, agency_id, &db);
+												notify_about_task_creation = true;
+											}
+											else
+											{
+												MESSAGE_DEBUG("", action, "Customer/Project/Task already exists for this agency.id(" + agency_id + ")");
+											}
+
+											task_assignment_id = CreateTaskAssignment(task_id, sow_id, sow_start_date, sow_end_date, &db, &user);
+
+											if(task_assignment_id.length())
+											{
+												if(notify_about_task_creation)
+												{
+													if(NotifySoWContractPartiesAboutChanges("AJAX_addTask", task_id, sow_id, "", item.task, &db, &user))
+													{
+													}
+													else
+													{
+														MESSAGE_ERROR("", "", "fail to notify SoW parties");
+													}
+												}
+												else
+												{
+													MESSAGE_DEBUG("", "", "no notification about task creation");
+												}
+												if(NotifySoWContractPartiesAboutChanges("AJAX_addTaskAssignment", task_assignment_id, sow_id, "", item.customer + " / " + item.project + " / " + item.task + " ( с " + sow_start_date + " по " + sow_end_date + ")", &db, &user))
+												{
+												}
+												else
+												{
+													MESSAGE_ERROR("", "", "fail to notify SoW parties");
+												}
+											}
+											else
+											{
+												MESSAGE_DEBUG("", action, "fail to create assignment sow.id(" + sow_id + ") task.id(" + task_id + ")");
+												error_description = "Неудалось создать назначение";
+												break;
+											}
+										}
+										else
+										{
+											MESSAGE_ERROR("", action, "sow(" + sow_id + ") start and end period can't be defined");
+											error_description = "Ошибка БД";
+											break;
+										}
+									}
+									else
+									{
+										MESSAGE_ERROR("", action, "SoW(" + sow_id + ") doesn't allows create tasks or consistensy issue");
+										error_description = "SoW не позволяет создавать новые задачи";
+										break;
+									}
+								}
+
+								if((timecard_status == "saved") || (timecard_status == "rejected"))
+								{
+									error_description = isValidToReportTime(timecard_id, task_id, item.timereports, &db, &user);
+									if(error_description.empty())
+									{
+
+									// --- update DB with timeentries
+										timecard_line_id = GetTimecardLineID(timecard_id, task_id, &db);
+										if(timecard_line_id.length())
+										{
+											// --- timeentry exists and need to be updated
+											db.Query("UPDATE `timecard_lines` SET `row`=\"" + item.timereports + "\" WHERE `id`=\"" + timecard_line_id + "\";");
+											if(db.isError())
+											{
+												MESSAGE_ERROR("", action, "DB INSERT issue: (" + db.GetErrorMessage() + ")");
+												error_description = "ошибка БД";
+												break;
+											}
+										}
+										else
+										{
+											// --- timeentry doesn't exists and need to be created
+
+											if(timecard_id.length() && task_id.length())
+											{
+												long int temp;
+
+												temp = db.InsertQuery("INSERT INTO `timecard_lines` SET "
+															"`timecard_id`=\"" + timecard_id + "\","
+															"`timecard_task_id`=\"" + task_id + "\","
+															"`row`=\"" + item.timereports + "\""
+															";");
+												if(!temp)
+												{
+													MESSAGE_ERROR("", action, "DB INSERT issue: (" + db.GetErrorMessage() + ")");
+													error_description = "ошибка БД";
+													break;
+												}
+											}
+										}
+									}
+									else
+									{
+										MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") can't report time to task.id(" + task_id + ") in timecard_id(" + timecard_id + "). Timereport validity failed.");
+										break;
+									}
+								}
+								else if((timecard_status == "submit") || (timecard_status == "approved"))
+								{
+									MESSAGE_DEBUG("", action, "timecard_id(" + timecard_id + ") already submit, you can't change it");
+									error_description = "Таймкарта уже отправлена, изменить нельзя";
+									break;
+								}
+								else
+								{
+									MESSAGE_ERROR("", action, "unknown timecard_id(" + timecard_id + ") status (" + timecard_status + ")");
+									error_description = "Ошибка таймкарты";
+									break;
+								}
+							}
+						}
+					}
+					else
+					{
+						error_description = "Таймкарта не найдена";
+						MESSAGE_ERROR("", action, "timecard_id(" + timecard_id + ") or status (" + timecard_status + ") or agency_id(" + agency_id + ") is empty");
+					}
+
+					// --- updated timecard
+					if(error_description.length())
+					{
+					}
+					else
+					{
+						if((timecard_status == "saved") || (timecard_status == "rejected"))
+						{
+								if(requested_status == "saved")
+								{
+								}
+								else if (requested_status == "submit")
+								{
+									db.Query("UPDATE `timecards` SET `status`=\"submit\", `submit_date`=UNIX_TIMESTAMP() WHERE `id`=\"" + timecard_id + "\";");
+									if(!db.isError())
+									{
+										// --- auto_approve
+										// --- UNIX_TIMESTAMP() + 1 needed to make visibility that approve been done after submission
+										db.Query("INSERT INTO `timecard_approvals` (`timecard_id`, `approver_id`, `decision`, `comment`, `eventTimestamp`) "
+														"SELECT \"" + timecard_id + "\", `id`, \"approved\", \"auto-approve\",UNIX_TIMESTAMP()+1 FROM `timecard_approvers` WHERE `contract_sow_id`=\"" + sow_id + "\" AND `auto_approve`=\"Y\"");
+
+
+										if(SubmitTimecard(timecard_id, &db, &user))
+										{
+											success_description = GetTimecardsSOWTaskAssignement_Reusable_InJSONFormat(current_period_start_year + "-" + current_period_start_month + "-" + current_period_start_date, &db, &user);
+										}
+										else
+										{
+											error_description = "ошибка отправки таймкарты";
+											MESSAGE_ERROR("", action, "fail to submit timecard_id(" + timecard_id + ")");
+										}
+									}
+									else
+									{
+										error_description = "ошибка обновления таймкарты";
+										MESSAGE_ERROR("", action, "fail to update timecards table with timecard_id(" + timecard_id + ")");
+									}
+								}
+								else
+								{
+									MESSAGE_ERROR("", action, "unknown requested timecard status(" + requested_status + ")")
+								}
+						}
+						else if((timecard_status == "submit") || (timecard_status == "approved"))
+						{
+							MESSAGE_DEBUG("", action, "timecard_id(" + timecard_id + ") already submit, you can't change it");
+							error_description = "Таймкарта уже отправлена, изменить нельзя";
+						}
+						else
+						{
+							MESSAGE_ERROR("", action, "unknown timecard_id(" + timecard_id + ") status (" + timecard_status + ")");
+							error_description = "Ошибка таймкарты";
+						}
+					}
+
+					if(error_description.length())
+						ostResult << "{\"result\":\"error\", \"description\":\"" + error_description + "\"}";
+					else
+						ostResult << "{\"result\":\"success\"" + (success_description.length() ? ", " + success_description : "") + "}";
+				}
+				else
+				{
+					MESSAGE_ERROR("", action, "SoW(" + sow_id + ") is not assigned to the user(" + user.GetID() + ") company");
+
+					ostResult << "{\"result\":\"error\",\"description\":\"Данный SoW подписан не с Вами\"}";
+				}
+			}
+			else
+			{
+				MESSAGE_ERROR("", action, "mandatory parameter missed (" +
+											"sow_id:" + sow_id +
+											"status:" + requested_status +
+											"current_period_start_year:" + current_period_start_year +
+											"current_period_start_month:" + current_period_start_month +
+											"current_period_start_date:" + current_period_start_date +
+											"current_period_finish_year:" + current_period_finish_year +
+											"current_period_finish_month:" + current_period_finish_month +
+											"current_period_finish_date:" + current_period_finish_date + ")");
+
+				ostResult << "{\"result\":\"error\",\"description\":\"Пропущены обязательные параметры\"}";
+			}
+
+			indexPage.RegisterVariableForce("result", ostResult.str());
+
+			if(!indexPage.SetTemplate(template_name))
+			{
+				MESSAGE_ERROR("", action, "can't find template " + template_name);
+			} // if(!indexPage.SetTemplate("my_network.htmlt"))
+		}
+
+
+		{
+			MESSAGE_DEBUG("", action, "finish");
+		}
+	}
+
+	if(action == "AJAX_getAutocompleteCustomerList")
+	{
+		string			strPageToGet, strFriendsOnSinglePage;
+		ostringstream	ostResult;
+
+		{
+			MESSAGE_DEBUG("", action, "start");
+		}
+
+		ostResult.str("");
+		if(user.GetLogin() == "Guest")
+		{
+			{
+				MESSAGE_DEBUG("", action, "re-login required");
+			}
+
+			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
+		}
+		else
+		{
+			string		template_name = "json_response.htmlt";
+			string		sow_id;
+			string		lookForKey;
+
+			sow_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("sow_id"));
+			lookForKey = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("lookForKey"));
+
+			if(sow_id.length() && lookForKey.length())
+			{
+
+				if(db.Query("SELECT `id` FROM `company` WHERE `admin_userID`=\"" + user.GetID() + "\" AND `id` IN (SELECT `subcontractor_company_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\");"))
+				{
+					string		items = "";
+					string		company_id = "";
+
+					company_id = db.Get(0, "id");
+
+					items = GetTimecardCustomersInJSONFormat(
+								"SELECT * FROM `timecard_customers` WHERE `title` LIKE \"%" + lookForKey + "%\" AND "
+									"`id` IN (SELECT `timecard_customers_id` FROM `timecard_projects` WHERE "
+										"`id` IN (SELECT `timecard_projects_id` FROM `timecard_tasks` WHERE "
+											"`id` IN (SELECT `timecard_tasks_id` FROM `timecard_task_assignment` WHERE `contract_sow_id`=\"" + sow_id + "\")))", &db, &user);
+
+					ostResult << "{\"status\":\"success\",\"items\":[" + items + "]}";
+				}
+				else
+				{
+					MESSAGE_ERROR("", action, "company not found");
+					ostResult << "{\"status\":\"error\",\"description\":\"Не найдена компания с которой заключен этот договор\"}";
+				}
+			}
+			else
+			{
+				{
+					MESSAGE_ERROR("", action, "lookForKey or sow_id is missed");
+				}
+				ostResult << "{\"status\":\"error\",\"description\":\"Пропущены обязательные параметры. Обратитьесь в тех. поддержку\"}";
+			}
+
+			indexPage.RegisterVariableForce("result", ostResult.str());
+
+			if(!indexPage.SetTemplate(template_name))
+			{
+				MESSAGE_ERROR("", action, "can't find template " + template_name);
+			}
+		}
+
+
+		{
+			MESSAGE_DEBUG("", action, "finish");
+		}
+	}
+
+	if(action == "AJAX_getDashboardData")
+	{
+		string			strPageToGet, strFriendsOnSinglePage;
+		ostringstream	ostResult;
+
+		{
+			MESSAGE_DEBUG("", action, "start");
+		}
+
+		ostResult.str("");
+		if(user.GetLogin() == "Guest")
+		{
+			{
+				MESSAGE_DEBUG("", action, "re-login required");
+			}
+
+			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
+		}
+		else
+		{
+			string		template_name = "json_response.htmlt";
+			int			affected = db.Query("SELECT `id` FROM `company` WHERE `admin_userID`=\"" + user.GetID() + "\";");
+
+			if(affected)
+			{
+				string		companies_list= "";
+				bool		successFlag = true;
+				string		rejected_timecards = "";
+				string		rejected_bt = "";
+
+				for(int i = 0; i < affected; ++i)
+				{
+					if(companies_list.length()) companies_list += ",";
+					companies_list += db.Get(i, "id");
+				}
+
+				// --- gather failed timecards
+				rejected_timecards = GetTimecardsInJSONFormat("SELECT * FROM `timecards` WHERE `status`=\"rejected\" AND `contract_sow_id` IN (SELECT `id` FROM `contracts_sow` WHERE `subcontractor_company_id` IN (" + companies_list + "));", &db, &user, false);
+				// --- gather failed bt
+				rejected_bt = GetBTsInJSONFormat("SELECT * FROM `bt` WHERE `status`=\"rejected\" AND `contract_sow_id` IN (SELECT `id` FROM `contracts_sow` WHERE `subcontractor_company_id` IN (" + companies_list + "));", &db, &user, false);
+
+				if(successFlag)
+				{
+					ostResult << "{"
+									"\"status\":\"success\","
+									"\"rejected_timecards\":[" << rejected_timecards << "],"
+									"\"rejected_bt\":[" << rejected_bt << "]"
+								"}";
+				}
+				else
+				{
+					MESSAGE_ERROR("", action, "dashboard data not gathered completely");
+					ostResult << "{\"status\":\"error\",\"description\":\"Ошибка построения панели управления\"}";
+				}
+			}
+			else
+			{
+				MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't owns company");
+				ostResult << "{\"status\":\"error\",\"description\":\"Вы не создали компанию\"}";
+			}
+
+			indexPage.RegisterVariableForce("result", ostResult.str());
+
+			if(!indexPage.SetTemplate(template_name))
+			{
+				MESSAGE_ERROR("", action, "can't find template " + template_name);
+			}
+		}
+
+
+		{
+			MESSAGE_DEBUG("", action, "finish");
+		}
+	}
+
+	if(action == "AJAX_submitBT")
+	{
+		string			strPageToGet, strFriendsOnSinglePage;
+		ostringstream	ostResult;
+
+		{
+			MESSAGE_DEBUG("", action, "start");
+		}
+
+		ostResult.str("");
+		if(user.GetLogin() == "Guest")
+		{
+			{
+				MESSAGE_DEBUG("", action, "re-login required");
+			}
+
+			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
+		}
+		else
+		{
+			string					template_name = "json_response.htmlt";
+			string					error_message = "";
+			CVars					*http_params = indexPage.GetVarsHandler();
+			string					expense_random_name;
+			string					expense_line_random_name;
+			regex					regex1("expense_item_random_");
+			regex					regex2("expense_item_doc_random_");
+			C_BT					bt;
+			vector<C_Expense>		expenses;
+
+			bt.SetDB			(&db);
+			bt.SetUser			(&user);
+			bt.SetID			(CheckHTTPParam_Number	(http_params->Get("bt_id")));
+			bt.SetSowID			(CheckHTTPParam_Number	(http_params->Get("sow_id")));
+			bt.SetDestination	(CheckHTTPParam_Text	(http_params->Get("destination")));
+			bt.SetPurpose		(CheckHTTPParam_Text	(http_params->Get("bt_purpose")));
+			bt.SetStartDate		(CheckHTTPParam_Date	(http_params->Get("bt_start_date")));
+			bt.SetEndDate		(CheckHTTPParam_Date	(http_params->Get("bt_end_date")));
+			bt.SetAction		(CheckHTTPParam_Text	(http_params->Get("action_type")));
+	
+			expense_random_name = http_params->GetNameByRegex(regex1);
+			while(expense_random_name.length() && error_message.empty())
+			{
+				string expense_random = CheckHTTPParam_Number(http_params->Get(expense_random_name));
+
+				if(expense_random.length())
+				{
+					C_Expense	expense;
+
+					expense.SetRandom				(expense_random);
+					expense.SetID					(CheckHTTPParam_Number	(http_params->Get("bt_expense_id_" + expense_random)));
+					expense.SetDate					(CheckHTTPParam_Date	(http_params->Get("expense_item_date_" + expense_random)));
+					expense.SetPaymentType			(CheckHTTPParam_Text	(http_params->Get("expense_item_payment_type_" + expense_random)));
+					expense.SetExpenseTemplateID	(CheckHTTPParam_Number	(http_params->Get("expense_item_type_" + expense_random)));
+					expense.SetComment				(CheckHTTPParam_Text	(http_params->Get("expense_item_comment_" + expense_random)));
+					expense.SetPriceDomestic		(CheckHTTPParam_Float	(http_params->Get("expense_item_price_domestic_" + expense_random)));
+					expense.SetPriceForeign			(CheckHTTPParam_Float	(http_params->Get("expense_item_price_foreign_" + expense_random)));
+					expense.SetCurrencyNominal		(CheckHTTPParam_Number	(http_params->Get("expense_item_currency_nominal_" + expense_random)));
+					expense.SetCurrencyName			(CheckHTTPParam_Text	(http_params->Get("expense_item_currency_name_" + expense_random)));
+					expense.SetCurrencyValue		(CheckHTTPParam_Float	(http_params->Get("expense_item_currency_value_" + expense_random)));
+
+					expenses.push_back(expense);
+					bt.AddExpense(expense);
+				}
+				else
+				{
+					error_message = "некорректный параметер random у растраты";
+					MESSAGE_ERROR("", action, "Can't convert expense_random(" + http_params->Get(expense_random_name) + ") to number")
+				}
+
+				http_params->Delete(expense_random_name);
+				expense_random_name = http_params->GetNameByRegex(regex1);
+			}
+
+			expense_line_random_name = http_params->GetNameByRegex(regex2);
+			while(expense_line_random_name.length() && error_message.empty())
+			{
+				string expense_line_random = CheckHTTPParam_Number(http_params->Get(expense_line_random_name));
+
+				if(expense_line_random.length())
+				{
+					C_ExpenseLine	expense_line;
+					string			parent_random = 	CheckHTTPParam_Number	(http_params->Get("expense_item_parent_random_" + expense_line_random));
+
+					if(parent_random.length())
+					{
+						string		dom_type = 			CheckHTTPParam_Text	(http_params->Get("expense_item_doc_dom_type_" + expense_line_random));
+
+						if((dom_type == "image") || (dom_type == "input"))
+						{
+							expense_line.SetRandom					(expense_line_random);
+							expense_line.SetParentRandom			(parent_random);
+							expense_line.SetID						(CheckHTTPParam_Number	(http_params->Get("expense_line_id_" + expense_line_random)));
+							expense_line.SetExpenseLineTemplateID	(CheckHTTPParam_Number	(http_params->Get("expense_item_doc_id_" + expense_line_random)));
+							expense_line.SetComment					(CheckHTTPParam_Text	(http_params->Get("expense_item_doc_comment_" + expense_line_random)));
+
+							if(dom_type == "input")
+								expense_line.SetValue				(CheckHTTPParam_Text	(http_params->Get("expense_item_doc_main_field_" + expense_line_random)));
+							if(dom_type == "image")
+							{
+								string		path_to_file = "";
+								int			file_size = indexPage.GetFilesHandler()->GetSize("expense_item_doc_main_field_" + expense_line_random + ".jpg");
+
+								if(file_size > 0)
+								{
+									// --- take care of an image file
+									MESSAGE_DEBUG("", action, "expense_item_doc_main_field_" + expense_line_random + ".jpg file size is " + to_string(file_size));
+									path_to_file = SaveImageFileFromHandler("expense_item_doc_main_field_" + expense_line_random + ".jpg", "expense_line", indexPage.GetFilesHandler());
+									expense_line.SetValue(path_to_file);
+
+									if(path_to_file.length())
+									{
+										MESSAGE_DEBUG("", action, "image to expense_line(random = " + expense_line_random + ") uploaded to " + path_to_file + "");
+									}
+								}
+								else
+								{
+									MESSAGE_DEBUG("", action, "file to expense_line(random = " + expense_line_random + ") not uploaded");
+								}
+							}
+
+							if(bt.AssignExpenseLineByParentRandom(expense_line))
+							{
+							}
+							else
+							{
+								error_message = "неполучилось определить принажделжность док-та";
+								MESSAGE_ERROR("", action, "AssignLineToExpenseByRandom fail");
+							}
+						}
+						else
+						{
+							error_message = "некорректный тип основного док-та";
+							MESSAGE_ERROR("", action, "primary doc-t wrong type(" + dom_type + ")");
+						}
+					}
+					else
+					{
+						error_message = "невозможно определить принажделжность документа";
+						MESSAGE_ERROR("", action, "parent expense.id missed for expense_line.rand(" + expense_line_random + ")");
+					}
+				}
+				else
+				{
+					error_message = "некорректный параметер random у док-та";
+					MESSAGE_ERROR("", action, "Can't convert expense_line_random(" + http_params->Get(expense_random_name) + ") to number")
+				}
+
+				http_params->Delete(expense_line_random_name);
+				expense_line_random_name = http_params->GetNameByRegex(regex2);
+			}
+
+			if(error_message.empty())
+			{
+				error_message = bt.CheckValidity();
+				if(error_message.empty())
+				{
+					// --- update DB
+					error_message = bt.SaveToDB();
+					if(error_message.length()) MESSAGE_ERROR("", action, "fail saving BT to DB");
+					
+				}
+				else
+				{
+					MESSAGE_DEBUG("", action, "BT validity chack failed");
+				}
+			}
+
+			{
+				ostringstream	ost;
+
+				ost.str("");
+				ost << bt;
+				MESSAGE_DEBUG("", action, "C_BT obj dump: " + ost.str());
+			}
+
+			if(error_message.empty())
+			{
+				ostResult << "{\"status\":\"success\"}";
+			}
+			else
+			{
+				MESSAGE_DEBUG("", action, "business trip validity check failed");
+
+				if(bt.RemoveUnsavedLinesImages())
+				{
+				}
+				else
+				{
+					MESSAGE_ERROR("", action, "fail to remove unsaved images");
+				}
+
+				ostResult << "{\"status\":\"error\",\"description\":\"" + error_message + "\"}";
+			}
+
+			indexPage.RegisterVariableForce("result", ostResult.str());
+
+			if(!indexPage.SetTemplate(template_name))
+			{
+				MESSAGE_ERROR("", action, "can't find template " + template_name);
+			}
+		}
+
+		{
+			MESSAGE_DEBUG("", action, "finish");
+		}
+	}
+
+	if(action == "AJAX_removeExpense")
+	{
+		string			strPageToGet, strFriendsOnSinglePage;
+		ostringstream	ostResult;
+
+		{
+			MESSAGE_DEBUG("", action, "start");
+		}
+
+		ostResult.str("");
+		if(user.GetLogin() == "Guest")
+		{
+			{
+				MESSAGE_DEBUG("", action, "re-login required");
+			}
+
+			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
+		}
+		else
+		{
+			string					template_name = "json_response.htmlt";
+			string 					expense_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("bt_expense_id"));
+			string					error_message = "";
+
+			if(expense_id.length())
+			{
+				if(db.Query("SELECT `bt_id` FROM `bt_expenses` WHERE `id`=\"" + expense_id + "\";"))
+				{
+					string		bt_id = db.Get(0, "bt_id");
+
+					if(db.Query("SELECT `status`, `contract_sow_id` FROM `bt` WHERE `id`= \"" + bt_id + "\";"))
+					{
+						string	contract_sow_id = db.Get(0, "contract_sow_id");
+						string	status = db.Get(0, "status");
+
+						if((status != "approved"))
+						{
+
+							if(db.Query(
+								"SELECT `id` FROM `company` WHERE `admin_userID`=\"" + user.GetID() + "\" AND `id` IN ("
+									"SELECT `subcontractor_company_id` FROM `contracts_sow` WHERE `id`=\"" + contract_sow_id + "\""
+								")"
+							))
+							{
+								int		expense_count = db.Query("SELECT `id` FROM `bt_expenses` WHERE `bt_id`=\"" + bt_id + "\";");
+
+								if(expense_count > 1)
+								{
+									// --- remove expense
+
+									int affected = db.Query(
+										"SELECT `bt_expense_lines`.`value` as `value`, `bt_expense_line_templates`.`dom_type` as `dom_type` FROM `bt_expense_lines` "
+										"INNER JOIN `bt_expense_line_templates` on `bt_expense_lines`.`bt_expense_line_template_id`=`bt_expense_line_templates`.`id` "
+										"WHERE `bt_expense_id`=\"" + expense_id + "\";"
+										);
+									for(int i = 0; i < affected; ++i)
+									{
+										string value = db.Get(i, "value");
+										string dom_type = db.Get(i, "dom_type");
+
+										if((dom_type == "image") && (value.length()))
+										{
+											MESSAGE_DEBUG("", action, "remove image (" + IMAGE_EXPENSELINES_DIRECTORY + "/" + value + ")");
+											unlink((IMAGE_EXPENSELINES_DIRECTORY + "/" + value).c_str());
+										}
+									}
+
+									db.Query("DELETE FROM `bt_expense_lines` WHERE `bt_expense_id`=\"" + expense_id + "\";");
+									db.Query("DELETE FROM `bt_expenses` WHERE `id`=\"" + expense_id + "\";");
+								}
+								else
+								{
+									error_message = "Нельзя удалять единственный расход";
+									MESSAGE_DEBUG("", action, "bt.id() have single bt_expense.id(" + expense_id + "), prohibited to remove single expense");
+								}
+
+							}
+							else
+							{
+								error_message = "У вас нет прав на удаление";
+								MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") can't remove bt_expense.id(" + expense_id + ")");
+							}
+						}
+						else
+						{
+							error_message = "Нельзя менять подтвержденный отчет";
+							MESSAGE_DEBUG("", action, "bt.id(" + bt_id + ") can't be changed, because it approved");
+						}
+					}
+					else
+					{
+						error_message = "Отчет которому принадлежит расход не найден";
+						MESSAGE_DEBUG("", action, "bt.id not found by bt_expense.id(" + expense_id + ")");
+					}
+
+				}
+				else
+				{
+					error_message = "Расход не найден";
+					MESSAGE_DEBUG("", action, "bt_expense.id(" + expense_id + ") not found");
+				}
+
+			}
+			else
+			{
+				error_message = "Неизвестный идентификатор удаления";
+				MESSAGE_DEBUG("", action, "HTTP param expense.id is not a number");
+			}
+
+			if(error_message.empty())
+			{
+				ostResult << "{\"status\":\"success\"}";
+			}
+			else
+			{
+				MESSAGE_DEBUG("", action, "bt_expense(" + expense_id + ") removal failed");
+				ostResult << "{\"status\":\"error\",\"description\":\"" + error_message + "\"}";
+			}
+
+			indexPage.RegisterVariableForce("result", ostResult.str());
+
+			if(!indexPage.SetTemplate(template_name))
+			{
+				MESSAGE_ERROR("", action, "can't find template " + template_name);
+			}
+		}
+
+		{
+			MESSAGE_DEBUG("", action, "finish");
+		}
+	}
+
+	if(action == "AJAX_removeBT")
+	{
+		string			strPageToGet, strFriendsOnSinglePage;
+		ostringstream	ostResult;
+
+		{
+			MESSAGE_DEBUG("", action, "start");
+		}
+
+		ostResult.str("");
+		if(user.GetLogin() == "Guest")
+		{
+			{
+				MESSAGE_DEBUG("", action, "re-login required");
+			}
+
+			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
+		}
+		else
+		{
+			string					template_name = "json_response.htmlt";
+			string 					bt_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("bt_id"));
+			string					error_message = "";
+
+			if(bt_id.length())
+			{
+				if(db.Query("SELECT `status`, `contract_sow_id` FROM `bt` WHERE `id`= \"" + bt_id + "\";"))
+				{
+					string	contract_sow_id = db.Get(0, "contract_sow_id");
+					string	status = db.Get(0, "status");
+
+					if((status != "approved"))
+					{
+
+						if(db.Query(
+							"SELECT `id` FROM `company` WHERE `admin_userID`=\"" + user.GetID() + "\" AND `id` IN ("
+								"SELECT `subcontractor_company_id` FROM `contracts_sow` WHERE `id`=\"" + contract_sow_id + "\""
+							")"
+						))
+						{
+							{
+								// --- remove expense
+
+								int affected = db.Query(
+									"SELECT `bt_expense_lines`.`value` as `value`, `bt_expense_line_templates`.`dom_type` as `dom_type` FROM `bt_expense_lines` "
+									"INNER JOIN `bt_expense_line_templates` on `bt_expense_lines`.`bt_expense_line_template_id`=`bt_expense_line_templates`.`id` "
+									"WHERE `bt_expense_id` IN ( "
+										" SELECT `id` FROM `bt_expenses` WHERE `bt_id`=\"" + bt_id + "\" "
+									");"
+									);
+								for(int i = 0; i < affected; ++i)
+								{
+									string value = db.Get(i, "value");
+									string dom_type = db.Get(i, "dom_type");
+
+									if((dom_type == "image") && (value.length()))
+									{
+										MESSAGE_DEBUG("", action, "remove image (" + IMAGE_EXPENSELINES_DIRECTORY + "/" + value + ")");
+										unlink((IMAGE_EXPENSELINES_DIRECTORY + "/" + value).c_str());
+									}
+								}
+
+								db.Query("DELETE FROM `bt_expense_lines` WHERE `bt_expense_id` IN ( "
+											" SELECT `id` FROM `bt_expenses` WHERE `bt_id`=\"" + bt_id + "\" "
+										");");
+								db.Query("DELETE FROM `bt_expenses` WHERE `bt_id`=\"" + bt_id + "\";");
+								db.Query("DELETE FROM `bt` WHERE `id`=\"" + bt_id + "\";");
+								db.Query("DELETE FROM `bt_approvals` WHERE `bt_id`=\"" + bt_id + "\";");
+							}
+						}
+						else
+						{
+							error_message = "У вас нет прав на удаление";
+							MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") can't remove bt.id(" + bt_id + ")");
+						}
+					}
+					else
+					{
+						error_message = "Нельзя удалить подтвержденный отчет";
+						MESSAGE_DEBUG("", action, "bt.id(" + bt_id + ") can't be куьщмув, because it approved");
+					}
+				}
+				else
+				{
+					error_message = "Отчет  не найден";
+					MESSAGE_DEBUG("", action, "bt.id(" + bt_id + ") not found");
+				}
+			}
+			else
+			{
+				error_message = "Неизвестный идентификатор удаления";
+				MESSAGE_DEBUG("", action, "HTTP param expense.id is not a number");
+			}
+
+			if(error_message.empty())
+			{
+				ostResult << "{\"status\":\"success\"}";
+			}
+			else
+			{
+				MESSAGE_DEBUG("", action, "bt.id(" + bt_id + ") removal failed");
+				ostResult << "{\"status\":\"error\",\"description\":\"" + error_message + "\"}";
+			}
+
+			indexPage.RegisterVariableForce("result", ostResult.str());
+
+			if(!indexPage.SetTemplate(template_name))
+			{
+				MESSAGE_ERROR("", action, "can't find template " + template_name);
+			}
+		}
+
+		{
+			MESSAGE_DEBUG("", action, "finish");
+		}
+	}
+
+	{
+		MESSAGE_DEBUG("", "", "post-condition if(action == \"" + action + "\")");
+	}
+
+	indexPage.OutTemplate();
+
+	}
+/*
+	catch(CExceptionRedirect &c) {
+		{
+			MESSAGE_DEBUG("", "", "catch CRedirectHTML: exception used for redirection");
+		}
+
+		c.SetDB(&db);
+
+		if(!indexPage.SetTemplate(c.GetTemplate()))
+		{
+			MESSAGE_ERROR("", "", "catch CRedirectHTML: ERROR, template redirect.htmlt not found");
+			throw CException("Template file was missing");
+		}
+
+		indexPage.RegisterVariableForce("content", "redirect page");
+		indexPage.OutTemplate();
+
+	}
+*/
+	catch(CExceptionHTML &c)
+	{
+
+		c.SetLanguage(indexPage.GetLanguage());
+		c.SetDB(&db);
+		MESSAGE_DEBUG("", action, "catch CExceptionHTML: DEBUG exception reason: [" + c.GetReason() + "]");
+
+		if(!indexPage.SetTemplate(c.GetTemplate()))
+		{
+			return(-1);
+		}
+		indexPage.RegisterVariable("content", c.GetReason());
+		indexPage.OutTemplate();
+		return(0);
+	}
+	catch(CException &c)
+	{
+		if(!indexPage.SetTemplateFile("templates/error.htmlt"))
+		{
+			return(-1);
+		}
+		{
+			MESSAGE_ERROR("", action, "catch CException: exception: ERROR  " + c.GetReason());
+		}
+
+		indexPage.RegisterVariable("content", c.GetReason());
+		indexPage.OutTemplate();
+		return(-1);
+	}
+	catch(exception& e)
+	{
+		{
+			MESSAGE_ERROR("", action, "catch(exception& e): catch standard exception: ERROR  " + e.what());
+		}
+
+		if(!indexPage.SetTemplateFile("templates/error.htmlt"))
+		{
+			return(-1);
+		}
+		indexPage.RegisterVariable("content", e.what());
+		indexPage.OutTemplate();
+		return(-1);
+	}
+
+	return(0);
+}
