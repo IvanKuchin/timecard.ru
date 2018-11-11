@@ -22,15 +22,20 @@ option(MAXMIND_DISABLE		"turn off GeoIP" OFF)
 option(FFPMPEG_DISABLE		"turn off VideoConverter" OFF)
 
 # --- Set required variables
+# ---- build variables
+set(CRON_PROJECT_DIR	${PROJECT_BINARY_DIR}/share/${PROJECT_NAME}/cron)
+set(ARCHIVE_PROJECT_DIR	${PROJECT_BINARY_DIR}/share/${PROJECT_NAME}/archive)
+set(MAXMIND_PROJECT_DIR	${PROJECT_BINARY_DIR}/share/${PROJECT_NAME}/maxmind)
+
+# ---- install variables
 set(ROOTDIR		"/home/httpd/dev.${PROJECT_NAME}")
 set(IMAGEROOTDIR	"/home/httpd/devimages.${PROJECT_NAME}")
 set(LOGDIR		"/home/ikuchin/src_logs/")
 set(CGIDIR		${ROOTDIR}/cgi-bin)
 set(CGIADMINDIR		${ROOTDIR}/cgi-bin/admin)
-set(CRONDIR		${PROJECT_BINARY_DIR}/share/${PROJECT_NAME}/cron)
-set(ARCHIVEDIR		${PROJECT_BINARY_DIR}/share/${PROJECT_NAME}/archive)
-set(MAXMINDDIR		${PROJECT_BINARY_DIR}/share/${PROJECT_NAME}/maxmind)
-
+set(CRON_INSTALL_DIR	${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}/cron)
+set(ARCHIVE_INSTALL_DIR	${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}/archive)
+set(MAXMIND_INSTALL_DIR	${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}/maxmind)
 
 add_subdirectory(src/)
 add_subdirectory(supplemental/cron/)
@@ -42,7 +47,7 @@ add_subdirectory(tests/)
 
 # --- CPack
 include(InstallRequiredSystemLibraries)
-set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/License.txt")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
 set(CPACK_PACKAGE_VERSION_MAJOR "${My_VERSION_MAJOR}")
 set(CPACK_PACKAGE_VERSION_MINOR "${My_VERSION_MINOR}")
 
