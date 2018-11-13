@@ -151,8 +151,8 @@ install(TARGETS system.cgi			DESTINATION		${CGIDIR})
 install(TARGETS ajax_anyrole_1.cgi		DESTINATION		${CGIDIR})
 install(TARGETS admin.cgi			DESTINATION		${CGIADMINDIR})
 
-install(TARGETS cron_daily			DESTINATION		${CRONDIR})
-install(TARGETS cron_minute			DESTINATION		${CRONDIR})
+install(TARGETS cron_daily			DESTINATION		${CRON_INSTALL_DIR})
+install(TARGETS cron_minute			DESTINATION		${CRON_INSTALL_DIR})
 
 # --- MACROSes start ---
 
