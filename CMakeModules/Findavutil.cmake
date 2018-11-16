@@ -5,7 +5,9 @@
 # AVUTIL_INCLUDE_DIR, where to find avutil.h
 #
 
-set( AVUTIL_FOUND "NO" )
+message("-- looking for libavutil-dev")
+
+set( AVUTIL_FOUND OFF )
 
 find_path( AVUTIL_INCLUDE_DIR libavutil/avutil.h
   HINTS
@@ -45,3 +47,8 @@ find_library( AVUTIL_LIBRARY
 set( AVUTIL_FOUND "YES" )
 
 #message( "AVUTIL_LIBRARY is ${AVUTIL_LIBRARY}" )
+
+if(AVUTIL_FOUND)
+else()
+    message(FATAL_ERROR "ERROR: libavutil-dev not installed")
+endif()

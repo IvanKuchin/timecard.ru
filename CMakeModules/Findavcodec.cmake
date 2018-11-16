@@ -5,7 +5,9 @@
 # AVCODEC_INCLUDE_DIR, where to find avcodec.h
 #
 
-set( AVCODEC_FOUND "NO" )
+message("-- looking for libavcodec-dev")
+
+set( AVCODEC_FOUND OFF )
 
 find_path( AVCODEC_INCLUDE_DIR libavcodec/avcodec.h
   HINTS
@@ -45,3 +47,8 @@ find_library( AVCODEC_LIBRARY
 set( AVCODEC_FOUND "YES" )
 
 #message( "AVCODEC_LIBRARY is ${AVCODEC_LIBRARY}" )
+
+if(AVCODEC_FOUND)
+else()
+    message(FATAL_ERROR "ERROR: libavcodec-dev not installed")
+endif()

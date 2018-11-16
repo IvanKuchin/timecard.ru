@@ -5,7 +5,9 @@
 # AVFORMAT_INCLUDE_DIR, where to find avformat.h
 #
 
-set( AVFORMAT_FOUND "NO" )
+message("-- looking for libavformat-dev")
+
+set( AVFORMAT_FOUND OFF )
 
 find_path( AVFORMAT_INCLUDE_DIR libavformat/avformat.h
   HINTS
@@ -45,3 +47,8 @@ find_library( AVFORMAT_LIBRARY
 set( AVFORMAT_FOUND "YES" )
 
 # message( "AVFORMAT_LIBRARY is ${AVFORMAT_LIBRARY}" )
+
+if(AVFORMAT_FOUND)
+else()
+    message(FATAL_ERROR "ERROR: libavformat-dev not installed")
+endif()
