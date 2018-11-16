@@ -61,6 +61,7 @@ if(FFPMPEG_DISABLE)
     message("Videoconverter/ffmpeg turned off")
 else(FFPMPEG_DISABLE)
     find_package(avutil REQUIRED)
+    find_package(avcodec REQUIRED)
     find_package(avformat REQUIRED)
 endif(FFPMPEG_DISABLE)
 
