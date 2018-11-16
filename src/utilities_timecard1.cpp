@@ -4476,7 +4476,11 @@ string GetAgencyObjectInJSONFormat(string agency_id, bool include_tasks, bool in
 																				"SELECT `id` FROM `timecard_projects` WHERE `timecard_customers_id` IN ("
 																					"SELECT `id` FROM `timecard_customers` WHERE `agency_company_id`=\"" + agency_id + "\""
 																				")"
-																			");", db, user) : "") + "]"
+																			");", db, user) : "") + "],"
+							
+							"\"bt_expense_templates\":[" + ( include_bt ? 
+																			GetBTExpenseTemplatesInJSONFormat("SELECT * FROM `bt_expense_templates` WHERE `agency_company_id`=\"" + agency_id + "\";", db, user)
+																			 : "") + "]"
 						"}";
 
 		}
