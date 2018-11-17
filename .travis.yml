@@ -20,4 +20,4 @@ addons:
     - pkg-config
 
 script:
-    - mkdir build && cd build && cmake -DMAXMIND_DISABLE:BOOL=ON .. && make && ctest
+    - mkdir build && cd build && cmake -DMAXMIND_DISABLE=TRUE .. && make && ctest
