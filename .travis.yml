@@ -1,6 +1,6 @@
 language: c++
 sudo: disabled
-#dist: xenial
+dist: xenial
 os:
 - linux
 before_install:
