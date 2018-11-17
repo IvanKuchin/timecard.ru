@@ -1,0 +1,13 @@
+language: c++
+sudo: disabled
+dist: xenial
+os:
+    - linux
+addons:
+    apt:
+	packages:
+	    graphicsmagick-libmagick-dev-compat libgraphicsmagick++1-dev libwebp-dev libmaxminddb-dev libmysqlclient-dev libssl-dev libavutil-dev libavcodec-dev libavformat-dev libcurl4-openssl-dev build-essential pkg-config
+
+script:
+    - mkdir build && cd build && cmake .. && make
+    - ctest
