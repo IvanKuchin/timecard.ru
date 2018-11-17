@@ -1,5 +1,5 @@
 sudo: disable
-language: c++
+language: cpp
 dist: xenial
 
 before_install:
@@ -13,11 +13,11 @@ addons:
     - graphicsmagick-libmagick-dev-compat
     - libgraphicsmagick++-dev
     - libwebp-dev
-#    - libmaxminddb-dev
+    - libmaxminddb-dev
     - libmysqlclient-dev
     - libssl-dev
     - libcurl4-openssl-dev
     - pkg-config
 
 script:
-    - mkdir build && cd build && cmake -DMAXMIND_DISABLE=TRUE .. && make && ctest
+    - mkdir build && cd build && cmake .. && make && ctest
