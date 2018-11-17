@@ -54,7 +54,8 @@ find_package(LibWebSockets REQUIRED)
 if(IMAGEMAGICK_DISABLE)
     message("Magick++ turned off")
 else(IMAGEMAGICK_DISABLE)
-    find_package(ImageMagick COMPONENTS Magick++)
+#    find_package(ImageMagick COMPONENTS Magick++)
+    find_package(ImageMagick REQUIRED)
 endif(IMAGEMAGICK_DISABLE)
 
 if(FFPMPEG_DISABLE)
@@ -76,7 +77,8 @@ include_directories(
     ${PROJECT_BINARY_DIR}/src/include/ # --- rendered config.h, generated table.h
     ${LIBMYSQLCLIENT_INCLUDE_DIRS}
     ${OPENSSL_INCLUDE_DIR}
-    ${ImageMagick_INCLUDE_DIRS}
+#    ${ImageMagick_INCLUDE_DIRS}
+    ${IMAGEMAGICK_INCLUDE_DIR}
     ${CURL_INCLUDE_DIR}
     ${AVUTIL_INCLUDE_DIR}
     ${AVFORMAT_INCLUDE_DIR}
@@ -89,7 +91,8 @@ link_directories(
 link_libraries(
     ${LIBMYSQLCLIENT_LIBRARIES}
     ${OPENSSL_CRYPTO_LIBRARIES}
-    ${ImageMagick_LIBRARIES}
+#    ${ImageMagick_LIBRARIES}
+    ${IMAGEMAGICK_LIBRARY}
     ${CURL_LIBRARIES}
     ${AVUTIL_LIBRARY}
     ${AVFORMAT_LIBRARY}
