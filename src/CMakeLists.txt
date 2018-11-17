@@ -9,7 +9,7 @@ set(EXECUTABLE_CGIs
     imageuploader.cpp
     system.cpp
     ajax_anyrole_1.cpp
-#    admin.cpp
+    admin.cpp
     )
 
 # --- Libraries
