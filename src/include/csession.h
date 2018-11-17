@@ -3,8 +3,11 @@
 
 using namespace std;
 
-#include <sys/time.h>
+#ifndef MAXMIND_DISABLE
 #include <maxminddb.h>
+#endif
+
+#include <sys/time.h>
 #include <string>
 #include <sstream>
 #include "cexception.h"
