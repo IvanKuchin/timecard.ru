@@ -44,9 +44,12 @@ find_library( AVFORMAT_LIBRARY
 
 # message( "AVFORMAT_LIBRARY is ${AVFORMAT_LIBRARY}" )
 
-set( AVFORMAT_FOUND "YES" )
+if(AVFORMAT_INCLUDE_DIR)
+    if(AVFORMAT_LIBRARY)
+	set( AVFORMAT_FOUND "YES" )
+    endif()
+endif()
 
-# message( "AVFORMAT_LIBRARY is ${AVFORMAT_LIBRARY}" )
 
 if(AVFORMAT_FOUND)
 else()

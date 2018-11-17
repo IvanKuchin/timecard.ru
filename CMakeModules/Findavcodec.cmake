@@ -44,9 +44,12 @@ find_library( AVCODEC_LIBRARY
 
 #message( "AVCODEC_LIBRARY is ${AVCODEC_LIBRARY}" )
 
-set( AVCODEC_FOUND "YES" )
+if(AVCODEC_INCLUDE_DIR)
+    if(AVCODEC_LIBRARY)
+	set( AVCODEC_FOUND "YES" )
+    endif()
+endif()
 
-#message( "AVCODEC_LIBRARY is ${AVCODEC_LIBRARY}" )
 
 if(AVCODEC_FOUND)
 else()
