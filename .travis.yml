@@ -1,8 +1,7 @@
-language: c++
-sudo: disabled
+sudo: false
+language: gcc
 dist: xenial
-os:
-  - linux
+
 before_install:
   - sudo add-apt-repository -y ppa:jonathonf/ffmpeg-3
   - sudo apt-get update -q
