@@ -16,5 +16,6 @@
 #include "utilities.h"
 #include "utilities_common.h"
 #include "localy.h"
+#include "c_bt.h"
 
 #endif

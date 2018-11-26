@@ -3,8 +3,11 @@
 
 using namespace std;
 
-#include <sys/time.h>
+#ifndef MAXMIND_DISABLE
 #include <maxminddb.h>
+#endif
+
+#include <sys/time.h>
 #include <string>
 #include <sstream>
 #include "cexception.h"
@@ -30,9 +33,11 @@ class CSession
 
 		// --- Possible to convert to "static" to reduce memory usage (MMDB is using about 9K per instance)
 		bool					MMDB_usage;
+#ifndef MAXMIND_DISABLE
 		MMDB_s					mmdb;
 		MMDB_entry_data_list_s *MMDB_entry_data_list;
 		MMDB_lookup_result_s	MMDB_result;
+#endif
 
 		string		GetRandom(int len);
 		bool		Save();

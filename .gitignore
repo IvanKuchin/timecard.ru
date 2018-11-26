@@ -71,7 +71,6 @@ doc
 /build3/
 /cov-int/
 /.vs/
-supplemental/
 ftpsync.settings
 sql
 sublime/

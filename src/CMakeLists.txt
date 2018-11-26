@@ -15,31 +15,31 @@ set(EXECUTABLE_CGIs
 # --- Libraries
 # ---- big joint librabry
 set(JOINT_LIBRARY_SRCs
-    ccgi.cpp
-    crequest.cpp
-    ccookie.cpp
-    cmail.cpp
-    cactivator.cpp
-    csession.cpp
-    chtml.cpp
     utilities_common.cpp
     utilities_timecard1.cpp
     utilities2.cpp
     utilities1.cpp
-    cvideoconverter.cpp
-    c_bt.cpp
-    cuser.cpp
     )
 
 # ---- list of independent libraries
 set(INDEPENDENT_LIBRARIES_SRC
+    cuser.cpp
+    cactivator.cpp
+    ccgi.cpp
+    ccookie.cpp
+    csession.cpp
+    crequest.cpp
+    chtml.cpp
+    cmail.cpp
     cvars.cpp
     cmysql.cpp
     cexception.cpp
     ctemplate.cpp
     cfiles.cpp
     cstatistics.cpp
+    c_bt.cpp
     c_float.cpp
+    cvideoconverter.cpp
     )
 
 
@@ -54,13 +54,15 @@ find_package(LibWebSockets REQUIRED)
 if(IMAGEMAGICK_DISABLE)
     message("Magick++ turned off")
 else(IMAGEMAGICK_DISABLE)
-    find_package(ImageMagick COMPONENTS Magick++)
+#    find_package(ImageMagick COMPONENTS Magick++)
+    find_package(ImageMagick REQUIRED)
 endif(IMAGEMAGICK_DISABLE)
 
 if(FFPMPEG_DISABLE)
     message("Videoconverter/ffmpeg turned off")
 else(FFPMPEG_DISABLE)
     find_package(avutil REQUIRED)
+    find_package(avcodec REQUIRED)
     find_package(avformat REQUIRED)
 endif(FFPMPEG_DISABLE)
 
@@ -75,7 +77,8 @@ include_directories(
     ${PROJECT_BINARY_DIR}/src/include/ # --- rendered config.h, generated table.h
     ${LIBMYSQLCLIENT_INCLUDE_DIRS}
     ${OPENSSL_INCLUDE_DIR}
-    ${ImageMagick_INCLUDE_DIRS}
+#    ${ImageMagick_INCLUDE_DIRS}
+    ${IMAGEMAGICK_INCLUDE_DIR}
     ${CURL_INCLUDE_DIR}
     ${AVUTIL_INCLUDE_DIR}
     ${AVFORMAT_INCLUDE_DIR}
@@ -88,7 +91,8 @@ link_directories(
 link_libraries(
     ${LIBMYSQLCLIENT_LIBRARIES}
     ${OPENSSL_CRYPTO_LIBRARIES}
-    ${ImageMagick_LIBRARIES}
+#    ${ImageMagick_LIBRARIES}
+    ${IMAGEMAGICK_LIBRARY}
     ${CURL_LIBRARIES}
     ${AVUTIL_LIBRARY}
     ${AVFORMAT_LIBRARY}
@@ -149,7 +153,7 @@ install(TARGETS generalimageuploader.cgi	DESTINATION		${CGIDIR})
 install(TARGETS imageuploader.cgi		DESTINATION		${CGIDIR})
 install(TARGETS system.cgi			DESTINATION		${CGIDIR})
 install(TARGETS ajax_anyrole_1.cgi		DESTINATION		${CGIDIR})
-install(TARGETS admin.cgi			DESTINATION		${CGIADMINDIR})
+#install(TARGETS admin.cgi			DESTINATION		${CGIADMINDIR})
 
 install(TARGETS cron_daily			DESTINATION		${CRON_INSTALL_DIR})
 install(TARGETS cron_minute			DESTINATION		${CRON_INSTALL_DIR})

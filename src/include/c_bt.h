@@ -22,6 +22,49 @@ class C_ExpenseLineTemplate
 		string					payment = "";
 		bool					required = false;
 		bool					matched = false;
+
+								C_ExpenseLineTemplate();
+
+		void					SetID(string param) { id = param; }
+		string					GetID() const { return id; }
+		void					SetTitle(string param) { title = param; }
+		string					GetTitle() const { return title; }
+		void					SetBTExpenseTemplateID(string param) { bt_expense_template_id = param; }
+		string					GetBTExpenseTemplateID() const { return bt_expense_template_id; }
+
+		string					CheckValidity(CMysql *) const;
+		string					SetPaymentMethod(bool is_cash, bool is_card);
+		string					SaveToDB(CMysql *db);
+
+								~C_ExpenseLineTemplate();
+};
+
+class C_ExpenseTemplate
+{
+		string							id = "";
+		string							title = "";
+		string							company_id = "";
+		string							description = "";
+		vector<C_ExpenseLineTemplate>	expense_template_lines;
+
+		string					CheckDuplicateLineTitles();
+	public:
+								C_ExpenseTemplate();
+								
+		void					SetID(string param) { id = param; }
+		string					GetID() const { return id; }
+		void					SetTitle(string param) { title = param; }
+		string					GetTitle() const { return title; }
+		void					SetDescription(string param) { description = param; }
+		string					GetDescription() const { return description; }
+		void					SetCompanyID(string param) { company_id = param; }
+		string					GetCompanyID() const { return company_id; }
+		string					CheckValidity(CMysql *) const;
+		string					CheckDuplicateLineTitles() const;
+		string					SaveToDB(CMysql *db);
+		string					AddLine(C_ExpenseLineTemplate );
+
+								~C_ExpenseTemplate();
 };
 
 class C_ExpenseLine
