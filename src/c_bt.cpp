@@ -1,5 +1,329 @@
 #include "c_bt.h"
 
+// --- class C_ExpenseLineTemplate
+
+C_ExpenseLineTemplate::C_ExpenseLineTemplate()
+{
+}
+
+string	C_ExpenseLineTemplate::CheckValidity(CMysql *db) const
+{
+	string	error_message = "";
+
+	MESSAGE_DEBUG("C_ExpenseLineTemplate", "", "start");
+
+	if(title.empty())
+	{
+		error_message = "Необходимо указать название";
+		MESSAGE_DEBUG("C_ExpenseLineTemplate", "", "title is required");
+	}
+	else if((dom_type != "image") && (dom_type != "input"))
+	{
+		error_message = "Некорректный тип документа";
+		MESSAGE_ERROR("C_ExpenseLineTemplate", "", "Incorrect document type (must be either input or image)");
+	}
+	else if(payment.empty())
+	{
+		error_message = "Необходимо выбрать форму оплаты";
+		MESSAGE_DEBUG("C_ExpenseLineTemplate", "", "payment method doesn't defined");
+	}
+/*
+	else if(bt_expense_template_id.empty())
+	{
+		error_message = "Не задан идентефикатор расхода";
+		MESSAGE_ERROR("C_ExpenseLineTemplate", "", "expense.id doesn't defined");
+	}
+*/
+	else if(db == NULL)
+	{
+		error_message = "Ошибка БД";
+		MESSAGE_ERROR("C_ExpenseLineTemplate", "", "*db doesn't initialized");
+	}
+	else if
+	(
+		bt_expense_template_id.length()
+		&&
+		(bt_expense_template_id != "0")
+		&&
+		(db->Query("SELECT `id` FROM `bt_expense_line_templates` WHERE `bt_expense_template_id`=\"" + bt_expense_template_id + "\" AND `title`=\"" + title + "\";"))
+	)
+	{
+		error_message = "Документ с таким названием уже существует";
+		MESSAGE_DEBUG("C_ExpenseLineTemplate", "", "bt_expense_template_line.title already exists with the same bt_expense_template_id(" + bt_expense_template_id + ")");
+	}
+
+	MESSAGE_DEBUG("C_ExpenseLineTemplate", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
+
+	return error_message;
+}
+
+string	C_ExpenseLineTemplate::SaveToDB(CMysql *db)
+{
+	string		error_message = "";
+
+	MESSAGE_DEBUG("C_ExpenseLineTemplate", "", "start");
+
+	if((bt_expense_template_id.length()) && (bt_expense_template_id != "0"))
+	{
+		if(db) 										
+		{
+			if((GetID().empty()) || (GetID() == "0"))
+			{
+				auto 	temp = db->InsertQuery("INSERT INTO `bt_expense_line_templates` SET "
+								"`bt_expense_template_id`=\"" + bt_expense_template_id + "\", "
+								"`dom_type`=\"" + dom_type + "\", "
+								"`title`=\"" + GetTitle() + "\", "
+								"`description`=\"" + description + "\", "
+								"`tooltip`=\"" + tooltip + "\", "
+								"`payment`=\"" + payment + "\", "
+								"`required`=\"" + (required ? "Y" : "N") + "\" "
+						);
+				if(temp)
+				{
+					SetID(to_string(temp));
+				}
+				else
+				{
+					error_message = "Ошибка БД";
+					MESSAGE_ERROR("C_ExpenseLineTemplate", "", "fail to insert into `bt_expense_line_templates` table entry (" + db->GetErrorMessage() + ")");
+				}
+			}
+			else
+			{
+				db->Query("UPDATE `bt_expense_line_templates` SET "
+								"`bt_expense_template_id`=\"" + bt_expense_template_id + "\", "
+								"`dom_type`=\"" + dom_type + "\", "
+								"`title`=\"" + GetTitle() + "\", "
+								"`description`=\"" + description + "\", "
+								"`tooltip`=\"" + tooltip + "\", "
+								"`payment`=\"" + payment + "\", "
+								"`required`=\"" + (required ? "Y" : "N") + "\" "
+								"WHERE `id`=\"" + GetID() + "\";"
+						);
+				if(db->isError())
+				{
+					error_message = "Ошибка БД";
+					MESSAGE_ERROR("C_ExpenseLineTemplate", "", "fail to update `bt_expense_line_templates` table (" + db->GetErrorMessage() + ")");
+				}
+			}
+		}
+		else
+		{
+			error_message = "Ошибка DB";
+			MESSAGE_ERROR("C_ExpenseLineTemplate", "", "DB not initialized");
+		}
+	}
+	else
+	{
+		error_message = "Не найден идентификатор шаблона";
+		MESSAGE_ERROR("C_ExpenseLineTemplate", "", "bt_expense_template_id not initialized or 0");
+	}
+
+	MESSAGE_DEBUG("C_ExpenseLineTemplate", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
+
+	return error_message;
+}
+
+string	C_ExpenseLineTemplate::SetPaymentMethod(bool is_cash, bool is_card)
+{
+	string	error_message = "";
+
+	MESSAGE_DEBUG("C_ExpenseLineTemplate", "", "start");
+
+	if(is_cash && is_card) { payment = "cash and card"; }
+	else if(is_cash) { payment = "cash"; }
+	else if(is_card) { payment = "card"; }
+	else 
+	{
+		error_message = "Необходимо выбрать форму оплаты";
+		MESSAGE_DEBUG("C_ExpenseLineTemplate", "", "payment method doesn't defined");
+	}
+
+	MESSAGE_DEBUG("C_ExpenseLineTemplate", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
+
+	return error_message;
+}
+
+C_ExpenseLineTemplate::~C_ExpenseLineTemplate()
+{
+}
+
+
+// --- class C_ExpenseTemplate
+
+C_ExpenseTemplate::C_ExpenseTemplate()
+{
+}
+
+string	C_ExpenseTemplate::CheckValidity(CMysql *db) const
+{
+	string	error_message = "";
+
+	MESSAGE_DEBUG("C_ExpenseTemplate", "", "start");
+
+	if(GetID().empty())
+	{
+		error_message = "Необходимо указать идентификатор расхода";
+		MESSAGE_DEBUG("C_ExpenseTemplate", "", "title is required");
+	}
+	if(GetTitle().empty())
+	{
+		error_message = "Необходимо указать название расхода";
+		MESSAGE_DEBUG("C_ExpenseTemplate", "", "title is required");
+	}
+	else if(GetCompanyID().empty())
+	{
+		error_message = "Необходимо указать компанию которой будет принадлежать расход";
+		MESSAGE_ERROR("C_ExpenseTemplate", "", "company.id is required");
+	}
+	else if(db == NULL)
+	{
+		error_message = "Ошибка БД";
+		MESSAGE_ERROR("C_ExpenseTemplate", "", "*db doesn't initialized");
+	}
+	else if(db->Query("SELECT `id` FROM `bt_expense_templates` WHERE `agency_company_id`=\"" + GetCompanyID() + "\" AND `title`=\"" + GetTitle() + "\";"))
+	{
+		error_message = "Расход с таким названием в компании уже существует";
+		MESSAGE_DEBUG("C_ExpenseTemplate", "", "bt_expense_templates.title already exists with the same company_id(" + GetCompanyID() + ")");
+	}
+	else if((error_message = CheckDuplicateLineTitles()).length())
+	{
+		MESSAGE_DEBUG("C_ExpenseTemplate", "", "bt_expense_templates.title duplicate titles");
+	}
+	else
+	{
+		for(auto &expense_template_line: expense_template_lines)
+		{
+			error_message = expense_template_line.CheckValidity(db);
+			if(error_message.length()) break;
+		}
+	}
+
+	MESSAGE_DEBUG("C_ExpenseTemplate", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
+
+	return error_message;
+}
+
+auto C_ExpenseTemplate::CheckDuplicateLineTitles() const -> string
+{
+	auto			error_message = ""s;
+	vector<string>	titles;
+	
+	MESSAGE_DEBUG("C_ExpenseTemplate", "", "start");
+
+	if(expense_template_lines.size() > 1)
+	{
+		for(auto &expense_template_line: expense_template_lines)
+		{
+			titles.push_back(expense_template_line.GetTitle());
+		}
+
+		sort(titles.begin(), titles.end());
+
+		for(auto it = titles.begin() + 1; it != titles.end(); ++it)
+		{
+			if(*it == *(it-1)) error_message = "Название докуметов не должно повторяться";
+		}
+	}
+	else
+	{
+		MESSAGE_DEBUG("C_ExpenseTemplate", "", "expense_template_lines < 2, elements are unique");
+	}
+
+
+	MESSAGE_DEBUG("C_ExpenseTemplate", "", "finish (error_message.length() = " + to_string(error_message.length()) + ")");
+
+	return error_message;
+}
+
+auto	C_ExpenseTemplate::SaveToDB(CMysql *db) -> string
+{
+	auto		error_message = ""s;
+
+	MESSAGE_DEBUG("C_ExpenseTemplate", "", "start");
+
+	if(db) 										
+	{
+		if((GetID().empty()) || (GetID() == "0"))
+		{
+			auto 	temp = db->InsertQuery("INSERT INTO `bt_expense_templates` SET "
+							"`title`=\"" + GetTitle() + "\", "
+							"`agency_company_id`=\"" + GetCompanyID() + "\", "
+							"`agency_comment`=\"" + GetDescription() + "\", "
+							"`eventTimestamp`=UNIX_TIMESTAMP() ;"
+					);
+			if(temp)
+			{
+				SetID(to_string(temp));
+			}
+			else
+			{
+				error_message = "Ошибка БД";
+				MESSAGE_ERROR("C_ExpenseTemplate", "", "fail to insert into `bt_expense_templates` table entry (" + db->GetErrorMessage() + ")");
+			}
+		}
+		else
+		{
+			db->Query("UPDATE `bt_expense_templates` SET "
+							"`title`=\"" + GetTitle() + "\", "
+							"`agency_company_id`=\"" + GetCompanyID() + "\", "
+							"`agency_comment`=\"" + GetDescription() + "\", "
+							"`eventTimestamp`=UNIX_TIMESTAMP() "
+							"WHERE `id`=\"" + GetID() + "\";"
+					);
+			if(db->isError())
+			{
+				error_message = "Ошибка БД";
+				MESSAGE_ERROR("C_ExpenseTemplate", "", "fail to update `bt_expense_templates` table (" + db->GetErrorMessage() + ")");
+			}
+		}
+
+		if(error_message.empty())
+		{
+			for(auto &expense_template_line: expense_template_lines)
+			{
+				expense_template_line.SetBTExpenseTemplateID(GetID());
+				error_message = expense_template_line.SaveToDB(db);
+				if(error_message.length())
+				{
+					MESSAGE_ERROR("C_ExpenseTemplate", "", "fail to save to `bt_expense_line_templates` table entry");
+					break;
+				}
+			}
+		}
+	}
+	else
+	{
+		error_message = "Ошибка DB";
+		MESSAGE_ERROR("C_ExpenseTemplate", "", "DB not initialized");
+	}
+
+	MESSAGE_DEBUG("C_ExpenseTemplate", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
+
+	return error_message;
+}
+
+string	C_ExpenseTemplate::AddLine(C_ExpenseLineTemplate expense_template_line)
+{
+	string	error_message = "";
+
+	MESSAGE_DEBUG("C_ExpenseTemplate", "", "start");
+
+	expense_template_lines.push_back(expense_template_line);
+
+	MESSAGE_DEBUG("C_ExpenseTemplate", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
+
+	return error_message;
+}
+
+C_ExpenseTemplate::~C_ExpenseTemplate()
+{
+}
+
+
+
+// ---  class C_ExpenseLine
+
 C_ExpenseLine::C_ExpenseLine()
 {
 }
@@ -239,6 +563,10 @@ bool C_ExpenseLine::RemoveUnsavedLinesImages(CMysql *db) const
 C_ExpenseLine::~C_ExpenseLine()
 {
 }
+
+
+
+// --- class C_Expense
 
 string	C_Expense::CheckExpenseLine(C_ExpenseLineTemplate exp_line_template, CMysql *db) const
 {
@@ -504,6 +832,10 @@ bool C_Expense::RemoveUnsavedLinesImages(CMysql *db) const
 C_Expense::~C_Expense()
 {
 }
+
+
+
+// --- class C_BT
 
 C_BT::C_BT()
 {

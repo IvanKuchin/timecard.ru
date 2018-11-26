@@ -1227,24 +1227,33 @@ int main(void)
 		}
 
 		if(
-			(action == "AJAX_updateCustomerTitle")			||
-			(action == "AJAX_updateProjectTitle")			||
-			(action == "AJAX_updateTaskTitle")				|| 
-			(action == "AJAX_updateCompanyTitle")			||
-			(action == "AJAX_updateCompanyDescription")		||
-			(action == "AJAX_updateCompanyWebSite")			||
-			(action == "AJAX_updateCompanyTIN")				||
-			(action == "AJAX_updateCompanyAccount")			||
-			(action == "AJAX_updateCompanyOGRN")			||
-			(action == "AJAX_updateCompanyKPP")				||
-			(action == "AJAX_updateCompanyLegalAddress")	||
-			(action == "AJAX_updateCompanyMailingAddress")	||
-			(action == "AJAX_updateAgencyPosition")			||
-			(action == "AJAX_updateAgencyEditCapability")	||
-			(action == "AJAX_updateSoWEditCapability")		||
-			(action == "AJAX_updateCompanyMailingZipID")	||
-			(action == "AJAX_updateCompanyLegalZipID")		||
-			(action == "AJAX_updateCompanyBankID")
+			(action == "AJAX_updateCustomerTitle")					||
+			(action == "AJAX_updateProjectTitle")					||
+			(action == "AJAX_updateTaskTitle")						|| 
+			(action == "AJAX_updateCompanyTitle")					||
+			(action == "AJAX_updateCompanyDescription")				||
+			(action == "AJAX_updateCompanyWebSite")					||
+			(action == "AJAX_updateCompanyTIN")						||
+			(action == "AJAX_updateCompanyAccount")					||
+			(action == "AJAX_updateCompanyOGRN")					||
+			(action == "AJAX_updateCompanyKPP")						||
+			(action == "AJAX_updateCompanyLegalAddress")			||
+			(action == "AJAX_updateCompanyMailingAddress")			||
+			(action == "AJAX_updateAgencyPosition")					||
+			(action == "AJAX_updateAgencyEditCapability")			||
+			(action == "AJAX_updateSoWEditCapability")				||
+			(action == "AJAX_updateCompanyMailingZipID")			||
+			(action == "AJAX_updateCompanyLegalZipID")				||
+			(action == "AJAX_updateCompanyBankID")					||
+			(action == "AJAX_updateExpenseTemplateTitle")			||
+			(action == "AJAX_updateExpenseTemplateAgencyComment")	||
+			(action == "AJAX_updateExpenseTemplateLineTitle")		||
+			(action == "AJAX_updateExpenseTemplateLineDescription")	||	
+			(action == "AJAX_updateExpenseTemplateLineTooltip")		||
+			(action == "AJAX_updateExpenseTemplateLineDomType")		||
+			(action == "AJAX_updateExpenseTemplateLinePaymentCash")	||	
+			(action == "AJAX_updateExpenseTemplateLinePaymentCard")	||	
+			(action == "AJAX_updateExpenseTemplateLineRequired")
 		)
 		{
 			ostringstream	ostResult;
@@ -1329,7 +1338,7 @@ int main(void)
 							}
 							else
 							{
-								MESSAGE_DEBUG("", action, "action entity id(" + user.GetID() + ") doesn't belong to agency.id(" + agency_id + ")");
+								MESSAGE_DEBUG("", action, "action entity id(" + user.GetID() + ") doesn't belongs to agency.id(" + agency_id + ")");
 							}
 						}
 						else
@@ -1598,6 +1607,250 @@ int main(void)
 			MESSAGE_DEBUG("", action, "finish");
 		}
 
+		if(action == "AJAX_addExpenseTemplate")
+		{
+			ostringstream	ostResult;
+
+			MESSAGE_DEBUG("", action, "start");
+
+			ostResult.str("");
+			{
+				string			template_name = "json_response.htmlt";
+				string			error_message = "";
+
+				auto			http_params = indexPage.GetVarsHandler();
+				auto			expense_random_name = ""s;
+				regex			regex1("bt_expense_template_line_random_");
+
+				C_ExpenseTemplate	expense_template;
+
+				expense_template.SetID			(CheckHTTPParam_Text(http_params->Get("bt_expense_template_id")));
+				expense_template.SetTitle		(CheckHTTPParam_Text(http_params->Get("bt_expense_template_title")));
+				expense_template.SetDescription	(CheckHTTPParam_Text(http_params->Get("bt_expense_template_description")));
+
+				expense_random_name = http_params->GetNameByRegex(regex1);
+				while(expense_random_name.length() && error_message.empty())
+				{
+					string expense_template_line_random = CheckHTTPParam_Number(http_params->Get(expense_random_name));
+
+					if(expense_template_line_random.length())
+					{
+						C_ExpenseLineTemplate	expense_line_template;
+
+						expense_line_template.title				= CheckHTTPParam_Text(http_params->Get("bt_expense_template_line_title_" + expense_template_line_random));
+						expense_line_template.tooltip			= CheckHTTPParam_Text(http_params->Get("bt_expense_template_line_tooltip_" + expense_template_line_random));
+						expense_line_template.description		= CheckHTTPParam_Text(http_params->Get("bt_expense_template_line_description_" + expense_template_line_random));
+						expense_line_template.dom_type			= CheckHTTPParam_Text(http_params->Get("bt_expense_template_line_dom_type_" + expense_template_line_random));
+						expense_line_template.required			= (http_params->Get("bt_expense_template_line_is_required_" + expense_template_line_random) == "true");
+						expense_line_template.SetPaymentMethod	(
+																	http_params->Get("bt_expense_template_line_is_cash_" + expense_template_line_random) == "true",
+																	http_params->Get("bt_expense_template_line_is_card_" + expense_template_line_random) == "true"
+																);
+
+						expense_template.AddLine(expense_line_template);
+					}
+					else
+					{
+						error_message = "некорректный параметер random у документа";
+						MESSAGE_ERROR("", action, "Can't convert expense_random(" + http_params->Get(expense_random_name) + ") to number")
+					}
+
+					http_params->Delete(expense_random_name);
+					expense_random_name = http_params->GetNameByRegex(regex1);
+				}
+
+
+				{
+					error_message = isAgencyEmployeeAllowedToChangeAgencyData(&db, &user);
+					if(error_message.empty())
+					{
+						string	agency_id = GetAgencyID(&user, &db);
+
+						if(agency_id.length())
+						{
+							expense_template.SetCompanyID(agency_id);
+
+							error_message = expense_template.CheckValidity(&db);
+							if(error_message.empty())
+							{
+								error_message = expense_template.SaveToDB(&db);
+								if(error_message.empty())
+								{
+									if(NotifySoWContractPartiesAboutChanges(action, expense_template.GetID(), "", "", "", &db, &user))
+									{
+									}
+									else
+									{
+										MESSAGE_ERROR("", "", "fail to notify agency");
+									}
+								}
+								else
+								{
+									MESSAGE_DEBUG("", action, "fail saving bt_expense_template to DB");
+								}
+							}
+							else
+							{
+								MESSAGE_DEBUG("", action, "fail to check bt_expense_template consistency");
+							}
+						}
+						else
+						{
+							MESSAGE_ERROR("", action, "agency.id not found by user.id(" + user.GetID() + ") employment");
+							error_message = "Агенство не найдено";
+						}
+					}
+					else
+					{
+						MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") doesn't allowed to change agency data");
+					}
+				}
+
+				if(error_message.empty())
+				{
+					ostResult << "{\"result\":\"success\"}";
+				}
+				else
+				{
+					MESSAGE_DEBUG("", action, "failed");
+					ostResult.str("");
+					ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+				}
+
+				indexPage.RegisterVariableForce("result", ostResult.str());
+
+				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			}
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
+
+		if(action == "AJAX_addExpenseTemplateLine")
+		{
+			ostringstream	ostResult;
+
+			MESSAGE_DEBUG("", action, "start");
+
+			ostResult.str("");
+			{
+				auto			new_expense_tempate_line_obj = ""s;
+				auto			template_name = "json_response.htmlt"s;
+				auto			error_message = ""s;
+				auto			bt_expense_template_id = ""s;
+
+				auto			http_params = indexPage.GetVarsHandler();
+				auto			expense_random_name = ""s;
+				regex			regex1("bt_expense_template_line_random_");
+
+				C_ExpenseLineTemplate	expense_line_template;
+
+				bt_expense_template_id = CheckHTTPParam_Text(http_params->Get("bt_expense_template_id"));
+
+				expense_random_name = http_params->GetNameByRegex(regex1);
+				while(expense_random_name.length() && error_message.empty())
+				{
+					string expense_template_line_random = CheckHTTPParam_Number(http_params->Get(expense_random_name));
+
+					if(expense_template_line_random.length())
+					{
+
+						expense_line_template.title				= CheckHTTPParam_Text(http_params->Get("bt_expense_template_line_title_" + expense_template_line_random));
+						expense_line_template.tooltip			= CheckHTTPParam_Text(http_params->Get("bt_expense_template_line_tooltip_" + expense_template_line_random));
+						expense_line_template.description		= CheckHTTPParam_Text(http_params->Get("bt_expense_template_line_description_" + expense_template_line_random));
+						expense_line_template.dom_type			= CheckHTTPParam_Text(http_params->Get("bt_expense_template_line_dom_type_" + expense_template_line_random));
+						expense_line_template.required			= (http_params->Get("bt_expense_template_line_is_required_" + expense_template_line_random) == "true");
+						expense_line_template.SetPaymentMethod	(
+																	http_params->Get("bt_expense_template_line_is_cash_" + expense_template_line_random) == "true",
+																	http_params->Get("bt_expense_template_line_is_card_" + expense_template_line_random) == "true"
+																);
+					}
+					else
+					{
+						error_message = "некорректный параметер random у документа";
+						MESSAGE_ERROR("", action, "Can't convert expense_random(" + http_params->Get(expense_random_name) + ") to number")
+					}
+
+					http_params->Delete(expense_random_name);
+					expense_random_name = http_params->GetNameByRegex(regex1);
+				}
+
+
+				{
+					error_message = isAgencyEmployeeAllowedToChangeAgencyData(&db, &user);
+					if(error_message.empty())
+					{
+						string	agency_id = GetAgencyID(&user, &db);
+
+						if(agency_id.length())
+						{
+							error_message = isActionEntityBelongsToAgency(action, bt_expense_template_id, agency_id, &db, &user);
+							if(error_message.empty())
+							{
+								expense_line_template.SetBTExpenseTemplateID(bt_expense_template_id);
+								error_message = expense_line_template.CheckValidity(&db);
+								if(error_message.empty())
+								{
+									error_message = expense_line_template.SaveToDB(&db);
+									if(error_message.empty())
+									{
+										new_expense_tempate_line_obj = GetBTExpenseLineTemplatesInJSONFormat("SELECT * FROM `bt_expense_line_templates` WHERE `id`=\"" + expense_line_template.GetID() + "\";", &db, &user);
+
+										if(NotifySoWContractPartiesAboutChanges(action, expense_line_template.GetID(), "", "", "", &db, &user))
+										{
+										}
+										else
+										{
+											MESSAGE_ERROR("", "", "fail to notify agency");
+										}
+									}
+									else
+									{
+										MESSAGE_DEBUG("", action, "fail saving bt_expense_template to DB");
+									}
+								}
+								else
+								{
+									MESSAGE_DEBUG("", action, "fail to check bt_expense_template consistency");
+								}
+							}
+							else
+							{
+								MESSAGE_DEBUG("", action, "action entity id(" + user.GetID() + ") doesn't belongs to agency.id(" + agency_id + ")");
+							}
+
+
+						}
+						else
+						{
+							MESSAGE_ERROR("", action, "agency.id not found by user.id(" + user.GetID() + ") employment");
+							error_message = "Агенство не найдено";
+						}
+					}
+					else
+					{
+						MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") doesn't allowed to change agency data");
+					}
+				}
+
+				if(error_message.empty())
+				{
+					ostResult << "{\"result\":\"success\",\"bt_expense_line_template\":" + new_expense_tempate_line_obj + "}";
+				}
+				else
+				{
+					MESSAGE_DEBUG("", action, "failed");
+					ostResult.str("");
+					ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+				}
+
+				indexPage.RegisterVariableForce("result", ostResult.str());
+
+				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			}
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
+
 		if(action == "AJAX_deleteTaskAssignment")
 		{
 			ostringstream	ostResult;
@@ -1773,7 +2026,7 @@ int main(void)
 							}
 							else
 							{
-								MESSAGE_DEBUG("", action, "action entity id(" + user.GetID() + ") doesn't belong to agency.id(" + agency_id + ")");
+								MESSAGE_DEBUG("", action, "action entity id(" + user.GetID() + ") doesn't belongs to agency.id(" + agency_id + ")");
 							}
 						}
 						else
@@ -1795,6 +2048,179 @@ int main(void)
 
 				if(error_message.empty())
 				{
+				}
+				else
+				{
+					MESSAGE_DEBUG("", action, "failed");
+					ostResult.str("");
+					ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+				}
+
+				indexPage.RegisterVariableForce("result", ostResult.str());
+
+				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			}
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
+
+		if(action == "AJAX_deleteExpenseTemplate")
+		{
+			ostringstream	ostResult;
+
+			MESSAGE_DEBUG("", action, "start");
+
+			ostResult.str("");
+			{
+				string			template_name = "json_response.htmlt";
+				string			error_message = "";
+
+				string			expense_template_id	= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
+
+				if(expense_template_id.length())
+				{
+					error_message = isAgencyEmployeeAllowedToChangeAgencyData(&db, &user);
+					if(error_message.empty())
+					{
+						string	agency_id = GetAgencyID(&user, &db);
+
+						if(agency_id.length())
+						{
+							error_message = isActionEntityBelongsToAgency(action, expense_template_id, agency_id, &db, &user);
+							if(error_message.empty())
+							{
+								if(isExpenseTemplateIDValidToRemove(expense_template_id, &db))
+								{
+									string		removal_sql_query = "";
+
+									if(NotifySoWContractPartiesAboutChanges("AJAX_deleteExpenseTemplate", expense_template_id, "", "", "", &db, &user))
+									{
+									}
+									else
+									{
+										MESSAGE_ERROR("", "", "fail to notify agency");
+									}
+									db.Query("DELETE FROM `bt_expense_line_templates` WHERE `bt_expense_template_id`=\"" + expense_template_id + "\";");
+									db.Query("DELETE FROM `bt_sow` WHERE `bt_expense_template_id`=\"" + expense_template_id + "\";");
+									db.Query("DELETE FROM `bt_expense_templates` WHERE `id`=\"" + expense_template_id + "\";");
+									ostResult << "{\"result\":\"success\"}";
+								}
+								else
+								{
+									error_message = "На этот расход субконтракторы отчитались. Поэтому нельзя удалить.";
+									MESSAGE_DEBUG("", action, "subcontractors reported on expense_template_id(" + expense_template_id + "), can't remove it");
+								}
+							}
+							else
+							{
+								MESSAGE_DEBUG("", action, "action entity id(" + user.GetID() + ") doesn't belongs to agency.id(" + agency_id + ")");
+							}
+						}
+						else
+						{
+							MESSAGE_ERROR("", action, "agency.id not found by user.id(" + user.GetID() + ") employment");
+							error_message = "Агенство не найдено";
+						}
+					}
+					else
+					{
+						MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") doesn't allowed to change agency data");
+					}
+				}
+				else
+				{
+					MESSAGE_ERROR("", action, "expense_template_id missed");
+					error_message = "Не указан номер расхода на удаление";
+				}
+
+				if(error_message.empty())
+				{
+				}
+				else
+				{
+					MESSAGE_DEBUG("", action, "failed");
+					ostResult.str("");
+					ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+				}
+
+				indexPage.RegisterVariableForce("result", ostResult.str());
+
+				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			}
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
+
+		if(action == "AJAX_deleteExpenseTemplateLine")
+		{
+			ostringstream	ostResult;
+
+			MESSAGE_DEBUG("", action, "start");
+
+			ostResult.str("");
+			{
+				string			template_name = "json_response.htmlt";
+				string			error_message = "";
+
+				string			expense_template_line_id	= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
+
+				if(expense_template_line_id.length())
+				{
+					error_message = isAgencyEmployeeAllowedToChangeAgencyData(&db, &user);
+					if(error_message.empty())
+					{
+						string	agency_id = GetAgencyID(&user, &db);
+
+						if(agency_id.length())
+						{
+							error_message = isActionEntityBelongsToAgency(action, expense_template_line_id, agency_id, &db, &user);
+							if(error_message.empty())
+							{
+								error_message = isExpenseTemplateLineIDValidToRemove(expense_template_line_id, &db);
+								if(error_message.empty())
+								{
+									string		removal_sql_query = "";
+
+									if(NotifySoWContractPartiesAboutChanges("AJAX_deleteExpenseTemplateLine", expense_template_line_id, "", "", "", &db, &user))
+									{
+									}
+									else
+									{
+										MESSAGE_ERROR("", "", "fail to notify agency");
+									}
+									
+									db.Query("DELETE FROM `bt_expense_line_templates` WHERE `id`=\"" + expense_template_line_id + "\";");
+								}
+								else
+								{
+									MESSAGE_DEBUG("", action, "expense_template_line_id(" + expense_template_line_id + ") presents in expences, can't remove it");
+								}
+							}
+							else
+							{
+								MESSAGE_DEBUG("", action, "action entity id(" + user.GetID() + ") doesn't belongs to agency.id(" + agency_id + ")");
+							}
+						}
+						else
+						{
+							MESSAGE_ERROR("", action, "agency.id not found by user.id(" + user.GetID() + ") employment");
+							error_message = "Агенство не найдено";
+						}
+					}
+					else
+					{
+						MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") doesn't allowed to change agency data");
+					}
+				}
+				else
+				{
+					MESSAGE_ERROR("", action, "expense_template_line_id missed");
+					error_message = "Не указан номер расхода на удаление";
+				}
+
+				if(error_message.empty())
+				{
+					ostResult << "{\"result\":\"success\"}";
 				}
 				else
 				{
@@ -1918,7 +2344,7 @@ int main(void)
 							}
 							else
 							{
-								MESSAGE_DEBUG("", action, "action entity id(" + user.GetID() + ") doesn't belong to agency.id(" + agency_id + ")");
+								MESSAGE_DEBUG("", action, "action entity id(" + user.GetID() + ") doesn't belongs to agency.id(" + agency_id + ")");
 							}
 						}
 						else

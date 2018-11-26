@@ -15,31 +15,31 @@ set(EXECUTABLE_CGIs
 # --- Libraries
 # ---- big joint librabry
 set(JOINT_LIBRARY_SRCs
-    ccgi.cpp
-    crequest.cpp
-    ccookie.cpp
-    cmail.cpp
-    cactivator.cpp
-    csession.cpp
-    chtml.cpp
     utilities_common.cpp
     utilities_timecard1.cpp
     utilities2.cpp
     utilities1.cpp
-    cvideoconverter.cpp
-    c_bt.cpp
-    cuser.cpp
     )
 
 # ---- list of independent libraries
 set(INDEPENDENT_LIBRARIES_SRC
+    cuser.cpp
+    cactivator.cpp
+    ccgi.cpp
+    ccookie.cpp
+    csession.cpp
+    crequest.cpp
+    chtml.cpp
+    cmail.cpp
     cvars.cpp
     cmysql.cpp
     cexception.cpp
     ctemplate.cpp
     cfiles.cpp
     cstatistics.cpp
+    c_bt.cpp
     c_float.cpp
+    cvideoconverter.cpp
     )
 
 

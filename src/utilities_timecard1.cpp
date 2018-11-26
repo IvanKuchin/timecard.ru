@@ -1493,7 +1493,7 @@ string CreateTaskBelongsToAgency(string customer, string project, string task, s
 
 						if(customer_id.empty())
 						{
-							long int	temp = db->InsertQuery("INSERT INTO `timecard_customers` (`agency_id`,`title`,`eventTimestamp`) VALUES (\"" + agency_id + "\", \"" + customer + "\", UNIX_TIMESTAMP());");
+							long int	temp = db->InsertQuery("INSERT INTO `timecard_customers` (`agency_company_id`,`title`,`eventTimestamp`) VALUES (\"" + agency_id + "\", \"" + customer + "\", UNIX_TIMESTAMP());");
 
 							if(temp) { customer_id = to_string(temp); }
 							else
@@ -2711,6 +2711,99 @@ string	isActionEntityBelongsToSoW(string action, string id, string sow_id, CMysq
 	return error_message;
 }
 
+bool isExpenseTemplateIDValidToRemove(string bt_expense_template_id, CMysql *db)
+{
+	bool	result = false;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(bt_expense_template_id.length())
+	{
+		if(db->Query("SELECT COUNT(*) AS `counter` FROM `bt_expenses` WHERE `bt_expense_template_id`=\"" + bt_expense_template_id + "\";"))
+		{
+			string	counter = db->Get(0, "counter");
+			if(counter == "0")
+			{
+				// --- task.id valid to remve
+				result = true;
+			}
+			else
+			{
+				MESSAGE_DEBUG("", "", "subcontractors reported " + counter + " times on bt_expense_templates.id(" + bt_expense_template_id + ")");
+			}
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "fail in sql-query syntax");
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "bt_expense_template_id is empty");
+	}
+
+
+	MESSAGE_DEBUG("", "", "finish (result is " + to_string(result) + ")");
+
+	return result;
+}
+
+auto isExpenseTemplateLineIDValidToRemove(string bt_expense_line_template_id, CMysql *db) -> string
+{
+	string	error_message = "";
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(bt_expense_line_template_id.length())
+	{
+		if(db->Query("SELECT COUNT(*) AS `counter` FROM `bt_expense_line_templates` WHERE `bt_expense_template_id`=(SELECT `bt_expense_template_id` FROM `bt_expense_line_templates` WHERE `id`=\"" + bt_expense_line_template_id + "\");"))
+		{
+			string	counter = db->Get(0, "counter");
+			if(stoi(counter) > 1)
+			{
+				if(db->Query("SELECT COUNT(*) AS `counter` FROM `bt_expense_lines` WHERE `bt_expense_line_template_id`=\"" + bt_expense_line_template_id + "\";"))
+				{
+					string	counter = db->Get(0, "counter");
+					if(counter == "0")
+					{
+						// --- task.id valid to remve
+					}
+					else
+					{
+						error_message = "Этот документ присутствует в " + counter + " отчетных документах. Нельзя удалить.";
+						MESSAGE_DEBUG("", "", "subcontractors reported " + counter + " times on bt_expense_templates.id(" + bt_expense_line_template_id + ")");
+					}
+				}
+				else
+				{
+					error_message = "Ошибка БД.";
+					MESSAGE_ERROR("", "", "fail in sql-query syntax");
+				}
+			}
+			else
+			{
+				error_message = "Нельзя удалять единственный документ из расхода.";
+				MESSAGE_DEBUG("", "", "Can't remove single bt_expense_line_templates.id(" + bt_expense_line_template_id + ") from BT expense");
+			}
+		}
+		else
+		{
+			error_message = "Ошибка БД.";
+			MESSAGE_ERROR("", "", "fail in sql-query syntax");
+		}
+	}
+	else
+	{
+		error_message = "Некорректные параметры.";
+		MESSAGE_ERROR("", "", "bt_expense_line_template_id is empty");
+	}
+
+
+	MESSAGE_DEBUG("", "", "finish (error_message is " + to_string(error_message.length()) + ")");
+
+	return error_message;
+}
+
 bool isTaskIDValidToRemove(string task_id, CMysql *db)
 {
 	bool	result = false;
@@ -2895,29 +2988,42 @@ string	isActionEntityBelongsToAgency(string action, string id, string agency_id,
 		{
 			if(action.length())
 			{
-
 				string		sql_query = "";
 
-				if(action == "AJAX_updateCustomerTitle") 		sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `timecard_customers` WHERE `id`=\"" + id + "\";";
-				if(action == "AJAX_updateProjectTitle") 		sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `timecard_customers` WHERE `id`=(SELECT `timecard_customers_id` FROM `timecard_projects` WHERE `id`=\"" + id + "\");";
-				if(action == "AJAX_updateTaskTitle") 			sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `timecard_customers` WHERE `id`=(SELECT `timecard_customers_id` FROM `timecard_projects` WHERE `id`=(SELECT `timecard_projects_id` FROM `timecard_tasks` WHERE `id`=\"" + id + "\"));";
-				if(action == "AJAX_deleteTask")					sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `timecard_customers` WHERE `id`=(SELECT `timecard_customers_id` FROM `timecard_projects` WHERE `id`=(SELECT `timecard_projects_id` FROM `timecard_tasks` WHERE `id`=\"" + id + "\"));";
-				if(action == "AJAX_deleteEmployee")				sql_query = "SELECT `company_id` AS `agency_id` FROM `company_employees` WHERE `id`=\"" + id + "\";";
-				if(action == "AJAX_updateAgencyPosition")		sql_query = "SELECT `company_id` AS `agency_id` FROM `company_employees` WHERE `id`=\"" + id + "\";";
-				if(action == "AJAX_updateAgencyEditCapability")	sql_query = "SELECT `company_id` AS `agency_id` FROM `company_employees` WHERE `id`=\"" + id + "\";";
-				if(action == "AJAX_updateSoWEditCapability")	sql_query = "SELECT `company_id` AS `agency_id` FROM `company_employees` WHERE `id`=\"" + id + "\";";
-				if(action == "AJAX_updateCompanyTitle")			sql_query = "SELECT \"" + agency_id + "\" AS `agency_id`;"; // --- entity always belongs to agency
-				if(action == "AJAX_updateCompanyDescription")	sql_query = "SELECT \"" + agency_id + "\" AS `agency_id`;"; // --- entity always belongs to agency
-				if(action == "AJAX_updateCompanyWebSite")		sql_query = "SELECT \"" + agency_id + "\" AS `agency_id`;"; // --- entity always belongs to agency
-				if(action == "AJAX_updateCompanyTIN")			sql_query = "SELECT \"" + agency_id + "\" AS `agency_id`;"; // --- entity always belongs to agency
-				if(action == "AJAX_updateCompanyAccount")		sql_query = "SELECT \"" + agency_id + "\" AS `agency_id`;"; // --- entity always belongs to agency
-				if(action == "AJAX_updateCompanyOGRN")			sql_query = "SELECT \"" + agency_id + "\" AS `agency_id`;"; // --- entity always belongs to agency
-				if(action == "AJAX_updateCompanyKPP")			sql_query = "SELECT \"" + agency_id + "\" AS `agency_id`;"; // --- entity always belongs to agency
-				if(action == "AJAX_updateCompanyLegalAddress")	sql_query = "SELECT \"" + agency_id + "\" AS `agency_id`;"; // --- entity always belongs to agency
-				if(action == "AJAX_updateCompanyMailingAddress")sql_query = "SELECT \"" + agency_id + "\" AS `agency_id`;"; // --- entity always belongs to agency
-				if(action == "AJAX_updateCompanyMailingZipID")	sql_query = "SELECT \"" + agency_id + "\" AS `agency_id`;"; // --- entity always belongs to agency
-				if(action == "AJAX_updateCompanyLegalZipID")	sql_query = "SELECT \"" + agency_id + "\" AS `agency_id`;"; // --- entity always belongs to agency
-				if(action == "AJAX_updateCompanyBankID")		sql_query = "SELECT \"" + agency_id + "\" AS `agency_id`;"; // --- entity always belongs to agency
+				if(action == "AJAX_updateCustomerTitle") 				sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `timecard_customers` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateProjectTitle") 				sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `timecard_customers` WHERE `id`=(SELECT `timecard_customers_id` FROM `timecard_projects` WHERE `id`=\"" + id + "\");";
+				if(action == "AJAX_updateTaskTitle") 					sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `timecard_customers` WHERE `id`=(SELECT `timecard_customers_id` FROM `timecard_projects` WHERE `id`=(SELECT `timecard_projects_id` FROM `timecard_tasks` WHERE `id`=\"" + id + "\"));";
+
+				if(action == "AJAX_updateExpenseTemplateTitle")				sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `bt_expense_templates` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateExpenseTemplateAgencyComment")		sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `bt_expense_templates` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateExpenseTemplateLineTitle")			sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `bt_expense_templates` WHERE `id`=(SELECT `bt_expense_template_id` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\");";
+				if(action == "AJAX_updateExpenseTemplateLineDescription")	sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `bt_expense_templates` WHERE `id`=(SELECT `bt_expense_template_id` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\");";
+				if(action == "AJAX_updateExpenseTemplateLineTooltip")		sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `bt_expense_templates` WHERE `id`=(SELECT `bt_expense_template_id` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\");";
+				if(action == "AJAX_updateExpenseTemplateLineDomType")		sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `bt_expense_templates` WHERE `id`=(SELECT `bt_expense_template_id` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\");";
+				if(action == "AJAX_updateExpenseTemplateLinePaymentCash")	sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `bt_expense_templates` WHERE `id`=(SELECT `bt_expense_template_id` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\");";
+				if(action == "AJAX_updateExpenseTemplateLinePaymentCard")	sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `bt_expense_templates` WHERE `id`=(SELECT `bt_expense_template_id` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\");";
+				if(action == "AJAX_updateExpenseTemplateLineRequired")		sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `bt_expense_templates` WHERE `id`=(SELECT `bt_expense_template_id` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\");";
+
+				if(action == "AJAX_deleteTask")							sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `timecard_customers` WHERE `id`=(SELECT `timecard_customers_id` FROM `timecard_projects` WHERE `id`=(SELECT `timecard_projects_id` FROM `timecard_tasks` WHERE `id`=\"" + id + "\"));";
+				if(action == "AJAX_deleteExpenseTemplate")				sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `bt_expense_templates` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_addExpenseTemplateLine")				sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `bt_expense_templates` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_deleteExpenseTemplateLine")			sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `bt_expense_templates` WHERE `id`=(SELECT `bt_expense_template_id` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\");";
+				if(action == "AJAX_deleteEmployee")						sql_query = "SELECT `company_id` AS `agency_id` FROM `company_employees` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateAgencyPosition")				sql_query = "SELECT `company_id` AS `agency_id` FROM `company_employees` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateAgencyEditCapability")			sql_query = "SELECT `company_id` AS `agency_id` FROM `company_employees` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateSoWEditCapability")			sql_query = "SELECT `company_id` AS `agency_id` FROM `company_employees` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateCompanyTitle")					sql_query = "SELECT \"" + agency_id + "\" AS `agency_id`;"; // --- entity always belongs to agency
+				if(action == "AJAX_updateCompanyDescription")			sql_query = "SELECT \"" + agency_id + "\" AS `agency_id`;"; // --- entity always belongs to agency
+				if(action == "AJAX_updateCompanyWebSite")				sql_query = "SELECT \"" + agency_id + "\" AS `agency_id`;"; // --- entity always belongs to agency
+				if(action == "AJAX_updateCompanyTIN")					sql_query = "SELECT \"" + agency_id + "\" AS `agency_id`;"; // --- entity always belongs to agency
+				if(action == "AJAX_updateCompanyAccount")				sql_query = "SELECT \"" + agency_id + "\" AS `agency_id`;"; // --- entity always belongs to agency
+				if(action == "AJAX_updateCompanyOGRN")					sql_query = "SELECT \"" + agency_id + "\" AS `agency_id`;"; // --- entity always belongs to agency
+				if(action == "AJAX_updateCompanyKPP")					sql_query = "SELECT \"" + agency_id + "\" AS `agency_id`;"; // --- entity always belongs to agency
+				if(action == "AJAX_updateCompanyLegalAddress")			sql_query = "SELECT \"" + agency_id + "\" AS `agency_id`;"; // --- entity always belongs to agency
+				if(action == "AJAX_updateCompanyMailingAddress")		sql_query = "SELECT \"" + agency_id + "\" AS `agency_id`;"; // --- entity always belongs to agency
+				if(action == "AJAX_updateCompanyMailingZipID")			sql_query = "SELECT \"" + agency_id + "\" AS `agency_id`;"; // --- entity always belongs to agency
+				if(action == "AJAX_updateCompanyLegalZipID")			sql_query = "SELECT \"" + agency_id + "\" AS `agency_id`;"; // --- entity always belongs to agency
+				if(action == "AJAX_updateCompanyBankID")				sql_query = "SELECT \"" + agency_id + "\" AS `agency_id`;"; // --- entity always belongs to agency
 
 				if(sql_query.length())
 				{
@@ -3005,6 +3111,15 @@ string	GetDBValueByAction(string action, string id, string sow_id, CMysql *db, C
 				if(action == "AJAX_updateAgencyEditCapability")		sql_query = "SELECT `allowed_change_agency_data`	as `value` FROM `company_employees` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateSoWEditCapability")		sql_query = "SELECT `allowed_change_sow`			as `value` FROM `company_employees` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateSubcontractorCreateTasks")	sql_query = "SELECT `subcontractor_create_tasks`	as `value` FROM `contracts_sow` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateExpenseTemplateTitle")		sql_query = "SELECT `title`							as `value` FROM `bt_expense_templates` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateExpenseTemplateAgencyComment") 	sql_query = "SELECT `agency_comment`		as `value` FROM `bt_expense_templates` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateExpenseTemplateLineTitle")			sql_query = "SELECT `title`					as `value` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateExpenseTemplateLineDescription")	sql_query = "SELECT `description`			as `value` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateExpenseTemplateLineTooltip")		sql_query = "SELECT `tooltip`				as `value` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateExpenseTemplateLineDomType")		sql_query = "SELECT `dom_type`				as `value` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateExpenseTemplateLinePaymentCash")	sql_query = "SELECT `payment`				as `value` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateExpenseTemplateLinePaymentCard")	sql_query = "SELECT `payment`				as `value` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateExpenseTemplateLineRequired")		sql_query = "SELECT `required`				as `value` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\";";
 
 				if(sql_query.length())
 				{
@@ -3461,6 +3576,65 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 							// --- good to go
 						}
 					}					
+					// --- Expense templates
+					else if(action == "AJAX_updateExpenseTemplateTitle")
+					{
+						if(db->Query(
+							"SELECT `id` FROM `bt_expense_templates` WHERE `title`=\"" + new_value + "\" AND `agency_company_id` = ( "
+								"SELECT `agency_company_id` FROM `bt_expense_templates` WHERE `id`=\"" + id + "\""
+							");"
+						))
+						{
+							error_message = "Расход " + new_value + " уже существует";
+							MESSAGE_DEBUG("", "", "BT expense template with same title already exists");
+						}
+					}
+					else if(action == "AJAX_updateExpenseTemplateAgencyComment")		{ /* --- good to go */ }
+					// --- Expense line templates
+					else if(action == "AJAX_updateExpenseTemplateLineTitle")
+					{
+						if(db->Query(
+							"SELECT `id` FROM `bt_expense_line_templates` WHERE `title`=\"" + new_value + "\" AND `bt_expense_template_id` = ( "
+								"SELECT `bt_expense_template_id` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\""
+							");"
+						))
+						{
+							error_message = "Документ с таким названием (" + new_value + ") уже есть в расходе";
+							MESSAGE_DEBUG("", "", "BT expense template line with same title already exists belongs to the same expense");
+						}
+					}
+					else if(action == "AJAX_updateExpenseTemplateLineDescription") 		{ /* --- good to go */ }
+					else if(action == "AJAX_updateExpenseTemplateLineTooltip") 			{ /* --- good to go */ }
+					else if(action == "AJAX_updateExpenseTemplateLineDomType") 
+					{
+						error_message = "Нельзя поменять тип документа";
+						MESSAGE_DEBUG("", "", "dom_type can't be changed");
+					}
+					else if(action == "AJAX_updateExpenseTemplateLinePaymentCash") 
+					{
+						if(
+							(new_value == "false")
+							&&
+							db->Query("SELECT `id` FROM `bt_expense_line_templates` WHERE `payment`=\"cash\" AND `id`=\"" + id + "\";")
+						)
+						{
+							error_message = "Необходимо оставить какой-нибудь способ оплаты";
+							MESSAGE_DEBUG("", "", "Fail to disable single methid of payment");
+						}
+					}
+					else if(action == "AJAX_updateExpenseTemplateLinePaymentCard")
+					{
+						if(
+							(new_value == "false")
+							&&
+							db->Query("SELECT `id` FROM `bt_expense_line_templates` WHERE `payment`=\"card\" AND `id`=\"" + id + "\";")
+						)
+						{
+							error_message = "Необходимо оставить какой-нибудь способ оплаты";
+							MESSAGE_DEBUG("", "", "Fail to disable single methid of payment");
+						}
+					}
+					else if(action == "AJAX_updateExpenseTemplateLineRequired") 		{ /* --- good to go */ }
  					else
 					{
 						MESSAGE_ERROR("", "", "unknown action(" + action + "), no validity check performed.");
@@ -3469,7 +3643,7 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 				}
 				else
 				{
-					error_message = "Новое значение некорректно";
+					error_message = "Новое значение не может быть пустым";
 					MESSAGE_ERROR("", "", "new_value is empty");
 				}
 			}
@@ -3628,9 +3802,16 @@ string	SetNewValueByAction(string action, string id, string sow_id, string new_v
 					{
 						string		sql_query = "";
 
-						if(action == "AJAX_updateCustomerTitle") 			sql_query = "UPDATE `timecard_customers`		SET `title`				=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
-						if(action == "AJAX_updateProjectTitle") 			sql_query = "UPDATE `timecard_projects`			SET `title`				=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
-						if(action == "AJAX_updateTaskTitle") 				sql_query = "UPDATE `timecard_tasks`			SET `title`				=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateCustomerTitle") 					sql_query = "UPDATE `timecard_customers`	SET `title`				=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateProjectTitle") 					sql_query = "UPDATE `timecard_projects`		SET `title`				=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateTaskTitle") 						sql_query = "UPDATE `timecard_tasks`		SET `title`				=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateExpenseTemplateTitle")				sql_query = "UPDATE `bt_expense_templates`	SET `title`				=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateExpenseTemplateAgencyComment")		sql_query = "UPDATE `bt_expense_templates`	SET `agency_comment`	=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateExpenseTemplateLineTitle")			sql_query = "UPDATE `bt_expense_line_templates`	SET `title`			=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateExpenseTemplateLineDescription")	sql_query = "UPDATE `bt_expense_line_templates`	SET `description`	=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateExpenseTemplateLineTooltip")		sql_query = "UPDATE `bt_expense_line_templates`	SET `tooltip`		=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateExpenseTemplateLineDomType")		sql_query = "UPDATE `bt_expense_line_templates`	SET `dom_type`		=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateExpenseTemplateLineRequired")		sql_query = "UPDATE `bt_expense_line_templates`	SET `required`		=\"" + (new_value == "true" ? "Y"s : "N"s) + "\" WHERE `id`=\"" + id + "\";";
 						if(action == "AJAX_updatePeriodStart") 				sql_query = "UPDATE `timecard_task_assignment`	SET `period_start`		=STR_TO_DATE(\"" + new_value + "\",\"%d/%m/%Y\") WHERE `id`=\"" + id + "\";";
 						if(action == "AJAX_updatePeriodEnd") 				sql_query = "UPDATE `timecard_task_assignment`	SET `period_end`		=STR_TO_DATE(\"" + new_value + "\",\"%d/%m/%Y\") WHERE `id`=\"" + id + "\";";
 						if(action == "AJAX_updateCompanyTitle")				sql_query = "UPDATE	`company`					SET `name` 				=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
@@ -3650,6 +3831,57 @@ string	SetNewValueByAction(string action, string id, string sow_id, string new_v
 						if(action == "AJAX_updateSubcontractorCreateTasks")	sql_query = "UPDATE	`contracts_sow`				SET `subcontractor_create_tasks` =\"" + new_value + "\" WHERE `id`=\"" + sow_id + "\";";
 						if(action == "AJAX_addTimecardApproverToSoW")		sql_query = "INSERT INTO `timecard_approvers` (`approver_user_id`,`contract_sow_id`) VALUES (\"" + new_value + "\", \"" + sow_id + "\");";
 						if(action == "AJAX_addBTApproverToSoW")				sql_query = "INSERT INTO `bt_approvers` (`approver_user_id`,`contract_sow_id`) VALUES (\"" + new_value + "\", \"" + sow_id + "\");";
+
+						// --- expense line template payment part
+						if(action == "AJAX_updateExpenseTemplateLinePaymentCash")
+						{
+							if(db->Query("SELECT `payment` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\";"))
+							{
+								string	curr_payment = db->Get(0, "payment");
+								auto	find_position = curr_payment.find("card");
+								auto	card = (find_position != string::npos);
+								auto	cash = (new_value == "true");
+								
+								if(cash && card) new_value = "cash and card";
+								else if(card) new_value = "card";
+								else if(cash) new_value = "cash";
+								else
+								{
+									MESSAGE_ERROR("", "", "fail to set payment method cash/card(" + to_string(cash) + "/" + to_string(card) + ")");
+								}
+							}
+							else
+							{
+								new_value = "cash and card";
+								MESSAGE_ERROR("", "", "fail to take payment value from bt_expense_line_templates table");
+							}
+							sql_query = "UPDATE `bt_expense_line_templates`	SET `payment`		=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
+						}
+						if(action == "AJAX_updateExpenseTemplateLinePaymentCard")			
+						{
+							if(db->Query("SELECT `payment` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\";"))
+							{
+								string	curr_payment = db->Get(0, "payment");
+								auto	find_position = curr_payment.find("cash");
+								auto	cash = (find_position != string::npos);
+								auto	card = (new_value == "true");
+								
+								if(cash && card) new_value = "cash and card";
+								else if(card) new_value = "card";
+								else if(cash) new_value = "cash";
+								else
+								{
+									MESSAGE_ERROR("", "", "fail to set payment method cash/card(" + to_string(cash) + "/" + to_string(card) + ")");
+								}
+							}
+							else
+							{
+								new_value = "cash and card";
+								MESSAGE_ERROR("", "", "fail to take payment value from bt_expense_line_templates table");
+							}
+							sql_query = "UPDATE `bt_expense_line_templates`	SET `payment`		=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
+						}
+
 						if(action == "AJAX_updateAgencyPosition")
 						{
 							string	position_id = "";
@@ -3825,7 +4057,78 @@ string	GetSpelledTimecardTaskByID(string id, CMysql *db)
 	return result;	
 }
 
-string	GetSpelledTimecardTaskAssignmentByID(string id, CMysql *db)
+string	GetSpelledBTExpenseTemplateByID(string id, CMysql *db)
+{
+	auto	result = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(db->Query("SELECT `title`, `agency_comment` FROM `bt_expense_templates` WHERE `id`=\"" + id + "\";"))
+	{
+		string 	title = db->Get(0, "title");
+		string	agency_comment = db->Get(0, "agency_comment");
+
+		result = title + " ("s + agency_comment + ")"s;
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "bt_expense_templates.id(" + id + ") not found");
+	}
+	
+	MESSAGE_DEBUG("", "", "finish (result.length is " + to_string(result.length()) + ")");
+
+	return result;	
+}
+
+auto	GetSpelledBTExpenseTemplateByLineID(string id, CMysql *db) -> string
+{
+	auto	result = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(db->Query("SELECT `title`, `agency_comment` FROM `bt_expense_templates` WHERE `id`=(SELECT `bt_expense_template_id` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\");"))
+	{
+		string 	title = db->Get(0, "title");
+		string	agency_comment = db->Get(0, "agency_comment");
+
+		result = title + " ("s + agency_comment + ")"s;
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "bt_expense_templates.id(" + id + ") not found");
+	}
+	
+	MESSAGE_DEBUG("", "", "finish (result.length is " + to_string(result.length()) + ")");
+
+	return result;	
+}
+
+auto	GetSpelledBTExpenseTemplateLineByID(string id, CMysql *db) -> string
+{
+	auto	result = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(db->Query("SELECT `title`, `dom_type`, `description`, `payment` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\";"))
+	{
+		string 	title = db->Get(0, "title");
+		string	description = db->Get(0, "description");
+		string	dom_type = db->Get(0, "dom_type");
+		string	payment = db->Get(0, "payment");
+
+		result = title + " ("s + description + " / "s + dom_type + " / "s + payment + ")"s;
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "bt_expense_templates.id(" + id + ") not found");
+	}
+	
+	MESSAGE_DEBUG("", "", "finish (result.length is " + to_string(result.length()) + ")");
+
+	return result;	
+}
+
+auto	GetSpelledTimecardTaskAssignmentByID(string id, CMysql *db) -> string
 {
 	string	result = "";
 	string	task_id = "";
@@ -4106,6 +4409,72 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 		notification_description = "Данные таймкарты: Субконтрактор " + (new_value == "N" ? string("не ") : string("")) + "может создавать задачи самостоятельно (SoW " + GetSpelledSoWByID(sow_id, db) + ")";
 		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 	}
+	if(action == "AJAX_deleteExpenseTemplate")
+	{
+		notification_description = "Данные командировки: удалили возмещаемый расход " + GetSpelledBTExpenseTemplateByID(id, db);
+		sql_query = ""; // --- don't notify subcontractors, only agency
+	}
+	if(action == "AJAX_deleteExpenseTemplateLine")
+	{
+		notification_description = "Данные командировки: удалили отчетный документ " + GetSpelledBTExpenseTemplateLineByID(id, db) + " из возмещаемого расхода "  + GetSpelledBTExpenseTemplateByLineID(id, db);
+		sql_query = ""; // --- don't notify subcontractors, only agency
+	}
+	if(action == "AJAX_addExpenseTemplate")
+	{
+		notification_description = "Данные командировки: добавили возмещаемый расход "  + GetSpelledBTExpenseTemplateByID(id, db);
+		sql_query = ""; // --- don't notify subcontractors, only agency
+	}
+	if(action == "AJAX_addExpenseTemplateLine")
+	{
+		notification_description = "Данные командировки: добавили отчетный документ " + GetSpelledBTExpenseTemplateLineByID(id, db) + " к возмещаемому расходу "  + GetSpelledBTExpenseTemplateByLineID(id, db);
+		sql_query = ""; // --- don't notify subcontractors, only agency
+	}
+
+	if(action == "AJAX_updateExpenseTemplateTitle")
+	{
+		notification_description = "Данные командировки: изменилось название расхода с " + existing_value + " на " + new_value;
+		sql_query = "SELECT `sow_id` AS `contract_sow_id` FROM `bt_sow` WHERE `bt_expense_template_id`=\"" + id + "\";";
+	}
+	if(action == "AJAX_updateExpenseTemplateAgencyComment")
+	{
+		notification_description = "Данные командировки: изменилось описание расхода (" + GetSpelledBTExpenseTemplateByID(id, db) + ") с " + existing_value + " на " + new_value;
+		sql_query = "SELECT `sow_id` AS `contract_sow_id` FROM `bt_sow` WHERE `bt_expense_template_id`=\"" + id + "\";";
+	}
+	if(action == "AJAX_updateExpenseTemplateLineTitle")
+	{
+		notification_description = "Данные командировки: изменилось название отчетного документа с " + existing_value + " на " + new_value + " у расхода " + GetSpelledBTExpenseTemplateByLineID(id, db);
+		sql_query = "SELECT `sow_id` AS `contract_sow_id` FROM `bt_sow` WHERE `bt_expense_template_id`=(SELECT `bt_expense_template_id` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\");";
+	}
+	if(action == "AJAX_updateExpenseTemplateLineDescription")
+	{
+		notification_description = "Данные командировки: изменилось описание отчетного документа (" + GetSpelledBTExpenseTemplateLineByID(id, db) + ") с " + existing_value + " на " + new_value + " у расхода " + GetSpelledBTExpenseTemplateByLineID(id, db);
+		sql_query = "SELECT `sow_id` AS `contract_sow_id` FROM `bt_sow` WHERE `bt_expense_template_id`=(SELECT `bt_expense_template_id` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\");";
+	}
+	if(action == "AJAX_updateExpenseTemplateLineTooltip")
+	{
+		notification_description = "Данные командировки: изменилась подсказка у отчетного документа (" + GetSpelledBTExpenseTemplateLineByID(id, db) + ") с " + existing_value + " на " + new_value + " у расхода " + GetSpelledBTExpenseTemplateByLineID(id, db);
+		sql_query = "SELECT `sow_id` AS `contract_sow_id` FROM `bt_sow` WHERE `bt_expense_template_id`=(SELECT `bt_expense_template_id` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\");";
+	}
+	if(action == "AJAX_updateExpenseTemplateLineDomType")
+	{
+		notification_description = "Данные командировки: изменился тип отчетного документа (" + GetSpelledBTExpenseTemplateLineByID(id, db) + ") с " + existing_value + " на " + new_value + " у расхода " + GetSpelledBTExpenseTemplateByLineID(id, db);
+		sql_query = "SELECT `sow_id` AS `contract_sow_id` FROM `bt_sow` WHERE `bt_expense_template_id`=(SELECT `bt_expense_template_id` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\");";
+	}
+	if(action == "AJAX_updateExpenseTemplateLinePaymentCash")
+	{
+		notification_description = "Данные командировки: изменилась оплата у отчетного документа (" + GetSpelledBTExpenseTemplateLineByID(id, db) + ") с " + existing_value + " на " + new_value + " у расхода " + GetSpelledBTExpenseTemplateByLineID(id, db);
+		sql_query = "SELECT `sow_id` AS `contract_sow_id` FROM `bt_sow` WHERE `bt_expense_template_id`=(SELECT `bt_expense_template_id` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\");";
+	}
+	if(action == "AJAX_updateExpenseTemplateLinePaymentCard")
+	{
+		notification_description = "Данные командировки: изменилась оплата у отчетного документа (" + GetSpelledBTExpenseTemplateLineByID(id, db) + ") с " + existing_value + " на " + new_value + " у расхода " + GetSpelledBTExpenseTemplateByLineID(id, db);
+		sql_query = "SELECT `sow_id` AS `contract_sow_id` FROM `bt_sow` WHERE `bt_expense_template_id`=(SELECT `bt_expense_template_id` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\");";
+	}
+	if(action == "AJAX_updateExpenseTemplateLineRequired")
+	{
+		notification_description = "Данные командировки: изменилось требование к отчетному документу (" + GetSpelledBTExpenseTemplateLineByID(id, db) + ") с " + existing_value + " на " + new_value + " у расхода " + GetSpelledBTExpenseTemplateByLineID(id, db);
+		sql_query = "SELECT `sow_id` AS `contract_sow_id` FROM `bt_sow` WHERE `bt_expense_template_id`=(SELECT `bt_expense_template_id` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\");";
+	}
 
 	MESSAGE_DEBUG("", "", "finish");
 
@@ -4243,7 +4612,7 @@ bool NotifySoWContractPartiesAboutChanges(string action, string id, string sow_i
 					{
 						if(affected > 1)
 						{
-							MESSAGE_ERROR("", "", "Two or more agencies are sharing Customer/Project/Task(" + action + ":" + id + ") - FORBIDDEN");
+							MESSAGE_ERROR("", "", "Two or more agencies are sharing entities (either Customer/Project/Task or BTexpense/line templates) (" + action + ":" + id + ") - FORBIDDEN");
 						}
 						else
 						{

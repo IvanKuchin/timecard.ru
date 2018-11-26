@@ -1,5 +1,10 @@
 message("-- buid tests/auto/")
 
+include_directories(
+    ${PROJECT_SOURCE_DIR}/src/
+    ${PROJECT_SOURCE_DIR}/src/include/
+)
+
 set(CTEST_BINARY_DIRECTORY ${PROJECT_BINARY_DIR}/tests)
 
 file(GLOB files "autotest_*.cpp")
