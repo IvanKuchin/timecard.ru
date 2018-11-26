@@ -2,7 +2,10 @@ sudo: disable
 language: cpp
 dist: xenial
 
-before_install:
+#
+# Another option to install from custom APT repo
+#
+#before_install:
 #  - sudo add-apt-repository -y ppa:jonathonf/ffmpeg-3
 #  - sudo apt-get update -q
 #  - sudo apt-get install -y libavutil-dev libavcodec-dev libavformat-dev
