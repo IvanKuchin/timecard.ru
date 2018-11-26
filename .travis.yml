@@ -3,13 +3,18 @@ language: cpp
 dist: xenial
 
 before_install:
-  - sudo add-apt-repository -y ppa:jonathonf/ffmpeg-3
-  - sudo apt-get update -q
-  - sudo apt-get install -y libavutil-dev libavcodec-dev libavformat-dev
-#  - sudo apt-get install -y --no-install-recommends --no-install-suggests graphicsmagick-libmagick-dev-compat libgraphicsmagick++1-dev libwebp-dev libmaxminddb-dev libmysqlclient-dev libssl-dev libcurl4-openssl-dev pkg-config
+#  - sudo add-apt-repository -y ppa:jonathonf/ffmpeg-3
+#  - sudo apt-get update -q
+#  - sudo apt-get install -y libavutil-dev libavcodec-dev libavformat-dev
+##  - sudo apt-get install -y --no-install-recommends --no-install-suggests graphicsmagick-libmagick-dev-compat libgraphicsmagick++1-dev libwebp-dev libmaxminddb-dev libmysqlclient-dev libssl-dev libcurl4-openssl-dev pkg-config
 addons:
   apt:
+    sources:
+    - sourceline: ppa:jonathonf/ffmpeg-3
     packages:
+    - libavutil-dev
+    - libavcodec-dev
+    - libavformat-dev
     - graphicsmagick-libmagick-dev-compat
     - libgraphicsmagick++-dev
     - libwebp-dev
