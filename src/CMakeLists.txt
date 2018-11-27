@@ -156,37 +156,13 @@ configure_file(
 
 
 # ---- big joint librabry
-#macro(set_lib_properties target_lib proj_src proj_inc_list proj_lib_list result_lib_list)
 set_lib_properties(__joint_lib "${JOINT_LIBRARY_SRCs}" "${project_include_directories}" "${project_link_libraries}")
-#add_library(			__joint_lib			${JOINT_LIBRARY_SRCs})
-#target_include_directories(	__joint_lib		PUBLIC	${project_include_directories})
-#target_link_libraries(		__joint_lib			${project_link_libraries})
-#if(MSVC)
-#    target_compile_options(	__joint_lib		PRIVATE	/W4 /WX)
-#else(MSVC)
-#    target_compile_options(	__joint_lib		PRIVATE	-Wall -Wextra -pedantic)
-#endif(MSVC)
-#
-#set(				PROJECT_LIBS			${PROJECT_LIBS} __joint_lib)
 
 # ---- list of independent libraries
 foreach(INDEPENDENT_LIBRARY_SRC ${INDEPENDENT_LIBRARIES_SRC})
     string(REGEX REPLACE "(^.*/|\\.[^.]*$)" "" file_without_ext ${INDEPENDENT_LIBRARY_SRC})
 
     set_lib_properties(${file_without_ext} "${file_without_ext}.cpp" "${project_include_directories}" "${project_link_libraries}")
-
-#[==[
-#    add_library(		${file_without_ext}		${file_without_ext}.cpp)
-#    target_include_directories(	${file_without_ext}	PUBLIC	${project_include_directories})
-#    target_link_libraries(	${file_without_ext}		${project_link_libraries})
-#    if(MSVC)
-#	target_compile_options(	${file_without_ext}	PRIVATE	/W4 /WX)
-#    else(MSVC)
-#	target_compile_options(	${file_without_ext}	PRIVATE	-Wall -Wextra -pedantic)
-#    endif(MSVC)
-#
-#    set(			PROJECT_LIBS			${PROJECT_LIBS} ${file_without_ext})
-#]==]
 endforeach()
 
 # --- MSVC grouping
