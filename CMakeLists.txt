@@ -13,7 +13,12 @@ set(My_VERSION_MAJOR 0)
 set(My_VERSION_MINOR 1)
 
 set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-long-long -Wno-unused-parameter -pedantic")
+# --- changing CXX_FLAGS is _not_ the best practise
+# --- cmake 3.12 have -D switch, capable remove definition per-target
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-unused-parameter -pedantic")
+
+# --- Doesn't work properly, enable and give it a try
+# --- set(CMAKE_CXX_INCLUDE_WHAT_YOU_USE "include-what-you-use")
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/CMakeModules/ )
 

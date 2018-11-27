@@ -5,7 +5,9 @@
 # SWSCALE_INCLUDE_DIR, where to find SWSCALE.h
 #
 
-set( SWSCALE_FOUND "NO" )
+message(STATUS "looking for libswscale-dev")
+
+set( SWSCALE_FOUND OFF )
 
 find_path( SWSCALE_INCLUDE_DIR libswscale/swscale.h
   HINTS
@@ -40,8 +42,17 @@ find_library( SWSCALE_LIBRARY
   /mingw
 )
 
-#message( "SWSCALE_LIBRARY is ${SWSCALE_LIBRARY}" )
+if(SWSCALE_INCLUDE_DIR)
+    if(SWSCALE_LIBRARY)
+	set( SWSCALE_FOUND "YES" )
+    endif()
+endif()
 
-set( SWSCALE_FOUND "YES" )
 
-#message( "SWSCALE_LIBRARY is ${SWSCALE_LIBRARY}" )
+if(SWSCALE_FOUND)
+    message(STATUS "looking for libswscale-dev - done")
+else()
+    message(FATAL_ERROR "ERROR: libswscale-dev not installed")
+endif()
+
+

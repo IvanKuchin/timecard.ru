@@ -5,7 +5,7 @@
 # AVFORMAT_INCLUDE_DIR, where to find avformat.h
 #
 
-message("-- looking for libavformat-dev")
+message(STATUS "looking for libavformat-dev")
 
 set( AVFORMAT_FOUND OFF )
 
@@ -52,6 +52,7 @@ endif()
 
 
 if(AVFORMAT_FOUND)
+    message(STATUS "looking for libavformat-dev - done")
 else()
     message(FATAL_ERROR "ERROR: libavformat-dev not installed")
 endif()

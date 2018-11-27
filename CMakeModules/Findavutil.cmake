@@ -5,7 +5,7 @@
 # AVUTIL_INCLUDE_DIR, where to find avutil.h
 #
 
-message("-- looking for libavutil-dev")
+message(STATUS "looking for libavutil-dev")
 
 set( AVUTIL_FOUND OFF )
 
@@ -53,6 +53,7 @@ endif()
 
 
 if(AVUTIL_FOUND)
+    message(STATUS "looking for libavutil-dev - done")
 else()
     message(FATAL_ERROR "ERROR: libavutil-dev not installed")
 endif()

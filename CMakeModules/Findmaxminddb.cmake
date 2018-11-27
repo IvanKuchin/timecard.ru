@@ -5,7 +5,9 @@
 # MAXMINDDB_INCLUDE_DIR, where to find MAXMIND.h
 #
 
-set( MAXMINDDB_FOUND "NO" )
+message(STATUS "looking for libmaxminddb-dev")
+
+set( MAXMINDDB_FOUND OFF )
 
 find_path( MAXMINDDB_INCLUDE_DIR maxminddb.h
   HINTS
@@ -42,6 +44,15 @@ find_library( MAXMINDDB_LIBRARY
 
 #message( "MAXMINDDB_LIBRARY is ${MAXMINDDB_LIBRARY}" )
 
-set( MAXMINDDB_FOUND "YES" )
+if(MAXMINDDB_INCLUDE_DIR)
+    if(MAXMINDDB_LIBRARY)
+	set( MAXMINDDB_FOUND "YES" )
+    endif()
+endif()
 
-#message( "MAXMINDDB_FOUND is ${MAXMINDDB_FOUND}" )
+
+if(MAXMINDDB_FOUND)
+    message(STATUS "looking for libmaxminddb-dev - done")
+else()
+    message(FATAL_ERROR "ERROR: libmaxminddb-dev not installed")
+endif()

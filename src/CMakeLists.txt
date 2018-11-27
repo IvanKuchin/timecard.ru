@@ -42,6 +42,31 @@ set(INDEPENDENT_LIBRARIES_SRC
     cvideoconverter.cpp
     )
 
+# --- MACROSes start ---
+
+macro(print_all_variables)
+    message(STATUS "print_all_variables------------------------------------------{")
+
+    get_cmake_property(_variableNames VARIABLES)
+    foreach (_variableName ${_variableNames})
+        message(STATUS "${_variableName}=${${_variableName}}")
+    endforeach()
+
+    message(STATUS "print_all_variables------------------------------------------}")
+endmacro()
+
+macro(set_lib_properties target_lib proj_src proj_inc_list proj_lib_list)
+    message(STATUS "set_lib_properties ${target_lib}")
+
+    add_library(		${target_lib}			${proj_src})
+    target_include_directories(	${target_lib}		PUBLIC	${proj_inc_list})
+    target_link_libraries(	${target_lib}			${proj_lib_list})
+
+    set(			PROJECT_LIBS		${PROJECT_LIBS} ${target_lib})
+endmacro()
+
+# --- MACROSes finish ---
+
 
 # --- Packages and libraries control
 include(FindPkgConfig)
@@ -72,12 +97,12 @@ else(MAXMIND_DISABLE)
     find_package(maxminddb REQUIRED)
 endif(MAXMIND_DISABLE)
 
+#[==[
 include_directories(
     ${PROJECT_SOURCE_DIR}/src/include/
     ${PROJECT_BINARY_DIR}/src/include/ # --- rendered config.h, generated table.h
     ${LIBMYSQLCLIENT_INCLUDE_DIRS}
     ${OPENSSL_INCLUDE_DIR}
-#    ${ImageMagick_INCLUDE_DIRS}
     ${IMAGEMAGICK_INCLUDE_DIR}
     ${CURL_INCLUDE_DIR}
     ${AVUTIL_INCLUDE_DIR}
@@ -91,7 +116,28 @@ link_directories(
 link_libraries(
     ${LIBMYSQLCLIENT_LIBRARIES}
     ${OPENSSL_CRYPTO_LIBRARIES}
-#    ${ImageMagick_LIBRARIES}
+    ${IMAGEMAGICK_LIBRARY}
+    ${CURL_LIBRARIES}
+    ${AVUTIL_LIBRARY}
+    ${AVFORMAT_LIBRARY}
+    ${MAXMINDDB_LIBRARY}
+    )
+#]==]
+
+set(project_include_directories
+    ${PROJECT_SOURCE_DIR}/src/include/
+    ${PROJECT_BINARY_DIR}/src/include/ # --- rendered config.h, generated table.h
+    ${LIBMYSQLCLIENT_INCLUDE_DIRS}
+    ${OPENSSL_INCLUDE_DIR}
+    ${IMAGEMAGICK_INCLUDE_DIR}
+    ${CURL_INCLUDE_DIR}
+    ${AVUTIL_INCLUDE_DIR}
+    ${AVFORMAT_INCLUDE_DIR}
+    )
+
+set(project_link_libraries
+    ${LIBMYSQLCLIENT_LIBRARIES}
+    ${OPENSSL_CRYPTO_LIBRARIES}
     ${IMAGEMAGICK_LIBRARY}
     ${CURL_LIBRARIES}
     ${AVUTIL_LIBRARY}
@@ -110,15 +156,37 @@ configure_file(
 
 
 # ---- big joint librabry
-add_library(__joint_lib		${JOINT_LIBRARY_SRCs})
-set(EXTRA_LIBS			${EXTRA_LIBS} __joint_lib)
+#macro(set_lib_properties target_lib proj_src proj_inc_list proj_lib_list result_lib_list)
+set_lib_properties(__joint_lib "${JOINT_LIBRARY_SRCs}" "${project_include_directories}" "${project_link_libraries}")
+#add_library(			__joint_lib			${JOINT_LIBRARY_SRCs})
+#target_include_directories(	__joint_lib		PUBLIC	${project_include_directories})
+#target_link_libraries(		__joint_lib			${project_link_libraries})
+#if(MSVC)
+#    target_compile_options(	__joint_lib		PRIVATE	/W4 /WX)
+#else(MSVC)
+#    target_compile_options(	__joint_lib		PRIVATE	-Wall -Wextra -pedantic)
+#endif(MSVC)
+#
+#set(				PROJECT_LIBS			${PROJECT_LIBS} __joint_lib)
 
 # ---- list of independent libraries
 foreach(INDEPENDENT_LIBRARY_SRC ${INDEPENDENT_LIBRARIES_SRC})
     string(REGEX REPLACE "(^.*/|\\.[^.]*$)" "" file_without_ext ${INDEPENDENT_LIBRARY_SRC})
-    add_library(${file_without_ext}		${file_without_ext}.cpp)
-    set(EXTRA_LIBS				${EXTRA_LIBS} ${file_without_ext})
-#    message("--- ${file_without_ext}")
+
+    set_lib_properties(${file_without_ext} "${file_without_ext}.cpp" "${project_include_directories}" "${project_link_libraries}")
+
+#[==[
+#    add_library(		${file_without_ext}		${file_without_ext}.cpp)
+#    target_include_directories(	${file_without_ext}	PUBLIC	${project_include_directories})
+#    target_link_libraries(	${file_without_ext}		${project_link_libraries})
+#    if(MSVC)
+#	target_compile_options(	${file_without_ext}	PRIVATE	/W4 /WX)
+#    else(MSVC)
+#	target_compile_options(	${file_without_ext}	PRIVATE	-Wall -Wextra -pedantic)
+#    endif(MSVC)
+#
+#    set(			PROJECT_LIBS			${PROJECT_LIBS} ${file_without_ext})
+#]==]
 endforeach()
 
 # --- MSVC grouping
@@ -128,19 +196,32 @@ source_group("Sources"          FILES ${SOURCES})
 source_group("Resources"        FILES ${RESOURCES})
 
 # --- Executables sources
-
 foreach(EXECUTABLE_CGI ${EXECUTABLE_CGIs})
     string(REGEX REPLACE "(^.*/|\\.[^.]*$)" "" file_without_ext ${EXECUTABLE_CGI})
-    add_executable(${file_without_ext}.cgi		${file_without_ext}.cpp	${SOURCES})
-    target_link_libraries(${file_without_ext}.cgi	${EXTRA_LIBS})
+
+    add_executable(		${file_without_ext}.cgi		${file_without_ext}.cpp	${SOURCES})
+    target_link_libraries(	${file_without_ext}.cgi		${PROJECT_LIBS})
+    target_compile_features(${file_without_ext}.cgi
+        PUBLIC
+            cxx_strong_enums
+        PRIVATE
+            cxx_range_for
+    )
     # message("=== ${file_without_ext}")
 endforeach()
 
-add_executable(cron_daily			cron_daily.cpp			${SOURCES})
-add_executable(cron_minute			cron_minute.cpp			${SOURCES})
+add_executable(cron_daily			cron_daily.cpp		${SOURCES})
+add_executable(cron_minute			cron_minute.cpp		${SOURCES})
 
-target_link_libraries(cron_daily		${EXTRA_LIBS})
-target_link_libraries(cron_minute		${EXTRA_LIBS})
+target_link_libraries(cron_daily		${PROJECT_LIBS})
+target_link_libraries(cron_minute		${PROJECT_LIBS})
+
+if(MSVC)
+    target_compile_options(	cron_daily		PRIVATE	/W4 /WX)
+else(MSVC)
+    target_compile_options(	cron_minute 		PRIVATE	-Wall -Wextra -pedantic)
+endif(MSVC)
+
 
 # --- Install part
 install(TARGETS index.cgi			DESTINATION		${CGIDIR})
@@ -158,18 +239,6 @@ install(TARGETS ajax_anyrole_1.cgi		DESTINATION		${CGIDIR})
 install(TARGETS cron_daily			DESTINATION		${CRON_INSTALL_DIR})
 install(TARGETS cron_minute			DESTINATION		${CRON_INSTALL_DIR})
 
-# --- MACROSes start ---
-
-macro(print_all_variables)
-    message(STATUS "print_all_variables------------------------------------------{")
-    get_cmake_property(_variableNames VARIABLES)
-    foreach (_variableName ${_variableNames})
-        message(STATUS "${_variableName}=${${_variableName}}")
-    endforeach()
-    message(STATUS "print_all_variables------------------------------------------}")
-endmacro()
-
-# --- MACROSes finish ---
 
 
 #print_all_variables()

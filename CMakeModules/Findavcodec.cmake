@@ -5,7 +5,7 @@
 # AVCODEC_INCLUDE_DIR, where to find avcodec.h
 #
 
-message("-- looking for libavcodec-dev")
+message(STATUS "looking for libavcodec-dev")
 
 set( AVCODEC_FOUND OFF )
 
@@ -52,6 +52,7 @@ endif()
 
 
 if(AVCODEC_FOUND)
+    message(STATUS "looking for libavcodec-dev - done")
 else()
     message(FATAL_ERROR "ERROR: libavcodec-dev not installed")
 endif()

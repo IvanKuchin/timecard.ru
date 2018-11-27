@@ -5,7 +5,7 @@
 # IMAGEMAGICK_INCLUDE_DIR, where to find avcodec.h
 #
 
-message("-- looking for ImageMagick++-dev")
+message(STATUS "looking for ImageMagick++-dev")
 
 set( IMAGEMAGICK_FOUND OFF )
 
@@ -52,6 +52,7 @@ endif()
 
 
 if(IMAGEMAGICK_FOUND)
+    message(STATUS "looking for ImageMagick++-dev - done")
 else()
     message(FATAL_ERROR "ERROR: libgraphicsmagick++-dev not installed")
 endif()
