@@ -56,7 +56,7 @@ macro(print_all_variables)
 endmacro()
 
 macro(set_lib_properties target_lib proj_src proj_inc_list proj_lib_list)
-    message(STATUS "set_lib_properties ${target_lib}")
+    # message(STATUS "set_lib_properties ${target_lib}")
 
     add_library(		${target_lib}			${proj_src})
     target_include_directories(	${target_lib}		PUBLIC	${proj_inc_list})

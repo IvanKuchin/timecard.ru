@@ -18,7 +18,7 @@ foreach(file ${files})
     target_include_directories(	${file_without_ext} PRIVATE	${project_include_directories})
     target_link_libraries(	${file_without_ext} 		${PROJECT_LIBS})
 
-message(STATUS "add test ${file_without_ext} include_var ${project_include_directories}")
+    # message(STATUS "add test ${file_without_ext} include_var ${project_include_directories}")
 
     add_test(${file_without_ext} ${file_without_ext})
     set_tests_properties(${file_without_ext}
