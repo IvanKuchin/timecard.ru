@@ -28,4 +28,4 @@ addons:
     - pkg-config
 
 script:
-    - mkdir build && cd build && cmake .. && make && ctest
+    - mkdir build && cd build && cmake .. && make && ctest --output-on-failure
