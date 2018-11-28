@@ -1090,6 +1090,70 @@ int main(void)
 														"`contract_sow_id` IN (SELECT `id` FROM `contracts_sow` WHERE "
 															"`agency_company_id`=\"" + agency_id + "\" "
 													");", &db, &user) << "]";
+						if(include_bt)
+							ostResult <<	","
+											"\"bt_expense_assignments\":[" << GetBTExpenseAssignmentInJSONFormat(
+													"SELECT * FROM `bt_sow_assignment` WHERE "
+														+ (sow_id.length() ? string("`sow_id`=\"" + sow_id + "\" AND ") : "") +
+														"`sow_id` IN (SELECT `id` FROM `contracts_sow` WHERE "
+															"`agency_company_id`=\"" + agency_id + "\" "
+													");", &db, &user) << "]";
+						ostResult << "}";
+					}
+					else
+					{
+						error_message = "Агенство не найдено";
+						MESSAGE_ERROR("", action, "user.id(" + user.GetID() + ") is not an agency employee");
+					}
+				}
+				else
+				{
+					MESSAGE_ERROR("", action, "user(" + user.GetID() + ") is not an agency employee");
+					error_message = "Информация доступна только для агенства";
+				}
+
+				if(error_message.empty())
+				{
+				}
+				else
+				{
+					MESSAGE_DEBUG("", action, "failed");
+					ostResult.str("");
+					ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+				}
+
+				indexPage.RegisterVariableForce("result", ostResult.str());
+
+				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			}
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
+
+		if(action == "AJAX_getBTExpenseTemplates")
+		{
+			ostringstream	ostResult;
+
+			MESSAGE_DEBUG("", action, "start");
+
+			ostResult.str("");
+			{
+				string			template_name = "json_response.htmlt";
+				string			error_message = "";
+
+				string			sow_id 			= indexPage.GetVarsHandler()->Get("sow_id");
+
+				if(sow_id.length())	sow_id = CheckHTTPParam_Number(sow_id);
+
+				if(user.GetType() == "agency")
+				{
+					if(db.Query("SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id`=(SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user.GetID() + "\");"))
+					{
+						string		agency_id = db.Get(0, "id");
+
+						ostResult << "{"
+										"\"result\":\"success\","
+										"\"bt_expense_templates\":[" << GetBTExpenseTemplatesInJSONFormat("SELECT * FROM `bt_expense_templates` WHERE `agency_company_id`=\"" + agency_id + "\";", &db, &user) << "]";
 						ostResult << "}";
 					}
 					else
@@ -1944,6 +2008,99 @@ int main(void)
 			MESSAGE_DEBUG("", action, "finish");
 		}
 
+		if(action == "AJAX_deleteBTExpenseAssignment")
+		{
+			ostringstream	ostResult;
+
+			MESSAGE_DEBUG("", action, "start");
+
+			ostResult.str("");
+			{
+				string			template_name = "json_response.htmlt";
+				string			error_message = "";
+
+				string			bt_expense_assignment_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
+
+				if(bt_expense_assignment_id.length())
+				{
+					if(db.Query("SELECT `bt_expense_template_id`,`sow_id` FROM `bt_sow_assignment` WHERE `id`=\"" + bt_expense_assignment_id + "\";"))
+					{
+						string	sow_id = db.Get(0, "sow_id");
+						string	bt_expense_template_id = db.Get(0, "bt_expense_template_id");
+
+						error_message = isAgencyEmployeeAllowedToChangeSoW(sow_id, &db, &user);
+						if(error_message.empty())
+						{
+							if(db.Query("SELECT COUNT(*) AS `counter` FROM `bt_expenses` WHERE `bt_expense_template_id`=\"" + bt_expense_template_id + "\" AND `bt_id` IN ( "
+											"SELECT `id` FROM `bt` WHERE `contract_sow_id`=\"" + sow_id + "\" "
+										");"
+							))
+							{
+								string	counter = db.Get(0, "counter");
+
+								if(counter == "0")
+								{
+									if(NotifySoWContractPartiesAboutChanges(action, bt_expense_assignment_id, sow_id, "", "", &db, &user))
+									{
+									}
+									else
+									{
+										MESSAGE_ERROR("", "", "fail to notify SoW parties");
+									}
+
+									// --- important that assignment removal comes after notification
+									// --- such as notification use information about assignment 
+									db.Query("DELETE FROM `bt_sow_assignment` WHERE `id`=\"" + bt_expense_assignment_id + "\";");
+									ostResult << "{\"result\":\"success\"}";
+								}
+								else
+								{
+									MESSAGE_DEBUG("", action, counter + " instances reported on bt_expenses.id(" + bt_expense_template_id + ")");
+									error_message = "Нельзя удалять, поскольку субконтрактор использовал этот расход " + counter + " раз(а)";
+								}
+							}
+							else
+							{
+								MESSAGE_ERROR("", action, "can't define # of reported lines");
+								error_message = "Ошибка БД";
+							}
+						}
+						else
+						{
+							MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") doesn't allowed to change sow.id(" + sow_id + ")");
+						}
+					}
+					else
+					{
+						MESSAGE_ERROR("", action, "bt_sow_assignment.id(" + bt_expense_assignment_id + ") not found");
+						error_message = "Назначение не найдено";
+					}
+
+				}
+				else
+				{
+					MESSAGE_ERROR("", action, "one of mandatory parameters missed");
+					error_message = "Информация доступна только для агенства";
+				}
+
+				if(error_message.empty())
+				{
+				}
+				else
+				{
+					MESSAGE_DEBUG("", action, "failed");
+					ostResult.str("");
+					ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+				}
+
+				indexPage.RegisterVariableForce("result", ostResult.str());
+
+				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			}
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
+
 		if(action == "AJAX_deleteTask")
 		{
 			ostringstream	ostResult;
@@ -2089,7 +2246,8 @@ int main(void)
 							error_message = isActionEntityBelongsToAgency(action, expense_template_id, agency_id, &db, &user);
 							if(error_message.empty())
 							{
-								if(isExpenseTemplateIDValidToRemove(expense_template_id, &db))
+								error_message = isExpenseTemplateIDValidToRemove(expense_template_id, &db);
+								if(error_message.empty())
 								{
 									string		removal_sql_query = "";
 
@@ -2101,13 +2259,12 @@ int main(void)
 										MESSAGE_ERROR("", "", "fail to notify agency");
 									}
 									db.Query("DELETE FROM `bt_expense_line_templates` WHERE `bt_expense_template_id`=\"" + expense_template_id + "\";");
-									db.Query("DELETE FROM `bt_sow` WHERE `bt_expense_template_id`=\"" + expense_template_id + "\";");
+									db.Query("DELETE FROM `bt_sow_assignment` WHERE `bt_expense_template_id`=\"" + expense_template_id + "\";");
 									db.Query("DELETE FROM `bt_expense_templates` WHERE `id`=\"" + expense_template_id + "\";");
 									ostResult << "{\"result\":\"success\"}";
 								}
 								else
 								{
-									error_message = "На этот расход субконтракторы отчитались. Поэтому нельзя удалить.";
 									MESSAGE_DEBUG("", action, "subcontractors reported on expense_template_id(" + expense_template_id + "), can't remove it");
 								}
 							}
@@ -2443,7 +2600,7 @@ int main(void)
 		}
 
 		if(	action == "AJAX_addTimecardApproverToSoW" ||
-			action == "AJAX_addBTApproverToSoW"
+			action == "AJAX_addBTExpenseApproverToSoW"
 		)
 		{
 			string			new_value = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("new_value"));
@@ -2518,7 +2675,7 @@ int main(void)
 		}
 
 		if(	action == "AJAX_deleteTimecardApproverFromSoW" ||
-			action == "AJAX_deleteBTApproverFromSoW"
+			action == "AJAX_deleteBTExpenseApproverFromSoW"
 		)
 		{
 			string			id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
