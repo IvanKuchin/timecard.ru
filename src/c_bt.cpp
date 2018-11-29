@@ -171,7 +171,7 @@ string	C_ExpenseTemplate::CheckValidity(CMysql *db) const
 		error_message = "Необходимо указать название расхода";
 		MESSAGE_DEBUG("C_ExpenseTemplate", "", "title is required");
 	}
-	else if(GetCompanyID().empty())
+	else if(GetCompanyID().empty() || (GetCompanyID() == "0"))
 	{
 		error_message = "Необходимо указать компанию которой будет принадлежать расход";
 		MESSAGE_ERROR("C_ExpenseTemplate", "", "company.id is required");

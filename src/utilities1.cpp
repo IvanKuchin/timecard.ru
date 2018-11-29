@@ -8037,13 +8037,19 @@ struct tm GetTMObject(string date)
 	{
 		result.tm_mday = stoi(sm[1]);
 		result.tm_mon = stoi(sm[2]) - 1;
-		result.tm_year = stoi(sm[3]) - 1900;
+		if(stoi(sm[3]) < 100)
+			result.tm_year = 2000 + stoi(sm[3]) - 1900;
+		else
+			result.tm_year = stoi(sm[3]) - 1900;
 	}
 	else if(regex_match(date, sm, regex("^([[:digit:]]{2,4})\\-([[:digit:]]{1,2})\\-([[:digit:]]{1,2})$")))
 	{
 		result.tm_mday = stoi(sm[3]);
 		result.tm_mon = stoi(sm[2]) - 1;
-		result.tm_year = stoi(sm[1]) - 1900;
+		if(stoi(sm[1]) < 100)
+			result.tm_year = 2000 + stoi(sm[1]) - 1900;
+		else
+			result.tm_year = stoi(sm[1]) - 1900;
 	}
 	else
 	{

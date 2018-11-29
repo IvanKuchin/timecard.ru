@@ -11,22 +11,33 @@
 
 using namespace std;
 
-string Test1()
+bool Test1()
 {
+	auto result = true;
 	auto error_message = ""s;
 	C_ExpenseTemplate	expense_template;
 
 	expense_template.SetID			("");
+	expense_template.SetCompanyID	("0");
 	expense_template.SetTitle		("expense title");
 	expense_template.SetDescription	("expense description");
 
 	error_message = expense_template.CheckValidity(NULL);
 
-	return error_message;
+	// --- error_message expected not empty
+	if(error_message.length())
+	{
+		if(error_message == "Œ¯Ë·Í‡ ¡ƒ") result = false;
+	}
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return result;
 }
 
-string Test2()
+bool Test2()
 {
+	auto result = true;
 	auto error_message = ""s;
 	C_ExpenseTemplate	expense_template;
 
@@ -36,7 +47,64 @@ string Test2()
 
 	error_message = expense_template.CheckValidity(NULL);
 
-	return error_message;
+	// --- error_message expected not empty
+	if(error_message.length())
+	{
+		if(error_message == "Œ¯Ë·Í‡ ¡ƒ") result = false;
+	}
+
+	MESSAGE_DEBUG("", "", "finish");
+	
+	return result;
+}
+
+bool Test3()
+{
+	auto result = true;
+	auto error_message = ""s;
+	C_ExpenseTemplate	expense_template;
+
+	expense_template.SetID			("123");
+	expense_template.SetCompanyID	("123");
+	expense_template.SetTitle		("");
+	expense_template.SetDescription	("expense description");
+
+	error_message = expense_template.CheckValidity(NULL);
+
+	// --- error_message expected not empty
+	if(error_message.length())
+	{
+		if(error_message == "Œ¯Ë·Í‡ ¡ƒ") result = false;
+	}
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return result;
+}
+
+bool Test4()
+{
+	auto result = true;
+	auto error_message = ""s;
+	C_ExpenseTemplate	expense_template;
+
+	expense_template.SetID			("123");
+	expense_template.SetCompanyID	("123");
+	expense_template.SetTitle		("expense title");
+	expense_template.SetDescription	("expense description");
+
+	error_message = expense_template.CheckValidity(NULL);
+
+	// --- error_message expected not empty
+	if(error_message.length())
+	{
+		if(error_message == "Œ¯Ë·Í‡ ¡ƒ") {}
+		else { result = false; }
+	}
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return result;
 }
 
 
@@ -50,7 +118,6 @@ int main(void)
 
 	{ MESSAGE_DEBUG("", "", __FILE__); }
 	signal(SIGSEGV, crash_handler);
-
 /*
 	if(db.Connect(DB_NAME, DB_LOGIN, DB_PASSWORD) < 0)
 	{
@@ -65,15 +132,25 @@ int main(void)
 	indexPage.SetDB(&db);
 */
 
-	if(Test1().length())
+	if(!Test1())
 	{
 		testing_success = false;
 		cout << "Test1 failed" << endl;
 	}
-	if(Test2().length())
+	if(!Test2())
 	{
 		testing_success = false;
 		cout << "Test2 failed" << endl;
+	}
+	if(!Test3())
+	{
+		testing_success = false;
+		cout << "Test3 failed" << endl;
+	}
+	if(!Test4())
+	{
+		testing_success = false;
+		cout << "Test4 failed" << endl;
 	}
 
 	if(testing_success)
