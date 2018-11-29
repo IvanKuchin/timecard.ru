@@ -2,7 +2,7 @@
 
 int main(void)
 {
-	printf("Test passed, but with failure");
+	printf("Test passed");
 	return(0);
 }
 
