@@ -10,6 +10,18 @@ dist: xenial
 #  - sudo apt-get update -q
 #  - sudo apt-get install -y libavutil-dev libavcodec-dev libavformat-dev
 ##  - sudo apt-get install -y --no-install-recommends --no-install-suggests graphicsmagick-libmagick-dev-compat libgraphicsmagick++1-dev libwebp-dev libmaxminddb-dev libmysqlclient-dev libssl-dev libcurl4-openssl-dev pkg-config
+
+services:
+  - mysql
+
+#
+# Change password from default empty to smth else
+#
+#before_install:
+#  - sudo mysql -e "use mysql; update user set authentication_string=PASSWORD('root') where User='root'; update user set plugin='mysql_native_password';FLUSH PRIVILEGES;"
+#  - sudo mysql_upgrade -u root -proot
+#  - sudo service mysql restart
+
 addons:
   apt:
     sources:
@@ -28,4 +40,4 @@ addons:
     - pkg-config
 
 script:
-    - mkdir build && cd build && cmake .. && make && ctest --output-on-failure
+    - mkdir build && cd build && cmake .. && more ./share/timecard.su/ci-scripts/pre.sql | mysql -e && more ./share/timecard.su/ci-scripts/ci.sql | mysql -e && make && ctest --output-on-failure

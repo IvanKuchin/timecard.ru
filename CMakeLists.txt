@@ -28,9 +28,10 @@ option(FFPMPEG_DISABLE		"turn off VideoConverter" OFF)
 
 # --- Set required variables
 # ---- build variables
-set(CRON_PROJECT_DIR	${PROJECT_BINARY_DIR}/share/${PROJECT_NAME}/cron)
-set(ARCHIVE_PROJECT_DIR	${PROJECT_BINARY_DIR}/share/${PROJECT_NAME}/archive)
-set(MAXMIND_PROJECT_DIR	${PROJECT_BINARY_DIR}/share/${PROJECT_NAME}/maxmind)
+set(CRON_PROJECT_DIR		${PROJECT_BINARY_DIR}/share/${PROJECT_NAME}/cron)
+set(ARCHIVE_PROJECT_DIR		${PROJECT_BINARY_DIR}/share/${PROJECT_NAME}/archive)
+set(MAXMIND_PROJECT_DIR		${PROJECT_BINARY_DIR}/share/${PROJECT_NAME}/maxmind)
+set(CI_SCRIPT_PROJECT_DIR	${PROJECT_BINARY_DIR}/share/${PROJECT_NAME}/ci-scripts)
 
 # ---- install variables
 set(ROOTDIR		"/home/httpd/dev.${PROJECT_NAME}")
@@ -46,6 +47,7 @@ add_subdirectory(src/)
 add_subdirectory(supplemental/cron/)
 add_subdirectory(supplemental/archive/)
 add_subdirectory(supplemental/maxmind/)
+add_subdirectory(supplemental/ci-scripts/)
 
 include(CTest)
 add_subdirectory(tests/)
