@@ -40,4 +40,4 @@ addons:
     - pkg-config
 
 script:
-    - mkdir build && cd build && cmake .. && more ./share/timecard.su/ci-scripts/pre.sql | mysql -e && more ./share/timecard.su/ci-scripts/ci.sql | mysql -e && make && ctest --output-on-failure
+    - mkdir build && cd build && cmake .. && chmod a+x ./share/timecard.su/ci-scripts/mysql_provisioning && ./share/timecard.su/ci-scripts/mysql_provisioning && make && ctest --output-on-failure

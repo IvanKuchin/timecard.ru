@@ -1,0 +1,6 @@
+#!/bin/bash
+
+set -ev
+
+more ./pre.sql | mysql
+more ./ci.sql | mysql ${PROJECT_NAME}
