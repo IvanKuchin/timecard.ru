@@ -7591,16 +7591,17 @@ int GetSpecificData_GetNumberOfFolders(string itemType)
 		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
 	}
 
-	if(itemType == "certification")		result = CERTIFICATIONSLOGO_NUMBER_OF_FOLDERS;
-	else if(itemType == "course")		result = CERTIFICATIONSLOGO_NUMBER_OF_FOLDERS;
-	else if(itemType == "university")	result = UNIVERSITYLOGO_NUMBER_OF_FOLDERS;
-	else if(itemType == "school")		result = SCHOOLLOGO_NUMBER_OF_FOLDERS;
-	else if(itemType == "language")		result = FLAG_NUMBER_OF_FOLDERS;
-	else if(itemType == "book")			result = BOOKCOVER_NUMBER_OF_FOLDERS;
-	else if(itemType == "company")		result = COMPANYLOGO_NUMBER_OF_FOLDERS;
-	else if(itemType == "gift")			result = GIFTIMAGE_NUMBER_OF_FOLDERS;
-	else if(itemType == "event")		result = EVENTIMAGE_NUMBER_OF_FOLDERS;
-	else if(itemType == "expense_line")	result = EXPENSELINE_NUMBER_OF_FOLDERS;
+	if(itemType == "certification")					result = CERTIFICATIONSLOGO_NUMBER_OF_FOLDERS;
+	else if(itemType == "course")					result = CERTIFICATIONSLOGO_NUMBER_OF_FOLDERS;
+	else if(itemType == "university")				result = UNIVERSITYLOGO_NUMBER_OF_FOLDERS;
+	else if(itemType == "school")					result = SCHOOLLOGO_NUMBER_OF_FOLDERS;
+	else if(itemType == "language")					result = FLAG_NUMBER_OF_FOLDERS;
+	else if(itemType == "book")						result = BOOKCOVER_NUMBER_OF_FOLDERS;
+	else if(itemType == "company")					result = COMPANYLOGO_NUMBER_OF_FOLDERS;
+	else if(itemType == "company_profile_logo")		result = COMPANYLOGO_NUMBER_OF_FOLDERS;
+	else if(itemType == "gift")						result = GIFTIMAGE_NUMBER_OF_FOLDERS;
+	else if(itemType == "event")					result = EVENTIMAGE_NUMBER_OF_FOLDERS;
+	else if(itemType == "expense_line")				result = EXPENSELINE_NUMBER_OF_FOLDERS;
 	else
 	{
 		CLog	log;
@@ -7626,16 +7627,17 @@ int GetSpecificData_GetMaxFileSize(string itemType)
 		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
 	}
 
-	if(itemType == "certification")		result = CERTIFICATIONSLOGO_MAX_FILE_SIZE;
-	else if(itemType == "course")		result = CERTIFICATIONSLOGO_MAX_FILE_SIZE;
-	else if(itemType == "university")	result = UNIVERSITYLOGO_MAX_FILE_SIZE;
-	else if(itemType == "school")		result = SCHOOLLOGO_MAX_FILE_SIZE;
-	else if(itemType == "language")		result = FLAG_MAX_FILE_SIZE;
-	else if(itemType == "book")			result = BOOKCOVER_MAX_FILE_SIZE;
-	else if(itemType == "company")		result = COMPANYLOGO_MAX_FILE_SIZE;
-	else if(itemType == "gift")			result = GIFTIMAGE_MAX_FILE_SIZE;
-	else if(itemType == "event")		result = EVENTIMAGE_MAX_FILE_SIZE;
-	else if(itemType == "expense_line")	result = EXPENSELINE_MAX_FILE_SIZE;
+	if(itemType == "certification")					result = CERTIFICATIONSLOGO_MAX_FILE_SIZE;
+	else if(itemType == "course")					result = CERTIFICATIONSLOGO_MAX_FILE_SIZE;
+	else if(itemType == "university")				result = UNIVERSITYLOGO_MAX_FILE_SIZE;
+	else if(itemType == "school")					result = SCHOOLLOGO_MAX_FILE_SIZE;
+	else if(itemType == "language")					result = FLAG_MAX_FILE_SIZE;
+	else if(itemType == "book")						result = BOOKCOVER_MAX_FILE_SIZE;
+	else if(itemType == "company")					result = COMPANYLOGO_MAX_FILE_SIZE;
+	else if(itemType == "company_profile_logo")		result = COMPANYLOGO_MAX_FILE_SIZE;
+	else if(itemType == "gift")						result = GIFTIMAGE_MAX_FILE_SIZE;
+	else if(itemType == "event")					result = EVENTIMAGE_MAX_FILE_SIZE;
+	else if(itemType == "expense_line")				result = EXPENSELINE_MAX_FILE_SIZE;
 	else
 	{
 		CLog	log;
@@ -7661,16 +7663,17 @@ unsigned int GetSpecificData_GetMaxWidth(string itemType)
 		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
 	}
 
-	if(itemType == "certification")		result = CERTIFICATIONSLOGO_MAX_WIDTH;
-	else if(itemType == "course")		result = CERTIFICATIONSLOGO_MAX_WIDTH;
-	else if(itemType == "university")	result = UNIVERSITYLOGO_MAX_WIDTH;
-	else if(itemType == "school")		result = SCHOOLLOGO_MAX_WIDTH;
-	else if(itemType == "language")		result = FLAG_MAX_WIDTH;
-	else if(itemType == "book")			result = BOOKCOVER_MAX_WIDTH;
-	else if(itemType == "company")		result = COMPANYLOGO_MAX_WIDTH;
-	else if(itemType == "gift")			result = GIFTIMAGE_MAX_WIDTH;
-	else if(itemType == "event")		result = EVENTIMAGE_MAX_WIDTH;
-	else if(itemType == "expense_line")	result = EXPENSELINE_IMAGE_MAX_WIDTH;
+	if(itemType == "certification")					result = CERTIFICATIONSLOGO_MAX_WIDTH;
+	else if(itemType == "course")					result = CERTIFICATIONSLOGO_MAX_WIDTH;
+	else if(itemType == "university")				result = UNIVERSITYLOGO_MAX_WIDTH;
+	else if(itemType == "school")					result = SCHOOLLOGO_MAX_WIDTH;
+	else if(itemType == "language")					result = FLAG_MAX_WIDTH;
+	else if(itemType == "book")						result = BOOKCOVER_MAX_WIDTH;
+	else if(itemType == "company")					result = COMPANYLOGO_MAX_WIDTH;
+	else if(itemType == "company_profile_logo")		result = COMPANYLOGO_MAX_WIDTH;
+	else if(itemType == "gift")						result = GIFTIMAGE_MAX_WIDTH;
+	else if(itemType == "event")					result = EVENTIMAGE_MAX_WIDTH;
+	else if(itemType == "expense_line")				result = EXPENSELINE_IMAGE_MAX_WIDTH;
 	else
 	{
 		CLog	log;
@@ -7696,16 +7699,17 @@ unsigned int GetSpecificData_GetMaxHeight(string itemType)
 		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
 	}
 
-	if(itemType == "certification")		result = CERTIFICATIONSLOGO_MAX_HEIGHT;
-	else if(itemType == "course")		result = CERTIFICATIONSLOGO_MAX_HEIGHT;
-	else if(itemType == "university")	result = UNIVERSITYLOGO_MAX_HEIGHT;
-	else if(itemType == "school")		result = SCHOOLLOGO_MAX_HEIGHT;
-	else if(itemType == "language")		result = FLAG_MAX_HEIGHT;
-	else if(itemType == "book")			result = BOOKCOVER_MAX_HEIGHT;
-	else if(itemType == "company")		result = COMPANYLOGO_MAX_HEIGHT;
-	else if(itemType == "gift")	  		result = GIFTIMAGE_MAX_HEIGHT;
-	else if(itemType == "event")	  	result = EVENTIMAGE_MAX_HEIGHT;
-	else if(itemType == "expense_line")	result = EXPENSELINE_IMAGE_MAX_HEIGHT;
+	if(itemType == "certification")					result = CERTIFICATIONSLOGO_MAX_HEIGHT;
+	else if(itemType == "course")					result = CERTIFICATIONSLOGO_MAX_HEIGHT;
+	else if(itemType == "university")				result = UNIVERSITYLOGO_MAX_HEIGHT;
+	else if(itemType == "school")					result = SCHOOLLOGO_MAX_HEIGHT;
+	else if(itemType == "language")					result = FLAG_MAX_HEIGHT;
+	else if(itemType == "book")						result = BOOKCOVER_MAX_HEIGHT;
+	else if(itemType == "company")					result = COMPANYLOGO_MAX_HEIGHT;
+	else if(itemType == "company_profile_logo")		result = COMPANYLOGO_MAX_HEIGHT;
+	else if(itemType == "gift")	  					result = GIFTIMAGE_MAX_HEIGHT;
+	else if(itemType == "event")	  				result = EVENTIMAGE_MAX_HEIGHT;
+	else if(itemType == "expense_line")				result = EXPENSELINE_IMAGE_MAX_HEIGHT;
 	else
 	{
 		CLog	log;
@@ -7731,16 +7735,17 @@ string GetSpecificData_GetBaseDirectory(string itemType)
 		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
 	}
 
-	if(itemType == "certification")		result = IMAGE_CERTIFICATIONS_DIRECTORY;
-	else if(itemType == "course")		result = IMAGE_CERTIFICATIONS_DIRECTORY;
-	else if(itemType == "university")	result = IMAGE_UNIVERSITIES_DIRECTORY;
-	else if(itemType == "school")		result = IMAGE_SCHOOLS_DIRECTORY;
-	else if(itemType == "language")		result = IMAGE_FLAGS_DIRECTORY;
-	else if(itemType == "book")			result = IMAGE_BOOKS_DIRECTORY;
-	else if(itemType == "company")		result = IMAGE_COMPANIES_DIRECTORY;
-	else if(itemType == "gift")			result = IMAGE_GIFTS_DIRECTORY;
-	else if(itemType == "event")		result = IMAGE_EVENTS_DIRECTORY;
-	else if(itemType == "expense_line")	result = IMAGE_EXPENSELINES_DIRECTORY;
+	if(itemType == "certification")					result = IMAGE_CERTIFICATIONS_DIRECTORY;
+	else if(itemType == "course")					result = IMAGE_CERTIFICATIONS_DIRECTORY;
+	else if(itemType == "university")				result = IMAGE_UNIVERSITIES_DIRECTORY;
+	else if(itemType == "school")					result = IMAGE_SCHOOLS_DIRECTORY;
+	else if(itemType == "language")					result = IMAGE_FLAGS_DIRECTORY;
+	else if(itemType == "book")						result = IMAGE_BOOKS_DIRECTORY;
+	else if(itemType == "company")					result = IMAGE_COMPANIES_DIRECTORY;
+	else if(itemType == "company_profile_logo")		result = IMAGE_COMPANIES_DIRECTORY;
+	else if(itemType == "gift")						result = IMAGE_GIFTS_DIRECTORY;
+	else if(itemType == "event")					result = IMAGE_EVENTS_DIRECTORY;
+	else if(itemType == "expense_line")				result = IMAGE_EXPENSELINES_DIRECTORY;
 	else
 	{
 		CLog	log;
@@ -7766,15 +7771,16 @@ string GetSpecificData_SelectQueryItemByID(string itemID, string itemType)
 		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
 	}
 
-	if(itemType == "certification")		result = "select * from `certification_tracks` where `id`=\"" + itemID + "\";";
-	else if(itemType == "course")		result = "select * from `certification_tracks` where `id`=\"" + itemID + "\";";
-	else if(itemType == "university")	result = "select * from `university` where `id`=\"" + itemID + "\";";
-	else if(itemType == "school")		result = "select * from `school` where `id`=\"" + itemID + "\";";
-	else if(itemType == "language")		result = "select * from `language` where `id`=\"" + itemID + "\";";
-	else if(itemType == "book")			result = "select * from `book` where `id`=\"" + itemID + "\";";
-	else if(itemType == "company")		result = "select * from `company` where `id`=\"" + itemID + "\";";
-	else if(itemType == "gift")			result = "select * from `gifts` where `id`=\"" + itemID + "\";";
-	else if(itemType == "event")		result = "select * from `events` where `id`=\"" + itemID + "\";";
+	if(itemType == "certification")					result = "select * from `certification_tracks` where `id`=\"" + itemID + "\";";
+	else if(itemType == "course")					result = "select * from `certification_tracks` where `id`=\"" + itemID + "\";";
+	else if(itemType == "university")				result = "select * from `university` where `id`=\"" + itemID + "\";";
+	else if(itemType == "school")					result = "select * from `school` where `id`=\"" + itemID + "\";";
+	else if(itemType == "language")					result = "select * from `language` where `id`=\"" + itemID + "\";";
+	else if(itemType == "book")						result = "select * from `book` where `id`=\"" + itemID + "\";";
+	else if(itemType == "company")					result = "select * from `company` where `id`=\"" + itemID + "\";";
+	else if(itemType == "company_profile_logo")		result = "select * from `company` where `id`=\"" + itemID + "\";";
+	else if(itemType == "gift")						result = "select * from `gifts` where `id`=\"" + itemID + "\";";
+	else if(itemType == "event")					result = "select * from `events` where `id`=\"" + itemID + "\";";
 	else
 	{
 		CLog	log;
@@ -7807,15 +7813,16 @@ string GetSpecificData_UpdateQueryItemByID(string itemID, string itemType, strin
 
 	if(logo_folder.length() && logo_filename.length())
 	{
-		if(itemType == "certification")		result = "update `certification_tracks` set	`" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
-		else if(itemType == "course")		result = "update `certification_tracks` set `" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
-		else if(itemType == "university")	result = "update `university` set 			`" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
-		else if(itemType == "school")		result = "update `school` set 				`" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
-		else if(itemType == "language")		result = "update `language` set 			`" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
-		else if(itemType == "book")			result = "update `book` set 				`" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
-		else if(itemType == "company")		result = "update `company` set 				`" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
-		else if(itemType == "gift")			result = "update `gifts` set 				`" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
-		else if(itemType == "event")		result = "update `events` set 				`" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
+		if(itemType == "certification")					result = "update `certification_tracks` set	`" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
+		else if(itemType == "course")					result = "update `certification_tracks` set `" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
+		else if(itemType == "university")				result = "update `university` set 			`" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
+		else if(itemType == "school")					result = "update `school` set 				`" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
+		else if(itemType == "language")					result = "update `language` set 			`" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
+		else if(itemType == "book")						result = "update `book` set 				`" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
+		else if(itemType == "company")					result = "update `company` set 				`" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
+		else if(itemType == "company_profile_logo")		result = "update `company` set 				`" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
+		else if(itemType == "gift")						result = "update `gifts` set 				`" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
+		else if(itemType == "event")					result = "update `events` set 				`" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
 		else
 		{
 			CLog	log;
@@ -7850,15 +7857,16 @@ string GetSpecificData_GetDBCoverPhotoFolderString(string itemType)
 		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
 	}
 
-	if(itemType == "certification")	 	result = "logo_folder";
-	else if(itemType == "course")	   	result = "logo_folder";
-	else if(itemType == "university")   result = "logo_folder";
-	else if(itemType == "school")	   	result = "logo_folder";
-	else if(itemType == "language")	 	result = "logo_folder";
-	else if(itemType == "book")		 	result = "coverPhotoFolder";
-	else if(itemType == "company")		result = "logo_folder";
-	else if(itemType == "gift")	  		result = "logo_folder";
-	else if(itemType == "event")	  	result = "logo_folder";
+	if(itemType == "certification")	 				result = "logo_folder";
+	else if(itemType == "course")	   				result = "logo_folder";
+	else if(itemType == "university")   			result = "logo_folder";
+	else if(itemType == "school")	   				result = "logo_folder";
+	else if(itemType == "language")	 				result = "logo_folder";
+	else if(itemType == "book")		 				result = "coverPhotoFolder";
+	else if(itemType == "company")					result = "logo_folder";
+	else if(itemType == "company_profile_logo")		result = "logo_folder";
+	else if(itemType == "gift")	  					result = "logo_folder";
+	else if(itemType == "event")	  				result = "logo_folder";
 	else
 	{
 		CLog	log;
@@ -7884,15 +7892,16 @@ string GetSpecificData_GetDBCoverPhotoFilenameString(string itemType)
 		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
 	}
 
-	if(itemType == "certification")		result = "logo_filename";
-	else if(itemType == "course")		result = "logo_filename";
-	else if(itemType == "university")	result = "logo_filename";
-	else if(itemType == "school")		result = "logo_filename";
-	else if(itemType == "language")		result = "logo_filename";
-	else if(itemType == "book")			result = "coverPhotoFilename";
-	else if(itemType == "company")		result = "logo_filename";
-	else if(itemType == "gift")			result = "logo_filename";
-	else if(itemType == "event")		result = "logo_filename";
+	if(itemType == "certification")					result = "logo_filename";
+	else if(itemType == "course")					result = "logo_filename";
+	else if(itemType == "university")				result = "logo_filename";
+	else if(itemType == "school")					result = "logo_filename";
+	else if(itemType == "language")					result = "logo_filename";
+	else if(itemType == "book")						result = "coverPhotoFilename";
+	else if(itemType == "company")					result = "logo_filename";
+	else if(itemType == "company_profile_logo")		result = "logo_filename";
+	else if(itemType == "gift")						result = "logo_filename";
+	else if(itemType == "event")					result = "logo_filename";
 	else
 	{
 		CLog	log;
@@ -7921,7 +7930,33 @@ bool GetSpecificData_AllowedToChange(string itemID, string itemType, CMysql *db,
 		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
 	}
 
-	if(db->Query(GetSpecificData_SelectQueryItemByID(itemID, itemType))) // --- item itemID exists ?
+	if(itemType == "company_profile_logo")
+	{
+		if((user->GetType() == "subcontractor"))
+		{
+			if(db->Query("SELECT `id` FROM `company` WHERE `id`=\"" + itemID + "\" AND `admin_userID`=\"" + user->GetID() + "\";"))
+				result = true;
+			else
+			{
+				MESSAGE_DEBUG("", "", "subcontractor user.id(" + user->GetID() + ") doesn't allowed to change company.id(" + itemID + ") logo");
+			}
+		}
+		else if((user->GetType() == "agency"))
+		{
+			if(db->Query("SELECT `id` FROM `company_employees` WHERE `company_id`=\"" + itemID + "\" AND `user_id`=\"" + user->GetID() + "\" AND `allowed_change_agency_data`=\"Y\";"))
+				result = true;
+			else
+			{
+				MESSAGE_DEBUG("", "", "agency user.id(" + user->GetID() + ") doesn't allowed to change company.id(" + itemID + ") logo");
+			}
+		}
+		else
+		{
+
+		}
+
+	}
+	else if(db->Query(GetSpecificData_SelectQueryItemByID(itemID, itemType))) // --- item itemID exists ?
 	{
 		if((itemType == "course") || (itemType == "university") || (itemType == "school") || (itemType == "language") || (itemType == "book") || (itemType == "company") || (itemType == "certification"))
 		{

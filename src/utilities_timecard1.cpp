@@ -1437,6 +1437,42 @@ string GetTaskIDFromSOW(string customer, string project, string task, string sow
 	return result;
 }
 
+auto GetBTExpenseTemplateAssignmentToSoW(string bt_expense_template_id, string sow_id, CMysql *db) -> string
+{
+	auto 	result = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(bt_expense_template_id.length())
+	{
+		if(sow_id.length())
+		{
+			if(db->Query(
+				"SELECT `id` FROM `bt_sow_assignment` WHERE `sow_id`=\"" + sow_id + "\" AND `bt_expense_template_id`=\"" + bt_expense_template_id + "\";"
+			))
+			{
+				result = db->Get(0, "id");
+			}
+			else
+			{
+				MESSAGE_DEBUG("", "", "bt_expense_template_id(" + bt_expense_template_id + ") doesn't assigned to sow_id(" + sow_id + ")");
+			}
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "sow_id is empty");
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "bt_expense_template_id is empty");
+	}
+
+	MESSAGE_DEBUG("", "", "finish (result = " + result + ")");
+
+	return result;
+}
+
 string GetTaskAssignmentID(string customer, string project, string task, string sow_id, CMysql *db)
 {
 	string 	result = "";
@@ -1655,6 +1691,40 @@ string CreateTaskAssignment(string task_id, string sow_id, string assignment_sta
 	{
 		MESSAGE_DEBUG("", "", "finish (result = " + result + ")");
 	}
+
+	return result;
+}
+
+auto CreateBTExpenseTemplateAssignmentToSoW(string new_bt_expense_template_id, string sow_id, CMysql *db, CUser *user) -> string
+{
+	auto	result = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(new_bt_expense_template_id.length() && sow_id.length() && db)
+	{
+		long int	assignment_id = db->InsertQuery("INSERT INTO `bt_sow_assignment` SET "
+													"`bt_expense_template_id`=\"" + new_bt_expense_template_id + "\","
+													"`sow_id`=\"" + sow_id + "\","
+													"`assignee_user_id`=\"" + user->GetID() + "\","
+													"`eventTimestamp`=UNIX_TIMESTAMP()"
+													";");
+
+		if(assignment_id)
+		{
+			result = to_string(assignment_id);
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "fail to insert to db");
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "one of mandatory parameters missed");
+	}
+
+	MESSAGE_DEBUG("", "", "finish (result = " + result + ")");
 
 	return result;
 }
@@ -3072,6 +3142,8 @@ string	isActionEntityBelongsToAgency(string action, string id, string agency_id,
 				if(action == "AJAX_deleteExpenseTemplate")				sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `bt_expense_templates` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_addExpenseTemplateLine")				sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `bt_expense_templates` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_deleteExpenseTemplateLine")			sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `bt_expense_templates` WHERE `id`=(SELECT `bt_expense_template_id` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\");";
+				if(action == "AJAX_addBTExpenseTemplateAssignment")		sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `contracts_sow` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_getCompanyInfoBySoWID")				sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `contracts_sow` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_deleteEmployee")						sql_query = "SELECT `company_id` AS `agency_id` FROM `company_employees` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateAgencyPosition")				sql_query = "SELECT `company_id` AS `agency_id` FROM `company_employees` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateAgencyEditCapability")			sql_query = "SELECT `company_id` AS `agency_id` FROM `company_employees` WHERE `id`=\"" + id + "\";";
@@ -4144,6 +4216,29 @@ string	GetSpelledBTExpenseTemplateByID(string id, CMysql *db)
 	return result;	
 }
 
+auto	GetSpelledBTExpenseTemplateByAssignmentID(string id, CMysql *db) -> string
+{
+	auto	result = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(db->Query("SELECT `title`, `agency_comment` FROM `bt_expense_templates` WHERE `id`=(SELECT `bt_expense_template_id` FROM `bt_sow_assignment` WHERE `id`=\"" + id + "\");"))
+	{
+		string 	title = db->Get(0, "title");
+		string	agency_comment = db->Get(0, "agency_comment");
+
+		result = title + " ("s + agency_comment + ")"s;
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "bt_expense_templates.id(" + id + ") not found");
+	}
+	
+	MESSAGE_DEBUG("", "", "finish (result.length is " + to_string(result.length()) + ")");
+
+	return result;	
+}
+
 auto	GetSpelledBTExpenseTemplateByLineID(string id, CMysql *db) -> string
 {
 	auto	result = ""s;
@@ -4373,7 +4468,7 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 	}
 	if(action == "AJAX_deleteBTExpenseAssignment")
 	{
-		notification_description = "ƒанные командировки: удалено возмещение расхода " + GetSpelledBTExpenseAssignmentByID(id, db) + ".";
+		notification_description = "ƒанные командировки: удалено возмещение расхода " + GetSpelledBTExpenseTemplateByAssignmentID(id, db) + " из SoW(" + GetSpelledSoWByID(sow_id, db) + ").";
 		sql_query = "SELECT DISTINCT `sow_id` AS `contract_sow_id` FROM `bt_sow_assignment` WHERE `id`=\"" + id + "\";";
 	}
 	if(action == "AJAX_addTask")
@@ -4566,6 +4661,11 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 	{
 		notification_description = "ƒанные командировки: изменилось требование к отчетному документу (" + GetSpelledBTExpenseTemplateLineByID(id, db) + ") с " + existing_value + " на " + new_value + " у расхода " + GetSpelledBTExpenseTemplateByLineID(id, db);
 		sql_query = "SELECT `sow_id` AS `contract_sow_id` FROM `bt_sow_assignment` WHERE `bt_expense_template_id`=(SELECT `bt_expense_template_id` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\");";
+	}
+	if(action == "AJAX_addBTExpenseTemplateAssignment")
+	{
+		notification_description = "ƒанные командировки: добавили возмещаемый расход (" + GetSpelledBTExpenseTemplateByAssignmentID(id, db) + ") к SoW(" + GetSpelledSoWByID(sow_id, db) + ")";
+		sql_query = "SELECT DISTINCT `sow_id` AS `contract_sow_id` FROM `bt_sow_assignment` WHERE `id`=\"" + id + "\";";
 	}
 
 	MESSAGE_DEBUG("", "", "finish");

@@ -270,9 +270,9 @@ int main()
 						for(int filesCounter = 0; filesCounter < indexPage.GetFilesHandler()->Count(); filesCounter++)
 						{
 							FILE			*f;
-							int			 folderID = (int)(rand()/(RAND_MAX + 1.0) * GetSpecificData_GetNumberOfFolders(itemType)) + 1;
-							string		  filePrefix = GetRandom(20);
-							string		  finalFilename, originalFilename, preFinalFilename, fileName, fileExtention;
+							int				folderID = (int)(rand()/(RAND_MAX + 1.0) * GetSpecificData_GetNumberOfFolders(itemType)) + 1;
+							string			filePrefix = GetRandom(20);
+							string			finalFilename, originalFilename, preFinalFilename, fileName, fileExtention;
 							ostringstream   ost;
 
 							if(indexPage.GetFilesHandler()->GetSize(filesCounter) > GetSpecificData_GetMaxFileSize(itemType)) 
@@ -320,13 +320,7 @@ int main()
 								preFinalFilename = ost.str();
 							} while(isFileExists(finalFilename) || isFileExists(originalFilename) || isFileExists(preFinalFilename));
 
-							{
-								CLog	log;
-								ostringstream   ost;
-
-								ost << __func__ << "[" << __LINE__ << "]: Save file to /tmp for checking of image validity [" << originalFilename << "]";
-								log.Write(DEBUG, ost.str());
-							}
+							MESSAGE_DEBUG("", "", "Save file to /tmp for checking of image validity [" + originalFilename + "]");
 
 							// --- Save file to "/tmp/" for checking of image validity
 							f = fopen(originalFilename.c_str(), "w");

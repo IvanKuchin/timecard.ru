@@ -1590,6 +1590,111 @@ int main(void)
 			MESSAGE_DEBUG("", action, "finish");
 		}
 
+		if(action == "AJAX_addBTExpenseTemplateAssignment")
+		{
+			ostringstream	ostResult;
+
+			MESSAGE_DEBUG("", action, "start");
+
+			ostResult.str("");
+			{
+				string			template_name = "json_response.htmlt";
+				string			error_message = "";
+
+				string			bt_expense_templates_param	= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("bt_expense_templates"));
+				string			sow_id 						= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("sow_id"));
+
+				if(split(bt_expense_templates_param, ',').size() && sow_id.length())
+				{
+					error_message = isAgencyEmployeeAllowedToChangeSoW(sow_id, &db, &user);
+					if(error_message.empty())
+					{
+						if(db.Query("SELECT `agency_company_id`,`start_date`,`end_date` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";"))
+						{
+							string agency_id				= db.Get(0, "agency_company_id");
+
+							error_message = isActionEntityBelongsToAgency(action, sow_id, agency_id, &db, &user);
+							if(error_message.empty())
+							{
+								vector<string>	new_bt_expense_template_id_list = split(bt_expense_templates_param, ',');
+								
+								for(auto new_bt_expense_template_id: new_bt_expense_template_id_list)
+								{
+									string	bt_expense_template_sow_assignment_id = GetBTExpenseTemplateAssignmentToSoW(new_bt_expense_template_id, sow_id, &db);
+
+									if(bt_expense_template_sow_assignment_id.empty())
+									{
+										bt_expense_template_sow_assignment_id = CreateBTExpenseTemplateAssignmentToSoW(new_bt_expense_template_id, sow_id, &db, &user);
+
+										if(bt_expense_template_sow_assignment_id.length())
+										{
+											if(NotifySoWContractPartiesAboutChanges(action, bt_expense_template_sow_assignment_id, sow_id, "", "", &db, &user))
+											{
+											}
+											else
+											{
+												MESSAGE_ERROR("", "", "fail to notify SoW parties");
+											}
+										}
+										else
+										{
+											MESSAGE_DEBUG("", action, "fail to create assignment sow.id(" + sow_id + ") new_bt_expense_template.id(" + new_bt_expense_template_id + ")");
+											error_message = "Неудалось создать назначение";
+											break;
+										}
+									}
+									else
+									{
+										MESSAGE_DEBUG("", action, "assignment BTExpenseTemplate(" + new_bt_expense_template_id + ") already assigned to sow.id(" + sow_id + ")");
+									}
+								}
+							}
+							else
+							{
+								MESSAGE_DEBUG("", action, "action entity id(" + user.GetID() + ") doesn't belongs to agency.id(" + agency_id + ")");
+							}
+						}
+						else
+						{
+							MESSAGE_ERROR("", action, "sow.id" + sow_id + " not found");
+							error_message = "Контракт не найден";
+						}
+					}
+					else
+					{
+						MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") doesn't allowed to change sow.id(" + sow_id + ")");
+					}
+
+				}
+				else
+				{
+					MESSAGE_ERROR("", action, "one of mandatory parameters missed");
+					error_message = "Некоторые параметры не заданы";
+				}
+
+				if(error_message.empty())
+				{
+					ostResult << "{\"result\":\"success\"}";
+				}
+				else
+				{
+					MESSAGE_DEBUG("", action, "failed");
+					ostResult.str("");
+					ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+				}
+
+				indexPage.RegisterVariableForce("result", ostResult.str());
+
+				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			}
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
+
+
+
+
+
 		if(action == "AJAX_addTask")
 		{
 			ostringstream	ostResult;
@@ -1881,8 +1986,6 @@ int main(void)
 							{
 								MESSAGE_DEBUG("", action, "action entity id(" + user.GetID() + ") doesn't belongs to agency.id(" + agency_id + ")");
 							}
-
-
 						}
 						else
 						{
@@ -2754,6 +2857,85 @@ int main(void)
 			indexPage.RegisterVariableForce("result", ostResult.str());
 
 			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+		}
+
+		if(action == "AJAX_getCompanyInfoBySoWID")
+		{
+			ostringstream	ostResult;
+
+			MESSAGE_DEBUG("", action, "start");
+
+			ostResult.str("");
+			{
+				string			template_name = "json_response.htmlt";
+				string			error_message = "";
+				string			sow_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("sow_id"));
+
+				if(user.GetType() == "agency")
+				{
+					if(db.Query("SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id`=(SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user.GetID() + "\");"))
+					{
+						string	agency_id = db.Get(0, "id");
+						if(agency_id.length())
+						{
+							error_message = isActionEntityBelongsToAgency(action, sow_id, agency_id, &db, &user);
+							if(error_message.empty())
+							{
+								string			company_obj = GetCompanyListInJSONFormat("SELECT * FROM `company` WHERE `id`=(SELECT `subcontractor_company_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\");", &db, &user);
+
+								if(company_obj.length())
+								{
+									// --- get short info
+									ostResult << "{\"result\":\"success\","
+													"\"companies\":[" + company_obj + "]"
+													"}";
+								}
+								else
+								{
+									error_message = "Агенство не найдено";
+									MESSAGE_DEBUG("", action, "sow_id(" + sow_id + ") not found");
+								}
+							}
+							else
+							{
+								MESSAGE_DEBUG("", action, "action entity id(" + user.GetID() + ") doesn't belongs to agency.id(" + agency_id + ")");
+							}
+						}
+						else
+						{
+							error_message = "Агенство не найдено";
+							MESSAGE_ERROR("", action, "user.id(" + user.GetID() + ") is not an agency employee");
+						}
+					}
+					else
+					{
+						MESSAGE_ERROR("", action, "user(" + user.GetID() + ") is not an agency employee");
+						error_message = "Информация доступна только для агенства";
+					}
+				}
+				else
+				{
+					MESSAGE_ERROR("", action, "user(" + user.GetID() + ") is not an agency employee");
+					error_message = "Информация доступна только для агенства";
+				}
+
+
+				if(error_message.empty())
+				{
+				}
+				else
+				{
+					MESSAGE_DEBUG("", action, "failed");
+					ostResult.str("");
+					ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+				}
+
+				indexPage.RegisterVariableForce("result", ostResult.str());
+
+				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			}
+
+			MESSAGE_DEBUG("", action, "finish");
 		}
 
 

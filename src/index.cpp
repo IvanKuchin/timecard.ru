@@ -6248,6 +6248,8 @@ int main()
 			}
 		}
 
+// --- Deprecated item
+/*
 		if(action == "edit_profile")
 		{
 			ostringstream	ost;
@@ -6321,7 +6323,7 @@ int main()
 
 			MESSAGE_DEBUG("", action, "finish");
 		}
-
+*/
 		if(action == "edit_company")
 		{
 			ostringstream	ost;
