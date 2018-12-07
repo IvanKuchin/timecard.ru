@@ -709,9 +709,9 @@ string CheckHTTPParam_Text(string srcText)
 	return	result;
 }
 
-string CheckHTTPParam_Number(string srcText)
+auto CheckHTTPParam_Number(string srcText) -> string
 {
-	string	result = "";
+	auto	result = ""s;
 
 	{
 		MESSAGE_DEBUG("", "", "start param(" + srcText + ")");
@@ -6839,6 +6839,13 @@ string  GetUserNotificationSpecificDataByType(unsigned long typeID, unsigned lon
 
 	if(typeID == NOTIFICATION_GENERAL_FROM_USER)
 	{
+		string	from_company_id = to_string(actionID);
+
+		if(from_company_id.length())
+		{
+			ostResult << "\"notificationFromCompany\":[" << GetCompanyListInJSONFormat("SELECT * FROM `company` WHERE `id`=\"" + from_company_id + "\";", db, NULL) << "]";
+		}
+/*
 		string	from_user_id = to_string(actionID);
 		
 		if(from_user_id.length() && db->Query("select * from `users` where `id`='" + from_user_id + "';"))
@@ -6848,6 +6855,7 @@ string  GetUserNotificationSpecificDataByType(unsigned long typeID, unsigned lon
 			ostResult << "\"notificationFriendUserNameLast\":\"" << db->Get(0, "nameLast") << "\",";
 			ostResult << "\"notificationFriendUserAvatar\":\"" << GetUserAvatarByUserID(from_user_id, db) << "\"";
 		}
+*/
 	}
 
 	if(typeID == NOTIFICATION_GENERAL_FROM_COMPANY)

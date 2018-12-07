@@ -1,37 +1,79 @@
 #include "subcontractor.h"
 
-/*
-bool AssignLineToExpenseByRandom(C_ExpenseLine expense_line, vector<C_Expense> &expenses)
+static auto GetCompanyID(CUser *user, CMysql *db)
 {
-	bool	result = false;
+	auto 	result = ""s;
 
 	MESSAGE_DEBUG("", "", "start");
 
-	if(expense_line.GetParentRandom().length())
+	if(user && db)
 	{
-		for(auto &expense: expenses)
+		if(user->GetType() == "subcontractor")
 		{
-			if(expense.GetRandom() == expense_line.GetParentRandom())
-			{
-				expense.AddExpenseLine(expense_line);
-				MESSAGE_DEBUG("", "", "expense_line(" + expense_line.GetRandom() + ") assigned to expense(" + expense.GetRandom() + ")");
-				result = true;
-			}
+				if(db->Query("SELECT `id` FROM `company` WHERE `admin_userID`=\"" + user->GetID() + "\";"))
+				{
+					result = db->Get(0, "id");
+				}
+				else
+				{
+					MESSAGE_DEBUG("", "", "user.id(" + user->GetID() + ") isn't an subcontractor employee");
+				}
+		}
+		else
+		{
+			MESSAGE_DEBUG("", "", "user.id(" + user->GetID() + ") isn't an subcontractor employee");
 		}
 	}
 	else
 	{
-		MESSAGE_ERROR("", "", "parent_random expense_line(id/random - " + expense_line.GetID() + "/" + expense_line.GetRandom() + ") is empty");
+		MESSAGE_ERROR("", "", "db or user doesn't initialized");
 	}
 
-	MESSAGE_DEBUG("", "", "finish (result is " + to_string(result) + ")");
+	MESSAGE_DEBUG("", "", "finish (result = " + result + ")");
 
 	return result;
 }
-*/
-string	GetTimecardsSOWTaskAssignement_Reusable_InJSONFormat(string date, CMysql *db, CUser *user)
+/*
+static string isUserAllowedAccessToCompany(string company_id, CMysql *db, CUser *user)
 {
-	string		result = "";
+	string	error_message = "";
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(company_id.length())
+	{
+		if(user->GetType() == "subcontractor")
+		{
+			if(db->Query("SELECT `id` FROM `company` WHERE `id`=\"" + company_id + "\" AND `admin_userID`=\"" + user->GetID() + "\");"))
+			{
+				// --- everything is good
+			}
+			else
+			{
+				MESSAGE_DEBUG("", "", "user(" + user->GetID() + ") have not rights to change company.id(" + company_id + ") data");
+				error_message = "Вы не можете менять данные kompanii";
+			}
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "user(" + user->GetID() + ") must be a subcontractor(" + user->GetType() + ")");
+			error_message = "Информация доступна только для subcontractor";
+		}
+	}
+	else
+	{
+		error_message = "Неизвестный номер kompanii";
+		MESSAGE_ERROR("", "", "company_id is empty");
+	}
+
+	MESSAGE_DEBUG("", "", "finish (result length is " + to_string(error_message.length()) + ")");
+
+	return error_message;
+}
+*/
+static auto	GetTimecardsSOWTaskAssignement_Reusable_InJSONFormat(string date, CMysql *db, CUser *user)
+{
+	auto		result = ""s;
 
 	MESSAGE_DEBUG("", "", "start");
 
@@ -442,8 +484,8 @@ int main()
 				affected = db.Query("SELECT `id` FROM `company` WHERE `admin_userID`=\"" + user.GetID() + "\";");
 				if(affected)
 				{
-					string		companies_list= "";
-					string		temp = GetTimecardsSOWTaskAssignement_Reusable_InJSONFormat(period_start_year + "-" + period_start_month + "-" + period_start_date, &db, &user);
+					auto		companies_list= ""s;
+					auto		temp = GetTimecardsSOWTaskAssignement_Reusable_InJSONFormat(period_start_year + "-" + period_start_month + "-" + period_start_date, &db, &user);
 
 /*
 					for(int i = 0; i < affected; ++i)
@@ -1002,16 +1044,16 @@ int main()
 
 			if(sow_id.length() && requested_status.length() && current_period_start_year.length() && current_period_start_month.length() && current_period_start_date.length() && current_period_finish_year.length() && current_period_finish_month.length() && current_period_finish_date.length())
 			{
-				string		error_description = "";
-				string		success_description = "";
+				auto		error_description = ""s;
+				auto		success_description = ""s;
 
 				if(isUserAssignedToSoW(user.GetID(), sow_id, &db))
 				{
 					string		period_start = current_period_start_year + "-" + current_period_start_month + "-" + current_period_start_date;
 					string		period_end = current_period_finish_year + "-" + current_period_finish_month + "-" + current_period_finish_date;
-					string		timecard_id = "";
-					string		timecard_status = "";
-					string		agency_id = "";
+					auto		timecard_id = ""s;
+					auto		timecard_status = ""s;
+					auto		agency_id = ""s;
 
 					timecard_id = GetTimecardID(sow_id, period_start, period_end, &db);
 					timecard_status = GetTimecardStatus(timecard_id, &db);
@@ -1602,7 +1644,7 @@ int main()
 							else
 							{
 								error_message = "неполучилось определить принажделжность док-та";
-								MESSAGE_ERROR("", action, "AssignLineToExpenseByRandom fail");
+								MESSAGE_ERROR("", action, "AssignExpenseLineByParentRandom fail");
 							}
 						}
 						else
@@ -1930,6 +1972,204 @@ int main()
 		{
 			MESSAGE_DEBUG("", action, "finish");
 		}
+	}
+
+	if(action == "AJAX_getCompanyInfo")
+	{
+		ostringstream	ostResult;
+		string			error_message = "";
+		string			template_name = "json_response.htmlt";
+
+		MESSAGE_DEBUG("", action, "start");
+
+		ostResult.str("");
+		if(user.GetType() != "subcontractor")
+		{
+			MESSAGE_DEBUG("", action, "re-login required");
+			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
+		}
+		else
+		{
+			string			agency_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
+
+			if(db.Query("SELECT `id` FROM `company` WHERE `admin_userID`=\"" + user.GetID() + "\";"))
+			{
+				string	company_id = db.Get(0, "id");
+				string	company_obj = GetCompanyListInJSONFormat("SELECT * FROM `company` WHERE `id`=\"" + company_id + "\";", &db, &user);
+
+				if(company_obj.length())
+				{
+					// --- get short info
+					ostResult << "{\"result\":\"success\","
+									"\"companies\":[" + company_obj + "]"
+									"}";
+				}
+				else
+				{
+					error_message = "Company не найденa";
+					MESSAGE_DEBUG("", action, "agency(" + agency_id + ") not found");
+				}
+			}
+			else
+			{
+				error_message = "You are not the company owner";
+				MESSAGE_ERROR("", action, "user.id(" + user.GetID() + ") doesn't own any company");
+			}
+		}
+
+		if(error_message.empty())
+		{
+		}
+		else
+		{
+			MESSAGE_DEBUG("", action, "failed");
+			ostResult.str("");
+			ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+		}
+
+		indexPage.RegisterVariableForce("result", ostResult.str());
+
+		if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+
+		MESSAGE_DEBUG("", action, "finish");
+	}
+
+	if(
+		(action == "AJAX_updateCompanyTitle")					||
+		(action == "AJAX_updateCompanyDescription")				||
+		(action == "AJAX_updateCompanyWebSite")					||
+		(action == "AJAX_updateCompanyTIN")						||
+		(action == "AJAX_updateCompanyAccount")					||
+		(action == "AJAX_updateCompanyOGRN")					||
+		(action == "AJAX_updateCompanyKPP")						||
+		(action == "AJAX_updateCompanyLegalAddress")			||
+		(action == "AJAX_updateCompanyMailingAddress")			||
+		(action == "AJAX_updateCompanyMailingZipID")			||
+		(action == "AJAX_updateCompanyLegalZipID")				||
+		(action == "AJAX_updateCompanyBankID")
+	)
+	{
+		ostringstream	ostResult;
+
+		MESSAGE_DEBUG("", action, "start");
+
+		ostResult.str("");
+		{
+			string			template_name = "json_response.htmlt";
+			string			error_message = "";
+
+			string			id				= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
+			string			new_value		= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("value"));
+
+			if(new_value.length())
+			{
+				{
+					auto	company_id = GetCompanyID(&user, &db);
+					if(company_id.length())
+					{
+						if(action == "AJAX_updateCompanyTitle") 		{	id = company_id; }
+						if(action == "AJAX_updateCompanyDescription")	{	id = company_id; }
+						if(action == "AJAX_updateCompanyWebSite")		{	id = company_id; }
+						if(action == "AJAX_updateCompanyTIN")			{	id = company_id; }
+						if(action == "AJAX_updateCompanyAccount")		{	id = company_id; }
+						if(action == "AJAX_updateCompanyOGRN")			{	id = company_id; }
+						if(action == "AJAX_updateCompanyKPP")			{	id = company_id; }
+						if(action == "AJAX_updateCompanyLegalAddress") 	{	id = company_id; }
+						if(action == "AJAX_updateCompanyMailingAddress"){	id = company_id; }
+						if(action == "AJAX_updateCompanyMailingZipID") 	{	new_value = id; id = company_id; }
+						if(action == "AJAX_updateCompanyLegalZipID") 	{	new_value = id; id = company_id; }
+						if(action == "AJAX_updateCompanyBankID") 		{	new_value = id; id = company_id; }
+
+						// error_message = isActionEntityBelongsToCompany(action, id, company_id, &db, &user);
+						// if(error_message.empty())
+						// {
+							// error_message = CheckNewValueByAction(action, id, "", new_value, &db, &user);
+							// if(error_message.empty())
+							// {
+								if(action.find("update"))
+								{
+									string		existing_value = GetDBValueByAction(action, id, "", &db, &user);
+
+									error_message = SetNewValueByAction(action, id, "", new_value, &db, &user);
+									if(error_message.empty())
+									{
+										ostResult << "{\"result\":\"success\"}";
+
+										if(NotifySoWContractPartiesAboutChanges(action, id, "", existing_value, new_value, &db, &user))
+										{
+										}
+										else
+										{
+											MESSAGE_DEBUG("", action, "fail to notify subcontractor about changes");
+										}
+									}
+									else
+									{
+										MESSAGE_DEBUG("", action, "unable to set new value (action/id/value = " + action + "/" + id + "/[" + FilterCP1251Symbols(new_value) + "])");
+									}
+								}
+								else if(action.find("insert"))
+								{
+									
+								}
+								else if(action.find("delete"))
+								{
+
+								}
+								else
+								{
+									MESSAGE_ERROR("", action, "unsupported action type(" + action + ")");
+								}
+
+/*
+							}
+							else
+							{
+								MESSAGE_DEBUG("", action, "new value failed to pass validity check");
+							}
+*/
+/*
+						}
+						else
+						{
+							MESSAGE_DEBUG("", action, "action entity id(" + user.GetID() + ") doesn't belongs to agency.id(" + company_id + ")");
+						}
+*/
+					}
+					else
+					{
+						error_message = "Агенство не найдено";
+						MESSAGE_ERROR("", action, "company.id not found by user.id(" + user.GetID() + ") employment");
+					}
+				}
+/*
+				else
+				{
+					MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") doesn't allowed to change agency data");
+				}
+*/
+			}
+			else
+			{
+				error_message = "Поле не должно быть пустым";
+				MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") didn't set new_value");
+			}
+
+			if(error_message.empty())
+			{
+			}
+			else
+			{
+				MESSAGE_DEBUG("", action, "failed");
+				ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+			}
+
+			indexPage.RegisterVariableForce("result", ostResult.str());
+
+			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+		}
+
+		MESSAGE_DEBUG("", action, "finish");
 	}
 
 	{

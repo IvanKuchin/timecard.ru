@@ -1088,6 +1088,7 @@ sub	FixOwnerAndAccessRights
 	}
 
 	system("chown -R ".$config{backup_username}.":".$config{backup_username}." ".$folders_to_backup{SRCDIR});
+	system("chown -R ".$config{backup_username}.":".$config{backup_username}." /usr/local/share/".$domainSuffix);
 }
 
 sub usage

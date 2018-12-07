@@ -44,7 +44,7 @@ string      	CleanUPText(const string messageBody, bool removeBR = true);
 string      	RemoveAllNonAlphabetSymbols(string src);
 string      	ConvertTextToHTML(const string messageBody);
 string 			CheckHTTPParam_Text(string srcText);
-string 			CheckHTTPParam_Number(string srcText);
+auto 			CheckHTTPParam_Number(string srcText) -> string;
 string 			CheckHTTPParam_Date(string srcText);
 string 			CheckHTTPParam_Float(string srcText);
 string 			CheckHTTPParam_Email(string srcText);
@@ -219,6 +219,7 @@ auto			isExpenseTemplateIDValidToRemove(string bt_expense_template_id, CMysql *)
 auto			isExpenseTemplateLineIDValidToRemove(string bt_expense_template_line_id, CMysql *) -> string;
 string			isEmployeeIDValidToRemove(string employee_id, CMysql *);
 pair<string, string> GetCustomerIDProjectIDByTaskID(string task_id, CMysql *);
+pair<int, int>	FirstAndLastReportingDaysFromTimereport(const vector<string> &timereport);
 
 
 string			GetBTApprovalsInJSONFormat(string sqlQuery, CMysql *, CUser *);
@@ -228,13 +229,13 @@ string			GetBTsInJSONFormat(string sqlQuery, CMysql *, CUser *, bool isExtended)
 string			GetBTExpensesInJSONFormat(string sqlQuery, CMysql *, CUser *);
 string			GetCurrencyRatesInJSONFormat(string sqlQuery, CMysql *, CUser *);
 string 			isUserAllowedAccessToBT(string bt_id, CMysql *, CUser *);
-string			isAgencyEmployeeAllowedToChangeSoW(string sow_id, CMysql *, CUser *);
-string			isAgencyEmployeeAllowedToChangeAgencyData(CMysql *, CUser *);
-string			isActionEntityBelongsToSoW(string action, string is, string sow_id, CMysql *, CUser *);
-string			isActionEntityBelongsToAgency(string action, string id, string agency_id, CMysql *, CUser *);
+// string			isAgencyEmployeeAllowedToChangeSoW(string sow_id, CMysql *, CUser *);
+// string			isAgencyEmployeeAllowedToChangeAgencyData(CMysql *, CUser *);
+// string			isActionEntityBelongsToSoW(string action, string is, string sow_id, CMysql *, CUser *);
+// string			isActionEntityBelongsToAgency(string action, string id, string agency_id, CMysql *, CUser *);
 bool			NotifySoWContractPartiesAboutChanges(string action, string id, string sow_id, string existing_value, string new_value, CMysql *, CUser *);
 string			GetDBValueByAction(string action, string id, string sow_id, CMysql *, CUser *);
-string			CheckNewValueByAction(string action, string id, string sow_id, string new_value, CMysql *, CUser *);
+// string			CheckNewValueByAction(string action, string id, string sow_id, string new_value, CMysql *, CUser *);
 string			SetNewValueByAction(string action, string id, string sow_id, string new_value, CMysql *, CUser *);
 string			ResubmitEntitiesByAction(string action, string id, string sow_id, string new_value, CMysql *, CUser *);
 string			GetAgencyEmployeesInJSONFormat(string sql_query, CMysql *, CUser *);

@@ -70,10 +70,75 @@ int main(void)
 			MESSAGE_DEBUG("", "", "pre-condition if(action == \"" + action + "\")");
 		}
 
+		if((action.length() > 10) && (action.compare(action.length() - 9, 9, "_template") == 0))
+		{
+			ostringstream	ost;
+			string			strPageToGet, strFriendsOnSinglePage;
+
+			{
+				MESSAGE_DEBUG("", action, "start");
+			}
+
+			{
+				string		template_name = action.substr(0, action.length() - 9) + ".htmlt";
+
+				if(!indexPage.SetTemplate(template_name))
+				{
+					MESSAGE_ERROR("", action, "can't find template " + template_name);
+				} // if(!indexPage.SetTemplate("my_network.htmlt"))
+			}
+
+			{
+				MESSAGE_DEBUG("", action, "finish");
+			}
+		}
+
+		if(action == "AJAX_getCompanyInfo")
+		{
+			auto			id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
+			string			template_name = "json_response.htmlt";
+			string			error_message = "";
+			ostringstream	ostResult;
+
+			ostResult.str("");
+
+			if(id.length())
+			{
+				string		company_obj = GetCompanyListInJSONFormat("SELECT * FROM `company` WHERE `id`=\"" + id + "\";", &db, &user);
+
+				if(company_obj.length())
+					ostResult << "{\"result\":\"success\",\"companies\":[" + company_obj + "]}";
+				else
+				{
+					error_message = "Kompaniya не найдена";
+					MESSAGE_DEBUG("", "", "company.id(" + id + ") not found");
+				}	
+					
+			}
+			else
+			{
+				error_message = "Некорректный номер kompanii";
+				MESSAGE_DEBUG("", "", "fail to get company.id(" + id + ")");
+			}
+
+			if(error_message.empty())
+			{
+			}
+			else
+			{
+				MESSAGE_DEBUG("", action, "failed");
+				ostResult.str("");
+				ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+			}
+
+			indexPage.RegisterVariableForce("result", ostResult.str());
+
+			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+		}
 
 		if(action == "AJAX_getGeoRegionName")
 		{
-			string			id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
+			auto			id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
 			string			template_name = "json_response.htmlt";
 			string			error_message = "";
 			ostringstream	ostResult;
