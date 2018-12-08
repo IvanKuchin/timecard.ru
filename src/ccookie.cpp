@@ -2,62 +2,20 @@
 
 CCookie::CCookie()
 {
-	{
-		CLog	log;
-		log.Write(DEBUG, "CCookie::" + string(__func__) + "[" + to_string(__LINE__) + "]: start");
-	}
-
-	{
-		CLog	log;
-		log.Write(DEBUG, "CCookie::" + string(__func__) + "[" + to_string(__LINE__) + "]: end");
-	}
+	MESSAGE_DEBUG("CCookie", "", "start default constructor");
 }
 
 CCookie::CCookie(string n, string v) : name(n), value(v)
 {
-	{
-		CLog	log;
-		log.Write(DEBUG, "CCookie::" + string(__func__) + "[" + to_string(__LINE__) + "]: start");
-	}
-
-	{
-		CLog	log;
-		log.Write(DEBUG, "CCookie::" + string(__func__) + "[" + to_string(__LINE__) + "]: end");
-	}
+	MESSAGE_DEBUG("CCookie", "", "start");
 }
-
-void	CCookie::SetName(string s) { 
-	{
-		CLog	log;
-		log.Write(DEBUG, "CCookie::" + string(__func__) + "[" + to_string(__LINE__) + "]: start");
-	}
-
-	name = s; 
-
-	{
-		CLog	log;
-		log.Write(DEBUG, "CCookie::" + string(__func__) + "[" + to_string(__LINE__) + "]: end");
-	}
-}
-void	CCookie::SetValue(string s) {
-	{
-		CLog	log;
-
-		log.Write(DEBUG, "CCookie::" + string(__func__) + "[" + to_string(__LINE__) + "]: name = " + GetName() + ", value = " + s);
-	}
-	value = s;
-}
-void	CCookie::SetDomain(string s) { domain = s; }
-void	CCookie::SetPath(string s) { path = s; }
 
 /*
 Header mismatch:
 	Expected: Set-Cookie: name=value; expires=Thu, 24-Apr-2014 22:36:43 GMT; Max-Age=5
 	Received: Set-Cookie: name=value; expires=Thu, 24-Apr-2014 22:36:43 GMT
 */
-void	CCookie::SetExpiration(string s) { expiration = s; }
-void	CCookie::SetMaxAge(int s) { maxAge = s; }
-void	CCookie::SetSecure(string s) { secure = s; }
+
 void	CCookie::SetNew(bool s) 
 {
 	{
@@ -67,38 +25,18 @@ void	CCookie::SetNew(bool s)
 	isNew = s;
 }
 
-string	CCookie::GetName() { return name; }
-string	CCookie::GetValue() { return value; }
-string	CCookie::GetDomain() { return domain; }
-string	CCookie::GetPath() { return path; }
-string	CCookie::GetExpiration() { return expiration; }
-int		CCookie::GetMaxAge() { return maxAge; }
-string	CCookie::GetSecure() { return secure; }
-bool	CCookie::GetNew() { return isNew; }
-
-
 CCookie::~CCookie()
 {
-	{
-		CLog	log;
-		log.Write(DEBUG, "CCookie::" + string(__func__) + "[" + to_string(__LINE__) + "]: destructor for " + GetName());
-	}
+	MESSAGE_DEBUG("CCookie", "", "destructor for " + GetName());
 }
 
 CCookies::CCookies()
 {
-	{
-		CLog	log;
-		log.Write(DEBUG, "CCookies::" + string(__func__) + "[" + to_string(__LINE__) + "]: start");
-	}
+	MESSAGE_DEBUG("CCookies", "", "start");
 
 	cookies.reserve(8);
 
-	{
-		CLog	log;
-		log.Write(DEBUG, "CCookies::" + string(__func__) + "[" + to_string(__LINE__) + "]: size of cookies=" + to_string(cookies.size()) + " object after reservation");
-	}
-
+	MESSAGE_DEBUG("CCookies", "", "finish (size of cookies=" + to_string(cookies.size()) + " object after reservation)");
 }
 
 void CCookies::Add(string name, string value, string expiration, string domain, string path, string secure, bool newCookie)

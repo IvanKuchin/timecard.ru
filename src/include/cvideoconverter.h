@@ -69,13 +69,13 @@ public:
 	bool	FirstPhase();
 	bool	SecondPhase();
 
-	string	GetMetadataLocationAltitude() { return _metadataLocationAltitude; }
-	string	GetMetadataLocationLongitude() { return _metadataLocationLongitude; }
-	string	GetMetadataLocationLatitude() { return _metadataLocationLatitude; }
-	string	GetMetadataDateTime() { return _metadataDateTime; }
-	string	GetMetadataMake() { return _metadataMake; }
-	string	GetMetadataModel() { return _metadataModel; }
-	string	GetMetadataSW() { return _metadataSW; }
+	string	GetMetadataLocationAltitude()	const	{ return _metadataLocationAltitude; }
+	string	GetMetadataLocationLongitude()	const	{ return _metadataLocationLongitude; }
+	string	GetMetadataLocationLatitude()	const	{ return _metadataLocationLatitude; }
+	string	GetMetadataDateTime()			const	{ return _metadataDateTime; }
+	string	GetMetadataMake() 				const	{ return _metadataMake; }
+	string	GetMetadataModel() 				const	{ return _metadataModel; }
+	string	GetMetadataSW() 				const	{ return _metadataSW; }
 
 	void	Cleanup();
 

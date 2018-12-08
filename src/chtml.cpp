@@ -277,21 +277,6 @@ bool CHTML::ExtractHEAD()
 	return result;
 }
 
-void CHTML::SetType(string tmp)
-{
-	{
-		CLog	log;
-		log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]:begin (type = " + tmp + ")");
-	}
-
-	type = tmp;
-
-	{
-		CLog	log;
-		log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]:finish");
-	}
-}
-
 int CHTML::GetNumberOfFoldersByType()
 {
 	int		result = FEEDIMAGE_NUMBER_OF_FOLDERS;
@@ -710,21 +695,6 @@ void CHTML::AppendToHTMLPage(string param)
 		CLog	log;
 		log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]:end");
 	}
-}
-
-string CHTML::GetTitle()
-{
-	return metaTitle;
-}
-
-string CHTML::GetDescription()
-{
-	return metaDescription;
-}
-
-string CHTML::GetPreviewImageURL()
-{
-	return metaPreviewImageURL;
 }
 
 CHTML::~CHTML()

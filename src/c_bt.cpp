@@ -124,7 +124,7 @@ string	C_ExpenseLineTemplate::SaveToDB(CMysql *db)
 	return error_message;
 }
 
-string	C_ExpenseLineTemplate::SetPaymentMethod(bool is_cash, bool is_card)
+string	C_ExpenseLineTemplate::SetPaymentMethod(const bool is_cash, const bool is_card)
 {
 	string	error_message = "";
 

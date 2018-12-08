@@ -149,8 +149,3 @@ string CTemplate::Render()
 
     return result;
 }
-
-
-CTemplate::~CTemplate()
-{
-}

@@ -4,10 +4,7 @@ CSession::CSession() : db(NULL), cookies(NULL)
 {
 	struct	timeval	tv;
 
-	{
-			CLog	log;
-			log.Write(DEBUG, "CSession::" + string(__func__) + "[" + to_string(__LINE__) + "]: start");
-	}
+	MESSAGE_DEBUG("CSession", "", "start");
 
 	gettimeofday(&tv, NULL);
 	srand(tv.tv_sec * tv.tv_usec * 100000);
@@ -16,10 +13,7 @@ CSession::CSession() : db(NULL), cookies(NULL)
 
 	MMDB_usage = false;
 
-	{
-			CLog	log;
-			log.Write(DEBUG, "CSession::" + string(__func__) + "[" + to_string(__LINE__) + "]: end");
-	}
+	MESSAGE_DEBUG("CSession", "", "end");
 }
 
 string CSession::GetRandom(int len)
@@ -133,61 +127,6 @@ void CSession::InitMaxMind()
 	}
 }
 
-string CSession::GetID()
-{
-	return sessID;
-}
-
-void CSession::SetID(string id)
-{
-	sessID = id;
-}
-
-string CSession::GetUser()
-{
-	return user;
-}
-
-void CSession::SetUser(string u)
-{
-	user = u;
-}
-
-string CSession::GetIP()
-{
-	return ip;
-}
-
-void CSession::SetIP(string i)
-{
-	ip = i;
-}
-
-string CSession::GetLng()
-{
-	return lng;
-}
-
-void CSession::SetLng(string l)
-{
-	lng = l;
-}
-
-void CSession::SetDB(CMysql *mysql)
-{
-	db = mysql;
-}
-
-int	 CSession::GetExpire()
-{
-	return expire;
-}
-
-void CSession::SetExpire(int i)
-{
-	expire = i;
-}
-
 string CSession::DetectItem(string MMDB_itemName) {
 	string		item = "";
 
@@ -224,29 +163,24 @@ string CSession::DetectItem(string MMDB_itemName) {
 
 string CSession::DetectCountry()
 {
-	string country;
+	auto	result = ""s;
 
-	country = DetectItem("country");
+    MESSAGE_ERROR("CSession", "", "attempt to detect country by IP");
 
-	{
-		CLog	log;
-		log.Write(DEBUG, "CSession::" + string(__func__) + "[" + to_string(__LINE__) + "]: auto detection country by IP");
-    }
+    result = DetectItem("country");
 
-	return country;
+	return result;
 }
 
 string CSession::DetectCity()
 {
-	string city;
+	auto	result = ""s;
 
-	city = DetectItem("city");
-	{
-		CLog	log;
-		log.Write(DEBUG, "CSession::" + string(__func__) + "[" + to_string(__LINE__) + "]: auto detection city by IP");
-    }
+    MESSAGE_ERROR("CSession", "", "attempt to detect city by IP");
 
-	return city;
+    result = DetectItem("city");
+
+	return result;
 }
 
 bool CSession::Save(string u, string i, string l)

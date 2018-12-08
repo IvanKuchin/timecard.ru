@@ -16,7 +16,6 @@ using namespace std;
 #include "utilities.h"
 #include "localy.h"
 
-
 #define	SESSION_LEN	60	// --- session duration in minutes
 #define	MMDB_fname "/home/httpd/dev." + DOMAIN_NAME + "/cgi-bin/GeoLite2-City.mmdb"
 
@@ -45,25 +44,31 @@ class CSession
 		void		InitMaxMind();
 
 	public:
-				CSession();
+					CSession();
 
-		void		SetUser(string u);
-		string		GetUser();
+		void		SetID	(const string &param)		{ sessID = param; }
+		void		SetUser	(const string &param)		{ user = param; }
+		void		SetIP	(const string &param)		{ ip = param; }
+		void		SetLng	(const string &param)		{ lng = param; }
+		void		SetDB	(CMysql *param)				{ db = param; }
+		void		SetExpire(int param)				{ expire = param; }
+
+		void		SetID	(string &&param)	noexcept{ sessID = move(param); }
+		void		SetUser	(string &&param)	noexcept{ user = move(param); }
+		void		SetIP	(string &&param)	noexcept{ ip = move(param); }
+		void		SetLng	(string &&param)	noexcept{ lng = move(param); }
+
+		string		GetIP()						const	{ return ip; }
+		string		GetID()						const	{ return sessID; }
+		string		GetUser()					const	{ return user; }
+		string		GetLng()					const	{ return lng; }
+		int			GetExpire()					const	{ return expire; }
 
 		void		GenerateID();
-		void		SetID(string id);
-		string		GetID();
-		void		SetIP(string i);
-		string		GetIP();
-		void		SetLng(string l);
-		string		GetLng();
-		void		SetExpire(int l);
-		int			GetExpire();
 
 		string		DetectCountry();
 		string		DetectCity();
 
-		void		SetDB(CMysql *mysql);
 
 		bool		Save(string u, string i, string l);
 		bool		Load(string id);
@@ -75,8 +80,7 @@ class CSession
 		bool		CheckConsistency();
 		bool		SessID_ExpireSession();
 
-
-				~CSession();
+					~CSession();
 };
 
 #endif

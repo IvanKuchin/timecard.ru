@@ -41,11 +41,11 @@ class CCgi
 
 		string		FindLanguageByIP(string ip);
     public:
-			CCgi();
-			CCgi(int typeTemplate);
-			CCgi(const char *fileName, int typeTemplate);
-			CCgi(const char *fileName, CVars v);
-			CCgi(const char *fileName, CVars v, CFiles f);
+				CCgi();
+				CCgi(int typeTemplate);
+				CCgi(const char *fileName, int typeTemplate);
+				CCgi(const char *fileName, CVars v);
+				CCgi(const char *fileName, CVars v, CFiles f);
 
 		void	SetDB(CMysql *mysql);
 

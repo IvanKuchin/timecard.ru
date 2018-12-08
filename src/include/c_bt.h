@@ -25,15 +25,18 @@ class C_ExpenseLineTemplate
 
 								C_ExpenseLineTemplate();
 
-		void					SetID(string param) { id = param; }
-		string					GetID() const { return id; }
-		void					SetTitle(string param) { title = param; }
-		string					GetTitle() const { return title; }
-		void					SetBTExpenseTemplateID(string param) { bt_expense_template_id = param; }
-		string					GetBTExpenseTemplateID() const { return bt_expense_template_id; }
+		void					SetID(const string &param)					{ id = param; }
+		void					SetID(string &&param) noexcept				{ id = move(param); }
+		string					GetID() const								{ return id; }
+		void					SetTitle(const string &param)				{ title = param; }
+		void					SetTitle(string &&param) noexcept			{ title = move(param); }
+		string					GetTitle() const							{ return title; }
+		void					SetBTExpenseTemplateID(const string &param) { bt_expense_template_id = param; }
+		void					SetBTExpenseTemplateID(string &&param) noexcept { bt_expense_template_id = move(param); }
+		string					GetBTExpenseTemplateID() const 				{ return bt_expense_template_id; }
 
 		string					CheckValidity(CMysql *) const;
-		string					SetPaymentMethod(bool is_cash, bool is_card);
+		string					SetPaymentMethod(const bool is_cash, const bool is_card);
 		string					SaveToDB(CMysql *db);
 
 								~C_ExpenseLineTemplate();
@@ -51,14 +54,18 @@ class C_ExpenseTemplate
 	public:
 								C_ExpenseTemplate();
 								
-		void					SetID(string param) { id = param; }
-		string					GetID() const { return id; }
-		void					SetTitle(string param) { title = param; }
-		string					GetTitle() const { return title; }
-		void					SetDescription(string param) { description = param; }
-		string					GetDescription() const { return description; }
-		void					SetCompanyID(string param) { company_id = param; }
-		string					GetCompanyID() const { return company_id; }
+		void					SetID(const string &param) 				{ id = param; }
+		void					SetID(string &&param) noexcept			{ id = move(param); }
+		string					GetID() const							{ return id; }
+		void					SetTitle(const string &param)			{ title = param; }
+		void					SetTitle(string &&param) noexcept		{ title = move(param); }
+		string					GetTitle() const						{ return title; }
+		void					SetDescription(const string &param) 	{ description = param; }
+		void					SetDescription(string &&param) noexcept { description = move(param); }
+		string					GetDescription() const					{ return description; }
+		void					SetCompanyID(const string &param)		{ company_id = param; }
+		void					SetCompanyID(string &&param) noexcept	{ company_id = move(param); }
+		string					GetCompanyID() const 					{ return company_id; }
 		string					CheckValidity(CMysql *) const;
 		string					CheckDuplicateLineTitles() const;
 		string					SaveToDB(CMysql *db);
@@ -83,21 +90,27 @@ class C_ExpenseLine
 	public:
 								C_ExpenseLine();
 
-		void					SetID(string param) { id = param; }
-		string					GetID() const { return id; }
-		void					SetExpenseLineTemplateID(string param) { expense_item_doc_id = param; }
-		string					GetExpenseLineTemplateID() const { return expense_item_doc_id; }
-		void					SetValue(string param) { value = param; }
-		string					GetValue() const { return value; }
-		void					SetComment(string param) { comment = param; }
-		string					GetComment() const { return comment; }
-		void					SetRandom(string param) { random = param; }
-		string					GetRandom() const { return random; }
-		void					SetParentRandom(string param) { parent_random = param; }
-		string					GetParentRandom() const { return parent_random; }
+		void					SetID(const string &param)							{ id = param; }
+		void					SetID(string &&param) noexcept						{ id = move(param); }
+		string					GetID() const										{ return id; }
+		void					SetExpenseLineTemplateID(const string &param) 		{ expense_item_doc_id = param; }
+		void					SetExpenseLineTemplateID(string &&param) noexcept	{ expense_item_doc_id = move(param); }
+		string					GetExpenseLineTemplateID() const					{ return expense_item_doc_id; }
+		void					SetValue(const string &param)						{ value = param; }
+		void					SetValue(string &&param) noexcept					{ value = move(param); }
+		string					GetValue() const 									{ return value; }
+		void					SetComment(const string &param)						{ comment = param; }
+		void					SetComment(string &&param) noexcept					{ comment = move(param); }
+		string					GetComment() const									{ return comment; }
+		void					SetRandom(const string &param)						{ random = param; }
+		void					SetRandom(string &&param) noexcept					{ random = move(param); }
+		string					GetRandom() const									{ return random; }
+		void					SetParentRandom(const string &param)				{ parent_random = param; }
+		void					SetParentRandom(string &&param) noexcept			{ parent_random = move(param); }
+		string					GetParentRandom() const								{ return parent_random; }
 
 		string					CheckValidity(C_ExpenseLineTemplate, CMysql *) const;
-		bool					isSavedInDB() const	{ if(GetID().length() && (GetID() != "0")) return true; else return false; };
+		bool					isSavedInDB() const									{ if(GetID().length() && (GetID() != "0")) return true; else return false; };
 		bool					RemoveUnsavedLinesImages(CMysql *) const;
 
 		string					SaveToDB(string expense_id, CMysql*);
@@ -125,34 +138,41 @@ class C_Expense
 	public:
 								C_Expense() : currency_value(0, 4) {};
 
-		void					SetID(string param) { id = param; }
-		string					GetID() const { return id; }
-		void					SetExpenseTemplateID(string param) { expense_item_id = param; }
-		string					GetExpenseTemplateID() const { return expense_item_id; }
-		void					SetPaymentType(string param) { payment_type = param; }
-		string					GetPaymentType() const { return payment_type; }
-		void					SetDate(string param) { date = param; }
-		string					GetDate() const { return date; }
-		void					SetPriceDomestic(c_float param) { price_domestic = param; }
-		c_float					GetPriceDomestic() const { return price_domestic; }
-		void					SetPriceDomestic(string param) { if(param.length()) try {price_domestic.Set(stod(param));} catch(...) { price_domestic.Set(0); MESSAGE_ERROR("C_Expense", "", "can't convert(" + param + ") to c_float")} }
-		void					SetPriceForeign(c_float param) { price_foreign = param; }
-		void					SetPriceForeign(string param) { if(param.length()) try {price_foreign.Set(stod(param));} catch(...) { price_foreign.Set(0); MESSAGE_ERROR("C_Expense", "", "can't convert(" + param + ") to c_float")} }
-		c_float					GetPriceForeign() const { return price_foreign; }
-		void					SetCurrencyNominal(long int param) { currency_nominal = param; }
-		void					SetCurrencyNominal(string param) { if(param.length()) try {currency_nominal = stol(param);} catch(...) { currency_nominal = 0; MESSAGE_ERROR("C_Expense", "", "can't convert(" + param + ") to long")} }
-		long int				GetCurrencyNominal() const { return currency_nominal; }
-		void					SetCurrencyValue(c_float param) { currency_value = param; }
-		void					SetCurrencyValue(string param) { if(param.length()) try { currency_value.Set(stod(param));} catch(...) { currency_value.Set(0); MESSAGE_ERROR("C_Expense", "", "can't convert(" + param + ") to c_float")} }
-		c_float					GetCurrencyValue() const { return currency_value; }
-		void					SetCurrencyName(string param) { currency_name = param; }
-		string					GetCurrencyName() const { return currency_name; }
-		void					SetComment(string param) { comment = param; }
-		string					GetComment() const { return comment; }
-		void					SetRandom(string param) { random = param; }
-		string					GetRandom() const { return random; }
-		void					AddExpenseLine(C_ExpenseLine param) { expense_lines.push_back(param); }
-		vector<C_ExpenseLine>	GetExpenseLines() const { return expense_lines; }
+		void					SetID(const string &param)						{ id = param; }
+		void					SetID(string &&param) noexcept					{ id = move(param); }
+		string					GetID() const									{ return id; }
+		void					SetExpenseTemplateID(const string &param)		{ expense_item_id = param; }
+		void					SetExpenseTemplateID(string &&param) noexcept	{ expense_item_id = move(param); }
+		string					GetExpenseTemplateID() const					{ return expense_item_id; }
+		void					SetPaymentType(const string &param)				{ payment_type = param; }
+		void					SetPaymentType(string &&param) noexcept			{ payment_type = move(param); }
+		string					GetPaymentType() const							{ return payment_type; }
+		void					SetDate(const string &param)					{ date = param; }
+		void					SetDate(string &&param) noexcept				{ date = move(param); }
+		string					GetDate() const 								{ return date; }
+		void					SetPriceDomestic(const c_float &param)			{ price_domestic = param; }
+		c_float					GetPriceDomestic() const						{ return price_domestic; }
+		void					SetPriceDomestic(const string &param)			{ if(param.length()) try {price_domestic.Set(stod(param));} catch(...) { price_domestic.Set(0); MESSAGE_ERROR("C_Expense", "", "can't convert(" + param + ") to c_float")} }
+		void					SetPriceForeign(const c_float &param)			{ price_foreign = param; }
+		void					SetPriceForeign(const string &param)			{ if(param.length()) try {price_foreign.Set(stod(param));} catch(...) { price_foreign.Set(0); MESSAGE_ERROR("C_Expense", "", "can't convert(" + param + ") to c_float")} }
+		c_float					GetPriceForeign() const							{ return price_foreign; }
+		void					SetCurrencyNominal(const long int param)		{ currency_nominal = param; }
+		void					SetCurrencyNominal(const string &param)			{ if(param.length()) try {currency_nominal = stol(param);} catch(...) { currency_nominal = 0; MESSAGE_ERROR("C_Expense", "", "can't convert(" + param + ") to long")} }
+		long int				GetCurrencyNominal() const						{ return currency_nominal; }
+		void					SetCurrencyValue(const c_float &param)			{ currency_value = param; }
+		void					SetCurrencyValue(const string &param)			{ if(param.length()) try { currency_value.Set(stod(param));} catch(...) { currency_value.Set(0); MESSAGE_ERROR("C_Expense", "", "can't convert(" + param + ") to c_float")} }
+		c_float					GetCurrencyValue() const						{ return currency_value; }
+		void					SetCurrencyName(const string &param)			{ currency_name = param; }
+		void					SetCurrencyName(string &&param) noexcept		{ currency_name = move(param); }
+		string					GetCurrencyName() const							{ return currency_name; }
+		void					SetComment(const string &param)					{ comment = param; }
+		void					SetComment(string &&param) noexcept				{ comment = move(param); }
+		string					GetComment() const								{ return comment; }
+		void					SetRandom(const string &param)					{ random = param; }
+		void					SetRandom(string &&param) noexcept				{ random = move(param); }
+		string					GetRandom() const								{ return random; }
+		void					AddExpenseLine(C_ExpenseLine param)				{ expense_lines.push_back(param); }
+		vector<C_ExpenseLine>	GetExpenseLines() const							{ return expense_lines; }
 
 		string					CheckValidity(CMysql *) const;
 		bool					RemoveUnsavedLinesImages(CMysql *) const;
@@ -182,29 +202,37 @@ class C_BT
 	public:
 								C_BT();
 
-		void					SetDB(CMysql *param) 			{ db = param; }
-		void					SetID(string param) 			{ id = param; }
-		string					GetID() const 					{ return id; }
-		void					SetSowID(string param) 			{ sow_id = param; }
-		string					GetSowID() const 				{ return sow_id; }
-		void					SetUserID(string param) 		{ user_id = param; }
-		string					GetUserID() const 				{ return user_id; }
-		void					SetUser(CUser *param)	 		{ if(param) { user_id = param->GetID(); user = param; } else { MESSAGE_DEBUG("C_BT", "", "user * is NULL"); } }
-		CUser *					GetUser() const 				{ return user; }
-		void					SetDestination(string param)	{ destination = param; }
-		string					GetDestination() const 			{ return destination; }
-		void					SetStartDate(string param)		{ start_date = param; }
-		string					GetStartDate() const			{ return start_date; }
-		void					SetEndDate(string param)		{ end_date = param; }
-		string					GetEndDate() const 				{ return end_date; }
-		void					SetStatus(string param)			{ status = param; };
+		void					SetDB(CMysql *param)	 				{ db = param; }
+		void					SetID(const string &param) 				{ id = param; }
+		void					SetID(string &&param) noexcept			{ id = move(param); }
+		string					GetID() const 							{ return id; }
+		void					SetSowID(const string &param) 			{ sow_id = param; }
+		void					SetSowID(string &&param) noexcept		{ sow_id = move(param); }
+		string					GetSowID() const 						{ return sow_id; }
+		void					SetUserID(const string &param) 			{ user_id = param; }
+		void					SetUserID(string &&param) noexcept		{ user_id = move(param); }
+		string					GetUserID() const 						{ return user_id; }
+		void					SetUser(CUser *param)	 				{ if(param) { user_id = param->GetID(); user = param; } else { MESSAGE_DEBUG("C_BT", "", "CUser * is NULL"); } }
+		CUser *					GetUser() const 						{ return user; }
+		void					SetDestination(const string &param)		{ destination = param; }
+		void					SetDestination(string &&param) noexcept	{ destination = move(param); }
+		string					GetDestination() const 					{ return destination; }
+		void					SetStartDate(const string &param)		{ start_date = param; }
+		void					SetStartDate(string &&param) noexcept	{ start_date = move(param); }
+		string					GetStartDate() const					{ return start_date; }
+		void					SetEndDate(const string &param)			{ end_date = param; }
+		void					SetEndDate(string &&param) noexcept		{ end_date = move(param); }
+		string					GetEndDate() const 						{ return end_date; }
+		void					SetStatus(const string &param)			{ status = param; };
+		void					SetStatus(string &&param) noexcept		{ status = move(param); };
 		string					GetStatus();
-		void					SetPurpose(string param) 		{ purpose = param; }
-		string					GetPurpose() const 				{ return purpose; }
-		void					SetAction(string param) 		{ if(param.length()) action = param; else { MESSAGE_DEBUG("C_BT", "", "action is empty (using default)"); } }
-		string					GetAction() const 				{ return action; }
-		void					AddExpense(C_Expense param) 	{ expenses.push_back(param); }
-		vector<C_Expense>		GetExpenses() const				{ return expenses; }
+		void					SetPurpose(const string &param) 		{ purpose = param; }
+		void					SetPurpose(string &&param) noexcept		{ purpose = move(param); }
+		string					GetPurpose() const 						{ return purpose; }
+		void					SetAction(const string &param) 			{ if(param.length()) action = param; else { MESSAGE_DEBUG("C_BT", "", "action is empty (using default)"); } }
+		string					GetAction() const 						{ return action; }
+		void					AddExpense(C_Expense param) 			{ expenses.push_back(param); }
+		vector<C_Expense>		GetExpenses() const						{ return expenses; }
 
 		string					isValidToUpdate();
 		string					CheckValidity() const;

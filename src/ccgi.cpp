@@ -115,38 +115,26 @@ string CCgi::GetEncoding()
 
 string	CCgi::GetCity()
 {
-	string	result ="";
+	auto	result =""s;
 	
-	{
-		CLog logFile;
-		logFile.Write(DEBUG, "CCgi::" + string(__func__) + "[" + to_string(__LINE__) + "]: start");
-	}
+	MESSAGE_DEBUG("CCgi", "", "start");
 
 	result = sessionDB.DetectCity();
 
-	{
-		CLog logFile;
-		logFile.Write(DEBUG, "CCgi::" + string(__func__) + "[" + to_string(__LINE__) + "]: finish (city length is " + to_string(result.length()) + ")");
-	}
+	MESSAGE_DEBUG("CCgi", "", "finish (city length is " + to_string(result.length()) + ")");
 
 	return result;
 }
 
 string	CCgi::GetCountry()
 {
-	string	result ="";
+	auto	result =""s;
 
-	{
-		CLog logFile;
-		logFile.Write(DEBUG, "CCgi::" + string(__func__) + "[" + to_string(__LINE__) + "]: start");
-	}
+	MESSAGE_DEBUG("CCgi", "", "start");
 
 	result = sessionDB.DetectCountry();
 
-	{
-		CLog logFile;
-		logFile.Write(DEBUG, "CCgi::" + string(__func__) + "[" + to_string(__LINE__) + "]: finish (country length is " + to_string(result.length()) + ")");
-	}
+	MESSAGE_DEBUG("CCgi", "", "finish (country length is " + to_string(result.length()) + ")");
 
 	return result;
 }

@@ -1,37 +1,5 @@
 #include "cfiles.h"
 
-CFile::CFile()
-{
-	content = NULL;
-	length = 0;
-	name = "";
-}
-
-string CFile::GetName()
-{
-	return name;
-}
-		
-int CFile::GetSize()
-{
-	return length;
-}
-
-char* CFile::GetContent()
-{
-	return content;
-}
-
-void CFile::SetName(string n)
-{
-	name = n;
-}
-
-void CFile::SetSize(int s)
-{
-	length = s;
-}
-
 void CFile::SetContent(char *c)
 {
 	content = (char *)malloc(GetSize() + 1);
@@ -73,10 +41,6 @@ void CFile::Delete()
 CFile::~CFile()
 {
 	Delete();
-}
-
-CFiles::CFiles()
-{
 }
 
 bool CFiles::Add(string name, char *content, int size)

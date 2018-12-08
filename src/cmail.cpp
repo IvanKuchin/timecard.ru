@@ -26,16 +26,6 @@ CMail::CMail() : smtpServer(SMTP_HOST), smtpPort(SMTP_PORT), smtpFlag(false)
 	mailfrom = "-f <" + string(SMTP_MAILFROM) + ">";
 }
 
-void CMail::SetSMTPServer(string server)
-{
-	smtpServer = server;
-}
-
-void CMail::SetSMTPPort(int port)
-{
-	smtpPort = port;
-}
-
 unsigned long CMail::Addr2Num (const char *addr)
 {
 	int i;
@@ -70,27 +60,6 @@ unsigned long CMail::Addr2Num (const char *addr)
 		}
 	}
 	return ipnum;
-}
-
-
-void CMail::To(string to)
-{
-	rcptto = to;
-}
-
-void CMail::From(string from)
-{
-	mailfrom = from;
-}
-
-void CMail::Subject(string subj)
-{
-	subject = subj;
-}
-
-void CMail::Message(string mess)
-{
-	message = mess;
 }
 
 bool CMail::Send(string to, string subj, string mess)
@@ -787,40 +756,12 @@ bool CMail::Send()
 	return result;
 }
 
-CMail::~CMail()
-{
-}
 
 
 
-CMailLocal::CMailLocal()
-{
-}
 
-void CMailLocal::UserLogin(string log)
-{
-	userLogin = log;
-}
 
-void CMailLocal::UserID(string id)
-{
-	userID = id;
-}
 
-string CMailLocal::GetUserLogin()
-{
-	return userLogin;
-}
-
-string CMailLocal::GetUserID()
-{
-	return userID;
-}
-
-void CMailLocal::SetDB(CMysql *mysql)
-{
-	db = mysql;
-}
 
 string CMailLocal::GetUserLng()
 {
@@ -872,11 +813,6 @@ string CMailLocal::SetTemplateFile(string fileName)
     fclose(templateFile);
 
     return fileName;
-}
-
-void CMailLocal::SetVars(CVars *v)
-{
-	vars = v;
 }
 
 void CMailLocal::Send(string login, string templID, CVars *v, CMysql *mysql)
@@ -942,17 +878,4 @@ void CMailLocal::Send(string login, string templID, CVars *v, CMysql *mysql)
 	}
 
 }
-
-CMailLocal::~CMailLocal()
-{
-}
-
-
-
-
-
-
-
-
-
 

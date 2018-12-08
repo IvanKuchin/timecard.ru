@@ -51,19 +51,21 @@ public:
 									CHTML(string _type_);
 
 	void							AppendToHTMLPage(string param);
-	void							SetType(string tmp);
 	bool							PerformRequest(string param);
-	string							GetTitle();
-	string							GetDescription();
-	string							GetPreviewImageURL();
-	string							GetPreviewImageFolder() { return folderID; };
-	string							GetPreviewImagePrefix() { return filePrefix; };
-	string							GetPreviewImageExtention() { return fileExtention; };
 
-	void							SetParsingDisable() { isParsingRequired = false; };
-	void							SetParsingEnable() { isParsingRequired = true; };
+	void							SetType(const string &tmp)				{ type = tmp; }
+	void							SetType(string &&tmp) 		noexcept	{ type = move(tmp); }
+	void							SetParsingDisable()			noexcept	{ isParsingRequired = false; };
+	void							SetParsingEnable()			noexcept	{ isParsingRequired = true; };
 
-	string							GetContent() { return htmlPage; };
+	string							GetTitle()						const	{ return metaTitle; }
+	string							GetDescription()				const	{ return metaDescription; }
+	string							GetPreviewImageURL()			const	{ return metaPreviewImageURL; }
+	string							GetPreviewImageFolder()			const	{ return folderID; };
+	string							GetPreviewImagePrefix()			const	{ return filePrefix; };
+	string							GetPreviewImageExtention()		const	{ return fileExtention; };
+	string							GetContent() 					const	{ return htmlPage; };
+
 
 	bool							isEmbedVideoHostedOnYoutube();
 	string							GetEmbedVideoURL() { return embedVideoURL; };

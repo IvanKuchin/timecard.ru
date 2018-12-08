@@ -30,26 +30,6 @@ CUser::CUser(string log, string pas, string pasConfirm, string em, string l, str
 	SetPhone(ph);
 }
 
-void CUser::SetDB(CMysql *mysql)
-{
-	db = mysql;
-}
-
-CMysql* CUser::GetDB()
-{
-	return db;
-}
-
-void CUser::SetVars(CVars *v)
-{
-	vars = v;
-}
-
-CVars* CUser::GetVars()
-{
-	return vars;
-}
-
 bool CUser::isBlock()
 {
 	ostringstream	ost;
@@ -210,41 +190,6 @@ bool CUser::isAgree()
 	return true;
 }
 
-string CUser::GetID()
-{
-	return id;
-}
-
-string CUser::GetLogin()
-{
-	return login;
-}
-
-string CUser::GetName()
-{
-	return name;
-}
-
-string CUser::GetNameLast()
-{
-	return nameLast;
-}
-
-string CUser::GetPasswd()
-{
-	return passwd;
-}
-
-string CUser::GetEmail()
-{
-	return email;
-}
-
-string CUser::GetSiteThemeID()
-{
-	return site_theme_id;
-}
-
 string CUser::GetSiteTheme()
 {
 	string	result = DEFAULT_SITE_THEME;
@@ -268,116 +213,6 @@ string CUser::GetSiteTheme()
 	return result;
 }
 
-string CUser::GetLng()
-{
-	return lng;
-}
-
-string CUser::GetIP()
-{
-	return ip;
-}
-
-string CUser::GetPhone()
-{
-	return phone;
-}
-
-string CUser::GetCV()
-{
-	return cv;
-}
-
-string CUser::GetType()
-{
-	return type;
-}
-
-string CUser::GetPartnerID()
-{
-	return partnerID;
-}
-
-string CUser::GetAvatar()
-{
-	return avatar;
-}
-
-string CUser::GetLastOnline()
-{
-	return lastOnline;
-}
-
-void CUser::SetPartnerID(string p)
-{
-	partnerID = p;
-}
-
-void CUser::SetID(string p)
-{
-	id = p;
-}
-
-void CUser::SetLogin(string p)
-{
-	login = p;
-}
-
-void CUser::SetName(string p)
-{
-	name = p;
-}
-
-void CUser::SetNameLast(string p)
-{
-	nameLast = p;
-}
-
-void CUser::SetPasswd(string p)
-{
-	passwd = p;
-}
-
-void CUser::SetEmail(string p)
-{
-	email = p;
-}
-
-void CUser::SetSiteThemeID(string p)
-{
-	site_theme_id = p;
-}
-
-void CUser::SetAvatar(string p)
-{
-	avatar = p;
-}
-
-void CUser::SetLastOnline(string p)
-{
-	lastOnline = p;
-}
-
-void CUser::SetCountry(string p)
-{
-	country = p;
-}
-
-void CUser::SetCity(string p)
-{
-	city = p;
-}
-
-string CUser::GetCountry()
-{
-	return country;
-}
-
-string CUser::GetCity()
-{
-	return city;
-}
-
 bool CUser::isAllowedLng(string p)
 {
 	struct	stat	buf;
@@ -398,7 +233,7 @@ bool CUser::isAllowedLng(string p)
 	return result;
 }
 
-void CUser::SetLng(string p)
+void CUser::SetLng(const string &p)
 {
 	if(isAllowedLng(p))
 		lng = p;
@@ -407,26 +242,6 @@ void CUser::SetLng(string p)
 		MESSAGE_ERROR("CUser", "", "language for user " + GetLogin() + " changed to default, because [" + p + "] is not supported yet.");
 		lng = DEFAULT_LANGUAGE;
 	}
-}
-
-void CUser::SetIP(string p)
-{
-	ip = p;
-}
-
-void CUser::SetType(string p)
-{
-	type = p;
-}
-
-void CUser::SetPhone(string p)
-{
-	phone = p;
-}
-
-void CUser::SetCV(string p)
-{
-	cv = p;
 }
 
 void CUser::Create()

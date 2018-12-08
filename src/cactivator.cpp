@@ -24,46 +24,6 @@ string CActivator::GetRandom(int len)
 	return result;
 }
 
-string CActivator::GetID()
-{
-	return actID;
-}
-
-void CActivator::SetID(string id)
-{
-	actID = id;
-}
-
-string CActivator::GetUser()
-{
-	return user;
-}
-
-void CActivator::SetUser(string u)
-{
-	user = u;
-}
-
-void CActivator::SetType(string t)
-{
-	type = t;
-}
-
-string CActivator::GetType()
-{
-	return type;
-}
-
-void CActivator::SetTime(string t)
-{
-	time = t;
-}
-
-string CActivator::GetTime()
-{
-	return time;
-}
-
 void CActivator::SetDB(CMysql *mysql)
 {
 	ostringstream 	ost;

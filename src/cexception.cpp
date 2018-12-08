@@ -14,59 +14,41 @@ CExceptionHTML::CExceptionHTML(string m, string n) : messageID(m), lng(DEFAULT_L
 {
 }
 
-void CExceptionHTML::SetLanguage(string lang)
-{
-	lng = lang;
-}
-
-void CExceptionHTML::SetDB(CMysql *mysql)
-{
-	db = mysql;
-}
-
-
-string CExceptionHTML::GetID()
-{
-	return messageID;
-}
-
 string CExceptionHTML::GetReason()
 {
 	string	result = "";
-	ostringstream	ost;
 
-	if(!db)
+	if(db)
 	{
-		CLog	log;
-
-		log.Write(ERROR,  string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: DB connection doesn't setup");
-		return result;
+		if(db->Query("SELECT `message` FROM `exception` WHERE `id`=\"" + messageID + "\" AND `lng`=\"" + lng + "\";"))
+			result = db->Get(0, "message");
+		else
+			MESSAGE_ERROR("CExceptionHTML", "", "exception.id(" + messageID + ") not found");
+	}
+	else
+	{
+		MESSAGE_ERROR("CExceptionHTML", "", "DB connection didn't initialized");
 	}
 
-	ost << "SELECT `message` FROM `exception` WHERE `id`=\"" << messageID << "\" AND `lng`=\"" << lng << "\";";
-	if(db->Query(ost.str()) == 0) return result;
-
-	result = db->Get(0, "message");
 	return result;
 }
 
 string CExceptionHTML::GetTemplate()
 {
 	string	result = "";
-	ostringstream	ost;
 
-	if(!db)
+	if(db)
 	{
-		CLog	log;
-
-		log.Write(ERROR,  string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: DB connection doesn't setup");
-		return result;
+		if(db->Query("SELECT `template` FROM `exception` WHERE `id`=\"" + messageID + "\" AND `lng`=\"" + lng + "\";"))
+			result = db->Get(0, "template");
+		else
+			MESSAGE_ERROR("CExceptionHTML", "", "exception.id(" + messageID + ") not found");
+	}
+	else
+	{
+		MESSAGE_ERROR("CExceptionHTML", "", "DB connection didn't initialized");
 	}
 
-	ost << "SELECT `template` FROM `exception` WHERE `id`=\"" << messageID << "\" AND `lng`=\"" << lng << "\";";
-	if(db->Query(ost.str()) == 0) return result;
-
-	result = db->Get(0, "template");
 	return result;
 }
 
