@@ -1,0 +1,3 @@
+#!/bin/bash
+
+xgettext -d timecard.su -j --no-location -o ./ru.pot -s ../src/*.cpp

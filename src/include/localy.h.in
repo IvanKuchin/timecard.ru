@@ -45,6 +45,9 @@
 #define	LOCALE_DEFAULT								LOCALE_RUSSIAN
 #define LOCALE_PATH									"${LOCALE_INSTALL_DIR}"s
 
+#define	DEFAULT_LANGUAGE							"ru"
+#define	TEMPLATE_PATH								string(ROOTDIR) + string("/cgi-bin/templates/")
+
 #define	LOG_FILE_MAX_LENGTH							500 // user to strip long output to log file
 #define	LOG_FILE_NAME								string(LOGDIR) + "dev." + DOMAIN_NAME + ".log"
 #define	MAIL_FILE_NAME								string(LOGDIR) + "dev." + DOMAIN_NAME + ".mail"
@@ -59,8 +62,6 @@
 #define	GUEST_USER_DEFAULT_ACTION					string("autologin")
 #define	BREADCRUMBS_STR								" | "
 
-#define	DEFAULT_LANGUAGE							"ru"
-#define	TEMPLATE_PATH								string(ROOTDIR) + string("/cgi-bin/templates/")
 
 #define	SMTP_HOST									"127.0.0.1"
 #define	SMTP_PORT									25

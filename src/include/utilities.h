@@ -260,6 +260,7 @@ string 			isCBCurrencyRate(string date, string currency_name, string currency_no
 
 // --- UTF8 encoding/decoding
 int         	convert_utf8_to_windows1251(const char* utf8, char* windows1251, size_t n);
+auto			utf8_to_cp1251(const string &) -> string;
 bool 			convert_cp1251_to_utf8(const char *in, char *out, int size);
 
 // --- base64 encoding/decoding

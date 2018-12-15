@@ -1612,6 +1612,24 @@ NEXT_LETTER:
 		return 1;
 }
 
+// --- wrapper to convert_utf8_to_windows1251
+auto	utf8_to_cp1251(const string &src) -> string
+{
+	char	convertBuffer[1024];
+	auto	result = 0;
+	
+	MESSAGE_DEBUG("", "", "start");
+
+	memset(convertBuffer, 0, sizeof(convertBuffer));
+
+	result = convert_utf8_to_windows1251(gettext(src.c_str()), convertBuffer, sizeof(convertBuffer));
+
+	MESSAGE_DEBUG("", "", "finish (conversation result is " + to_string(result) + ")");
+
+	return convertBuffer;
+}
+
+
 bool convert_cp1251_to_utf8(const char *in, char *out, int size)
 {
 	const char table[129*3] = {

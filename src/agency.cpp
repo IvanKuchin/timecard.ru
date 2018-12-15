@@ -426,7 +426,7 @@ static string	CheckNewValueByAction(string action, string id, string sow_id, str
 					{
 						if(db->Query("SELECT `id` FROM `cost_centers` WHERE `title`=\"" + new_value + "\" AND `agency_company_id`=\"" + id + "\";"))
 						{
-							error_message = gettext("cost center already exists");
+							error_message = utf8_to_cp1251(gettext("cost center already exists"));
 							MESSAGE_DEBUG("", action, "cost_center with the same name already exists in agency.id(" + id + ")");
 						}
 						else

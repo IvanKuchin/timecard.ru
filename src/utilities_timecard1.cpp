@@ -4001,7 +4001,7 @@ string	GetSpelledSoWByID(string sow_id, CMysql *db)
 
 static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action, string id, string sow_id, string existing_value, string new_value, CMysql *db, CUser *user)
 {
-	string	notification_description, sql_query;
+	string			notification_description, sql_query;
 
 	MESSAGE_DEBUG("", "", "start");
 
@@ -4282,7 +4282,7 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 	}
 	if(action == "AJAX_addCostCenter")
 	{
-		notification_description = gettext("Agency: cost center added") + " "s + GetSpelledCostCenterByID(id, db);
+		notification_description = utf8_to_cp1251(gettext("Agency: cost center added")) + " "s + GetSpelledCostCenterByID(id, db);
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 

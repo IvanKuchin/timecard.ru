@@ -3,8 +3,8 @@ message(STATUS "Install locales")
 configure_file(ru.pot	"${LOCALE_PROJECT_DIR}/ru/LC_MESSAGES/${PROJECT_NAME}.pot" COPYONLY)
 
 # install(CODE "execute_process(COMMAND xgettext -d ${PROJECT_NAME} -o ${LOCALE_PROJECT_DIR}/ru/LC_MESSAGES/${PROJECT_NAME}.po -s ${LOCALE_PROJECT_DIR}/ru/LC_MESSAGES/${PROJECT_NAME}.pot)")
-install(CODE "execute_process(COMMAND msginit --no-translator --locale ru --output ${LOCALE_PROJECT_DIR}/ru/LC_MESSAGES/${PROJECT_NAME}.po --input ${LOCALE_PROJECT_DIR}/ru/LC_MESSAGES/${PROJECT_NAME}.pot)")
-install(CODE "execute_process(COMMAND msgfmt ${LOCALE_PROJECT_DIR}/ru/LC_MESSAGES/${PROJECT_NAME}.po -o ${LOCALE_PROJECT_DIR}/ru/LC_MESSAGES/${PROJECT_NAME}.mo)")
+install(CODE "execute_process(COMMAND msginit --no-translator --locale ru_RU.utf-8 --output ${LOCALE_PROJECT_DIR}/ru/LC_MESSAGES/${PROJECT_NAME}.po --input ${LOCALE_PROJECT_DIR}/ru/LC_MESSAGES/${PROJECT_NAME}.pot)")
+install(CODE "execute_process(COMMAND msgfmt ${LOCALE_PROJECT_DIR}/ru/LC_MESSAGES/${PROJECT_NAME}.po -o ${LOCALE_INSTALL_DIR}/ru/LC_MESSAGES/${PROJECT_NAME}.mo)")
 
 #install(FILES
 #	"${LOCALE_PROJECT_DIR}/ru/LC_MESSAGES/${PROJECT_NAME}.po"
