@@ -32,6 +32,7 @@ set(CRON_PROJECT_DIR		${PROJECT_BINARY_DIR}/share/${PROJECT_NAME}/cron)
 set(ARCHIVE_PROJECT_DIR		${PROJECT_BINARY_DIR}/share/${PROJECT_NAME}/archive)
 set(MAXMIND_PROJECT_DIR		${PROJECT_BINARY_DIR}/share/${PROJECT_NAME}/maxmind)
 set(CI_SCRIPT_PROJECT_DIR	${PROJECT_BINARY_DIR}/share/${PROJECT_NAME}/ci-scripts)
+set(LOCALE_PROJECT_DIR		${PROJECT_BINARY_DIR}/share/${PROJECT_NAME}/locale)
 
 # ---- install variables
 set(ROOTDIR		"/home/httpd/dev.${PROJECT_NAME}")
@@ -42,12 +43,14 @@ set(CGIADMINDIR		${ROOTDIR}/cgi-bin/admin)
 set(CRON_INSTALL_DIR	${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}/cron)
 set(ARCHIVE_INSTALL_DIR	${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}/archive)
 set(MAXMIND_INSTALL_DIR	${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}/maxmind)
+set(LOCALE_INSTALL_DIR	${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}/locale)
 
 add_subdirectory(src/)
 add_subdirectory(supplemental/cron/)
 add_subdirectory(supplemental/archive/)
 add_subdirectory(supplemental/maxmind/)
 add_subdirectory(supplemental/ci-scripts/)
+add_subdirectory(po/)
 
 include(CTest)
 add_subdirectory(tests/)

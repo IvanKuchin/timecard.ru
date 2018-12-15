@@ -108,7 +108,7 @@ string CCgi::GetEncoding()
 	if(lng == "ru")
 		return "windows-1251";
 	if(lng == "en")
-		return "windows-1251";
+		return "ISO-8859-1";
 
 	return "windows-1251";
 }

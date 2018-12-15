@@ -5,7 +5,8 @@
 #include <ctime>
 #include <sys/time.h>
 #include <string.h>
-#include <Magick++.h>
+#include <libintl.h>
+// #include <Magick++.h>
 
 #include "ccgi.h"
 #include "chtml.h"

@@ -40,6 +40,11 @@
 
 #define	DOMAIN_NAME									string(DB_NAME)
 
+#define	LOCALE_RUSSIAN								"ru_RU.UTF-8"s
+#define	LOCALE_ENGLISH								"en_US.UTF-8"s
+#define	LOCALE_DEFAULT								LOCALE_RUSSIAN
+#define LOCALE_PATH									"${LOCALE_INSTALL_DIR}"s
+
 #define	LOG_FILE_MAX_LENGTH							500 // user to strip long output to log file
 #define	LOG_FILE_NAME								string(LOGDIR) + "dev." + DOMAIN_NAME + ".log"
 #define	MAIL_FILE_NAME								string(LOGDIR) + "dev." + DOMAIN_NAME + ".mail"

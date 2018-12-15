@@ -1,6 +1,6 @@
 #include "utilities.h"
 
-string	GetSHA512(string src)
+auto	GetSHA512(const string &src) -> string
 {
 	string			result = "";
     unsigned char	digest[SHA512_DIGEST_LENGTH];

@@ -712,6 +712,63 @@ string	GetApproversInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool i
 	return result;
 }
 
+auto	GetCostCentersInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
+{
+	struct ItemClass
+	{
+		string	id;
+		string	title;
+		string	agency_company_id;
+		string	assignee_user_id;
+		string	eventTimestamp;
+	};
+
+	auto					affected = 0;
+	auto					result = ""s;
+	vector<ItemClass>		itemsList;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	affected = db->Query(sqlQuery);
+	if(affected)
+	{
+		for(auto i = 0; i < affected; i++)
+		{
+			ItemClass	item;
+
+			item.id = db->Get(i, "id");
+			item.title = db->Get(i, "title");
+			item.agency_company_id = db->Get(i, "agency_company_id");
+			item.assignee_user_id = db->Get(i, "assignee_user_id");
+			item.eventTimestamp = db->Get(i, "eventTimestamp");
+
+			itemsList.push_back(item);
+		}
+
+		for (auto& item : itemsList)
+		{
+			if(result.length()) result += ",";
+			result +=	"{";
+
+			result += "\"id\":\"" + item.id + "\",";
+			result += "\"title\":\"" + item.title + "\",";
+			result += "\"agency_company_id\":\"" + item.agency_company_id + "\",";
+			result += "\"assignee_user_id\":\"" + item.assignee_user_id + "\",";
+			result += "\"eventTimestamp\":\"" + item.eventTimestamp + "\"";
+
+			result +=	"}";
+		}
+	}
+	else
+	{
+		MESSAGE_DEBUG("", "", "cost_center list is empty");
+	}
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return result;
+}
+
 string	GetTimecardsInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool isExtended)
 {
 	int		affected;
@@ -2865,9 +2922,9 @@ auto isExpenseTemplateLineIDValidToRemove(string bt_expense_line_template_id, CM
 	return error_message;
 }
 
-bool isTaskIDValidToRemove(string task_id, CMysql *db)
+auto isTaskIDValidToRemove(string task_id, CMysql *db) -> string
 {
-	bool	result = false;
+	auto	error_message = ""s;
 
 	MESSAGE_DEBUG("", "", "start");
 
@@ -2878,28 +2935,47 @@ bool isTaskIDValidToRemove(string task_id, CMysql *db)
 			string	counter = db->Get(0, "counter");
 			if(counter == "0")
 			{
-				// --- task.id valid to remve
-				result = true;
+				if(db->Query("SELECT COUNT(*) AS `counter` FROM `timecard_task_assignment` WHERE `timecard_tasks_id`=\"" + task_id + "\";"))
+				{
+					string	counter = db->Get(0, "counter");
+					if(counter == "0")
+					{
+						// --- task.id valid to remve
+					}
+					else
+					{
+						MESSAGE_DEBUG("", "", counter + "subcontractors assigned on task.id(" + task_id + ")");
+						error_message = "Эта задача назначена " + counter + " субконтракторам. Поэтому нельзя удалить.";
+					}
+				}
+				else
+				{
+					MESSAGE_ERROR("", "", "fail in sql-query syntax");
+					error_message = "Ошибка БД.";
+				}
 			}
 			else
 			{
 				MESSAGE_DEBUG("", "", "subcontractors reported " + counter + " times on task.id(" + task_id + ")");
+				error_message = "На эту задачу субконтракторы отчитались. Поэтому нельзя удалить.";
 			}
 		}
 		else
 		{
 			MESSAGE_ERROR("", "", "fail in sql-query syntax");
+			error_message = "Ошибка БД.";
 		}
 	}
 	else
 	{
 		MESSAGE_ERROR("", "", "task_id is empty");
+		error_message = "Задача не найдена";
 	}
 
 
-	MESSAGE_DEBUG("", "", "finish (result is " + to_string(result) + ")");
+	MESSAGE_DEBUG("", "", "finish (error_message.length is " + to_string(error_message.length()) + ")");
 
-	return result;
+	return error_message;
 }
 
 string isEmployeeIDValidToRemove(string employee_id, CMysql *db)
@@ -3744,6 +3820,28 @@ auto	GetSpelledBTExpenseTemplateByLineID(string id, CMysql *db) -> string
 	return result;	
 }
 
+auto	GetSpelledCostCenterByID(string id, CMysql *db) -> string
+{
+	auto	result = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(db->Query("SELECT `title` FROM `cost_centers` WHERE `id`=\"" + id + "\";"))
+	{
+		string 	title = db->Get(0, "title");
+
+		result = title;
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "cost_centers.id(" + id + ") not found");
+	}
+	
+	MESSAGE_DEBUG("", "", "finish (result.length is " + to_string(result.length()) + ")");
+
+	return result;	
+}
+
 auto	GetSpelledBTExpenseTemplateLineByID(string id, CMysql *db) -> string
 {
 	auto	result = ""s;
@@ -4182,6 +4280,11 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 		notification_description = "Данные командировки: добавили отчетный документ " + GetSpelledBTExpenseTemplateLineByID(id, db) + " к возмещаемому расходу "  + GetSpelledBTExpenseTemplateByLineID(id, db);
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
+	if(action == "AJAX_addCostCenter")
+	{
+		notification_description = gettext("Agency: cost center added") + " "s + GetSpelledCostCenterByID(id, db);
+		sql_query = ""; // --- don't notify subcontractors, only agency
+	}
 
 	if(action == "AJAX_updateExpenseTemplateTitle")
 	{
@@ -4511,6 +4614,7 @@ string GetAgencyObjectInJSONFormat(string agency_id, bool include_tasks, bool in
 																					"SELECT `id` FROM `timecard_customers` WHERE `agency_company_id`=\"" + agency_id + "\""
 																				")"
 																			");", db, user) : "") + "],"
+							"\"cost_centers\":[" + ( include_tasks ? GetCostCentersInJSONFormat("SELECT * FROM `cost_centers` WHERE `agency_company_id`=\"" + agency_id + "\";", db, user) : "") + "],"
 							
 							"\"bt_expense_templates\":[" + ( include_bt ? 
 																			GetBTExpenseTemplatesInJSONFormat("SELECT * FROM `bt_expense_templates` WHERE `agency_company_id`=\"" + agency_id + "\";", db, user)

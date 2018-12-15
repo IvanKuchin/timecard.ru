@@ -1,8 +1,8 @@
 #include "utilities_common.h"
 
-bool RegisterInitialVariables(CCgi *indexPage, CMysql *db, CUser *user)
+auto RegisterInitialVariables(CCgi *indexPage, CMysql *db, CUser *user) -> bool
 {
-	bool	result = true;
+	auto	result = true;
 
 	MESSAGE_DEBUG("", "", "start");
 
@@ -68,13 +68,45 @@ bool RegisterInitialVariables(CCgi *indexPage, CMysql *db, CUser *user)
 	return result;
 }
 
-string GenerateSession(string action, CCgi *indexPage, CMysql *db, CUser *user)
+auto SetLocale(string locale) -> bool
 {
-	string			lng, sessidHTTP;
-	ostringstream	ost;
+	auto	result = true;
+	
+	MESSAGE_DEBUG("", "", "start");
+
+	if(locale.length())
+	{
+		setlocale(LC_ALL, locale.c_str());
+		bindtextdomain(DOMAIN_NAME.c_str(), LOCALE_PATH.c_str());
+		textdomain(DOMAIN_NAME.c_str());
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "locale is empty");
+	}
+
+	MESSAGE_DEBUG("", "", "finish: locale is "s + locale);
+
+	return result;
+}
+
+auto GenerateSession(string action, CCgi *indexPage, CMysql *db, CUser *user) -> string
+{
+	auto			locale = LOCALE_DEFAULT;
+	auto			sessidHTTP = ""s;
 
 	MESSAGE_DEBUG("", "", "start");
 
+	// --- internalization settings
+	if(indexPage->GetLanguage() == "ru") locale = LOCALE_RUSSIAN;
+	if(SetLocale(locale)) {}
+	else
+	{
+		MESSAGE_ERROR("", "", "fail to setup locale");
+	}
+
+
+	// --- session generation
 	sessidHTTP = indexPage->SessID_Get_FromHTTP();
 	if(sessidHTTP.length() < 5)
 	{
@@ -221,7 +253,7 @@ string GenerateSession(string action, CCgi *indexPage, CMysql *db, CUser *user)
 	return action;
 }
 
-string 		LogoutIfGuest(string action, CCgi *indexPage, CMysql *db, CUser *user)
+auto 		LogoutIfGuest(string action, CCgi *indexPage, CMysql *db, CUser *user) -> string
 {
 	MESSAGE_DEBUG("", "", "start");
 
@@ -229,7 +261,7 @@ string 		LogoutIfGuest(string action, CCgi *indexPage, CMysql *db, CUser *user)
 	{
 		if(action.compare(0, 5, "AJAX_"))
 		{
-			string	template_name = "json_response.htmlt";
+			auto	template_name = "json_response.htmlt"s;
 
 			indexPage->RegisterVariableForce("result", "{\"result\":\"error\",\"description\":\"re-login required\"}");
 

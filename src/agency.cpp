@@ -422,6 +422,18 @@ static string	CheckNewValueByAction(string action, string id, string sow_id, str
 							// --- good to go
 						}
 					}					
+					else if(action == "AJAX_addCostCenter")
+					{
+						if(db->Query("SELECT `id` FROM `cost_centers` WHERE `title`=\"" + new_value + "\" AND `agency_company_id`=\"" + id + "\";"))
+						{
+							error_message = gettext("cost center already exists");
+							MESSAGE_DEBUG("", action, "cost_center with the same name already exists in agency.id(" + id + ")");
+						}
+						else
+						{
+							// --- good to go
+						}
+					}
 					else if(action == "AJAX_addBTExpenseApproverToSoW")
 					{
 						if(db->Query("SELECT `id` FROM `bt_approvers` WHERE `approver_user_id`=\"" + new_value + "\" AND `contract_sow_id`=\"" + sow_id + "\";"))
@@ -2454,7 +2466,7 @@ int main(void)
 					expense_random_name = http_params->GetNameByRegex(regex1);
 				}
 
-
+				if(error_message.empty())
 				{
 					error_message = isAgencyEmployeeAllowedToChangeAgencyData(&db, &user);
 					if(error_message.empty())
@@ -2499,6 +2511,10 @@ int main(void)
 					{
 						MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") doesn't allowed to change agency data");
 					}
+				}
+				else
+				{
+					MESSAGE_DEBUG("", action, "consistensy check failed");
 				}
 
 				if(error_message.empty())
@@ -2855,7 +2871,8 @@ int main(void)
 							error_message = isActionEntityBelongsToAgency(action, task_id, agency_id, &db, &user);
 							if(error_message.empty())
 							{
-								if(isTaskIDValidToRemove(task_id, &db))
+								error_message = isTaskIDValidToRemove(task_id, &db);
+								if(error_message.empty())
 								{
 									string		removal_sql_query = "";
 									string		project_id, customer_id;
@@ -2906,8 +2923,7 @@ int main(void)
 								}
 								else
 								{
-									error_message = "На эту задачу субконтракторы отчитались. Поэтому нельзя удалить.";
-									MESSAGE_DEBUG("", action, "task_id(" + task_id + ") has hours reported, can't remove it");
+									MESSAGE_DEBUG("", action, "can't remove task_id(" + task_id + ")");
 								}
 							}
 							else
@@ -3112,6 +3128,88 @@ int main(void)
 				{
 					MESSAGE_DEBUG("", action, "failed");
 					ostResult.str("");
+					ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+				}
+
+				indexPage.RegisterVariableForce("result", ostResult.str());
+
+				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			}
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
+
+		if(action == "AJAX_addCostCenter")
+		{
+			ostringstream	ostResult;
+
+			MESSAGE_DEBUG("", action, "start");
+
+			ostResult.str("");
+			{
+				auto			template_name = "json_response.htmlt"s;
+				auto			error_message = ""s;
+
+				auto			title			= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("title"));
+				auto			cost_center_id = 0l;
+
+				if(title.length())
+				{
+					error_message = isAgencyEmployeeAllowedToChangeAgencyData(&db, &user);
+					if(error_message.empty())
+					{
+						string	agency_id = GetAgencyID(&user, &db);
+
+						if(agency_id.length())
+						{
+							error_message = CheckNewValueByAction(action, agency_id, "", title, &db, &user);
+							if(error_message.empty())
+							{
+								cost_center_id = db.InsertQuery("INSERT INTO `cost_centers` (`title`, `agency_company_id`, `assignee_user_id`, `eventTimestamp`) VALUES (\"" + title + "\", \"" + agency_id + "\", \"" + user.GetID() + "\", UNIX_TIMESTAMP());");
+								if(cost_center_id)
+								{
+									if(NotifySoWContractPartiesAboutChanges(action, to_string(cost_center_id), "", "", "", &db, &user))
+									{
+									}
+									else
+									{
+										MESSAGE_ERROR("", "", "fail to notify agency");
+									}
+								}
+							}
+							else
+							{
+								MESSAGE_DEBUG("", action, "fail saving bt_expense_template to DB");
+							}
+						}
+						else
+						{
+							MESSAGE_ERROR("", action, "agency.id not found by user.id(" + user.GetID() + ") employment");
+							error_message = gettext("agency not found");
+						}
+					}
+					else
+					{
+						MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") doesn't allowed to change agency data");
+					}
+				}
+				else
+				{
+					MESSAGE_ERROR("", action, "mandatory parameter missed");
+					error_message = gettext("mandatory parameter missed");
+				}
+
+				ostResult.str("");
+				if(error_message.empty())
+				{
+					ostResult	<< "{"
+								<< "\"result\":\"success\","
+								<< "\"cost_centers\":[" << GetCostCentersInJSONFormat("SELECT * FROM `cost_centers` WHERE `id`=\"" + to_string(cost_center_id) + "\";", &db, &user) << "]"
+								<< "}";
+				}
+				else
+				{
+					MESSAGE_DEBUG("", action, "failed");
 					ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
 				}
 

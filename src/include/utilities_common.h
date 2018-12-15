@@ -7,8 +7,9 @@
 
 using namespace std;
 
-bool 		RegisterInitialVariables(CCgi *, CMysql *, CUser *);
-string 		GenerateSession(string action, CCgi *, CMysql *, CUser *);
-string 		LogoutIfGuest(string action, CCgi *, CMysql *, CUser *);
+auto 		RegisterInitialVariables(CCgi *, CMysql *, CUser *) -> bool;
+auto 		SetLocale(string locale) -> bool;
+auto 		GenerateSession(string action, CCgi *, CMysql *, CUser *) -> string;
+auto 		LogoutIfGuest(string action, CCgi *, CMysql *, CUser *) -> string;
 
 #endif
