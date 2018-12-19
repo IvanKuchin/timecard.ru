@@ -48,6 +48,8 @@
 #define	DEFAULT_LANGUAGE							"ru"
 #define	TEMPLATE_PATH								string(ROOTDIR) + string("/cgi-bin/templates/")
 
+#define	TEMPLATE_1C_PATH							TEMPLATE_PATH + "1c"
+
 #define	LOG_FILE_MAX_LENGTH							500 // user to strip long output to log file
 #define	LOG_FILE_NAME								string(LOGDIR) + "dev." + DOMAIN_NAME + ".log"
 #define	MAIL_FILE_NAME								string(LOGDIR) + "dev." + DOMAIN_NAME + ".mail"

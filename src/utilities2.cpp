@@ -1861,6 +1861,70 @@ string	GetMySQLDateInJSONFormat(string dateString)
 	return result;
 }
 
+string GetCompanyPositionsInJSONFormat(string dbQuery, CMysql *db, CUser *user)
+{
+	struct ItemClass
+	{
+		string	id;
+		string	title;
+		string	area;
+	};
+
+	ostringstream			ost, ostFinal;
+	string					sessid, lookForKey;
+	int						affected;
+	vector<ItemClass>		eventsList;
+
+	{
+		CLog	log;
+		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+	}
+
+	ostFinal.str("");
+
+	if((affected = db->Query(dbQuery)) > 0)
+	{
+		int						eventCounter = affected;
+
+		eventsList.reserve(eventCounter);  // --- reserving allows avoid moving vector in memory
+											// --- to fit vector into continous memory piece
+
+		for(int i = 0; i < affected; i++)
+		{
+			ItemClass	event;
+
+			event.id = db->Get(i, "id");
+			event.title = db->Get(i, "title");
+			event.area = db->Get(i, "area");
+
+			eventsList.push_back(event);
+		}
+
+		for(int i = 0; i < eventCounter; i++)
+		{
+				if(ostFinal.str().length()) ostFinal << ", ";
+
+				ostFinal << "{";
+				ostFinal << "\"id\": \""				  	<< eventsList[i].id << "\",";
+				ostFinal << "\"title\": \""					<< eventsList[i].title << "\",";
+				ostFinal << "\"area\": \""					<< eventsList[i].area << "\"";
+				ostFinal << "}";
+		} // --- for loop through event list
+	} // --- if sql-query on event selection success
+	else
+	{
+		CLog	log;
+		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: there are no themes returned by request [", dbQuery, "]");
+	}
+
+	{
+		CLog	log;
+		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: end (result length = " + to_string(ostFinal.str().length()) + ")");
+	}
+
+	return ostFinal.str();
+}
+
 string GetSiteThemesInJSONFormat(string dbQuery, CMysql *db, CUser *user)
 {
 	struct ItemClass

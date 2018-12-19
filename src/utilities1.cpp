@@ -2074,12 +2074,24 @@ string GetUserListInJSONFormat(string dbQuery, CMysql *db, CUser *user)
 
 			if(setOfUserID.find(stol(itemsList[i].userID)) == setOfUserID.end())
 			{
-				string				userID, userLogin, userName, userNameLast, userSex, userBirthday, userBirthdayAccess, userCurrentEmployment, userCurrentCityID, userCurrentCity, avatarPath;
-				string				userAppliedVacanciesRender;
-				string				userLastOnline, numberUreadMessages, userLastOnlineSecondSinceY2k;
-				string				userFriendship;
+				auto				userID = ""s;
+				auto				userLogin = ""s;
+				auto				userName = ""s;
+				auto				userNameLast = ""s;
+				auto				userSex = ""s;
+				auto				userBirthday = ""s;
+				auto				userBirthdayAccess = ""s;
+				auto				userCurrentEmployment = ""s;
+				auto				userCurrentCityID = ""s;
+				auto				userCurrentCity = ""s;
+				auto				avatarPath = ""s;
+				auto				userAppliedVacanciesRender = ""s;
+				auto				userLastOnline = ""s;
+				auto				numberUreadMessages = ""s;
+				auto				userLastOnlineSecondSinceY2k = ""s;
+				auto				userFriendship = ""s;
 				ostringstream		ost1;
-				int					affected1;
+				// auto				affected1 = 0;
 
 				userID = itemsList[i].userID;
 				userLogin = itemsList[i].userLogin;
@@ -2095,6 +2107,7 @@ string GetUserListInJSONFormat(string dbQuery, CMysql *db, CUser *user)
 
 				setOfUserID.insert(atol(userID.c_str()));
 
+/*
 				// --- Defining title and company of user
 				ost1.str("");
 				ost1 << "SELECT `company_position`.`title` as `users_company_position_title`,  "
@@ -2123,11 +2136,8 @@ string GetUserListInJSONFormat(string dbQuery, CMysql *db, CUser *user)
 				ost1 << "]";
 				userCurrentEmployment = ost1.str();
 
-				{
-					CLog	log;
-
-					log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: done with building employment list ", userCurrentEmployment);
-				}
+				MESSAGE_DEBUG("", "", "done with building employment list (length is " + to_string(userCurrentEmployment.length()) + ")");
+*/
 
 				// --- Get user avatars
 				ost1.str("");
@@ -2143,22 +2153,14 @@ string GetUserListInJSONFormat(string dbQuery, CMysql *db, CUser *user)
 				// --- Get friendship status
 				userFriendship = "empty";
 				if(user && db->Query("select * from `users_friends` where `userid`='" + user->GetID() + "' and `friendID`='" + userID + "';"))
-				{
 					userFriendship = db->Get(0, "state");
-				}
 
-				// --- Get presense status for chat purposes
-				ost1.str("");
-				ost1 << "select COUNT(*) as `number_unread_messages` from `chat_messages` where `fromType`='fromUser' and `fromID`='" << userID << "' and (`messageStatus`='unread' or `messageStatus`='sent' or `messageStatus`='delivered');";
-				if(db->Query(ost1.str()))
-				{
+/*
+				if(db->Query("select COUNT(*) as `number_unread_messages` from `chat_messages` where `fromType`='fromUser' and `fromID`='" + userID + "' and (`messageStatus`='unread' or `messageStatus`='sent' or `messageStatus`='delivered');"))
 					numberUreadMessages = db->Get(0, "number_unread_messages");
-				}
-
+*/
 				if(userCurrentCityID.length() && db->Query("SELECT `title` FROM `geo_locality` WHERE `id`=\"" + userCurrentCityID + "\";"))
-				{
 					userCurrentCity = db->Get(0, "title");
-				}
 
 				if(ost.str().length()) ost << ", ";
 
@@ -2176,12 +2178,12 @@ string GetUserListInJSONFormat(string dbQuery, CMysql *db, CUser *user)
 						  "\"last_onlineSecondsSinceY2k\": \""  << userLastOnlineSecondSinceY2k << "\","
 						  "\"userFriendship\": \""				<< userFriendship << "\","
 						  "\"avatar\": \""						<< avatarPath << "\","
-						  "\"currentEmployment\": "				<< userCurrentEmployment << ", "
+						  // "\"currentEmployment\": "				<< userCurrentEmployment << ", "
 						  "\"currentCity\": \""					<< userCurrentCity << "\", "
 						  "\"numberUnreadMessages\": \""		<< numberUreadMessages << "\", "
-						  "\"languages\": ["		 			<< GetLanguageListInJSONFormat("SELECT * FROM `language` WHERE `id` in (SELECT `language_id` FROM `users_language` WHERE `user_id`=\"" + userID + "\");", db) << "], "
-						  "\"skills\": ["		 				<< GetSkillListInJSONFormat("SELECT * FROM `skill` WHERE `id` in (SELECT `skill_id` FROM `users_skill` WHERE `user_id`=\"" + userID + "\");", db) << "], "
-						  "\"subscriptions\":[" 				<< (user && (user->GetID() == userID) ? GetUserSubscriptionsInJSONFormat("SELECT * FROM `users_subscriptions` WHERE `user_id`=\"" + userID + "\";", db) : "") << "],"
+						  // "\"languages\": ["		 			<< GetLanguageListInJSONFormat("SELECT * FROM `language` WHERE `id` in (SELECT `language_id` FROM `users_language` WHERE `user_id`=\"" + userID + "\");", db) << "], "
+						  // "\"skills\": ["		 				<< GetSkillListInJSONFormat("SELECT * FROM `skill` WHERE `id` in (SELECT `skill_id` FROM `users_skill` WHERE `user_id`=\"" + userID + "\");", db) << "], "
+						  // "\"subscriptions\":[" 				<< (user && (user->GetID() == userID) ? GetUserSubscriptionsInJSONFormat("SELECT * FROM `users_subscriptions` WHERE `user_id`=\"" + userID + "\";", db) : "") << "],"
 						  "\"isMe\": \""						<< ((user && (userID == user->GetID())) ? "yes" : "no") << "\" "
 						"}";
 			} // --- if user is not dupicated
@@ -4313,10 +4315,7 @@ string GetCompanyPositionIDByTitle(string positionTitle, CMysql *db)
 	string		  	result = "";
 	string			positionID = "";
 
-	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	if(positionTitle.length())
 	{
@@ -4327,36 +4326,26 @@ string GetCompanyPositionIDByTitle(string positionTitle, CMysql *db)
 		else
 		{
 			long int 	tmp;
-			{
-				CLog			log;
-				log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: position[" + positionTitle + "] not found. Creating new one.");
-			}
+
+			MESSAGE_DEBUG("", "", "company position not found. Creating new one.");
 
 			tmp = db->InsertQuery("INSERT INTO `company_position` SET `area`=\"\", `title`=\"" + positionTitle + "\";");
 			if(tmp)
 				positionID = to_string(tmp);
 			else
 			{
-				CLog			log;
-				log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: insert into company_position");
+				MESSAGE_ERROR("", "", "fail to insert to company_position table");
 			}
 		}
 	}
 	else
 	{
-		{
-			CLog			log;
-			log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: positionTitle is empty");
-		}
+		MESSAGE_DEBUG("", "", "positionTitle is empty");
 	}
 
 	result = positionID;
 
-	{
-		CLog			log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: end (returning string length " + to_string(result.length()) + ")");
-	}
-
+	MESSAGE_DEBUG("", "", "end (returning string length " + to_string(result.length()) + ")");
 
 	return result;
 }

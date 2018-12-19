@@ -164,6 +164,9 @@ static auto	isActionEntityBelongsToSoW(string action, string id, string sow_id, 
 				if(action == "AJAX_deleteTimecardApproverFromSoW")	sql_query = "SELECT `contract_sow_id` AS `sow_id` FROM `timecard_approvers` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_deleteBTExpenseApproverFromSoW")	sql_query = "SELECT `contract_sow_id` AS `sow_id` FROM `bt_approvers` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateSubcontractorCreateTasks")	sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
+				if(action == "AJAX_updateSoWNumber")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
+				if(action == "AJAX_updateSoWAct")					sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
+				if(action == "AJAX_updateSoWPosition")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
 
 				if(sql_query.length())
 				{
@@ -395,21 +398,64 @@ static string	CheckNewValueByAction(string action, string id, string sow_id, str
 							// --- good to go
 						}
 					}
-					else if(action == "AJAX_updateSoWEditCapability")		{ /* --- good to go */ }
-					else if(action == "AJAX_updateAgencyPosition")			{ /* --- good to go */ }
-					else if(action == "AJAX_updateCompanyTitle")			{ /* --- good to go */ }
-					else if(action == "AJAX_updateCompanyDescription")		{ /* --- good to go */ }
-					else if(action == "AJAX_updateCompanyWebSite")			{ /* --- good to go */ }
-					else if(action == "AJAX_updateCompanyTIN")				{ /* --- good to go */ }
-					else if(action == "AJAX_updateCompanyAccount")			{ /* --- good to go */ }
-					else if(action == "AJAX_updateCompanyOGRN")				{ /* --- good to go */ }
-					else if(action == "AJAX_updateCompanyKPP")				{ /* --- good to go */ }
-					else if(action == "AJAX_updateCompanyLegalAddress")		{ /* --- good to go */ }
-					else if(action == "AJAX_updateCompanyMailingAddress")	{ /* --- good to go */ }
-					else if(action == "AJAX_updateCompanyMailingZipID")		{ /* --- good to go */ }
-					else if(action == "AJAX_updateCompanyLegalZipID")		{ /* --- good to go */ }
-					else if(action == "AJAX_updateCompanyBankID")			{ /* --- good to go */ }
-					else if(action == "AJAX_updateSubcontractorCreateTasks"){ /* --- good to go */ }
+					else if(action == "AJAX_updateSoWEditCapability")			{ /* --- good to go */ }
+					else if(action == "AJAX_updateAgencyPosition")				{ /* --- good to go */ }
+					else if(action == "AJAX_updateSoWPosition")					{ /* --- good to go */ }
+					else if(action == "AJAX_updateCompanyTitle")				{ /* --- good to go */ }
+					else if(action == "AJAX_updateCompanyDescription")			{ /* --- good to go */ }
+					else if(action == "AJAX_updateCompanyWebSite")				{ /* --- good to go */ }
+					else if(action == "AJAX_updateCompanyTIN")					{ /* --- good to go */ }
+					else if(action == "AJAX_updateCompanyAccount")				{ /* --- good to go */ }
+					else if(action == "AJAX_updateCompanyOGRN")					{ /* --- good to go */ }
+					else if(action == "AJAX_updateCompanyKPP")					{ /* --- good to go */ }
+					else if(action == "AJAX_updateCompanyLegalAddress")			{ /* --- good to go */ }
+					else if(action == "AJAX_updateCompanyMailingAddress")		{ /* --- good to go */ }
+					else if(action == "AJAX_updateCompanyMailingZipID")			{ /* --- good to go */ }
+					else if(action == "AJAX_updateCompanyLegalZipID")			{ /* --- good to go */ }
+					else if(action == "AJAX_updateCompanyBankID")				{ /* --- good to go */ }
+					else if(action == "AJAX_updateSubcontractorCreateTasks")	{ /* --- good to go */ }
+					else if(action == "AJAX_deleteCostCenterFromCustomer")		{ /* --- good to go */ }
+					else if(action == "AJAX_updateCostCenterTitle")				{ /* --- good to go */ }
+					else if(action == "AJAX_updateCostCenterDescription")		{ /* --- good to go */ }
+					else if(action == "AJAX_updateSoWAct")						{ /* --- good to go */ }
+					else if(action == "AJAX_deleteCostCenter")
+					{
+						if(db->Query("SELECT COUNT(*) AS `counter` FROM `cost_center_assignment` WHERE `cost_center_id`=\"" + id + "\";"))
+						{
+							auto		counter = stoi(db->Get(0, "counter"));
+
+							if(counter)
+							{
+								char	buffer[50];
+
+								sprintf(buffer, ngettext("%d customers", "%d customers", counter), counter);
+
+								error_message = utf8_to_cp1251(gettext("cost center assigned")) + " " + utf8_to_cp1251(buffer) + ". " +  utf8_to_cp1251(gettext("removal prohibited"));
+								MESSAGE_DEBUG("", action, "cost_center.id(" + id + ") assigned to " + to_string(counter) + " customers. Removal prohibited.");
+							}
+							else
+							{
+								// --- good to go
+							}
+						}
+						else
+						{
+							error_message = utf8_to_cp1251(gettext("SQL syntax issue"));
+							MESSAGE_ERROR("", "", "issue in SQL-syntax");
+						}
+					}					
+					else if(action == "AJAX_updateSoWNumber")
+					{
+						if(db->Query("SELECT `id` FROM `contracts_sow` WHERE `number`=\"" + new_value + "\" AND `id`!=\"" + sow_id + "\" AND `agency_company_id`=(SELECT `agency_company_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\");"))
+						{
+							error_message = utf8_to_cp1251(gettext("SoW number already exists"));
+							MESSAGE_DEBUG("", action, "sow.number already exists in agency.id");
+						}
+						else
+						{
+							// --- good to go
+						}
+					}
 					else if(action == "AJAX_addTimecardApproverToSoW")
 					{
 						if(db->Query("SELECT `id` FROM `timecard_approvers` WHERE `approver_user_id`=\"" + new_value + "\" AND `contract_sow_id`=\"" + sow_id + "\";"))
@@ -432,6 +478,19 @@ static string	CheckNewValueByAction(string action, string id, string sow_id, str
 						else
 						{
 							// --- good to go
+						}
+					}
+					else if(action == "AJAX_updateCostCenterToCustomer")
+					{
+						// --- check that assigning cost center belongs to the same agency as timecard_customer
+						if(db->Query("SELECT `id` FROM `timecard_customers` WHERE `id`=\"" + id + "\" AND `agency_company_id`=(SELECT `agency_company_id` FROM `cost_centers` WHERE `id`=\"" + new_value + "\");"))
+						{
+							// --- good to go
+						}
+						else
+						{
+							error_message = utf8_to_cp1251(gettext("cost center doesn't belongs to your company"));
+							MESSAGE_DEBUG("", action, "cost center doesn't belongs to your company");
 						}
 					}
 					else if(action == "AJAX_addBTExpenseApproverToSoW")
@@ -562,6 +621,14 @@ static string	isActionEntityBelongsToAgency(string action, string id, string age
 				if(action == "AJAX_updateExpenseTemplateLinePaymentCash")	sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `bt_expense_templates` WHERE `id`=(SELECT `bt_expense_template_id` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\");";
 				if(action == "AJAX_updateExpenseTemplateLinePaymentCard")	sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `bt_expense_templates` WHERE `id`=(SELECT `bt_expense_template_id` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\");";
 				if(action == "AJAX_updateExpenseTemplateLineRequired")		sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `bt_expense_templates` WHERE `id`=(SELECT `bt_expense_template_id` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\");";
+
+				if(action == "AJAX_updateCostCenterToCustomer")				sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `timecard_customers` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_deleteCostCenterFromCustomer")			sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `timecard_customers` WHERE `id`=\"" + id + "\";";
+
+				if(action == "AJAX_deleteCostCenter")						sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `cost_centers` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateCostCenterTitle")					sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `cost_centers` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateCostCenterDescription")			sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `cost_centers` WHERE `id`=\"" + id + "\";";
+
 
 				if(action == "AJAX_deleteTask")							sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `timecard_customers` WHERE `id`=(SELECT `timecard_customers_id` FROM `timecard_projects` WHERE `id`=(SELECT `timecard_projects_id` FROM `timecard_tasks` WHERE `id`=\"" + id + "\"));";
 				if(action == "AJAX_deleteExpenseTemplate")				sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `bt_expense_templates` WHERE `id`=\"" + id + "\";";
@@ -1825,6 +1892,10 @@ int main(void)
 		}
 
 		if(
+			(action == "AJAX_updateSoWNumber")					||
+			(action == "AJAX_updateSoWAct")						||
+			(action == "AJAX_updateSoWPosition")				||
+
 			(action == "AJAX_updatePeriodStart")				||
 			(action == "AJAX_updatePeriodEnd")					||
 			(action == "AJAX_updateSubcontractorCreateTasks")
@@ -1955,7 +2026,12 @@ int main(void)
 			(action == "AJAX_updateExpenseTemplateLineDomType")		||
 			(action == "AJAX_updateExpenseTemplateLinePaymentCash")	||	
 			(action == "AJAX_updateExpenseTemplateLinePaymentCard")	||	
-			(action == "AJAX_updateExpenseTemplateLineRequired")
+			(action == "AJAX_updateExpenseTemplateLineRequired")	||
+			(action == "AJAX_updateCostCenterToCustomer")			||
+			(action == "AJAX_deleteCostCenterFromCustomer")			||
+			(action == "AJAX_deleteCostCenter")						||
+			(action == "AJAX_updateCostCenterTitle")				||
+			(action == "AJAX_updateCostCenterDescription")
 		)
 		{
 			ostringstream	ostResult;
@@ -1997,14 +2073,14 @@ int main(void)
 								error_message = CheckNewValueByAction(action, id, "", new_value, &db, &user);
 								if(error_message.empty())
 								{
-									if(action.find("update"))
+									if((action.find("update") != string::npos))
 									{
 										string		existing_value = GetDBValueByAction(action, id, "", &db, &user);
 
 										error_message = SetNewValueByAction(action, id, "", new_value, &db, &user);
 										if(error_message.empty())
 										{
-											ostResult << "{\"result\":\"success\"}";
+											// --- good finish
 
 											if(NotifySoWContractPartiesAboutChanges(action, id, "", existing_value, new_value, &db, &user))
 											{
@@ -2019,13 +2095,31 @@ int main(void)
 											MESSAGE_DEBUG("", action, "unable to set new value (action/id/value = " + action + "/" + id + "/[" + FilterCP1251Symbols(new_value) + "])");
 										}
 									}
-									else if(action.find("insert"))
+									else if(action.find("insert") != string::npos)
 									{
 										
 									}
-									else if(action.find("delete"))
+									else if(action.find("delete") != string::npos)
 									{
+										string		existing_value = GetDBValueByAction(action, id, "", &db, &user);
 
+										if(NotifySoWContractPartiesAboutChanges(action, id, "", existing_value, new_value, &db, &user))
+										{
+										}
+										else
+										{
+											MESSAGE_ERROR("", action, "fail to notify agency about changes");
+										}
+
+										error_message = SetNewValueByAction(action, id, "", new_value, &db, &user);
+										if(error_message.empty())
+										{
+											// --- good finish
+										}
+										else
+										{
+											MESSAGE_DEBUG("", action, "unable to set new value (action/id/value = " + action + "/" + id + "/[" + FilterCP1251Symbols(new_value) + "])");
+										}
 									}
 									else
 									{
@@ -2062,6 +2156,7 @@ int main(void)
 
 				if(error_message.empty())
 				{
+					ostResult << "{\"result\":\"success\"}";
 				}
 				else
 				{
@@ -3151,6 +3246,7 @@ int main(void)
 				auto			error_message = ""s;
 
 				auto			title			= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("title"));
+				auto			description		= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("description"));
 				auto			cost_center_id = 0l;
 
 				if(title.length())
@@ -3165,7 +3261,7 @@ int main(void)
 							error_message = CheckNewValueByAction(action, agency_id, "", title, &db, &user);
 							if(error_message.empty())
 							{
-								cost_center_id = db.InsertQuery("INSERT INTO `cost_centers` (`title`, `agency_company_id`, `assignee_user_id`, `eventTimestamp`) VALUES (\"" + title + "\", \"" + agency_id + "\", \"" + user.GetID() + "\", UNIX_TIMESTAMP());");
+								cost_center_id = db.InsertQuery("INSERT INTO `cost_centers` (`title`, `description`, `agency_company_id`, `assignee_user_id`, `eventTimestamp`) VALUES (\"" + title + "\", \"" + description + "\", \"" + agency_id + "\", \"" + user.GetID() + "\", UNIX_TIMESTAMP());");
 								if(cost_center_id)
 								{
 									if(NotifySoWContractPartiesAboutChanges(action, to_string(cost_center_id), "", "", "", &db, &user))

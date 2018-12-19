@@ -712,12 +712,70 @@ string	GetApproversInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool i
 	return result;
 }
 
+auto	GetCostCentersAssignmentInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
+{
+	struct ItemClass
+	{
+		string	id;
+		string	cost_center_id;
+		string	timecard_customer_id;
+		string	assignee_user_id;
+		string	eventTimestamp;
+	};
+
+	auto					affected = 0;
+	auto					result = ""s;
+	vector<ItemClass>		itemsList;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	affected = db->Query(sqlQuery);
+	if(affected)
+	{
+		for(auto i = 0; i < affected; i++)
+		{
+			ItemClass	item;
+
+			item.id = db->Get(i, "id");
+			item.cost_center_id = db->Get(i, "cost_center_id");
+			item.timecard_customer_id = db->Get(i, "timecard_customer_id");
+			item.assignee_user_id = db->Get(i, "assignee_user_id");
+			item.eventTimestamp = db->Get(i, "eventTimestamp");
+
+			itemsList.push_back(item);
+		}
+
+		for (auto& item : itemsList)
+		{
+			if(result.length()) result += ",";
+			result +=	"{";
+
+			result += "\"id\":\"" + item.id + "\",";
+			result += "\"cost_center_id\":\"" + item.cost_center_id + "\",";
+			result += "\"timecard_customer_id\":\"" + item.timecard_customer_id + "\",";
+			result += "\"assignee_user_id\":\"" + item.assignee_user_id + "\",";
+			result += "\"eventTimestamp\":\"" + item.eventTimestamp + "\"";
+
+			result +=	"}";
+		}
+	}
+	else
+	{
+		MESSAGE_DEBUG("", "", "cost_center list is empty");
+	}
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return result;
+}
+
 auto	GetCostCentersInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
 {
 	struct ItemClass
 	{
 		string	id;
 		string	title;
+		string	description;
 		string	agency_company_id;
 		string	assignee_user_id;
 		string	eventTimestamp;
@@ -738,6 +796,7 @@ auto	GetCostCentersInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> str
 
 			item.id = db->Get(i, "id");
 			item.title = db->Get(i, "title");
+			item.description = db->Get(i, "description");
 			item.agency_company_id = db->Get(i, "agency_company_id");
 			item.assignee_user_id = db->Get(i, "assignee_user_id");
 			item.eventTimestamp = db->Get(i, "eventTimestamp");
@@ -752,6 +811,7 @@ auto	GetCostCentersInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> str
 
 			result += "\"id\":\"" + item.id + "\",";
 			result += "\"title\":\"" + item.title + "\",";
+			result += "\"description\":\"" + item.description + "\",";
 			result += "\"agency_company_id\":\"" + item.agency_company_id + "\",";
 			result += "\"assignee_user_id\":\"" + item.assignee_user_id + "\",";
 			result += "\"eventTimestamp\":\"" + item.eventTimestamp + "\"";
@@ -941,12 +1001,15 @@ string	GetSOWInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include
 		string	id;
 		string	subcontractor_company_id;
 		string	agency_company_id;
+		string	company_position_id;
 		string	start_date;
 		string	end_date;
 		string	number;
 		string	sign_date;
 		string	timecard_period;
 		string	subcontractor_create_tasks;
+		string	day_rate;
+		string	act_number;
 		string	eventTimestamp;
 	};
 	vector<ItemClass>		itemsList;
@@ -965,12 +1028,15 @@ string	GetSOWInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include
 			item.id = db->Get(i, "id");
 			item.subcontractor_company_id = db->Get(i, "subcontractor_company_id");
 			item.agency_company_id = db->Get(i, "agency_company_id");
+			item.company_position_id = db->Get(i, "company_position_id");
 			item.start_date = db->Get(i, "start_date");
 			item.end_date = db->Get(i, "end_date");
 			item.number = db->Get(i, "number");
 			item.sign_date = db->Get(i, "sign_date");
 			item.timecard_period = db->Get(i, "timecard_period");
 			item.subcontractor_create_tasks = db->Get(i, "subcontractor_create_tasks");
+			item.act_number = db->Get(i, "act_number");
+			item.day_rate = db->Get(i, "day_rate");
 			item.eventTimestamp = db->Get(i, "eventTimestamp");
 
 			itemsList.push_back(item);
@@ -984,6 +1050,8 @@ string	GetSOWInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include
 			result += "\"id\":\"" + item.id + "\",";
 			result += "\"subcontractor_company_id\":\"" + item.subcontractor_company_id + "\",";
 			result += "\"agency_company_id\":[" + GetCompanyListInJSONFormat("SELECT * FROM `company` WHERE `isBlocked`='N' AND `id`=\"" + item.agency_company_id + "\";", db, user) + "],";
+			result += "\"company_position_id\":\"" + item.company_position_id + "\",";
+			result += "\"company_positions\":[" + GetCompanyPositionsInJSONFormat("SELECT * FROM `company_position` WHERE `id`=\"" + item.company_position_id + "\";", db, user) + "],";
 			result += "\"start_date\":\"" + item.start_date + "\",";
 			result += "\"end_date\":\"" + item.end_date + "\",";
 			result += "\"number\":\"" + item.number + "\",";
@@ -1006,6 +1074,8 @@ string	GetSOWInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include
 			result += "\"bt_approvers\":[" + GetApproversInJSONFormat("SELECT * FROM `bt_approvers` WHERE `contract_sow_id`=\"" + item.id + "\";", db, user, DO_NOT_INCLUDE_SOW_INFO) + "],";
 			result += "\"timecard_approvers\":[" + GetApproversInJSONFormat("SELECT * FROM `timecard_approvers` WHERE `contract_sow_id`=\"" + item.id + "\";", db, user, DO_NOT_INCLUDE_SOW_INFO) + "],";
 			result += "\"subcontractor_create_tasks\":\"" + item.subcontractor_create_tasks + "\",";
+			result += "\"act_number\":\"" + item.act_number + "\",";
+			result += "\"day_rate\":\"" + (user->GetType() == "agency" || user->GetType() == "subcontractor" ? item.day_rate : "") + "\",";
 			result += "\"eventTimestamp\":\"" + item.eventTimestamp + "\"";
 
 			result +=	"}";
@@ -1930,9 +2000,9 @@ string GetAgencyID(CUser *user, CMysql *db)
 	return result;
 }
 
-string	GetDBValueByAction(string action, string id, string sow_id, CMysql *db, CUser *user)
+auto	GetDBValueByAction(string action, string id, string sow_id, CMysql *db, CUser *user) -> string
 {
-	string	result = "";
+	auto	result = ""s;
 
 	MESSAGE_DEBUG("", "", "start");
 
@@ -1961,6 +2031,7 @@ string	GetDBValueByAction(string action, string id, string sow_id, CMysql *db, C
 				if(action == "AJAX_updateCompanyLegalZipID")		sql_query = "SELECT `legal_geo_zip_id`	as `value` FROM `company` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateCompanyBankID")			sql_query = "SELECT `bank_id`			as `value` FROM `company` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateAgencyPosition")			sql_query = "SELECT `title`				as `value` FROM `company_position` WHERE `id`=(SELECT `position_id` FROM `company_employees` WHERE `id`=\"" + id + "\");";
+				if(action == "AJAX_updateSoWPosition")				sql_query = "SELECT `title`				as `value` FROM `company_position` WHERE `id`=(SELECT `company_position_id` FROM `contracts_sow` WHERE `id`=\"" + id + "\");";
 				if(action == "AJAX_updateAgencyEditCapability")		sql_query = "SELECT `allowed_change_agency_data`	as `value` FROM `company_employees` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateSoWEditCapability")		sql_query = "SELECT `allowed_change_sow`			as `value` FROM `company_employees` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateSubcontractorCreateTasks")	sql_query = "SELECT `subcontractor_create_tasks`	as `value` FROM `contracts_sow` WHERE `id`=\"" + id + "\";";
@@ -1973,6 +2044,13 @@ string	GetDBValueByAction(string action, string id, string sow_id, CMysql *db, C
 				if(action == "AJAX_updateExpenseTemplateLinePaymentCash")	sql_query = "SELECT `payment`				as `value` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateExpenseTemplateLinePaymentCard")	sql_query = "SELECT `payment`				as `value` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateExpenseTemplateLineRequired")		sql_query = "SELECT `required`				as `value` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateCostCenterToCustomer")				sql_query = "SELECT `cost_center_id`		as `value` FROM `cost_center_assignment` WHERE `timecard_customer_id`=\"" + id + "\";";
+				if(action == "AJAX_deleteCostCenterFromCustomer")			sql_query = "SELECT `cost_center_id`		as `value` FROM `cost_center_assignment` WHERE `timecard_customer_id`=\"" + id + "\";";
+				if(action == "AJAX_deleteCostCenter")						sql_query = "SELECT `id`					as `value` FROM `cost_centers` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateCostCenterTitle")					sql_query = "SELECT `title`					as `value` FROM `cost_centers` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateCostCenterDescription")			sql_query = "SELECT `description`			as `value` FROM `cost_centers` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateSoWNumber")						sql_query = "SELECT `number`				as `value` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
+				if(action == "AJAX_updateSoWAct")							sql_query = "SELECT `act_number`			as `value` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 
 				if(sql_query.length())
 				{
@@ -3496,35 +3574,41 @@ string	SetNewValueByAction(string action, string id, string sow_id, string new_v
 					{
 						string		sql_query = "";
 
-						if(action == "AJAX_updateCustomerTitle") 					sql_query = "UPDATE `timecard_customers`	SET `title`				=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
-						if(action == "AJAX_updateProjectTitle") 					sql_query = "UPDATE `timecard_projects`		SET `title`				=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
-						if(action == "AJAX_updateTaskTitle") 						sql_query = "UPDATE `timecard_tasks`		SET `title`				=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
-						if(action == "AJAX_updateExpenseTemplateTitle")				sql_query = "UPDATE `bt_expense_templates`	SET `title`				=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
-						if(action == "AJAX_updateExpenseTemplateAgencyComment")		sql_query = "UPDATE `bt_expense_templates`	SET `agency_comment`	=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
-						if(action == "AJAX_updateExpenseTemplateLineTitle")			sql_query = "UPDATE `bt_expense_line_templates`	SET `title`			=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
-						if(action == "AJAX_updateExpenseTemplateLineDescription")	sql_query = "UPDATE `bt_expense_line_templates`	SET `description`	=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
-						if(action == "AJAX_updateExpenseTemplateLineTooltip")		sql_query = "UPDATE `bt_expense_line_templates`	SET `tooltip`		=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
-						if(action == "AJAX_updateExpenseTemplateLineDomType")		sql_query = "UPDATE `bt_expense_line_templates`	SET `dom_type`		=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
-						if(action == "AJAX_updateExpenseTemplateLineRequired")		sql_query = "UPDATE `bt_expense_line_templates`	SET `required`		=\"" + (new_value == "true" ? "Y"s : "N"s) + "\" WHERE `id`=\"" + id + "\";";
-						if(action == "AJAX_updatePeriodStart") 				sql_query = "UPDATE `timecard_task_assignment`	SET `period_start`		=STR_TO_DATE(\"" + new_value + "\",\"%d/%m/%Y\") WHERE `id`=\"" + id + "\";";
-						if(action == "AJAX_updatePeriodEnd") 				sql_query = "UPDATE `timecard_task_assignment`	SET `period_end`		=STR_TO_DATE(\"" + new_value + "\",\"%d/%m/%Y\") WHERE `id`=\"" + id + "\";";
-						if(action == "AJAX_updateCompanyTitle")				sql_query = "UPDATE	`company`					SET `name` 				=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
-						if(action == "AJAX_updateCompanyDescription")		sql_query = "UPDATE	`company`					SET `description`		=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
-						if(action == "AJAX_updateCompanyWebSite")			sql_query = "UPDATE	`company`					SET `webSite`			=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
-						if(action == "AJAX_updateCompanyTIN")				sql_query = "UPDATE	`company`					SET `tin` 				=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
-						if(action == "AJAX_updateCompanyAccount")			sql_query = "UPDATE	`company`					SET `account`			=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
-						if(action == "AJAX_updateCompanyOGRN")				sql_query = "UPDATE	`company`					SET `ogrn` 				=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
-						if(action == "AJAX_updateCompanyKPP")				sql_query = "UPDATE	`company`					SET `kpp` 				=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
-						if(action == "AJAX_updateCompanyLegalAddress")		sql_query = "UPDATE	`company`					SET `legal_address`		=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
-						if(action == "AJAX_updateCompanyMailingAddress")	sql_query = "UPDATE	`company`					SET `mailing_address`	=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
-						if(action == "AJAX_updateCompanyMailingZipID")		sql_query = "UPDATE	`company`					SET `mailing_geo_zip_id`=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
-						if(action == "AJAX_updateCompanyLegalZipID")		sql_query = "UPDATE	`company`					SET `legal_geo_zip_id`	=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
-						if(action == "AJAX_updateCompanyBankID")			sql_query = "UPDATE	`company`					SET `bank_id`			=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
-						if(action == "AJAX_updateSoWEditCapability")		sql_query = "UPDATE	`company_employees`			SET `allowed_change_sow`=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
-						if(action == "AJAX_updateAgencyEditCapability")		sql_query = "UPDATE	`company_employees`			SET `allowed_change_agency_data` =\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
-						if(action == "AJAX_updateSubcontractorCreateTasks")	sql_query = "UPDATE	`contracts_sow`				SET `subcontractor_create_tasks` =\"" + new_value + "\" WHERE `id`=\"" + sow_id + "\";";
-						if(action == "AJAX_addTimecardApproverToSoW")		sql_query = "INSERT INTO `timecard_approvers` (`approver_user_id`,`contract_sow_id`) VALUES (\"" + new_value + "\", \"" + sow_id + "\");";
-						if(action == "AJAX_addBTExpenseApproverToSoW")				sql_query = "INSERT INTO `bt_approvers` (`approver_user_id`,`contract_sow_id`) VALUES (\"" + new_value + "\", \"" + sow_id + "\");";
+						if(action == "AJAX_updateCustomerTitle") 					sql_query = "UPDATE `timecard_customers`		SET `title`							=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateProjectTitle") 					sql_query = "UPDATE `timecard_projects`			SET `title`							=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateTaskTitle") 						sql_query = "UPDATE `timecard_tasks`			SET `title`							=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateExpenseTemplateTitle")				sql_query = "UPDATE `bt_expense_templates`		SET `title`							=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateExpenseTemplateAgencyComment")		sql_query = "UPDATE `bt_expense_templates`		SET `agency_comment`				=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateExpenseTemplateLineTitle")			sql_query = "UPDATE `bt_expense_line_templates`	SET `title`							=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateExpenseTemplateLineDescription")	sql_query = "UPDATE `bt_expense_line_templates`	SET `description`					=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateExpenseTemplateLineTooltip")		sql_query = "UPDATE `bt_expense_line_templates`	SET `tooltip`						=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateExpenseTemplateLineDomType")		sql_query = "UPDATE `bt_expense_line_templates`	SET `dom_type`						=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateExpenseTemplateLineRequired")		sql_query = "UPDATE `bt_expense_line_templates`	SET `required`						=\"" + (new_value == "true" ? "Y"s : "N"s) + "\" WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updatePeriodStart") 						sql_query = "UPDATE `timecard_task_assignment`	SET `period_start`					=STR_TO_DATE(\"" + new_value + "\",\"%d/%m/%Y\") WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updatePeriodEnd") 						sql_query = "UPDATE `timecard_task_assignment`	SET `period_end`					=STR_TO_DATE(\"" + new_value + "\",\"%d/%m/%Y\") WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateCompanyTitle")						sql_query = "UPDATE	`company`					SET `name` 							=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateCompanyDescription")				sql_query = "UPDATE	`company`					SET `description`					=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateCompanyWebSite")					sql_query = "UPDATE	`company`					SET `webSite`						=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateCompanyTIN")						sql_query = "UPDATE	`company`					SET `tin` 							=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateCompanyAccount")					sql_query = "UPDATE	`company`					SET `account`						=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateCompanyOGRN")						sql_query = "UPDATE	`company`					SET `ogrn` 							=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateCompanyKPP")						sql_query = "UPDATE	`company`					SET `kpp` 							=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateCompanyLegalAddress")				sql_query = "UPDATE	`company`					SET `legal_address`					=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateCompanyMailingAddress")			sql_query = "UPDATE	`company`					SET `mailing_address`				=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateCompanyMailingZipID")				sql_query = "UPDATE	`company`					SET `mailing_geo_zip_id`			=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateCompanyLegalZipID")				sql_query = "UPDATE	`company`					SET `legal_geo_zip_id`				=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateCompanyBankID")					sql_query = "UPDATE	`company`					SET `bank_id`						=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateSoWEditCapability")				sql_query = "UPDATE	`company_employees`			SET `allowed_change_sow`			=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateAgencyEditCapability")				sql_query = "UPDATE	`company_employees`			SET `allowed_change_agency_data`	=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateSubcontractorCreateTasks")			sql_query = "UPDATE	`contracts_sow`				SET `subcontractor_create_tasks`	=\"" + new_value + "\" WHERE `id`=\"" + sow_id + "\";";
+						if(action == "AJAX_addTimecardApproverToSoW")				sql_query = "INSERT INTO `timecard_approvers` (`approver_user_id`,`contract_sow_id`) VALUES (\"" + new_value + "\", \"" + sow_id + "\");";
+						if(action == "AJAX_addBTExpenseApproverToSoW")				sql_query = "INSERT INTO `bt_approvers` (`approver_user_id`,`contract_sow_id`) 		VALUES (\"" + new_value + "\", \"" + sow_id + "\");";
+						if(action == "AJAX_deleteCostCenterFromCustomer")			sql_query = "DELETE FROM `cost_center_assignment` WHERE `timecard_customer_id`=\"" + id + "\";";
+						if(action == "AJAX_deleteCostCenter")						sql_query = "DELETE FROM `cost_centers` WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateCostCenterTitle")					sql_query = "UPDATE `cost_centers`				SET `title`							=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateCostCenterDescription")			sql_query = "UPDATE `cost_centers`				SET `description`					=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateSoWNumber")						sql_query = "UPDATE `contracts_sow`				SET `number`						=\"" + new_value + "\" WHERE `id`=\"" + sow_id + "\";";
+						if(action == "AJAX_updateSoWAct")							sql_query = "UPDATE `contracts_sow`				SET `act_number`					=\"" + new_value + "\" WHERE `id`=\"" + sow_id + "\";";
 
 						// --- expense line template payment part
 						if(action == "AJAX_updateExpenseTemplateLinePaymentCash")
@@ -3578,28 +3662,47 @@ string	SetNewValueByAction(string action, string id, string sow_id, string new_v
 
 						if(action == "AJAX_updateAgencyPosition")
 						{
+							auto	position_id = GetCompanyPositionIDByTitle(new_value, db);
+
+							if(position_id.length())
+								sql_query = "UPDATE	`company_employees`	SET `position_id` =\"" + position_id + "\" WHERE `id`=\"" + id + "\";";
+							else
+								MESSAGE_ERROR("", "", "fail to get position.id");
+						}
+						if(action == "AJAX_updateSoWPosition")
+						{
+							auto	position_id = GetCompanyPositionIDByTitle(new_value, db);
+
+							if(position_id.length())
+								sql_query = "UPDATE	`contracts_sow`	SET `company_position_id` =\"" + position_id + "\" WHERE `id`=\"" + sow_id + "\";";
+							else
+								MESSAGE_ERROR("", "", "fail to get position.id");
+						}
+						if(action == "AJAX_updateCostCenterToCustomer")
+						{
 							string	position_id = "";
-							if(db->Query("SELECT `id` FROM `company_position` WHERE `title`=\"" + new_value + "\";"))
+							if(db->Query("SELECT `id` FROM `cost_center_assignment` WHERE `timecard_customer_id`=\"" + id + "\";"))
 							{
 								position_id = db->Get(0, "id");
 							}
 							else
 							{
-								long int temp = db->InsertQuery("INSERT INTO `company_position` (`title`) VALUES (\"" + new_value + "\");");
+								long int temp = db->InsertQuery("INSERT INTO `cost_center_assignment` (`cost_center_id`,`timecard_customer_id`,`assignee_user_id`,`eventTimestamp`) VALUES (\"" + new_value + "\",\"" + id + "\",\"" + user->GetID() + "\", UNIX_TIMESTAMP());");
 								if(temp)
 								{
 									position_id = to_string(temp);
-									MESSAGE_ERROR("", "", "new company_position.id(" + position_id + ") created. Check the title.");
+									MESSAGE_DEBUG("", "", "new cost_center_assignment.id(" + position_id + ") created.");
 								}
 								else
 								{
-									position_id = "1";
-									MESSAGE_ERROR("", "", "fail to insert to company_position table");
+									position_id = "0";
+									MESSAGE_ERROR("", "", "fail to insert to cost_center_assignment table");
 								}
 							}
 
-							sql_query = "UPDATE	`company_employees`	SET `position_id` =\"" + position_id + "\" WHERE `id`=\"" + id + "\";";
+							sql_query = "UPDATE	`cost_center_assignment` SET `cost_center_id` =\"" + new_value + "\" WHERE `timecard_customer_id`=\"" + id + "\";";
 						}
+
 						if(action == "AJAX_deleteTimecardApproverFromSoW")
 						{
 
@@ -3985,9 +4088,9 @@ string	GetSpelledSoWByID(string sow_id, CMysql *db)
 
 	MESSAGE_DEBUG("", "", "start");
 
-	if(db->Query("SELECT `start_date`, `end_date`, `number` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";"))
+	if(db->Query("SELECT `sign_date`, `number` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";"))
 	{
-		result = string(db->Get(0, "number")) + " с " + db->Get(0, "start_date") + " по " + db->Get(0, "end_date");
+		result = string(db->Get(0, "number")) + " " + utf8_to_cp1251(gettext("agreement from")) + " " + db->Get(0, "sign_date");
 	}
 	else
 	{
@@ -4284,6 +4387,42 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 	{
 		notification_description = utf8_to_cp1251(gettext("Agency: cost center added")) + " "s + GetSpelledCostCenterByID(id, db);
 		sql_query = ""; // --- don't notify subcontractors, only agency
+	}
+	if(action == "AJAX_updateCostCenterToCustomer")
+	{
+		notification_description = utf8_to_cp1251(gettext("Agency: cost center belongs to customer")) + " "s + GetSpelledTimecardCustomerByID(id, db) + " "s + utf8_to_cp1251(gettext("updated")) + " "s + (existing_value.length() ? utf8_to_cp1251(gettext("from")) + " "s + GetSpelledCostCenterByID(existing_value, db) : "") + " "s + utf8_to_cp1251(gettext("to")) + " "s + GetSpelledCostCenterByID(new_value, db);
+		sql_query = ""; // --- don't notify subcontractors, only agency
+	}
+	if(action == "AJAX_deleteCostCenterFromCustomer")
+	{
+		notification_description = utf8_to_cp1251(gettext("Agency: cost center belongs to customer")) + " "s + GetSpelledTimecardCustomerByID(id, db) + " "s + (existing_value.length() ? " ("s + GetSpelledCostCenterByID(existing_value, db) : "") + ") "s + utf8_to_cp1251(gettext("removed"));
+		sql_query = ""; // --- don't notify subcontractors, only agency
+	}
+	if(action == "AJAX_deleteCostCenter")
+	{
+		notification_description = utf8_to_cp1251(gettext("Agency: cost center")) + " ("s + GetSpelledCostCenterByID(existing_value, db) + ") "s + utf8_to_cp1251(gettext("removed"));
+		sql_query = ""; // --- don't notify subcontractors, only agency
+	}
+	if(action == "AJAX_updateCostCenterTitle")
+	{
+		notification_description = utf8_to_cp1251(gettext("Agency: cost center title updated")) + " "s + utf8_to_cp1251(gettext("from")) + " "s + existing_value + " "s + utf8_to_cp1251(gettext("to")) + " "s + new_value;
+		sql_query = ""; // --- don't notify subcontractors, only agency
+	}
+	if(action == "AJAX_updateCostCenterDescription")
+	{
+		notification_description = utf8_to_cp1251(gettext("Agency: cost center"))  + " ("s + GetSpelledCostCenterByID(id, db) + ") "  + utf8_to_cp1251(gettext("description updated")) + " "s + utf8_to_cp1251(gettext("from")) + " "s + existing_value + " "s + utf8_to_cp1251(gettext("to")) + " "s + new_value;
+		sql_query = ""; // --- don't notify subcontractors, only agency
+	}
+
+	if(action == "AJAX_updateSoWNumber")
+	{
+		notification_description = utf8_to_cp1251(gettext("SoW: number")) + " " + utf8_to_cp1251(gettext("updated")) + " " + utf8_to_cp1251(gettext("from")) + " "s + existing_value + " "  + utf8_to_cp1251(gettext("to")) + " "s + new_value;
+		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
+	}
+	if(action == "AJAX_updateSoWAct")
+	{
+		notification_description = utf8_to_cp1251(gettext("SoW")) + " (" + GetSpelledSoWByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("updated")) + " " + utf8_to_cp1251(gettext("act number")) + " " + " " + utf8_to_cp1251(gettext("from")) + " "s + existing_value + " "  + utf8_to_cp1251(gettext("to")) + " "s + new_value;
+		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 	}
 
 	if(action == "AJAX_updateExpenseTemplateTitle")
@@ -4615,6 +4754,7 @@ string GetAgencyObjectInJSONFormat(string agency_id, bool include_tasks, bool in
 																				")"
 																			");", db, user) : "") + "],"
 							"\"cost_centers\":[" + ( include_tasks ? GetCostCentersInJSONFormat("SELECT * FROM `cost_centers` WHERE `agency_company_id`=\"" + agency_id + "\";", db, user) : "") + "],"
+							"\"cost_center_assignment\":[" + ( include_tasks ? GetCostCentersAssignmentInJSONFormat("SELECT * FROM `cost_center_assignment` WHERE `timecard_customer_id` IN (SELECT `id` FROM `timecard_customers` WHERE `agency_company_id`=\"" + agency_id + "\");", db, user) : "") + "],"
 							
 							"\"bt_expense_templates\":[" + ( include_bt ? 
 																			GetBTExpenseTemplatesInJSONFormat("SELECT * FROM `bt_expense_templates` WHERE `agency_company_id`=\"" + agency_id + "\";", db, user)

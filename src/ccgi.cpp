@@ -108,33 +108,45 @@ string CCgi::GetEncoding()
 	if(lng == "ru")
 		return "windows-1251";
 	if(lng == "en")
-		return "ISO-8859-1";
+		return "windows-1251";
 
 	return "windows-1251";
 }
 
 string	CCgi::GetCity()
 {
-	auto	result =""s;
+	string	result ="";
 	
-	MESSAGE_DEBUG("CCgi", "", "start");
+	{
+		CLog logFile;
+		logFile.Write(DEBUG, "CCgi::" + string(__func__) + "[" + to_string(__LINE__) + "]: start");
+	}
 
 	result = sessionDB.DetectCity();
 
-	MESSAGE_DEBUG("CCgi", "", "finish (city length is " + to_string(result.length()) + ")");
+	{
+		CLog logFile;
+		logFile.Write(DEBUG, "CCgi::" + string(__func__) + "[" + to_string(__LINE__) + "]: finish (city length is " + to_string(result.length()) + ")");
+	}
 
 	return result;
 }
 
 string	CCgi::GetCountry()
 {
-	auto	result =""s;
+	string	result ="";
 
-	MESSAGE_DEBUG("CCgi", "", "start");
+	{
+		CLog logFile;
+		logFile.Write(DEBUG, "CCgi::" + string(__func__) + "[" + to_string(__LINE__) + "]: start");
+	}
 
 	result = sessionDB.DetectCountry();
 
-	MESSAGE_DEBUG("CCgi", "", "finish (country length is " + to_string(result.length()) + ")");
+	{
+		CLog logFile;
+		logFile.Write(DEBUG, "CCgi::" + string(__func__) + "[" + to_string(__LINE__) + "]: finish (country length is " + to_string(result.length()) + ")");
+	}
 
 	return result;
 }

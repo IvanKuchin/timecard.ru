@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-12-14 23:39-0500\n"
+"POT-Creation-Date: 2018-12-19 08:11-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,15 +16,77 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#, c-format
+msgid "%d customers"
+msgid_plural "%d customers"
+msgstr[0] "%d заказчику"
+msgstr[1] "%d заказчикам"
+msgstr[2] "%d заказчикам"
+
+msgid "Agency: cost center"
+msgstr "Данные агенства: центр затрат"
 
 msgid "Agency: cost center added"
 msgstr "Данные агенства: Добавлен центр затрат"
 
+msgid "Agency: cost center belongs to customer"
+msgstr "Данные агенства: центр затрат заказчика"
+
+msgid "Agency: cost center description updated"
+msgstr "Данные агенства: описание центра затрат изменено"
+
+msgid "Agency: cost center title updated"
+msgstr "Данные агенства: название центра затрат изменено"
+
+msgid "SQL syntax issue"
+msgstr "Ошибка БД"
+
+msgid "SoW"
+msgstr "SoW"
+
+msgid "SoW number already exists"
+msgstr "SoW с таким номером уже есть"
+
+msgid "SoW: number"
+msgstr "SoW: номер договора"
+
+msgid "act number"
+msgstr "номер акта"
+
 msgid "agency not found"
 msgstr "агенство не найдено"
+
+msgid "agreement from"
+msgstr "от"
 
 msgid "cost center already exists"
 msgstr "такой центр затрат уже есть"
 
+msgid "cost center assigned"
+msgstr "центр затрат назначен"
+
+msgid "cost center doesn't belongs to your company"
+msgstr "Центр затрат не принадлежит компании"
+
+msgid "description updated"
+msgstr "описание изменено"
+
+msgid "from"
+msgstr "с"
+
 msgid "mandatory parameter missed"
 msgstr "пропущен обязательный параметр"
+
+msgid "removal prohibited"
+msgstr "Нельзя удалить"
+
+msgid "removed"
+msgstr "удален"
+
+msgid "to"
+msgstr "на"
+
+msgid "updated"
+msgstr "изменен"
