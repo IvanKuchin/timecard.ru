@@ -4,6 +4,7 @@
 #include <string>
 #include <cstdlib>
 #include <math.h>		// --- pow() in RoundWithPrecision
+#include <ios>			// --- getloc()
 
 #include "clog.h"
 
@@ -15,8 +16,9 @@ class c_float
 		double		val;
 		int			precision;
 
-		double		RoundWithPrecision(double num, int precision);
-		double		RoundWithPrecision(double num);
+		auto		RoundWithPrecision(double num, int precision) -> double;
+		auto		RoundWithPrecision(double num) -> double;
+		auto 		FixRussianLocale(string param) -> string;
 
 	public:
 					c_float();

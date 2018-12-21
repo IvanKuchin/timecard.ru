@@ -167,6 +167,10 @@ static auto	isActionEntityBelongsToSoW(string action, string id, string sow_id, 
 				if(action == "AJAX_updateSoWNumber")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
 				if(action == "AJAX_updateSoWAct")					sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
 				if(action == "AJAX_updateSoWPosition")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
+				if(action == "AJAX_updateSoWDayRate")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
+				if(action == "AJAX_updateSoWSignDate")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
+				if(action == "AJAX_updateSoWStartDate")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
+				if(action == "AJAX_updateSoWEndDate")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
 
 				if(sql_query.length())
 				{
@@ -418,6 +422,108 @@ static string	CheckNewValueByAction(string action, string id, string sow_id, str
 					else if(action == "AJAX_updateCostCenterTitle")				{ /* --- good to go */ }
 					else if(action == "AJAX_updateCostCenterDescription")		{ /* --- good to go */ }
 					else if(action == "AJAX_updateSoWAct")						{ /* --- good to go */ }
+					else if(action == "AJAX_updateSoWSignDate")					{ /* --- good to go */ }
+					else if(action == "AJAX_updateSoWStartDate")
+					{
+						if(db->Query("SELECT `end_date` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";"))
+						{
+							auto		string_start = new_value;
+							auto		string_end = db->Get(0, "end_date");
+							auto		tm_start = GetTMObject(string_start);
+							auto		tm_end = GetTMObject(string_end);
+
+							if(tm_start <= tm_end)
+							{
+								if(db->Query("SELECT `period_start`, `period_end` FROM `timecards` where `contract_sow_id`=\"" + sow_id + "\" ORDER BY `period_start` ASC LIMIT 0,1;"))
+								{
+									auto	string_timecard_report_date = db->Get(0, "period_start");
+									auto	tm_timecard_report_date = GetTMObject(string_timecard_report_date);
+
+									if(tm_start <= tm_timecard_report_date)
+									{
+										// --- good to go
+									}
+									else
+									{
+										error_message = utf8_to_cp1251(gettext("Subcontractor reported time on")) + " " + PrintDate(tm_timecard_report_date);
+										MESSAGE_DEBUG("", "", "Subcontractor reported time on " + PrintDate(tm_timecard_report_date) + " earlier than SoW start " + PrintDate(tm_start));
+									}
+								}
+								else
+								{
+									error_message = utf8_to_cp1251(gettext("SQL syntax issue"));
+									MESSAGE_ERROR("", "", "issue in SQL-syntax");
+								}
+							}
+							else
+							{
+								error_message = utf8_to_cp1251(gettext("period start have to precede period end")) + " (" + string_start + " - " +  string_end + ")";
+								MESSAGE_DEBUG("", "", "period start have to precede period end (" + string_start + " - " + string_end + ")");
+							}
+						}
+						else
+						{
+							error_message = utf8_to_cp1251(gettext("SQL syntax issue"));
+							MESSAGE_ERROR("", "", "issue in SQL-syntax");
+						}
+					}
+					else if(action == "AJAX_updateSoWEndDate")
+					{
+						if(db->Query("SELECT `start_date` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";"))
+						{
+							auto		string_start = db->Get(0, "start_date");
+							auto		string_end = new_value;
+							auto		tm_start = GetTMObject(string_start);
+							auto		tm_end = GetTMObject(string_end);
+
+							mktime(&tm_start);
+							mktime(&tm_end);
+
+							if(tm_start <= tm_end)
+							{
+								if(db->Query("SELECT `period_start`, `period_end` FROM `timecards` where `contract_sow_id`=\"" + sow_id + "\" ORDER BY `period_end` DESC LIMIT 0,1;"))
+								{
+									auto	string_timecard_report_date = db->Get(0, "period_end");
+									auto	tm_timecard_report_date = GetTMObject(string_timecard_report_date);
+
+									if(tm_timecard_report_date <= tm_end)
+									{
+										// --- good to go
+									}
+									else
+									{
+										error_message = utf8_to_cp1251(gettext("Subcontractor reported time on")) + " " + PrintDate(tm_timecard_report_date);
+										MESSAGE_DEBUG("", "", "Subcontractor reported time on " + PrintDate(tm_timecard_report_date) + " earlier than SoW start " + PrintDate(tm_start));
+									}
+								}
+								else
+								{
+									error_message = utf8_to_cp1251(gettext("SQL syntax issue"));
+									MESSAGE_ERROR("", "", "issue in SQL-syntax");
+								}
+							}
+							else
+							{
+								error_message = utf8_to_cp1251(gettext("period start have to precede period end")) + " (" + string_start + " - " +  string_end + ")";
+								MESSAGE_DEBUG("", "", "period start have to precede period end (" + string_start + " - " + string_end + ")");
+							}
+						}
+						else
+						{
+							error_message = utf8_to_cp1251(gettext("SQL syntax issue"));
+							MESSAGE_ERROR("", "", "issue in SQL-syntax");
+						}
+					}
+					else if(action == "AJAX_updateSoWDayRate")
+					{
+						c_float		num(new_value);
+
+						if(string(num) == new_value) { /* --- good to go */ }
+						else
+						{
+							MESSAGE_ERROR("", "", "input DayRate(" + new_value + ") wrongly formatted, need to be " + string(num));
+						}
+					}
 					else if(action == "AJAX_deleteCostCenter")
 					{
 						if(db->Query("SELECT COUNT(*) AS `counter` FROM `cost_center_assignment` WHERE `cost_center_id`=\"" + id + "\";"))
@@ -431,7 +537,7 @@ static string	CheckNewValueByAction(string action, string id, string sow_id, str
 								sprintf(buffer, ngettext("%d customers", "%d customers", counter), counter);
 
 								error_message = utf8_to_cp1251(gettext("cost center assigned")) + " " + utf8_to_cp1251(buffer) + ". " +  utf8_to_cp1251(gettext("removal prohibited"));
-								MESSAGE_DEBUG("", action, "cost_center.id(" + id + ") assigned to " + to_string(counter) + " customers. Removal prohibited.");
+								MESSAGE_DEBUG("", "", "cost_center.id(" + id + ") assigned to " + to_string(counter) + " customers. Removal prohibited.");
 							}
 							else
 							{
@@ -449,7 +555,7 @@ static string	CheckNewValueByAction(string action, string id, string sow_id, str
 						if(db->Query("SELECT `id` FROM `contracts_sow` WHERE `number`=\"" + new_value + "\" AND `id`!=\"" + sow_id + "\" AND `agency_company_id`=(SELECT `agency_company_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\");"))
 						{
 							error_message = utf8_to_cp1251(gettext("SoW number already exists"));
-							MESSAGE_DEBUG("", action, "sow.number already exists in agency.id");
+							MESSAGE_DEBUG("", "", "sow.number already exists in agency.id");
 						}
 						else
 						{
@@ -461,7 +567,7 @@ static string	CheckNewValueByAction(string action, string id, string sow_id, str
 						if(db->Query("SELECT `id` FROM `timecard_approvers` WHERE `approver_user_id`=\"" + new_value + "\" AND `contract_sow_id`=\"" + sow_id + "\";"))
 						{
 							error_message = "Уже в списке утвердителей";
-							MESSAGE_DEBUG("", action, "user.id(" + new_value + ") already in sow.id(" + sow_id + ") approver list");
+							MESSAGE_DEBUG("", "", "user.id(" + new_value + ") already in sow.id(" + sow_id + ") approver list");
 						}
 						else
 						{
@@ -473,7 +579,7 @@ static string	CheckNewValueByAction(string action, string id, string sow_id, str
 						if(db->Query("SELECT `id` FROM `cost_centers` WHERE `title`=\"" + new_value + "\" AND `agency_company_id`=\"" + id + "\";"))
 						{
 							error_message = utf8_to_cp1251(gettext("cost center already exists"));
-							MESSAGE_DEBUG("", action, "cost_center with the same name already exists in agency.id(" + id + ")");
+							MESSAGE_DEBUG("", "", "cost_center with the same name already exists in agency.id(" + id + ")");
 						}
 						else
 						{
@@ -490,7 +596,7 @@ static string	CheckNewValueByAction(string action, string id, string sow_id, str
 						else
 						{
 							error_message = utf8_to_cp1251(gettext("cost center doesn't belongs to your company"));
-							MESSAGE_DEBUG("", action, "cost center doesn't belongs to your company");
+							MESSAGE_DEBUG("", "", "cost center doesn't belongs to your company");
 						}
 					}
 					else if(action == "AJAX_addBTExpenseApproverToSoW")
@@ -498,7 +604,7 @@ static string	CheckNewValueByAction(string action, string id, string sow_id, str
 						if(db->Query("SELECT `id` FROM `bt_approvers` WHERE `approver_user_id`=\"" + new_value + "\" AND `contract_sow_id`=\"" + sow_id + "\";"))
 						{
 							error_message = "Уже в списке утвердителей";
-							MESSAGE_DEBUG("", action, "user.id(" + new_value + ") already in sow.id(" + sow_id + ") approver list");
+							MESSAGE_DEBUG("", "", "user.id(" + new_value + ") already in sow.id(" + sow_id + ") approver list");
 						}
 						else
 						{
@@ -1895,6 +2001,10 @@ int main(void)
 			(action == "AJAX_updateSoWNumber")					||
 			(action == "AJAX_updateSoWAct")						||
 			(action == "AJAX_updateSoWPosition")				||
+			(action == "AJAX_updateSoWDayRate")					||
+			(action == "AJAX_updateSoWSignDate")				||
+			(action == "AJAX_updateSoWStartDate")				||
+			(action == "AJAX_updateSoWEndDate")					||
 
 			(action == "AJAX_updatePeriodStart")				||
 			(action == "AJAX_updatePeriodEnd")					||

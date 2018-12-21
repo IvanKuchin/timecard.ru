@@ -2031,7 +2031,7 @@ auto	GetDBValueByAction(string action, string id, string sow_id, CMysql *db, CUs
 				if(action == "AJAX_updateCompanyLegalZipID")		sql_query = "SELECT `legal_geo_zip_id`	as `value` FROM `company` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateCompanyBankID")			sql_query = "SELECT `bank_id`			as `value` FROM `company` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateAgencyPosition")			sql_query = "SELECT `title`				as `value` FROM `company_position` WHERE `id`=(SELECT `position_id` FROM `company_employees` WHERE `id`=\"" + id + "\");";
-				if(action == "AJAX_updateSoWPosition")				sql_query = "SELECT `title`				as `value` FROM `company_position` WHERE `id`=(SELECT `company_position_id` FROM `contracts_sow` WHERE `id`=\"" + id + "\");";
+				if(action == "AJAX_updateSoWPosition")				sql_query = "SELECT `title`				as `value` FROM `company_position` WHERE `id`=(SELECT `company_position_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\");";
 				if(action == "AJAX_updateAgencyEditCapability")		sql_query = "SELECT `allowed_change_agency_data`	as `value` FROM `company_employees` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateSoWEditCapability")		sql_query = "SELECT `allowed_change_sow`			as `value` FROM `company_employees` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateSubcontractorCreateTasks")	sql_query = "SELECT `subcontractor_create_tasks`	as `value` FROM `contracts_sow` WHERE `id`=\"" + id + "\";";
@@ -2051,6 +2051,10 @@ auto	GetDBValueByAction(string action, string id, string sow_id, CMysql *db, CUs
 				if(action == "AJAX_updateCostCenterDescription")			sql_query = "SELECT `description`			as `value` FROM `cost_centers` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateSoWNumber")						sql_query = "SELECT `number`				as `value` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 				if(action == "AJAX_updateSoWAct")							sql_query = "SELECT `act_number`			as `value` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
+				if(action == "AJAX_updateSoWDayRate")						sql_query = "SELECT `day_rate`				as `value` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
+				if(action == "AJAX_updateSoWSignDate")						sql_query = "SELECT `sign_date`				as `value` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
+				if(action == "AJAX_updateSoWStartDate")						sql_query = "SELECT `start_date`			as `value` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
+				if(action == "AJAX_updateSoWEndDate")						sql_query = "SELECT `end_date`				as `value` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 
 				if(sql_query.length())
 				{
@@ -3609,6 +3613,10 @@ string	SetNewValueByAction(string action, string id, string sow_id, string new_v
 						if(action == "AJAX_updateCostCenterDescription")			sql_query = "UPDATE `cost_centers`				SET `description`					=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
 						if(action == "AJAX_updateSoWNumber")						sql_query = "UPDATE `contracts_sow`				SET `number`						=\"" + new_value + "\" WHERE `id`=\"" + sow_id + "\";";
 						if(action == "AJAX_updateSoWAct")							sql_query = "UPDATE `contracts_sow`				SET `act_number`					=\"" + new_value + "\" WHERE `id`=\"" + sow_id + "\";";
+						if(action == "AJAX_updateSoWSignDate")						sql_query = "UPDATE `contracts_sow`				SET `sign_date`						=STR_TO_DATE(\"" + new_value + "\",\"%d/%m/%Y\") WHERE `id`=\"" + sow_id + "\";";
+						if(action == "AJAX_updateSoWStartDate")						sql_query = "UPDATE `contracts_sow`				SET `start_date`					=STR_TO_DATE(\"" + new_value + "\",\"%d/%m/%Y\") WHERE `id`=\"" + sow_id + "\";";
+						if(action == "AJAX_updateSoWEndDate")						sql_query = "UPDATE `contracts_sow`				SET `end_date`						=STR_TO_DATE(\"" + new_value + "\",\"%d/%m/%Y\") WHERE `id`=\"" + sow_id + "\";";
+						if(action == "AJAX_updateSoWDayRate") {c_float	num(new_value); sql_query = "UPDATE `contracts_sow` 		SET `day_rate`						=\"" + string(num) + "\" WHERE `id`=\"" + sow_id + "\";"; }
 
 						// --- expense line template payment part
 						if(action == "AJAX_updateExpenseTemplateLinePaymentCash")
@@ -4289,7 +4297,7 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 	}
 	if(action == "AJAX_updateAgencyPosition")
 	{
-		notification_description = "ƒанные сотрудника: " + GetSpelledEmployeeByID(id, db) + " перешел(шла) с должности (" + existing_value + ")";
+		notification_description = utf8_to_cp1251(gettext("Employee data")) + ": " + GetSpelledEmployeeByID(id, db) + " " + utf8_to_cp1251(gettext("promouted from")) + " " + existing_value;
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 	if(action == "AJAX_updateAgencyEditCapability")
@@ -4422,6 +4430,31 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 	if(action == "AJAX_updateSoWAct")
 	{
 		notification_description = utf8_to_cp1251(gettext("SoW")) + " (" + GetSpelledSoWByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("updated")) + " " + utf8_to_cp1251(gettext("act number")) + " " + " " + utf8_to_cp1251(gettext("from")) + " "s + existing_value + " "  + utf8_to_cp1251(gettext("to")) + " "s + new_value;
+		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
+	}
+	if(action == "AJAX_updateSoWPosition")
+	{
+		notification_description = utf8_to_cp1251(gettext("SoW")) + " (" + GetSpelledSoWByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("position changed")) + " " + utf8_to_cp1251(gettext("from")) + " " + existing_value + " " + utf8_to_cp1251(gettext("to")) + " " + new_value;
+		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
+	}
+	if(action == "AJAX_updateSoWDayRate")
+	{
+		notification_description = utf8_to_cp1251(gettext("SoW")) + " (" + GetSpelledSoWByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("dayrate changed")) + " " + utf8_to_cp1251(gettext("from")) + " " + existing_value + " " + utf8_to_cp1251(gettext("to")) + " " + new_value;
+		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
+	}
+	if(action == "AJAX_updateSoWSignDate")
+	{
+		notification_description = utf8_to_cp1251(gettext("SoW")) + " (" + GetSpelledSoWByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("SoW sign date changed")) + " " + utf8_to_cp1251(gettext("from")) + " " + existing_value + " " + utf8_to_cp1251(gettext("to")) + " " + new_value;
+		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
+	}
+	if(action == "AJAX_updateSoWStartDate")
+	{
+		notification_description = utf8_to_cp1251(gettext("SoW")) + " (" + GetSpelledSoWByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("SoW start date changed")) + " " + utf8_to_cp1251(gettext("from")) + " " + existing_value + " " + utf8_to_cp1251(gettext("to")) + " " + new_value;
+		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
+	}
+	if(action == "AJAX_updateSoWEndDate")
+	{
+		notification_description = utf8_to_cp1251(gettext("SoW")) + " (" + GetSpelledSoWByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("SoW end date changed")) + " " + utf8_to_cp1251(gettext("from")) + " " + existing_value + " " + utf8_to_cp1251(gettext("to")) + " " + new_value;
 		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 	}
 

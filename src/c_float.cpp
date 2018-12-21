@@ -50,11 +50,7 @@ c_float::c_float() : c_float(0, 2) {}
 
 c_float::c_float(double param) : c_float(param, 2) {}
 
-c_float::c_float(double param,  int prec_param)
-{
-	precision = prec_param;
-	val = param;
-}
+c_float::c_float(double param,  int prec_param) : val(param), precision(prec_param) {}
 
 c_float::c_float(string param) : c_float(param, 2) {}
 
@@ -67,15 +63,26 @@ c_float::c_float(string param, int prec_param)
 	{
 		try
 		{
-			val = stod(param);
+			val = stod(FixRussianLocale(param));
 		}
 		catch(...)
 		{
-			MESSAGE_ERROR("", "", "can't convert " + param + " to double");
+			MESSAGE_ERROR("c_float", "", "can't convert " + param + " to double");
 			val = 0;
 		}
 
 	}
+}
+
+auto c_float::FixRussianLocale(string param) -> string
+{
+	locale	loc;
+
+	if(loc.name().find("ru"))
+		if(param.find(".") != string::npos)
+			param.replace(param.find("."), 1, ",");
+
+	return param;
 }
 
 double c_float::RoundWithPrecision(double num, int precision)
