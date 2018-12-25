@@ -905,6 +905,115 @@ bool C_BT::AssignExpenseLineByParentRandom(C_ExpenseLine expense_line)
 	return result;
 }
 
+bool C_BT::isSubcontractorAssignedToCustomerID() const
+{
+	bool	result = false;
+
+	MESSAGE_DEBUG("C_BT", "", "start");
+
+	if(!user) 
+	{		
+		MESSAGE_ERROR("C_BT", "", "user not initialized");
+	}
+	if(!db) 
+	{		
+		MESSAGE_ERROR("C_BT", "", "DB not initialized");
+	}
+	else if(GetUserID().length() == 0)
+	{
+		MESSAGE_ERROR("C_BT", "", "user.id not initialized");
+	}
+	else if(GetCustomerID().length() == 0)
+	{
+		MESSAGE_DEBUG("C_BT", "", "customer.id is empty");
+	}
+	else if(db->Query(
+				"SELECT `id` FROM `company` WHERE `admin_userID`=\"" + user->GetID() + "\" AND `id` IN ("
+					"SELECT `subcontractor_company_id` FROM `contracts_sow` WHERE `id` IN ("
+						"SELECT `contract_sow_id` FROM `timecard_task_assignment` WHERE `timecard_tasks_id` IN ("
+							"SELECT `id` FROM `timecard_tasks` WHERE `timecard_projects_id` IN ("
+								"SELECT `id` FROM `timecard_projects` WHERE `timecard_customers_id`=\"" + GetCustomerID() + "\""
+							")"
+						")"
+					")"
+				")"
+			))
+	{
+		result = true;
+	}	
+
+	MESSAGE_DEBUG("C_BT", "", "finish (result = " + to_string(result) + ")");
+
+	return result;
+}
+
+bool C_BT::isCustomerAssignmentInsideBTPeriod() const
+{
+	auto	result = false;
+	auto	affected = 0;
+
+	MESSAGE_DEBUG("C_BT", "", "start");
+
+	if(!user) 
+	{		
+		MESSAGE_ERROR("C_BT", "", "user not initialized");
+	}
+	if(!db) 
+	{		
+		MESSAGE_ERROR("C_BT", "", "DB not initialized");
+	}
+	else if(GetUserID().length() == 0)
+	{
+		MESSAGE_ERROR("C_BT", "", "user.id not initialized");
+	}
+	else if(GetSowID().length() == 0)
+	{
+		MESSAGE_DEBUG("C_BT", "", "sow.id is empty");
+	}
+	else if(GetCustomerID().length() == 0)
+	{
+		MESSAGE_DEBUG("C_BT", "", "customer.id is empty");
+	}
+	else if(GetStartDate().length() == 0)
+	{
+		MESSAGE_DEBUG("C_BT", "", "start_date is empty");
+	}
+	else if(GetEndDate().length() == 0)
+	{
+		MESSAGE_DEBUG("C_BT", "", "end_date is empty");
+	}
+	else if((affected = db->Query(
+				"SELECT `period_start`, `period_end` FROM `timecard_task_assignment` WHERE `contract_sow_id`=\"" + GetSowID() + "\" AND `timecard_tasks_id` IN ("
+					"SELECT `id` FROM `timecard_tasks` WHERE `timecard_projects_id` IN ("
+						"SELECT `id` FROM `timecard_projects` WHERE `timecard_customers_id`=\"" + GetCustomerID() + "\""
+					")"
+				")"
+			)))
+	{
+		auto		tm_bt_start = GetTMObject(GetStartDate());
+		auto		tm_bt_end = GetTMObject(GetEndDate());
+
+		for(auto i = 0; i < affected; ++i)
+		{
+			auto	tm_task_start = GetTMObject(db->Get(i, "period_start"));
+			auto	tm_task_end = GetTMObject(db->Get(i, "period_end"));
+
+			if((tm_task_start <= tm_bt_start) && (tm_bt_end <= tm_task_end))
+			{
+				result = true;
+				break;
+			}
+
+			if(result) {}
+			else MESSAGE_DEBUG("C_BT", "", "there is no task assignment overlaps with travel period");
+		}
+	}	
+
+	MESSAGE_DEBUG("C_BT", "", "finish (result = " + to_string(result) + ")");
+
+	return result;
+}
+
 bool C_BT::isSubcontractorAssignedToSow() const
 {
 	bool	result = false;
@@ -980,6 +1089,16 @@ string	C_BT::CheckValidity() const
 		result = "этот договор заключен не с вами";
 		MESSAGE_DEBUG("C_BT", "", "subcontractor doesn't belong to sow");
 	}
+	else if(!isSubcontractorAssignedToCustomerID())
+	{
+		result = utf8_to_cp1251(gettext("you are not assigned to customer"));
+		MESSAGE_DEBUG("C_BT", "", "user.id(" + user->GetID() + ") not assigned to customer.id(" + GetCustomerID() + ")");
+	}
+	else if(!isCustomerAssignmentInsideBTPeriod())
+	{
+		result = utf8_to_cp1251(gettext("customer assignment outside bt travel"));
+		MESSAGE_DEBUG("C_BT", "", "user.id(" + user->GetID() + ") assignment to customer.id(" + GetCustomerID() + ") beyond the business travle period (" + GetStartDate() + " -> " + GetEndDate() + ")");
+	}
 	else
 	{
 		for(auto &expense: expenses)
@@ -1027,6 +1146,7 @@ string	C_BT::SaveToDB()
 								"`contract_sow_id`=\"" + GetSowID() + "\", "
 								"`date_start`=STR_TO_DATE(\"" + GetStartDate() + "\", '%d/%m/%Y'), "
 								"`date_end`=STR_TO_DATE(\"" + GetEndDate() + "\", '%d/%m/%Y'), "
+								"`customer_id`=\"" + GetCustomerID() + "\", "
 								"`place`=\"" + GetDestination() + "\", "
 								"`purpose`=\"" + GetPurpose() + "\", "
 								+ (GetAction() == "submit" ? "`status`=\"submit\",`submit_date`=UNIX_TIMESTAMP(), " : "") +
@@ -1050,6 +1170,7 @@ string	C_BT::SaveToDB()
 							"`contract_sow_id`=\"" + GetSowID() + "\", "
 							"`date_start`=STR_TO_DATE(\"" + GetStartDate() + "\", '%d/%m/%Y'), "
 							"`date_end`=STR_TO_DATE(\"" + GetEndDate() + "\", '%d/%m/%Y'), "
+							"`customer_id`=\"" + GetCustomerID() + "\", "
 							"`place`=\"" + GetDestination() + "\", "
 							"`purpose`=\"" + GetPurpose() + "\", "
 							+ (GetAction() == "submit" ? "`status`=\"submit\",`submit_date`=UNIX_TIMESTAMP(), " : "") +

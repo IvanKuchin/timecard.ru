@@ -171,6 +171,7 @@ auto			GetTimecardTasksInJSONFormat(string sqlQuery, CMysql *, CUser *) -> strin
 auto			GetTimecardTaskAssignmentInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetBTExpenseAssignmentInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetTimecardsInJSONFormat(string sqlQuery, CMysql *, CUser *, bool isExtended = false) -> string;
+auto			GetSoWCustomFieldsInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string;
 auto			GetSOWInJSONFormat(string sqlQuery, CMysql *, CUser *, bool include_tasks = true, bool include_bt = false) -> string;
 auto			GetTimecardApprovalsInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			SubmitTimecard(string timecard_id, CMysql *, CUser *) -> bool;
@@ -179,91 +180,93 @@ auto			GetNumberOfTimecardsInPendingState(CMysql *, CUser *) -> string;
 auto			GetNumberOfBTInPendingState(CMysql *, CUser *) -> string;
 auto 			SummarizeTimereports(string timereport1, string timereport2) -> string;
 vector<string> 	SplitTimeentry(const string& s, const char c = ',');
-bool			isTimecardEntryEmpty(string	timereports);
-bool			isUserAssignedToSoW(string user_id, string sow_id, CMysql *);
-bool 			isSoWAllowedToCreateTask(string sow_id, CMysql *);
-string			GetTaskIDFromAgency(string customer, string project, string task, string agency_id, CMysql *);
-string			GetTaskIDFromSOW(string customer, string project, string task, string sow_id, CMysql *);
-string			CreateTaskBelongsToAgency(string customer, string project, string task, string agency_id, CMysql *);
-string			GetTimecardID(string sow_id, string period_start, string period_end, CMysql *);
-string			GetTimecardStatus(string timecard_id, CMysql *);
-string			GetTimecardLineID(string timecard_id, string task_id, CMysql *);
-string			GetAgencyID(string sow_id, CMysql *);
-string			GetAgencyID(CUser *, CMysql *);
-string			GetObjectsSOW_Reusable_InJSONFormat(string object, string filter, CMysql *, CUser *);
+auto			isTimecardEntryEmpty(string	timereports) -> bool;
+auto			isUserAssignedToSoW(string user_id, string sow_id, CMysql *) -> bool;
+auto 			isSoWAllowedToCreateTask(string sow_id, CMysql *) -> bool;
+auto			GetTaskIDFromAgency(string customer, string project, string task, string agency_id, CMysql *) -> string;
+auto			GetTaskIDFromSOW(string customer, string project, string task, string sow_id, CMysql *) -> string;
+auto			CreateTaskBelongsToAgency(string customer, string project, string task, string agency_id, CMysql *) -> string;
+auto			GetTimecardID(string sow_id, string period_start, string period_end, CMysql *) -> string;
+auto			GetTimecardStatus(string timecard_id, CMysql *) -> string;
+auto			GetTimecardLineID(string timecard_id, string task_id, CMysql *) -> string;
+auto			GetAgencyID(string sow_id, CMysql *) -> string;
+auto			GetAgencyID(CUser *, CMysql *) -> string;
+auto			GetObjectsSOW_Reusable_InJSONFormat(string object, string filter, CMysql *, CUser *) -> string;
 auto			GetBTExpenseTemplateAssignmentToSoW(string bt_expense_template_id, string sow_id, CMysql *) -> string;
-string			GetTaskAssignmentID(string customer, string project, string task, string sow_id, CMysql *);
-string			CreateTaskAssignment(string task_id, string sow_id, string assignment_start, string assignment_end, CMysql *, CUser *);
+auto			GetTaskAssignmentID(string customer, string project, string task, string sow_id, CMysql *) -> string;
+auto			CreateTaskAssignment(string task_id, string sow_id, string assignment_start, string assignment_end, CMysql *, CUser *) -> string;
 auto 			CreateBTExpenseTemplateAssignmentToSoW(string new_bt_expense_template_id, string sow_id, CMysql *, CUser *) -> string;
 auto			GetCostCentersInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetCostCentersAssignmentInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
-string			GetApproversInJSONFormat(string sqlQuery, CMysql *, CUser *, bool include_sow);
-string			GetSpelledTimecardCustomerByID(string id, CMysql *);
-string			GetSpelledTimecardProjectByID(string id, CMysql *);
-string			GetSpelledTimecardTaskByID(string id, CMysql *);
-string			GetSpelledTimecardTaskAssignmentByID(string id, CMysql *);
+auto			GetApproversInJSONFormat(string sqlQuery, CMysql *, CUser *, bool include_sow) -> string;
+auto			GetSpelledTimecardCustomerByID(string id, CMysql *) -> string;
+auto			GetSpelledTimecardProjectByID(string id, CMysql *) -> string;
+auto			GetSpelledTimecardTaskByID(string id, CMysql *) -> string;
+auto			GetSpelledTimecardTaskAssignmentByID(string id, CMysql *) -> string;
 auto			GetSpelledBTExpenseTemplateLineByID(string id, CMysql *) -> string;
 auto			GetSpelledCostCenterByID(string id, CMysql *) -> string;
 auto			GetSpelledBTExpenseAssignmentByID(string id, CMysql *) -> string;
-string			GetSpelledUserNameByID(string id, CMysql *);
-string			GetSpelledEmployeeByID(string id, CMysql *);
-string			GetSpelledTimecardApproverNameByID(string id, CMysql *);
-string			GetSpelledBTExpenseApproverNameByID(string id, CMysql *);
-string			GetSpelledSoWByID(string sow_id, CMysql *);
-string			GetSpelledZIPByID(string id, CMysql *);
-string			GetSpelledBankByID(string id, CMysql *);
-string			GetSpelledBTExpenseTemplateByID(string id, CMysql *);
-string			GetSpelledBTExpenseTemplateByLineID(string id, CMysql *);
+auto			GetSpelledUserNameByID(string id, CMysql *) -> string;
+auto			GetSpelledEmployeeByID(string id, CMysql *) -> string;
+auto			GetSpelledTimecardApproverNameByID(string id, CMysql *) -> string;
+auto			GetSpelledBTExpenseApproverNameByID(string id, CMysql *) -> string;
+auto			GetSpelledSoWByID(string sow_id, CMysql *) -> string;
+auto			GetSpelledZIPByID(string id, CMysql *) -> string;
+auto			GetSpelledBankByID(string id, CMysql *) -> string;
+auto			GetSpelledBTExpenseTemplateByID(string id, CMysql *) -> string;
+auto			GetSpelledBTExpenseTemplateByLineID(string id, CMysql *) -> string;
 auto			GetSpelledBTExpenseTemplateByAssignmentID(string id, CMysql *) -> string;
-string			isValidToReportTime(string timecard_id, string task_id, string timereport, CMysql *, CUser *);
+auto			isValidToReportTime(string timecard_id, string task_id, string timereport, CMysql *, CUser *) -> string;
 auto			isTaskIDValidToRemove(string task_id, CMysql *) -> string;
-bool			isProjectIDValidToRemove(string task_id, CMysql *);
-bool			isCustomerIDValidToRemove(string task_id, CMysql *);
+auto			isProjectIDValidToRemove(string task_id, CMysql *) -> bool;
+auto			isCustomerIDValidToRemove(string task_id, CMysql *) -> bool;
 auto			isExpenseTemplateIDValidToRemove(string bt_expense_template_id, CMysql *) -> string;
 auto			isExpenseTemplateLineIDValidToRemove(string bt_expense_template_line_id, CMysql *) -> string;
-string			isEmployeeIDValidToRemove(string employee_id, CMysql *);
+auto			isEmployeeIDValidToRemove(string employee_id, CMysql *) -> string;
 pair<string, string> GetCustomerIDProjectIDByTaskID(string task_id, CMysql *);
 pair<int, int>	FirstAndLastReportingDaysFromTimereport(const vector<string> &timereport);
 
 
-string			GetBTApprovalsInJSONFormat(string sqlQuery, CMysql *, CUser *);
-string			GetBTExpenseTemplatesInJSONFormat(string sqlQuery, CMysql *, CUser *);
-string			GetBTExpenseLineTemplatesInJSONFormat(string sqlQuery, CMysql *, CUser *);
-string			GetBTsInJSONFormat(string sqlQuery, CMysql *, CUser *, bool isExtended);
-string			GetBTExpensesInJSONFormat(string sqlQuery, CMysql *, CUser *);
-string			GetCurrencyRatesInJSONFormat(string sqlQuery, CMysql *, CUser *);
-string 			isUserAllowedAccessToBT(string bt_id, CMysql *, CUser *);
+auto			GetBTApprovalsInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
+auto			GetBTExpenseTemplatesInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
+auto			GetBTExpenseLineTemplatesInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
+auto			GetBTsInJSONFormat(string sqlQuery, CMysql *, CUser *, bool isExtended) -> string;
+auto			GetBTExpensesInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
+auto			GetCurrencyRatesInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
+auto 			isUserAllowedAccessToBT(string bt_id, CMysql *, CUser *) -> string;
 // string			isAgencyEmployeeAllowedToChangeSoW(string sow_id, CMysql *, CUser *);
 // string			isAgencyEmployeeAllowedToChangeAgencyData(CMysql *, CUser *);
 // string			isActionEntityBelongsToSoW(string action, string is, string sow_id, CMysql *, CUser *);
 // string			isActionEntityBelongsToAgency(string action, string id, string agency_id, CMysql *, CUser *);
-bool			NotifySoWContractPartiesAboutChanges(string action, string id, string sow_id, string existing_value, string new_value, CMysql *, CUser *);
-string			GetDBValueByAction(string action, string id, string sow_id, CMysql *, CUser *);
+auto			NotifySoWContractPartiesAboutChanges(string action, string id, string sow_id, string existing_value, string new_value, CMysql *, CUser *) -> bool;
+auto			GetDBValueByAction(string action, string id, string sow_id, CMysql *, CUser *) -> string;
 // string			CheckNewValueByAction(string action, string id, string sow_id, string new_value, CMysql *, CUser *);
-string			SetNewValueByAction(string action, string id, string sow_id, string new_value, CMysql *, CUser *);
-string			ResubmitEntitiesByAction(string action, string id, string sow_id, string new_value, CMysql *, CUser *);
-string			GetAgencyEmployeesInJSONFormat(string sql_query, CMysql *, CUser *);
-string			GetAgencyObjectInJSONFormat(string agency_id, bool include_tasks, bool include_bt, CMysql *, CUser *);
-string			GetInfoToReturnByAction(string action, string id, string sow_id, string new_value, CMysql *, CUser *);
+auto			SetNewValueByAction(string action, string id, string sow_id, string new_value, CMysql *, CUser *) -> string;
+auto			ResubmitEntitiesByAction(string action, string id, string sow_id, string new_value, CMysql *, CUser *) -> string;
+auto			GetAgencyEmployeesInJSONFormat(string sql_query, CMysql *, CUser *) -> string;
+auto			GetAgencyObjectInJSONFormat(string agency_id, bool include_tasks, bool include_bt, CMysql *, CUser *) -> string;
+auto			GetInfoToReturnByAction(string action, string id, string sow_id, string new_value, CMysql *, CUser *) -> string;
 
 // --- function set for image upload/removal
-int 			GetSpecificData_GetNumberOfFolders(string itemType);
-int 			GetSpecificData_GetMaxFileSize(string itemType);
-unsigned int 	GetSpecificData_GetMaxWidth(string itemType);
-unsigned int 	GetSpecificData_GetMaxHeight(string itemType);
-string 			GetSpecificData_GetBaseDirectory(string itemType);
-string 			GetSpecificData_SelectQueryItemByID(string itemID, string itemType);
-string 			GetSpecificData_UpdateQueryItemByID(string itemID, string itemType, string folderID, string fileName);
-string 			GetSpecificData_GetDBCoverPhotoFolderString(string itemType);
-string 			GetSpecificData_GetDBCoverPhotoFilenameString(string itemType);
-bool 			GetSpecificData_AllowedToChange(string itemID, string itemType, CMysql *, CUser *);
-string			SaveImageFileFromHandler(string f_name, string f_type, CFiles *files);
-string 			isCBCurrencyRate(string date, string currency_name, string currency_nominal, string currency_value, CMysql *);
+auto 			GetSpecificData_GetNumberOfFolders(string itemType) -> int;
+auto 			GetSpecificData_GetMaxFileSize(string itemType) -> int;
+auto		 	GetSpecificData_GetMaxWidth(string itemType) -> unsigned int;
+auto		 	GetSpecificData_GetMaxHeight(string itemType) -> unsigned int;
+auto 			GetSpecificData_GetBaseDirectory(string itemType) -> string;
+auto			GetSpecificData_GetFinalFileExtenstion(string itemType) -> string;
+auto 			GetSpecificData_SelectQueryItemByID(string itemID, string itemType) -> string;
+auto 			GetSpecificData_UpdateQueryItemByID(string itemID, string itemType, string folderID, string fileName) -> string;
+auto 			GetSpecificData_GetDBCoverPhotoFolderString(string itemType) -> string;
+auto 			GetSpecificData_GetDBCoverPhotoFilenameString(string itemType) -> string;
+auto 			GetSpecificData_GetDataTypeByItemType(const string &itemType) -> string;
+auto 			GetSpecificData_AllowedToChange(string itemID, string itemType, CMysql *, CUser *) -> bool;
+auto			SaveImageFileFromHandler(string f_name, string f_type, CFiles *files) -> string;
+auto 			isCBCurrencyRate(string date, string currency_name, string currency_nominal, string currency_value, CMysql *) -> string;
 
 // --- UTF8 encoding/decoding
-int         	convert_utf8_to_windows1251(const char* utf8, char* windows1251, size_t n);
+auto         	convert_utf8_to_windows1251(const char* utf8, char* windows1251, size_t n) -> int;
 auto			utf8_to_cp1251(const string &) -> string;
-bool 			convert_cp1251_to_utf8(const char *in, char *out, int size);
+auto 			convert_cp1251_to_utf8(const char *in, char *out, int size) -> bool;
 
 // --- base64 encoding/decoding
 static const std::string base64_chars = 
@@ -272,9 +275,9 @@ static const std::string base64_chars =
              "0123456789+/";
 typedef unsigned char BYTE;
 
-bool 			is_base64(BYTE c);
-string 			base64_encode(BYTE const* buf, unsigned int bufLen) ;
-string 			base64_decode(std::string const& encoded_string) ;
+auto 			is_base64(BYTE c) -> bool;
+auto 			base64_encode(BYTE const* buf, unsigned int bufLen)  -> string;
+auto 			base64_decode(std::string const& encoded_string)  -> string;
 
 
 struct ExifInfo 
@@ -334,9 +337,9 @@ struct ExifInfo
 	string  YResolution;
 };
 
-string		ParseGPSLongitude(const string longitudeStr);
-string		ParseGPSLatitude(const string latitudeStr);
-string		ParseGPSAltitude(const string altitudeStr);
-string		ParseGPSSpeed(const string speedStr);
+auto		ParseGPSLongitude(const string longitudeStr) -> string;
+auto		ParseGPSLatitude(const string latitudeStr) -> string;
+auto		ParseGPSAltitude(const string altitudeStr) -> string;
+auto		ParseGPSSpeed(const string speedStr) -> string;
 
 #endif

@@ -161,26 +161,18 @@ string CSession::DetectItem(string MMDB_itemName) {
 	return	item;
 }
 
-string CSession::DetectCountry()
+auto CSession::DetectCountry() -> string
 {
-	auto	result = ""s;
+    MESSAGE_DEBUG("CSession", "", "attempt to detect country by IP");
 
-    MESSAGE_ERROR("CSession", "", "attempt to detect country by IP");
-
-    result = DetectItem("country");
-
-	return result;
+	return DetectItem("country");
 }
 
-string CSession::DetectCity()
+auto CSession::DetectCity() -> string
 {
-	auto	result = ""s;
+    MESSAGE_DEBUG("CSession", "", "attempt to detect city by IP");
 
-    MESSAGE_ERROR("CSession", "", "attempt to detect city by IP");
-
-    result = DetectItem("city");
-
-	return result;
+	return DetectItem("city");
 }
 
 bool CSession::Save(string u, string i, string l)

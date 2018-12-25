@@ -319,6 +319,11 @@ unsigned long CMysql::InsertQuery(string query)
     return InsertQueryDB(query);
 }
 
+char *CMysql::Get(int row, const string &name)
+{
+    return Get(row, name.c_str());
+}
+
 char *CMysql::Get(int row, const char *name)
 {
     if(resultSet)

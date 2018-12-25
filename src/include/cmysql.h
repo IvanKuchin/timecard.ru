@@ -52,6 +52,7 @@ class CMysql : public CMysqlSkel
 		int				Connect(const char *dbname, const char *login, const char *pass);
 		int				Query(string query);
 		unsigned long	InsertQuery(string query);
+		char*			Get(int rows, const string &field);
 		char*			Get(int rows, const char *field);
 		char*			Get(int rows, int col);
 		MYSQL_ROW		NextRow(void);

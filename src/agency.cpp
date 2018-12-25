@@ -171,6 +171,7 @@ static auto	isActionEntityBelongsToSoW(string action, string id, string sow_id, 
 				if(action == "AJAX_updateSoWSignDate")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
 				if(action == "AJAX_updateSoWStartDate")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
 				if(action == "AJAX_updateSoWEndDate")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
+				if(action == "AJAX_updateSoWCustomField")			sql_query = "SELECT `contract_sow_id` AS `sow_id` FROM `contract_sow_custom_fields` WHERE `id`=\"" + id + "\";";
 
 				if(sql_query.length())
 				{
@@ -423,6 +424,7 @@ static string	CheckNewValueByAction(string action, string id, string sow_id, str
 					else if(action == "AJAX_updateCostCenterDescription")		{ /* --- good to go */ }
 					else if(action == "AJAX_updateSoWAct")						{ /* --- good to go */ }
 					else if(action == "AJAX_updateSoWSignDate")					{ /* --- good to go */ }
+					else if(action == "AJAX_updateSoWCustomField")				{ /* --- good to go */ }
 					else if(action == "AJAX_updateSoWStartDate")
 					{
 						if(db->Query("SELECT `end_date` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";"))
@@ -2005,6 +2007,7 @@ int main(void)
 			(action == "AJAX_updateSoWSignDate")				||
 			(action == "AJAX_updateSoWStartDate")				||
 			(action == "AJAX_updateSoWEndDate")					||
+			(action == "AJAX_updateSoWCustomField")				||
 
 			(action == "AJAX_updatePeriodStart")				||
 			(action == "AJAX_updatePeriodEnd")					||

@@ -1,12 +1,8 @@
 #include "generalimageuploader.h"	 
 
-bool ImageSaveAsJpg(const string src, const string dst, string itemType)
+static bool ImageSaveAsJpg(const string src, const string dst, string itemType)
 {
-	{
-		CLog	log;
-
-		log.Write(DEBUG, string(__func__) + "(" + src + ", " + dst + ")[" + to_string(__LINE__) + "]: start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 #ifndef IMAGEMAGICK_DISABLE
 	// Construct the image object. Seperating image construction from the
@@ -62,29 +58,34 @@ bool ImageSaveAsJpg(const string src, const string dst, string itemType)
 	}
 	catch( Magick::Exception &error_ )
 	{
-		{
-			CLog	log;
-			log.Write(DEBUG, string(__func__) + "(" + src + ", " + dst + ")[" + to_string(__LINE__) + "]: exception in read/write operation [" + error_.what() + "]");
-		}
+		MESSAGE_DEBUG("", "", "exception in read/write operation [" + error_.what() + "]");
+		
 		return false;
 	}
-	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "(" + src + ", " + dst + ")[" + to_string(__LINE__) + "]: finish (image has been successfully converted to .jpg format)");
-	}
+
+	MESSAGE_DEBUG("", "", "finish (image(" + src + " -> " + dst + ") has been successfully converted to .jpg format)");
+
 	return true;
 #else
-	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "(" + src + ", " + dst + ")[" + to_string(__LINE__) + "]: simple file coping, because ImageMagick++ is not activated");
-	}
+	MESSAGE_DEBUG("", "", "start (" + src + " -> " + dst + ") simple file coping, because ImageMagick++ is not activated");
+
 	CopyFile(src, dst);
-	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "(" + src + ", " + dst + ")[" + to_string(__LINE__) + "]: finish");
-	}
+
+	MESSAGE_DEBUG("", "", "finish (image(" + src + " -> " + dst + ")");
+
 	return  true;
 #endif
+}
+
+static bool BlindCopy(const string src, const string dst, string itemType)
+{
+	MESSAGE_DEBUG("", "", "start (" + src + " -> " + dst + ")");
+
+	CopyFile(src, dst);
+
+	MESSAGE_DEBUG("", "", "finish (image(" + src + " -> " + dst + ")");
+
+	return  true;
 }
 
 int main()
@@ -136,120 +137,35 @@ int main()
 #endif
 		action = indexPage.GetVarsHandler()->Get("action");
 		{
-			CLog	log;
-
-			log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: action = " + action);
+			MESSAGE_DEBUG("", "", "action taken from HTTP is " + action);
 		}
 
 
 
 	// ------------ generate common parts
 		{
-			ostringstream			query, ost1, ost2;
-			string				partNum;
-			map<string, string>		menuHeader;
-			map<string, string>::iterator	iterMenuHeader;
-			string				content;
 
+// TODO: remove now
+/*
 			indexPage.RegisterVariableForce("rand", GetRandom(10));
 			indexPage.RegisterVariableForce("random", GetRandom(10));
 			indexPage.RegisterVariableForce("style", "style.css");
-
+*/
 
 #ifndef IMAGEMAGICK_DISABLE
 			Magick::InitializeMagick(NULL);
 #endif
 
-	//------- Generate session
+			if(RegisterInitialVariables(&indexPage, &db, &user))
 			{
-				string			lng, sessidHTTP;
-				ostringstream	ost;
-
-
-				sessidHTTP = indexPage.SessID_Get_FromHTTP();
-				if(sessidHTTP.length() < 5) {
-					{
-						CLog	log;
-						log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: session cookie is not exist, generating new session.");
-					}
-					sessidHTTP = indexPage.SessID_Create_HTTP_DB();
-					if(sessidHTTP.length() < 5) {
-						CLog	log;
-						log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: in generating session ID");
-						throw CExceptionHTML("session can't be created");
-					}
-				} 
-				else {
-					if(indexPage.SessID_Load_FromDB(sessidHTTP)) 
-					{
-						if(indexPage.SessID_CheckConsistency()) 
-						{
-							if(indexPage.SessID_Update_HTTP_DB()) 
-							{
-								indexPage.RegisterVariableForce("loginUser", "");
-
-								if(indexPage.SessID_Get_UserFromDB() != "Guest") {
-									user.SetDB(&db);
-									user.GetFromDBbyEmail(indexPage.SessID_Get_UserFromDB());
-									indexPage.RegisterVariableForce("loginUser", indexPage.SessID_Get_UserFromDB());
-									{
-										CLog	log;
-										ostringstream	ost;
-
-										log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: user [" + user.GetLogin() + "] logged in");
-									}
-								}
-								else
-								{
-									indexPage.RegisterVariableForce("ErrorDescription", "ERROR: user not signed in (Guest user)");
-
-									{
-										CLog	log;
-										log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: user not signed in (Guest user)");
-									}
-								}
-							}
-							else
-							{
-								indexPage.RegisterVariableForce("ErrorDescription", "ERROR: update session in HTTP or DB failed");
-
-								{
-									CLog	log;
-									log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: update session in HTTP or DB failed");
-								}
-							}
-						}
-						else {
-							indexPage.RegisterVariableForce("ErrorDescription", "ERROR: session consistency check failed");
-
-							{
-								CLog	log;
-								log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: session consistency check failed");
-							}
-						}
-					}
-					else 
-					{
-						ostringstream	ost;
-
-						{
-							CLog	log;
-							log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: cookie session and DB session is not equal. Need to recreate session");
-						}
-
-						ost.str("");
-						ost << "/?rand=" << GetRandom(10);
-
-						if(!indexPage.Cookie_Expire()) 
-						{
-							CLog	log;
-							log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: in session expiration");
-						}
-						indexPage.Redirect(ost.str().c_str());
-					} // --- if(indexPage.SessID_Load_FromDB(sessidHTTP)) 
-				} // --- if(sessidHTTP.length() < 5)
 			}
-	//------- End generate session
+			else
+			{
+				MESSAGE_ERROR("", "", "RegisterInitialVariables failed, throwing exception");
+				throw CExceptionHTML("environment variable error");
+			}
+
+			action = GenerateSession(action, &indexPage, &db, &user);
 		}
 	// ------------ end generate common parts
 
@@ -267,57 +183,56 @@ int main()
 					if(indexPage.GetFilesHandler()->Count() == 1)
 					{
 						// --- number uploaded files = 1
-						for(int filesCounter = 0; filesCounter < indexPage.GetFilesHandler()->Count(); filesCounter++)
+						for(auto filesCounter = 0; filesCounter < indexPage.GetFilesHandler()->Count(); ++filesCounter)
 						{
 							FILE			*f;
-							int				folderID = (int)(rand()/(RAND_MAX + 1.0) * GetSpecificData_GetNumberOfFolders(itemType)) + 1;
-							string			filePrefix = GetRandom(20);
-							string			finalFilename, originalFilename, preFinalFilename, fileName, fileExtention;
-							ostringstream   ost;
+							auto			folderID = 0;
+							auto			filePrefix = GetRandom(20);
+							auto			finalFilename = ""s;
+							auto			originalFilename = ""s;
+							auto			preFinalFilename = ""s;
+							auto			fileName = ""s;
+							auto			fileExtention = ""s;
+							auto			save_func = ImageSaveAsJpg;
 
-							if(indexPage.GetFilesHandler()->GetSize(filesCounter) > GetSpecificData_GetMaxFileSize(itemType)) 
+							if(indexPage.GetFilesHandler()->GetSize(filesCounter) > GetSpecificData_GetMaxFileSize(itemType))
 							{
-								CLog			log;
-								ostringstream   ost;
-
-								ost.str("");
-								ost << string(__func__) << "[" << to_string(__LINE__) << "]:ERROR: file [" << indexPage.GetFilesHandler()->GetName(filesCounter) << "] size exceed permited maximum: " << indexPage.GetFilesHandler()->GetSize(filesCounter) << " > " << GetSpecificData_GetMaxFileSize(itemType);
-
-								log.Write(ERROR, ost.str());
+								MESSAGE_ERROR("", "", "file [" + indexPage.GetFilesHandler()->GetName(filesCounter) + "] size exceed permited maximum: " + to_string(indexPage.GetFilesHandler()->GetSize(filesCounter)) + " > " + to_string(GetSpecificData_GetMaxFileSize(itemType)));
 								throw CExceptionHTML("file size exceed", indexPage.GetFilesHandler()->GetName(filesCounter));
 							}
 
 							//--- check logo file existing
 							do
 							{
-								ostringstream   ost;
-								string		  tmp;
-								std::size_t  foundPos;
+								auto		  	tmp = indexPage.GetFilesHandler()->GetName(filesCounter);
+								auto		  	foundPos = tmp.rfind(".");
 
-								folderID = (int)(rand()/(RAND_MAX + 1.0) * GetSpecificData_GetNumberOfFolders(itemType)) + 1;
-								filePrefix = GetRandom(20);
-								tmp = indexPage.GetFilesHandler()->GetName(filesCounter);
+								folderID	= (int)(rand()/(RAND_MAX + 1.0) * GetSpecificData_GetNumberOfFolders(itemType)) + 1;
+								filePrefix	= GetRandom(20);
 
-								if((foundPos = tmp.rfind(".")) != string::npos) 
+								if(foundPos != string::npos) 
 								{
 									fileExtention = tmp.substr(foundPos, tmp.length() - foundPos);
+
+						            // --- filter wrong fileExtension (for ex: .com?action=fake_action) 
+						            if(fileExtention.find("jpeg")) fileExtention = ".jpeg";
+						            else if(fileExtention.find("png")) fileExtention = ".png";
+						            else if(fileExtention.find("gif")) fileExtention = ".gif";
+						            else if(fileExtention.find("svg")) fileExtention = ".svg";
+						            else if(fileExtention.find("xml")) fileExtention = ".xml";
+						            else if(fileExtention.find("txt")) fileExtention = ".txt";
+						            else fileExtention = ".jpg";
 								}
 								else
 								{
 									fileExtention = ".jpg";
 								}
 
-								ost.str("");
-								ost << GetSpecificData_GetBaseDirectory(itemType) << "/" << folderID << "/" << filePrefix << ".jpg";
-								finalFilename = ost.str();
 
-								ost.str("");
-								ost << "/tmp/tmp_" << filePrefix << fileExtention;
-								originalFilename = ost.str();
+								originalFilename = "/tmp/tmp_" + filePrefix + fileExtention;
+								preFinalFilename = "/tmp/" + filePrefix + ".jpg";
+								finalFilename = GetSpecificData_GetBaseDirectory(itemType) + "/" + to_string(folderID) + "/" + filePrefix + GetSpecificData_GetFinalFileExtenstion(itemType);
 
-								ost.str("");
-								ost << "/tmp/" << filePrefix << ".jpg";
-								preFinalFilename = ost.str();
 							} while(isFileExists(finalFilename) || isFileExists(originalFilename) || isFileExists(preFinalFilename));
 
 							MESSAGE_DEBUG("", "", "Save file to /tmp for checking of image validity [" + originalFilename + "]");
@@ -327,44 +242,45 @@ int main()
 							if(f == NULL)
 							{
 								{
-									CLog			log;
-
-									log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: writing file:", originalFilename.c_str());
+									MESSAGE_ERROR("", "", "fail to write file " + originalFilename);
 									throw CExceptionHTML("file write error", indexPage.GetFilesHandler()->GetName(filesCounter));
 								}
 							}
 							fwrite(indexPage.GetFilesHandler()->Get(filesCounter), indexPage.GetFilesHandler()->GetSize(filesCounter), 1, f);
 							fclose(f);
 
-							if(ImageSaveAsJpg(originalFilename, preFinalFilename, itemType))
+							// --- scoping
+							{
+								auto	file_type = GetSpecificData_GetDataTypeByItemType(itemType);
+
+								if(file_type == "image")			save_func = ImageSaveAsJpg;
+								else if(file_type == "template")	save_func = BlindCopy;
+							}
+							// if(ImageSaveAsJpg(originalFilename, preFinalFilename, itemType))
+							if(save_func(originalFilename, preFinalFilename, itemType))
 							{
 
-								{
-									CLog	log;
-									ostringstream   ost;
-
-									ost << string(__func__) << "[" << to_string(__LINE__) << "]: choosen filename for [" << finalFilename << "]";
-									log.Write(DEBUG, ost.str());
-								}
+								MESSAGE_DEBUG("", "", "final filename is " + finalFilename + "");
 
 								// --- Don't forget to remove previous logo
 								if(db.Query(GetSpecificData_SelectQueryItemByID(itemID, itemType)))
 								{
-									string  currLogo = GetSpecificData_GetBaseDirectory(itemType) + "/" + db.Get(0, GetSpecificData_GetDBCoverPhotoFolderString(itemType).c_str()) + "/" + db.Get(0, GetSpecificData_GetDBCoverPhotoFilenameString(itemType).c_str());
+									auto  currLogo = GetSpecificData_GetBaseDirectory(itemType) + (GetSpecificData_GetDBCoverPhotoFolderString(itemType).length() ? "/"s + db.Get(0, GetSpecificData_GetDBCoverPhotoFolderString(itemType)) : "") + "/" + db.Get(0, GetSpecificData_GetDBCoverPhotoFilenameString(itemType));
 
 									if(isFileExists(currLogo)) 
 									{
-										{
-											CLog			log;
-											log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: remove current logo (" + currLogo + ")");
-										}
+										MESSAGE_DEBUG("", "", "unlink current file " + currLogo);
 										unlink(currLogo.c_str());
+									}
+									else
+									{
+										MESSAGE_DEBUG("", "", "file " + currLogo + " doesn't exists");
 									}
 								}
 
 								CopyFile(preFinalFilename, finalFilename);
 
-								db.Query(GetSpecificData_UpdateQueryItemByID(itemID, itemType, to_string(folderID), filePrefix  + ".jpg"));
+								db.Query(GetSpecificData_UpdateQueryItemByID(itemID, itemType, to_string(folderID), filePrefix  + GetSpecificData_GetFinalFileExtenstion(itemType)));
 								{
 									if(filesCounter == 0) ostJSONResult << "[" << std::endl;
 									if(filesCounter  > 0) ostJSONResult << ",";
@@ -373,8 +289,15 @@ int main()
 									ostJSONResult << "\"textStatus\": \"\",";
 									ostJSONResult << "\"fileName\": \"" << indexPage.GetFilesHandler()->GetName(filesCounter) << "\" ,";
 									ostJSONResult << "\"jqXHR\": \"\",";
-									ostJSONResult << "\"" + GetSpecificData_GetDBCoverPhotoFolderString(itemType) + "\": \"" << folderID << "\",";
-									ostJSONResult << "\"" + GetSpecificData_GetDBCoverPhotoFilenameString(itemType) + "\": \"" << filePrefix << ".jpg\"";
+									if(GetSpecificData_GetDBCoverPhotoFolderString(itemType).length())
+									{
+										ostJSONResult << "\"" + GetSpecificData_GetDBCoverPhotoFolderString(itemType) + "\": \"" << folderID << "\",";
+										ostJSONResult << "\"" + GetSpecificData_GetDBCoverPhotoFilenameString(itemType) + "\": \"" << filePrefix << ".jpg\"";
+									}
+									else
+									{
+										ostJSONResult << "\"" + GetSpecificData_GetDBCoverPhotoFilenameString(itemType) + "\": \"" << folderID << "/" << filePrefix << ".jpg\"";
+									}
 									ostJSONResult << "}";
 									if(filesCounter == (indexPage.GetFilesHandler()->Count() - 1)) ostJSONResult << "]";
 								}
@@ -382,20 +305,13 @@ int main()
 							}
 							else
 							{
-								{
-									ostringstream   ost;
-									CLog			log;
-
-									ost.clear();
-									ost << __func__ << "[" << __LINE__ << "]: file [" << indexPage.GetFilesHandler()->GetName(filesCounter) << "] is not valid image";
-									log.Write(DEBUG, ost.str());
-								}
+								MESSAGE_DEBUG("", "", "fail to save " + indexPage.GetFilesHandler()->GetName(filesCounter) + ". Probably it is not an image file.");
 
 								if(filesCounter == 0) ostJSONResult << "[" << std::endl;
 								if(filesCounter  > 0) ostJSONResult << ",";
 								ostJSONResult << "{" << std::endl;
 								ostJSONResult << "\"result\": \"error\"," << std::endl;
-								ostJSONResult << "\"textStatus\": \"wrong format\"," << std::endl;
+								ostJSONResult << "\"textStatus\": \"" << utf8_to_cp1251(gettext("wrong format")) << "\"," << std::endl;
 								ostJSONResult << "\"fileName\": \"" << indexPage.GetFilesHandler()->GetName(filesCounter) << "\" ," << std::endl;
 								ostJSONResult << "\"jqXHR\": \"\"" << std::endl;
 								ostJSONResult << "}" << std::endl;
@@ -411,14 +327,13 @@ int main()
 					else
 					{
 						{
-							CLog	log;
-							log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]: ERROR: number uploaded images=" + to_string(indexPage.GetFilesHandler()->Count()) + ", but must be 1");
+							MESSAGE_ERROR("", "", "number uploaded images is " + to_string(indexPage.GetFilesHandler()->Count()) + ", but must be 1");
 						}
 
 						ostJSONResult.str("");
 						ostJSONResult << "{" << std::endl;
 						ostJSONResult << "\"result\": \"error\"," << std::endl;
-						ostJSONResult << "\"textStatus\": \"number uploaded images must be 1\"," << std::endl;
+						ostJSONResult << "\"textStatus\": \"" << utf8_to_cp1251(gettext("number uploaded images must be 1")) << "\"," << std::endl;
 						ostJSONResult << "\"fileName\": \"\" ," << std::endl;
 						ostJSONResult << "\"jqXHR\": \"\"" << std::endl;
 						ostJSONResult << "}" << std::endl;
@@ -427,15 +342,14 @@ int main()
 				else
 				{
 					{
-						CLog	log;
 						// --- it could be DEBUG level
-						log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]: ERROR: access to " + itemType + "(" + itemID + ") denied for user(" + user.GetID() + ")");
+						MESSAGE_ERROR("", "", "access to " + itemType + "(" + itemID + ") denied for user(" + user.GetID() + ")");
 					}
 
 					ostJSONResult.str("");
 					ostJSONResult << "{";
 					ostJSONResult << "\"result\": \"error\",";
-					ostJSONResult << "\"textStatus\": \"У Вас нет доступа\",";
+					ostJSONResult << "\"textStatus\": \"" << utf8_to_cp1251(gettext("Access prohibited")) << "\",";
 					ostJSONResult << "\"fileName\": \"\" ,";
 					ostJSONResult << "\"jqXHR\": \"\"";
 					ostJSONResult << "}";
@@ -446,8 +360,7 @@ int main()
 			else
 			{
 				{
-					CLog	log;
-					log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]: ERROR: itemID or itemType parameter missed");
+					MESSAGE_ERROR("", "", "itemID or itemType parameter missed");
 				}
 
 				ostringstream   ost;
@@ -455,7 +368,7 @@ int main()
 				ost.str("");
 				ost << "{" << std::endl;
 				ost << "\"result\": \"error\"," << std::endl;
-				ost << "\"textStatus\": \"itemID or itemType parameter missed\"," << std::endl;
+				ost << "\"textStatus\": \"" << utf8_to_cp1251(gettext("mandatory parameter missed")) << "\"," << std::endl;
 				ost << "\"fileName\": \"\" ," << std::endl;
 				ost << "\"jqXHR\": \"\"" << std::endl;
 				ost << "}" << std::endl;
@@ -466,8 +379,7 @@ int main()
 		else
 		{
 			{
-				CLog	log;
-				log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]: ERROR: user not found or not logged in");
+				MESSAGE_ERROR("", "", "user not found or not logged in");
 			}
 
 
@@ -486,9 +398,7 @@ int main()
 
 		if(!indexPage.SetTemplate("json_response.htmlt"))
 		{
-			CLog	log;
-
-			log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: template file was missing: ", "json_response_with_braces.htmlt");
+			MESSAGE_ERROR("", "", "template file missed (json_response_with_braces.htmlt)");
 			throw CException("Template file was missing");
 		}
 
@@ -497,12 +407,10 @@ int main()
 	}
 	catch(CExceptionHTML &c)
 	{
-		CLog	log;
-
 		c.SetLanguage(indexPage.GetLanguage());
 		c.SetDB(&db);
 
-		log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: catch CExceptionHTML: exception reason: [", c.GetReason(), "]");
+		MESSAGE_ERROR("", "", "catch CExceptionHTML: exception reason (" + c.GetReason() + ")");
 
 		if(c.GetReason() == "file write error")
 		{

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-12-20 23:10-0500\n"
+"POT-Creation-Date: 2018-12-24 22:28-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -24,6 +24,9 @@ msgid_plural "%d customers"
 msgstr[0] "%d заказчику"
 msgstr[1] "%d заказчикам"
 msgstr[2] "%d заказчикам"
+
+msgid "Access prohibited"
+msgstr "Нет доступа"
 
 msgid "Agency: cost center"
 msgstr "Данные агенства: центр затрат"
@@ -48,6 +51,9 @@ msgstr "Ошибка БД"
 
 msgid "SoW"
 msgstr "SoW"
+
+msgid "SoW custom field"
+msgstr "SoW доп. поле"
 
 msgid "SoW end date changed"
 msgstr "изменилась дата окончания контракта"
@@ -76,6 +82,9 @@ msgstr "агенство не найдено"
 msgid "agreement from"
 msgstr "от"
 
+msgid "changed"
+msgstr "изменилось"
+
 msgid "cost center already exists"
 msgstr "такой центр затрат уже есть"
 
@@ -84,6 +93,9 @@ msgstr "центр затрат назначен"
 
 msgid "cost center doesn't belongs to your company"
 msgstr "Центр затрат не принадлежит компании"
+
+msgid "customer assignment outside bt travel"
+msgstr "даты командировки вне периода назначения на заказчика"
 
 msgid "dayrate changed"
 msgstr "dayrate изменился"
@@ -97,8 +109,11 @@ msgstr "с"
 msgid "mandatory parameter missed"
 msgstr "пропущен обязательный параметр"
 
+msgid "number uploaded images must be 1"
+msgstr "выберите один фаил"
+
 msgid "period start have to precede period end"
-msgstr ""
+msgstr "начало должно быть раньше окончания"
 
 msgid "position changed"
 msgstr "изменили должность"
@@ -117,3 +132,9 @@ msgstr "на"
 
 msgid "updated"
 msgstr "изменен"
+
+msgid "wrong format"
+msgstr "некорректный формат"
+
+msgid "you are not assigned to customer"
+msgstr "вы не назначены на этого заказчика"

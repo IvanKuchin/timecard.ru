@@ -74,13 +74,38 @@ c_float::c_float(string param, int prec_param)
 	}
 }
 
+void c_float::Set(string param)
+{
+	if(param.empty()) val = 0;
+	else
+	{
+		double	temp = 0;
+
+		try
+		{
+			temp = stod(FixRussianLocale(param));
+		}
+		catch(...)
+		{
+			MESSAGE_ERROR("c_float", "", "can't convert " + param + " to double");
+			temp = 0;
+		}
+
+		Set(temp);
+	}
+}
+
 auto c_float::FixRussianLocale(string param) -> string
 {
 	locale	loc;
 
+	MESSAGE_DEBUG("c_float", "", "start (" + param + ")")
+
 	if(loc.name().find("ru"))
 		if(param.find(".") != string::npos)
 			param.replace(param.find("."), 1, ",");
+
+	MESSAGE_DEBUG("c_float", "", "finish (" + param + ")")
 
 	return param;
 }

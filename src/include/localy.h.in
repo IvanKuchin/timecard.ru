@@ -30,6 +30,7 @@
 #define IMAGE_FLAGS_DIRECTORY						string(IMAGE_DIRECTORY) + string("flags")
 #define IMAGE_TEMP_DIRECTORY						string(IMAGE_DIRECTORY) + string("temp")
 #define IMAGE_EXPENSELINES_DIRECTORY				string(IMAGE_DIRECTORY) + string("expense_lines")
+#define TEMPLATE_SOW_DIRECTORY						string(IMAGEROOTDIR) + string("/html/templates")
 
 #define BROWSER_FILE_PREFIX							"/"	// for instance "\\server\folder" or "http://dev.file.serever/com"
 
@@ -47,8 +48,6 @@
 
 #define	DEFAULT_LANGUAGE							"ru"
 #define	TEMPLATE_PATH								string(ROOTDIR) + string("/cgi-bin/templates/")
-
-#define	TEMPLATE_1C_PATH							TEMPLATE_PATH + "1c"
 
 #define	LOG_FILE_MAX_LENGTH							500 // user to strip long output to log file
 #define	LOG_FILE_NAME								string(LOGDIR) + "dev." + DOMAIN_NAME + ".log"
@@ -145,6 +144,11 @@
 #define	EXPENSELINE_IMAGE_MAX_WIDTH 				1600
 #define	EXPENSELINE_IMAGE_MAX_HEIGHT				1600
 
+#define	TEMPLATE_SOW_NUMBER_OF_FOLDERS				512
+#define	TEMPLATE_SOW_MAX_FILE_SIZE					10 * 1024 * 1024 // --- 1 MegaByte
+#define	TEMPLATE_SOW_IMAGE_MAX_WIDTH 				1600
+#define	TEMPLATE_SOW_IMAGE_MAX_HEIGHT				1600
+
 
 #define	FFMPEG_FILE_NAME							"ffmpeg"
 #define	FEEDVIDEO_STDOUT							string(LOGDIR) + "dev." + DOMAIN_NAME + ".ffmpeg.stdout"
@@ -196,6 +200,7 @@
 #define	INCLUDE_BT_EXPENSE_TEMPLATES				true
 #define	DO_NOT_INCLUDE_BT							false
 #define	DO_NOT_INCLUDE_TIMECARDS					false
+#define	INCLUDE_TIMECARD_TASKS						true
 #define	DO_NOT_INCLUDE_TIMECARD_TASKS				false
 
 #define	MYSQL_DATE_FORMAT							"%Y-%m-%d"

@@ -152,15 +152,15 @@ class C_Expense
 		string					GetDate() const 								{ return date; }
 		void					SetPriceDomestic(const c_float &param)			{ price_domestic = param; }
 		c_float					GetPriceDomestic() const						{ return price_domestic; }
-		void					SetPriceDomestic(const string &param)			{ if(param.length()) try {price_domestic.Set(stod(param));} catch(...) { price_domestic.Set(0); MESSAGE_ERROR("C_Expense", "", "can't convert(" + param + ") to c_float")} }
+		void					SetPriceDomestic(const string &param)			{ price_domestic.Set(param); }
 		void					SetPriceForeign(const c_float &param)			{ price_foreign = param; }
-		void					SetPriceForeign(const string &param)			{ if(param.length()) try {price_foreign.Set(stod(param));} catch(...) { price_foreign.Set(0); MESSAGE_ERROR("C_Expense", "", "can't convert(" + param + ") to c_float")} }
+		void					SetPriceForeign(const string &param)			{ price_foreign.Set(param); }
 		c_float					GetPriceForeign() const							{ return price_foreign; }
 		void					SetCurrencyNominal(const long int param)		{ currency_nominal = param; }
 		void					SetCurrencyNominal(const string &param)			{ if(param.length()) try {currency_nominal = stol(param);} catch(...) { currency_nominal = 0; MESSAGE_ERROR("C_Expense", "", "can't convert(" + param + ") to long")} }
 		long int				GetCurrencyNominal() const						{ return currency_nominal; }
 		void					SetCurrencyValue(const c_float &param)			{ currency_value = param; }
-		void					SetCurrencyValue(const string &param)			{ if(param.length()) try { currency_value.Set(stod(param));} catch(...) { currency_value.Set(0); MESSAGE_ERROR("C_Expense", "", "can't convert(" + param + ") to c_float")} }
+		void					SetCurrencyValue(const string &param)			{ currency_value.Set(param); }
 		c_float					GetCurrencyValue() const						{ return currency_value; }
 		void					SetCurrencyName(const string &param)			{ currency_name = param; }
 		void					SetCurrencyName(string &&param) noexcept		{ currency_name = move(param); }
@@ -187,6 +187,7 @@ class C_BT
 	private:
 		string					id = "";
 		string					sow_id = "";
+		string					customer_id = "";
 		string					destination = "";
 		string					start_date = "", end_date = "";
 		string					purpose = "";
@@ -197,7 +198,9 @@ class C_BT
 		CMysql					*db = NULL;
 		CUser					*user = NULL;
 
-		bool					isSubcontractorAssignedToSow() const;
+		auto					isSubcontractorAssignedToSow() const -> bool;
+		auto					isSubcontractorAssignedToCustomerID() const -> bool;
+		auto					isCustomerAssignmentInsideBTPeriod() const -> bool;
 
 	public:
 								C_BT();
@@ -209,6 +212,9 @@ class C_BT
 		void					SetSowID(const string &param) 			{ sow_id = param; }
 		void					SetSowID(string &&param) noexcept		{ sow_id = move(param); }
 		string					GetSowID() const 						{ return sow_id; }
+		void					SetCustomerID(const string &param) 		{ customer_id = param; }
+		void					SetCustomerID(string &&param) noexcept	{ customer_id = move(param); }
+		string					GetCustomerID() const 					{ return customer_id; }
 		void					SetUserID(const string &param) 			{ user_id = param; }
 		void					SetUserID(string &&param) noexcept		{ user_id = move(param); }
 		string					GetUserID() const 						{ return user_id; }
@@ -234,12 +240,12 @@ class C_BT
 		void					AddExpense(C_Expense param) 			{ expenses.push_back(param); }
 		vector<C_Expense>		GetExpenses() const						{ return expenses; }
 
-		string					isValidToUpdate();
-		string					CheckValidity() const;
-		string					SaveToDB();
-		bool					RemoveUnsavedLinesImages() const;
+		auto					isValidToUpdate() -> string;
+		auto					CheckValidity() const -> string;
+		auto					SaveToDB() -> string;
+		auto					RemoveUnsavedLinesImages() const -> bool;
 
-		bool					AssignExpenseLineByParentRandom(C_ExpenseLine);
+		auto					AssignExpenseLineByParentRandom(C_ExpenseLine) -> bool;
 
 								~C_BT();
 };

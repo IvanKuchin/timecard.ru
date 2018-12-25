@@ -1710,7 +1710,7 @@ bool convert_cp1251_to_utf8(const char *in, char *out, int size)
 
 string	FilterCP1251Symbols(const string &src)
 {
-	string	result = "";
+	auto	result = ""s;
 
 	for(auto n:src)
 	{
@@ -1729,8 +1729,8 @@ bool isFileExists(const std::string& name)
 
 string SymbolReplace(const string where, const string src, const string dst)
 {
-	string				  result;
-	string::size_type	   pos;
+	auto				  result = ""s;
+	string::size_type	  pos;
 
 	result = where;
 
@@ -1743,14 +1743,14 @@ string SymbolReplace(const string where, const string src, const string dst)
 	return result;
 }
 
-string SymbolReplace_KeepDigitsOnly(const string where)
+auto SymbolReplace_KeepDigitsOnly(const string &where) -> string
 {
-	string				  result = where;
+	auto				  	result = where;
 	unsigned int			i = 0;
 
 	while(i < result.length())
 	{
-		char	currSymb = result.at(i);
+		auto	currSymb = result.at(i);
 
 		if((currSymb >= static_cast<char>('0')) && (currSymb <= static_cast<char>('9')))
 			i++;
@@ -7600,11 +7600,7 @@ int GetSpecificData_GetNumberOfFolders(string itemType)
 {
 	int	  result = 0;
 
-	{
-		CLog	log;
-
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	if(itemType == "certification")					result = CERTIFICATIONSLOGO_NUMBER_OF_FOLDERS;
 	else if(itemType == "course")					result = CERTIFICATIONSLOGO_NUMBER_OF_FOLDERS;
@@ -7617,17 +7613,13 @@ int GetSpecificData_GetNumberOfFolders(string itemType)
 	else if(itemType == "gift")						result = GIFTIMAGE_NUMBER_OF_FOLDERS;
 	else if(itemType == "event")					result = EVENTIMAGE_NUMBER_OF_FOLDERS;
 	else if(itemType == "expense_line")				result = EXPENSELINE_NUMBER_OF_FOLDERS;
+	else if(itemType == "template_sow")				result = TEMPLATE_SOW_NUMBER_OF_FOLDERS;
 	else
 	{
-		CLog	log;
-		log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: itemType [" + itemType + "] unknown");
+		MESSAGE_ERROR("", "", "itemType (" + itemType + ") is unknown");
 	}
 
-	{
-		CLog	log;
-
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: finish (result: " + to_string(result) + ")");
-	}
+	MESSAGE_DEBUG("", "", "finish (result = " + to_string(result) + ")");
 
 	return result;
 }
@@ -7636,11 +7628,7 @@ int GetSpecificData_GetMaxFileSize(string itemType)
 {
 	int	  result = 0;
 
-	{
-		CLog	log;
-
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	if(itemType == "certification")					result = CERTIFICATIONSLOGO_MAX_FILE_SIZE;
 	else if(itemType == "course")					result = CERTIFICATIONSLOGO_MAX_FILE_SIZE;
@@ -7653,17 +7641,13 @@ int GetSpecificData_GetMaxFileSize(string itemType)
 	else if(itemType == "gift")						result = GIFTIMAGE_MAX_FILE_SIZE;
 	else if(itemType == "event")					result = EVENTIMAGE_MAX_FILE_SIZE;
 	else if(itemType == "expense_line")				result = EXPENSELINE_MAX_FILE_SIZE;
+	else if(itemType == "template_sow")				result = TEMPLATE_SOW_MAX_FILE_SIZE;
 	else
 	{
-		CLog	log;
-		log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: itemType [" + itemType + "] unknown");
+		MESSAGE_ERROR("", "", "itemType (" + itemType + ") is unknown");
 	}
 
-	{
-		CLog	log;
-
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: finish (result: " + to_string(result) + ")");
-	}
+	MESSAGE_DEBUG("", "", "finish (result = " + to_string(result) + ")");
 
 	return result;
 }
@@ -7672,11 +7656,7 @@ unsigned int GetSpecificData_GetMaxWidth(string itemType)
 {
 	int	  result = 0;
 
-	{
-		CLog	log;
-
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	if(itemType == "certification")					result = CERTIFICATIONSLOGO_MAX_WIDTH;
 	else if(itemType == "course")					result = CERTIFICATIONSLOGO_MAX_WIDTH;
@@ -7691,15 +7671,10 @@ unsigned int GetSpecificData_GetMaxWidth(string itemType)
 	else if(itemType == "expense_line")				result = EXPENSELINE_IMAGE_MAX_WIDTH;
 	else
 	{
-		CLog	log;
-		log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: itemType [" + itemType + "] unknown");
+		MESSAGE_ERROR("", "", "itemType (" + itemType + ") is unknown");
 	}
 
-	{
-		CLog	log;
-
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: finish (result: " + to_string(result) + ")");
-	}
+	MESSAGE_DEBUG("", "", "finish (result = " + to_string(result) + ")");
 
 	return result;
 }
@@ -7708,11 +7683,7 @@ unsigned int GetSpecificData_GetMaxHeight(string itemType)
 {
 	int	  result = 0;
 
-	{
-		CLog	log;
-
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	if(itemType == "certification")					result = CERTIFICATIONSLOGO_MAX_HEIGHT;
 	else if(itemType == "course")					result = CERTIFICATIONSLOGO_MAX_HEIGHT;
@@ -7727,15 +7698,10 @@ unsigned int GetSpecificData_GetMaxHeight(string itemType)
 	else if(itemType == "expense_line")				result = EXPENSELINE_IMAGE_MAX_HEIGHT;
 	else
 	{
-		CLog	log;
-		log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: itemType [" + itemType + "] unknown");
+		MESSAGE_ERROR("", "", "itemType (" + itemType + ") is unknown");
 	}
 
-	{
-		CLog	log;
-
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: finish (result: " + to_string(result) + ")");
-	}
+	MESSAGE_DEBUG("", "", "finish (result = " + to_string(result) + ")");
 
 	return result;
 }
@@ -7744,11 +7710,7 @@ string GetSpecificData_GetBaseDirectory(string itemType)
 {
 	string	  result = "";
 
-	{
-		CLog	log;
-
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	if(itemType == "certification")					result = IMAGE_CERTIFICATIONS_DIRECTORY;
 	else if(itemType == "course")					result = IMAGE_CERTIFICATIONS_DIRECTORY;
@@ -7761,17 +7723,30 @@ string GetSpecificData_GetBaseDirectory(string itemType)
 	else if(itemType == "gift")						result = IMAGE_GIFTS_DIRECTORY;
 	else if(itemType == "event")					result = IMAGE_EVENTS_DIRECTORY;
 	else if(itemType == "expense_line")				result = IMAGE_EXPENSELINES_DIRECTORY;
+	else if(itemType == "template_sow")				result = TEMPLATE_SOW_DIRECTORY;
 	else
 	{
-		CLog	log;
-		log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: itemType [" + itemType + "] unknown");
+		MESSAGE_ERROR("", "", "itemType (" + itemType + ") is unknown");
 	}
 
+	MESSAGE_DEBUG("", "", "finish (result = " + result + ")");
+
+	return result;
+}
+
+string GetSpecificData_GetFinalFileExtenstion(string itemType)
+{
+	string	  result = ".jpg";
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(itemType == "template_sow")				result = ".txt";
+	else
 	{
-		CLog	log;
-
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: finish (result: " + result + ")");
+		MESSAGE_ERROR("", "", "default extension taken");
 	}
+
+	MESSAGE_DEBUG("", "", "finish (result = " + result + ")");
 
 	return result;
 }
@@ -7780,33 +7755,25 @@ string GetSpecificData_SelectQueryItemByID(string itemID, string itemType)
 {
 	string	  result = "";
 
-	{
-		CLog	log;
+	MESSAGE_DEBUG("", "", "start");
 
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
-	}
-
-	if(itemType == "certification")					result = "select * from `certification_tracks` where `id`=\"" + itemID + "\";";
-	else if(itemType == "course")					result = "select * from `certification_tracks` where `id`=\"" + itemID + "\";";
-	else if(itemType == "university")				result = "select * from `university` where `id`=\"" + itemID + "\";";
-	else if(itemType == "school")					result = "select * from `school` where `id`=\"" + itemID + "\";";
-	else if(itemType == "language")					result = "select * from `language` where `id`=\"" + itemID + "\";";
-	else if(itemType == "book")						result = "select * from `book` where `id`=\"" + itemID + "\";";
-	else if(itemType == "company")					result = "select * from `company` where `id`=\"" + itemID + "\";";
-	else if(itemType == "company_profile_logo")		result = "select * from `company` where `id`=\"" + itemID + "\";";
-	else if(itemType == "gift")						result = "select * from `gifts` where `id`=\"" + itemID + "\";";
-	else if(itemType == "event")					result = "select * from `events` where `id`=\"" + itemID + "\";";
+	if(itemType == "certification")					result = "SELECT * FROM `certification_tracks` WHERE `id`=\"" + itemID + "\";";
+	else if(itemType == "course")					result = "SELECT * FROM `certification_tracks` WHERE `id`=\"" + itemID + "\";";
+	else if(itemType == "university")				result = "SELECT * FROM `university` WHERE `id`=\"" + itemID + "\";";
+	else if(itemType == "school")					result = "SELECT * FROM `school` WHERE `id`=\"" + itemID + "\";";
+	else if(itemType == "language")					result = "SELECT * FROM `language` WHERE `id`=\"" + itemID + "\";";
+	else if(itemType == "book")						result = "SELECT * FROM `book` WHERE `id`=\"" + itemID + "\";";
+	else if(itemType == "company")					result = "SELECT * FROM `company` WHERE `id`=\"" + itemID + "\";";
+	else if(itemType == "company_profile_logo")		result = "SELECT * FROM `company` WHERE `id`=\"" + itemID + "\";";
+	else if(itemType == "gift")						result = "SELECT * FROM `gifts` WHERE `id`=\"" + itemID + "\";";
+	else if(itemType == "event")					result = "SELECT * FROM `events` WHERE `id`=\"" + itemID + "\";";
+	else if(itemType == "template_sow")				result = "SELECT * FROM `contract_sow_custom_fields` WHERE `id`=\"" + itemID + "\" AND `type`=\"file\";";
 	else
 	{
-		CLog	log;
-		log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: itemType [" + itemType + "] unknown");
+		MESSAGE_ERROR("", "", "itemType (" + itemType + ") is unknown");
 	}
 
-	{
-		CLog	log;
-
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: finish (result: " + result + ")");
-	}
+	MESSAGE_DEBUG("", "", "finish (result = " + result + ")");
 
 	return result;
 }
@@ -7817,47 +7784,36 @@ string GetSpecificData_UpdateQueryItemByID(string itemID, string itemType, strin
 	string		logo_folder = "";
 	string		logo_filename = "";
 
-	{
-		CLog	log;
-
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	logo_folder = GetSpecificData_GetDBCoverPhotoFolderString(itemType);
 	logo_filename = GetSpecificData_GetDBCoverPhotoFilenameString(itemType);
 
-	if(logo_folder.length() && logo_filename.length())
+	if(logo_filename.length())
 	{
-		if(itemType == "certification")					result = "update `certification_tracks` set	`" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
-		else if(itemType == "course")					result = "update `certification_tracks` set `" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
-		else if(itemType == "university")				result = "update `university` set 			`" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
-		else if(itemType == "school")					result = "update `school` set 				`" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
-		else if(itemType == "language")					result = "update `language` set 			`" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
-		else if(itemType == "book")						result = "update `book` set 				`" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
-		else if(itemType == "company")					result = "update `company` set 				`" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
-		else if(itemType == "company_profile_logo")		result = "update `company` set 				`" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
-		else if(itemType == "gift")						result = "update `gifts` set 				`" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
-		else if(itemType == "event")					result = "update `events` set 				`" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
+		if(itemType == "certification")					result = "update `certification_tracks` 		set	`" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
+		else if(itemType == "course")					result = "update `certification_tracks` 		set `" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
+		else if(itemType == "university")				result = "update `university`					set	`" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
+		else if(itemType == "school")					result = "update `school`						set `" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
+		else if(itemType == "language")					result = "update `language`						set `" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
+		else if(itemType == "book")						result = "update `book`							set `" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
+		else if(itemType == "company")					result = "update `company`						set `" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
+		else if(itemType == "company_profile_logo")		result = "update `company`						set `" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
+		else if(itemType == "gift")						result = "update `gifts`						set `" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
+		else if(itemType == "event")					result = "update `events`						set `" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
+		else if(itemType == "template_sow")				result = "update `contract_sow_custom_fields`	set `" + logo_filename + "`='" + folderID + "/" + fileName + "' where `id`=\"" + itemID + "\";";
 		else
 		{
-			CLog	log;
-			log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: itemType [" + itemType + "] unknown");
+			MESSAGE_ERROR("", "", "itemType (" + itemType + ") is unknown");
 		}
 	}
 	else
 	{
-		{
-			CLog	log;
-			log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: logo_folder or logo_filename not found for itemType [" + itemType + "]");
-		}
+		MESSAGE_ERROR("", "", "logo_filename not found for itemType (" + itemType + ")");
 	}
 
 
-	{
-		CLog	log;
-
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: finish (result: " + result + ")");
-	}
+	MESSAGE_DEBUG("", "", "finish (result = " + result + ")");
 
 	return result;
 }
@@ -7866,11 +7822,7 @@ string GetSpecificData_GetDBCoverPhotoFolderString(string itemType)
 {
 	string	  result = "";
 
-	{
-		CLog	log;
-
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	if(itemType == "certification")	 				result = "logo_folder";
 	else if(itemType == "course")	   				result = "logo_folder";
@@ -7882,17 +7834,13 @@ string GetSpecificData_GetDBCoverPhotoFolderString(string itemType)
 	else if(itemType == "company_profile_logo")		result = "logo_folder";
 	else if(itemType == "gift")	  					result = "logo_folder";
 	else if(itemType == "event")	  				result = "logo_folder";
+	else if(itemType == "template_sow")				result = "";
 	else
 	{
-		CLog	log;
-		log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: itemType [" + itemType + "] unknown");
+		MESSAGE_ERROR("", "", "itemType (" + itemType + ") is unknown");
 	}
 
-	{
-		CLog	log;
-
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: finish (result: " + result + ")");
-	}
+	MESSAGE_DEBUG("", "", "finish (result = " + result + ")");
 
 	return result;
 }
@@ -7901,11 +7849,7 @@ string GetSpecificData_GetDBCoverPhotoFilenameString(string itemType)
 {
 	string	  result = "";
 
-	{
-		CLog	log;
-
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	if(itemType == "certification")					result = "logo_filename";
 	else if(itemType == "course")					result = "logo_filename";
@@ -7917,19 +7861,30 @@ string GetSpecificData_GetDBCoverPhotoFilenameString(string itemType)
 	else if(itemType == "company_profile_logo")		result = "logo_filename";
 	else if(itemType == "gift")						result = "logo_filename";
 	else if(itemType == "event")					result = "logo_filename";
+	else if(itemType == "template_sow")				result = "value";
 	else
 	{
-		CLog	log;
-		log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: itemType [" + itemType + "] unknown");
+		MESSAGE_ERROR("", "", "itemType (" + itemType + ") is unknown");
 	}
 
-	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: finish (result: " + result + ")");
-	}
+	MESSAGE_DEBUG("", "", "finish (result = " + result + ")");
 
 	return result;
 }
+
+string GetSpecificData_GetDataTypeByItemType(const string &itemType)
+{
+	auto	result = "image"s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(itemType == "template_sow") result = "template";
+
+	MESSAGE_DEBUG("", "", "finish (result = " + result + ")");
+
+	return result;
+}
+
 
 // --- Does the owner user allowed to change it ?
 // --- For example:
@@ -7939,13 +7894,31 @@ bool GetSpecificData_AllowedToChange(string itemID, string itemType, CMysql *db,
 {
 	bool	  result = false;
 
+	MESSAGE_DEBUG("", "", "start");
+
+
+	if(itemType == "template_sow")
 	{
-		CLog	log;
-
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		if((user->GetType() == "agency"))
+		{
+			if(db->Query("SELECT `id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\" AND `allowed_change_sow`=\"Y\" AND `company_id`=("
+							"SELECT `agency_company_id` FROM `contracts_sow` WHERE `id`=("
+								"SELECT `contract_sow_id` FROM `contract_sow_custom_fields` WHERE `id`=\"" + itemID + "\""
+							")"
+						");"))
+				result = true;
+			else
+			{
+				MESSAGE_DEBUG("", "", "user.id(" + user->GetID() + ") doesn't allowed to change contract_sow_custom_fields.id(" + itemID + ")");
+			}
+		}
+		else
+		{
+			MESSAGE_DEBUG("", "", "user.type(" + user->GetType() + ") must be agency employee to change");
+		}
+		
 	}
-
-	if(itemType == "company_profile_logo")
+	else if(itemType == "company_profile_logo")
 	{
 		if((user->GetType() == "subcontractor"))
 		{
@@ -7967,7 +7940,7 @@ bool GetSpecificData_AllowedToChange(string itemID, string itemType, CMysql *db,
 		}
 		else
 		{
-
+			MESSAGE_DEBUG("", "", "user.type(" + user->GetType() + ") not allowed to change");
 		}
 
 	}
@@ -8007,10 +7980,8 @@ bool GetSpecificData_AllowedToChange(string itemID, string itemType, CMysql *db,
 			else
 			{
 				result = false;
-				{
-					CLog	log;
-					log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: user object is NULL");
-				}
+
+				MESSAGE_ERROR("", "", "user object is NULL")
 			}
 		}
 		else if(itemType == "gift")
@@ -8033,16 +8004,14 @@ bool GetSpecificData_AllowedToChange(string itemID, string itemType, CMysql *db,
 			else
 			{
 				result = false;
-				{
-					CLog	log;
-					log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: user object is NULL");
-				}
+
+				MESSAGE_ERROR("", "", "user object is NULL")
 			}
 		}
 		else
 		{
 			CLog	log;
-			log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: itemType [" + itemType + "] unknown");
+			log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: itemType (" + itemType + ") is unknown");
 		}
 	}
 	else

@@ -352,6 +352,13 @@ tuple<string, string, string> CHTML::PickFileName()
         if((foundPos = tmp.rfind(".")) != string::npos)
         {
             fileExtention = tmp.substr(foundPos, tmp.length() - foundPos);
+            
+            // --- filter wrong fileExtension (for ex: .com?action=fake_action) 
+            if(fileExtention.find("jpeg")) fileExtention = ".jpeg";
+            else if(fileExtention.find("png")) fileExtention = ".png";
+            else if(fileExtention.find("gif")) fileExtention = ".gif";
+            else if(fileExtention.find("svg")) fileExtention = ".svg";
+            else fileExtention = ".jpg";
         }
         else
         {

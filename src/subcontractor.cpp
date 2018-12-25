@@ -1551,6 +1551,7 @@ int main()
 			bt.SetUser			(&user);
 			bt.SetID			(CheckHTTPParam_Number	(http_params->Get("bt_id")));
 			bt.SetSowID			(CheckHTTPParam_Number	(http_params->Get("sow_id")));
+			bt.SetCustomerID	(CheckHTTPParam_Number	(http_params->Get("customer_id")));
 			bt.SetDestination	(CheckHTTPParam_Text	(http_params->Get("destination")));
 			bt.SetPurpose		(CheckHTTPParam_Text	(http_params->Get("bt_purpose")));
 			bt.SetStartDate		(CheckHTTPParam_Date	(http_params->Get("bt_start_date")));

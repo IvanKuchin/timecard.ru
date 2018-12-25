@@ -28,6 +28,8 @@ class c_float
 					c_float(double param,  int prec_param);
 
 		void		Set(double param) 						{ val = RoundWithPrecision(param, precision); };
+		void		Set(string param);
+
 		double		Get()	const 							{ return val; };
 		double		GetPrecision()	const					{ return precision; };
 
@@ -39,8 +41,6 @@ class c_float
 		c_float		operator/(const c_float&);
 		c_float		operator/(const long int&);
 		// c_float&	operator=(const c_float &);
-
-					~c_float()								{};
 };
 
 ostream&	operator<<(ostream& os, const c_float &);
