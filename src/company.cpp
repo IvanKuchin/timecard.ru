@@ -712,10 +712,18 @@ int main()
 
 				if(publish_period == "week")
 				{
+					// --- NOW() is datetime  format
+					// --- CURDATE() is date format
+					// --- correct usage is CURDATE(), but in INSERT statement doesn't matter
+					// --- CURDATE() must be used in comparison
 					publish_finish = "(NOW() + INTERVAL 7 DAY)";
 				}
 				else if(publish_period == "month")
 				{
+					// --- NOW() is datetime  format
+					// --- CURDATE() is date format
+					// --- correct usage is CURDATE(), but in INSERT statement doesn't matter
+					// --- CURDATE() must be used in comparison
 					publish_finish = "(NOW() + INTERVAL 31 DAY)";
 				}
 				else
@@ -1432,10 +1440,18 @@ int main()
 
 				if(publish_period == "week")
 				{
+					// --- NOW() is datetime  format
+					// --- CURDATE() is date format
+					// --- correct usage is CURDATE(), but in INSERT statement doesn't matter
+					// --- CURDATE() must be used in comparison
 					publish_finish = "(NOW() + INTERVAL 7 DAY)";
 				}
 				else if(publish_period == "month")
 				{
+					// --- NOW() is datetime  format
+					// --- CURDATE() is date format
+					// --- correct usage is CURDATE(), but in INSERT statement doesn't matter
+					// --- CURDATE() must be used in comparison
 					publish_finish = "(NOW() + INTERVAL 31 DAY)";
 				}
 				else

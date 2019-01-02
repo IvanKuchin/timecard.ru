@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-12-24 22:28-0500\n"
+"POT-Creation-Date: 2018-12-29 23:14-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -24,6 +24,13 @@ msgid_plural "%d customers"
 msgstr[0] "%d заказчику"
 msgstr[1] "%d заказчикам"
 msgstr[2] "%d заказчикам"
+
+#, c-format
+msgid "%d subcontractors"
+msgid_plural "%d subcontractors"
+msgstr[0] "%d субконтрактору"
+msgstr[1] "%d субконтракторам"
+msgstr[2] "%d субконтракторам"
 
 msgid "Access prohibited"
 msgstr "Нет доступа"
@@ -43,8 +50,23 @@ msgstr "Данные агенства: описание центра затра�
 msgid "Agency: cost center title updated"
 msgstr "Данные агенства: название центра затрат изменено"
 
+msgid "Cost Center"
+msgstr "Центр Затрат"
+
+msgid "Cost Center: number"
+msgstr "Центр Затрат: номер договора"
+
 msgid "Employee data"
 msgstr "Данные сотрудника"
+
+msgid "PSoW"
+msgstr "PSoW"
+
+msgid "PSoW number already exists"
+msgstr "PSoW с таким номером уже есть"
+
+msgid "PSoW: number"
+msgstr "PSoW: номер договора"
 
 msgid "SQL syntax issue"
 msgstr "Ошибка БД"
@@ -52,26 +74,17 @@ msgstr "Ошибка БД"
 msgid "SoW"
 msgstr "SoW"
 
-msgid "SoW custom field"
-msgstr "SoW доп. поле"
-
-msgid "SoW end date changed"
-msgstr "изменилась дата окончания контракта"
-
 msgid "SoW number already exists"
 msgstr "SoW с таким номером уже есть"
-
-msgid "SoW sign date changed"
-msgstr "изменилась дата начала контракта"
-
-msgid "SoW start date changed"
-msgstr "изменилась дата подписания контракта"
 
 msgid "SoW: number"
 msgstr "SoW: номер договора"
 
 msgid "Subcontractor reported time on"
 msgstr "Субконтрактор отчитался за"
+
+msgid "This task assigned to cost center"
+msgstr "Этой задаче назначена Центр Затрат"
 
 msgid "act number"
 msgstr "номер акта"
@@ -94,6 +107,9 @@ msgstr "центр затрат назначен"
 msgid "cost center doesn't belongs to your company"
 msgstr "Центр затрат не принадлежит компании"
 
+msgid "custom field"
+msgstr "доп. поле"
+
 msgid "customer assignment outside bt travel"
 msgstr "даты командировки вне периода назначения на заказчика"
 
@@ -102,6 +118,9 @@ msgstr "dayrate изменился"
 
 msgid "description updated"
 msgstr "описание изменено"
+
+msgid "end date changed"
+msgstr "изменилась дата окончания контракта"
 
 msgid "from"
 msgstr "с"
@@ -126,6 +145,12 @@ msgstr "Нельзя удалить"
 
 msgid "removed"
 msgstr "удален"
+
+msgid "sign date changed"
+msgstr "изменилась дата начала контракта"
+
+msgid "start date changed"
+msgstr "изменилась дата подписания контракта"
 
 msgid "to"
 msgstr "на"

@@ -7518,12 +7518,12 @@ string	SaveImageFileFromHandler(string f_name, string f_type, CFiles *files)
 	{
 		if(f_type.length())
 		{
-			int			folderID = 0;
 			string		filePrefix = "";
 			string		finalFilename, originalFilename, preFinalFilename, fileName, fileExtention;
 
 			if(files->GetSize(f_name) && (files->GetSize(f_name) <= GetSpecificData_GetMaxFileSize(f_type)))
 			{
+				int		folderID = 0;
 				FILE	*f;
 
 				//--- check logo file existing
@@ -7614,6 +7614,7 @@ int GetSpecificData_GetNumberOfFolders(string itemType)
 	else if(itemType == "event")					result = EVENTIMAGE_NUMBER_OF_FOLDERS;
 	else if(itemType == "expense_line")				result = EXPENSELINE_NUMBER_OF_FOLDERS;
 	else if(itemType == "template_sow")				result = TEMPLATE_SOW_NUMBER_OF_FOLDERS;
+	else if(itemType == "template_psow")			result = TEMPLATE_PSOW_NUMBER_OF_FOLDERS;
 	else
 	{
 		MESSAGE_ERROR("", "", "itemType (" + itemType + ") is unknown");
@@ -7642,6 +7643,7 @@ int GetSpecificData_GetMaxFileSize(string itemType)
 	else if(itemType == "event")					result = EVENTIMAGE_MAX_FILE_SIZE;
 	else if(itemType == "expense_line")				result = EXPENSELINE_MAX_FILE_SIZE;
 	else if(itemType == "template_sow")				result = TEMPLATE_SOW_MAX_FILE_SIZE;
+	else if(itemType == "template_psow")			result = TEMPLATE_PSOW_MAX_FILE_SIZE;
 	else
 	{
 		MESSAGE_ERROR("", "", "itemType (" + itemType + ") is unknown");
@@ -7724,6 +7726,7 @@ string GetSpecificData_GetBaseDirectory(string itemType)
 	else if(itemType == "event")					result = IMAGE_EVENTS_DIRECTORY;
 	else if(itemType == "expense_line")				result = IMAGE_EXPENSELINES_DIRECTORY;
 	else if(itemType == "template_sow")				result = TEMPLATE_SOW_DIRECTORY;
+	else if(itemType == "template_psow")			result = TEMPLATE_PSOW_DIRECTORY;
 	else
 	{
 		MESSAGE_ERROR("", "", "itemType (" + itemType + ") is unknown");
@@ -7741,6 +7744,7 @@ string GetSpecificData_GetFinalFileExtenstion(string itemType)
 	MESSAGE_DEBUG("", "", "start");
 
 	if(itemType == "template_sow")				result = ".txt";
+	else if(itemType == "template_psow")		result = ".txt";
 	else
 	{
 		MESSAGE_ERROR("", "", "default extension taken");
@@ -7768,6 +7772,7 @@ string GetSpecificData_SelectQueryItemByID(string itemID, string itemType)
 	else if(itemType == "gift")						result = "SELECT * FROM `gifts` WHERE `id`=\"" + itemID + "\";";
 	else if(itemType == "event")					result = "SELECT * FROM `events` WHERE `id`=\"" + itemID + "\";";
 	else if(itemType == "template_sow")				result = "SELECT * FROM `contract_sow_custom_fields` WHERE `id`=\"" + itemID + "\" AND `type`=\"file\";";
+	else if(itemType == "template_psow")			result = "SELECT * FROM `contract_psow_custom_fields` WHERE `id`=\"" + itemID + "\" AND `type`=\"file\";";
 	else
 	{
 		MESSAGE_ERROR("", "", "itemType (" + itemType + ") is unknown");
@@ -7802,6 +7807,7 @@ string GetSpecificData_UpdateQueryItemByID(string itemID, string itemType, strin
 		else if(itemType == "gift")						result = "update `gifts`						set `" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
 		else if(itemType == "event")					result = "update `events`						set `" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
 		else if(itemType == "template_sow")				result = "update `contract_sow_custom_fields`	set `" + logo_filename + "`='" + folderID + "/" + fileName + "' where `id`=\"" + itemID + "\";";
+		else if(itemType == "template_psow")			result = "update `contract_psow_custom_fields`	set `" + logo_filename + "`='" + folderID + "/" + fileName + "' where `id`=\"" + itemID + "\";";
 		else
 		{
 			MESSAGE_ERROR("", "", "itemType (" + itemType + ") is unknown");
@@ -7835,6 +7841,7 @@ string GetSpecificData_GetDBCoverPhotoFolderString(string itemType)
 	else if(itemType == "gift")	  					result = "logo_folder";
 	else if(itemType == "event")	  				result = "logo_folder";
 	else if(itemType == "template_sow")				result = "";
+	else if(itemType == "template_psow")			result = "";
 	else
 	{
 		MESSAGE_ERROR("", "", "itemType (" + itemType + ") is unknown");
@@ -7862,6 +7869,7 @@ string GetSpecificData_GetDBCoverPhotoFilenameString(string itemType)
 	else if(itemType == "gift")						result = "logo_filename";
 	else if(itemType == "event")					result = "logo_filename";
 	else if(itemType == "template_sow")				result = "value";
+	else if(itemType == "template_psow")			result = "value";
 	else
 	{
 		MESSAGE_ERROR("", "", "itemType (" + itemType + ") is unknown");
@@ -7879,6 +7887,7 @@ string GetSpecificData_GetDataTypeByItemType(const string &itemType)
 	MESSAGE_DEBUG("", "", "start");
 
 	if(itemType == "template_sow") result = "template";
+	if(itemType == "template_psow") result = "template";
 
 	MESSAGE_DEBUG("", "", "finish (result = " + result + ")");
 
@@ -7910,6 +7919,29 @@ bool GetSpecificData_AllowedToChange(string itemID, string itemType, CMysql *db,
 			else
 			{
 				MESSAGE_DEBUG("", "", "user.id(" + user->GetID() + ") doesn't allowed to change contract_sow_custom_fields.id(" + itemID + ")");
+			}
+		}
+		else
+		{
+			MESSAGE_DEBUG("", "", "user.type(" + user->GetType() + ") must be agency employee to change");
+		}
+		
+	}
+	else if(itemType == "template_psow")
+	{
+		if((user->GetType() == "agency"))
+		{
+			if(db->Query("SELECT `id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\" AND `allowed_change_sow`=\"Y\" AND `company_id`=("
+							"SELECT `agency_company_id` FROM `contracts_sow` WHERE `id`=("
+								"SELECT `contract_sow_id` FROM `contracts_psow` WHERE `id`=("
+									"SELECT `contract_psow_id` FROM `contract_psow_custom_fields` WHERE `id`=\"" + itemID + "\""
+								")"
+							")"
+						");"))
+				result = true;
+			else
+			{
+				MESSAGE_DEBUG("", "", "user.id(" + user->GetID() + ") doesn't allowed to change contract_psow_custom_fields.id(" + itemID + ")");
 			}
 		}
 		else
@@ -8010,28 +8042,116 @@ bool GetSpecificData_AllowedToChange(string itemID, string itemType, CMysql *db,
 		}
 		else
 		{
-			CLog	log;
-			log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: itemType (" + itemType + ") is unknown");
+			MESSAGE_ERROR("", "", "itemType (" + itemType + ") is unknown");
 		}
 	}
 	else
 	{
 		result = false;
-		{
-			CLog	log;
-			// --- it could be DEBUG level
-			log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]: ERROR: " + itemType + "(" + itemID + ") not found");
-		}
-
+		
+		MESSAGE_ERROR("", "", itemType + "(" + itemID + ") not found");
 	}
 
-	{
-		CLog	log;
-
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: finish (result: " + (result ? "true" : "false") + ")");
-	}
+	MESSAGE_DEBUG("", "", "finish (result: " + (result ? "true" : "false") + ")");
 
 	return result;
+}
+
+pair<struct tm, struct tm> GetFirstAndLastDateOfThisMonth()
+{
+	time_t rawtime;
+	struct tm * timeinfo;
+
+	struct tm end_of_curr_mon, start_of_curr_mon;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	start_of_curr_mon.tm_sec	= 0;   // seconds of minutes from 0 to 61
+	start_of_curr_mon.tm_min	= 0;   // minutes of hour from 0 to 59
+	start_of_curr_mon.tm_hour	= 0;  // hours of day from 0 to 24
+	start_of_curr_mon.tm_mday	= 0;  // day of month from 1 to 31
+	start_of_curr_mon.tm_mon	= 0;   // month of year from 0 to 11
+	start_of_curr_mon.tm_year	= 0;  // year since 1900
+	start_of_curr_mon.tm_wday	= 0;  // days since sunday
+	start_of_curr_mon.tm_yday	= 0;  // days since January 1st
+	start_of_curr_mon.tm_isdst	= 0; // hours of daylight savings time
+
+	end_of_curr_mon.tm_sec	= 0;   // seconds of minutes from 0 to 61
+	end_of_curr_mon.tm_min	= 0;   // minutes of hour from 0 to 59
+	end_of_curr_mon.tm_hour	= 0;  // hours of day from 0 to 24
+	end_of_curr_mon.tm_mday	= 0;  // day of month from 1 to 31
+	end_of_curr_mon.tm_mon	= 0;   // month of year from 0 to 11
+	end_of_curr_mon.tm_year	= 0;  // year since 1900
+	end_of_curr_mon.tm_wday	= 0;  // days since sunday
+	end_of_curr_mon.tm_yday	= 0;  // days since January 1st
+	end_of_curr_mon.tm_isdst	= 0; // hours of daylight savings time
+
+	time ( &rawtime );
+	timeinfo = localtime ( &rawtime );
+
+	start_of_curr_mon.tm_year	= timeinfo->tm_year;
+	start_of_curr_mon.tm_mon	= timeinfo->tm_mon;
+	start_of_curr_mon.tm_mday	= 1;
+
+	end_of_curr_mon.tm_year		= start_of_curr_mon.tm_year;
+	end_of_curr_mon.tm_mon		= start_of_curr_mon.tm_mon + 1;
+	end_of_curr_mon.tm_mday		= 0;
+
+	mktime(&start_of_curr_mon);
+	mktime(&end_of_curr_mon);
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return make_pair(start_of_curr_mon, end_of_curr_mon);
+}
+
+pair<struct tm, struct tm> GetFirstAndLastDateOfLastMonth()
+{
+	time_t rawtime;
+	struct tm * timeinfo;
+
+	struct tm end_of_last_mon, start_of_last_mon;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	start_of_last_mon.tm_sec	= 0;   // seconds of minutes from 0 to 61
+	start_of_last_mon.tm_min	= 0;   // minutes of hour from 0 to 59
+	start_of_last_mon.tm_hour	= 0;  // hours of day from 0 to 24
+	start_of_last_mon.tm_mday	= 0;  // day of month from 1 to 31
+	start_of_last_mon.tm_mon	= 0;   // month of year from 0 to 11
+	start_of_last_mon.tm_year	= 0;  // year since 1900
+	start_of_last_mon.tm_wday	= 0;  // days since sunday
+	start_of_last_mon.tm_yday	= 0;  // days since January 1st
+	start_of_last_mon.tm_isdst	= 0; // hours of daylight savings time
+
+	end_of_last_mon.tm_sec	= 0;   // seconds of minutes from 0 to 61
+	end_of_last_mon.tm_min	= 0;   // minutes of hour from 0 to 59
+	end_of_last_mon.tm_hour	= 0;  // hours of day from 0 to 24
+	end_of_last_mon.tm_mday	= 0;  // day of month from 1 to 31
+	end_of_last_mon.tm_mon	= 0;   // month of year from 0 to 11
+	end_of_last_mon.tm_year	= 0;  // year since 1900
+	end_of_last_mon.tm_wday	= 0;  // days since sunday
+	end_of_last_mon.tm_yday	= 0;  // days since January 1st
+	end_of_last_mon.tm_isdst	= 0; // hours of daylight savings time
+
+
+	time ( &rawtime );
+	timeinfo = localtime ( &rawtime );
+
+	start_of_last_mon.tm_year	= timeinfo->tm_year;
+	start_of_last_mon.tm_mon	= timeinfo->tm_mon - 1;
+	start_of_last_mon.tm_mday	= 1;
+
+	end_of_last_mon.tm_year		= start_of_last_mon.tm_year;
+	end_of_last_mon.tm_mon		= start_of_last_mon.tm_mon + 1;
+	end_of_last_mon.tm_mday		= 0;
+
+	mktime(&start_of_last_mon);
+	mktime(&end_of_last_mon);
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return make_pair(start_of_last_mon, end_of_last_mon);
 }
 
 struct tm GetTMObject(string date)
@@ -8160,6 +8280,15 @@ string PrintDate(const struct tm &_tm)
 	string	result = "";
 
 	result = to_string(_tm.tm_mday) + "/" + to_string(_tm.tm_mon + 1) + "/" + to_string(_tm.tm_year + 1900);
+
+	return result;
+}
+
+string PrintSQLDate(const struct tm &_tm)
+{
+	string	result = "";
+
+	result = to_string(_tm.tm_year + 1900) + "-" + to_string(_tm.tm_mon + 1) + "-" + to_string(_tm.tm_mday);
 
 	return result;
 }

@@ -776,6 +776,11 @@ auto	GetCostCentersInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> str
 		string	id;
 		string	title;
 		string	description;
+		string	start_date;
+		string	end_date;
+		string	number;
+		string	sign_date;
+		string	act_number;
 		string	agency_company_id;
 		string	assignee_user_id;
 		string	eventTimestamp;
@@ -797,6 +802,11 @@ auto	GetCostCentersInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> str
 			item.id = db->Get(i, "id");
 			item.title = db->Get(i, "title");
 			item.description = db->Get(i, "description");
+			item.start_date = db->Get(i, "start_date");
+			item.end_date = db->Get(i, "end_date");
+			item.number = db->Get(i, "number");
+			item.sign_date = db->Get(i, "sign_date");
+			item.act_number = db->Get(i, "act_number");
 			item.agency_company_id = db->Get(i, "agency_company_id");
 			item.assignee_user_id = db->Get(i, "assignee_user_id");
 			item.eventTimestamp = db->Get(i, "eventTimestamp");
@@ -812,6 +822,11 @@ auto	GetCostCentersInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> str
 			result += "\"id\":\"" + item.id + "\",";
 			result += "\"title\":\"" + item.title + "\",";
 			result += "\"description\":\"" + item.description + "\",";
+			result += "\"start_date\":\"" + item.start_date + "\",";
+			result += "\"end_date\":\"" + item.end_date + "\",";
+			result += "\"number\":\"" + item.number + "\",";
+			result += "\"sign_date\":\"" + item.sign_date + "\",";
+			result += "\"act_number\":\"" + item.act_number + "\",";
 			result += "\"agency_company_id\":\"" + item.agency_company_id + "\",";
 			result += "\"assignee_user_id\":\"" + item.assignee_user_id + "\",";
 			result += "\"eventTimestamp\":\"" + item.eventTimestamp + "\"";
@@ -995,7 +1010,91 @@ string	GetBTsInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool isExten
 }
 
 
-auto	GetSOWInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include_tasks, bool include_bt) -> string
+auto	GetPSoWInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
+{
+	int		affected;
+	string	result;
+
+	struct ItemClass
+	{
+		string	id;
+		string	contract_sow_id;
+		string	cost_center_id;
+		string	company_position_id;
+		string	start_date;
+		string	end_date;
+		string	number;
+		string	day_rate;
+		string	act_number;
+		string	sign_date;
+		string	eventTimestamp;
+	};
+	vector<ItemClass>		itemsList;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	affected = db->Query(sqlQuery);
+	if(affected)
+	{
+		for(int i = 0; i < affected; i++)
+		{
+			ItemClass	item;
+
+			item.id = db->Get(i, "id");
+			item.contract_sow_id = db->Get(i, "contract_sow_id");
+			item.cost_center_id = db->Get(i, "cost_center_id");
+			item.company_position_id = db->Get(i, "company_position_id");
+			item.start_date = db->Get(i, "start_date");
+			item.end_date = db->Get(i, "end_date");
+			item.number = db->Get(i, "number");
+			item.day_rate = db->Get(i, "day_rate");
+			item.act_number = db->Get(i, "act_number");
+			item.sign_date = db->Get(i, "sign_date");
+			item.eventTimestamp = db->Get(i, "eventTimestamp");
+
+			itemsList.push_back(item);
+		}
+
+		for (const auto& item : itemsList)
+		{
+			if(result.length()) result += ",";
+			result +=	"{";
+
+			result += "\"id\":\"" + item.id + "\",";
+			result += "\"contract_sow_id\":\"" + item.contract_sow_id + "\",";
+			result += "\"cost_center_id\":\"" + item.cost_center_id + "\",";
+			result += "\"company_position_id\":\"" + item.company_position_id + "\",";
+			result += "\"company_positions\":[" + GetCompanyPositionsInJSONFormat("SELECT * FROM `company_position` WHERE `id`=\"" + item.company_position_id + "\";", db, user) + "],";
+			result += "\"start_date\":\"" + item.start_date + "\",";
+			result += "\"end_date\":\"" + item.end_date + "\",";
+			result += "\"number\":\"" + item.number + "\",";
+			result += "\"day_rate\":\"" + item.day_rate + "\",";
+			result += "\"act_number\":\"" + item.act_number + "\",";
+			result += "\"sign_date\":\"" + item.sign_date + "\",";
+			result += "\"custom_fields\":[" + GetPSoWCustomFieldsInJSONFormat("SELECT * FROM `contract_psow_custom_fields` WHERE `contract_psow_id`=\"" + item.id + "\" "
+						+ (user->GetType() == "subcontractor" ? " AND (`visible_by_subcontractor`=\"Y\" OR `editable_by_subcontractor`=\"Y\") " : "")
+						+ ";", db, user)
+						+ "],";
+			result += "\"eventTimestamp\":\"" + item.eventTimestamp + "\"";
+
+			result +=	"}";
+		}
+	}
+	else
+	{
+		{
+			MESSAGE_DEBUG("", "", "user (" + user->GetID() + ") timecard is empty");
+		}
+	}
+
+	{
+		MESSAGE_DEBUG("", "", "finish");
+	}
+
+	return result;
+}
+
+auto	GetSOWInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include_tasks, bool include_bt, bool include_cost_centers) -> string
 {
 	auto	affected = 0;
 	auto	result = ""s;
@@ -1083,6 +1182,17 @@ auto	GetSOWInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include_t
 						+ (user->GetType() == "subcontractor" ? " AND (`visible_by_subcontractor`=\"Y\" OR `editable_by_subcontractor`=\"Y\") " : "")
 						+ ";", db, user)
 						+ "],";
+			result += "\"cost_centers\":[" + (include_cost_centers ? GetCostCentersInJSONFormat(
+																		"SELECT * FROM `cost_centers` WHERE `id` IN ("
+																			"SELECT `cost_center_id` FROM `cost_center_assignment` WHERE `timecard_customer_id` IN ("
+																				"SELECT `timecard_customers_id` FROM `timecard_projects` WHERE `id` IN ("
+																					"SELECT `timecard_projects_id` FROM `timecard_tasks` WHERE `id` IN ("
+																						"SELECT `timecard_tasks_id` FROM `timecard_task_assignment` WHERE `contract_sow_id`=\"" + item.id + "\""
+																					")"
+																				")"
+																			")"
+																		")", db, user) : "") + "],";
+			result += "\"psow\":[" + (include_cost_centers ? GetPSoWInJSONFormat("SELECT * FROM `contracts_psow` WHERE `contract_sow_id`=\"" + item.id + "\";", db, user) : "") + "],";
 			result += "\"eventTimestamp\":\"" + item.eventTimestamp + "\"";
 
 			result +=	"}";
@@ -1155,6 +1265,86 @@ auto	GetSoWCustomFieldsInJSONFormat(string sqlQuery, CMysql *db, CUser *user) ->
 
 			result += "\"id\":\""							+ item.id + "\",";
 			result += "\"contract_sow_id\":\""				+ item.contract_sow_id + "\",";
+			result += "\"title\":\""						+ item.title + "\",";
+			result += "\"description\":\""					+ item.description + "\",";
+			result += "\"type\":\""							+ item.type + "\",";
+			result += "\"var_name\":\""						+ item.var_name + "\",";
+			result += "\"value\":\""						+ item.value + "\",";
+			result += "\"visible_by_subcontractor\":\""		+ item.visible_by_subcontractor + "\",";
+			result += "\"editable_by_subcontractor\":\""	+ item.editable_by_subcontractor + "\",";
+			result += "\"owner_user_id\":\""				+ item.owner_user_id + "\",";
+			result += "\"eventTimestamp\":\""				+ item.eventTimestamp + "\"";
+
+			result +=	"}";
+		}
+	}
+	else
+	{
+		{
+			MESSAGE_DEBUG("", "", "no bt items assigned");
+		}
+	}
+
+	{
+		MESSAGE_DEBUG("", "", "finish");
+	}
+
+	return result;
+}
+
+auto	GetPSoWCustomFieldsInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
+{
+	int		affected;
+	auto	result = ""s;
+	struct ItemClass
+	{
+		string	id;
+		string	contract_psow_id;
+		string	title;
+		string	description;
+		string	type;
+		string	var_name;
+		string	value;
+		string	visible_by_subcontractor;
+		string	editable_by_subcontractor;
+		string	owner_user_id;
+		string	eventTimestamp;
+	};
+	vector<ItemClass>		itemsList;
+
+	{
+		MESSAGE_DEBUG("", "", "start");
+	}
+
+	affected = db->Query(sqlQuery);
+	if(affected)
+	{
+		for(int i = 0; i < affected; i++)
+		{
+			ItemClass	item;
+
+			item.id = db->Get(i, "id");
+			item.contract_psow_id = db->Get(i, "contract_psow_id");
+			item.title = db->Get(i, "title");
+			item.description = db->Get(i, "description");
+			item.type = db->Get(i, "type");
+			item.var_name = db->Get(i, "var_name");
+			item.value = db->Get(i, "value");
+			item.visible_by_subcontractor = db->Get(i, "visible_by_subcontractor");
+			item.editable_by_subcontractor = db->Get(i, "editable_by_subcontractor");
+			item.owner_user_id = db->Get(i, "owner_user_id");
+			item.eventTimestamp = db->Get(i, "eventTimestamp");
+
+			itemsList.push_back(item);
+		}
+
+		for (const auto& item : itemsList)
+		{
+			if(result.length()) result += ",";
+			result +=	"{";
+
+			result += "\"id\":\""							+ item.id + "\",";
+			result += "\"contract_psow_id\":\""				+ item.contract_psow_id + "\",";
 			result += "\"title\":\""						+ item.title + "\",";
 			result += "\"description\":\""					+ item.description + "\",";
 			result += "\"type\":\""							+ item.type + "\",";
@@ -2119,6 +2309,7 @@ auto	GetDBValueByAction(string action, string id, string sow_id, CMysql *db, CUs
 				if(action == "AJAX_updateCompanyBankID")			sql_query = "SELECT `bank_id`			as `value` FROM `company` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateAgencyPosition")			sql_query = "SELECT `title`				as `value` FROM `company_position` WHERE `id`=(SELECT `position_id` FROM `company_employees` WHERE `id`=\"" + id + "\");";
 				if(action == "AJAX_updateSoWPosition")				sql_query = "SELECT `title`				as `value` FROM `company_position` WHERE `id`=(SELECT `company_position_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\");";
+				if(action == "AJAX_updatePSoWPosition")				sql_query = "SELECT `title`				as `value` FROM `company_position` WHERE `id`=(SELECT `company_position_id` FROM `contracts_psow` WHERE `id`=\"" + sow_id + "\");";
 				if(action == "AJAX_updateAgencyEditCapability")		sql_query = "SELECT `allowed_change_agency_data`	as `value` FROM `company_employees` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateSoWEditCapability")		sql_query = "SELECT `allowed_change_sow`			as `value` FROM `company_employees` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateSubcontractorCreateTasks")	sql_query = "SELECT `subcontractor_create_tasks`	as `value` FROM `contracts_sow` WHERE `id`=\"" + id + "\";";
@@ -2136,6 +2327,7 @@ auto	GetDBValueByAction(string action, string id, string sow_id, CMysql *db, CUs
 				if(action == "AJAX_deleteCostCenter")						sql_query = "SELECT `id`					as `value` FROM `cost_centers` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateCostCenterTitle")					sql_query = "SELECT `title`					as `value` FROM `cost_centers` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateCostCenterDescription")			sql_query = "SELECT `description`			as `value` FROM `cost_centers` WHERE `id`=\"" + id + "\";";
+		
 				if(action == "AJAX_updateSoWNumber")						sql_query = "SELECT `number`				as `value` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 				if(action == "AJAX_updateSoWAct")							sql_query = "SELECT `act_number`			as `value` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 				if(action == "AJAX_updateSoWDayRate")						sql_query = "SELECT `day_rate`				as `value` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
@@ -2143,6 +2335,21 @@ auto	GetDBValueByAction(string action, string id, string sow_id, CMysql *db, CUs
 				if(action == "AJAX_updateSoWStartDate")						sql_query = "SELECT `start_date`			as `value` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 				if(action == "AJAX_updateSoWEndDate")						sql_query = "SELECT `end_date`				as `value` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 				if(action == "AJAX_updateSoWCustomField")					sql_query = "SELECT `value`					as `value` FROM `contract_sow_custom_fields` WHERE `id`=\"" + id + "\";";
+
+				if(action == "AJAX_updatePSoWNumber")						sql_query = "SELECT `number`				as `value` FROM `contracts_psow` WHERE `id`=\"" + sow_id + "\";";
+				if(action == "AJAX_updatePSoWAct")							sql_query = "SELECT `act_number`			as `value` FROM `contracts_psow` WHERE `id`=\"" + sow_id + "\";";
+				if(action == "AJAX_updatePSoWDayRate")						sql_query = "SELECT `day_rate`				as `value` FROM `contracts_psow` WHERE `id`=\"" + sow_id + "\";";
+				if(action == "AJAX_updatePSoWSignDate")						sql_query = "SELECT `sign_date`				as `value` FROM `contracts_psow` WHERE `id`=\"" + sow_id + "\";";
+				if(action == "AJAX_updatePSoWStartDate")					sql_query = "SELECT `start_date`			as `value` FROM `contracts_psow` WHERE `id`=\"" + sow_id + "\";";
+				if(action == "AJAX_updatePSoWEndDate")						sql_query = "SELECT `end_date`				as `value` FROM `contracts_psow` WHERE `id`=\"" + sow_id + "\";";
+				if(action == "AJAX_updatePSoWCustomField")					sql_query = "SELECT `value`					as `value` FROM `contract_psow_custom_fields` WHERE `id`=\"" + id + "\";";
+
+				if(action == "AJAX_updateCostCenterNumber")					sql_query = "SELECT `number`				as `value` FROM `cost_centers` WHERE `id`=\"" + sow_id + "\";";
+				if(action == "AJAX_updateCostCenterAct")					sql_query = "SELECT `act_number`			as `value` FROM `cost_centers` WHERE `id`=\"" + sow_id + "\";";
+				if(action == "AJAX_updateCostCenterSignDate")				sql_query = "SELECT `sign_date`				as `value` FROM `cost_centers` WHERE `id`=\"" + sow_id + "\";";
+				if(action == "AJAX_updateCostCenterStartDate")				sql_query = "SELECT `start_date`			as `value` FROM `cost_centers` WHERE `id`=\"" + sow_id + "\";";
+				if(action == "AJAX_updateCostCenterEndDate")				sql_query = "SELECT `end_date`				as `value` FROM `cost_centers` WHERE `id`=\"" + sow_id + "\";";
+				if(action == "AJAX_updateCostCenterCustomField")			sql_query = "SELECT `value`					as `value` FROM `cost_center_custom_fields` WHERE `id`=\"" + id + "\";";
 
 				if(sql_query.length())
 				{
@@ -2918,6 +3125,44 @@ string	GetBTExpensesInJSONFormat(string sqlQuery, CMysql *db, CUser *user)
 	return result;
 }
 
+auto isCostCenterBelongsToAgency(string cost_center_id, CMysql *db, CUser *user) -> bool
+{
+	auto result = false;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(db && user)
+	{
+		if(cost_center_id.length())
+		{
+			if(db->Query("SELECT `id` FROM `cost_centers` WHERE `id`=\"" + cost_center_id + "\" AND `agency_company_id`=("
+							"SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id`=("
+								"SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\""
+							")"
+						");"))
+			{
+				result = true;
+			}
+			else
+			{
+				MESSAGE_DEBUG("", "", "cost_center_id(" + cost_center_id + ") doesn't belongs to company user.id(" + user->GetID() + ") employeed");
+			}
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "cost_center_id is empty");
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "db or user not initialized");
+	}
+	
+	MESSAGE_DEBUG("", "", "finish (result is " + to_string(result) + ")");
+
+	return result;
+}
+
 string isUserAllowedAccessToBT(string bt_id, CMysql *db, CUser *user)
 {
 	string	error_message = "";
@@ -3110,7 +3355,28 @@ auto isTaskIDValidToRemove(string task_id, CMysql *db) -> string
 					string	counter = db->Get(0, "counter");
 					if(counter == "0")
 					{
-						// --- task.id valid to remve
+						if(db->Query("SELECT COUNT(*) AS `counter` FROM `cost_center_assignment` WHERE `timecard_customer_id` IN ("
+										"SELECT `timecard_customers_id` FROM `timecard_projects` WHERE `id` IN ("
+											"SELECT `timecard_projects_id` FROM `timecard_tasks` WHERE `id`=\"" + task_id + "\""
+										")"
+									");"))
+						{
+							auto	counter = stoi(db->Get(0, "counter"));
+							if(counter == 0)
+							{
+								// --- task.id valid to remve
+							}
+							else
+							{
+								MESSAGE_DEBUG("", "", "cost center assigned on task.id(" + task_id + ")");
+								error_message = utf8_to_cp1251(gettext("This task assigned to cost center")) + ". " + utf8_to_cp1251(gettext("removal prohibited")) + ".";
+							}
+						}
+						else
+						{
+							MESSAGE_ERROR("", "", "fail in sql-query syntax");
+							error_message = "Îøèáêà ÁÄ.";
+						}
 					}
 					else
 					{
@@ -3699,13 +3965,29 @@ string	SetNewValueByAction(string action, string id, string sow_id, string new_v
 						if(action == "AJAX_deleteCostCenter")						sql_query = "DELETE FROM `cost_centers` WHERE `id`=\"" + id + "\";";
 						if(action == "AJAX_updateCostCenterTitle")					sql_query = "UPDATE `cost_centers`				SET `title`							=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
 						if(action == "AJAX_updateCostCenterDescription")			sql_query = "UPDATE `cost_centers`				SET `description`					=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
-						if(action == "AJAX_updateSoWCustomField")					sql_query = "UPDATE `contract_sow_custom_fields`SET `value`							=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
-						if(action == "AJAX_updateSoWNumber")						sql_query = "UPDATE `contracts_sow`				SET `number`						=\"" + new_value + "\" WHERE `id`=\"" + sow_id + "\";";
-						if(action == "AJAX_updateSoWAct")							sql_query = "UPDATE `contracts_sow`				SET `act_number`					=\"" + new_value + "\" WHERE `id`=\"" + sow_id + "\";";
-						if(action == "AJAX_updateSoWSignDate")						sql_query = "UPDATE `contracts_sow`				SET `sign_date`						=STR_TO_DATE(\"" + new_value + "\",\"%d/%m/%Y\") WHERE `id`=\"" + sow_id + "\";";
-						if(action == "AJAX_updateSoWStartDate")						sql_query = "UPDATE `contracts_sow`				SET `start_date`					=STR_TO_DATE(\"" + new_value + "\",\"%d/%m/%Y\") WHERE `id`=\"" + sow_id + "\";";
-						if(action == "AJAX_updateSoWEndDate")						sql_query = "UPDATE `contracts_sow`				SET `end_date`						=STR_TO_DATE(\"" + new_value + "\",\"%d/%m/%Y\") WHERE `id`=\"" + sow_id + "\";";
-						if(action == "AJAX_updateSoWDayRate") {c_float	num(new_value); sql_query = "UPDATE `contracts_sow` 		SET `day_rate`						=\"" + string(num) + "\" WHERE `id`=\"" + sow_id + "\";"; }
+
+						if(action == "AJAX_updateSoWCustomField")					sql_query = "UPDATE `contract_sow_custom_fields`SET `value`			=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateSoWNumber")						sql_query = "UPDATE `contracts_sow`				SET `number`		=\"" + new_value + "\" WHERE `id`=\"" + sow_id + "\";";
+						if(action == "AJAX_updateSoWAct")							sql_query = "UPDATE `contracts_sow`				SET `act_number`	=\"" + new_value + "\" WHERE `id`=\"" + sow_id + "\";";
+						if(action == "AJAX_updateSoWSignDate")						sql_query = "UPDATE `contracts_sow`				SET `sign_date`		=STR_TO_DATE(\"" + new_value + "\",\"%d/%m/%Y\") WHERE `id`=\"" + sow_id + "\";";
+						if(action == "AJAX_updateSoWStartDate")						sql_query = "UPDATE `contracts_sow`				SET `start_date`	=STR_TO_DATE(\"" + new_value + "\",\"%d/%m/%Y\") WHERE `id`=\"" + sow_id + "\";";
+						if(action == "AJAX_updateSoWEndDate")						sql_query = "UPDATE `contracts_sow`				SET `end_date`		=STR_TO_DATE(\"" + new_value + "\",\"%d/%m/%Y\") WHERE `id`=\"" + sow_id + "\";";
+						if(action == "AJAX_updateSoWDayRate") {c_float	num(new_value); sql_query = "UPDATE `contracts_sow` 		SET `day_rate`		=\"" + string(num) + "\" WHERE `id`=\"" + sow_id + "\";"; }
+
+						if(action == "AJAX_updatePSoWCustomField")					sql_query = "UPDATE `contract_psow_custom_fields`SET `value`		=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updatePSoWNumber")						sql_query = "UPDATE `contracts_psow`			SET `number`		=\"" + new_value + "\" WHERE `id`=\"" + sow_id + "\";";
+						if(action == "AJAX_updatePSoWAct")							sql_query = "UPDATE `contracts_psow`			SET `act_number`	=\"" + new_value + "\" WHERE `id`=\"" + sow_id + "\";";
+						if(action == "AJAX_updatePSoWSignDate")						sql_query = "UPDATE `contracts_psow`			SET `sign_date`		=STR_TO_DATE(\"" + new_value + "\",\"%d/%m/%Y\") WHERE `id`=\"" + sow_id + "\";";
+						if(action == "AJAX_updatePSoWStartDate")					sql_query = "UPDATE `contracts_psow`			SET `start_date`	=STR_TO_DATE(\"" + new_value + "\",\"%d/%m/%Y\") WHERE `id`=\"" + sow_id + "\";";
+						if(action == "AJAX_updatePSoWEndDate")						sql_query = "UPDATE `contracts_psow`			SET `end_date`		=STR_TO_DATE(\"" + new_value + "\",\"%d/%m/%Y\") WHERE `id`=\"" + sow_id + "\";";
+						if(action == "AJAX_updatePSoWDayRate") {c_float	num(new_value); sql_query = "UPDATE `contracts_psow` 		SET `day_rate`		=\"" + string(num) + "\" WHERE `id`=\"" + sow_id + "\";"; }
+
+						if(action == "AJAX_updateCostCenterCustomField")			sql_query = "UPDATE `cost_center_custom_fields` SET `value`			=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateCostCenterNumber")					sql_query = "UPDATE `cost_centers`				SET `number`		=\"" + new_value + "\" WHERE `id`=\"" + sow_id + "\";";
+						if(action == "AJAX_updateCostCenterAct")					sql_query = "UPDATE `cost_centers`				SET `act_number`	=\"" + new_value + "\" WHERE `id`=\"" + sow_id + "\";";
+						if(action == "AJAX_updateCostCenterSignDate")				sql_query = "UPDATE `cost_centers`				SET `sign_date`		=STR_TO_DATE(\"" + new_value + "\",\"%d/%m/%Y\") WHERE `id`=\"" + sow_id + "\";";
+						if(action == "AJAX_updateCostCenterStartDate")				sql_query = "UPDATE `cost_centers`				SET `start_date`	=STR_TO_DATE(\"" + new_value + "\",\"%d/%m/%Y\") WHERE `id`=\"" + sow_id + "\";";
+						if(action == "AJAX_updateCostCenterEndDate")				sql_query = "UPDATE `cost_centers`				SET `end_date`		=STR_TO_DATE(\"" + new_value + "\",\"%d/%m/%Y\") WHERE `id`=\"" + sow_id + "\";";
 
 						// --- expense line template payment part
 						if(action == "AJAX_updateExpenseTemplateLinePaymentCash")
@@ -3772,6 +4054,15 @@ string	SetNewValueByAction(string action, string id, string sow_id, string new_v
 
 							if(position_id.length())
 								sql_query = "UPDATE	`contracts_sow`	SET `company_position_id` =\"" + position_id + "\" WHERE `id`=\"" + sow_id + "\";";
+							else
+								MESSAGE_ERROR("", "", "fail to get position.id");
+						}
+						if(action == "AJAX_updatePSoWPosition")
+						{
+							auto	position_id = GetCompanyPositionIDByTitle(new_value, db);
+
+							if(position_id.length())
+								sql_query = "UPDATE	`contracts_psow` SET `company_position_id` =\"" + position_id + "\" WHERE `id`=\"" + sow_id + "\";";
 							else
 								MESSAGE_ERROR("", "", "fail to get position.id");
 						}
@@ -4201,6 +4492,52 @@ string	GetSpelledSoWCustomFieldNameByID(string custom_field_id, CMysql *db)
 	return result;	
 }
 
+string	GetSpelledPSoWCustomFieldNameByID(string custom_field_id, CMysql *db)
+{
+	string	result = "";
+	string	task_id = "";
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(db->Query("SELECT `title`,`description` FROM `contract_psow_custom_fields` WHERE `id`=\"" + custom_field_id + "\";"))
+	{
+		auto	description = ""s + db->Get(0, "description");
+
+		result = string(db->Get(0, "title")) + (description.length() ? " / " + description : "");
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "custom_field.id(" + custom_field_id + ") not found");
+	}
+
+	MESSAGE_DEBUG("", "", "finish (result.length is " + to_string(result.length()) + ")");
+
+	return result;	
+}
+
+string	GetSpelledCostCenterCustomFieldNameByID(string custom_field_id, CMysql *db)
+{
+	string	result = "";
+	string	task_id = "";
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(db->Query("SELECT `title`,`description` FROM `contract_psow_custom_fields` WHERE `id`=\"" + custom_field_id + "\";"))
+	{
+		auto	description = ""s + db->Get(0, "description");
+
+		result = string(db->Get(0, "title")) + (description.length() ? " / " + description : "");
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "custom_field.id(" + custom_field_id + ") not found");
+	}
+
+	MESSAGE_DEBUG("", "", "finish (result.length is " + to_string(result.length()) + ")");
+
+	return result;	
+}
+
 string	GetSpelledSoWByID(string sow_id, CMysql *db)
 {
 	string	result = "";
@@ -4215,6 +4552,27 @@ string	GetSpelledSoWByID(string sow_id, CMysql *db)
 	else
 	{
 		MESSAGE_ERROR("", "", "contract_sow.id(" + sow_id + ") not found");
+	}
+
+	MESSAGE_DEBUG("", "", "finish (result.length is " + to_string(result.length()) + ")");
+
+	return result;	
+}
+
+string	GetSpelledPSoWByID(string psow_id, CMysql *db)
+{
+	string	result = "";
+	string	task_id = "";
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(db->Query("SELECT `sign_date`, `number` FROM `contracts_psow` WHERE `id`=\"" + psow_id + "\";"))
+	{
+		result = string(db->Get(0, "number")) + " " + utf8_to_cp1251(gettext("agreement from")) + " " + db->Get(0, "sign_date");
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "contracts_psow.id(" + psow_id + ") not found");
 	}
 
 	MESSAGE_DEBUG("", "", "finish (result.length is " + to_string(result.length()) + ")");
@@ -4556,24 +4914,98 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 	}
 	if(action == "AJAX_updateSoWSignDate")
 	{
-		notification_description = utf8_to_cp1251(gettext("SoW")) + " (" + GetSpelledSoWByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("SoW sign date changed")) + " " + utf8_to_cp1251(gettext("from")) + " " + existing_value + " " + utf8_to_cp1251(gettext("to")) + " " + new_value;
+		notification_description = utf8_to_cp1251(gettext("SoW")) + " (" + GetSpelledSoWByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("sign date changed")) + " " + utf8_to_cp1251(gettext("from")) + " " + existing_value + " " + utf8_to_cp1251(gettext("to")) + " " + new_value;
 		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 	}
 	if(action == "AJAX_updateSoWStartDate")
 	{
-		notification_description = utf8_to_cp1251(gettext("SoW")) + " (" + GetSpelledSoWByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("SoW start date changed")) + " " + utf8_to_cp1251(gettext("from")) + " " + existing_value + " " + utf8_to_cp1251(gettext("to")) + " " + new_value;
+		notification_description = utf8_to_cp1251(gettext("SoW")) + " (" + GetSpelledSoWByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("start date changed")) + " " + utf8_to_cp1251(gettext("from")) + " " + existing_value + " " + utf8_to_cp1251(gettext("to")) + " " + new_value;
 		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 	}
 	if(action == "AJAX_updateSoWEndDate")
 	{
-		notification_description = utf8_to_cp1251(gettext("SoW")) + " (" + GetSpelledSoWByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("SoW end date changed")) + " " + utf8_to_cp1251(gettext("from")) + " " + existing_value + " " + utf8_to_cp1251(gettext("to")) + " " + new_value;
+		notification_description = utf8_to_cp1251(gettext("SoW")) + " (" + GetSpelledSoWByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("end date changed")) + " " + utf8_to_cp1251(gettext("from")) + " " + existing_value + " " + utf8_to_cp1251(gettext("to")) + " " + new_value;
 		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 	}
 	if(action == "AJAX_updateSoWCustomField")
 	{
-		notification_description = utf8_to_cp1251(gettext("SoW")) + " (" + GetSpelledSoWByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("SoW custom field")) + "(" + GetSpelledSoWCustomFieldNameByID(id, db) + ") " + utf8_to_cp1251(gettext("changed")) + " " + utf8_to_cp1251(gettext("from")) + " " + existing_value + " " + utf8_to_cp1251(gettext("to")) + " " + new_value;
+		notification_description = utf8_to_cp1251(gettext("SoW")) + " (" + GetSpelledSoWByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("custom field")) + "(" + GetSpelledSoWCustomFieldNameByID(id, db) + ") " + utf8_to_cp1251(gettext("changed")) + " " + utf8_to_cp1251(gettext("from")) + " " + existing_value + " " + utf8_to_cp1251(gettext("to")) + " " + new_value;
 		sql_query = "SELECT `contract_sow_id` AS `contract_sow_id` FROM `contract_sow_custom_fields` WHERE `id`=\"" + id + "\";";
 	}
+
+	if(action == "AJAX_updatePSoWNumber")
+	{
+		notification_description = utf8_to_cp1251(gettext("PSoW: number")) + " " + utf8_to_cp1251(gettext("updated")) + " " + utf8_to_cp1251(gettext("from")) + " "s + existing_value + " "  + utf8_to_cp1251(gettext("to")) + " "s + new_value;
+		sql_query = ""; // --- don't notify subcontractors, only agency
+	}
+	if(action == "AJAX_updatePSoWAct")
+	{
+		notification_description = utf8_to_cp1251(gettext("PSoW")) + " (" + GetSpelledPSoWByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("updated")) + " " + utf8_to_cp1251(gettext("act number")) + " " + " " + utf8_to_cp1251(gettext("from")) + " "s + existing_value + " "  + utf8_to_cp1251(gettext("to")) + " "s + new_value;
+		sql_query = ""; // --- don't notify subcontractors, only agency
+	}
+	if(action == "AJAX_updatePSoWPosition")
+	{
+		notification_description = utf8_to_cp1251(gettext("PSoW")) + " (" + GetSpelledPSoWByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("position changed")) + " " + utf8_to_cp1251(gettext("from")) + " " + existing_value + " " + utf8_to_cp1251(gettext("to")) + " " + new_value;
+		sql_query = ""; // --- don't notify subcontractors, only agency
+	}
+	if(action == "AJAX_updatePSoWDayRate")
+	{
+		notification_description = utf8_to_cp1251(gettext("PSoW")) + " (" + GetSpelledPSoWByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("dayrate changed")) + " " + utf8_to_cp1251(gettext("from")) + " " + existing_value + " " + utf8_to_cp1251(gettext("to")) + " " + new_value;
+		sql_query = ""; // --- don't notify subcontractors, only agency
+	}
+	if(action == "AJAX_updatePSoWSignDate")
+	{
+		notification_description = utf8_to_cp1251(gettext("PSoW")) + " (" + GetSpelledPSoWByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("sign date changed")) + " " + utf8_to_cp1251(gettext("from")) + " " + existing_value + " " + utf8_to_cp1251(gettext("to")) + " " + new_value;
+		sql_query = ""; // --- don't notify subcontractors, only agency
+	}
+	if(action == "AJAX_updatePSoWStartDate")
+	{
+		notification_description = utf8_to_cp1251(gettext("PSoW")) + " (" + GetSpelledPSoWByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("start date changed")) + " " + utf8_to_cp1251(gettext("from")) + " " + existing_value + " " + utf8_to_cp1251(gettext("to")) + " " + new_value;
+		sql_query = ""; // --- don't notify subcontractors, only agency
+	}
+	if(action == "AJAX_updatePSoWEndDate")
+	{
+		notification_description = utf8_to_cp1251(gettext("PSoW")) + " (" + GetSpelledPSoWByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("end date changed")) + " " + utf8_to_cp1251(gettext("from")) + " " + existing_value + " " + utf8_to_cp1251(gettext("to")) + " " + new_value;
+		sql_query = ""; // --- don't notify subcontractors, only agency
+	}
+	if(action == "AJAX_updatePSoWCustomField")
+	{
+		notification_description = utf8_to_cp1251(gettext("PSoW")) + " (" + GetSpelledPSoWByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("custom field")) + "(" + GetSpelledPSoWCustomFieldNameByID(id, db) + ") " + utf8_to_cp1251(gettext("changed")) + " " + utf8_to_cp1251(gettext("from")) + " " + existing_value + " " + utf8_to_cp1251(gettext("to")) + " " + new_value;
+		sql_query = ""; // --- don't notify subcontractors, only agency
+	}
+
+	if(action == "AJAX_updateCostCenterNumber")
+	{
+		notification_description = utf8_to_cp1251(gettext("Cost Center: number")) + " " + utf8_to_cp1251(gettext("updated")) + " " + utf8_to_cp1251(gettext("from")) + " "s + existing_value + " "  + utf8_to_cp1251(gettext("to")) + " "s + new_value;
+		sql_query = ""; // --- don't notify subcontractors, only agency
+	}
+	if(action == "AJAX_updateCostCenterAct")
+	{
+		notification_description = utf8_to_cp1251(gettext("Cost Center")) + " (" + GetSpelledCostCenterByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("updated")) + " " + utf8_to_cp1251(gettext("act number")) + " " + " " + utf8_to_cp1251(gettext("from")) + " "s + existing_value + " "  + utf8_to_cp1251(gettext("to")) + " "s + new_value;
+		sql_query = ""; // --- don't notify subcontractors, only agency
+	}
+	if(action == "AJAX_updateCostCenterSignDate")
+	{
+		notification_description = utf8_to_cp1251(gettext("Cost Center")) + " (" + GetSpelledCostCenterByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("sign date changed")) + " " + utf8_to_cp1251(gettext("from")) + " " + existing_value + " " + utf8_to_cp1251(gettext("to")) + " " + new_value;
+		sql_query = ""; // --- don't notify subcontractors, only agency
+	}
+	if(action == "AJAX_updateCostCenterStartDate")
+	{
+		notification_description = utf8_to_cp1251(gettext("Cost Center")) + " (" + GetSpelledCostCenterByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("start date changed")) + " " + utf8_to_cp1251(gettext("from")) + " " + existing_value + " " + utf8_to_cp1251(gettext("to")) + " " + new_value;
+		sql_query = ""; // --- don't notify subcontractors, only agency
+	}
+	if(action == "AJAX_updateCostCenterEndDate")
+	{
+		notification_description = utf8_to_cp1251(gettext("Cost Center")) + " (" + GetSpelledCostCenterByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("end date changed")) + " " + utf8_to_cp1251(gettext("from")) + " " + existing_value + " " + utf8_to_cp1251(gettext("to")) + " " + new_value;
+		sql_query = ""; // --- don't notify subcontractors, only agency
+	}
+	if(action == "AJAX_updateCostCenterCustomField")
+	{
+		notification_description = utf8_to_cp1251(gettext("Cost Center")) + " (" + GetSpelledCostCenterByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("custom field")) + "(" + GetSpelledCostCenterCustomFieldNameByID(id, db) + ") " + utf8_to_cp1251(gettext("changed")) + " " + utf8_to_cp1251(gettext("from")) + " " + existing_value + " " + utf8_to_cp1251(gettext("to")) + " " + new_value;
+		sql_query = ""; // --- don't notify subcontractors, only agency
+	}
+
+
 
 	if(action == "AJAX_updateExpenseTemplateTitle")
 	{
@@ -4664,7 +5096,11 @@ bool NotifySoWContractPartiesAboutChanges(string action, string id, string sow_i
 
 					if(sow_list.size())
 					{
-						agency_list_sql_query = "SELECT DISTINCT `agency_company_id` FROM `contracts_sow` WHERE `id` IN (" + join(sow_list) + ") AND `start_date`<=NOW() AND `end_date`>=NOW();";
+						// --- NOW() can't be used here because NOW()-type is datetime, but CURDATE()-type is date
+						// --- for example SELECT NOW()=CURDATE() gives false, 
+						// --- reason behind is SELECT "YYYY-MM-DD HH:MM:SS" NOT equal "YYYY-MM-DD" due to type inconsistency
+						// --- in comparison opertions "datetime" can't be compared to "date"
+						agency_list_sql_query = "SELECT DISTINCT `agency_company_id` FROM `contracts_sow` WHERE `id` IN (" + join(sow_list) + ") AND `start_date`<=CURDATE() AND `end_date`>=CURDATE();";
 					}
 					else
 					{
@@ -4921,4 +5357,132 @@ string GetAgencyObjectInJSONFormat(string agency_id, bool include_tasks, bool in
 	MESSAGE_DEBUG("", "", "finish (result.length is " + to_string(result.length()) + ")");
 
 	return result;	
+}
+
+auto GetNumberOfApprovedTimecardsThisMonth(CMysql *db, CUser *user) -> string
+{
+	auto	result = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(user->GetType() == "agency")
+	{
+		{
+			struct tm	period_start, period_end;
+
+			tie(period_start, period_end) = GetFirstAndLastDateOfThisMonth();
+
+			if(db->Query("SELECT COUNT(*) AS `counter` FROM `timecards` WHERE `status`=\"approved\" AND `period_end`>=\"" + PrintSQLDate(period_start) + "\"  AND `period_end`<=\"" + PrintSQLDate(period_end) + "\" AND `contract_sow_id` IN ("
+								"SELECT `id` FROM `contracts_sow` WHERE `agency_company_id`=("
+									"SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\""
+								")"
+							");"))
+			{
+				result = db->Get(0, "counter");
+			}
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "user.id(" + user->GetID() + ") have unknown type(" + user->GetType() + ")");
+	}
+
+	MESSAGE_DEBUG("", "", "finish (result is " + result + ")");
+
+	return result;
+}
+
+auto GetNumberOfApprovedTimecardsLastMonth(CMysql *db, CUser *user) -> string
+{
+	auto	result = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(user->GetType() == "agency")
+	{
+		{
+			struct tm	period_start, period_end;
+
+			tie(period_start, period_end) = GetFirstAndLastDateOfLastMonth();
+
+			if(db->Query("SELECT COUNT(*) AS `counter` FROM `timecards` WHERE `status`=\"approved\" AND `period_end`>=\"" + PrintSQLDate(period_start) + "\"  AND `period_end`<=\"" + PrintSQLDate(period_end) + "\" AND `contract_sow_id` IN ("
+								"SELECT `id` FROM `contracts_sow` WHERE `agency_company_id`=("
+									"SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\""
+								")"
+							");"))
+			{
+				result = db->Get(0, "counter");
+			}
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "user.id(" + user->GetID() + ") have unknown type(" + user->GetType() + ")");
+	}
+
+	MESSAGE_DEBUG("", "", "finish (result is " + result + ")");
+
+	return result;
+}
+
+auto GetNumberOfSoWActiveThisMonth(CMysql *db, CUser *user) -> string
+{
+	auto	result = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(user->GetType() == "agency")
+	{
+		{
+			struct tm	period_start, period_end;
+
+			tie(period_start, period_end) = GetFirstAndLastDateOfThisMonth();
+
+			if(db->Query("SELECT COUNT(*) AS `counter` FROM `contracts_sow` WHERE `end_date`>=\"" + PrintSQLDate(period_start) + "\"  AND `start_date`<=\"" + PrintSQLDate(period_end) + "\" AND `agency_company_id`=("
+									"SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\""
+								")"))
+			{
+				result = db->Get(0, "counter");
+			}
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "user.id(" + user->GetID() + ") have unknown type(" + user->GetType() + ")");
+	}
+
+	MESSAGE_DEBUG("", "", "finish (result is " + result + ")");
+
+	return result;
+}
+
+auto GetNumberOfSoWActiveLastMonth(CMysql *db, CUser *user) -> string
+{
+	auto	result = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(user->GetType() == "agency")
+	{
+		{
+			struct tm	period_start, period_end;
+
+			tie(period_start, period_end) = GetFirstAndLastDateOfLastMonth();
+
+			if(db->Query("SELECT COUNT(*) AS `counter` FROM `contracts_sow` WHERE `end_date`>=\"" + PrintSQLDate(period_start) + "\"  AND `start_date`<=\"" + PrintSQLDate(period_end) + "\" AND `agency_company_id`=("
+									"SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\""
+								")"))
+			{
+				result = db->Get(0, "counter");
+			}
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "user.id(" + user->GetID() + ") have unknown type(" + user->GetType() + ")");
+	}
+
+	MESSAGE_DEBUG("", "", "finish (result is " + result + ")");
+
+	return result;
 }

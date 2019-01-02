@@ -31,6 +31,7 @@
 #define IMAGE_TEMP_DIRECTORY						string(IMAGE_DIRECTORY) + string("temp")
 #define IMAGE_EXPENSELINES_DIRECTORY				string(IMAGE_DIRECTORY) + string("expense_lines")
 #define TEMPLATE_SOW_DIRECTORY						string(IMAGEROOTDIR) + string("/html/templates")
+#define TEMPLATE_PSOW_DIRECTORY						string(IMAGEROOTDIR) + string("/html/templates")
 
 #define BROWSER_FILE_PREFIX							"/"	// for instance "\\server\folder" or "http://dev.file.serever/com"
 
@@ -145,9 +146,10 @@
 #define	EXPENSELINE_IMAGE_MAX_HEIGHT				1600
 
 #define	TEMPLATE_SOW_NUMBER_OF_FOLDERS				512
-#define	TEMPLATE_SOW_MAX_FILE_SIZE					10 * 1024 * 1024 // --- 1 MegaByte
-#define	TEMPLATE_SOW_IMAGE_MAX_WIDTH 				1600
-#define	TEMPLATE_SOW_IMAGE_MAX_HEIGHT				1600
+#define	TEMPLATE_SOW_MAX_FILE_SIZE					2 * 1024 * 1024 // --- 1 MegaByte
+
+#define	TEMPLATE_PSOW_NUMBER_OF_FOLDERS				512
+#define	TEMPLATE_PSOW_MAX_FILE_SIZE					2 * 1024 * 1024 // --- 1 MegaByte
 
 
 #define	FFMPEG_FILE_NAME							"ffmpeg"

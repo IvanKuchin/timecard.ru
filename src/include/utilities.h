@@ -149,6 +149,8 @@ auto 			isBotIP(string ip) -> bool;
 auto 			isAdverseWordsHere(string text, CMysql *) -> bool;
 auto			GetCompanyPositionsInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetSiteThemesInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
+pair<struct tm, struct tm> GetFirstAndLastDateOfLastMonth();
+pair<struct tm, struct tm> GetFirstAndLastDateOfThisMonth();
 struct tm		GetTMObject(string date);
 auto			operator <(const struct tm &tm_1, const struct tm &tm_2) -> bool;
 auto			operator <=(const struct tm &tm_1, const struct tm &tm_2) -> bool;
@@ -156,6 +158,7 @@ auto			operator >(const struct tm &tm_1, const struct tm &tm_2) -> bool;
 auto			operator >=(const struct tm &tm_1, const struct tm &tm_2) -> bool;
 auto			operator ==(const struct tm &tm_1, const struct tm &tm_2) -> bool;
 auto			PrintDate(const struct tm &_tm) -> string;
+auto			PrintSQLDate(const struct tm &_tm) -> string;
 auto			PrintDateTime(const struct tm &_tm) -> string;
 auto			PrintTime(const struct tm &_tm, string format) -> string;
 auto			GetZipInJSONFormat(string zip_id, CMysql *, CUser *) -> string;
@@ -172,7 +175,9 @@ auto			GetTimecardTaskAssignmentInJSONFormat(string sqlQuery, CMysql *, CUser *)
 auto			GetBTExpenseAssignmentInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetTimecardsInJSONFormat(string sqlQuery, CMysql *, CUser *, bool isExtended = false) -> string;
 auto			GetSoWCustomFieldsInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string;
-auto			GetSOWInJSONFormat(string sqlQuery, CMysql *, CUser *, bool include_tasks = true, bool include_bt = false) -> string;
+auto			GetSOWInJSONFormat(string sqlQuery, CMysql *, CUser *, bool include_tasks = true, bool include_bt = false, bool include_cost_centers = false) -> string;
+auto			GetPSoWCustomFieldsInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string;
+auto			GetPSoWInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string;
 auto			GetTimecardApprovalsInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			SubmitTimecard(string timecard_id, CMysql *, CUser *) -> bool;
 auto			SubmitBT(string bt_id, CMysql *, CUser *) -> bool;
@@ -210,7 +215,11 @@ auto			GetSpelledUserNameByID(string id, CMysql *) -> string;
 auto			GetSpelledEmployeeByID(string id, CMysql *) -> string;
 auto			GetSpelledTimecardApproverNameByID(string id, CMysql *) -> string;
 auto			GetSpelledBTExpenseApproverNameByID(string id, CMysql *) -> string;
+auto			GetSpelledSoWCustomFieldNameByID(string custom_field_id, CMysql *) -> string;
+auto			GetSpelledPSoWCustomFieldNameByID(string custom_field_id, CMysql *) -> string;
+auto			GetSpelledCostCenterCustomFieldNameByID(string custom_field_id, CMysql *) -> string;
 auto			GetSpelledSoWByID(string sow_id, CMysql *) -> string;
+auto			GetSpelledPSoWByID(string sow_id, CMysql *) -> string;
 auto			GetSpelledZIPByID(string id, CMysql *) -> string;
 auto			GetSpelledBankByID(string id, CMysql *) -> string;
 auto			GetSpelledBTExpenseTemplateByID(string id, CMysql *) -> string;
@@ -234,6 +243,8 @@ auto			GetBTsInJSONFormat(string sqlQuery, CMysql *, CUser *, bool isExtended) -
 auto			GetBTExpensesInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetCurrencyRatesInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto 			isUserAllowedAccessToBT(string bt_id, CMysql *, CUser *) -> string;
+auto			isCostCenterBelongsToAgency(string cost_center_id, CMysql *db, CUser *user) -> bool;
+
 // string			isAgencyEmployeeAllowedToChangeSoW(string sow_id, CMysql *, CUser *);
 // string			isAgencyEmployeeAllowedToChangeAgencyData(CMysql *, CUser *);
 // string			isActionEntityBelongsToSoW(string action, string is, string sow_id, CMysql *, CUser *);
@@ -246,6 +257,11 @@ auto			ResubmitEntitiesByAction(string action, string id, string sow_id, string 
 auto			GetAgencyEmployeesInJSONFormat(string sql_query, CMysql *, CUser *) -> string;
 auto			GetAgencyObjectInJSONFormat(string agency_id, bool include_tasks, bool include_bt, CMysql *, CUser *) -> string;
 auto			GetInfoToReturnByAction(string action, string id, string sow_id, string new_value, CMysql *, CUser *) -> string;
+auto			GetNumberOfApprovedTimecardsThisMonth(CMysql *db, CUser *user) -> string;
+auto			GetNumberOfApprovedTimecardsLastMonth(CMysql *db, CUser *user) -> string;
+auto 			GetNumberOfSoWActiveThisMonth(CMysql *db, CUser *user) -> string;
+auto 			GetNumberOfSoWActiveLastMonth(CMysql *db, CUser *user) -> string;
+
 
 // --- function set for image upload/removal
 auto 			GetSpecificData_GetNumberOfFolders(string itemType) -> int;

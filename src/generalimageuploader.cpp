@@ -292,11 +292,11 @@ int main()
 									if(GetSpecificData_GetDBCoverPhotoFolderString(itemType).length())
 									{
 										ostJSONResult << "\"" + GetSpecificData_GetDBCoverPhotoFolderString(itemType) + "\": \"" << folderID << "\",";
-										ostJSONResult << "\"" + GetSpecificData_GetDBCoverPhotoFilenameString(itemType) + "\": \"" << filePrefix << ".jpg\"";
+										ostJSONResult << "\"" + GetSpecificData_GetDBCoverPhotoFilenameString(itemType) + "\": \"" << filePrefix << GetSpecificData_GetFinalFileExtenstion(itemType) << "\"";
 									}
 									else
 									{
-										ostJSONResult << "\"" + GetSpecificData_GetDBCoverPhotoFilenameString(itemType) + "\": \"" << folderID << "/" << filePrefix << ".jpg\"";
+										ostJSONResult << "\"" + GetSpecificData_GetDBCoverPhotoFilenameString(itemType) + "\": \"" << folderID << "/" << filePrefix << GetSpecificData_GetFinalFileExtenstion(itemType) << "\"";
 									}
 									ostJSONResult << "}";
 									if(filesCounter == (indexPage.GetFilesHandler()->Count() - 1)) ostJSONResult << "]";

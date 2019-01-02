@@ -164,6 +164,7 @@ static auto	isActionEntityBelongsToSoW(string action, string id, string sow_id, 
 				if(action == "AJAX_deleteTimecardApproverFromSoW")	sql_query = "SELECT `contract_sow_id` AS `sow_id` FROM `timecard_approvers` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_deleteBTExpenseApproverFromSoW")	sql_query = "SELECT `contract_sow_id` AS `sow_id` FROM `bt_approvers` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateSubcontractorCreateTasks")	sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
+
 				if(action == "AJAX_updateSoWNumber")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
 				if(action == "AJAX_updateSoWAct")					sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
 				if(action == "AJAX_updateSoWPosition")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
@@ -172,6 +173,22 @@ static auto	isActionEntityBelongsToSoW(string action, string id, string sow_id, 
 				if(action == "AJAX_updateSoWStartDate")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
 				if(action == "AJAX_updateSoWEndDate")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
 				if(action == "AJAX_updateSoWCustomField")			sql_query = "SELECT `contract_sow_id` AS `sow_id` FROM `contract_sow_custom_fields` WHERE `id`=\"" + id + "\";";
+
+				if(action == "AJAX_updatePSoWNumber")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
+				if(action == "AJAX_updatePSoWAct")					sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
+				if(action == "AJAX_updatePSoWPosition")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
+				if(action == "AJAX_updatePSoWDayRate")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
+				if(action == "AJAX_updatePSoWSignDate")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
+				if(action == "AJAX_updatePSoWStartDate")			sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
+				if(action == "AJAX_updatePSoWEndDate")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
+				if(action == "AJAX_updatePSoWCustomField")			sql_query = "SELECT `contract_psow_id` AS `sow_id` FROM `contract_psow_custom_fields` WHERE `id`=\"" + id + "\";";
+
+				if(action == "AJAX_updateCostCenterNumber")			sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
+				if(action == "AJAX_updateCostCenterAct")			sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
+				if(action == "AJAX_updateCostCenterSignDate")		sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
+				if(action == "AJAX_updateCostCenterStartDate")		sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
+				if(action == "AJAX_updateCostCenterEndDate")		sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
+				if(action == "AJAX_updateCostCenterCustomField")	sql_query = "SELECT `cost_center_id` AS `sow_id` FROM `cost_center_custom_fields` WHERE `id`=\"" + id + "\";";
 
 				if(sql_query.length())
 				{
@@ -535,7 +552,6 @@ static string	CheckNewValueByAction(string action, string id, string sow_id, str
 							if(counter)
 							{
 								char	buffer[50];
-
 								sprintf(buffer, ngettext("%d customers", "%d customers", counter), counter);
 
 								error_message = utf8_to_cp1251(gettext("cost center assigned")) + " " + utf8_to_cp1251(buffer) + ". " +  utf8_to_cp1251(gettext("removal prohibited"));
@@ -672,6 +688,147 @@ static string	CheckNewValueByAction(string action, string id, string sow_id, str
 						}
 					}
 					else if(action == "AJAX_updateExpenseTemplateLineRequired") 		{ /* --- good to go */ }
+
+					// --- PSoW part
+					else if(action == "AJAX_updatePSoWPosition")				{ /* --- good to go */ }
+					else if(action == "AJAX_updatePSoWAct")						{ /* --- good to go */ }
+					else if(action == "AJAX_updatePSoWSignDate")				{ /* --- good to go */ }
+					else if(action == "AJAX_updatePSoWCustomField")				{ /* --- good to go */ }
+					else if(action == "AJAX_updatePSoWStartDate")
+					{
+						if(db->Query("SELECT `end_date` FROM `contracts_psow` WHERE `id`=\"" + sow_id + "\";"))
+						{
+							auto		string_start = new_value;
+							auto		string_end = db->Get(0, "end_date");
+							auto		tm_start = GetTMObject(string_start);
+							auto		tm_end = GetTMObject(string_end);
+
+							if(tm_start <= tm_end)
+							{
+								// --- good to go
+							}
+							else
+							{
+								error_message = utf8_to_cp1251(gettext("period start have to precede period end")) + " (" + string_start + " - " +  string_end + ")";
+								MESSAGE_DEBUG("", "", "period start have to precede period end (" + string_start + " - " + string_end + ")");
+							}
+						}
+						else
+						{
+							error_message = utf8_to_cp1251(gettext("SQL syntax issue"));
+							MESSAGE_ERROR("", "", "issue in SQL-syntax");
+						}
+					}
+					else if(action == "AJAX_updatePSoWEndDate")
+					{
+						if(db->Query("SELECT `start_date` FROM `contracts_psow` WHERE `id`=\"" + sow_id + "\";"))
+						{
+							auto		string_start = db->Get(0, "start_date");
+							auto		string_end = new_value;
+							auto		tm_start = GetTMObject(string_start);
+							auto		tm_end = GetTMObject(string_end);
+
+							mktime(&tm_start);
+							mktime(&tm_end);
+
+							if(tm_start <= tm_end)
+							{
+								// --- good to go
+							}
+							else
+							{
+								error_message = utf8_to_cp1251(gettext("period start have to precede period end")) + " (" + string_start + " - " +  string_end + ")";
+								MESSAGE_DEBUG("", "", "period start have to precede period end (" + string_start + " - " + string_end + ")");
+							}
+						}
+						else
+						{
+							error_message = utf8_to_cp1251(gettext("SQL syntax issue"));
+							MESSAGE_ERROR("", "", "issue in SQL-syntax");
+						}
+					}
+					else if(action == "AJAX_updatePSoWDayRate")
+					{
+						c_float		num(new_value);
+
+						if(string(num) == new_value) { /* --- good to go */ }
+						else
+						{
+							MESSAGE_ERROR("", "", "input DayRate(" + new_value + ") wrongly formatted, need to be " + string(num));
+						}
+					}
+					else if(action == "AJAX_updatePSoWNumber")
+					{
+						if(db->Query("SELECT `id` FROM `contracts_psow` WHERE `number`=\"" + new_value + "\" AND `id`!=\"" + sow_id + "\" AND `cost_center_id`=(SELECT `cost_center_id` FROM `contracts_psow` WHERE `id`=\"" + sow_id + "\");"))
+						{
+							error_message = utf8_to_cp1251(gettext("PSoW number already exists"));
+							MESSAGE_DEBUG("", "", "psow.number already exists in agency.id");
+						}
+						else
+						{
+							// --- good to go
+						}
+					}
+
+					// --- cost_center part
+					else if(action == "AJAX_updateCostCenterAct")						{ /* --- good to go */ }
+					else if(action == "AJAX_updateCostCenterSignDate")					{ /* --- good to go */ }
+					else if(action == "AJAX_updateCostCenterCustomField")				{ /* --- good to go */ }
+					else if(action == "AJAX_updateCostCenterNumber")					{ /* --- good to go */ }
+					else if(action == "AJAX_updateCostCenterStartDate")
+					{
+						if(db->Query("SELECT `end_date` FROM `cost_centers` WHERE `id`=\"" + sow_id + "\";"))
+						{
+							auto		string_start = new_value;
+							auto		string_end = db->Get(0, "end_date");
+							auto		tm_start = GetTMObject(string_start);
+							auto		tm_end = GetTMObject(string_end);
+
+							if(tm_start <= tm_end)
+							{
+								// --- good to go
+							}
+							else
+							{
+								error_message = utf8_to_cp1251(gettext("period start have to precede period end")) + " (" + string_start + " - " +  string_end + ")";
+								MESSAGE_DEBUG("", "", "period start have to precede period end (" + string_start + " - " + string_end + ")");
+							}
+						}
+						else
+						{
+							error_message = utf8_to_cp1251(gettext("SQL syntax issue"));
+							MESSAGE_ERROR("", "", "issue in SQL-syntax");
+						}
+					}
+					else if(action == "AJAX_updateCostCenterEndDate")
+					{
+						if(db->Query("SELECT `start_date` FROM `cost_centers` WHERE `id`=\"" + sow_id + "\";"))
+						{
+							auto		string_start = db->Get(0, "start_date");
+							auto		string_end = new_value;
+							auto		tm_start = GetTMObject(string_start);
+							auto		tm_end = GetTMObject(string_end);
+
+							mktime(&tm_start);
+							mktime(&tm_end);
+
+							if(tm_start <= tm_end)
+							{
+								// --- good to go
+							}
+							else
+							{
+								error_message = utf8_to_cp1251(gettext("period start have to precede period end")) + " (" + string_start + " - " +  string_end + ")";
+								MESSAGE_DEBUG("", "", "period start have to precede period end (" + string_start + " - " + string_end + ")");
+							}
+						}
+						else
+						{
+							error_message = utf8_to_cp1251(gettext("SQL syntax issue"));
+							MESSAGE_ERROR("", "", "issue in SQL-syntax");
+						}
+					}
+
  					else
 					{
 						MESSAGE_ERROR("", "", "unknown action(" + action + "), no validity check performed.");
@@ -1810,7 +1967,7 @@ int main(void)
 			}
 		}
 
-		if(action == "AJAX_getDashboardData")
+		if(action == "AJAX_getDashboardPendingData")
 		{
 			string			strPageToGet, strFriendsOnSinglePage;
 			ostringstream	ostResult;
@@ -1864,6 +2021,104 @@ int main(void)
 			}
 		}
 
+		if(action == "AJAX_getDashboardSubmitTimecardsThisMonth")
+		{
+			string			strPageToGet, strFriendsOnSinglePage;
+			ostringstream	ostResult;
+
+			MESSAGE_DEBUG("", action, "start");
+
+			ostResult.str("");
+			{
+				string		template_name = "json_response.htmlt";
+				int			affected = db.Query("SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user.GetID() + "\";");
+
+				if(affected)
+				{
+					string		company_id= db.Get(0, "company_id");
+					bool		successFlag = true;
+					string		pending_timecards = "";
+
+					if(successFlag)
+					{
+						ostResult << "{"
+										"\"result\":\"success\","
+										"\"number_of_submit_timecards\":" << GetNumberOfApprovedTimecardsThisMonth(&db, &user) << ","
+										"\"total_number_of_sow\":" << GetNumberOfSoWActiveThisMonth(&db, &user) << ""
+									"}";
+					}
+					else
+					{
+						MESSAGE_ERROR("", action, "dashboard data not gathered completely");
+						ostResult << "{\"result\":\"error\",\"description\":\"Ошибка построения панели управления\"}";
+					}
+				}
+				else
+				{
+					MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't owns company");
+					ostResult << "{\"result\":\"error\",\"description\":\"Вы не работаете ни в каком агенстве\"}";
+				}
+
+				indexPage.RegisterVariableForce("result", ostResult.str());
+
+				if(!indexPage.SetTemplate(template_name))
+				{
+					MESSAGE_ERROR("", action, "can't find template " + template_name);
+				}
+			}
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
+
+		if(action == "AJAX_getDashboardSubmitTimecardsLastMonth")
+		{
+			string			strPageToGet, strFriendsOnSinglePage;
+			ostringstream	ostResult;
+
+			MESSAGE_DEBUG("", action, "start");
+
+			ostResult.str("");
+			{
+				string		template_name = "json_response.htmlt";
+				int			affected = db.Query("SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user.GetID() + "\";");
+
+				if(affected)
+				{
+					string		company_id= db.Get(0, "company_id");
+					bool		successFlag = true;
+					string		pending_timecards = "";
+
+					if(successFlag)
+					{
+						ostResult << "{"
+										"\"result\":\"success\","
+										"\"number_of_submit_timecards\":" << GetNumberOfApprovedTimecardsLastMonth(&db, &user) << ","
+										"\"total_number_of_sow\":" << GetNumberOfSoWActiveLastMonth(&db, &user) << ""
+									"}";
+					}
+					else
+					{
+						MESSAGE_ERROR("", action, "dashboard data not gathered completely");
+						ostResult << "{\"result\":\"error\",\"description\":\"Ошибка построения панели управления\"}";
+					}
+				}
+				else
+				{
+					MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't owns company");
+					ostResult << "{\"result\":\"error\",\"description\":\"Вы не работаете ни в каком агенстве\"}";
+				}
+
+				indexPage.RegisterVariableForce("result", ostResult.str());
+
+				if(!indexPage.SetTemplate(template_name))
+				{
+					MESSAGE_ERROR("", action, "can't find template " + template_name);
+				}
+			}
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
+
 		if(action == "AJAX_getSoWList")
 		{
 			ostringstream	ostResult;
@@ -1875,9 +2130,10 @@ int main(void)
 				string			template_name = "json_response.htmlt";
 				string			error_message = "";
 
-				bool			include_bt 		= indexPage.GetVarsHandler()->Get("include_bt") == "true";
-				bool			include_tasks 	= indexPage.GetVarsHandler()->Get("include_tasks") == "true";
-				string			sow_id 			= indexPage.GetVarsHandler()->Get("sow_id");
+				bool			include_tasks 			= indexPage.GetVarsHandler()->Get("include_tasks") == "true";
+				bool			include_bt 				= indexPage.GetVarsHandler()->Get("include_bt") == "true";
+				bool			include_cost_centers 	= indexPage.GetVarsHandler()->Get("include_cost_centers") == "true";
+				string			sow_id 					= indexPage.GetVarsHandler()->Get("sow_id");
 
 				if(sow_id.length())	sow_id = CheckHTTPParam_Number(sow_id);
 
@@ -1893,7 +2149,7 @@ int main(void)
 												"SELECT * FROM `contracts_sow` WHERE "
 													+ (sow_id.length() ? string("`id`=\"" + sow_id + "\" AND ") : "") +
 													"`agency_company_id`=\"" + agency_id + "\" "
-												";", &db, &user, include_tasks, include_bt) << "]";
+												";", &db, &user, include_tasks, include_bt, include_cost_centers) << "]";
 
 						if(include_tasks)
 							ostResult <<	","
@@ -1917,6 +2173,115 @@ int main(void)
 					{
 						error_message = "Агенство не найдено";
 						MESSAGE_ERROR("", action, "user.id(" + user.GetID() + ") is not an agency employee");
+					}
+				}
+				else
+				{
+					MESSAGE_ERROR("", action, "user(" + user.GetID() + ") is not an agency employee");
+					error_message = "Информация доступна только для агенства";
+				}
+
+				if(error_message.empty())
+				{
+				}
+				else
+				{
+					MESSAGE_DEBUG("", action, "failed");
+					ostResult.str("");
+					ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+				}
+
+				indexPage.RegisterVariableForce("result", ostResult.str());
+
+				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			}
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
+
+		if(action == "AJAX_getCostCenterList")
+		{
+			ostringstream	ostResult;
+
+			MESSAGE_DEBUG("", action, "start");
+
+			ostResult.str("");
+
+			{
+				string			template_name = "json_response.htmlt";
+				string			error_message = "";
+
+				if(user.GetType() == "agency")
+				{
+					{
+						string		agency_id = db.Get(0, "id");
+
+						ostResult << "{"
+										"\"result\":\"success\","
+										"\"cost_centers\":[" << GetCostCentersInJSONFormat(
+												"SELECT * FROM `cost_centers` WHERE `agency_company_id`=("
+													"SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id`=("
+														"SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user.GetID() + "\""
+													")"
+												");", &db, &user) << "]";
+						ostResult << "}";
+					}
+				}
+				else
+				{
+					MESSAGE_ERROR("", action, "user(" + user.GetID() + ") is not an agency employee");
+					error_message = "Информация доступна только для агенства";
+				}
+
+				if(error_message.empty())
+				{
+				}
+				else
+				{
+					MESSAGE_DEBUG("", action, "failed");
+					ostResult.str("");
+					ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+				}
+
+				indexPage.RegisterVariableForce("result", ostResult.str());
+
+				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			}
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
+
+		if(action == "AJAX_getApprovedTimecardList")
+		{
+			ostringstream	ostResult;
+
+			MESSAGE_DEBUG("", action, "start");
+
+			ostResult.str("");
+
+			{
+				string			template_name = "json_response.htmlt";
+				string			error_message = "";
+				string			cost_center_id = indexPage.GetVarsHandler()->Get("cost_center_id");
+
+				if(user.GetType() == "agency")
+				{
+					if(isCostCenterBelongsToAgency(cost_center_id, &db, &user))
+					{
+						string		agency_id = db.Get(0, "id");
+
+						ostResult << "{"
+										"\"result\":\"success\","
+										"\"timecards\":[" << GetTimecardsInJSONFormat(
+												"SELECT * FROM `timecards` WHERE `status`=\"approved\" AND `contract_sow_id` IN ("
+													"SELECT `contract_sow_id` FROM `contracts_psow` WHERE `cost_center_id`=\"" + cost_center_id + "\""
+												");", &db, &user) << "]";
+						ostResult << "}";
+					}
+					else
+					{
+						MESSAGE_ERROR("", action, "cost_center.id(" + cost_center_id + ") doesn't belongs to agance user(" + user.GetID() + ") employeed");
+						error_message = "Информация доступна только для агенства";
 					}
 				}
 				else
@@ -2008,6 +2373,22 @@ int main(void)
 			(action == "AJAX_updateSoWStartDate")				||
 			(action == "AJAX_updateSoWEndDate")					||
 			(action == "AJAX_updateSoWCustomField")				||
+
+			(action == "AJAX_updatePSoWNumber")					||
+			(action == "AJAX_updatePSoWAct")					||
+			(action == "AJAX_updatePSoWPosition")				||
+			(action == "AJAX_updatePSoWDayRate")				||
+			(action == "AJAX_updatePSoWSignDate")				||
+			(action == "AJAX_updatePSoWStartDate")				||
+			(action == "AJAX_updatePSoWEndDate")				||
+			(action == "AJAX_updatePSoWCustomField")			||
+
+			(action == "AJAX_updateCostCenterNumber")			||
+			(action == "AJAX_updateCostCenterAct")				||
+			(action == "AJAX_updateCostCenterSignDate")			||
+			(action == "AJAX_updateCostCenterStartDate")		||
+			(action == "AJAX_updateCostCenterEndDate")			||
+			(action == "AJAX_updateCostCenterCustomField")		||
 
 			(action == "AJAX_updatePeriodStart")				||
 			(action == "AJAX_updatePeriodEnd")					||
