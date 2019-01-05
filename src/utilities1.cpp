@@ -665,7 +665,7 @@ string RemoveAllNonAlphabetSymbols(string src)
 }
 
 
-string ConvertTextToHTML(const string messageBody)
+string ConvertTextToHTML(const string &messageBody)
 {
 	string 		result = messageBody;
 
@@ -687,7 +687,7 @@ string ConvertTextToHTML(const string messageBody)
 	return result;
 }
 
-string CheckHTTPParam_Text(string srcText)
+string CheckHTTPParam_Text(const string &srcText)
 {
 	char	convertBuffer[16384];
 	string	result = "";
@@ -749,7 +749,7 @@ string CheckHTTPParam_Float(string srcText)
 
 	if(srcText.length())
 	{
-		regex	r("^[0-9]+\\.?[0-9]*");
+		regex	r("^[0-9]+\\.?[0-9]+$");
 
 		if(regex_match(srcText, r))
 		{
@@ -778,11 +778,50 @@ string CheckHTTPParam_Date(string srcText)
 
 	if(srcText.length())
 	{
-		regex	r("^[[:digit:]]{1,2}\\/[[:digit:]]{1,2}\\/[[:digit:]]{2,4}$");
+		regex	r("^([[:digit:]]{1,2})\\/([[:digit:]]{1,2})\\/([[:digit:]]{2,4})$");
+		smatch	sm;
 
-		if(regex_match(srcText, r))
+		if(regex_match(srcText, sm, r))
 		{
-			result = srcText;
+			auto	date	= stoi(sm[1]);
+			auto	month	= stoi(sm[2]);
+			auto	year	= stoi(sm[3]);
+
+			if(year < 100) year += 2000;
+
+			if((1 <= date) && (date <= 31))
+			{
+				if((1 <= month) && (month <= 12))
+				{
+					if((1900 <= year) && (year <= 2100))
+					{
+						auto tm_obj = GetTMObject(srcText);
+
+						mktime(&tm_obj);
+
+						if((date == tm_obj.tm_mday) && (month == (tm_obj.tm_mon + 1)) && (year == (tm_obj.tm_year + 1900)))
+						{
+							result = srcText;
+						}
+						else
+						{
+							MESSAGE_ERROR("", "", "wrong date (" + srcText + " -> " + to_string(date) + "/" + to_string(month) + "/" + to_string(year) + " vs " + to_string(tm_obj.tm_mday) + "/" + to_string(tm_obj.tm_mon + 1) + "/" + to_string(tm_obj.tm_year + 1900) + ")");
+						}
+					}
+					else
+					{
+						MESSAGE_ERROR("", "", "year (" + to_string(year) + ") is out of range");
+					}
+				}
+				else
+				{
+					MESSAGE_ERROR("", "", "month (" + to_string(month) + ") is out of range");
+				}
+			}
+			else
+			{
+				MESSAGE_ERROR("", "", "date (" + to_string(date) + ") is out of range");
+			}
 		}
 		else
 		{
@@ -814,9 +853,18 @@ string CheckHTTPParam_Email(string srcText)
 	convert_utf8_to_windows1251(srcText.c_str(), convertBuffer, sizeof(convertBuffer) - 1);
 	result = ConvertTextToHTML(convertBuffer);
 
-	if(regex_match(srcText, regex("^[.[:alnum:]]+@[.[:alnum:]]+.[[:alnum:]]{2,5}$") ))
+//  if(regex_match(srcText, regex("^[[:alnum:]][._[:alnum:]]+[[:alnum:]]@[[:alnum:]][.-[:alnum:]]+[[:alnum:]].[[:alnum:]]{2,5}$") ))
+	if(regex_match(srcText, regex("^[._[:alnum:]]+@[[:alnum:]][\\-.[:alnum:]]*[[:alnum:]]\\.[[:alnum:]]{2,5}$") ))
     {
-    	// --- regex matched
+    	if(result.length() > 128)
+    	{
+    		result = "";
+    		MESSAGE_DEBUG("", "", "e-mail too long >128 symbols");
+    	}
+    	else
+    	{
+	    	// --- regex matched
+    	}
     }
     else
     {
@@ -862,7 +910,7 @@ string CheckHTTPParam_Timeentry(string srcText)
 	return	result;
 }
 
-
+/*
 string CheckIfFurtherThanNow(string occupationStart_cp1251)
 {
 	time_t	  now_t, checked_t;
@@ -961,6 +1009,7 @@ string CheckIfFurtherThanNow(string occupationStart_cp1251)
 
 	return occupationStart_cp1251;
 }
+*/
 
 string	GetDefaultActionFromUserType(string role, CMysql *db)
 {

@@ -50,14 +50,17 @@ c_float::c_float() : c_float(0, 2) {}
 
 c_float::c_float(double param) : c_float(param, 2) {}
 
-c_float::c_float(double param,  int prec_param) : val(param), precision(prec_param) {}
+c_float::c_float(double param,  int prec_param) : precision(prec_param) 
+{
+	val = RoundWithPrecision(param, precision);
+}
 
 c_float::c_float(string param) : c_float(param, 2) {}
 
-c_float::c_float(string param, int prec_param)
+c_float::c_float(string param, int prec_param) : precision(prec_param)
 {
-	precision = prec_param;
-
+// TODO: remove after building c_float tests
+/*
 	if(param.empty()) val = 0;
 	else
 	{
@@ -72,6 +75,8 @@ c_float::c_float(string param, int prec_param)
 		}
 
 	}
+*/
+	Set(param);
 }
 
 void c_float::Set(string param)
@@ -80,15 +85,31 @@ void c_float::Set(string param)
 	else
 	{
 		double	temp = 0;
+		auto	decimal_point = (localeconv()->decimal_point ? localeconv()->decimal_point[0] : ',');
+		auto	lc_original = ""s;
+		auto	lc_en = "en_US.utf8"s;
+
+		if(decimal_point != '.')
+		{
+			lc_original = setlocale(LC_NUMERIC, NULL);
+			setlocale(LC_NUMERIC, lc_en.c_str());
+			MESSAGE_DEBUG("c_float", "", "temporary switch locale from " + lc_original + " to " + lc_en)
+		}
 
 		try
 		{
-			temp = stod(FixRussianLocale(param));
+			temp = stod(param);
 		}
 		catch(...)
 		{
 			MESSAGE_ERROR("c_float", "", "can't convert " + param + " to double");
 			temp = 0;
+		}
+
+		if(decimal_point != '.')
+		{
+			setlocale(LC_NUMERIC, lc_original.c_str());
+			MESSAGE_DEBUG("c_float", "", "switch locale back to " + lc_original)
 		}
 
 		Set(temp);

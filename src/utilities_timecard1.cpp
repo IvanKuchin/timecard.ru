@@ -1617,18 +1617,9 @@ bool isTimecardEntryEmpty(string timereports)
 	timereport_vector = SplitTimeentry(timereports, ',');
 	for(auto &item: timereport_vector)
 	{
-		float	digit = 0;
+		c_float	digit(item);
 
-		try
-		{
-			digit = stof(item);
-		}
-		catch(...)
-		{
-			MESSAGE_ERROR("", "", "can't convert " + item + " to float");
-		}
-
-		if(digit)
+		if(digit.Get())
 		{
 			result = false;
 			break;
