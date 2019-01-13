@@ -4,7 +4,7 @@ backup_username => "ikuchin",
 
 # Mysql tables need to be upgraded in DEV -> WWW
 # have an effect in backup_structure / restore_structure
-tables_to_upgrade => "action_category action_types",
+tables_to_upgrade => "action_category action_types site_themes",
 
 replace_dev_to_www_files => [
 	"SRCDIR/CMakeLists.txt",

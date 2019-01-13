@@ -543,6 +543,45 @@ auto RunTest12()
 	return result;
 }
 
+auto RunTest13()
+{
+	auto	result = true;
+
+	for(auto i = 0; i < 100; ++i)
+	{
+		c_float	num("0." + to_string(i));
+		string	target =	(i ? "0." + (i % 10 ? to_string(i) : to_string(i / 10)) : "0");
+
+		if(string(num) == target) {}
+		else
+		{
+			result = false;
+			cout << "[" << __LINE__ << "] failed on (0." << i << ")" << endl;
+		}
+	}
+
+	return result;
+}
+
+auto RunTest14()
+{
+	auto	result = true;
+
+	for(auto i = 0; i < 100; ++i)
+	{
+		c_float	num(i/100);
+
+		if(num.Get() == i/100) {}
+		else
+		{
+			result = false;
+			cout << "[" << __LINE__ << "] failed on (0." << i << ")" << endl;
+		}
+	}
+
+	return result;
+}
+
 vector<bool (*)(void)>	func_v = {
 	RunTest1,
 	RunTest2,
@@ -556,6 +595,8 @@ vector<bool (*)(void)>	func_v = {
 	RunTest10,
 	RunTest11,
 	RunTest12,
+	RunTest13,
+	RunTest14,
 };
 
 
