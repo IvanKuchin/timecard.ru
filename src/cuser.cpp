@@ -552,7 +552,7 @@ bool CUser::LoadAvatar()
 	// --- Get user avatars
 	if(db->Query("select * from `users_avatars` where `userid`=\"" + GetID() + "\" and `isActive`='1';"))
 	{
-		avatarPath = "/images/avatars/avatars" + string(db->Get(0, "folder")) + "/" + db->Get(0, "filename");
+		avatarPath = "/images/avatars/avatars"s + db->Get(0, "folder") + "/" + db->Get(0, "filename");
 		result = true;
 	}
 	SetAvatar(avatarPath);
