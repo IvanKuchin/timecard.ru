@@ -2273,9 +2273,15 @@ int main(void)
 						ostResult << "{"
 										"\"result\":\"success\","
 										"\"timecards\":[" << GetTimecardsInJSONFormat(
-												"SELECT * FROM `timecards` WHERE `status`=\"approved\" AND `contract_sow_id` IN ("
-													"SELECT `contract_sow_id` FROM `contracts_psow` WHERE `cost_center_id`=\"" + cost_center_id + "\""
-												");", &db, &user) << "]";
+																"SELECT * FROM `timecards` WHERE `status`=\"approved\" AND `id` IN ("
+																	"SELECT `timecard_id` FROM `timecard_lines` WHERE `timecard_task_id` IN ("
+																		"SELECT `id` FROM `timecard_tasks` WHERE `timecard_projects_id` IN ("
+																			"SELECT `id` FROM `timecard_projects` WHERE `timecard_customers_id` IN ("
+																				"SELECT `timecard_customer_id` FROM `cost_center_assignment` WHERE `cost_center_id`=\"" + cost_center_id + "\""
+																			")"
+																		")"
+																	")"
+																")", &db, &user) << "]";
 						ostResult << "}";
 					}
 					else

@@ -15,10 +15,10 @@
 #include <sstream>
 #include <chrono>
 
-#include "localy.h"
-// #include "clock.h"
-
 using namespace std;
+
+#include "localy.h"
+#include "clock.h"
 
 #define DEBUG		0
 #define	WARNING		1
@@ -26,8 +26,31 @@ using namespace std;
 #define	PANIC		3
 
 #define	CURRENT_LOG_LEVEL			DEBUG
-#define	MESSAGE_DEBUG(classname, action, mess)	{ CLog	obj; obj.Write(DEBUG, string(classname) + (string(classname) == "" ? "" : "::") + string(__func__) + "[" + to_string(__LINE__) + "]:" + string(action) + (string(action) == "" ? "" : ":") + " " + mess); }
-#define	MESSAGE_ERROR(classname, action, mess)	{ CLog	log; log.Write(ERROR, string(classname) + (string(classname) == "" ? "" : "::") + string(__func__) + "[" + to_string(__LINE__) + "]:" + string(action) + (string(action) == "" ? "" : ":") + " " + mess); }
+#define	MESSAGE_DEBUG(classname_legacy, action, mess) \
+{ \
+	CLog	obj; \
+	string	pretty = __PRETTY_FUNCTION__;  \
+	string	classname = ""s; \
+	size_t	p1 = pretty.find(" "); \
+	size_t	p2 = pretty.find("::"); \
+\
+	if((p1 != string::npos) && (p2 != string::npos) && (p1 < p2)) { classname = pretty.substr(p1 + 1, p2 - p1 + 1); } \
+\
+	obj.Write(DEBUG, classname + string(__func__) + "[" + to_string(__LINE__) + "]" + (string(action) == "" ? "" : " "s + action + ":") + " " + mess); \
+}
+
+#define	MESSAGE_ERROR(classname_legacy, action, mess) \
+{ \
+	CLog	obj; \
+	string	pretty = __PRETTY_FUNCTION__;  \
+	string	classname = ""s; \
+	size_t	p1 = pretty.find(" "); \
+	size_t	p2 = pretty.find("::"); \
+\
+	if((p1 != string::npos) && (p2 != string::npos) && (p1 < p2)) { classname = pretty.substr(p1 + 1, p2 - p1 + 1); } \
+\
+	obj.Write(ERROR, classname + string(__func__) + "[" + to_string(__LINE__) + "]" + (string(action) == "" ? "" : " "s + action + ":") + " " + mess); \
+}
 
 using namespace std::chrono;
 
@@ -36,7 +59,7 @@ class CLog
     private:
     	string	fileName;
 //	CLock	lock;
-
+    	
 		string	SpellLogLevel(int level)
 		{
 			return  (level == 0 ? "DEBUG" :
@@ -137,4 +160,4 @@ class CLog
 	struct	sembuf sop_unlock[1];
 };
 
-#endif
+#endif 

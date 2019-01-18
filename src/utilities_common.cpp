@@ -110,13 +110,26 @@ auto GenerateSession(string action, CCgi *indexPage, CMysql *db, CUser *user) ->
 	sessidHTTP = indexPage->SessID_Get_FromHTTP();
 	if(sessidHTTP.length() < 5)
 	{
-		MESSAGE_DEBUG("", action, "session cookie doesn't exists, generating new session");
-
-		sessidHTTP = indexPage->SessID_Create_HTTP_DB();
-		if(sessidHTTP.length() < 5)
+		if((action.find("AJAX_") != string::npos) || (action.find("JSON_") != string::npos))
 		{
-			MESSAGE_ERROR("", action, "in generating session ID");
-			throw CExceptionHTML("session can't be created");
+			// --- this line prevents double cookie assignment in abnormal workflow
+			// --- for example:
+			// ---              browser cached _main_Doc_ w/o cookies
+			// ---              it will request many AJAX-s: EchoRequest, GetNavChatStatus, GetNewsFeed
+			// ---              some of those will assign _new_sessid_ cookies and these cookies will be diffferent
+			// ---              prohibiting AJAX to assign sessid cookies, help to avoid assignment multiple sessid cookies 
+			MESSAGE_ERROR("", action, "no sessid cookie assignment in AJAX/JSON handler, this is not normal workflow. This line may appear in the log only if AJAX_ been requested prior to _main_doc_ or _main_doc_ with clean cookies has been cached in a browser.");
+		}
+		else
+		{
+			MESSAGE_DEBUG("", action, "session cookie doesn't exists, generating new session");
+
+			sessidHTTP = indexPage->SessID_Create_HTTP_DB();
+			if(sessidHTTP.length() < 5)
+			{
+				MESSAGE_ERROR("", action, "in generating session ID");
+				throw CExceptionHTML("session can't be created");
+			}
 		}
 
 		if(action.length())
@@ -161,6 +174,7 @@ auto GenerateSession(string action, CCgi *indexPage, CMysql *db, CUser *user) ->
 							indexPage->RegisterVariableForce("myUserAvatar", user->GetAvatar());
 							indexPage->RegisterVariableForce("user_type", user->GetType());
 
+							// --- specific actions to AJAX-requests
 							if((action.find("AJAX_") != string::npos) || (action.find("JSON_") != string::npos))
 							{
 								// --- don't look for user theme if it is AJAX_ or JSON_ request
@@ -168,14 +182,10 @@ auto GenerateSession(string action, CCgi *indexPage, CMysql *db, CUser *user) ->
 								// --- this will save one request to DB
 							}
 							else
+							{
 								indexPage->RegisterVariableForce("site_theme", user->GetSiteTheme());
+							}
 
-/*							// --- Get user avatars
-							if(db->Query("SELECT * FROM `users_avatars` WHERE `userid`=\"" + user->GetID() + "\" and `isActive`=\"1\";"))
-								avatarPath = "/images/avatars/avatars" + string(db->Get(0, "folder")) + "/" + string(db->Get(0, "filename"));
-
-							indexPage->RegisterVariableForce("myUserAvatar", avatarPath);
-*/
 							MESSAGE_DEBUG("", action, "user (" + user->GetLogin() + ") logged in");
 						}
 						else
@@ -231,20 +241,17 @@ auto GenerateSession(string action, CCgi *indexPage, CMysql *db, CUser *user) ->
 	// --- check default action if needed
 	if(action.empty())
 	{
-		if(user->GetLogin().length() and (user->GetLogin() != "Guest"))
+		if(user)
 		{
 			action = GetDefaultActionFromUserType(user->GetType(), db);
 
-			MESSAGE_DEBUG("", "", "META-registration: action has been overriden to 'logged-in user' default action [action = " + action + "]");
+			MESSAGE_DEBUG("", "", "META-registration: action has been overriden user.type(" + user->GetType() + ") default action [action = " + action + "]");
+
+			if(user->GetLogin().empty()) MESSAGE_ERROR("", "", "user login is empty (user login must not be empty, either \"Guest\", or actual user login)");
 		}
 		else
 		{
-			action = GUEST_USER_DEFAULT_ACTION;
-
-			MESSAGE_DEBUG("", "", "META-registration: action has been overriden to 'guest user' default action [action = " + action + "]");
-
-			// --- user login should not be empty, either "Guest", or actual user login
-			if(user->GetLogin().empty()) MESSAGE_ERROR("", "", "user login is empty");
+			MESSAGE_ERROR("", "", "user is NULL");
 		}
 	}
 
@@ -259,7 +266,7 @@ auto 		LogoutIfGuest(string action, CCgi *indexPage, CMysql *db, CUser *user) ->
 
 	if(user->GetLogin() == "Guest")
 	{
-		if(action.compare(0, 5, "AJAX_"))
+		if(action.compare(0, 5, "AJAX_") == 0)
 		{
 			auto	template_name = "json_response.htmlt"s;
 
