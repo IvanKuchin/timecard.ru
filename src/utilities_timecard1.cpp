@@ -892,6 +892,7 @@ string	GetTimecardsInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool i
 
 			result += "\"id\":\"" + item.id + "\",";
 			result += "\"contract_sow_id\":\"" + item.contract_sow_id + "\",";
+			result += "\"contract_sow\":[" + GetSOWInJSONFormat("SELECT * FROM `contracts_sow` WHERE `id`=\"" + item.contract_sow_id + "\";", db, user, false, false, false) + "],";
 			result += "\"period_start\":\"" + item.period_start + "\",";
 			result += "\"period_end\":\"" + item.period_end + "\",";
 			result += "\"submit_date\":\"" + item.submit_date + "\",";
