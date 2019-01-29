@@ -42,6 +42,15 @@ auto C_Invoice_Service::CreateTempDirectory() -> bool
 		temp_dir = TEMP_DIRECTORY_PREFIX + GetRandom(15);
 	} while(isDirExists(temp_dir));
 
+	if(CreateDir(temp_dir))
+	{
+
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "fail to create " + temp_dir);
+	}
+
 	return result;
 }
 
@@ -76,7 +85,7 @@ C_Invoice_Service::~C_Invoice_Service()
 {
 	if(temp_dir.length())
 	{
-
+		RmDirRecursive(temp_dir.c_str());
 	}
 	else
 	{

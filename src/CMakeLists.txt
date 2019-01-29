@@ -100,32 +100,12 @@ else(MAXMIND_DISABLE)
     find_package(maxminddb REQUIRED)
 endif(MAXMIND_DISABLE)
 
-#[==[
-include_directories(
-    ${PROJECT_SOURCE_DIR}/src/include/
-    ${PROJECT_BINARY_DIR}/src/include/ # --- rendered config.h, generated table.h
-    ${LIBMYSQLCLIENT_INCLUDE_DIRS}
-    ${OPENSSL_INCLUDE_DIR}
-    ${IMAGEMAGICK_INCLUDE_DIR}
-    ${CURL_INCLUDE_DIR}
-    ${AVUTIL_INCLUDE_DIR}
-    ${AVFORMAT_INCLUDE_DIR}
-    )
-
-link_directories(
-    ${LIBMYSQLCLIENT_LIBDIR}
-    )
-
-link_libraries(
-    ${LIBMYSQLCLIENT_LIBRARIES}
-    ${OPENSSL_CRYPTO_LIBRARIES}
-    ${IMAGEMAGICK_LIBRARY}
-    ${CURL_LIBRARIES}
-    ${AVUTIL_LIBRARY}
-    ${AVFORMAT_LIBRARY}
-    ${MAXMINDDB_LIBRARY}
-    )
-#]==]
+# --- install option
+# --- this setting allows to dynalic linker find .so library in custom location
+# --- otherwise it have to be added to ld.so.conf or environment variable
+# --- actual linker options are -Wl,-rpath,/path/to/dynamic/library
+# --- https://gitlab.kitware.com/cmake/community/wikis/doc/cmake/RPATH-handling
+set(CMAKE_INSTALL_RPATH		${XL_LIBRARY_DIR})
 
 set(project_include_directories
     ${PROJECT_SOURCE_DIR}/src/include/
@@ -200,11 +180,14 @@ target_link_libraries(cron_daily		${PROJECT_LIBS})
 target_link_libraries(cron_minute		${PROJECT_LIBS})
 
 if(MSVC)
-    target_compile_options(	cron_daily		PRIVATE	/W4 /WX)
+    target_compile_options(cron_daily		PRIVATE	/W4 /WX)
 else(MSVC)
-    target_compile_options(	cron_minute 		PRIVATE	-Wall -Wextra -pedantic)
+    target_compile_options(cron_minute 		PRIVATE	-Wall -Wextra -pedantic)
 endif(MSVC)
 
+
+# --- Install settings
+#set(CMAKE_INSTALL_RPATH		${XL_LIBRARY_DIR})
 
 # --- Install part
 install(TARGETS index.cgi			DESTINATION		${CGIDIR})
@@ -224,5 +207,5 @@ install(TARGETS cron_minute			DESTINATION		${CRON_INSTALL_DIR})
 
 
 
-#print_all_variables()
+# print_all_variables()
 

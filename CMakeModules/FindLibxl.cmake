@@ -26,22 +26,22 @@ find_path( XL_INCLUDE_DIR libxl.h
   /mingw/include
 )
 
- message( "XL_INCLUDE_DIR is ${XL_INCLUDE_DIR}" )
+# message( "XL_INCLUDE_DIR is ${XL_INCLUDE_DIR}" )
 
 EXECUTE_PROCESS( COMMAND getconf LONG_BIT COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE )
 
 if( ${ARCHITECTURE} STREQUAL "64" )
-    set( XL_LIBRARY_TEST ${CMAKE_SOURCE_DIR}/libxl-3.8.4.0/lib64 )
+    set( XL_LIBRARY_DIR ${CMAKE_SOURCE_DIR}/libxl-3.8.4.0/lib64 )
 else()
-    set( XL_LIBRARY_TEST ${CMAKE_SOURCE_DIR}/libxl-3.8.4.0/lib )
+    set( XL_LIBRARY_DIR ${CMAKE_SOURCE_DIR}/libxl-3.8.4.0/lib )
 endif()
 
- message( "XL_LIBRARY_TEST is ${XL_LIBRARY_TEST}" )
+# message( "XL_LIBRARY_DIR is ${XL_LIBRARY_DIR}" )
 
 find_library( XL_LIBRARY
   NAMES xl
   HINTS
-  "${XL_LIBRARY_TEST}"
+  "${XL_LIBRARY_DIR}"
   $ENV{XLDIR}
   PATH_SUFFIXES lib64 lib bin
   PATHS
@@ -54,7 +54,7 @@ find_library( XL_LIBRARY
   /mingw
 )
 
- message( "XL_LIBRARY is ${XL_LIBRARY}" )
+# message( "XL_LIBRARY is ${XL_LIBRARY}" )
 
 if(XL_INCLUDE_DIR)
     if(XL_LIBRARY)

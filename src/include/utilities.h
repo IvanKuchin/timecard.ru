@@ -10,6 +10,8 @@
 #include <regex>
 #include <cctype> 		//--- used for tolower
 #include <sys/stat.h>
+#include <sys/types.h>	// --- DIR
+#include <dirent.h>		// --- opendir, rmdir
 #include <execinfo.h>   // --- backtrace defined here
 #include <signal.h>     // --- signal intercaeption
 #include <iomanip>		// --- setprecision(2) in Float2StringWithPrecision
@@ -119,6 +121,8 @@ auto 			GetOpenVacanciesInJSONFormat(string companyID, CMysql *, CUser * = NULL)
 auto			GetGeoLocalityIDByCityAndRegion(string regionName, string cityName, CMysql *) -> string;
 auto        	AllowMessageInNewsFeed(CUser *me, const string messageOwnerID, const string messageAccessRights, vector<string> *messageFriendList) -> bool;
 auto        	isPersistenceRateLimited(string REMOTE_ADDR, CMysql *) -> bool;
+auto			CreateDir(const string &dir) -> bool;
+auto 			RmDirRecursive(const char *dirname) -> bool;
 auto        	isDirExists(const std::string& name) -> bool;
 auto        	isFileExists(const std::string& name) -> bool;
 auto			isFilenameImage(string	filename) -> bool;

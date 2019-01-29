@@ -35,6 +35,8 @@ set(CI_SCRIPT_PROJECT_DIR	${PROJECT_BINARY_DIR}/share/${PROJECT_NAME}/ci-scripts
 set(LOCALE_PROJECT_DIR		${PROJECT_BINARY_DIR}/share/${PROJECT_NAME}/locale)
 
 # ---- install variables
+# set(CMAKE_INSTALL_RPATH "/home/ikuchin/src/dev.timecard.su/libxl-3.8.4.0/lib64")
+#set(CMAKE_INSTALL_RPATH ${XL_LIBRARY_DIR})
 set(ROOTDIR		"/home/httpd/dev.${PROJECT_NAME}")
 set(IMAGEROOTDIR	"/home/httpd/devimages.${PROJECT_NAME}")
 set(LOGDIR		"/home/ikuchin/src_logs/")
@@ -51,6 +53,8 @@ add_subdirectory(supplemental/archive/)
 add_subdirectory(supplemental/maxmind/)
 add_subdirectory(supplemental/ci-scripts/)
 add_subdirectory(po/)
+
+
 
 include(CTest)
 add_subdirectory(tests/)
