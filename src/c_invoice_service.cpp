@@ -44,7 +44,7 @@ auto C_Invoice_Service::CreateTempDirectory() -> bool
 
 	if(CreateDir(temp_dir))
 	{
-
+		result = true;
 	}
 	else
 	{
