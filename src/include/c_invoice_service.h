@@ -8,6 +8,7 @@
 #include "clog.h"
 #include "hpdf.h"
 #include "libxl.h"
+#include "utilities.h"
 
 using namespace std;
 
@@ -18,6 +19,10 @@ class C_Invoice_Service
 		CUser			*user = NULL;
 		vector<string>	timecard_list;
 		string			cost_center_id = "";
+
+		string			temp_dir = "";
+
+		auto		CreateTempDirectory() -> bool;
 
 		auto		GeneratePDF() -> string;
 		auto		GenerateXL() -> string;
@@ -32,6 +37,8 @@ class C_Invoice_Service
 		auto		SetCostCenterID(string &&param1) 				{ cost_center_id = move(param1); };
 
 		auto		GenerateDocumentArchive() -> string;
+
+					~C_Invoice_Service();
 };
 
 ostream&	operator<<(ostream& os, const C_Invoice_Service &);

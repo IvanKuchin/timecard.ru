@@ -208,4 +208,6 @@
 #define	MYSQL_DATE_FORMAT							"%Y-%m-%d"
 #define	RU_DATE_FORMAT								"%d/%m/%Y"
 
+#define	TEMP_DIRECTORY_PREFIX						"/tmp/"s
+
 #endif

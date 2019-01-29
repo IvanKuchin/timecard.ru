@@ -14,13 +14,33 @@ C_Invoice_Service::C_Invoice_Service(CMysql *param1, CUser *param2) : db(param1)
 
 auto C_Invoice_Service::GenerateDocumentArchive() -> string
 {
-	auto		result = ""s;
+	auto		error_message = ""s;
 
 	MESSAGE_DEBUG("", "", "start");
 
+	if(CreateTempDirectory())
+	{
 
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "fail to create temp directory");
+		error_message = utf8_to_cp1251(gettext("fail to create temp directory"));
+	}
 
 	MESSAGE_DEBUG("", "", "finish");
+
+	return error_message;
+}
+
+auto C_Invoice_Service::CreateTempDirectory() -> bool
+{
+	auto result = false;
+
+	do
+	{
+		temp_dir = TEMP_DIRECTORY_PREFIX + GetRandom(15);
+	} while(isDirExists(temp_dir))
 
 	return result;
 }
@@ -50,6 +70,18 @@ auto C_Invoice_Service::GenerateXL() -> string
     }
 
     return "ok";
+}
+
+C_Invoice_Service::~C_Invoice_Service()
+{
+	if(temp_dir.length())
+	{
+
+	}
+	else
+	{
+		MESSAGE_DEBUG("", "", "temp_dir is not defined, no need to remove it");
+	}
 }
 
 ostream& operator<<(ostream& os, const C_Invoice_Service &var)
