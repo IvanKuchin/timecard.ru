@@ -37,6 +37,7 @@ addons:
     - libmysqlclient-dev
     - libssl-dev
     - libcurl4-openssl-dev
+    - libhpdf-dev
     - pkg-config
 
 script:
