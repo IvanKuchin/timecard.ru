@@ -40,7 +40,7 @@ auto C_Invoice_Service::CreateTempDirectory() -> bool
 	do
 	{
 		temp_dir = TEMP_DIRECTORY_PREFIX + GetRandom(15);
-	} while(isDirExists(temp_dir))
+	} while(isDirExists(temp_dir));
 
 	return result;
 }

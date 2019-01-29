@@ -1776,6 +1776,27 @@ bool isFileExists(const std::string& name)
 	return (stat (name.c_str(), &buffer) == 0);
 }
 
+bool isDirExists(const std::string& name)
+{
+	struct stat buffer;
+	auto		result = false;
+
+	if(stat(name.c_str(), &buffer) != 0)
+	{
+		MESSAGE_DEBUG("", "", "can't access " + name);
+	}
+	else if(buffer.st_mode & S_IFDIR)
+	{
+		result = true;
+	}
+	else
+	{
+		MESSAGE_DEBUG("", "", name + " isn't directory");
+	}
+
+	return result;
+}
+
 string SymbolReplace(const string where, const string src, const string dst)
 {
 	auto				  result = ""s;

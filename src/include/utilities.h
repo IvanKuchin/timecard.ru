@@ -119,6 +119,7 @@ auto 			GetOpenVacanciesInJSONFormat(string companyID, CMysql *, CUser * = NULL)
 auto			GetGeoLocalityIDByCityAndRegion(string regionName, string cityName, CMysql *) -> string;
 auto        	AllowMessageInNewsFeed(CUser *me, const string messageOwnerID, const string messageAccessRights, vector<string> *messageFriendList) -> bool;
 auto        	isPersistenceRateLimited(string REMOTE_ADDR, CMysql *) -> bool;
+auto        	isDirExists(const std::string& name) -> bool;
 auto        	isFileExists(const std::string& name) -> bool;
 auto			isFilenameImage(string	filename) -> bool;
 auto			isFilenameVideo(string	filename) -> bool;

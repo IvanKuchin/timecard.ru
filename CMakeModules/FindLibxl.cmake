@@ -41,7 +41,7 @@ endif()
 find_library( XL_LIBRARY
   NAMES xl
   HINTS
-  ${XL_LIBRARY_TEST}
+  "${XL_LIBRARY_TEST}"
   $ENV{XLDIR}
   PATH_SUFFIXES lib64 lib bin
   PATHS
