@@ -1,10 +1,25 @@
 #include "utilities_common.h"
 
+auto LogEnvVariables() -> void
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	if(getenv("HTTP_REFERER")) MESSAGE_DEBUG("", "", "HTTP_REFERER: "s + getenv("HTTP_REFERER"));
+	if(getenv("REMOTE_ADDR")) MESSAGE_DEBUG("", "", "REMOTE_ADDR: "s + getenv("REMOTE_ADDR"));
+	if(getenv("SERVER_NAME")) MESSAGE_DEBUG("", "", "SERVER_NAME: "s + getenv("SERVER_NAME"));
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return;
+}
+
 auto RegisterInitialVariables(CCgi *indexPage, CMysql *db, CUser *user) -> bool
 {
 	auto	result = true;
 
 	MESSAGE_DEBUG("", "", "start");
+
+	LogEnvVariables();
 
 	indexPage->RegisterVariableForce("rand", GetRandom(10));
 	indexPage->RegisterVariableForce("random", GetRandom(10));

@@ -5478,3 +5478,46 @@ auto GetNumberOfSoWActiveLastMonth(CMysql *db, CUser *user) -> string
 
 	return result;
 }
+
+auto GetPSoWIDByTimecardIDAndCostCenterID(string timecard_id, string cost_center_id, CMysql *db, CUser *user) -> string
+{
+	auto	result = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(user)
+	{
+		if(user->GetType() == "agency")
+		{
+			if(db)
+			{
+				if(db->Query(
+					"SELECT `id` FROM `contracts_psow` WHERE `cost_center_id`=\"" + cost_center_id + "\" AND `contract_sow_id` IN ("
+						"SELECT `contract_sow_id` FROM `timecard_task_assignment` WHERE `timecard_tasks_id` IN ("
+					        "SELECT `timecard_task_id` FROM `timecard_lines` WHERE `timecard_id`=\"" + timecard_id + "\""
+					    ")"
+					")"
+				))
+				{
+					result = db->Get(0, "id");
+				}
+			}
+			else
+			{
+				MESSAGE_ERROR("", "", "db not initialized");
+			}
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "user.id(" + user->GetID() + ") is not an agency employee (" + user->GetType() + ")");
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "user not initialized");
+	}
+
+	MESSAGE_DEBUG("", "", "finish (result is " + result + ")");
+
+	return result;
+}

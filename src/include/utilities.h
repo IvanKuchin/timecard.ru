@@ -41,14 +41,14 @@ auto	      	RemoveSpecialHTMLSymbols(string src) -> string;
 auto	      	ReplaceDoubleQuoteToQuote(string src) -> string;
 auto	      	ReplaceCRtoHTML(string src) -> string;
 auto	      	CleanUPText(const string messageBody, bool removeBR = true) -> string;
-auto	      	RemoveAllNonAlphabetSymbols(string src) -> string;
+auto	      	RemoveAllNonAlphabetSymbols(const string &src) -> string;
 auto	      	ConvertTextToHTML(const string &messageBody) -> string;
 auto	 		CheckHTTPParam_Text(const string &srcText) -> string;
-auto 			CheckHTTPParam_Number(string srcText) -> string;
-auto	 		CheckHTTPParam_Date(string srcText) -> string;
-auto	 		CheckHTTPParam_Float(string srcText) -> string;
-auto	 		CheckHTTPParam_Email(string srcText) -> string;
-auto	 		CheckHTTPParam_Timeentry(string srcText) -> string;
+auto 			CheckHTTPParam_Number(const string &srcText) -> string;
+auto	 		CheckHTTPParam_Date(const string &srcText) -> string;
+auto	 		CheckHTTPParam_Float(const string &srcText) -> string;
+auto	 		CheckHTTPParam_Email(const string &srcText) -> string;
+auto	 		CheckHTTPParam_Timeentry(const string &srcText) -> string;
 // auto	      	CheckIfFurtherThanNow(string occupationStart_cp1251) -> string;
 auto			GetDefaultActionFromUserType(string role, CMysql *) -> string;
 auto	      	GetSecondsSinceY2k() -> double;
@@ -261,6 +261,7 @@ auto			GetNumberOfApprovedTimecardsThisMonth(CMysql *db, CUser *user) -> string;
 auto			GetNumberOfApprovedTimecardsLastMonth(CMysql *db, CUser *user) -> string;
 auto 			GetNumberOfSoWActiveThisMonth(CMysql *db, CUser *user) -> string;
 auto 			GetNumberOfSoWActiveLastMonth(CMysql *db, CUser *user) -> string;
+auto			GetPSoWIDByTimecardIDAndCostCenterID(string timecard_id, string cost_center_id, CMysql *db, CUser *user) -> string;
 
 
 // --- function set for image upload/removal

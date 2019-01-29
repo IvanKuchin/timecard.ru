@@ -1,5 +1,77 @@
 #include "agency.h"
 
+static string isTimecardsHavePSOWAssigned(const vector<string> &timecard_list, string cost_center_id, CMysql *db, CUser *user)
+{
+	auto	error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+	
+	if(db)
+	{
+		for(auto &timecard_id: timecard_list)
+		{
+			auto	psow_id = GetPSoWIDByTimecardIDAndCostCenterID(timecard_id, cost_center_id, db, user);
+
+			if(psow_id.empty())
+			{
+				MESSAGE_ERROR("", "", "timecard.id(" + timecard_id + ") have no PSoW associated");
+				error_message = utf8_to_cp1251(gettext("Some timecards have no PSoW associated"));
+				break;
+			}
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "db is NULL");
+		error_message = utf8_to_cp1251(gettext("Data has not been initialized"));
+	}
+
+	MESSAGE_DEBUG("", "", "finish (error_message.length = " + to_string(error_message.length()) + ")");
+
+	return error_message;
+}
+
+static string isTimecardsBelongToAgency(const vector<string> &timecard_list, string agency_id, CMysql *db, CUser *user)
+{
+	auto	error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+	
+	if(db)
+	{
+		for(auto &timecard_id: timecard_list)
+		{
+			if(db->Query("SELECT `agency_company_id` FROM `contracts_sow` WHERE `id`=(SELECT `contract_sow_id` FROM `timecards` WHERE `id`=\"" + timecard_id + "\");"))
+			{
+				if(agency_id == db->Get(0, "agency_company_id"))
+				{
+
+				}
+				else
+				{
+					MESSAGE_ERROR("", "", "timecard.id(" + timecard_id + ") doesn't belongs to agency.id(" + agency_id + ")");
+					error_message = utf8_to_cp1251(gettext("Timecard doesn't belongs to agency"));
+					break;
+				}
+			}
+			else
+			{
+				MESSAGE_ERROR("", "", "timecard.id(" + timecard_id + ") doesn't exists");
+				error_message = utf8_to_cp1251(gettext("Timecard not found"));
+			}
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "db is NULL");
+		error_message = utf8_to_cp1251(gettext("Data has not been initialized"));
+	}
+
+	MESSAGE_DEBUG("", "", "finish (error_message.length = " + to_string(error_message.length()) + ")");
+
+	return error_message;
+}
+
 static string isAgencyEmployeeAllowedToChangeSoW(string sow_id, CMysql *db, CUser *user)
 {
 	string	error_message = "";
@@ -17,19 +89,19 @@ static string isAgencyEmployeeAllowedToChangeSoW(string sow_id, CMysql *db, CUse
 			else
 			{
 				MESSAGE_DEBUG("", "", "user(" + user->GetID() + ") have not rights to change SoW(" + sow_id + ")");
-				error_message = "Вы не можете менять данные договора";
+				error_message = utf8_to_cp1251(gettext("You are not authorized"));
 			}
 		}
 		else
 		{
 			MESSAGE_ERROR("", "", "user(" + user->GetID() + ") is not an agency employee");
-			error_message = "Информация доступна только для агенства";
+			error_message = utf8_to_cp1251(gettext("You are not agency employee"));
 		}
 	}
 	else
 	{
-		error_message = "Неизвестный номер договора";
 		MESSAGE_ERROR("", "", "sow_id is empty");
+		error_message = utf8_to_cp1251(gettext("Data has not been initialized"));
 	}
 
 	MESSAGE_DEBUG("", "", "finish (result length is " + to_string(error_message.length()) + ")");
@@ -54,19 +126,19 @@ static string isAgencyEmployeeAllowedToChangeAgencyData(CMysql *db, CUser *user)
 			else
 			{
 				MESSAGE_DEBUG("", "", "user(" + user->GetID() + ") have no rights to change agency data");
-				error_message = "Вы не можете менять данные договора";
+				error_message = utf8_to_cp1251(gettext("You are not authorized"));
 			}
 		}
 		else
 		{
 			MESSAGE_ERROR("", "", "user(" + user->GetID() + ") is not an agency employee");
-			error_message = "Информация доступна только для агенства";
+			error_message = utf8_to_cp1251(gettext("You are not agency employee"));
 		}
 	}
 	else
 	{
-		error_message = "Инициализации данных";
 		MESSAGE_ERROR("", "", "db or user is NULL");
+		error_message = utf8_to_cp1251(gettext("Data has not been initialized"));
 	}
 
 	MESSAGE_DEBUG("", "", "finish (result length is " + to_string(error_message.length()) + ")");
@@ -1032,206 +1104,6 @@ int main(void)
 			//------- Generate session
 			action = GenerateSession(action, &indexPage, &db, &user);
 			action = LogoutIfGuest(action, &indexPage, &db, &user);
-
-		/*
-			ostringstream		query, ost1, ost2;
-			string				partNum;
-			string				content;
-			// Menu				m;
-
-			indexPage.RegisterVariableForce("rand", GetRandom(10));
-			indexPage.RegisterVariableForce("random", GetRandom(10));
-			indexPage.RegisterVariableForce("style", "style.css");
-
-			// --- Generate session
-			{
-				string			lng, sessidHTTP;
-				ostringstream	ost;
-
-
-				sessidHTTP = indexPage.SessID_Get_FromHTTP();
-				if(sessidHTTP.length() < 5)
-				{
-					{
-						MESSAGE_DEBUG("", action, "session cookie is not exist, generating new session.");
-					}
-					sessidHTTP = indexPage.SessID_Create_HTTP_DB();
-					if(sessidHTTP.length() < 5)
-					{
-						MESSAGE_ERROR("", action, "error in generating session ID");
-						throw CExceptionHTML("session can't be created");
-					}
-				}
-				else {
-					if(indexPage.SessID_Load_FromDB(sessidHTTP))
-					{
-						if(indexPage.SessID_CheckConsistency())
-						{
-							if(indexPage.SessID_Update_HTTP_DB())
-							{
-								indexPage.RegisterVariableForce("loginUser", "");
-								indexPage.RegisterVariableForce("loginUserID", "");
-
-								user.SetDB(&db);
-								if(indexPage.SessID_Get_UserFromDB() != "Guest")
-								{
-									// --- place 2change user from user.email to user.id
-									if(user.GetFromDBbyEmail(indexPage.SessID_Get_UserFromDB()))
-									{
-										ostringstream	ost1;
-										string			avatarPath;
-
-										indexPage.RegisterVariableForce("loginUser", indexPage.SessID_Get_UserFromDB());
-										indexPage.RegisterVariableForce("loginUserID", user.GetID());
-										indexPage.RegisterVariableForce("myLogin", user.GetLogin());
-										indexPage.RegisterVariableForce("myFirstName", user.GetName());
-										indexPage.RegisterVariableForce("myLastName", user.GetNameLast());
-
-										// --- Get user avatars
-										ost1.str("");
-										ost1 << "select * from `users_avatars` where `userid`='" << user.GetID() << "' and `isActive`='1';";
-										avatarPath = "empty";
-										if(db.Query(ost1.str()))
-										{
-											ost1.str("");
-											ost1 << "/images/avatars/avatars" << db.Get(0, "folder") << "/" << db.Get(0, "filename");
-											avatarPath = ost1.str();
-										}
-										indexPage.RegisterVariableForce("myUserAvatar", avatarPath);
-
-										{
-											MESSAGE_DEBUG("", "", "user [" + user.GetLogin() + "] logged in");
-										}
-									}
-									else
-									{
-										// --- enforce to close session
-										action = "logout";
-
-										{
-											MESSAGE_DEBUG("", "", "user [" + indexPage.SessID_Get_UserFromDB() + "] session exists on client device, but not in the DB. Change the [action = logout]");
-										}
-
-									}
-								}
-								else
-								{
-									{
-										MESSAGE_DEBUG("", action, "user [" + user.GetLogin() + "] surfing");
-									}
-
-									if(user.GetFromDBbyLogin(user.GetLogin()))
-									{
-										indexPage.RegisterVariableForce("loginUser", user.GetLogin());
-										indexPage.RegisterVariableForce("loginUserID", user.GetID());
-										indexPage.RegisterVariableForce("myLogin", user.GetLogin());
-										indexPage.RegisterVariableForce("myFirstName", user.GetName());
-										indexPage.RegisterVariableForce("myLastName", user.GetNameLast());
-									}
-									else
-									{
-										// --- enforce to close session
-										action = "logout";
-
-										{
-											MESSAGE_DEBUG("", action, "user [" + indexPage.SessID_Get_UserFromDB() + "] session exists on client device, but not in the DB. Change the [action = logout].");
-										}
-
-									}
-
-								}
-
-
-							}
-							else
-							{
-								MESSAGE_ERROR("", action, "error update session in HTTP or DB failed");
-							}
-						}
-						else {
-							MESSAGE_ERROR("", action, "error session consistency check failed");
-						}
-					}
-					else
-					{
-						ostringstream	ost;
-
-						{
-							MESSAGE_DEBUG("", action, "cookie session and DB session is not equal. Need to recreate session");
-						}
-
-						ost.str("");
-						ost << "/?rand=" << GetRandom(10);
-
-						if(!indexPage.Cookie_Expire()) {
-							MESSAGE_ERROR("", action, "error in session expiration");
-						} // --- if(!indexPage.Cookie_Expire())
-						indexPage.Redirect(ost.str());
-					} // --- if(indexPage.SessID_Load_FromDB(sessidHTTP))
-				} // --- if(sessidHTTP.length() < 5)
-			}
-	//------- End generate session
-
-
-	//------- Register html META-tags
-			if(db.Query("select `value` from `settings_default` where `setting`=\"keywords_head\"") > 0)
-				indexPage.RegisterVariable("keywords_head", db.Get(0, "value"));
-			else
-			{
-				MESSAGE_ERROR("", action, "error getting keywords_head from settings_default");
-			}
-
-			if(db.Query("select `value` from `settings_default` where `setting`=\"title_head\"") > 0)
-				indexPage.RegisterVariable("title_head", db.Get(0, "value"));
-			else
-			{
-				MESSAGE_ERROR("", action, "error getting title_head from settings_default");
-			}
-
-			if(db.Query("select `value` from `settings_default` where `setting`=\"description_head\"") > 0)
-				indexPage.RegisterVariable("description_head", db.Get(0, "value"));
-			else
-			{
-				MESSAGE_ERROR("", action, "error getting description_head from settings_default");
-			}
-
-			if(db.Query("select `value` from `settings_default` where `setting`=\"NewsOnSinglePage\"") > 0)
-				indexPage.RegisterVariable("NewsOnSinglePage", db.Get(0, "value"));
-			else
-			{
-				MESSAGE_ERROR("", action, "error getting NewsOnSinglePage from settings_default");
-
-				indexPage.RegisterVariable("NewsOnSinglePage", to_string(NEWS_ON_SINGLE_PAGE));
-			}
-
-			if(db.Query("select `value` from `settings_default` where `setting`=\"FriendsOnSinglePage\"") > 0)
-				indexPage.RegisterVariable("FriendsOnSinglePage", db.Get(0, "value"));
-			else
-			{
-				MESSAGE_ERROR("", action, "error getting FriendsOnSinglePage from settings_default");
-
-				indexPage.RegisterVariable("FriendsOnSinglePage", to_string(FRIENDS_ON_SINGLE_PAGE));
-			}
-
-			if(action.empty() and user.GetLogin().length() and (user.GetLogin() != "Guest"))
-			{
-				action = GetDefaultActionFromUserType(user.GetType(), &db);
-
-				{
-					MESSAGE_DEBUG("", action, "META-registration: 'logged-in user' action has been overriden to [" + action + "]");
-				}
-
-			}
-			else if(!action.length())
-			{
-				action = GUEST_USER_DEFAULT_ACTION;
-
-				{
-					MESSAGE_DEBUG("", action, "META-registration: 'guest user' action has been overriden to [" + action + "]");
-				} // --- log block
-			} // --- default action
-	//------- End register html META-tags
-		*/
 		}
 	// ------------ end generate common parts
 
@@ -2214,8 +2086,6 @@ int main(void)
 				if(user.GetType() == "agency")
 				{
 					{
-						string		agency_id = db.Get(0, "id");
-
 						ostResult << "{"
 										"\"result\":\"success\","
 										"\"cost_centers\":[" << GetCostCentersInJSONFormat(
@@ -2262,23 +2132,29 @@ int main(void)
 			{
 				string			template_name = "json_response.htmlt";
 				string			error_message = "";
-				string			cost_center_id = indexPage.GetVarsHandler()->Get("cost_center_id");
+				string			cost_center_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("cost_center_id"));
 
 				if(user.GetType() == "agency")
 				{
 					if(isCostCenterBelongsToAgency(cost_center_id, &db, &user))
 					{
-						string		agency_id = db.Get(0, "id");
-
 						ostResult << "{"
 										"\"result\":\"success\","
 										"\"timecards\":[" << GetTimecardsInJSONFormat(
-																"SELECT * FROM `timecards` WHERE `status`=\"approved\" AND `id` IN ("
-																	"SELECT `timecard_id` FROM `timecard_lines` WHERE `timecard_task_id` IN ("
-																		"SELECT `id` FROM `timecard_tasks` WHERE `timecard_projects_id` IN ("
-																			"SELECT `id` FROM `timecard_projects` WHERE `timecard_customers_id` IN ("
-																				"SELECT `timecard_customer_id` FROM `cost_center_assignment` WHERE `cost_center_id`=\"" + cost_center_id + "\""
+																"SELECT * FROM `timecards` WHERE `status`=\"approved\" AND ("
+																	"`id` IN ("
+																		"SELECT `timecard_id` FROM `timecard_lines` WHERE `timecard_task_id` IN ("
+																			"SELECT `id` FROM `timecard_tasks` WHERE `timecard_projects_id` IN ("
+																				"SELECT `id` FROM `timecard_projects` WHERE `timecard_customers_id` IN ("
+																					"SELECT `timecard_customer_id` FROM `cost_center_assignment` WHERE `cost_center_id`=\"" + cost_center_id + "\""
+																				")"
 																			")"
+																		")"
+																	")"
+																") AND NOT("
+																	"`id` IN ("
+																		"SELECT `timecard_id` FROM `invoice_cost_center_service_details` WHERE `invoice_cost_center_service_id` IN ("
+																			"SELECT `id` FROM `invoice_cost_center_service` WHERE `cost_center_id`=\"" + cost_center_id + "\""
 																		")"
 																	")"
 																")", &db, &user) << "]";
@@ -3806,6 +3682,131 @@ int main(void)
 				else
 				{
 					MESSAGE_DEBUG("", action, "failed");
+					ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+				}
+
+				indexPage.RegisterVariableForce("result", ostResult.str());
+
+				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			}
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
+
+		if(action == "AJAX_submitTimecardsToInvoice")
+		{
+			ostringstream	ostResult;
+
+			MESSAGE_DEBUG("", action, "start");
+
+			ostResult.str("");
+
+			{
+				auto			template_name = "json_response.htmlt"s;
+				auto			error_message = ""s;
+				auto			cost_center_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("cost_center_id"));
+				auto			timecard_list_param = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("timecard_list"));
+				auto			timecard_list = split(timecard_list_param, ',');
+				auto			isListCorrect = true;
+
+				for(auto &item: timecard_list)
+				{
+					if(CheckHTTPParam_Number(item).empty())
+					{
+						isListCorrect = false;
+					}
+				}
+
+				if(isListCorrect)
+				{
+					if(cost_center_id.length())
+					{
+						if(user.GetType() == "agency")
+						{
+							error_message = isAgencyEmployeeAllowedToChangeAgencyData(&db, &user);
+							if(error_message.empty())
+							{
+								if(isCostCenterBelongsToAgency(cost_center_id, &db, &user))
+								{
+									if(db.Query("SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id`=(SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user.GetID() + "\");"))
+									{
+										string		agency_id = db.Get(0, "id");
+
+										error_message = isTimecardsBelongToAgency(timecard_list, agency_id, &db, &user);
+										if(error_message.empty())
+										{
+											error_message = isTimecardsHavePSOWAssigned(timecard_list, cost_center_id, &db, &user);
+											if(error_message.empty())
+											{
+												C_Invoice_Service	c_invoice(&db, &user);
+
+												c_invoice.SetTimecardList(timecard_list);
+												c_invoice.SetCostCenterID(cost_center_id);
+
+												error_message = c_invoice.GenerateDocumentArchive();
+												if(error_message.empty())
+												{
+													ostResult << "{"
+																	"\"result\":\"success\""
+																 "}";
+												}
+												else
+												{
+													MESSAGE_DEBUG("", action, "fail to generate invoice document archive");
+												}
+											}
+											else
+											{
+												MESSAGE_ERROR("", action, "some timecard.id's(" + timecard_list_param + ") doesn't belong to agency(" + agency_id + ")");
+											}
+										}
+										else
+										{
+											MESSAGE_ERROR("", action, "user.id(" + user.GetID() + ") isn't agency employee");
+										}
+									}
+									else
+									{
+										MESSAGE_ERROR("", action, "Can't define agency.id by user.id(" + user.GetID() + ")");
+										error_message = utf8_to_cp1251(gettext("You are not agency employee"));
+									}
+								}
+								else
+								{
+									MESSAGE_ERROR("", action, "cost_center.id(" + cost_center_id + ") doesn't belongs to agance user(" + user.GetID() + ") employeed");
+									error_message = utf8_to_cp1251(gettext("You are not agency employee"));
+								}
+							}
+							else
+							{
+								MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") doesn't allowed to change agency data");
+							}
+						}
+						else
+						{
+							MESSAGE_ERROR("", action, "user(" + user.GetID() + ") is not an agency employee");
+							error_message = utf8_to_cp1251(gettext("You are not agency employee"));
+						}
+					}
+					else
+					{
+						MESSAGE_ERROR("", action, "cost_center_id id is missed");
+						error_message = utf8_to_cp1251(gettext("mandatory parameter missed"));
+					}
+				}
+				else
+				{
+					MESSAGE_ERROR("", action, "timecard list(" + timecard_list_param + ") is incorrect");
+					error_message = utf8_to_cp1251(gettext("Incorrect timecard list"));
+				}
+
+				if(error_message.empty())
+				{
+				}
+				else
+				{
+					MESSAGE_DEBUG("", action, "failed");
+					ostResult.str("");
 					ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
 				}
 

@@ -4,7 +4,7 @@ CSession::CSession() : db(NULL), cookies(NULL)
 {
 	struct	timeval	tv;
 
-	MESSAGE_DEBUG("CSession", "", "start");
+	MESSAGE_DEBUG("", "", "start");
 
 	gettimeofday(&tv, NULL);
 	srand(tv.tv_sec * tv.tv_usec * 100000);
@@ -13,7 +13,7 @@ CSession::CSession() : db(NULL), cookies(NULL)
 
 	MMDB_usage = false;
 
-	MESSAGE_DEBUG("CSession", "", "end");
+	MESSAGE_DEBUG("", "", "end");
 }
 
 string CSession::GetRandom(int len)
@@ -32,8 +32,7 @@ string CSession::GetRandom(int len)
 void CSession::InitMaxMind()
 {
 	{
-		CLog	log;
-		log.Write(DEBUG, "CSession::" + string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	MMDB_usage = false;
@@ -53,16 +52,14 @@ void CSession::InitMaxMind()
 
 			MMDB_usage = true;
 			{
-				CLog	log;
-				log.Write(DEBUG, "CSession::" + string(__func__) + "[" + to_string(__LINE__) + "]: MMDB_open(" + MMDB_fname + ") opened succesfully. ");
+				MESSAGE_DEBUG("", "", "MMDB_open(" + MMDB_fname + ") opened succesfully. ");
 			}
 
 		    MMDB_result = MMDB_lookup_string(&mmdb, getenv("REMOTE_ADDR"), &gai_error, &mmdb_error);
 
 		    if (0 != gai_error) {
 		    	{
-					CLog	log;
-					log.Write(ERROR, "CSession::" + string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: MMDB_open(" + MMDB_fname + ") Error from getaddrinfo for " + getenv("REMOTE_ADDR") + ", " + gai_strerror(gai_error) + ". ");
+					MESSAGE_ERROR("", "", "ERROR: MMDB_open(" + MMDB_fname + ") Error from getaddrinfo for " + getenv("REMOTE_ADDR") + ", " + gai_strerror(gai_error) + ". ");
 				}
 
 				MMDB_usage = false;
@@ -71,8 +68,7 @@ void CSession::InitMaxMind()
 
 		    if (MMDB_SUCCESS != mmdb_error) {
 		    	{
-					CLog	log;
-					log.Write(ERROR, "CSession::" + string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: MMDB_open(" + MMDB_fname + ") Got an error from libmaxminddb: " + MMDB_strerror(mmdb_error));
+					MESSAGE_ERROR("", "", "ERROR: MMDB_open(" + MMDB_fname + ") Got an error from libmaxminddb: " + MMDB_strerror(mmdb_error));
 				}
 
 				MMDB_usage = false;
@@ -85,8 +81,7 @@ void CSession::InitMaxMind()
 
 		        if (MMDB_SUCCESS != status) {
 			    	{
-						CLog	log;
-						log.Write(ERROR, "CSession::" + string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: MMDB_open(" + MMDB_fname + ") : Got an error looking up the entry data -" + MMDB_strerror(status));
+						MESSAGE_ERROR("", "", "ERROR: MMDB_open(" + MMDB_fname + ") : Got an error looking up the entry data -" + MMDB_strerror(status));
 					}
 
 					MMDB_usage = false;
@@ -99,15 +94,13 @@ void CSession::InitMaxMind()
 	    }
 	    else
 	    {
-			CLog	log;
-			log.Write(ERROR, "CSession::" + string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: in reading GeoInfo DB MMDB_open(" + MMDB_fname + ") error is: " + MMDB_strerror(status) + ". ");
+			MESSAGE_ERROR("", "", "ERROR: in reading GeoInfo DB MMDB_open(" + MMDB_fname + ") error is: " + MMDB_strerror(status) + ". ");
 
 			MMDB_usage = false;
 
 	        if (MMDB_IO_ERROR == status)
 	        {
-				CLog	log;
-				log.Write(ERROR, "CSession::" + string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: MMDB_open(" + MMDB_fname + ") returned MMDB_IO_ERROR: " + strerror(status) + ". ");
+				MESSAGE_ERROR("", "", "ERROR: MMDB_open(" + MMDB_fname + ") returned MMDB_IO_ERROR: " + strerror(status) + ". ");
 	        }
 	    }
 
@@ -115,15 +108,13 @@ void CSession::InitMaxMind()
 	else
 	{
 	    {
-			CLog	log;
-			log.Write(DEBUG, "CSession::" + string(__func__) + "[" + to_string(__LINE__) + "]: REMOTE_ADDR is empty, no way to determine remote IP");
+			MESSAGE_DEBUG("", "", "REMOTE_ADDR is empty, no way to determine remote IP");
 		}
 	}
 #endif
 
 	{
-		CLog	log;
-		log.Write(DEBUG, "CSession::" + string(__func__) + "[" + to_string(__LINE__) + "]: finish (MMDB_usage = " + to_string(MMDB_usage) + ")");
+		MESSAGE_DEBUG("", "", "finish (MMDB_usage = " + to_string(MMDB_usage) + ")");
 	}
 }
 
@@ -143,15 +134,13 @@ string CSession::DetectItem(string MMDB_itemName) {
 
 				if(convert_utf8_to_windows1251(MMDB_entryDataS.utf8_string, itemName, MMDB_entryDataS.data_size))
 				{
-					CLog	log;
-					log.Write(DEBUG, "CSession::" + string(__func__) + "(" + MMDB_itemName + ")[" + to_string(__LINE__) + "]: result is " + itemName + ". ");
+					 MESSAGE_DEBUG("", "", "result is " + itemName + ". ");
 
 					item = itemName;
 				}
 				else
 				{
-					CLog	log;
-					log.Write(ERROR, "CSession::" + string(__func__) + "(" + MMDB_itemName + ")[" + to_string(__LINE__) + "]:ERROR: in converting from UTF8 to CP1251. ");
+					MESSAGE_ERROR("", "", "fail in conversion from UTF8 to CP1251");
 				}
 			}
 		}
@@ -163,14 +152,14 @@ string CSession::DetectItem(string MMDB_itemName) {
 
 auto CSession::DetectCountry() -> string
 {
-    MESSAGE_DEBUG("CSession", "", "attempt to detect country by IP");
+    MESSAGE_DEBUG("", "", "attempt to detect country by IP");
 
 	return DetectItem("country");
 }
 
 auto CSession::DetectCity() -> string
 {
-    MESSAGE_DEBUG("CSession", "", "attempt to detect city by IP");
+    MESSAGE_DEBUG("", "", "attempt to detect city by IP");
 
 	return DetectItem("city");
 }
@@ -191,44 +180,38 @@ bool CSession::Save()
 
 	if(!db)
 	{
-		CLog	log;
-		log.Write(ERROR, "CSession::" + string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: connect to database in CSession module");
+		MESSAGE_ERROR("", "", "ERROR: connect to database in CSession module");
 
 		throw CExceptionHTML("error db");
 	}
 
 	if(GetUser().empty())
 	{
-		CLog	log;
-		log.Write(ERROR, "CSession::" + string(__func__) + "[" + to_string(__LINE__) + "]: user name must be set in session::Save");
+		MESSAGE_ERROR("", "", " user name must be set in session::Save");
 
 		throw CExceptionHTML("session error");
 	}
 	if(GetID().empty())
 	{
-		CLog	log;
-		log.Write(ERROR, "CSession::" + string(__func__) + "[" + to_string(__LINE__) + "]: id must be set in session::Save");
+		MESSAGE_ERROR("", "", " id must be set in session::Save");
 
 		throw CExceptionHTML("session error");
 	}
 	if(GetIP().empty())
 	{
-		CLog	log;
-		log.Write(ERROR, "CSession::" + string(__func__) + "[" + to_string(__LINE__) + "]: ip must be set in session::Save");
+		MESSAGE_ERROR("", "", " ip must be set in session::Save");
 
 		throw CExceptionHTML("session error");
 	}
 	if(GetLng().empty())
 	{
-		CLog	log;
-		log.Write(ERROR, "CSession::" + string(__func__) + "[" + to_string(__LINE__) + "]: lng must be set in session::Save");
+		MESSAGE_ERROR("", "", " lng must be set in session::Save");
 
 		throw CExceptionHTML("session error");
 	}
 
 	if(db->Query("INSERT INTO `sessions` (`id`, `user`, `country_auto`, `city_auto`, `lng`, `ip`, `time`,`expire` ) VALUES ('" + GetID() + "', '" + GetUser() + "', '" + DetectCountry() + "', '" + DetectCity() + "', '" + GetLng() + "', '" + GetIP() + "', NOW(), '" + to_string(SESSION_LEN * 60) + "')") != 0) {
-		CLog	log;
-		log.Write(ERROR, "CSession::" + string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: in insert SQL-query");
+		MESSAGE_ERROR("", "", "ERROR: in insert SQL-query");
 
 		return false;
 	}
@@ -245,8 +228,7 @@ bool CSession::Load(string id)
 	bool			result = true;
 
 	{
-		CLog	log;
-		log.Write(DEBUG, "CSession::" + string(__func__) + "(" + id + ")[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	if(id.find(",") != string::npos)
@@ -255,13 +237,11 @@ bool CSession::Load(string id)
 
 		if(isBotIP(ip))
 		{
-			CLog	log;
-			log.Write(DEBUG, "CSession::" + string(__func__) + "[" + to_string(__LINE__) + "]: wrong cookie behavior from search engine bot [" + ip + "]");
+			MESSAGE_DEBUG("", "", "wrong cookie behavior from search engine bot [" + ip + "]");
 		}
 		else
 		{
-			CLog	log;
-			log.Write(ERROR, "CSession::" + string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: \"sessid\" got the wrong value (" + id + "). (probably bot, check IP in whois DB)");
+			MESSAGE_ERROR("", "", "ERROR: \"sessid\" got the wrong value (" + id + "). (probably bot, check IP in whois DB)");
 		}
 	}
 
@@ -276,22 +256,19 @@ bool CSession::Load(string id)
 		SetExpire(stoi(db->Get(0, "expire")));
 
 		{
-			CLog	log;
-			log.Write(DEBUG, "CSession::" + string(__func__) + "(" + id + ")[" + to_string(__LINE__) + "]: session loaded for user [" + GetUser() + "]");
+			MESSAGE_DEBUG("", "", "session loaded for user [" + GetUser() + "]");
 		}
 	}
 	else
 	{
-		CLog	log;
-		log.Write(DEBUG, "CSession::" + string(__func__) + "(" + id + ")[" + to_string(__LINE__) + "]: there is no session in DB, session hasn't been loaded from DB");
+		MESSAGE_DEBUG("", "", "there is no session in DB, session hasn't been loaded from DB");
 
 		result = false;
 	}
 
 
 	{
-		CLog	log;
-		log.Write(DEBUG, "CSession::" + string(__func__) + "(" + id + ")[" + to_string(__LINE__) + "]: end (result: " + (result ? "true" : "false") + ")");
+		MESSAGE_DEBUG("", "", "result (" + to_string(result) + ")");
 	}
 
 	return result;
@@ -301,8 +278,7 @@ bool CSession::CheckConsistency() {
 	bool		result = true;
 
 	{
-		CLog	log;
-		log.Write(DEBUG, "CSession::" + string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 	// --- Check IP address changing
 	if(getenv("REMOTE_ADDR"))
@@ -314,25 +290,21 @@ bool CSession::CheckConsistency() {
 		{
 			if(UpdateIP(currIP))
 			{
-				CLog	log;
-				log.Write(DEBUG, "CSession::" + string(__func__) + "[" + to_string(__LINE__) + "]: user (" + GetUser() + ") IP was changed (" + oldIP + " -> " + currIP + ") during the session.");
+				MESSAGE_DEBUG("", "", "user (" + GetUser() + ") IP was changed (" + oldIP + " -> " + currIP + ") during the session.");
 			}
 			else
 			{
-				CLog	log;
-				log.Write(ERROR, "CSession::" + string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: fail to update IP (" + oldIP + " -> " + currIP + ")");
+				MESSAGE_ERROR("", "", "ERROR: fail to update IP (" + oldIP + " -> " + currIP + ")");
 			}
 		}
 	}
 	else
 	{
-		CLog	log;
-		log.Write(DEBUG, "CSession::" + string(__func__) + "[" + to_string(__LINE__) + "]: environment variable 'REMOTE_ADDR' doesn't defined");
+		MESSAGE_DEBUG("", "", "environment variable 'REMOTE_ADDR' doesn't defined");
 	}
 
 	{
-		CLog	log;
-		log.Write(DEBUG, "CSession::" + string(__func__) + "[" + to_string(__LINE__) + "]: end (result: " + (result ? "true" : "false") + ")");
+		MESSAGE_DEBUG("", "", "end (result: " + (result ? "true" : "false") + ")");
 	}
 	return result;
 }
@@ -341,24 +313,21 @@ bool CSession::Update() {
 
 	if(GetUser() == "")
 	{
-		CLog	log;
-		log.Write(ERROR, "CSession::" + string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: session [" + GetID() + "], user is empty");
+		MESSAGE_ERROR("", "", "ERROR: session [" + GetID() + "], user is empty");
 
 		return false;
 	}
 
 	if(GetID() == "")
 	{
-		CLog	log;
-		log.Write(ERROR, "CSession::" + string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: sessionID is empty");
+		MESSAGE_ERROR("", "", "ERROR: sessionID is empty");
 
 		return false;
 	}
 
-	if(db->Query("UPDATE `sessions` SET `time`=NOW() WHERE `id`=\"" + GetID() + "\";")) 
+	if(db->Query("UPDATE `sessions` SET `time`=NOW(),`http_user_agent`=\""s + (getenv("HTTP_USER_AGENT") ? getenv("HTTP_USER_AGENT") : "") + "\" WHERE `id`=\"" + GetID() + "\";")) 
 	{
-		CLog	log;
-		log.Write(ERROR, "CSession::" + string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: session [" + GetID() + "] there are more than one session with the same session ID.");
+		MESSAGE_ERROR("", "", "ERROR: session [" + GetID() + "] there are more than one session with the same session ID.");
 
 		return false;
 	}
@@ -371,16 +340,14 @@ bool CSession::UpdateIP(string newIP) {
 
 	if(GetUser() == "")
 	{
-		CLog	log;
-		log.Write(ERROR, "CSession::" + string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: session [" + GetID() + "], user is empty");
+		MESSAGE_ERROR("", "", "ERROR: session [" + GetID() + "], user is empty");
 
 		return false;
 	}
 
 	if(GetID() == "")
 	{
-		CLog	log;
-		log.Write(ERROR, "CSession::" + string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: session ID is empty");
+		MESSAGE_ERROR("", "", "ERROR: session ID is empty");
 
 		return false;
 	}
@@ -394,8 +361,7 @@ bool CSession::UpdateIP(string newIP) {
 
 	if(db->Query("UPDATE `sessions` SET `ip`=\"" + newIP + "\", `country_auto`=\"" + DetectCountry() + "\", `city_auto`=\"" + DetectCity() + "\" WHERE `id`=\"" + GetID() + "\";"))
 	{
-		CLog	log;
-		log.Write(ERROR, "CSession::" + string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: session [" + GetID() + "] there are more than one session with the same session ID.");
+		MESSAGE_ERROR("", "", "ERROR: session [" + GetID() + "] there are more than one session with the same session ID.");
 
 		return false;
 	}
@@ -410,21 +376,18 @@ bool CSession::isExist(string id)
 	string		currIP;
 
 	{
-		CLog	log;
-		log.Write(DEBUG, "CSession::" + string(__func__) + "(" + id + ")[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	if(!db)
 	{
-		CLog	log;
-		log.Write(ERROR, "CSession::" + string(__func__) + "(" + id + ")[" + to_string(__LINE__) + "]:ERROR:ERROR: connect to database in CSession::Load module");
+		MESSAGE_ERROR("", "", "db not initialized");
 
 		throw CExceptionHTML("error db");
 	}
 	if(id.empty())
 	{
-		CLog	log;
-		log.Write(ERROR, "CSession::" + string(__func__) + "(" + id + ")[" + to_string(__LINE__) + "]:ERROR: id must be set in session::Load");
+		MESSAGE_ERROR("", "", "id is empty");
 
 		throw CExceptionHTML("activator error");
 	}
@@ -435,15 +398,13 @@ bool CSession::isExist(string id)
 	}
 	else
 	{
-		CLog	log;
-		log.Write(DEBUG, "CSession::" + string(__func__) + "(" + id + ")[" + to_string(__LINE__) + "]: end (return: false)");
+		MESSAGE_DEBUG("", "", "finish (false)");
 
 		return false;
 	}
 
 	{
-		CLog	log;
-		log.Write(DEBUG, "CSession::" + string(__func__) + "(" + id + ")[" + to_string(__LINE__) + "]: end (return: true)");
+		MESSAGE_DEBUG("", "", "finish (true)");
 	}
 
 	return true;
@@ -452,8 +413,7 @@ bool CSession::isExist(string id)
 CSession::~CSession()
 {
 	{
-		CLog	log;
-		log.Write(DEBUG, "CSession::" + string(__func__) + "(): start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 #ifndef MAXMIND_DISABLE
@@ -465,8 +425,7 @@ CSession::~CSession()
 #endif
 
 	{
-		CLog	log;
-		log.Write(DEBUG, "CSession::" + string(__func__) + "(): end");
+		MESSAGE_DEBUG("", "", "finish");
 	}
 }
 

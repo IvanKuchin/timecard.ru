@@ -141,7 +141,7 @@ string	GetPasswordNounsList(CMysql *db)
 	affected = db->Query("SELECT COUNT(*) as `total` FROM `password_dictionary_nouns`;");
 	if(affected)
 	{
-		int		total_number_of_words = atoi(db->Get(0, "total")) - 1;
+		int		total_number_of_words = stoi(db->Get(0, "total")) - 1;
 
 		affected = db->Query("SELECT * FROM `password_dictionary_nouns` WHERE `id` in (round(rand()*" + to_string(total_number_of_words) + ") + 1, round(rand()*" + to_string(total_number_of_words) + ") + 1,round(rand()*" + to_string(total_number_of_words) + ") + 1,round(rand()*" + to_string(total_number_of_words) + ") + 1,round(rand()*" + to_string(total_number_of_words) + ") + 1,round(rand()*" + to_string(total_number_of_words) + ") + 1,round(rand()*" + to_string(total_number_of_words) + ") + 1)");
 		for(int i = 0; i < affected; ++i)
@@ -170,7 +170,7 @@ string	GetPasswordCharacteristicsList(CMysql *db)
 	affected = db->Query("SELECT COUNT(*) as `total` FROM `password_dictionary_characteristics`;");
 	if(affected)
 	{
-		int		total_number_of_words = atoi(db->Get(0, "total"));
+		int		total_number_of_words = stoi(db->Get(0, "total"));
 
 		affected = db->Query("SELECT * FROM `password_dictionary_characteristics` WHERE `id` in (round(rand()*" + to_string(total_number_of_words) + ") + 1, round(rand()*" + to_string(total_number_of_words) + ") + 1,round(rand()*" + to_string(total_number_of_words) + ") + 1,round(rand()*" + to_string(total_number_of_words) + ") + 1,round(rand()*" + to_string(total_number_of_words) + ") + 1,round(rand()*" + to_string(total_number_of_words) + ") + 1,round(rand()*" + to_string(total_number_of_words) + ") + 1)");
 		for(int i = 0; i < affected; ++i)
@@ -199,7 +199,7 @@ string	GetPasswordAdjectivesList(CMysql *db)
 	affected = db->Query("SELECT COUNT(*) as `total` FROM `password_dictionary_adjectives`;");
 	if(affected)
 	{
-		int		total_number_of_words = atoi(db->Get(0, "total"));
+		int		total_number_of_words = stoi(db->Get(0, "total"));
 
 		affected = db->Query("SELECT * FROM `password_dictionary_adjectives` WHERE `id` in (round(rand()*" + to_string(total_number_of_words) + ") + 1, round(rand()*" + to_string(total_number_of_words) + ") + 1,round(rand()*" + to_string(total_number_of_words) + ") + 1,round(rand()*" + to_string(total_number_of_words) + ") + 1,round(rand()*" + to_string(total_number_of_words) + ") + 1,round(rand()*" + to_string(total_number_of_words) + ") + 1,round(rand()*" + to_string(total_number_of_words) + ") + 1)");
 		for(int i = 0; i < affected; ++i)
@@ -520,7 +520,7 @@ string CleanUPText(const string messageBody, bool removeBR/* = true*/)
 	Delete any special symbols
 	Used only for matching duplicates
 */
-string RemoveAllNonAlphabetSymbols(string src)
+string RemoveAllNonAlphabetSymbols(const string &src)
 {
 	string		result = src;
 	string::size_type	pos = 0;
@@ -709,7 +709,7 @@ string CheckHTTPParam_Text(const string &srcText)
 	return	result;
 }
 
-auto CheckHTTPParam_Number(string srcText) -> string
+auto CheckHTTPParam_Number(const string &srcText) -> string
 {
 	auto	result = ""s;
 
@@ -739,7 +739,7 @@ auto CheckHTTPParam_Number(string srcText) -> string
 	return	result;
 }
 
-string CheckHTTPParam_Float(string srcText)
+string CheckHTTPParam_Float(const string &srcText)
 {
 	string	result = "";
 
@@ -768,7 +768,7 @@ string CheckHTTPParam_Float(string srcText)
 	return	result;
 }
 
-string CheckHTTPParam_Date(string srcText)
+string CheckHTTPParam_Date(const string &srcText)
 {
 	string	result = "";
 
@@ -836,7 +836,7 @@ string CheckHTTPParam_Date(string srcText)
 	return	result;
 }
 
-string CheckHTTPParam_Email(string srcText)
+string CheckHTTPParam_Email(const string &srcText)
 {
 	char		convertBuffer[16384];
 	string		result = "";
@@ -884,7 +884,7 @@ string CheckHTTPParam_Email(string srcText)
 	return	result;
 }
 
-string CheckHTTPParam_Timeentry(string srcText)
+string CheckHTTPParam_Timeentry(const string &srcText)
 {
 	string			result = "";
 	string			timeentry_string;
@@ -5017,7 +5017,7 @@ bool isPersistenceRateLimited(string REMOTE_ADDR, CMysql *db)
 			log.Write(DEBUG, ostTemp.str());
 		}
 		rateLimitID = db->Get(0, "id");
-		attempts = atoi(db->Get(0, "attempts"));
+		attempts = stoi(db->Get(0, "attempts"));
 		ost.str("");
 		ost << "update `sessions_persistence_ratelimit` set `attempts`=`attempts`+1 where `id`='" << rateLimitID << "';";
 		db->Query(ost.str());
@@ -5227,7 +5227,7 @@ string GetPicturesWithUnknownMessage(CMysql *db)
 	affected = db->Query(ost.str());
 	for(int i = 0; i < affected; i++)
 	{
-		allImageSets.insert(atol(db->Get(i, "setID")));
+		allImageSets.insert(stol(db->Get(i, "setID")));
 	}
 
 	for(const unsigned long& id: allImageSets)
@@ -5235,7 +5235,7 @@ string GetPicturesWithUnknownMessage(CMysql *db)
 		ost.str("");
 		ost << "select count(*) as count from `feed_message` where `imageSetID`=\"" << id << "\";";
 		db->Query(ost.str());
-		if(!atoi(db->Get(0, "count")))
+		if(!stoi(db->Get(0, "count")))
 		{
 			lostImageSets.insert(id);
 		}

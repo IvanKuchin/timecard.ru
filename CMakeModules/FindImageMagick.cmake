@@ -1,4 +1,4 @@
-# Locate AVCODEC library
+# Locate IMAGEMAGICK library
 # This module defines
 # IMAGEMAGICK_LIBRARY, the name of the library to link against
 # IMAGEMAGICK_FOUND, if false, do not try to link to AVCODEC

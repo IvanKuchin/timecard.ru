@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-12-29 23:14-0500\n"
+"POT-Creation-Date: 2019-01-29 09:37-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -56,8 +56,14 @@ msgstr "Центр Затрат"
 msgid "Cost Center: number"
 msgstr "Центр Затрат: номер договора"
 
+msgid "Data has not been initialized"
+msgstr "Ошибка инициализации данных"
+
 msgid "Employee data"
 msgstr "Данные сотрудника"
+
+msgid "Incorrect timecard list"
+msgstr "Некорректный список таймкарт"
 
 msgid "PSoW"
 msgstr "PSoW"
@@ -80,11 +86,26 @@ msgstr "SoW с таким номером уже есть"
 msgid "SoW: number"
 msgstr "SoW: номер договора"
 
+msgid "Some timecards have no PSoW associated"
+msgstr "У некоторых таймкарт не хватает PSoW-контракта"
+
 msgid "Subcontractor reported time on"
 msgstr "Субконтрактор отчитался за"
 
 msgid "This task assigned to cost center"
 msgstr "Этой задаче назначена Центр Затрат"
+
+msgid "Timecard doesn't belongs to agency"
+msgstr "Таймкарта не принадлежит агенству"
+
+msgid "Timecard not found"
+msgstr "Таймкарта не найдена"
+
+msgid "You are not agency employee"
+msgstr "Вы не сотрудник агенства"
+
+msgid "You are not authorized"
+msgstr "У Вас нет доступа"
 
 msgid "act number"
 msgstr "номер акта"

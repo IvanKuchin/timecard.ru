@@ -39,6 +39,7 @@ set(INDEPENDENT_LIBRARIES_SRC
     cstatistics.cpp
     c_bt.cpp
     c_float.cpp
+    c_invoice_service.cpp
     cvideoconverter.cpp
     )
 
@@ -75,6 +76,8 @@ pkg_check_modules(LIBMYSQLCLIENT REQUIRED mysqlclient)
 find_package(OpenSSL REQUIRED)
 find_package(CURL REQUIRED)
 find_package(LibWebSockets REQUIRED)
+find_package(Libhpdf REQUIRED)
+find_package(Libxl REQUIRED)
 
 if(IMAGEMAGICK_DISABLE)
     message("Magick++ turned off")
@@ -133,6 +136,8 @@ set(project_include_directories
     ${CURL_INCLUDE_DIR}
     ${AVUTIL_INCLUDE_DIR}
     ${AVFORMAT_INCLUDE_DIR}
+    ${HPDF_INCLUDE_DIR}
+    ${XL_INCLUDE_DIR}
     )
 
 set(project_link_libraries
@@ -143,6 +148,8 @@ set(project_link_libraries
     ${AVUTIL_LIBRARY}
     ${AVFORMAT_LIBRARY}
     ${MAXMINDDB_LIBRARY}
+    ${HPDF_LIBRARY}
+    ${XL_LIBRARY}
     )
 
 # --- does this system provide the exp function ?

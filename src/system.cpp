@@ -200,7 +200,7 @@ int main()
 		if(action == "EchoRequest")
 		{
 			{
-				MESSAGE_DEBUG("", action, "action == " + action + ": start");
+				MESSAGE_DEBUG("", action, "start");
 			}
 			mapResult["type"] = "EchoResponse";
 
@@ -216,7 +216,7 @@ int main()
 			int				numberOfFriendshipRequests;
 
 			{
-				MESSAGE_DEBUG("", action, "action == " + action + ": start");
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			result.str("");
@@ -282,7 +282,7 @@ int main()
 			char			*convertBuffer;
 
 			{
-				MESSAGE_DEBUG("", action, "]:action == " + action + ": start");
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			if(user.GetLogin() == "Guest")
@@ -326,7 +326,7 @@ int main()
 			} // --- if(user.GetLogin() == "Guest")
 
 			{
-				MESSAGE_DEBUG("", action, "]:action == " + action + ": end");
+				MESSAGE_DEBUG("", action, "finish");
 			}
 		}
 
@@ -338,7 +338,7 @@ int main()
 			int				affected;
 
 			{
-				MESSAGE_DEBUG("", action, "]:action == " + action + ": start");
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			if(user.GetLogin() == "Guest")
@@ -373,7 +373,7 @@ int main()
 				friendsSqlQuery << ");";
 
 				{
-					MESSAGE_DEBUG("", action, "]:action == " + action + ": query for JSON prepared [" + friendsSqlQuery.str() + "]");
+					MESSAGE_DEBUG("", action, "query for JSON prepared [" + friendsSqlQuery.str() + "]");
 				}
 
 				userList = GetUserListInJSONFormat(friendsSqlQuery.str(), &db, &user);
@@ -387,7 +387,7 @@ int main()
 			mapResult["type"] = "ChatStatus";
 
 			{
-				MESSAGE_DEBUG("", action, "]:action == " + action + ": end");
+				MESSAGE_DEBUG("", action, "finish");
 			}
 		}
 
@@ -402,7 +402,7 @@ int main()
 			sessidPersistence = indexPage.GetVarsHandler()->Get("sessid");
 
 			{
-				MESSAGE_DEBUG("", action, "]:action == " + action + ": start (persistence sessid" + sessidPersistence + ")");
+				MESSAGE_DEBUG("", action, "start (persistence sessid" + sessidPersistence + ")");
 			}
 
 			mapResult["result"] = "error";
@@ -415,19 +415,19 @@ int main()
 				if(sessidPersistence.length() < 5)
 				{
 					{
-						MESSAGE_DEBUG("", action, "]:action == " + action + ": session checks: persistence sessid doesn't exists, UA must be redirected to / page.");
+						MESSAGE_DEBUG("", action, "session checks: persistence sessid doesn't exists, UA must be redirected to / page.");
 					}
 				}
 				else
 				{
 					{
-						MESSAGE_DEBUG("", action, "]:action == " + action + ": session checks: HTTP-param sessid exists");
+						MESSAGE_DEBUG("", action, "session checks: HTTP-param sessid exists");
 					}
 
 					if(indexPage.SessID_Load_FromDB(sessidPersistence))
 					{
 						{
-							MESSAGE_DEBUG("", action, "]:action == " + action + ": session checks: DB session loaded");
+							MESSAGE_DEBUG("", action, "session checks: DB session loaded");
 						}
 
 						if(indexPage.SessID_CheckConsistency())
@@ -435,7 +435,7 @@ int main()
 							string		sessidHTTP("");
 
 							{
-								MESSAGE_DEBUG("", action, "]:action == " + action + ": session checks: HTTP session consistent with DB session");
+								MESSAGE_DEBUG("", action, "session checks: HTTP session consistent with DB session");
 							}
 
 							sessidHTTP = indexPage.SessID_Get_FromHTTP();
@@ -451,8 +451,7 @@ int main()
 								// ---- 		2.a) network I connected to relayed HTTP requests to Symantec for AV-analysis, Symantec didn't keep cookie in HTTP-requests
 								// ---			2.b) our server saw two similar requests at the same time with different IP addresses (change IP address in logs)
 								{
-									CLog	log;
-									log.Write(ERROR, __func__ + string("[") + to_string(__LINE__) + "]:action == " + action + ": \"session\" cookie doesn't exists or expired, UA must be redirected to / page.");
+									MESSAGE_ERROR("", action, "\"sessid\" cookie doesn't exists or expired, UA must be redirected to / page. This is AJAX request called from "s + (getenv("HTTP_REFERER") ? getenv("HTTP_REFERER") : "") + ". Supposed that parent script assign cookie:sessid, BUT cookie hasn't been assigned. Probably this script has been called from cached page or page opened in neighbour tab (check that parallel stream may exists with the same persistency key).");
 								}
 								// --- clean DB to remove number # of stuck sessions and reduce risk of back dooring to old sessions
 								db.Query("DELETE FROM `sessions` WHERE `id`=\"" + sessidPersistence + "\";");
@@ -538,7 +537,7 @@ int main()
 						ostringstream	ost;
 
 						{
-							MESSAGE_DEBUG("", action, "]:action == " + action + ": persisted session not found in DB. Need to recreate session");
+							MESSAGE_DEBUG("", action, "persisted session not found in DB. Need to recreate session");
 						}
 
 	/*						if(!indexPage.Cookie_Expire())
@@ -565,7 +564,7 @@ int main()
 			}
 
 			{
-				MESSAGE_DEBUG("", action, "]:action == " + action + ": end");
+				MESSAGE_DEBUG("", action, "finish");
 			}
 		} // --- if(action == "CheckSessionPersistence")
 
@@ -576,7 +575,7 @@ int main()
 			string		sessid;
 
 			{
-				MESSAGE_DEBUG("", action, "action == " + action + ": start");
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			sessid = indexPage.GetCookie("sessid");

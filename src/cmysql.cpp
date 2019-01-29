@@ -319,19 +319,19 @@ unsigned long CMysql::InsertQuery(string query)
     return InsertQueryDB(query);
 }
 
-char *CMysql::Get(int row, const string &name)
+string CMysql::Get(int row, const string &name)
 {
     return Get(row, name.c_str());
 }
 
-char *CMysql::Get(int row, const char *name)
+string CMysql::Get(int row, const char *name)
 {
     if(resultSet)
         return ResultValue(resultSet, row, name);
     return(NULL);
 }
 
-char *CMysql::Get(int row, int col)
+string CMysql::Get(int row, int col)
 {
     if(resultSet)
         return ResultValue(resultSet, row, col);

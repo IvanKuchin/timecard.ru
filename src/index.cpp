@@ -2331,9 +2331,9 @@ int main()
 				{
 					for(int i = 0; i < affected; i++)
 					{
-						vectorFriendList1.push_back(atoi(db.Get(i, "friendID")));
+						vectorFriendList1.push_back(stoi(db.Get(i, "friendID")));
 
-						if(atoi(user2.c_str()) == atoi(db.Get(i, "friendID")))
+						if(atoi(user2.c_str()) == stoi(db.Get(i, "friendID")))
 						{
 							handshakeUserStatus = "directFriends";
 						}
@@ -2352,7 +2352,7 @@ int main()
 						{
 							for(int i = 0; i < affected; i++)
 							{
-								vectorFriendList2.push_back(atoi(db.Get(i, "friendID")));
+								vectorFriendList2.push_back(stoi(db.Get(i, "friendID")));
 							}
 						}
 

@@ -7,6 +7,7 @@
 
 using namespace std;
 
+auto		LogEnvVariables() -> void;
 auto 		RegisterInitialVariables(CCgi *, CMysql *, CUser *) -> bool;
 auto 		SetLocale(string locale) -> bool;
 auto 		GenerateSession(string action, CCgi *, CMysql *, CUser *) -> string;
