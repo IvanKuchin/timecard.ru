@@ -41,4 +41,6 @@ addons:
     - pkg-config
 
 script:
+    - ls /home/travis/build/IvanKuchin/timecard.su/libxl-3.8.4.0
+    - ls /home/travis/build/IvanKuchin/timecard.su/libxl-3.8.4.0/lib64
     - mkdir build && cd build && cmake .. && chmod a+x ./share/timecard.su/ci-scripts/mysql_provisioning && ./share/timecard.su/ci-scripts/mysql_provisioning && make && ctest --output-on-failure
