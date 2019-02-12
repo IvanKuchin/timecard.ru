@@ -14,29 +14,29 @@ string	C_ExpenseLineTemplate::CheckValidity(CMysql *db) const
 
 	if(title.empty())
 	{
-		error_message = "Необходимо указать название";
+		error_message = "РќРµРѕР±С…РѕРґРёРјРѕ СѓРєР°Р·Р°С‚СЊ РЅР°Р·РІР°РЅРёРµ";
 		MESSAGE_DEBUG("C_ExpenseLineTemplate", "", "title is required");
 	}
 	else if((dom_type != "image") && (dom_type != "input"))
 	{
-		error_message = "Некорректный тип документа";
+		error_message = "РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ С‚РёРї РґРѕРєСѓРјРµРЅС‚Р°";
 		MESSAGE_ERROR("C_ExpenseLineTemplate", "", "Incorrect document type (must be either input or image)");
 	}
 	else if(payment.empty())
 	{
-		error_message = "Необходимо выбрать форму оплаты";
+		error_message = "РќРµРѕР±С…РѕРґРёРјРѕ РІС‹Р±СЂР°С‚СЊ С„РѕСЂРјСѓ РѕРїР»Р°С‚С‹";
 		MESSAGE_DEBUG("C_ExpenseLineTemplate", "", "payment method doesn't defined");
 	}
 /*
 	else if(bt_expense_template_id.empty())
 	{
-		error_message = "Не задан идентефикатор расхода";
+		error_message = "РќРµ Р·Р°РґР°РЅ РёРґРµРЅС‚РµС„РёРєР°С‚РѕСЂ СЂР°СЃС…РѕРґР°";
 		MESSAGE_ERROR("C_ExpenseLineTemplate", "", "expense.id doesn't defined");
 	}
 */
 	else if(db == NULL)
 	{
-		error_message = "Ошибка БД";
+		error_message = "РћС€РёР±РєР° Р‘Р”";
 		MESSAGE_ERROR("C_ExpenseLineTemplate", "", "*db doesn't initialized");
 	}
 	else if
@@ -48,7 +48,7 @@ string	C_ExpenseLineTemplate::CheckValidity(CMysql *db) const
 		(db->Query("SELECT `id` FROM `bt_expense_line_templates` WHERE `bt_expense_template_id`=\"" + bt_expense_template_id + "\" AND `title`=\"" + title + "\";"))
 	)
 	{
-		error_message = "Документ с таким названием уже существует";
+		error_message = "Р”РѕРєСѓРјРµРЅС‚ СЃ С‚Р°РєРёРј РЅР°Р·РІР°РЅРёРµРј СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚";
 		MESSAGE_DEBUG("C_ExpenseLineTemplate", "", "bt_expense_template_line.title already exists with the same bt_expense_template_id(" + bt_expense_template_id + ")");
 	}
 
@@ -84,7 +84,7 @@ string	C_ExpenseLineTemplate::SaveToDB(CMysql *db)
 				}
 				else
 				{
-					error_message = "Ошибка БД";
+					error_message = "РћС€РёР±РєР° Р‘Р”";
 					MESSAGE_ERROR("C_ExpenseLineTemplate", "", "fail to insert into `bt_expense_line_templates` table entry (" + db->GetErrorMessage() + ")");
 				}
 			}
@@ -102,20 +102,20 @@ string	C_ExpenseLineTemplate::SaveToDB(CMysql *db)
 						);
 				if(db->isError())
 				{
-					error_message = "Ошибка БД";
+					error_message = "РћС€РёР±РєР° Р‘Р”";
 					MESSAGE_ERROR("C_ExpenseLineTemplate", "", "fail to update `bt_expense_line_templates` table (" + db->GetErrorMessage() + ")");
 				}
 			}
 		}
 		else
 		{
-			error_message = "Ошибка DB";
+			error_message = "РћС€РёР±РєР° DB";
 			MESSAGE_ERROR("C_ExpenseLineTemplate", "", "DB not initialized");
 		}
 	}
 	else
 	{
-		error_message = "Не найден идентификатор шаблона";
+		error_message = "РќРµ РЅР°Р№РґРµРЅ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ С€Р°Р±Р»РѕРЅР°";
 		MESSAGE_ERROR("C_ExpenseLineTemplate", "", "bt_expense_template_id not initialized or 0");
 	}
 
@@ -135,7 +135,7 @@ string	C_ExpenseLineTemplate::SetPaymentMethod(const bool is_cash, const bool is
 	else if(is_card) { payment = "card"; }
 	else 
 	{
-		error_message = "Необходимо выбрать форму оплаты";
+		error_message = "РќРµРѕР±С…РѕРґРёРјРѕ РІС‹Р±СЂР°С‚СЊ С„РѕСЂРјСѓ РѕРїР»Р°С‚С‹";
 		MESSAGE_DEBUG("C_ExpenseLineTemplate", "", "payment method doesn't defined");
 	}
 
@@ -163,27 +163,27 @@ string	C_ExpenseTemplate::CheckValidity(CMysql *db) const
 
 	if(GetID().empty())
 	{
-		error_message = "Необходимо указать идентификатор расхода";
+		error_message = "РќРµРѕР±С…РѕРґРёРјРѕ СѓРєР°Р·Р°С‚СЊ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ СЂР°СЃС…РѕРґР°";
 		MESSAGE_DEBUG("C_ExpenseTemplate", "", "title is required");
 	}
 	if(GetTitle().empty())
 	{
-		error_message = "Необходимо указать название расхода";
+		error_message = "РќРµРѕР±С…РѕРґРёРјРѕ СѓРєР°Р·Р°С‚СЊ РЅР°Р·РІР°РЅРёРµ СЂР°СЃС…РѕРґР°";
 		MESSAGE_DEBUG("C_ExpenseTemplate", "", "title is required");
 	}
 	else if(GetCompanyID().empty() || (GetCompanyID() == "0"))
 	{
-		error_message = "Необходимо указать компанию которой будет принадлежать расход";
+		error_message = "РќРµРѕР±С…РѕРґРёРјРѕ СѓРєР°Р·Р°С‚СЊ РєРѕРјРїР°РЅРёСЋ РєРѕС‚РѕСЂРѕР№ Р±СѓРґРµС‚ РїСЂРёРЅР°РґР»РµР¶Р°С‚СЊ СЂР°СЃС…РѕРґ";
 		MESSAGE_ERROR("C_ExpenseTemplate", "", "company.id is required");
 	}
 	else if(db == NULL)
 	{
-		error_message = "Ошибка БД";
+		error_message = "РћС€РёР±РєР° Р‘Р”";
 		MESSAGE_ERROR("C_ExpenseTemplate", "", "*db doesn't initialized");
 	}
 	else if(db->Query("SELECT `id` FROM `bt_expense_templates` WHERE `agency_company_id`=\"" + GetCompanyID() + "\" AND `title`=\"" + GetTitle() + "\";"))
 	{
-		error_message = "Расход с таким названием в компании уже существует";
+		error_message = "Р Р°СЃС…РѕРґ СЃ С‚Р°РєРёРј РЅР°Р·РІР°РЅРёРµРј РІ РєРѕРјРїР°РЅРёРё СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚";
 		MESSAGE_DEBUG("C_ExpenseTemplate", "", "bt_expense_templates.title already exists with the same company_id(" + GetCompanyID() + ")");
 	}
 	else if((error_message = CheckDuplicateLineTitles()).length())
@@ -222,7 +222,7 @@ auto C_ExpenseTemplate::CheckDuplicateLineTitles() const -> string
 
 		for(auto it = titles.begin() + 1; it != titles.end(); ++it)
 		{
-			if(*it == *(it-1)) error_message = "Название докуметов не должно повторяться";
+			if(*it == *(it-1)) error_message = "РќР°Р·РІР°РЅРёРµ РґРѕРєСѓРјРµС‚РѕРІ РЅРµ РґРѕР»Р¶РЅРѕ РїРѕРІС‚РѕСЂСЏС‚СЊСЃСЏ";
 		}
 	}
 	else
@@ -258,7 +258,7 @@ auto	C_ExpenseTemplate::SaveToDB(CMysql *db) -> string
 			}
 			else
 			{
-				error_message = "Ошибка БД";
+				error_message = "РћС€РёР±РєР° Р‘Р”";
 				MESSAGE_ERROR("C_ExpenseTemplate", "", "fail to insert into `bt_expense_templates` table entry (" + db->GetErrorMessage() + ")");
 			}
 		}
@@ -273,7 +273,7 @@ auto	C_ExpenseTemplate::SaveToDB(CMysql *db) -> string
 					);
 			if(db->isError())
 			{
-				error_message = "Ошибка БД";
+				error_message = "РћС€РёР±РєР° Р‘Р”";
 				MESSAGE_ERROR("C_ExpenseTemplate", "", "fail to update `bt_expense_templates` table (" + db->GetErrorMessage() + ")");
 			}
 		}
@@ -294,7 +294,7 @@ auto	C_ExpenseTemplate::SaveToDB(CMysql *db) -> string
 	}
 	else
 	{
-		error_message = "Ошибка DB";
+		error_message = "РћС€РёР±РєР° DB";
 		MESSAGE_ERROR("C_ExpenseTemplate", "", "DB not initialized");
 	}
 
@@ -357,31 +357,31 @@ string	C_ExpenseLine::CheckValidity(C_ExpenseLineTemplate exp_line_template, CMy
 							}
 							else
 							{
-								result = "Обязательное фото(" + exp_line_template.title + ") не загружено";
+								result = "РћР±СЏР·Р°С‚РµР»СЊРЅРѕРµ С„РѕС‚Рѕ(" + exp_line_template.title + ") РЅРµ Р·Р°РіСЂСѓР¶РµРЅРѕ";
 								MESSAGE_ERROR("C_ExpenseLine", "", "required image expense_line_template.id(" + exp_line_template.id + ") didn't upload in expense_line (id/random: " + GetID() + "/" + GetRandom() + ")");
 							}
 						}
 						else
 						{
-							result = "Обязательное фото(" + exp_line_template.title + ") не найдено в БД";
+							result = "РћР±СЏР·Р°С‚РµР»СЊРЅРѕРµ С„РѕС‚Рѕ(" + exp_line_template.title + ") РЅРµ РЅР°Р№РґРµРЅРѕ РІ Р‘Р”";
 							MESSAGE_ERROR("C_ExpenseLine", "", "required image expense_line_template.id(" + exp_line_template.id + ") not found in DB in expense_line (id/random: " + GetID() + "/" + GetRandom() + ")");
 						}
 					}
 					else
 					{
-						result = "Ошибка DB";
+						result = "РћС€РёР±РєР° DB";
 						MESSAGE_ERROR("C_ExpenseLine", "", "DB not initialized in expense (id/random: " + GetID() + "/" + GetRandom() + ")");
 					}
 				}
 				else
 				{
-					result = "Обязательное фото(" + exp_line_template.title + ") не загружено";
+					result = "РћР±СЏР·Р°С‚РµР»СЊРЅРѕРµ С„РѕС‚Рѕ(" + exp_line_template.title + ") РЅРµ Р·Р°РіСЂСѓР¶РµРЅРѕ";
 					MESSAGE_ERROR("C_ExpenseLine", "", "required image expense_line_template.id(" + exp_line_template.id + ") didn't upload in expense_line (id/random: " + GetID() + "/" + GetRandom() + ")");
 				}
 			}
 			else
 			{
-				result = "Обязательное поле ввода(" + exp_line_template.title + ") не заполнено";
+				result = "РћР±СЏР·Р°С‚РµР»СЊРЅРѕРµ РїРѕР»Рµ РІРІРѕРґР°(" + exp_line_template.title + ") РЅРµ Р·Р°РїРѕР»РЅРµРЅРѕ";
 				MESSAGE_ERROR("C_ExpenseLine", "", "missed required input field expense_line_template.id(" + exp_line_template.id + ") in expense_line (id/random: " + GetID() + "/" + GetRandom() + ")");
 			}
 		}
@@ -463,7 +463,7 @@ string	C_ExpenseLine::SaveToDB(string bt_expense_id, CMysql *db)
 				db->Query(update_query);
 				if(db->isError())
 				{
-					error_message = "Ошибка БД";
+					error_message = "РћС€РёР±РєР° Р‘Р”";
 					MESSAGE_ERROR("C_ExpenseLine", "", "fail to update `bt_expense_lines` table (" + db->GetErrorMessage() + ")");
 				}
 			}
@@ -487,14 +487,14 @@ string	C_ExpenseLine::SaveToDB(string bt_expense_id, CMysql *db)
 			}
 			else
 			{
-				error_message = "Ошибка БД";
+				error_message = "РћС€РёР±РєР° Р‘Р”";
 				MESSAGE_ERROR("C_ExpenseLine", "", "fail to insert into `bt_expense_lines` table entry (" + db->GetErrorMessage() + ")");
 			}
 		}
 	}
 	else
 	{
-		error_message = "Ошибка DB";
+		error_message = "РћС€РёР±РєР° DB";
 		MESSAGE_ERROR("C_ExpenseLine", "", "DB not initialized");
 	}
 
@@ -592,13 +592,13 @@ string	C_Expense::CheckExpenseLine(C_ExpenseLineTemplate exp_line_template, CMys
 		}
 		else
 		{
-			result = "Необходимый документ не найден";
+			result = "РќРµРѕР±С…РѕРґРёРјС‹Р№ РґРѕРєСѓРјРµРЅС‚ РЅРµ РЅР°Р№РґРµРЅ";
 			MESSAGE_ERROR("C_Expense", "", "Mandatory document not found, it should match expense_line_template.id(" + exp_line_template.id + ") in expense(id/random: " + GetID() + "/" + GetRandom() + ")");
 		}
 	}
 	else
 	{
-		result = "Ошибка DB";
+		result = "РћС€РёР±РєР° DB";
 		MESSAGE_ERROR("C_Expense", "", "DB not initialized in expense (id/random: " + GetID() + "/" + GetRandom() + ")");
 	}
 
@@ -659,7 +659,7 @@ string	C_Expense::CheckAppropriateExpenseLines(CMysql *db) const
 				{
 					if(expense_line_template.required && !expense_line_template.matched)
 					{
-						result = "Не все обязательные документы загружены";
+						result = "РќРµ РІСЃРµ РѕР±СЏР·Р°С‚РµР»СЊРЅС‹Рµ РґРѕРєСѓРјРµРЅС‚С‹ Р·Р°РіСЂСѓР¶РµРЅС‹";
 						MESSAGE_DEBUG("C_Expense", "", "mandatory expense_line_template.id(" + expense_line_template.id + ") failed on expense (id/random: " + GetID() + "/" + GetRandom() + ")");
 
 						// --- if place break then we don't get all the information about missing expense_lines
@@ -670,13 +670,13 @@ string	C_Expense::CheckAppropriateExpenseLines(CMysql *db) const
 		}
 		else
 		{
-			result = "Не найден шаблон расхода";
+			result = "РќРµ РЅР°Р№РґРµРЅ С€Р°Р±Р»РѕРЅ СЂР°СЃС…РѕРґР°";
 			MESSAGE_ERROR("C_Expense", "", "ExpenseTemplateID is empty on expense (id/random: " + GetID() + "/" + GetRandom() + ")");
 		}
 	}
 	else
 	{
-		result = "Ошибка DB";
+		result = "РћС€РёР±РєР° DB";
 		MESSAGE_ERROR("C_Expense", "", "DB not initialized in expense (id/random: " + GetID() + "/" + GetRandom() + ")");
 	}
 
@@ -694,32 +694,32 @@ string	C_Expense::CheckValidity(CMysql *db) const
 
 	if(db == NULL) 										
 	{
-		result = "Ошибка DB";
+		result = "РћС€РёР±РєР° DB";
 		MESSAGE_ERROR("C_Expense", "", "DB not initialized in expense (id/random: " + GetID() + "/" + GetRandom() + ")");
 	}
 	else if(!regex_match(GetDate(), date_regex))
 	{
-		result = "некорректная дата расхода";
+		result = "РЅРµРєРѕСЂСЂРµРєС‚РЅР°СЏ РґР°С‚Р° СЂР°СЃС…РѕРґР°";
 		MESSAGE_DEBUG("C_Expense", "", "wrong expense date(" + GetDate() + ")  in expense (id/random: " + GetID() + "/" + GetRandom() + ")");
 	}
 	else if(GetPriceDomestic() <= 0)
 	{
-		result = "не указана цена в руб.";
+		result = "РЅРµ СѓРєР°Р·Р°РЅР° С†РµРЅР° РІ СЂСѓР±.";
 		MESSAGE_DEBUG("C_Expense", "", "domestic price " + string(GetPriceDomestic()) + " incorrect in expense (id/random: " + GetID() + "/" + GetRandom() + "");
 	}
 	else if(GetPriceForeign() && (GetCurrencyName().length() == 0))
 	{
-		result = "не указано наименование валюты";
+		result = "РЅРµ СѓРєР°Р·Р°РЅРѕ РЅР°РёРјРµРЅРѕРІР°РЅРёРµ РІР°Р»СЋС‚С‹";
 		MESSAGE_DEBUG("C_Expense", "", "currency name is empty in expense (id/random: " + GetID() + "/" + GetRandom() + "");
 	}
 	else if(GetPriceForeign() && (GetCurrencyNominal() == 0))
 	{
-		result = "не указан номинал валюты";
+		result = "РЅРµ СѓРєР°Р·Р°РЅ РЅРѕРјРёРЅР°Р» РІР°Р»СЋС‚С‹";
 		MESSAGE_DEBUG("C_Expense", "", "currency nominal is 0 in expense (id/random: " + GetID() + "/" + GetRandom() + "");
 	}
 	else if(GetPriceForeign() && (GetPriceDomestic() != (GetPriceForeign() * GetCurrencyValue() / GetCurrencyNominal())))
 	{
-		result = "сумма в рублях не соответствует сумме в валюте";
+		result = "СЃСѓРјРјР° РІ СЂСѓР±Р»СЏС… РЅРµ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓРµС‚ СЃСѓРјРјРµ РІ РІР°Р»СЋС‚Рµ";
 		MESSAGE_DEBUG("C_Expense", "", "price in rub.(" + string(GetPriceDomestic()) + ") not equal to foregn price(cost = price / nominal / value is " + string(GetPriceForeign() * GetCurrencyValue() / GetCurrencyNominal()) + " = " + string(GetPriceForeign()) + " / " + to_string(GetCurrencyNominal()) + " / " + string(GetCurrencyValue()) + ") in expense (id/random: " + GetID() + "/" + GetRandom() + ")");
 	}
 	else
@@ -758,7 +758,7 @@ string	C_Expense::SaveToDB(string bt_id, CMysql *db)
 					);
 			if(db->isError())
 			{
-				error_message = "Ошибка БД";
+				error_message = "РћС€РёР±РєР° Р‘Р”";
 				MESSAGE_ERROR("C_Expense", "", "fail to update `bt_expenses` table (" + db->GetErrorMessage() + ")");
 			}
 		}
@@ -783,7 +783,7 @@ string	C_Expense::SaveToDB(string bt_id, CMysql *db)
 			}
 			else
 			{
-				error_message = "Ошибка БД";
+				error_message = "РћС€РёР±РєР° Р‘Р”";
 				MESSAGE_ERROR("C_Expense", "", "fail to insert into `bt_expenses` table entry (" + db->GetErrorMessage() + ")");
 			}
 		}
@@ -804,7 +804,7 @@ string	C_Expense::SaveToDB(string bt_id, CMysql *db)
 	}
 	else
 	{
-		error_message = "Ошибка DB";
+		error_message = "РћС€РёР±РєР° DB";
 		MESSAGE_ERROR("C_Expense", "", "DB not initialized");
 	}
 
@@ -1051,42 +1051,42 @@ string	C_BT::CheckValidity() const
 
 	if(db == NULL) 										
 	{
-		result = "Ошибка DB";
+		result = "РћС€РёР±РєР° DB";
 		MESSAGE_ERROR("C_BT", "", "DB not initialized");
 	}
 	else if(GetUserID().length() == 0)
 	{
-		result = "не указан user.id";
+		result = "РЅРµ СѓРєР°Р·Р°РЅ user.id";
 		MESSAGE_ERROR("C_BT", "", "user.id not initialized");
 	}
 	else if(GetSowID().length() == 0)
 	{
-		result = "не указан sow";
+		result = "РЅРµ СѓРєР°Р·Р°РЅ sow";
 		MESSAGE_DEBUG("C_BT", "", "sow.id is empty");
 	}
 	else if(GetPurpose().length() == 0)
 	{
-		result = "не указана цель поездки";
+		result = "РЅРµ СѓРєР°Р·Р°РЅР° С†РµР»СЊ РїРѕРµР·РґРєРё";
 		MESSAGE_DEBUG("C_BT", "", "purpose is empty");
 	}
 	else if(GetDestination().length() == 0)
 	{
-		result = "пункт назначения пустой";
+		result = "РїСѓРЅРєС‚ РЅР°Р·РЅР°С‡РµРЅРёСЏ РїСѓСЃС‚РѕР№";
 		MESSAGE_DEBUG("C_BT", "", "destination is empty");
 	}
 	else if(!regex_match(GetStartDate(), date_regex))
 	{
-		result = "некорректная дата отправления";
+		result = "РЅРµРєРѕСЂСЂРµРєС‚РЅР°СЏ РґР°С‚Р° РѕС‚РїСЂР°РІР»РµРЅРёСЏ";
 		MESSAGE_DEBUG("C_BT", "", "start_date is empty");
 	}
 	else if(!regex_match(GetEndDate(), date_regex))
 	{
-		result = "некорректная дата возврата";
+		result = "РЅРµРєРѕСЂСЂРµРєС‚РЅР°СЏ РґР°С‚Р° РІРѕР·РІСЂР°С‚Р°";
 		MESSAGE_DEBUG("C_BT", "", "end_date is empty");
 	}
 	else if(!isSubcontractorAssignedToSow())
 	{
-		result = "этот договор заключен не с вами";
+		result = "СЌС‚РѕС‚ РґРѕРіРѕРІРѕСЂ Р·Р°РєР»СЋС‡РµРЅ РЅРµ СЃ РІР°РјРё";
 		MESSAGE_DEBUG("C_BT", "", "subcontractor doesn't belong to sow");
 	}
 	else if(!isSubcontractorAssignedToCustomerID())
@@ -1121,7 +1121,7 @@ string	C_BT::isValidToUpdate()
 
 	if((GetStatus() == "submit") || (GetStatus() == "approved"))
 	{
-		error_message = "Невозможно изменить данные";
+		error_message = "РќРµРІРѕР·РјРѕР¶РЅРѕ РёР·РјРµРЅРёС‚СЊ РґР°РЅРЅС‹Рµ";
 	}
 	
 	MESSAGE_DEBUG("C_BT", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
@@ -1155,7 +1155,7 @@ string	C_BT::SaveToDB()
 						);
 				if(db->isError())
 				{
-					error_message = "Ошибка БД";
+					error_message = "РћС€РёР±РєР° Р‘Р”";
 					MESSAGE_ERROR("C_BT", "", "fail to update `bt` table (" + db->GetErrorMessage() + ")");
 				}
 			}
@@ -1183,7 +1183,7 @@ string	C_BT::SaveToDB()
 			}
 			else
 			{
-				error_message = "Ошибка БД";
+				error_message = "РћС€РёР±РєР° Р‘Р”";
 				MESSAGE_ERROR("C_BT", "", "fail to insert into `bt` table entry (" + db->GetErrorMessage() + ")");
 			}
 		}
@@ -1223,14 +1223,14 @@ string	C_BT::SaveToDB()
 			}
 			else
 			{
-				error_message = "Неудалось отправить командировку на проверку.";
+				error_message = "РќРµСѓРґР°Р»РѕСЃСЊ РѕС‚РїСЂР°РІРёС‚СЊ РєРѕРјР°РЅРґРёСЂРѕРІРєСѓ РЅР° РїСЂРѕРІРµСЂРєСѓ.";
 				MESSAGE_ERROR("C_BT", "", "fail to submit bt.id(" + GetID() + ") for approvals");
 			}
 		}
 	}
 	else
 	{
-		error_message = "Ошибка DB";
+		error_message = "РћС€РёР±РєР° DB";
 		MESSAGE_ERROR("C_BT", "", "DB not initialized");
 	}
 

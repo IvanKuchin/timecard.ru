@@ -350,7 +350,7 @@ int main()
 		indexPage.SetDB(&db);
 
 #ifndef MYSQL_3
-		db.Query("set names cp1251");
+		db.Query("set names utf8;");
 #endif
 
 		action = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("action"));
@@ -1038,7 +1038,7 @@ int main()
 						ostFinal.str("");
 						ostFinal << "{";
 						ostFinal << "\"result\" : \"error\",";
-						ostFinal << "\"description\" : \"Ошибка: Не получилось определить владельца сообщения\"";
+						ostFinal << "\"description\" : \"РћС€РёР±РєР°: РќРµ РїРѕР»СѓС‡РёР»РѕСЃСЊ РѕРїСЂРµРґРµР»РёС‚СЊ РІР»Р°РґРµР»СЊС†Р° СЃРѕРѕР±С‰РµРЅРёСЏ\"";
 						ostFinal << "}";
 					}
 				}
@@ -1051,7 +1051,7 @@ int main()
 					ostFinal.str("");
 					ostFinal << "{";
 					ostFinal << "\"result\" : \"error\",";
-					ostFinal << "\"description\" : \"Ошибка: Вы не можете удалить чужое сообщение.\"";
+					ostFinal << "\"description\" : \"РћС€РёР±РєР°: Р’С‹ РЅРµ РјРѕР¶РµС‚Рµ СѓРґР°Р»РёС‚СЊ С‡СѓР¶РѕРµ СЃРѕРѕР±С‰РµРЅРёРµ.\"";
 					ostFinal << "}";
 				}
 			}
@@ -1343,7 +1343,7 @@ int main()
 					ostFinal.str("");
 					ostFinal << "{" << std::endl;
 					ostFinal << "\"result\" : \"error\"," << std::endl;
-					ostFinal << "\"description\" : \"проблема с выбором imageTempSet\"" << std::endl;
+					ostFinal << "\"description\" : \"РїСЂРѕР±Р»РµРјР° СЃ РІС‹Р±РѕСЂРѕРј imageTempSet\"" << std::endl;
 					ostFinal << "}" << std::endl;
 				}
 				else
@@ -1354,7 +1354,7 @@ int main()
 					ostFinal.str("");
 					ostFinal << "{" << std::endl;
 					ostFinal << "\"result\" : \"error\"," << std::endl;
-					ostFinal << "\"description\" : \"ссылка пустая или слишком длинная\"" << std::endl;
+					ostFinal << "\"description\" : \"СЃСЃС‹Р»РєР° РїСѓСЃС‚Р°СЏ РёР»Рё СЃР»РёС€РєРѕРј РґР»РёРЅРЅР°СЏ\"" << std::endl;
 					ostFinal << "}" << std::endl;
 				}
 			}
@@ -1372,7 +1372,7 @@ int main()
 					ostFinal.str("");
 					ostFinal << "{" << std::endl;
 					ostFinal << "\"result\" : \"error\"," << std::endl;
-					ostFinal << "\"description\" : \"Ваша сессия истекла. Необходимо выйти и повторно зайти.\"" << std::endl;
+					ostFinal << "\"description\" : \"Р’Р°С€Р° СЃРµСЃСЃРёСЏ РёСЃС‚РµРєР»Р°. РќРµРѕР±С…РѕРґРёРјРѕ РІС‹Р№С‚Рё Рё РїРѕРІС‚РѕСЂРЅРѕ Р·Р°Р№С‚Рё.\"" << std::endl;
 					ostFinal << "}" << std::endl;
 				}
 
@@ -1558,7 +1558,7 @@ int main()
 						ostFinal.str("");
 						ostFinal << "{";
 						ostFinal << "\"result\" : \"error\",";
-						ostFinal << "\"description\" : \"Не удалось получить данные с сайта, проверьте корректность ссылки\"";
+						ostFinal << "\"description\" : \"РќРµ СѓРґР°Р»РѕСЃСЊ РїРѕР»СѓС‡РёС‚СЊ РґР°РЅРЅС‹Рµ СЃ СЃР°Р№С‚Р°, РїСЂРѕРІРµСЂСЊС‚Рµ РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚СЊ СЃСЃС‹Р»РєРё\"";
 						ostFinal << "}";
 					}
 				}
@@ -2464,7 +2464,7 @@ int main()
 			}
 
 #ifndef MYSQL_3
-			db1.Query("set names cp1251");
+			db1.Query("set names utf8;");
 #endif
 
 			lookForKey = indexPage.GetVarsHandler()->Get("lookForKey");
@@ -2905,7 +2905,7 @@ int main()
 			}
 
 #ifndef MYSQL_3
-			db1.Query("set names cp1251");
+			db1.Query("set names utf8;");
 #endif
 
 			friendsSqlQuery.str("");
@@ -3342,7 +3342,7 @@ int main()
 								}
 								ostFinal.str("");
 								ostFinal << "\"result\": \"error\"," << std::endl;
-								ostFinal << "\"description\": \"проблема с базой данных (сообщите администрации)\"" << std::endl;
+								ostFinal << "\"description\": \"РїСЂРѕР±Р»РµРјР° СЃ Р±Р°Р·РѕР№ РґР°РЅРЅС‹С… (СЃРѕРѕР±С‰РёС‚Рµ Р°РґРјРёРЅРёСЃС‚СЂР°С†РёРё)\"" << std::endl;
 							}
 						}
 
@@ -3358,7 +3358,7 @@ int main()
 							}
 							ostFinal.str("");
 							ostFinal << "\"result\": \"error\"," << std::endl;
-							ostFinal << "\"description\": \"проблема с базой данных (сообщите администрации)\"" << std::endl;
+							ostFinal << "\"description\": \"РїСЂРѕР±Р»РµРјР° СЃ Р±Р°Р·РѕР№ РґР°РЅРЅС‹С… (СЃРѕРѕР±С‰РёС‚Рµ Р°РґРјРёРЅРёСЃС‚СЂР°С†РёРё)\"" << std::endl;
 						}
 
 					}
@@ -3369,7 +3369,7 @@ int main()
 						}
 						ostFinal.str("");
 						ostFinal << "\"result\": \"error\"," << std::endl;
-						ostFinal << "\"description\": \"проблема с базой данных (сообщите администрации)\"" << std::endl;
+						ostFinal << "\"description\": \"РїСЂРѕР±Р»РµРјР° СЃ Р±Р°Р·РѕР№ РґР°РЅРЅС‹С… (СЃРѕРѕР±С‰РёС‚Рµ Р°РґРјРёРЅРёСЃС‚СЂР°С†РёРё)\"" << std::endl;
 					}
 
 
@@ -3382,7 +3382,7 @@ int main()
 					}
 					ostFinal.str("");
 					ostFinal << "\"result\": \"error\"," << std::endl;
-					ostFinal << "\"description\": \"сообщение должно содержать текст\"" << std::endl;
+					ostFinal << "\"description\": \"СЃРѕРѕР±С‰РµРЅРёРµ РґРѕР»Р¶РЅРѕ СЃРѕРґРµСЂР¶Р°С‚СЊ С‚РµРєСЃС‚\"" << std::endl;
 				}
 
 
@@ -3858,7 +3858,7 @@ int main()
 							ost.str("");
 							ost << "{";
 							ost << "\"result\" : \"error\",";
-							ost << "\"description\" : \"Ошибка: Не получилось определить владельца сообщения\"";
+							ost << "\"description\" : \"РћС€РёР±РєР°: РќРµ РїРѕР»СѓС‡РёР»РѕСЃСЊ РѕРїСЂРµРґРµР»РёС‚СЊ РІР»Р°РґРµР»СЊС†Р° СЃРѕРѕР±С‰РµРЅРёСЏ\"";
 							ost << "}";
 						}
 					}
@@ -3867,7 +3867,7 @@ int main()
 						{
 							MESSAGE_ERROR("", action, "message.id(" + messageID + ") doesn't belongs to user.id(" + user.GetID() + ") or his companies");
 						}
-						indexPage.RegisterVariableForce("result", "{\"result\" : \"error\", \"description\" : \"вы не можете редактировать сообщение\"}");
+						indexPage.RegisterVariableForce("result", "{\"result\" : \"error\", \"description\" : \"РІС‹ РЅРµ РјРѕР¶РµС‚Рµ СЂРµРґР°РєС‚РёСЂРѕРІР°С‚СЊ СЃРѕРѕР±С‰РµРЅРёРµ\"}");
 					}
 				}
 				else
@@ -4332,7 +4332,7 @@ int main()
 							ost << "[";
 							ost << "{";
 							ost << "\"result\": \"error\",";
-							ost << "\"description\": \"присутствуют запрещенные слова\"";
+							ost << "\"description\": \"РїСЂРёСЃСѓС‚СЃС‚РІСѓСЋС‚ Р·Р°РїСЂРµС‰РµРЅРЅС‹Рµ СЃР»РѕРІР°\"";
 							ost << "}";
 							ost << "]";
 
@@ -4350,7 +4350,7 @@ int main()
 						ost.str("");
 						ost << "{";
 						ost << "\"result\" : \"error\",";
-						ost << "\"description\" : \"Ошибка: Не получилось определить владельца сообщения\"";
+						ost << "\"description\" : \"РћС€РёР±РєР°: РќРµ РїРѕР»СѓС‡РёР»РѕСЃСЊ РѕРїСЂРµРґРµР»РёС‚СЊ РІР»Р°РґРµР»СЊС†Р° СЃРѕРѕР±С‰РµРЅРёСЏ\"";
 						ost << "}";
 					}
 
@@ -4362,7 +4362,7 @@ int main()
 					ost << "[";
 					ost << "{";
 					ost << "\"result\": \"error\",";
-					ost << "\"description\": \"Ошибка: сообщение не найдено или не ваше\"";
+					ost << "\"description\": \"РћС€РёР±РєР°: СЃРѕРѕР±С‰РµРЅРёРµ РЅРµ РЅР°Р№РґРµРЅРѕ РёР»Рё РЅРµ РІР°С€Рµ\"";
 					ost << "}";
 					ost << "]";
 
@@ -4819,7 +4819,7 @@ int main()
 					ostResult.str("");
 					ostResult << "{";
 					ostResult << "\"result\": \"error\",";
-					ostResult << "\"description\": \"Пароль не должен содержать символов [(кавычки), (перевод строки), '<>] \"";
+					ostResult << "\"description\": \"РџР°СЂРѕР»СЊ РЅРµ РґРѕР»Р¶РµРЅ СЃРѕРґРµСЂР¶Р°С‚СЊ СЃРёРјРІРѕР»РѕРІ [(РєР°РІС‹С‡РєРё), (РїРµСЂРµРІРѕРґ СЃС‚СЂРѕРєРё), '<>] \"";
 					ostResult << "}";
 				}
 				else
@@ -4840,7 +4840,7 @@ int main()
 							ostResult.str("");
 							ostResult << "{";
 							ostResult << "\"result\": \"error\",";
-							ostResult << "\"description\": \"Пароль не должен совпадать с одним из прошлых паролей\"";
+							ostResult << "\"description\": \"РџР°СЂРѕР»СЊ РЅРµ РґРѕР»Р¶РµРЅ СЃРѕРІРїР°РґР°С‚СЊ СЃ РѕРґРЅРёРј РёР· РїСЂРѕС€Р»С‹С… РїР°СЂРѕР»РµР№\"";
 							ostResult << "}";
 						}
 						else
@@ -4870,7 +4870,7 @@ int main()
 								ostResult.str("");
 								ostResult << "{";
 								ostResult << "\"result\": \"error\",";
-								ostResult << "\"description\": \"Ошибка БД\"";
+								ostResult << "\"description\": \"РћС€РёР±РєР° Р‘Р”\"";
 								ostResult << "}";
 							}
 
@@ -5038,7 +5038,7 @@ int main()
 
 					if(GetTimeDifferenceFromNow(friendLastOnline) < 60)
 					{
-						indexPage.RegisterVariableForce("friendLastOnlineStatement", "менее минуты назад");
+						indexPage.RegisterVariableForce("friendLastOnlineStatement", "РјРµРЅРµРµ РјРёРЅСѓС‚С‹ РЅР°Р·Р°Рґ");
 					}
 					else
 					{
@@ -5091,15 +5091,15 @@ int main()
 
 								ost1 << "<div class='row'>\n";
 								ost1 << "<div class='col-md-4'>";
-								ost1 << "<p" << (current_company == "1" ? " class=\"current_company\"" : "") << ">с ";
-								ost1 << "<span data-id='" << db.Get(i, "users_company_id") << "' data-action='update_occupation_start' class='occupation_start datePick'>" << db.Get(i, "occupation_start") << "</span> по ";
-								ost1 << "<span data-id='" << db.Get(i, "users_company_id") << "' data-action='update_occupation_finish' class='occupation_finish editableSpan'>" << (occupationFinish == "0000-00-00" ? "настоящее время" : occupationFinish)  << "</span></p>";
+								ost1 << "<p" << (current_company == "1" ? " class=\"current_company\"" : "") << ">СЃ ";
+								ost1 << "<span data-id='" << db.Get(i, "users_company_id") << "' data-action='update_occupation_start' class='occupation_start datePick'>" << db.Get(i, "occupation_start") << "</span> РїРѕ ";
+								ost1 << "<span data-id='" << db.Get(i, "users_company_id") << "' data-action='update_occupation_finish' class='occupation_finish editableSpan'>" << (occupationFinish == "0000-00-00" ? "РЅР°СЃС‚РѕСЏС‰РµРµ РІСЂРµРјСЏ" : occupationFinish)  << "</span></p>";
 								ost1 << "</div>\n";
 								ost1 << "<div class='col-md-8'>";
 								ost1 << "<p" << (current_company == "1" ? " class=\"current_company\" " : "") << "> \
-								<span data-id='" << db.Get(i, "users_company_id") << "' data-action='updateJobTitle' class='jobTitle editableSpan'>"  << db.Get(i, "title") << "</span> в \
+								<span data-id='" << db.Get(i, "users_company_id") << "' data-action='updateJobTitle' class='jobTitle editableSpan'>"  << db.Get(i, "title") << "</span> РІ \
 								<span data-id='" << db.Get(i, "users_company_id") << "' data-action='updateCompanyName' class='companyName editableSpan'>" << db.Get(i, "company_name") << "</span>";
-								// ost1 << (current_company == "1" ? " (текущее место работы)" : "") << "</p>";
+								// ost1 << (current_company == "1" ? " (С‚РµРєСѓС‰РµРµ РјРµСЃС‚Рѕ СЂР°Р±РѕС‚С‹)" : "") << "</p>";
 								ost1 << "</div>\n";
 								ost1 << "</div> <!-- row -->\n\n";
 								ost1 << "<div class='row'>\n";
@@ -5116,7 +5116,7 @@ int main()
 					}
 					else
 					{
-						indexPage.RegisterVariableForce("carrierPath", "Нет данных");
+						indexPage.RegisterVariableForce("carrierPath", "РќРµС‚ РґР°РЅРЅС‹С…");
 					}
 				}
 				else
@@ -5330,7 +5330,7 @@ int main()
 			indexPage.RegisterVariableForce("noun_list", GetPasswordNounsList(&db));
 			indexPage.RegisterVariableForce("adjectives_list", GetPasswordAdjectivesList(&db));
 
-			indexPage.RegisterVariableForce("title", "Добро пожаловать");
+			indexPage.RegisterVariableForce("title", "Р”РѕР±СЂРѕ РїРѕР¶Р°Р»РѕРІР°С‚СЊ");
 			indexPage.RegisterVariable("regEmail_checked", "0");
 
 
@@ -5446,7 +5446,7 @@ int main()
 					ostResult.str("");
 					ostResult << "{";
 					ostResult << "\"result\": \"error\",";
-					ostResult << "\"description\": \"Проверьте свой e-mail\"";
+					ostResult << "\"description\": \"РџСЂРѕРІРµСЂСЊС‚Рµ СЃРІРѕР№ e-mail\"";
 					ostResult << "}";
 				}
 				else
@@ -5459,7 +5459,7 @@ int main()
 						ostResult.str("");
 						ostResult << "{";
 						ostResult << "\"result\": \"error\",";
-						ostResult << "\"description\": \"пользователь неактивирован. Проверьте e-mail и активируйте аккаунт.\"";
+						ostResult << "\"description\": \"РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ РЅРµР°РєС‚РёРІРёСЂРѕРІР°РЅ. РџСЂРѕРІРµСЂСЊС‚Рµ e-mail Рё Р°РєС‚РёРІРёСЂСѓР№С‚Рµ Р°РєРєР°СѓРЅС‚.\"";
 						ostResult << "}";
 					}
 					else
@@ -5480,7 +5480,7 @@ int main()
 							ostResult.str("");
 							ostResult << "{";
 							ostResult << "\"result\": \"error\",";
-							ostResult << "\"description\": \"Ошибка БД. Мы исправим ее в течение 24 часов.\"";
+							ostResult << "\"description\": \"РћС€РёР±РєР° Р‘Р”. РњС‹ РёСЃРїСЂР°РІРёРј РµРµ РІ С‚РµС‡РµРЅРёРµ 24 С‡Р°СЃРѕРІ.\"";
 							ostResult << "}";
 						}
 						else
@@ -5534,7 +5534,7 @@ int main()
 			sessid = indexPage.GetCookie("sessid");
 			if(sessid.length() < 5)
 			{
-				error_message = "Устаревшая сессия";
+				error_message = "РЈСЃС‚Р°СЂРµРІС€Р°СЏ СЃРµСЃСЃРёСЏ";
 				redirect_url = "/login?rand=" + GetRandom(10) + "\"";
 				MESSAGE_ERROR("", action, "with session id derived FROM cookies");
 			}
@@ -5557,7 +5557,7 @@ int main()
 							{
 								string timestamp = db.Get(0, "eventTimestamp");
 
-								error_message = "этот пароль использовался " + GetHumanReadableTimeDifferenceFromNow(timestamp) + ". Выберите другой.";
+								error_message = "СЌС‚РѕС‚ РїР°СЂРѕР»СЊ РёСЃРїРѕР»СЊР·РѕРІР°Р»СЃСЏ " + GetHumanReadableTimeDifferenceFromNow(timestamp) + ". Р’С‹Р±РµСЂРёС‚Рµ РґСЂСѓРіРѕР№.";
 								MESSAGE_DEBUG("", action, "user.id(" + user_id + ") not allowd to re-use old password(" + timestamp + ").");
 							}
 							else
@@ -5565,7 +5565,7 @@ int main()
 								db.Query("UPDATE `users_passwd` SET `isActive`=\"false\" WHERE `userID`=\"" + user_id + "\";");
 								if(db.isError())
 								{
-									error_message = "Ошибка обновления пароля";
+									error_message = "РћС€РёР±РєР° РѕР±РЅРѕРІР»РµРЅРёСЏ РїР°СЂРѕР»СЏ";
 									MESSAGE_ERROR("", action, "fail to update users_passwd table user.id(" + user_id + ")");
 								}
 								else
@@ -5584,7 +5584,7 @@ int main()
 									}
 									else
 									{
-										error_message = "Ошибка обновления пароля";
+										error_message = "РћС€РёР±РєР° РѕР±РЅРѕРІР»РµРЅРёСЏ РїР°СЂРѕР»СЏ";
 										MESSAGE_ERROR("", action, "fail to insert new passwd to users_passwd table");
 									}
 								}
@@ -5592,19 +5592,19 @@ int main()
 						}
 						else
 						{
-							error_message = "Неизвестный пользователь";
+							error_message = "РќРµРёР·РІРµСЃС‚РЅС‹Р№ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ";
 							MESSAGE_ERROR("", action, "user_email(" + user_email + ") not found in the users table");
 						}
 					}
 					else
 					{
-						error_message = "Неизвестный токен активации";
+						error_message = "РќРµРёР·РІРµСЃС‚РЅС‹Р№ С‚РѕРєРµРЅ Р°РєС‚РёРІР°С†РёРё";
 						MESSAGE_ERROR("", action, "activator_id(" + activator_id + ") with type(password_recovery) not found in the activator table");
 					}
 				}
 				else
 				{
-					error_message = "Токен активации пустой";
+					error_message = "РўРѕРєРµРЅ Р°РєС‚РёРІР°С†РёРё РїСѓСЃС‚РѕР№";
 					MESSAGE_ERROR("", action, "activator_id is empty");
 				}
 			} // if(sessid.length() < 5)
@@ -5654,7 +5654,7 @@ int main()
 			if(sessid.length() < 5)
 			{
 				MESSAGE_DEBUG("", action, "cookie is not enabled or session didn't created");
-				error_message = "Разрешите cookie в браузере";
+				error_message = "Р Р°Р·СЂРµС€РёС‚Рµ cookie РІ Р±СЂР°СѓР·РµСЂРµ";
 			}
 			else
 			{
@@ -5667,7 +5667,7 @@ int main()
 				if(!user.GetFromDBbyEmail(login))
 				{
 					MESSAGE_DEBUG("", action, "user [" + user.GetLogin() + "] not found");
-					error_message = "Имя пользователя или пароль некорректны";
+					error_message = "РРјСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РёР»Рё РїР°СЂРѕР»СЊ РЅРµРєРѕСЂСЂРµРєС‚РЅС‹";
 				}
 				else
 				{
@@ -5675,14 +5675,14 @@ int main()
 					if(!user.isActive())
 					{
 						MESSAGE_ERROR("", action, "user [" + user.GetLogin() + "] not activated");
-						error_message = "Пользоатель не активирован. Проверьте email и нажмите на ссылку.";
+						error_message = "РџРѕР»СЊР·РѕР°С‚РµР»СЊ РЅРµ Р°РєС‚РёРІРёСЂРѕРІР°РЅ. РџСЂРѕРІРµСЂСЊС‚Рµ email Рё РЅР°Р¶РјРёС‚Рµ РЅР° СЃСЃС‹Р»РєСѓ.";
 					}
 					else
 					{
 						if((password != user.GetPasswd()) || (user.GetPasswd() == ""))
 						{
 							MESSAGE_DEBUG("", action, "password incorrect for user [" + user.GetLogin() + "]");
-							error_message = "Имя пользователя или пароль некорректны";
+							error_message = "РРјСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РёР»Рё РїР°СЂРѕР»СЊ РЅРµРєРѕСЂСЂРµРєС‚РЅС‹";
 						}
 						else
 						{
@@ -5694,7 +5694,7 @@ int main()
 							if(db.isError())
 							{
 								MESSAGE_DEBUG("", action, "fail to updte DB sessions`");
-								error_message = "Ошибка БД";
+								error_message = "РћС€РёР±РєР° Р‘Р”";
 							}
 							else
 							{
@@ -5786,7 +5786,7 @@ int main()
 					ostResult.str("");
 					ostResult << "{";
 					ostResult << "\"result\": \"error\",";
-					ostResult << "\"description\": \"Почта или Пароль указаны не верно.\"";
+					ostResult << "\"description\": \"РџРѕС‡С‚Р° РёР»Рё РџР°СЂРѕР»СЊ СѓРєР°Р·Р°РЅС‹ РЅРµ РІРµСЂРЅРѕ.\"";
 					ostResult << "}";
 				}
 				else
@@ -5799,7 +5799,7 @@ int main()
 						ostResult.str("");
 						ostResult << "{";
 						ostResult << "\"result\": \"error\",";
-						ostResult << "\"description\": \"пользователь неактивирован, необходима активация\"";
+						ostResult << "\"description\": \"РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ РЅРµР°РєС‚РёРІРёСЂРѕРІР°РЅ, РЅРµРѕР±С…РѕРґРёРјР° Р°РєС‚РёРІР°С†РёСЏ\"";
 						ostResult << "}";
 					}
 					else
@@ -5818,7 +5818,7 @@ int main()
 								ostResult.str("");
 								ostResult << "{";
 								ostResult << "\"result\": \"error\",";
-								ostResult << "\"description\": \"этот пароль был изменен " << GetHumanReadableTimeDifferenceFromNow(db.Get(0, "eventTimestamp")) << "\"";
+								ostResult << "\"description\": \"СЌС‚РѕС‚ РїР°СЂРѕР»СЊ Р±С‹Р» РёР·РјРµРЅРµРЅ " << GetHumanReadableTimeDifferenceFromNow(db.Get(0, "eventTimestamp")) << "\"";
 								ostResult << "}";
 							}
 							else
@@ -5833,7 +5833,7 @@ int main()
 								ostResult.str("");
 								ostResult << "{";
 								ostResult << "\"result\": \"error\",";
-								ostResult << "\"description\": \"логин или пароль указаны не верно\"";
+								ostResult << "\"description\": \"Р»РѕРіРёРЅ РёР»Рё РїР°СЂРѕР»СЊ СѓРєР°Р·Р°РЅС‹ РЅРµ РІРµСЂРЅРѕ\"";
 								ostResult << "}";
 							}
 
@@ -5856,7 +5856,7 @@ int main()
 								ostResult.str("");
 								ostResult << "{";
 								ostResult << "\"result\": \"error\",";
-								ostResult << "\"description\": \"ошибка БД\"";
+								ostResult << "\"description\": \"РѕС€РёР±РєР° Р‘Р”\"";
 								ostResult << "}";
 							}
 							else
@@ -5918,7 +5918,7 @@ int main()
 			if(sessid.length() < 5)
 			{
 				MESSAGE_ERROR("", action, "in session id [" + sessid + "]");
-				error_message = "Разрешите cookie в браузере";
+				error_message = "Р Р°Р·СЂРµС€РёС‚Рµ cookie РІ Р±СЂР°СѓР·РµСЂРµ";
 			}
 			else
 			{
@@ -5931,14 +5931,14 @@ int main()
 					if(regEmail.length() <= 3)
 					{
 						MESSAGE_DEBUG("", action, "email is incorrect [" + regEmail + "]");
-						error_message = "Введен некорректный email";
+						error_message = "Р’РІРµРґРµРЅ РЅРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ email";
 					}
 					else
 					{
 						if(CheckUserEmailExisting(regEmail, &db))
 						{
 							MESSAGE_DEBUG("", action, "login or email already registered");
-							error_message = "Пользователь с этим адресом уже зарегистрирован";
+							error_message = "РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ СЃ СЌС‚РёРј Р°РґСЂРµСЃРѕРј СѓР¶Рµ Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅ";
 						}
 						else
 						{
@@ -5949,7 +5949,7 @@ int main()
 									MESSAGE_DEBUG("", action, "check captcha fail");
 								}
 
-								error_message = "Некорректный код с картинки";
+								error_message = "РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ РєРѕРґ СЃ РєР°СЂС‚РёРЅРєРё";
 								redirect_url = "/cgi-bin/index.cgi?action=weberror_captcha_template&regEmail=" + regEmail + "&rand=" + GetRandom(10);
 							}
 							else
@@ -6223,11 +6223,11 @@ int main()
 
 				if(isBlocked == "Y")
 				{
-					indexPage.RegisterVariableForce("isblocked", "<button type=\"button\" class=\"btn btn-danger user-account-properties-visible form-control\" id=\"ButtonAccountEnable1\">Аккаунт заблокирован</button> <button type=\"button\" class=\"btn btn-success user-account-properties-hidden form-control\" id=\"ButtonAccountBlock1\">Аккаунт активен</button>");
+					indexPage.RegisterVariableForce("isblocked", "<button type=\"button\" class=\"btn btn-danger user-account-properties-visible form-control\" id=\"ButtonAccountEnable1\">РђРєРєР°СѓРЅС‚ Р·Р°Р±Р»РѕРєРёСЂРѕРІР°РЅ</button> <button type=\"button\" class=\"btn btn-success user-account-properties-hidden form-control\" id=\"ButtonAccountBlock1\">РђРєРєР°СѓРЅС‚ Р°РєС‚РёРІРµРЅ</button>");
 				}
 				else
 				{
-					indexPage.RegisterVariableForce("isblocked", "<button type=\"button\" class=\"btn btn-danger user-account-properties-hidden form-control\" id=\"ButtonAccountEnable1\">Аккаунт заблокирован</button> <button type=\"button\" class=\"btn btn-success user-account-properties-visible form-control\" id=\"ButtonAccountBlock1\">Аккаунт активен</button>");
+					indexPage.RegisterVariableForce("isblocked", "<button type=\"button\" class=\"btn btn-danger user-account-properties-hidden form-control\" id=\"ButtonAccountEnable1\">РђРєРєР°СѓРЅС‚ Р·Р°Р±Р»РѕРєРёСЂРѕРІР°РЅ</button> <button type=\"button\" class=\"btn btn-success user-account-properties-visible form-control\" id=\"ButtonAccountBlock1\">РђРєРєР°СѓРЅС‚ Р°РєС‚РёРІРµРЅ</button>");
 				}
 
 				{
@@ -6291,7 +6291,7 @@ int main()
 					nameLast = db.Get(0, "users_nameLast"); indexPage.RegisterVariableForce("nameLast", nameLast);
 															indexPage.RegisterVariableForce("myLastName", nameLast);
 					cv = db.Get(0, "users_cv");
-					if(cv == "") cv = "Напишите несколько слов о себе";
+					if(cv == "") cv = "РќР°РїРёС€РёС‚Рµ РЅРµСЃРєРѕР»СЊРєРѕ СЃР»РѕРІ Рѕ СЃРµР±Рµ";
 															indexPage.RegisterVariableForce("cv", cv);
 					address = db.Get(0, "users_address");	indexPage.RegisterVariableForce("address", address);
 					phone = db.Get(0, "users_phone");		indexPage.RegisterVariableForce("phone", phone);
@@ -6312,7 +6312,7 @@ int main()
 					CExceptionHTML("no user");
 				}
 
-				indexPage.RegisterVariableForce("title", "Моя страница");
+				indexPage.RegisterVariableForce("title", "РњРѕСЏ СЃС‚СЂР°РЅРёС†Р°");
 			}
 
 			if(!indexPage.SetTemplate("edit_profile.htmlt"))
@@ -6346,7 +6346,7 @@ int main()
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
 			}
 
-			indexPage.RegisterVariableForce("title", "Редактирование данных компании");
+			indexPage.RegisterVariableForce("title", "Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ РґР°РЅРЅС‹С… РєРѕРјРїР°РЅРёРё");
 
 			if(!indexPage.SetTemplate("edit_company.htmlt"))
 			{
@@ -6429,7 +6429,7 @@ int main()
 				name = db.Get(0, "users_name");
 				nameLast = db.Get(0, "users_nameLast");
 				cv = db.Get(0, "users_cv");
-				if(cv == "") cv = "Напишите несколько слов о себе";
+				if(cv == "") cv = "РќР°РїРёС€РёС‚Рµ РЅРµСЃРєРѕР»СЊРєРѕ СЃР»РѕРІ Рѕ СЃРµР±Рµ";
 				geo_locality_id = db.Get(0, "users_geo_locality_id");
 				pass = db.Get(0, "users_passwd_passwd");
 				address = db.Get(0, "users_address");
@@ -6627,7 +6627,7 @@ int main()
 					ostFinal.str("");
 					ostFinal << "{";
 					ostFinal << "\"result\" : \"error\",";
-					ostFinal << "\"description\" : \"Вам запрещено редактировать это сообщение\"";
+					ostFinal << "\"description\" : \"Р’Р°Рј Р·Р°РїСЂРµС‰РµРЅРѕ СЂРµРґР°РєС‚РёСЂРѕРІР°С‚СЊ СЌС‚Рѕ СЃРѕРѕР±С‰РµРЅРёРµ\"";
 					ostFinal << "}";
 				}
 
@@ -7285,19 +7285,19 @@ int main()
 						if(db.isError())
 						{
 							MESSAGE_ERROR("", action, "DB update failed (" + db.GetErrorMessage() + ")");
-							error_message = "Ошибка БД";
+							error_message = "РћС€РёР±РєР° Р‘Р”";
 						}
 					}
 					else
 					{
 						MESSAGE_DEBUG("", action, "theme_id(" + theme_id + ") not found");
-						error_message = "Некорректный идентификатор темы";
+						error_message = "РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ С‚РµРјС‹";
 					}
 				}
 				else
 				{
 					MESSAGE_DEBUG("", action, "theme_id is empty");
-					error_message = "Не указан идентификатор";
+					error_message = "РќРµ СѓРєР°Р·Р°РЅ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ";
 				}
 
 
@@ -7400,9 +7400,9 @@ int main()
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
 			}
 
-			if(action == "my_network") indexPage.RegisterVariableForce("title_head", "Мои друзья");
-			if(action == "who_watched_on_me") indexPage.RegisterVariableForce("title_head", "Кто просматривал мой профиль");
-			if(action == "companies_i_own_list") indexPage.RegisterVariableForce("title_head", "Мои компании");
+			if(action == "my_network") indexPage.RegisterVariableForce("title_head", "РњРѕРё РґСЂСѓР·СЊСЏ");
+			if(action == "who_watched_on_me") indexPage.RegisterVariableForce("title_head", "РљС‚Рѕ РїСЂРѕСЃРјР°С‚СЂРёРІР°Р» РјРѕР№ РїСЂРѕС„РёР»СЊ");
+			if(action == "companies_i_own_list") indexPage.RegisterVariableForce("title_head", "РњРѕРё РєРѕРјРїР°РЅРёРё");
 
 			strFriendsOnSinglePage	= indexPage.GetVarsHandler()->Get("FriendsOnSinglePage");
 			strPageToGet 			= indexPage.GetVarsHandler()->Get("page");
@@ -7446,7 +7446,7 @@ int main()
 			}
 */
 
-			indexPage.RegisterVariableForce("title_head", "Поиск друзей");
+			indexPage.RegisterVariableForce("title_head", "РџРѕРёСЃРє РґСЂСѓР·РµР№");
 			strFriendsOnSinglePage	= indexPage.GetVarsHandler()->Get("FriendsOnSinglePage");
 			strPageToGet 			= indexPage.GetVarsHandler()->Get("page");
 			if(strPageToGet.empty()) strPageToGet = "0";
@@ -7468,7 +7468,7 @@ int main()
 
 		if(action == "showmain")
 		{
-				indexPage.RegisterVariableForce("title", "Добро пожаловать");
+				indexPage.RegisterVariableForce("title", "Р”РѕР±СЂРѕ РїРѕР¶Р°Р»РѕРІР°С‚СЊ");
 				if(!indexPage.SetTemplate("main.htmlt"))
 				{
 					MESSAGE_ERROR("", action, "template file anketa.htmlt was missing");
@@ -7519,7 +7519,7 @@ int main()
 				}
 			}
 
-			indexPage.RegisterVariableForce("content", "На ваш почтовый ящик выслан пароль !");
+			indexPage.RegisterVariableForce("content", "РќР° РІР°С€ РїРѕС‡С‚РѕРІС‹Р№ СЏС‰РёРє РІС‹СЃР»Р°РЅ РїР°СЂРѕР»СЊ !");
 		}
 
 		{

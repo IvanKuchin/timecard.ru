@@ -17,6 +17,7 @@
 #include <iomanip>		// --- setprecision(2) in Float2StringWithPrecision
 #include <openssl/sha.h>
 #include <Magick++.h>
+#include <codecvt>
 
 #include "c_float.h"
 #include "cfiles.h"
@@ -29,12 +30,16 @@
 using namespace std;
 
 auto			crash_handler(int sig) -> void;
+auto			wide_to_multibyte(std::wstring const& s) -> string;
+auto			multibyte_to_wide(std::string const& s) -> wstring;
+auto			GetLocale();
 auto			GetSHA512(const string &src) -> string;
 auto	      	rtrim(string& str) -> string;
 auto	      	ltrim(string& str) -> string;
 auto	      	trim(string& str) -> string;
 auto	      	quoted(string src) -> string;
-auto	  		toLower(string src) -> string;
+auto	  		toUpper(const string &src) -> string;
+auto	  		toLower(const string &src) -> string;
 auto	      	GetRandom(int len) -> string;
 auto	      	DeleteHTML(string src, bool removeBR = true) -> string;
 auto	      	RemoveQuotas(string src) -> string;
@@ -157,6 +162,7 @@ auto			GetSiteThemesInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 pair<struct tm, struct tm> GetFirstAndLastDateOfLastMonth();
 pair<struct tm, struct tm> GetFirstAndLastDateOfThisMonth();
 struct tm		GetTMObject(string date);
+auto			GetSpellingFormattedDate(string date, string format) -> string;
 auto			operator <(const struct tm &tm_1, const struct tm &tm_2) -> bool;
 auto			operator <=(const struct tm &tm_1, const struct tm &tm_2) -> bool;
 auto			operator >(const struct tm &tm_1, const struct tm &tm_2) -> bool;
@@ -267,6 +273,7 @@ auto			GetNumberOfApprovedTimecardsLastMonth(CMysql *db, CUser *user) -> string;
 auto 			GetNumberOfSoWActiveThisMonth(CMysql *db, CUser *user) -> string;
 auto 			GetNumberOfSoWActiveLastMonth(CMysql *db, CUser *user) -> string;
 auto			GetPSoWIDByTimecardIDAndCostCenterID(string timecard_id, string cost_center_id, CMysql *db, CUser *user) -> string;
+auto			GetSoWIDByTimecardID(string timecard_id, CMysql *db, CUser *user) -> string;
 
 
 // --- function set for image upload/removal

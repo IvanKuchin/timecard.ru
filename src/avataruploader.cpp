@@ -144,7 +144,7 @@ int main()
 		indexPage.SetDB(&db);
 
 #ifndef MYSQL_3
-		db.Query("set names cp1251");
+		db.Query("set names utf8;");
 #endif
 		action = indexPage.GetVarsHandler()->Get("action");
 		{

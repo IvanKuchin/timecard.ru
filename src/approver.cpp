@@ -39,7 +39,7 @@ int main()
 	indexPage.SetDB(&db);
 
 #ifndef MYSQL_3
-	db.Query("set names cp1251");
+	db.Query("set names utf8;");
 #endif
 
 	action = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("action"));
@@ -339,7 +339,7 @@ int main()
 				else
 				{
 					MESSAGE_ERROR("", action, "dashboard data didn't gathered completely");
-					ostResult << "{\"status\":\"error\",\"description\":\"Îøèáêà ïîñòðîåíèÿ ïàíåëè óïðàâëåíèÿ\"}";
+					ostResult << "{\"status\":\"error\",\"description\":\"ÐžÑˆÐ¸Ð±ÐºÐ° Ð¿Ð¾ÑÑ‚Ñ€Ð¾ÐµÐ½Ð¸Ñ Ð¿Ð°Ð½ÐµÐ»Ð¸ ÑƒÐ¿Ñ€Ð°Ð²Ð»ÐµÐ½Ð¸Ñ\"}";
 				}
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
@@ -352,7 +352,7 @@ int main()
 			else
 			{
 				MESSAGE_ERROR("", action, "user.id(" + user.GetID() + ") not an approver(" + user.GetType() + ")");
-				ostResult << "{\"status\":\"error\",\"description\":\"Âû íå íàíà÷åíû íà ñîãëàñîâàíèå\"}";
+				ostResult << "{\"status\":\"error\",\"description\":\"Ð’Ñ‹ Ð½Ðµ Ð½Ð°Ð½Ð°Ñ‡ÐµÐ½Ñ‹ Ð½Ð° ÑÐ¾Ð³Ð»Ð°ÑÐ¾Ð²Ð°Ð½Ð¸Ðµ\"}";
 			}
 		}
 
@@ -404,19 +404,19 @@ int main()
 					else
 					{
 						MESSAGE_ERROR("", action, "error get reusable data");
-						ostResult << "{\"status\":\"error\",\"description\":\"Îøèáêà ïîëó÷åíèÿ äàííûõ\"}";
+						ostResult << "{\"status\":\"error\",\"description\":\"ÐžÑˆÐ¸Ð±ÐºÐ° Ð¿Ð¾Ð»ÑƒÑ‡ÐµÐ½Ð¸Ñ Ð´Ð°Ð½Ð½Ñ‹Ñ…\"}";
 					}
 
 				}
 				else
 				{
 					MESSAGE_ERROR("", action, "user(" + user.GetID() + ") neither approver, nor agency");
-					ostResult << "{\"status\":\"error\",\"description\":\"Âû íå äîëæíû ñîãëàñîâûâàòü\"}";
+					ostResult << "{\"status\":\"error\",\"description\":\"Ð’Ñ‹ Ð½Ðµ Ð´Ð¾Ð»Ð¶Ð½Ñ‹ ÑÐ¾Ð³Ð»Ð°ÑÐ¾Ð²Ñ‹Ð²Ð°Ñ‚ÑŒ\"}";
 				}
 			}
 			else
 			{
-				ostResult << "{\"status\":\"error\",\"description\":\"Íåèçâåñòíûé òèï îáüåêòà\"}";
+				ostResult << "{\"status\":\"error\",\"description\":\"ÐÐµÐ¸Ð·Ð²ÐµÑÑ‚Ð½Ñ‹Ð¹ Ñ‚Ð¸Ð¿ Ð¾Ð±ÑŒÐµÐºÑ‚Ð°\"}";
 				MESSAGE_ERROR("", action, "unknown object type (" + object + ")");
 			}
 
@@ -474,19 +474,19 @@ int main()
 					else
 					{
 						MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't allow to see this timecard");
-						ostResult << "{\"status\":\"error\",\"description\":\"Ó Âàñ íåò äîñòóïà ê ýòîé òàéìêàðòå\"}";
+						ostResult << "{\"status\":\"error\",\"description\":\"Ð£ Ð’Ð°Ñ Ð½ÐµÑ‚ Ð´Ð¾ÑÑ‚ÑƒÐ¿Ð° Ðº ÑÑ‚Ð¾Ð¹ Ñ‚Ð°Ð¹Ð¼ÐºÐ°Ñ€Ñ‚Ðµ\"}";
 					}
 				}
 				else
 				{
 					MESSAGE_ERROR("", action, "user.id(" + user.GetID() + ") not an approver(" + user.GetType() + ")");
-					ostResult << "{\"status\":\"error\",\"description\":\"Âàì íå íàçíà÷åíà ðîëü ñîãëàñîâàíèÿ\"}";
+					ostResult << "{\"status\":\"error\",\"description\":\"Ð’Ð°Ð¼ Ð½Ðµ Ð½Ð°Ð·Ð½Ð°Ñ‡ÐµÐ½Ð° Ñ€Ð¾Ð»ÑŒ ÑÐ¾Ð³Ð»Ð°ÑÐ¾Ð²Ð°Ð½Ð¸Ñ\"}";
 				}
 			}
 			else
 			{
 				MESSAGE_ERROR("", action, "parameter timecard_id is empty");
-				ostResult << "{\"status\":\"error\",\"description\":\"Íåêîððåêòûå ïàðàìåòðû\"}";
+				ostResult << "{\"status\":\"error\",\"description\":\"ÐÐµÐºÐ¾Ñ€Ñ€ÐµÐºÑ‚Ñ‹Ðµ Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ñ‹\"}";
 			}
 
 
@@ -538,7 +538,7 @@ int main()
 			else
 			{
 				MESSAGE_ERROR("", action, "user.id(" + user.GetID() + ") is not an approver(" + user.GetType() + ")");
-				ostResult << "{\"status\":\"error\",\"description\":\"Íåêîððåêòûå ïàðàìåòðû\"}";
+				ostResult << "{\"status\":\"error\",\"description\":\"ÐÐµÐºÐ¾Ñ€Ñ€ÐµÐºÑ‚Ñ‹Ðµ Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ñ‹\"}";
 			}
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
@@ -612,7 +612,7 @@ int main()
 							if(db.isError())
 							{
 								MESSAGE_ERROR("", action, "fail to update table " + type + " _approvers");
-								ostResult << "{\"result\":\"error\",\"description\":\"îøèáêà ÁÄ\"}";
+								ostResult << "{\"result\":\"error\",\"description\":\"Ð¾ÑˆÐ¸Ð±ÐºÐ° Ð‘Ð”\"}";
 							}
 							else
 							{
@@ -623,7 +623,7 @@ int main()
 					else
 					{
 						MESSAGE_ERROR("", action, "user.id(" + user.GetID() + ") doesn't require to approve sow.id(" + sow_id + ")");
-						ostResult << "{\"result\":\"error\",\"description\":\"Âàøåãî ñîãëàñîâàíèÿ íå òðåáóåòñÿ\"}";
+						ostResult << "{\"result\":\"error\",\"description\":\"Ð’Ð°ÑˆÐµÐ³Ð¾ ÑÐ¾Ð³Ð»Ð°ÑÐ¾Ð²Ð°Ð½Ð¸Ñ Ð½Ðµ Ñ‚Ñ€ÐµÐ±ÑƒÐµÑ‚ÑÑ\"}";
 					}
 
 
@@ -631,13 +631,13 @@ int main()
 				else
 				{
 					MESSAGE_ERROR("", action, "user.id(" + user.GetID() + ") not an approver(" + user.GetType() + ")");
-					ostResult << "{\"result\":\"error\",\"description\":\"Âàì íå íàçíà÷åíà ðîëü ñîãëàñîâàíèÿ\"}";
+					ostResult << "{\"result\":\"error\",\"description\":\"Ð’Ð°Ð¼ Ð½Ðµ Ð½Ð°Ð·Ð½Ð°Ñ‡ÐµÐ½Ð° Ñ€Ð¾Ð»ÑŒ ÑÐ¾Ð³Ð»Ð°ÑÐ¾Ð²Ð°Ð½Ð¸Ñ\"}";
 				}
 			}
 			else
 			{
 				MESSAGE_ERROR("", action, "any of HTTP-request parameters is empty");
-				ostResult << "{\"result\":\"error\",\"description\":\"Íåêîððåêòûå ïàðàìåòðû\"}";
+				ostResult << "{\"result\":\"error\",\"description\":\"ÐÐµÐºÐ¾Ñ€Ñ€ÐµÐºÑ‚Ñ‹Ðµ Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ñ‹\"}";
 			}
 
 

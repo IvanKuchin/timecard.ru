@@ -548,7 +548,7 @@ string	SubscribeToCompany(string companyID, CUser *user, CMysql *db)
 				log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: already subscribed [companyID: " + companyID + ", userID: " + user->GetID() + "]");
 			}
 
-			ostResult << "\"result\": \"success\", \"description\": \"‚˚ ÛÊÂ ÔÓ‰ÔËÒ‡Ì˚ Ì‡ ÌÓ‚ÓÒÚË ˝ÚÓÈ ÍÓÏÔ‡ÌËË\"";
+			ostResult << "\"result\": \"success\", \"description\": \"–≤—ã —É–∂–µ –ø–æ–¥–ø–∏—Å–∞–Ω—ã –Ω–∞ –Ω–æ–≤–æ—Å—Ç–∏ —ç—Ç–æ–π –∫–æ–º–ø–∞–Ω–∏–∏\"";
 		}
 		else
 		{
@@ -585,7 +585,7 @@ string	SubscribeToCompany(string companyID, CUser *user, CMysql *db)
 					log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: error inserting into users subscription [companyID: " + companyID + ", userID: " + user->GetID() + "]");
 				}
 
-				ostResult << "\"result\": \"error\",\"description\": \"Œ¯Ë·Í‡ ¡ƒ\"";
+				ostResult << "\"result\": \"error\",\"description\": \"–û—à–∏–±–∫–∞ –ë–î\"";
 			}
 		}
 	}
@@ -596,7 +596,7 @@ string	SubscribeToCompany(string companyID, CUser *user, CMysql *db)
 			log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: (companyID is empty) || (user == NULL) [companyID: " + companyID + ", userID: " + (user ? "not-NULL" : "NULL") + "]");
 		}
 
-		ostResult << "\"result\": \"error\",\"description\": \" ÓÏÔ‡ÌËˇ ÌÂ Ì‡È‰ÂÌ‡ ËÎË ÔÓÎ¸ÁÓ‚‡ÚÂÎ¸ ÌÂÓÔÂ‰ÂÎÂÌ\"";
+		ostResult << "\"result\": \"error\",\"description\": \"–ö–æ–º–ø–∞–Ω–∏—è –Ω–µ –Ω–∞–π–¥–µ–Ω–∞ –∏–ª–∏ –ø–æ–ª—å–∑–æ–≤–∞—Ç–µ–ª—å –Ω–µ–æ–ø—Ä–µ–¥–µ–ª–µ–Ω\"";
 	}
 
 
@@ -632,7 +632,7 @@ string	UnsubscribeFromCompany(string companyID, CUser *user, CMysql *db)
 					log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: user can't unsubscribe from own company [companyID: " + companyID + ", userID: " + user->GetID() + "]");
 				}
 
-				ostResult << "\"result\": \"error\",\"description\": \"¬˚ ÌÂ ÏÓÊÂÚÂ ÓÚÔËÒ‡Ú¸Òˇ ÓÚ ÒÓ·ÒÚ‚ÂÌÌÓÈ ÍÓÏÔ‡ÌËË\"";
+				ostResult << "\"result\": \"error\",\"description\": \"–í—ã –Ω–µ –º–æ–∂–µ—Ç–µ –æ—Ç–ø–∏—Å–∞—Ç—å—Å—è –æ—Ç —Å–æ–±—Å—Ç–≤–µ–Ω–Ω–æ–π –∫–æ–º–ø–∞–Ω–∏–∏\"";
 			}
 			else
 			{
@@ -664,7 +664,7 @@ string	UnsubscribeFromCompany(string companyID, CUser *user, CMysql *db)
 				log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: user not subscribed to company [companyID: " + companyID + ", userID: " + user->GetID() + "]");
 			}
 
-			ostResult << "\"result\": \"success\", \"description\": \"¬˚ ÌÂ ÔÓ‰ÔËÒ‡Ì˚\"";
+			ostResult << "\"result\": \"success\", \"description\": \"–í—ã –Ω–µ –ø–æ–¥–ø–∏—Å–∞–Ω—ã\"";
 		}
 	}
 	else
@@ -674,7 +674,7 @@ string	UnsubscribeFromCompany(string companyID, CUser *user, CMysql *db)
 			log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: (companyID is empty) || (user == NULL) [companyID: " + companyID + ", userID: " + (user ? "not-NULL" : "NULL") + "]");
 		}
 
-		ostResult << "\"result\": \"error\",\"description\": \" ÓÏÔ‡ÌËˇ ÌÂ Ì‡È‰ÂÌ‡ ËÎË ÔÓÎ¸ÁÓ‚‡ÚÂÎ¸ ÌÂÓÔÂ‰ÂÎÂÌ\"";
+		ostResult << "\"result\": \"error\",\"description\": \"–ö–æ–º–ø–∞–Ω–∏—è –Ω–µ –Ω–∞–π–¥–µ–Ω–∞ –∏–ª–∏ –ø–æ–ª—å–∑–æ–≤–∞—Ç–µ–ª—å –Ω–µ–æ–ø—Ä–µ–¥–µ–ª–µ–Ω\"";
 	}
 
 
@@ -706,7 +706,7 @@ string	SubscribeToGroup(string groupID, CUser *user, CMysql *db)
 				log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: already subscribed [groupID: " + groupID + ", userID: " + user->GetID() + "]");
 			}
 
-			ostResult << "\"result\": \"success\", \"description\": \"‚˚ ÛÊÂ ÔÓ‰ÔËÒ‡Ì˚ Ì‡ ÌÓ‚ÓÒÚË ˝ÚÓÈ „ÛÔÔ˚\"";
+			ostResult << "\"result\": \"success\", \"description\": \"–≤—ã —É–∂–µ –ø–æ–¥–ø–∏—Å–∞–Ω—ã –Ω–∞ –Ω–æ–≤–æ—Å—Ç–∏ —ç—Ç–æ–π –≥—Ä—É–ø–ø—ã\"";
 		}
 		else
 		{
@@ -743,7 +743,7 @@ string	SubscribeToGroup(string groupID, CUser *user, CMysql *db)
 					log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: error inserting into users subscription [groupID: " + groupID + ", userID: " + user->GetID() + "]");
 				}
 
-				ostResult << "\"result\": \"error\",\"description\": \"Œ¯Ë·Í‡ ¡ƒ\"";
+				ostResult << "\"result\": \"error\",\"description\": \"–û—à–∏–±–∫–∞ –ë–î\"";
 			}
 		}
 	}
@@ -754,7 +754,7 @@ string	SubscribeToGroup(string groupID, CUser *user, CMysql *db)
 			log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: (groupID is empty) || (user == NULL) [groupID: " + groupID + ", userID: " + (user ? "not-NULL" : "NULL") + "]");
 		}
 
-		ostResult << "\"result\": \"error\",\"description\": \" ÓÏÔ‡ÌËˇ ÌÂ Ì‡È‰ÂÌ‡ ËÎË ÔÓÎ¸ÁÓ‚‡ÚÂÎ¸ ÌÂÓÔÂ‰ÂÎÂÌ\"";
+		ostResult << "\"result\": \"error\",\"description\": \"–ö–æ–º–ø–∞–Ω–∏—è –Ω–µ –Ω–∞–π–¥–µ–Ω–∞ –∏–ª–∏ –ø–æ–ª—å–∑–æ–≤–∞—Ç–µ–ª—å –Ω–µ–æ–ø—Ä–µ–¥–µ–ª–µ–Ω\"";
 	}
 
 
@@ -790,7 +790,7 @@ string	UnsubscribeFromGroup(string groupID, CUser *user, CMysql *db)
 					log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: user can't unsubscribe from own group [groupID: " + groupID + ", userID: " + user->GetID() + "]");
 				}
 
-				ostResult << "\"result\": \"error\",\"description\": \"¬˚ ÌÂ ÏÓÊÂÚÂ ÓÚÔËÒ‡Ú¸Òˇ ÓÚ ÒÓ·ÒÚ‚ÂÌÌÓÈ „ÛÔÔ˚\"";
+				ostResult << "\"result\": \"error\",\"description\": \"–í—ã –Ω–µ –º–æ–∂–µ—Ç–µ –æ—Ç–ø–∏—Å–∞—Ç—å—Å—è –æ—Ç —Å–æ–±—Å—Ç–≤–µ–Ω–Ω–æ–π –≥—Ä—É–ø–ø—ã\"";
 			}
 			else
 			{
@@ -821,7 +821,7 @@ string	UnsubscribeFromGroup(string groupID, CUser *user, CMysql *db)
 				log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: user not subscribed to group [groupID: " + groupID + ", userID: " + user->GetID() + "]");
 			}
 
-			ostResult << "\"result\": \"success\", \"description\": \"¬˚ ÌÂ ÔÓ‰ÔËÒ‡Ì˚\"";
+			ostResult << "\"result\": \"success\", \"description\": \"–í—ã –Ω–µ –ø–æ–¥–ø–∏—Å–∞–Ω—ã\"";
 		}
 	}
 	else
@@ -831,7 +831,7 @@ string	UnsubscribeFromGroup(string groupID, CUser *user, CMysql *db)
 			log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: (groupID is empty) || (user == NULL) [groupID: " + groupID + ", userID: " + (user ? "not-NULL" : "NULL") + "]");
 		}
 
-		ostResult << "\"result\": \"error\",\"description\": \" ÓÏÔ‡ÌËˇ ÌÂ Ì‡È‰ÂÌ‡ ËÎË ÔÓÎ¸ÁÓ‚‡ÚÂÎ¸ ÌÂÓÔÂ‰ÂÎÂÌ\"";
+		ostResult << "\"result\": \"error\",\"description\": \"–ö–æ–º–ø–∞–Ω–∏—è –Ω–µ –Ω–∞–π–¥–µ–Ω–∞ –∏–ª–∏ –ø–æ–ª—å–∑–æ–≤–∞—Ç–µ–ª—å –Ω–µ–æ–ø—Ä–µ–¥–µ–ª–µ–Ω\"";
 	}
 
 
@@ -2170,7 +2170,7 @@ string	GetSpelledBankByID(string id, CMysql *db)
 		string	bank_geo_zip_id = db->Get(0, "geo_zip_id");
 		string	bank_address = db->Get(0, "address");
 
-		result = bank_title + " (¡» : " + bank_bik + ") " + GetSpelledZIPByID(bank_geo_zip_id, db) + ", " + bank_address;
+		result = bank_title + " (–ë–ò–ö: " + bank_bik + ") " + GetSpelledZIPByID(bank_geo_zip_id, db) + ", " + bank_address;
 	}
 	else
 	{

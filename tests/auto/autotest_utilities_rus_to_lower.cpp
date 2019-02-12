@@ -13,9 +13,9 @@ using namespace std;
 bool Test1()
 {
 	auto			result = true;
-	auto			rus_alphabet = "Àà Áá Ââ Ãã Ää Åå ¨¸ Ææ Çç Èè Éé Êê Ëë Ìì Íí Îî Ïï Ğğ Ññ Òò Óó Ôô Õõ Öö ×÷ Øø Ùù Úú Ûû Üü İı Şş ßÿ"s;
-	auto			rus_alphabet_upper = "ÀÁÂÃÄÅ¨ÆÇÈÉÊËÌÍÎÏĞÑÒÓÔÕÖ×ØÙÚÛÜİŞß"s;
-	auto			rus_alphabet_lower = "àáâãäå¸æçèéêëìíîïğñòóôõö÷øùúûüışÿ"s;
+	auto			rus_alphabet = "ĞĞ° Ğ‘Ğ± Ğ’Ğ² Ğ“Ğ³ Ğ”Ğ´ Ğ•Ğµ ĞÑ‘ Ğ–Ğ¶ Ğ—Ğ· Ğ˜Ğ¸ Ğ™Ğ¹ ĞšĞº Ğ›Ğ» ĞœĞ¼ ĞĞ½ ĞĞ¾ ĞŸĞ¿ Ğ Ñ€ Ğ¡Ñ Ğ¢Ñ‚ Ğ£Ñƒ Ğ¤Ñ„ Ğ¥Ñ… Ğ¦Ñ† Ğ§Ñ‡ Ğ¨Ñˆ Ğ©Ñ‰ ĞªÑŠ Ğ«Ñ‹ Ğ¬ÑŒ Ğ­Ñ Ğ®Ñ Ğ¯Ñ"s;
+	auto			rus_alphabet_upper = "ĞĞ‘Ğ’Ğ“Ğ”Ğ•ĞĞ–Ğ—Ğ˜Ğ™ĞšĞ›ĞœĞĞĞŸĞ Ğ¡Ğ¢Ğ£Ğ¤Ğ¥Ğ¦Ğ§Ğ¨Ğ©ĞªĞ«Ğ¬Ğ­Ğ®Ğ¯"s;
+	auto			rus_alphabet_lower = "Ğ°Ğ±Ğ²Ğ³Ğ´ĞµÑ‘Ğ¶Ğ·Ğ¸Ğ¹ĞºĞ»Ğ¼Ğ½Ğ¾Ğ¿Ñ€ÑÑ‚ÑƒÑ„Ñ…Ñ†Ñ‡ÑˆÑ‰ÑŠÑ‹ÑŒÑÑÑ"s;
 
 	setlocale(LC_ALL, "en_US.utf8");
 
@@ -32,9 +32,9 @@ bool Test1()
 bool Test2()
 {
 	auto			result = true;
-	auto			rus_alphabet = "Àà Áá Ââ Ãã Ää Åå ¨¸ Ææ Çç Èè Éé Êê Ëë Ìì Íí Îî Ïï Ğğ Ññ Òò Óó Ôô Õõ Öö ×÷ Øø Ùù Úú Ûû Üü İı Şş ßÿ"s;
-	auto			rus_alphabet_upper = "ÀÁÂÃÄÅ¨ÆÇÈÉÊËÌÍÎÏĞÑÒÓÔÕÖ×ØÙÚÛÜİŞß"s;
-	auto			rus_alphabet_lower = "àáâãäå¸æçèéêëìíîïğñòóôõö÷øùúûüışÿ"s;
+	auto			rus_alphabet = "ĞĞ° Ğ‘Ğ± Ğ’Ğ² Ğ“Ğ³ Ğ”Ğ´ Ğ•Ğµ ĞÑ‘ Ğ–Ğ¶ Ğ—Ğ· Ğ˜Ğ¸ Ğ™Ğ¹ ĞšĞº Ğ›Ğ» ĞœĞ¼ ĞĞ½ ĞĞ¾ ĞŸĞ¿ Ğ Ñ€ Ğ¡Ñ Ğ¢Ñ‚ Ğ£Ñƒ Ğ¤Ñ„ Ğ¥Ñ… Ğ¦Ñ† Ğ§Ñ‡ Ğ¨Ñˆ Ğ©Ñ‰ ĞªÑŠ Ğ«Ñ‹ Ğ¬ÑŒ Ğ­Ñ Ğ®Ñ Ğ¯Ñ"s;
+	auto			rus_alphabet_upper = "ĞĞ‘Ğ’Ğ“Ğ”Ğ•ĞĞ–Ğ—Ğ˜Ğ™ĞšĞ›ĞœĞĞĞŸĞ Ğ¡Ğ¢Ğ£Ğ¤Ğ¥Ğ¦Ğ§Ğ¨Ğ©ĞªĞ«Ğ¬Ğ­Ğ®Ğ¯"s;
+	auto			rus_alphabet_lower = "Ğ°Ğ±Ğ²Ğ³Ğ´ĞµÑ‘Ğ¶Ğ·Ğ¸Ğ¹ĞºĞ»Ğ¼Ğ½Ğ¾Ğ¿Ñ€ÑÑ‚ÑƒÑ„Ñ…Ñ†Ñ‡ÑˆÑ‰ÑŠÑ‹ÑŒÑÑÑ"s;
 
 	setlocale(LC_ALL, "ru_RU.utf8");
 
@@ -66,7 +66,7 @@ int main(void)
 	}
 
 #ifndef MYSQL_3
-	db.Query("set names cp1251");
+	db.Query("set names utf8;");
 #endif
 
 	indexPage.SetDB(&db);

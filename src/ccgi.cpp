@@ -106,11 +106,11 @@ string CCgi::GetEncoding()
 
 	lng = GetLanguage();
 	if(lng == "ru")
-		return "windows-1251";
+		return "utf-8";
 	if(lng == "en")
-		return "windows-1251";
+		return "utf-8";
 
-	return "windows-1251";
+	return "utf-8";
 }
 
 string	CCgi::GetCity()

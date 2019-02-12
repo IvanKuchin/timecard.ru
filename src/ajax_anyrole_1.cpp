@@ -39,7 +39,7 @@ int main(void)
 		indexPage.SetDB(&db);
 
 #ifndef MYSQL_3
-		db.Query("set names cp1251");
+		db.Query("set names utf8;");
 #endif
 
 		action = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("action"));
@@ -110,14 +110,14 @@ int main(void)
 					ostResult << "{\"result\":\"success\",\"companies\":[" + company_obj + "]}";
 				else
 				{
-					error_message = "Kompaniya íå íàéäåíà";
+					error_message = "Kompaniya Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½Ð°";
 					MESSAGE_DEBUG("", "", "company.id(" + id + ") not found");
 				}	
 					
 			}
 			else
 			{
-				error_message = "Íåêîððåêòíûé íîìåð kompanii";
+				error_message = "ÐÐµÐºÐ¾Ñ€Ñ€ÐµÐºÑ‚Ð½Ñ‹Ð¹ Ð½Ð¾Ð¼ÐµÑ€ kompanii";
 				MESSAGE_DEBUG("", "", "fail to get company.id(" + id + ")");
 			}
 
@@ -151,14 +151,14 @@ int main(void)
 					ostResult << "{\"result\":\"success\",\"geo_region\":{\"id\":\"" + id + "\",\"name\":\"" + db.Get(0, "title") + "\"}}";
 				else
 				{
-					error_message = "Ðåãèîí íå íàéäåí";
+					error_message = "Ð ÐµÐ³Ð¸Ð¾Ð½ Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½";
 					MESSAGE_DEBUG("", "", "region_id(" + id + ") not found");
 				}	
 					
 			}
 			else
 			{
-				error_message = "Íåêîððåêòíûé íîìåð ðåãèîíà";
+				error_message = "ÐÐµÐºÐ¾Ñ€Ñ€ÐµÐºÑ‚Ð½Ñ‹Ð¹ Ð½Ð¾Ð¼ÐµÑ€ Ñ€ÐµÐ³Ð¸Ð¾Ð½Ð°";
 				MESSAGE_DEBUG("", "", "fail to get region_id(" + id + ")");
 			}
 
@@ -205,14 +205,14 @@ int main(void)
 				}
 				else
 				{
-					error_message = "Èíäåêñ íå íàéäåí";
+					error_message = "Ð˜Ð½Ð´ÐµÐºÑ Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½";
 					MESSAGE_DEBUG("", "", "country and zip not found");
 				}	
 					
 			}
 			else
 			{
-				error_message = "Íåêîððåêòíûé ïàðàìåòðû";
+				error_message = "ÐÐµÐºÐ¾Ñ€Ñ€ÐµÐºÑ‚Ð½Ñ‹Ð¹ Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ñ‹";
 				MESSAGE_DEBUG("", "", "fail to get country name or zip code");
 			}
 
@@ -262,14 +262,14 @@ int main(void)
 				}
 				else
 				{
-					error_message = "Ðåãèîí íå íàéäåí";
+					error_message = "Ð ÐµÐ³Ð¸Ð¾Ð½ Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½";
 					MESSAGE_DEBUG("", "", "country and region pair not found");
 				}	
 					
 			}
 			else
 			{
-				error_message = "Íåêîððåêòíûé ïàðàìåòðû";
+				error_message = "ÐÐµÐºÐ¾Ñ€Ñ€ÐµÐºÑ‚Ð½Ñ‹Ð¹ Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ñ‹";
 				MESSAGE_DEBUG("", "", "fail to get country name or region code");
 			}
 
@@ -322,14 +322,14 @@ int main(void)
 				}
 				else
 				{
-					error_message = "Ãîðîä íå íàéäåí";
+					error_message = "Ð“Ð¾Ñ€Ð¾Ð´ Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½";
 					MESSAGE_DEBUG("", "", "country, region and locality not found");
 				}	
 					
 			}
 			else
 			{
-				error_message = "Íåêîððåêòíûé ïàðàìåòðû";
+				error_message = "ÐÐµÐºÐ¾Ñ€Ñ€ÐµÐºÑ‚Ð½Ñ‹Ð¹ Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ñ‹";
 				MESSAGE_DEBUG("", "", "fail to get country name or region code");
 			}
 
@@ -374,14 +374,14 @@ int main(void)
 				}
 				else
 				{
-					error_message = "Äîëæíîñòü íå íàéäåíà";
+					error_message = "Ð”Ð¾Ð»Ð¶Ð½Ð¾ÑÑ‚ÑŒ Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½Ð°";
 					MESSAGE_DEBUG("", "", "position not found");
 				}	
 					
 			}
 			else
 			{
-				error_message = "Íåêîððåêòíûå ïàðàìåòðû";
+				error_message = "ÐÐµÐºÐ¾Ñ€Ñ€ÐµÐºÑ‚Ð½Ñ‹Ðµ Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ñ‹";
 				MESSAGE_DEBUG("", "", "mandatory parameter missed");
 			}
 
@@ -496,40 +496,40 @@ int main(void)
 								}
 								else
 								{
-									error_message = "Íå óäàëîñü äîáàâèòü èíäåêñ";
+									error_message = "ÐÐµ ÑƒÐ´Ð°Ð»Ð¾ÑÑŒ Ð´Ð¾Ð±Ð°Ð²Ð¸Ñ‚ÑŒ Ð¸Ð½Ð´ÐµÐºÑ";
 									MESSAGE_ERROR("", action, "fail to add new zip");
 								}
 							}
 							else
 							{
-								error_message = "Íå óäàëîñü äîáàâèòü ãîðîä";
+								error_message = "ÐÐµ ÑƒÐ´Ð°Ð»Ð¾ÑÑŒ Ð´Ð¾Ð±Ð°Ð²Ð¸Ñ‚ÑŒ Ð³Ð¾Ñ€Ð¾Ð´";
 								MESSAGE_ERROR("", action, "fail to add new locality");
 							}
 						}
 						else
 						{
-							error_message = "Íå óäàëîñü äîáàâèòü ðåãèîí";
+							error_message = "ÐÐµ ÑƒÐ´Ð°Ð»Ð¾ÑÑŒ Ð´Ð¾Ð±Ð°Ð²Ð¸Ñ‚ÑŒ Ñ€ÐµÐ³Ð¸Ð¾Ð½";
 							MESSAGE_ERROR("", action, "fail to add new region");
 						}
 
 					}
 					else
 					{
-						error_message = "Íå óäàëîñü äîáàâèòü ñòðàíó";
+						error_message = "ÐÐµ ÑƒÐ´Ð°Ð»Ð¾ÑÑŒ Ð´Ð¾Ð±Ð°Ð²Ð¸Ñ‚ÑŒ ÑÑ‚Ñ€Ð°Ð½Ñƒ";
 						MESSAGE_ERROR("", action, "fail to add new country");
 					}
 
 				}
 				else
 				{
-					error_message = "Èíäåêñ óæå ñóùåñòâóåò â ÁÄ";
+					error_message = "Ð˜Ð½Ð´ÐµÐºÑ ÑƒÐ¶Ðµ ÑÑƒÑ‰ÐµÑÑ‚Ð²ÑƒÐµÑ‚ Ð² Ð‘Ð”";
 					MESSAGE_DEBUG("", "", "zip(" + zip + ") already exists in DB");
 				}	
 					
 			}
 			else
 			{
-				error_message = "Íåêîððåêòíûé ïàðàìåòðû";
+				error_message = "ÐÐµÐºÐ¾Ñ€Ñ€ÐµÐºÑ‚Ð½Ñ‹Ð¹ Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ñ‹";
 				MESSAGE_DEBUG("", "", "mandatory parameter missed");
 			}
 
@@ -565,7 +565,7 @@ int main(void)
 			}
 			else
 			{
-				error_message = "Íåêîððåêòíûé ïàðàìåòðû";
+				error_message = "ÐÐµÐºÐ¾Ñ€Ñ€ÐµÐºÑ‚Ð½Ñ‹Ð¹ Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ñ‹";
 				MESSAGE_DEBUG("", "", "fail to get country name or zip code");
 			}
 
@@ -624,7 +624,7 @@ int main(void)
 								}
 								else
 								{
-									error_message = "Íå óäàëîñü äîáàâèòü èíäåêñ";
+									error_message = "ÐÐµ ÑƒÐ´Ð°Ð»Ð¾ÑÑŒ Ð´Ð¾Ð±Ð°Ð²Ð¸Ñ‚ÑŒ Ð¸Ð½Ð´ÐµÐºÑ";
 									MESSAGE_ERROR("", action, "fail to add new bik");
 								}
 							}
@@ -633,14 +633,14 @@ int main(void)
 				}
 				else
 				{
-					error_message = "Áàíê óæå ñóùåñòâóåò â ÁÄ";
+					error_message = "Ð‘Ð°Ð½Ðº ÑƒÐ¶Ðµ ÑÑƒÑ‰ÐµÑÑ‚Ð²ÑƒÐµÑ‚ Ð² Ð‘Ð”";
 					MESSAGE_DEBUG("", "", "bik(" + bik + ") already exists in DB");
 				}	
 					
 			}
 			else
 			{
-				error_message = "Íåêîððåêòíûå ïàðàìåòðû";
+				error_message = "ÐÐµÐºÐ¾Ñ€Ñ€ÐµÐºÑ‚Ð½Ñ‹Ðµ Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ñ‹";
 				MESSAGE_DEBUG("", "", "mandatory parameter missed");
 			}
 

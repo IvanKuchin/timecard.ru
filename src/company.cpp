@@ -44,7 +44,7 @@ int main()
 		indexPage.SetDB(&db);
 
 #ifndef MYSQL_3
-		db.Query("set names cp1251");
+		db.Query("set names utf8;");
 #endif
 
 		action = indexPage.GetVarsHandler()->Get("action");
@@ -449,7 +449,7 @@ int main()
 					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]:action == JSON_getCompanyProfile: re-login required");
 				}
 
-				ostResult << "{\"result\":\"error\",\"description\":\"ñåññèÿ çàêîí÷èëàñü, íåîáõîäèìî âíîâü çàéòè íà ñàéò\"}";
+				ostResult << "{\"result\":\"error\",\"description\":\"ÑÐµÑÑÐ¸Ñ Ð·Ð°ÐºÐ¾Ð½Ñ‡Ð¸Ð»Ð°ÑÑŒ, Ð½ÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð²Ð½Ð¾Ð²ÑŒ Ð·Ð°Ð¹Ñ‚Ð¸ Ð½Ð° ÑÐ°Ð¹Ñ‚\"}";
 			}
 			else
 			{
@@ -508,7 +508,7 @@ int main()
 					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]:action == JSON_getCompanyProfileAndMyVacancies: re-login required");
 				}
 
-				ostResult << "{\"result\":\"error\",\"description\":\"ñåññèÿ çàêîí÷èëàñü, íåîáõîäèìî âíîâü çàéòè íà ñàéò\"}";
+				ostResult << "{\"result\":\"error\",\"description\":\"ÑÐµÑÑÐ¸Ñ Ð·Ð°ÐºÐ¾Ð½Ñ‡Ð¸Ð»Ð°ÑÑŒ, Ð½ÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð²Ð½Ð¾Ð²ÑŒ Ð·Ð°Ð¹Ñ‚Ð¸ Ð½Ð° ÑÐ°Ð¹Ñ‚\"}";
 			}
 			else
 */
@@ -575,7 +575,7 @@ int main()
 					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]:action == AJAX_removeOpenVacancy: re-login required");
 				}
 
-				ostResult << "{\"result\":\"error\",\"description\":\"ñåññèÿ çàêîí÷èëàñü, íåîáõîäèìî âíîâü çàéòè íà ñàéò\"}";
+				ostResult << "{\"result\":\"error\",\"description\":\"ÑÐµÑÑÐ¸Ñ Ð·Ð°ÐºÐ¾Ð½Ñ‡Ð¸Ð»Ð°ÑÑŒ, Ð½ÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð²Ð½Ð¾Ð²ÑŒ Ð·Ð°Ð¹Ñ‚Ð¸ Ð½Ð° ÑÐ°Ð¹Ñ‚\"}";
 			}
 			else
 			{
@@ -614,7 +614,7 @@ int main()
 							log.Write(ERROR, string(__func__) + string("[") + to_string(__LINE__) + "]:action == AJAX_removeOpenVacancy:ERROR: userID[" + user.GetID() + "] not allowed remove openVacancyID[" + id + "], due to he is not company[" + companyID + "] admin");
 						}
 
-						ostResult << "{\"result\":\"error\",\"description\":\"Âàì íåëüçÿ óäàëèòü ýòó âàêàíñèþ\"}";
+						ostResult << "{\"result\":\"error\",\"description\":\"Ð’Ð°Ð¼ Ð½ÐµÐ»ÑŒÐ·Ñ ÑƒÐ´Ð°Ð»Ð¸Ñ‚ÑŒ ÑÑ‚Ñƒ Ð²Ð°ÐºÐ°Ð½ÑÐ¸ÑŽ\"}";
 					}
 				}
 				else
@@ -623,7 +623,7 @@ int main()
 						CLog	log;
 						log.Write(ERROR, string(__func__) + string("[") + to_string(__LINE__) + "]:action == AJAX_removeOpenVacancy:ERROR: openVacancyID[" + id + "] not found in DB");
 					}
-					ostResult << "{\"result\":\"error\",\"description\":\"Âàêàíñèÿ íå íàéäåíà\"}";
+					ostResult << "{\"result\":\"error\",\"description\":\"Ð’Ð°ÐºÐ°Ð½ÑÐ¸Ñ Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½Ð°\"}";
 				}
 			}
 
@@ -662,7 +662,7 @@ int main()
 					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]:action == AJAX_precreateNewOpenVacancy: re-login required");
 				}
 
-				ostResult << "{\"result\":\"error\",\"description\":\"ñåññèÿ çàêîí÷èëàñü, íåîáõîäèìî âíîâü çàéòè íà ñàéò\"}";
+				ostResult << "{\"result\":\"error\",\"description\":\"ÑÐµÑÑÐ¸Ñ Ð·Ð°ÐºÐ¾Ð½Ñ‡Ð¸Ð»Ð°ÑÑŒ, Ð½ÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð²Ð½Ð¾Ð²ÑŒ Ð·Ð°Ð¹Ñ‚Ð¸ Ð½Ð° ÑÐ°Ð¹Ñ‚\"}";
 			}
 			else
 			{
@@ -769,7 +769,7 @@ int main()
 
 					ostResult << "{" 
 							  << "\"result\":\"error\","
-							  << "\"description\":\"Íåîáõîäèìî óêàçàòü êîìïàíèþ-ðàáîòîäàòåëÿ\""
+							  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ ÑƒÐºÐ°Ð·Ð°Ñ‚ÑŒ ÐºÐ¾Ð¼Ð¿Ð°Ð½Ð¸ÑŽ-Ñ€Ð°Ð±Ð¾Ñ‚Ð¾Ð´Ð°Ñ‚ÐµÐ»Ñ\""
 							  << "}";
 				}
 				else if(!company_position_id.length())
@@ -781,7 +781,7 @@ int main()
 
 					ostResult << "{" 
 							  << "\"result\":\"error\","
-							  << "\"description\":\"Íåîáõîäèìî çàïîëíèòü äîëæíîñòü\""
+							  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð·Ð°Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÑŒ Ð´Ð¾Ð»Ð¶Ð½Ð¾ÑÑ‚ÑŒ\""
 							  << "}";
 				}
 				else if(!month.length())
@@ -793,7 +793,7 @@ int main()
 
 					ostResult << "{" 
 							  << "\"result\":\"error\","
-							  << "\"description\":\"Íåîáõîäèìî âûáðàòü ìåñÿö âûõîäà íà ðàáîòó\""
+							  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð²Ñ‹Ð±Ñ€Ð°Ñ‚ÑŒ Ð¼ÐµÑÑÑ† Ð²Ñ‹Ñ…Ð¾Ð´Ð° Ð½Ð° Ñ€Ð°Ð±Ð¾Ñ‚Ñƒ\""
 							  << "}";
 				}
 				else if(!geo_locality_id.length())
@@ -805,7 +805,7 @@ int main()
 
 					ostResult << "{" 
 							  << "\"result\":\"error\","
-							  << "\"description\":\"Íåîáõîäèìî âûáðàòü ãîðîä ðàáîòû âûõîäà íà ðàáîòó\""
+							  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð²Ñ‹Ð±Ñ€Ð°Ñ‚ÑŒ Ð³Ð¾Ñ€Ð¾Ð´ Ñ€Ð°Ð±Ð¾Ñ‚Ñ‹ Ð²Ñ‹Ñ…Ð¾Ð´Ð° Ð½Ð° Ñ€Ð°Ð±Ð¾Ñ‚Ñƒ\""
 							  << "}";
 				}
 				else if(!employmenttype.length())
@@ -816,7 +816,7 @@ int main()
 					}
 					ostResult << "{"
 							  << "\"result\":\"error\","
-							  << "\"description\":\"Íåîáõîäèìî çàïîëíèòü òèï òðóäîóñòðîéñòâà\""
+							  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð·Ð°Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÑŒ Ñ‚Ð¸Ð¿ Ñ‚Ñ€ÑƒÐ´Ð¾ÑƒÑÑ‚Ñ€Ð¾Ð¹ÑÑ‚Ð²Ð°\""
 							  << "}";
 				}
 				else if(!question1.length())
@@ -827,7 +827,7 @@ int main()
 					}
 					ostResult << "{"
 							  << "\"result\":\"error\","
-							  << "\"description\":\"Íåîáõîäèìî çàïîëíèòü êâàëèôèêàöèîííûé âîïðîñ 1\""
+							  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð·Ð°Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÑŒ ÐºÐ²Ð°Ð»Ð¸Ñ„Ð¸ÐºÐ°Ñ†Ð¸Ð¾Ð½Ð½Ñ‹Ð¹ Ð²Ð¾Ð¿Ñ€Ð¾Ñ 1\""
 							  << "}";
 				}
 				else if(!question1answers.length())
@@ -838,7 +838,7 @@ int main()
 					}
 					ostResult << "{"
 							  << "\"result\":\"error\","
-							  << "\"description\":\"Íåîáõîäèìî âûáðàòü ïðàâèëüíûé îòâåò íà ïåðâûé âîïðîñ\""
+							  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð²Ñ‹Ð±Ñ€Ð°Ñ‚ÑŒ Ð¿Ñ€Ð°Ð²Ð¸Ð»ÑŒÐ½Ñ‹Ð¹ Ð¾Ñ‚Ð²ÐµÑ‚ Ð½Ð° Ð¿ÐµÑ€Ð²Ñ‹Ð¹ Ð²Ð¾Ð¿Ñ€Ð¾Ñ\""
 							  << "}";
 				}
 				else if(!question1answer1.length())
@@ -849,7 +849,7 @@ int main()
 					}
 					ostResult << "{"
 							  << "\"result\":\"error\","
-							  << "\"description\":\"Íåîáõîäèìî çàïîëíèòü âñå îòâåòû íà ïåðâûé âîïðîñ\""
+							  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð·Ð°Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÑŒ Ð²ÑÐµ Ð¾Ñ‚Ð²ÐµÑ‚Ñ‹ Ð½Ð° Ð¿ÐµÑ€Ð²Ñ‹Ð¹ Ð²Ð¾Ð¿Ñ€Ð¾Ñ\""
 							  << "}";
 				}
 				else if(!question1answer2.length())
@@ -860,7 +860,7 @@ int main()
 					}
 					ostResult << "{"
 							  << "\"result\":\"error\","
-							  << "\"description\":\"Íåîáõîäèìî çàïîëíèòü âñå îòâåòû íà ïåðâûé âîïðîñ\""
+							  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð·Ð°Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÑŒ Ð²ÑÐµ Ð¾Ñ‚Ð²ÐµÑ‚Ñ‹ Ð½Ð° Ð¿ÐµÑ€Ð²Ñ‹Ð¹ Ð²Ð¾Ð¿Ñ€Ð¾Ñ\""
 							  << "}";
 				}
 				else if(!question1answer3.length())
@@ -871,7 +871,7 @@ int main()
 					}
 					ostResult << "{"
 							  << "\"result\":\"error\","
-							  << "\"description\":\"Íåîáõîäèìî çàïîëíèòü âñå îòâåòû íà ïåðâûé âîïðîñ\""
+							  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð·Ð°Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÑŒ Ð²ÑÐµ Ð¾Ñ‚Ð²ÐµÑ‚Ñ‹ Ð½Ð° Ð¿ÐµÑ€Ð²Ñ‹Ð¹ Ð²Ð¾Ð¿Ñ€Ð¾Ñ\""
 							  << "}";
 				}
 				else if(!question2.length())
@@ -882,7 +882,7 @@ int main()
 					}
 					ostResult << "{"
 							  << "\"result\":\"error\","
-							  << "\"description\":\"Íåîáõîäèìî çàïîëíèòü êâàëèôèêàöèîííûé âîïðîñ 2\""
+							  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð·Ð°Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÑŒ ÐºÐ²Ð°Ð»Ð¸Ñ„Ð¸ÐºÐ°Ñ†Ð¸Ð¾Ð½Ð½Ñ‹Ð¹ Ð²Ð¾Ð¿Ñ€Ð¾Ñ 2\""
 							  << "}";
 				}
 				else if(!question2answers.length())
@@ -893,7 +893,7 @@ int main()
 					}
 					ostResult << "{"
 							  << "\"result\":\"error\","
-							  << "\"description\":\"Íåîáõîäèìî âûáðàòü ïðàâèëüíûé îòâåò íà âòîðîé âîïðîñ\""
+							  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð²Ñ‹Ð±Ñ€Ð°Ñ‚ÑŒ Ð¿Ñ€Ð°Ð²Ð¸Ð»ÑŒÐ½Ñ‹Ð¹ Ð¾Ñ‚Ð²ÐµÑ‚ Ð½Ð° Ð²Ñ‚Ð¾Ñ€Ð¾Ð¹ Ð²Ð¾Ð¿Ñ€Ð¾Ñ\""
 							  << "}";
 				}
 				else if(!question2answer1.length())
@@ -904,7 +904,7 @@ int main()
 					}
 					ostResult << "{"
 							  << "\"result\":\"error\","
-							  << "\"description\":\"Íåîáõîäèìî çàïîëíèòü âñå îòâåòû íà âòîðîé âîïðîñ\""
+							  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð·Ð°Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÑŒ Ð²ÑÐµ Ð¾Ñ‚Ð²ÐµÑ‚Ñ‹ Ð½Ð° Ð²Ñ‚Ð¾Ñ€Ð¾Ð¹ Ð²Ð¾Ð¿Ñ€Ð¾Ñ\""
 							  << "}";
 				}
 				else if(!question2answer2.length())
@@ -915,7 +915,7 @@ int main()
 					}
 					ostResult << "{"
 							  << "\"result\":\"error\","
-							  << "\"description\":\"Íåîáõîäèìî çàïîëíèòü âñå îòâåòû íà âòîðîé âîïðîñ\""
+							  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð·Ð°Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÑŒ Ð²ÑÐµ Ð¾Ñ‚Ð²ÐµÑ‚Ñ‹ Ð½Ð° Ð²Ñ‚Ð¾Ñ€Ð¾Ð¹ Ð²Ð¾Ð¿Ñ€Ð¾Ñ\""
 							  << "}";
 				}
 				else if(!question2answer3.length())
@@ -926,7 +926,7 @@ int main()
 					}
 					ostResult << "{"
 							  << "\"result\":\"error\","
-							  << "\"description\":\"Íåîáõîäèìî çàïîëíèòü âñå îòâåòû íà âòîðîé âîïðîñ\""
+							  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð·Ð°Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÑŒ Ð²ÑÐµ Ð¾Ñ‚Ð²ÐµÑ‚Ñ‹ Ð½Ð° Ð²Ñ‚Ð¾Ñ€Ð¾Ð¹ Ð²Ð¾Ð¿Ñ€Ð¾Ñ\""
 							  << "}";
 				}
 				else if(!question3.length())
@@ -937,7 +937,7 @@ int main()
 					}
 					ostResult << "{"
 							  << "\"result\":\"error\","
-							  << "\"description\":\"Íåîáõîäèìî çàïîëíèòü êâàëèôèêàöèîííûé âîïðîñ 3\""
+							  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð·Ð°Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÑŒ ÐºÐ²Ð°Ð»Ð¸Ñ„Ð¸ÐºÐ°Ñ†Ð¸Ð¾Ð½Ð½Ñ‹Ð¹ Ð²Ð¾Ð¿Ñ€Ð¾Ñ 3\""
 							  << "}";
 				}
 				else if(!question3answers.length())
@@ -948,7 +948,7 @@ int main()
 					}
 					ostResult << "{"
 							  << "\"result\":\"error\","
-							  << "\"description\":\"Íåîáõîäèìî âûáðàòü ïðàâèëüíûé îòâåò íà òðåòèé âîïðîñ\""
+							  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð²Ñ‹Ð±Ñ€Ð°Ñ‚ÑŒ Ð¿Ñ€Ð°Ð²Ð¸Ð»ÑŒÐ½Ñ‹Ð¹ Ð¾Ñ‚Ð²ÐµÑ‚ Ð½Ð° Ñ‚Ñ€ÐµÑ‚Ð¸Ð¹ Ð²Ð¾Ð¿Ñ€Ð¾Ñ\""
 							  << "}";
 				}
 				else if(!question3answer1.length())
@@ -959,7 +959,7 @@ int main()
 					}
 					ostResult << "{"
 							  << "\"result\":\"error\","
-							  << "\"description\":\"Íåîáõîäèìî çàïîëíèòü âñå îòâåòû íà òðåòèé âîïðîñ\""
+							  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð·Ð°Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÑŒ Ð²ÑÐµ Ð¾Ñ‚Ð²ÐµÑ‚Ñ‹ Ð½Ð° Ñ‚Ñ€ÐµÑ‚Ð¸Ð¹ Ð²Ð¾Ð¿Ñ€Ð¾Ñ\""
 							  << "}";
 				}
 				else if(!question3answer2.length())
@@ -970,7 +970,7 @@ int main()
 					}
 					ostResult << "{"
 							  << "\"result\":\"error\","
-							  << "\"description\":\"Íåîáõîäèìî çàïîëíèòü âñå îòâåòû íà òðåòèé âîïðîñ\""
+							  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð·Ð°Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÑŒ Ð²ÑÐµ Ð¾Ñ‚Ð²ÐµÑ‚Ñ‹ Ð½Ð° Ñ‚Ñ€ÐµÑ‚Ð¸Ð¹ Ð²Ð¾Ð¿Ñ€Ð¾Ñ\""
 							  << "}";
 				}
 				else if(!question3answer3.length())
@@ -981,7 +981,7 @@ int main()
 					}
 					ostResult << "{"
 							  << "\"result\":\"error\","
-							  << "\"description\":\"Íåîáõîäèìî çàïîëíèòü âñå îòâåòû íà òðåòèé âîïðîñ\""
+							  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð·Ð°Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÑŒ Ð²ÑÐµ Ð¾Ñ‚Ð²ÐµÑ‚Ñ‹ Ð½Ð° Ñ‚Ñ€ÐµÑ‚Ð¸Ð¹ Ð²Ð¾Ð¿Ñ€Ð¾Ñ\""
 							  << "}";
 				}
 				else if(!publish_period.length())
@@ -992,7 +992,7 @@ int main()
 					}
 					ostResult << "{"
 							  << "\"result\":\"error\","
-							  << "\"description\":\"Íåîáõîäèìî âûáðàòü äëèòåëüíîñòü ïóáëèêàöèè\""
+							  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð²Ñ‹Ð±Ñ€Ð°Ñ‚ÑŒ Ð´Ð»Ð¸Ñ‚ÐµÐ»ÑŒÐ½Ð¾ÑÑ‚ÑŒ Ð¿ÑƒÐ±Ð»Ð¸ÐºÐ°Ñ†Ð¸Ð¸\""
 							  << "}";
 				}
 				else
@@ -1044,7 +1044,7 @@ int main()
 							ostResult.str("");
 							ostResult << "{" 
 									  << "\"result\":\"error\","
-									  << "\"description\":\"Îøèáêà ÁÄ.\""
+									  << "\"description\":\"ÐžÑˆÐ¸Ð±ÐºÐ° Ð‘Ð”.\""
 									  << "}";
 						}
 						else
@@ -1067,7 +1067,7 @@ int main()
 						ostResult.str("");
 						ostResult << "{" 
 								  << "\"result\":\"error\","
-								  << "\"description\":\"Âû íå ìîæåòå ñîçäàâàòü âàêàíñèè.\""
+								  << "\"description\":\"Ð’Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚Ðµ ÑÐ¾Ð·Ð´Ð°Ð²Ð°Ñ‚ÑŒ Ð²Ð°ÐºÐ°Ð½ÑÐ¸Ð¸.\""
 								  << "}";
 					}
 				}
@@ -1107,7 +1107,7 @@ int main()
 					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]:action == AJAX_rejectCandidate: re-login required");
 				}
 
-				ostResult << "{\"result\":\"error\",\"description\":\"ñåññèÿ çàêîí÷èëàñü, íåîáõîäèìî âíîâü çàéòè íà ñàéò\"}";
+				ostResult << "{\"result\":\"error\",\"description\":\"ÑÐµÑÑÐ¸Ñ Ð·Ð°ÐºÐ¾Ð½Ñ‡Ð¸Ð»Ð°ÑÑŒ, Ð½ÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð²Ð½Ð¾Ð²ÑŒ Ð·Ð°Ð¹Ñ‚Ð¸ Ð½Ð° ÑÐ°Ð¹Ñ‚\"}";
 			}
 			else
 			{
@@ -1140,7 +1140,7 @@ int main()
 								ostResult.str("");
 								ostResult << "{" 
 										  << "\"result\":\"error\","
-										  << "\"description\":\"Îøèáêà ÁÄ.\""
+										  << "\"description\":\"ÐžÑˆÐ¸Ð±ÐºÐ° Ð‘Ð”.\""
 										  << "}";
 							}
 							else
@@ -1174,7 +1174,7 @@ int main()
 							ostResult.str("");
 							ostResult << "{" 
 									  << "\"result\":\"error\","
-									  << "\"description\":\"Âû íå ìîæåòå îòêàçàòü êàíäèäàòó.\""
+									  << "\"description\":\"Ð’Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚Ðµ Ð¾Ñ‚ÐºÐ°Ð·Ð°Ñ‚ÑŒ ÐºÐ°Ð½Ð´Ð¸Ð´Ð°Ñ‚Ñƒ.\""
 									  << "}";
 						}
 
@@ -1189,7 +1189,7 @@ int main()
 						ostResult.str("");
 						ostResult << "{" 
 								  << "\"result\":\"error\","
-								  << "\"description\":\"Âàêàíñèÿ íå íàéäåíà.\""
+								  << "\"description\":\"Ð’Ð°ÐºÐ°Ð½ÑÐ¸Ñ Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½Ð°.\""
 								  << "}";
 					}
 
@@ -1204,7 +1204,7 @@ int main()
 					ostResult.str("");
 					ostResult << "{" 
 							  << "\"result\":\"error\","
-							  << "\"description\":\"Òàêîé êàíäèäàò íå àïëàèëñÿ íà ïîçèöèþ.\""
+							  << "\"description\":\"Ð¢Ð°ÐºÐ¾Ð¹ ÐºÐ°Ð½Ð´Ð¸Ð´Ð°Ñ‚ Ð½Ðµ Ð°Ð¿Ð»Ð°Ð¸Ð»ÑÑ Ð½Ð° Ð¿Ð¾Ð·Ð¸Ñ†Ð¸ÑŽ.\""
 							  << "}";
 				}
 
@@ -1244,7 +1244,7 @@ int main()
 					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]:action == AJAX_getCandidatesAppliedToPosition: re-login required");
 				}
 
-				ostResult << "{\"result\":\"error\",\"description\":\"ñåññèÿ çàêîí÷èëàñü, íåîáõîäèìî âíîâü çàéòè íà ñàéò\"}";
+				ostResult << "{\"result\":\"error\",\"description\":\"ÑÐµÑÑÐ¸Ñ Ð·Ð°ÐºÐ¾Ð½Ñ‡Ð¸Ð»Ð°ÑÑŒ, Ð½ÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð²Ð½Ð¾Ð²ÑŒ Ð·Ð°Ð¹Ñ‚Ð¸ Ð½Ð° ÑÐ°Ð¹Ñ‚\"}";
 			}
 			else
 			{
@@ -1273,7 +1273,7 @@ int main()
 						ostResult.str("");
 						ostResult << "{" 
 								  << "\"result\":\"error\","
-								  << "\"description\":\"Íå õâàòàåò ïðàâ äîñòóïà\""
+								  << "\"description\":\"ÐÐµ Ñ…Ð²Ð°Ñ‚Ð°ÐµÑ‚ Ð¿Ñ€Ð°Ð² Ð´Ð¾ÑÑ‚ÑƒÐ¿Ð°\""
 								  << "}";
 					}
 				}
@@ -1288,7 +1288,7 @@ int main()
 					ostResult.str("");
 					ostResult << "{" 
 							  << "\"result\":\"error\","
-							  << "\"description\":\"âàêàíñèÿ íå íàéäåíà\""
+							  << "\"description\":\"Ð²Ð°ÐºÐ°Ð½ÑÐ¸Ñ Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½Ð°\""
 							  << "}";
 				}
 
@@ -1328,7 +1328,7 @@ int main()
 					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]:action == AJAX_amIAppliedToVacancy: re-login required");
 				}
 
-				ostResult << "{\"result\":\"error\",\"description\":\"ñåññèÿ çàêîí÷èëàñü, íåîáõîäèìî âíîâü çàéòè íà ñàéò\"}";
+				ostResult << "{\"result\":\"error\",\"description\":\"ÑÐµÑÑÐ¸Ñ Ð·Ð°ÐºÐ¾Ð½Ñ‡Ð¸Ð»Ð°ÑÑŒ, Ð½ÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð²Ð½Ð¾Ð²ÑŒ Ð·Ð°Ð¹Ñ‚Ð¸ Ð½Ð° ÑÐ°Ð¹Ñ‚\"}";
 			}
 			else
 			{
@@ -1378,7 +1378,7 @@ int main()
 					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]:action == AJAX_updateOpenVacancy: re-login required");
 				}
 
-				ostResult << "{\"result\":\"error\",\"description\":\"ñåññèÿ çàêîí÷èëàñü, íåîáõîäèìî âíîâü çàéòè íà ñàéò\"}";
+				ostResult << "{\"result\":\"error\",\"description\":\"ÑÐµÑÑÐ¸Ñ Ð·Ð°ÐºÐ¾Ð½Ñ‡Ð¸Ð»Ð°ÑÑŒ, Ð½ÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð²Ð½Ð¾Ð²ÑŒ Ð·Ð°Ð¹Ñ‚Ð¸ Ð½Ð° ÑÐ°Ð¹Ñ‚\"}";
 			}
 			else
 			{
@@ -1432,7 +1432,7 @@ int main()
 						log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]:action == AJAX_updateOpenVacancy: openVacancyID[" + openVacancyID + "] not found in DB.company_vacancy table");
 					}
 
-					ostResult << "{\"result\":\"error\",\"description\":\"ÎØÈÁÊÀ. âàêàíñèÿ íå íàéäåíà â ÁÄ.\"}";
+					ostResult << "{\"result\":\"error\",\"description\":\"ÐžÐ¨Ð˜Ð‘ÐšÐ. Ð²Ð°ÐºÐ°Ð½ÑÐ¸Ñ Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½Ð° Ð² Ð‘Ð”.\"}";
 				}
 
 				if(!minsalary.length()) minsalary = "0";
@@ -1497,7 +1497,7 @@ int main()
 
 					ostResult << "{" 
 							  << "\"result\":\"error\","
-							  << "\"description\":\"Íåîáõîäèìî óêàçàòü êîìïàíèþ-ðàáîòîäàòåëÿ\""
+							  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ ÑƒÐºÐ°Ð·Ð°Ñ‚ÑŒ ÐºÐ¾Ð¼Ð¿Ð°Ð½Ð¸ÑŽ-Ñ€Ð°Ð±Ð¾Ñ‚Ð¾Ð´Ð°Ñ‚ÐµÐ»Ñ\""
 							  << "}";
 				}
 				else if(!company_position_id.length())
@@ -1509,7 +1509,7 @@ int main()
 
 					ostResult << "{" 
 							  << "\"result\":\"error\","
-							  << "\"description\":\"Íåîáõîäèìî çàïîëíèòü äîëæíîñòü\""
+							  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð·Ð°Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÑŒ Ð´Ð¾Ð»Ð¶Ð½Ð¾ÑÑ‚ÑŒ\""
 							  << "}";
 				}
 				else if(!month.length())
@@ -1521,7 +1521,7 @@ int main()
 
 					ostResult << "{" 
 							  << "\"result\":\"error\","
-							  << "\"description\":\"Íåîáõîäèìî âûáðàòü ìåñÿö âûõîäà íà ðàáîòó\""
+							  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð²Ñ‹Ð±Ñ€Ð°Ñ‚ÑŒ Ð¼ÐµÑÑÑ† Ð²Ñ‹Ñ…Ð¾Ð´Ð° Ð½Ð° Ñ€Ð°Ð±Ð¾Ñ‚Ñƒ\""
 							  << "}";
 				}
 				else if(!geo_locality_id.length())
@@ -1533,7 +1533,7 @@ int main()
 
 					ostResult << "{" 
 							  << "\"result\":\"error\","
-							  << "\"description\":\"Íåîáõîäèìî âûáðàòü ãîðîä ðàáîòû âûõîäà íà ðàáîòó\""
+							  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð²Ñ‹Ð±Ñ€Ð°Ñ‚ÑŒ Ð³Ð¾Ñ€Ð¾Ð´ Ñ€Ð°Ð±Ð¾Ñ‚Ñ‹ Ð²Ñ‹Ñ…Ð¾Ð´Ð° Ð½Ð° Ñ€Ð°Ð±Ð¾Ñ‚Ñƒ\""
 							  << "}";
 				}
 				else if(!employmenttype.length())
@@ -1544,7 +1544,7 @@ int main()
 					}
 					ostResult << "{"
 							  << "\"result\":\"error\","
-							  << "\"description\":\"Íåîáõîäèìî çàïîëíèòü òèï òðóäîóñòðîéñòâà\""
+							  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð·Ð°Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÑŒ Ñ‚Ð¸Ð¿ Ñ‚Ñ€ÑƒÐ´Ð¾ÑƒÑÑ‚Ñ€Ð¾Ð¹ÑÑ‚Ð²Ð°\""
 							  << "}";
 				}
 				else if(!question1.length())
@@ -1555,7 +1555,7 @@ int main()
 					}
 					ostResult << "{"
 							  << "\"result\":\"error\","
-							  << "\"description\":\"Íåîáõîäèìî çàïîëíèòü êâàëèôèêàöèîííûé âîïðîñ 1\""
+							  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð·Ð°Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÑŒ ÐºÐ²Ð°Ð»Ð¸Ñ„Ð¸ÐºÐ°Ñ†Ð¸Ð¾Ð½Ð½Ñ‹Ð¹ Ð²Ð¾Ð¿Ñ€Ð¾Ñ 1\""
 							  << "}";
 				}
 				else if(!question1answers.length())
@@ -1566,7 +1566,7 @@ int main()
 					}
 					ostResult << "{"
 							  << "\"result\":\"error\","
-							  << "\"description\":\"Íåîáõîäèìî âûáðàòü ïðàâèëüíûé îòâåò íà ïåðâûé âîïðîñ\""
+							  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð²Ñ‹Ð±Ñ€Ð°Ñ‚ÑŒ Ð¿Ñ€Ð°Ð²Ð¸Ð»ÑŒÐ½Ñ‹Ð¹ Ð¾Ñ‚Ð²ÐµÑ‚ Ð½Ð° Ð¿ÐµÑ€Ð²Ñ‹Ð¹ Ð²Ð¾Ð¿Ñ€Ð¾Ñ\""
 							  << "}";
 				}
 				else if(!question1answer1.length())
@@ -1577,7 +1577,7 @@ int main()
 					}
 					ostResult << "{"
 							  << "\"result\":\"error\","
-							  << "\"description\":\"Íåîáõîäèìî çàïîëíèòü âñå îòâåòû íà ïåðâûé âîïðîñ\""
+							  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð·Ð°Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÑŒ Ð²ÑÐµ Ð¾Ñ‚Ð²ÐµÑ‚Ñ‹ Ð½Ð° Ð¿ÐµÑ€Ð²Ñ‹Ð¹ Ð²Ð¾Ð¿Ñ€Ð¾Ñ\""
 							  << "}";
 				}
 				else if(!question1answer2.length())
@@ -1588,7 +1588,7 @@ int main()
 					}
 					ostResult << "{"
 							  << "\"result\":\"error\","
-							  << "\"description\":\"Íåîáõîäèìî çàïîëíèòü âñå îòâåòû íà ïåðâûé âîïðîñ\""
+							  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð·Ð°Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÑŒ Ð²ÑÐµ Ð¾Ñ‚Ð²ÐµÑ‚Ñ‹ Ð½Ð° Ð¿ÐµÑ€Ð²Ñ‹Ð¹ Ð²Ð¾Ð¿Ñ€Ð¾Ñ\""
 							  << "}";
 				}
 				else if(!question1answer3.length())
@@ -1599,7 +1599,7 @@ int main()
 					}
 					ostResult << "{"
 							  << "\"result\":\"error\","
-							  << "\"description\":\"Íåîáõîäèìî çàïîëíèòü âñå îòâåòû íà ïåðâûé âîïðîñ\""
+							  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð·Ð°Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÑŒ Ð²ÑÐµ Ð¾Ñ‚Ð²ÐµÑ‚Ñ‹ Ð½Ð° Ð¿ÐµÑ€Ð²Ñ‹Ð¹ Ð²Ð¾Ð¿Ñ€Ð¾Ñ\""
 							  << "}";
 				}
 				else if(!question2.length())
@@ -1610,7 +1610,7 @@ int main()
 					}
 					ostResult << "{"
 							  << "\"result\":\"error\","
-							  << "\"description\":\"Íåîáõîäèìî çàïîëíèòü êâàëèôèêàöèîííûé âîïðîñ 2\""
+							  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð·Ð°Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÑŒ ÐºÐ²Ð°Ð»Ð¸Ñ„Ð¸ÐºÐ°Ñ†Ð¸Ð¾Ð½Ð½Ñ‹Ð¹ Ð²Ð¾Ð¿Ñ€Ð¾Ñ 2\""
 							  << "}";
 				}
 				else if(!question2answers.length())
@@ -1621,7 +1621,7 @@ int main()
 					}
 					ostResult << "{"
 							  << "\"result\":\"error\","
-							  << "\"description\":\"Íåîáõîäèìî âûáðàòü ïðàâèëüíûé îòâåò íà âòîðîé âîïðîñ\""
+							  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð²Ñ‹Ð±Ñ€Ð°Ñ‚ÑŒ Ð¿Ñ€Ð°Ð²Ð¸Ð»ÑŒÐ½Ñ‹Ð¹ Ð¾Ñ‚Ð²ÐµÑ‚ Ð½Ð° Ð²Ñ‚Ð¾Ñ€Ð¾Ð¹ Ð²Ð¾Ð¿Ñ€Ð¾Ñ\""
 							  << "}";
 				}
 				else if(!question2answer1.length())
@@ -1632,7 +1632,7 @@ int main()
 					}
 					ostResult << "{"
 							  << "\"result\":\"error\","
-							  << "\"description\":\"Íåîáõîäèìî çàïîëíèòü âñå îòâåòû íà âòîðîé âîïðîñ\""
+							  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð·Ð°Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÑŒ Ð²ÑÐµ Ð¾Ñ‚Ð²ÐµÑ‚Ñ‹ Ð½Ð° Ð²Ñ‚Ð¾Ñ€Ð¾Ð¹ Ð²Ð¾Ð¿Ñ€Ð¾Ñ\""
 							  << "}";
 				}
 				else if(!question2answer2.length())
@@ -1643,7 +1643,7 @@ int main()
 					}
 					ostResult << "{"
 							  << "\"result\":\"error\","
-							  << "\"description\":\"Íåîáõîäèìî çàïîëíèòü âñå îòâåòû íà âòîðîé âîïðîñ\""
+							  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð·Ð°Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÑŒ Ð²ÑÐµ Ð¾Ñ‚Ð²ÐµÑ‚Ñ‹ Ð½Ð° Ð²Ñ‚Ð¾Ñ€Ð¾Ð¹ Ð²Ð¾Ð¿Ñ€Ð¾Ñ\""
 							  << "}";
 				}
 				else if(!question2answer3.length())
@@ -1654,7 +1654,7 @@ int main()
 					}
 					ostResult << "{"
 							  << "\"result\":\"error\","
-							  << "\"description\":\"Íåîáõîäèìî çàïîëíèòü âñå îòâåòû íà âòîðîé âîïðîñ\""
+							  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð·Ð°Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÑŒ Ð²ÑÐµ Ð¾Ñ‚Ð²ÐµÑ‚Ñ‹ Ð½Ð° Ð²Ñ‚Ð¾Ñ€Ð¾Ð¹ Ð²Ð¾Ð¿Ñ€Ð¾Ñ\""
 							  << "}";
 				}
 				else if(!question3.length())
@@ -1665,7 +1665,7 @@ int main()
 					}
 					ostResult << "{"
 							  << "\"result\":\"error\","
-							  << "\"description\":\"Íåîáõîäèìî çàïîëíèòü êâàëèôèêàöèîííûé âîïðîñ 3\""
+							  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð·Ð°Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÑŒ ÐºÐ²Ð°Ð»Ð¸Ñ„Ð¸ÐºÐ°Ñ†Ð¸Ð¾Ð½Ð½Ñ‹Ð¹ Ð²Ð¾Ð¿Ñ€Ð¾Ñ 3\""
 							  << "}";
 				}
 				else if(!question3answers.length())
@@ -1676,7 +1676,7 @@ int main()
 					}
 					ostResult << "{"
 							  << "\"result\":\"error\","
-							  << "\"description\":\"Íåîáõîäèìî âûáðàòü ïðàâèëüíûé îòâåò íà òðåòèé âîïðîñ\""
+							  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð²Ñ‹Ð±Ñ€Ð°Ñ‚ÑŒ Ð¿Ñ€Ð°Ð²Ð¸Ð»ÑŒÐ½Ñ‹Ð¹ Ð¾Ñ‚Ð²ÐµÑ‚ Ð½Ð° Ñ‚Ñ€ÐµÑ‚Ð¸Ð¹ Ð²Ð¾Ð¿Ñ€Ð¾Ñ\""
 							  << "}";
 				}
 				else if(!question3answer1.length())
@@ -1687,7 +1687,7 @@ int main()
 					}
 					ostResult << "{"
 							  << "\"result\":\"error\","
-							  << "\"description\":\"Íåîáõîäèìî çàïîëíèòü âñå îòâåòû íà òðåòèé âîïðîñ\""
+							  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð·Ð°Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÑŒ Ð²ÑÐµ Ð¾Ñ‚Ð²ÐµÑ‚Ñ‹ Ð½Ð° Ñ‚Ñ€ÐµÑ‚Ð¸Ð¹ Ð²Ð¾Ð¿Ñ€Ð¾Ñ\""
 							  << "}";
 				}
 				else if(!question3answer2.length())
@@ -1698,7 +1698,7 @@ int main()
 					}
 					ostResult << "{"
 							  << "\"result\":\"error\","
-							  << "\"description\":\"Íåîáõîäèìî çàïîëíèòü âñå îòâåòû íà òðåòèé âîïðîñ\""
+							  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð·Ð°Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÑŒ Ð²ÑÐµ Ð¾Ñ‚Ð²ÐµÑ‚Ñ‹ Ð½Ð° Ñ‚Ñ€ÐµÑ‚Ð¸Ð¹ Ð²Ð¾Ð¿Ñ€Ð¾Ñ\""
 							  << "}";
 				}
 				else if(!question3answer3.length())
@@ -1709,7 +1709,7 @@ int main()
 					}
 					ostResult << "{"
 							  << "\"result\":\"error\","
-							  << "\"description\":\"Íåîáõîäèìî çàïîëíèòü âñå îòâåòû íà òðåòèé âîïðîñ\""
+							  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð·Ð°Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÑŒ Ð²ÑÐµ Ð¾Ñ‚Ð²ÐµÑ‚Ñ‹ Ð½Ð° Ñ‚Ñ€ÐµÑ‚Ð¸Ð¹ Ð²Ð¾Ð¿Ñ€Ð¾Ñ\""
 							  << "}";
 				}
 				else if(!publish_period.length())
@@ -1720,7 +1720,7 @@ int main()
 					}
 					ostResult << "{"
 							  << "\"result\":\"error\","
-							  << "\"description\":\"Íåîáõîäèìî âûáðàòü äëèòåëüíîñòü ïóáëèêàöèè\""
+							  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð²Ñ‹Ð±Ñ€Ð°Ñ‚ÑŒ Ð´Ð»Ð¸Ñ‚ÐµÐ»ÑŒÐ½Ð¾ÑÑ‚ÑŒ Ð¿ÑƒÐ±Ð»Ð¸ÐºÐ°Ñ†Ð¸Ð¸\""
 							  << "}";
 				}
 				else
@@ -1770,7 +1770,7 @@ int main()
 							ostResult.str("");
 							ostResult << "{" 
 									  << "\"result\":\"error\","
-									  << "\"description\":\"Îøèáêà ÁÄ.\""
+									  << "\"description\":\"ÐžÑˆÐ¸Ð±ÐºÐ° Ð‘Ð”.\""
 									  << "}";
 						}
 						else
@@ -1792,7 +1792,7 @@ int main()
 						ostResult.str("");
 						ostResult << "{" 
 								  << "\"result\":\"error\","
-								  << "\"description\":\"Âû íå ìîæåòå ðåäàêòèðîâàòü âàêàíñèè.\""
+								  << "\"description\":\"Ð’Ñ‹ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚Ðµ Ñ€ÐµÐ´Ð°ÐºÑ‚Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ Ð²Ð°ÐºÐ°Ð½ÑÐ¸Ð¸.\""
 								  << "}";
 					}
 				}
@@ -1833,7 +1833,7 @@ int main()
 					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]:action == AJAX_applyToVacancy: re-login required");
 				}
 
-				ostResult << "{\"result\":\"error\",\"description\":\"ñåññèÿ çàêîí÷èëàñü, íåîáõîäèìî âíîâü çàéòè íà ñàéò\"}";
+				ostResult << "{\"result\":\"error\",\"description\":\"ÑÐµÑÑÐ¸Ñ Ð·Ð°ÐºÐ¾Ð½Ñ‡Ð¸Ð»Ð°ÑÑŒ, Ð½ÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð²Ð½Ð¾Ð²ÑŒ Ð·Ð°Ð¹Ñ‚Ð¸ Ð½Ð° ÑÐ°Ð¹Ñ‚\"}";
 			}
 			else
 			{
@@ -1862,7 +1862,7 @@ int main()
 						}
 						ostResult << "{"
 								  << "\"result\":\"error\","
-								  << "\"description\":\"Íåëüçÿ ðåãèñòðèðîâàòüñÿ íà ïîçèöèþ, ãäå Âàì îòêàçàëè\""
+								  << "\"description\":\"ÐÐµÐ»ÑŒÐ·Ñ Ñ€ÐµÐ³Ð¸ÑÑ‚Ñ€Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒÑÑ Ð½Ð° Ð¿Ð¾Ð·Ð¸Ñ†Ð¸ÑŽ, Ð³Ð´Ðµ Ð’Ð°Ð¼ Ð¾Ñ‚ÐºÐ°Ð·Ð°Ð»Ð¸\""
 								  << "}";
 					}
 					else
@@ -1876,7 +1876,7 @@ int main()
 							}
 							ostResult << "{"
 									  << "\"result\":\"error\","
-									  << "\"description\":\"Íåîáõîäèìî âûáðàòü ïðàâèëüíûé îòâåò íà ïåðâûé âîïðîñ\""
+									  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð²Ñ‹Ð±Ñ€Ð°Ñ‚ÑŒ Ð¿Ñ€Ð°Ð²Ð¸Ð»ÑŒÐ½Ñ‹Ð¹ Ð¾Ñ‚Ð²ÐµÑ‚ Ð½Ð° Ð¿ÐµÑ€Ð²Ñ‹Ð¹ Ð²Ð¾Ð¿Ñ€Ð¾Ñ\""
 									  << "}";
 						}
 						else if(!question2answers.length())
@@ -1887,7 +1887,7 @@ int main()
 							}
 							ostResult << "{"
 									  << "\"result\":\"error\","
-									  << "\"description\":\"Íåîáõîäèìî âûáðàòü ïðàâèëüíûé îòâåò íà âòîðîé âîïðîñ\""
+									  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð²Ñ‹Ð±Ñ€Ð°Ñ‚ÑŒ Ð¿Ñ€Ð°Ð²Ð¸Ð»ÑŒÐ½Ñ‹Ð¹ Ð¾Ñ‚Ð²ÐµÑ‚ Ð½Ð° Ð²Ñ‚Ð¾Ñ€Ð¾Ð¹ Ð²Ð¾Ð¿Ñ€Ð¾Ñ\""
 									  << "}";
 						}
 						else if(!question3answers.length())
@@ -1898,7 +1898,7 @@ int main()
 							}
 							ostResult << "{"
 									  << "\"result\":\"error\","
-									  << "\"description\":\"Íåîáõîäèìî âûáðàòü ïðàâèëüíûé îòâåò íà òðåòèé âîïðîñ\""
+									  << "\"description\":\"ÐÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð²Ñ‹Ð±Ñ€Ð°Ñ‚ÑŒ Ð¿Ñ€Ð°Ð²Ð¸Ð»ÑŒÐ½Ñ‹Ð¹ Ð¾Ñ‚Ð²ÐµÑ‚ Ð½Ð° Ñ‚Ñ€ÐµÑ‚Ð¸Ð¹ Ð²Ð¾Ð¿Ñ€Ð¾Ñ\""
 									  << "}";
 						}
 						else
@@ -1935,7 +1935,7 @@ int main()
 								ostResult.str("");
 								ostResult << "{" 
 										  << "\"result\":\"error\","
-										  << "\"description\":\"Îøèáêà ÁÄ.\""
+										  << "\"description\":\"ÐžÑˆÐ¸Ð±ÐºÐ° Ð‘Ð”.\""
 										  << "}";
 							}
 							else
@@ -1958,7 +1958,7 @@ int main()
 						log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]:action == AJAX_applyToVacancy: openVacancyID[" + openVacancyID + "] not found in DB.company_vacancy table");
 					}
 
-					ostResult << "{\"result\":\"error\",\"description\":\"ÎØÈÁÊÀ. âàêàíñèÿ íå íàéäåíà â ÁÄ.\"}";
+					ostResult << "{\"result\":\"error\",\"description\":\"ÐžÐ¨Ð˜Ð‘ÐšÐ. Ð²Ð°ÐºÐ°Ð½ÑÐ¸Ñ Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½Ð° Ð² Ð‘Ð”.\"}";
 				}
 
 			} // --- if(user.GetLogin() == "Guest")
@@ -1998,7 +1998,7 @@ int main()
 					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]: action == AJAX_companyTakeOwnership: re-login required");
 				}
 
-				ostResult << "{\"result\":\"error\",\"description\":\"ñåññèÿ çàêîí÷èëàñü, íåîáõîäèìî âíîâü çàéòè íà ñàéò\"}";
+				ostResult << "{\"result\":\"error\",\"description\":\"ÑÐµÑÑÐ¸Ñ Ð·Ð°ÐºÐ¾Ð½Ñ‡Ð¸Ð»Ð°ÑÑŒ, Ð½ÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð²Ð½Ð¾Ð²ÑŒ Ð·Ð°Ð¹Ñ‚Ð¸ Ð½Ð° ÑÐ°Ð¹Ñ‚\"}";
 			}
 			else
 			{
@@ -2026,7 +2026,7 @@ int main()
 								ostResult.str("");
 								ostResult << "{" 
 										  << "\"result\":\"error\","
-										  << "\"description\":\"Îøèáêà ÁÄ.\""
+										  << "\"description\":\"ÐžÑˆÐ¸Ð±ÐºÐ° Ð‘Ð”.\""
 										  << "}";
 							}
 							else
@@ -2048,7 +2048,7 @@ int main()
 								log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]: action == AJAX_companyTakeOwnership: ERROR: company[" + companyID + "] can't be assigned to user[" + user.GetID() + "] due to current owner exists");
 							}
 
-							ostResult << "{\"result\": \"error\", \"description\": \"Êîìïàíèÿ íå ìîæåò áûòü ïåðåäàííà\"}";
+							ostResult << "{\"result\": \"error\", \"description\": \"ÐšÐ¾Ð¼Ð¿Ð°Ð½Ð¸Ñ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚ Ð±Ñ‹Ñ‚ÑŒ Ð¿ÐµÑ€ÐµÐ´Ð°Ð½Ð½Ð°\"}";
 						}
 					}
 					else
@@ -2058,7 +2058,7 @@ int main()
 							log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]: action == AJAX_companyTakeOwnership: ERROR: company[" + companyID + "] doesn't exists");
 						}
 
-						ostResult << "{\"result\": \"error\", \"description\": \"Êîìïàíèÿ íå ñóùåñòâóåò\"}";
+						ostResult << "{\"result\": \"error\", \"description\": \"ÐšÐ¾Ð¼Ð¿Ð°Ð½Ð¸Ñ Ð½Ðµ ÑÑƒÑ‰ÐµÑÑ‚Ð²ÑƒÐµÑ‚\"}";
 					}
 				}
 				else
@@ -2068,7 +2068,7 @@ int main()
 						log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]::AJAX_companyTakeOwnership: ERROR: mandatory parameter missed or empty in HTML request [companyID]");
 					}
 
-					ostResult << "{\"result\": \"error\", \"description\": \"ÎØÈÁÊÀ: íåäîñòàòî÷íî ïàðàìåòðîâ\"}";
+					ostResult << "{\"result\": \"error\", \"description\": \"ÐžÐ¨Ð˜Ð‘ÐšÐ: Ð½ÐµÐ´Ð¾ÑÑ‚Ð°Ñ‚Ð¾Ñ‡Ð½Ð¾ Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ð¾Ð²\"}";
 				}
 
 			}
@@ -2105,7 +2105,7 @@ int main()
 					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]: action == AJAX_companyPosessionRequest: re-login required");
 				}
 
-				ostResult << "{\"result\":\"error\",\"description\":\"ñåññèÿ çàêîí÷èëàñü, íåîáõîäèìî âíîâü çàéòè íà ñàéò\"}";
+				ostResult << "{\"result\":\"error\",\"description\":\"ÑÐµÑÑÐ¸Ñ Ð·Ð°ÐºÐ¾Ð½Ñ‡Ð¸Ð»Ð°ÑÑŒ, Ð½ÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð²Ð½Ð¾Ð²ÑŒ Ð·Ð°Ð¹Ñ‚Ð¸ Ð½Ð° ÑÐ°Ð¹Ñ‚\"}";
 			}
 			else
 			{
@@ -2125,7 +2125,7 @@ int main()
 							log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]: action == AJAX_companyPosessionRequest: posession request already exists [id = " + db.Get(0, "id") + "]");
 						}
 
-						ostResult << "{\"result\": \"error\", \"description\": \"Òàêîé çàïðîñ óæå ñóùåñòâóåò\"}";
+						ostResult << "{\"result\": \"error\", \"description\": \"Ð¢Ð°ÐºÐ¾Ð¹ Ð·Ð°Ð¿Ñ€Ð¾Ñ ÑƒÐ¶Ðµ ÑÑƒÑ‰ÐµÑÑ‚Ð²ÑƒÐµÑ‚\"}";
 					}
 					else
 					{
@@ -2181,7 +2181,7 @@ int main()
 										log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]: action == AJAX_companyPosessionRequest: ERROR: inserting posession request to `company_posession_request` table");
 									}
 
-									ostResult << "{\"result\": \"error\", \"description\": \"Îøèáêà ÁÄ\"}";
+									ostResult << "{\"result\": \"error\", \"description\": \"ÐžÑˆÐ¸Ð±ÐºÐ° Ð‘Ð”\"}";
 								}
 
 							}
@@ -2192,7 +2192,7 @@ int main()
 									log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]: action == AJAX_companyPosessionRequest: ERROR: company[" + companyID + "] can't be assigned to user[" + user.GetID() + "] due to current owner exists");
 								}
 
-								ostResult << "{\"result\": \"error\", \"description\": \"Êîìïàíèÿ íå ìîæåò áûòü ïåðåäàííà\"}";
+								ostResult << "{\"result\": \"error\", \"description\": \"ÐšÐ¾Ð¼Ð¿Ð°Ð½Ð¸Ñ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚ Ð±Ñ‹Ñ‚ÑŒ Ð¿ÐµÑ€ÐµÐ´Ð°Ð½Ð½Ð°\"}";
 							}
 						}
 						else
@@ -2202,7 +2202,7 @@ int main()
 								log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]: action == AJAX_companyPosessionRequest: ERROR: company[" + companyID + "] doesn't exists");
 							}
 
-							ostResult << "{\"result\": \"error\", \"description\": \"Êîìïàíèÿ íå ñóùåñòâóåò\"}";
+							ostResult << "{\"result\": \"error\", \"description\": \"ÐšÐ¾Ð¼Ð¿Ð°Ð½Ð¸Ñ Ð½Ðµ ÑÑƒÑ‰ÐµÑÑ‚Ð²ÑƒÐµÑ‚\"}";
 						}
 					}
 				}
@@ -2213,7 +2213,7 @@ int main()
 						log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]::AJAX_companyPosessionRequest: ERROR: mandatory parameter missed or empty in HTML request [companyID]");
 					}
 
-					ostResult << "{\"result\": \"error\", \"description\": \"ÎØÈÁÊÀ: íåäîñòàòî÷íî ïàðàìåòðîâ\"}";
+					ostResult << "{\"result\": \"error\", \"description\": \"ÐžÐ¨Ð˜Ð‘ÐšÐ: Ð½ÐµÐ´Ð¾ÑÑ‚Ð°Ñ‚Ð¾Ñ‡Ð½Ð¾ Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ð¾Ð²\"}";
 				}
 
 			}
@@ -2250,7 +2250,7 @@ int main()
 					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]: action == AJAX_grantPosessionRequest: re-login required");
 				}
 
-				ostResult << "{\"result\":\"error\",\"description\":\"ñåññèÿ çàêîí÷èëàñü, íåîáõîäèìî âíîâü çàéòè íà ñàéò\"}";
+				ostResult << "{\"result\":\"error\",\"description\":\"ÑÐµÑÑÐ¸Ñ Ð·Ð°ÐºÐ¾Ð½Ñ‡Ð¸Ð»Ð°ÑÑŒ, Ð½ÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð²Ð½Ð¾Ð²ÑŒ Ð·Ð°Ð¹Ñ‚Ð¸ Ð½Ð° ÑÐ°Ð¹Ñ‚\"}";
 			}
 			else
 			{
@@ -2297,7 +2297,7 @@ int main()
 											ostResult.str("");
 											ostResult << "{" 
 													  << "\"result\":\"error\","
-													  << "\"description\":\"Îøèáêà ÁÄ.\""
+													  << "\"description\":\"ÐžÑˆÐ¸Ð±ÐºÐ° Ð‘Ð”.\""
 													  << "}";
 										}
 										else
@@ -2330,7 +2330,7 @@ int main()
 											log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]: action == AJAX_grantPosessionRequest: ERROR: company[" + requested_company_id + "] doesn't belongs to you [userid: " + user.GetID() + "]");
 										}
 
-										ostResult << "{\"result\": \"error\", \"description\": \"Êîìïàíèÿ íå ìîæåò áûòü ïåðåäàíà\"}";
+										ostResult << "{\"result\": \"error\", \"description\": \"ÐšÐ¾Ð¼Ð¿Ð°Ð½Ð¸Ñ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚ Ð±Ñ‹Ñ‚ÑŒ Ð¿ÐµÑ€ÐµÐ´Ð°Ð½Ð°\"}";
 									}
 								}
 								else
@@ -2340,7 +2340,7 @@ int main()
 										log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]: action == AJAX_grantPosessionRequest: ERROR: company[" + requested_company_id + "] doesn't exists or not belongs to you [id: " + user.GetID() + "]");
 									}
 
-									ostResult << "{\"result\": \"error\", \"description\": \"Êîìïàíèÿ íå ñóùåñòâóåò èëè íå âàøà\"}";
+									ostResult << "{\"result\": \"error\", \"description\": \"ÐšÐ¾Ð¼Ð¿Ð°Ð½Ð¸Ñ Ð½Ðµ ÑÑƒÑ‰ÐµÑÑ‚Ð²ÑƒÐµÑ‚ Ð¸Ð»Ð¸ Ð½Ðµ Ð²Ð°ÑˆÐ°\"}";
 								}
 							}
 							else
@@ -2350,7 +2350,7 @@ int main()
 									log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]::AJAX_grantPosessionRequest: ERROR: mandatory parameter empty [requested_company_id]");
 								}
 
-								ostResult << "{\"result\": \"error\", \"description\": \"ÎØÈÁÊÀ: íåäîñòàòî÷íî ïàðàìåòðîâ\"}";
+								ostResult << "{\"result\": \"error\", \"description\": \"ÐžÐ¨Ð˜Ð‘ÐšÐ: Ð½ÐµÐ´Ð¾ÑÑ‚Ð°Ñ‚Ð¾Ñ‡Ð½Ð¾ Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ð¾Ð²\"}";
 							}
 						}
 						else
@@ -2360,7 +2360,7 @@ int main()
 								log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]::AJAX_grantPosessionRequest: ERROR: posession request in wrong state [state: " + status + "], must be in `requested` state");
 							}
 
-							ostResult << "{\"result\": \"error\", \"description\": \"ÎØÈÁÊÀ: íåâîçìîæíî íàéòè çàïðîñ íà âëàäåíèå\"}";
+							ostResult << "{\"result\": \"error\", \"description\": \"ÐžÐ¨Ð˜Ð‘ÐšÐ: Ð½ÐµÐ²Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ð¾ Ð½Ð°Ð¹Ñ‚Ð¸ Ð·Ð°Ð¿Ñ€Ð¾Ñ Ð½Ð° Ð²Ð»Ð°Ð´ÐµÐ½Ð¸Ðµ\"}";
 						}
 					}
 					else
@@ -2370,7 +2370,7 @@ int main()
 							log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]::AJAX_grantPosessionRequest: ERROR: posession request [id: " + posessionRequestID + "] not found");
 						}
 
-						ostResult << "{\"result\": \"error\", \"description\": \"ÎØÈÁÊÀ: íåâîçìîæíî íàéòè çàïðîñ íà âëàäåíèå\"}";
+						ostResult << "{\"result\": \"error\", \"description\": \"ÐžÐ¨Ð˜Ð‘ÐšÐ: Ð½ÐµÐ²Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ð¾ Ð½Ð°Ð¹Ñ‚Ð¸ Ð·Ð°Ð¿Ñ€Ð¾Ñ Ð½Ð° Ð²Ð»Ð°Ð´ÐµÐ½Ð¸Ðµ\"}";
 					}
 				}
 				else
@@ -2380,7 +2380,7 @@ int main()
 						log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]::AJAX_grantPosessionRequest: ERROR: notification [id: " + notificationID + ", actionTypeId: 60] doesn't exists or not yours [userid: " + user.GetID() + "]");
 					}
 
-					ostResult << "{\"result\": \"error\", \"description\": \"ÎØÈÁÊÀ: íåâîçìîæíî íàéòè âàø notification\"}";
+					ostResult << "{\"result\": \"error\", \"description\": \"ÐžÐ¨Ð˜Ð‘ÐšÐ: Ð½ÐµÐ²Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ð¾ Ð½Ð°Ð¹Ñ‚Ð¸ Ð²Ð°Ñˆ notification\"}";
 				}
 			}
 
@@ -2416,7 +2416,7 @@ int main()
 					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]: action == AJAX_dropCompanyPosession: re-login required");
 				}
 
-				ostResult << "{\"result\":\"error\",\"description\":\"ñåññèÿ çàêîí÷èëàñü, íåîáõîäèìî âíîâü çàéòè íà ñàéò\"}";
+				ostResult << "{\"result\":\"error\",\"description\":\"ÑÐµÑÑÐ¸Ñ Ð·Ð°ÐºÐ¾Ð½Ñ‡Ð¸Ð»Ð°ÑÑŒ, Ð½ÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð²Ð½Ð¾Ð²ÑŒ Ð·Ð°Ð¹Ñ‚Ð¸ Ð½Ð° ÑÐ°Ð¹Ñ‚\"}";
 			}
 			else
 			{
@@ -2437,7 +2437,7 @@ int main()
 							ostResult.str("");
 							ostResult << "{" 
 									  << "\"result\":\"error\","
-									  << "\"description\":\"Îøèáêà ÁÄ.\""
+									  << "\"description\":\"ÐžÑˆÐ¸Ð±ÐºÐ° Ð‘Ð”.\""
 									  << "}";
 						}
 						else
@@ -2455,7 +2455,7 @@ int main()
 						log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]: action == AJAX_dropCompanyPosession: ERROR: company[" + companyID + "] doesn't exists or not belongs to you [id: " + user.GetID() + "]");
 					}
 
-					ostResult << "{\"result\": \"error\", \"description\": \"Êîìïàíèÿ íå ñóùåñòâóåò èëè íå âàøà\"}";
+					ostResult << "{\"result\": \"error\", \"description\": \"ÐšÐ¾Ð¼Ð¿Ð°Ð½Ð¸Ñ Ð½Ðµ ÑÑƒÑ‰ÐµÑÑ‚Ð²ÑƒÐµÑ‚ Ð¸Ð»Ð¸ Ð½Ðµ Ð²Ð°ÑˆÐ°\"}";
 				}
 			}
 
@@ -2491,7 +2491,7 @@ int main()
 					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]: action == AJAX_rejectPosessionRequest: re-login required");
 				}
 
-				ostResult << "{\"result\":\"error\",\"description\":\"ñåññèÿ çàêîí÷èëàñü, íåîáõîäèìî âíîâü çàéòè íà ñàéò\"}";
+				ostResult << "{\"result\":\"error\",\"description\":\"ÑÐµÑÑÐ¸Ñ Ð·Ð°ÐºÐ¾Ð½Ñ‡Ð¸Ð»Ð°ÑÑŒ, Ð½ÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð²Ð½Ð¾Ð²ÑŒ Ð·Ð°Ð¹Ñ‚Ð¸ Ð½Ð° ÑÐ°Ð¹Ñ‚\"}";
 			}
 			else
 			{
@@ -2531,7 +2531,7 @@ int main()
 											ostResult.str("");
 											ostResult << "{" 
 													  << "\"result\":\"error\","
-													  << "\"description\":\"Îøèáêà ÁÄ.\""
+													  << "\"description\":\"ÐžÑˆÐ¸Ð±ÐºÐ° Ð‘Ð”.\""
 													  << "}";
 										}
 										else
@@ -2563,7 +2563,7 @@ int main()
 											log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]: action == AJAX_rejectPosessionRequest: ERROR: company[" + requested_company_id + "] doesn't belongs to you [userid: " + user.GetID() + "]");
 										}
 
-										ostResult << "{\"result\": \"error\", \"description\": \"Êîìïàíèÿ íå ìîæåò áûòü ïåðåäàíà\"}";
+										ostResult << "{\"result\": \"error\", \"description\": \"ÐšÐ¾Ð¼Ð¿Ð°Ð½Ð¸Ñ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚ Ð±Ñ‹Ñ‚ÑŒ Ð¿ÐµÑ€ÐµÐ´Ð°Ð½Ð°\"}";
 									}
 								}
 								else
@@ -2573,7 +2573,7 @@ int main()
 										log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]: action == AJAX_rejectPosessionRequest: ERROR: company[" + requested_company_id + "] doesn't exists or not belongs to you [id: " + user.GetID() + "]");
 									}
 
-									ostResult << "{\"result\": \"error\", \"description\": \"Êîìïàíèÿ íå ñóùåñòâóåò èëè íå âàøà\"}";
+									ostResult << "{\"result\": \"error\", \"description\": \"ÐšÐ¾Ð¼Ð¿Ð°Ð½Ð¸Ñ Ð½Ðµ ÑÑƒÑ‰ÐµÑÑ‚Ð²ÑƒÐµÑ‚ Ð¸Ð»Ð¸ Ð½Ðµ Ð²Ð°ÑˆÐ°\"}";
 								}
 							}
 							else
@@ -2583,7 +2583,7 @@ int main()
 									log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]::AJAX_rejectPosessionRequest: ERROR: mandatory parameter empty [requested_company_id]");
 								}
 
-								ostResult << "{\"result\": \"error\", \"description\": \"ÎØÈÁÊÀ: íåäîñòàòî÷íî ïàðàìåòðîâ\"}";
+								ostResult << "{\"result\": \"error\", \"description\": \"ÐžÐ¨Ð˜Ð‘ÐšÐ: Ð½ÐµÐ´Ð¾ÑÑ‚Ð°Ñ‚Ð¾Ñ‡Ð½Ð¾ Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ð¾Ð²\"}";
 							}
 						}
 						else
@@ -2593,7 +2593,7 @@ int main()
 								log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]::AJAX_rejectPosessionRequest: ERROR: posession request in wrong state [state: " + status + "], must be in `requested` state");
 							}
 
-							ostResult << "{\"result\": \"error\", \"description\": \"ÎØÈÁÊÀ: íåâîçìîæíî íàéòè çàïðîñ íà âëàäåíèå\"}";
+							ostResult << "{\"result\": \"error\", \"description\": \"ÐžÐ¨Ð˜Ð‘ÐšÐ: Ð½ÐµÐ²Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ð¾ Ð½Ð°Ð¹Ñ‚Ð¸ Ð·Ð°Ð¿Ñ€Ð¾Ñ Ð½Ð° Ð²Ð»Ð°Ð´ÐµÐ½Ð¸Ðµ\"}";
 						}
 					}
 					else
@@ -2603,7 +2603,7 @@ int main()
 							log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]::AJAX_rejectPosessionRequest: ERROR: posession request [id: " + posessionRequestID + "] not found");
 						}
 
-						ostResult << "{\"result\": \"error\", \"description\": \"ÎØÈÁÊÀ: íåâîçìîæíî íàéòè çàïðîñ íà âëàäåíèå\"}";
+						ostResult << "{\"result\": \"error\", \"description\": \"ÐžÐ¨Ð˜Ð‘ÐšÐ: Ð½ÐµÐ²Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ð¾ Ð½Ð°Ð¹Ñ‚Ð¸ Ð·Ð°Ð¿Ñ€Ð¾Ñ Ð½Ð° Ð²Ð»Ð°Ð´ÐµÐ½Ð¸Ðµ\"}";
 					}
 				}
 				else
@@ -2613,7 +2613,7 @@ int main()
 						log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]::AJAX_rejectPosessionRequest: ERROR: notification [id: " + notificationID + ", actionTypeId: 60] doesn't exists or not yours [userid: " + user.GetID() + "]");
 					}
 
-					ostResult << "{\"result\": \"error\", \"description\": \"ÎØÈÁÊÀ: íåâîçìîæíî íàéòè âàø notification\"}";
+					ostResult << "{\"result\": \"error\", \"description\": \"ÐžÐ¨Ð˜Ð‘ÐšÐ: Ð½ÐµÐ²Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ð¾ Ð½Ð°Ð¹Ñ‚Ð¸ Ð²Ð°Ñˆ notification\"}";
 				}
 			}
 
@@ -2728,7 +2728,7 @@ int main()
 					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]: action == AJAX_SubscribeOnCompany: re-login required");
 				}
 
-				ostResult << "{\"result\":\"error\",\"description\":\"ñåññèÿ çàêîí÷èëàñü, íåîáõîäèìî âíîâü çàéòè íà ñàéò\"}";
+				ostResult << "{\"result\":\"error\",\"description\":\"ÑÐµÑÑÐ¸Ñ Ð·Ð°ÐºÐ¾Ð½Ñ‡Ð¸Ð»Ð°ÑÑŒ, Ð½ÐµÐ¾Ð±Ñ…Ð¾Ð´Ð¸Ð¼Ð¾ Ð²Ð½Ð¾Ð²ÑŒ Ð·Ð°Ð¹Ñ‚Ð¸ Ð½Ð° ÑÐ°Ð¹Ñ‚\"}";
 			}
 			else
 			{

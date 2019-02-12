@@ -647,7 +647,7 @@ int main(void)
 	}
 
 #ifndef MYSQL_3
-	db.Query("set names cp1251");
+	db.Query("set names utf8;");
 #endif
 
 	indexPage.SetDB(&db);

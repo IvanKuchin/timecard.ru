@@ -1723,11 +1723,11 @@ string GetTaskIDFromAgency(string customer, string project, string task, string 
 		MESSAGE_DEBUG("", "", "start");
 	}
 
-	if(customer.length() && (customer.find("ыберите") == string::npos))
+	if(customer.length() && (customer.find("С‹Р±РµСЂРёС‚Рµ") == string::npos))
 	{
-		if(project.length() && (project.find("ыберите") == string::npos))
+		if(project.length() && (project.find("С‹Р±РµСЂРёС‚Рµ") == string::npos))
 		{
-			if(task.length() && (task.find("ыберите") == string::npos))
+			if(task.length() && (task.find("С‹Р±РµСЂРёС‚Рµ") == string::npos))
 			{
 				if(agency_id.length())
 				{
@@ -1781,11 +1781,11 @@ string GetTaskIDFromSOW(string customer, string project, string task, string sow
 		MESSAGE_DEBUG("", "", "start");
 	}
 
-	if(customer.length() && (customer.find("ыберите") == string::npos))
+	if(customer.length() && (customer.find("С‹Р±РµСЂРёС‚Рµ") == string::npos))
 	{
-		if(project.length() && (project.find("ыберите") == string::npos))
+		if(project.length() && (project.find("С‹Р±РµСЂРёС‚Рµ") == string::npos))
 		{
-			if(task.length() && (task.find("ыберите") == string::npos))
+			if(task.length() && (task.find("С‹Р±РµСЂРёС‚Рµ") == string::npos))
 			{
 				if(sow_id.length())
 				{
@@ -1877,11 +1877,11 @@ string GetTaskAssignmentID(string customer, string project, string task, string 
 		MESSAGE_DEBUG("", "", "start");
 	}
 
-	if(customer.length() && (customer.find("ыберите") == string::npos))
+	if(customer.length() && (customer.find("С‹Р±РµСЂРёС‚Рµ") == string::npos))
 	{
-		if(project.length() && (project.find("ыберите") == string::npos))
+		if(project.length() && (project.find("С‹Р±РµСЂРёС‚Рµ") == string::npos))
 		{
-			if(task.length() && (task.find("ыберите") == string::npos))
+			if(task.length() && (task.find("С‹Р±РµСЂРёС‚Рµ") == string::npos))
 			{
 				if(sow_id.length())
 				{
@@ -1939,11 +1939,11 @@ string CreateTaskBelongsToAgency(string customer, string project, string task, s
 		MESSAGE_DEBUG("", "", "start");
 	}
 
-	if(customer.length() && (customer.find("ыберите") == string::npos))
+	if(customer.length() && (customer.find("С‹Р±РµСЂРёС‚Рµ") == string::npos))
 	{
-		if(project.length() && (project.find("ыберите") == string::npos))
+		if(project.length() && (project.find("С‹Р±РµСЂРёС‚Рµ") == string::npos))
 		{
-			if(task.length() && (task.find("ыберите") == string::npos))
+			if(task.length() && (task.find("С‹Р±РµСЂРёС‚Рµ") == string::npos))
 			{
 				if(agency_id.length())
 				{
@@ -3177,7 +3177,7 @@ string isUserAllowedAccessToBT(string bt_id, CMysql *db, CUser *user)
 			}
 			else
 			{
-				error_message = "У Вас нет доступа";
+				error_message = "РЈ Р’Р°СЃ РЅРµС‚ РґРѕСЃС‚СѓРїР°";
 				MESSAGE_ERROR("", "", "user.id(" + user->GetID() + ") have no access to bt.id(" + bt_id + ")");
 			}
 		}
@@ -3195,7 +3195,7 @@ string isUserAllowedAccessToBT(string bt_id, CMysql *db, CUser *user)
 			}
 			else
 			{
-				error_message = "У Вас нет доступа";
+				error_message = "РЈ Р’Р°СЃ РЅРµС‚ РґРѕСЃС‚СѓРїР°";
 				MESSAGE_ERROR("", "", "user.id(" + user->GetID() + ") have no access to bt.id(" + bt_id + ")");
 			}
 		}
@@ -3212,19 +3212,19 @@ string isUserAllowedAccessToBT(string bt_id, CMysql *db, CUser *user)
 			}
 			else
 			{
-				error_message = "У Вас нет доступа";
+				error_message = "РЈ Р’Р°СЃ РЅРµС‚ РґРѕСЃС‚СѓРїР°";
 				MESSAGE_ERROR("", "", "user.id(" + user->GetID() + ") have no access to bt.id(" + bt_id + ")");
 			}
 		}
 		else
 		{
-			error_message = "Неизвестный тип пользователя";
+			error_message = "РќРµРёР·РІРµСЃС‚РЅС‹Р№ С‚РёРї РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ";
 			MESSAGE_ERROR("", "", "user.id(" + user->GetID() + ") have unknown type(" + user->GetType() + ")");
 		}
 	}
 	else
 	{
-		error_message = "Командировка не найдена";
+		error_message = "РљРѕРјР°РЅРґРёСЂРѕРІРєР° РЅРµ РЅР°Р№РґРµРЅР°";
 		MESSAGE_ERROR("", "", "bt_id is empty");
 	}
 
@@ -3251,19 +3251,19 @@ auto isExpenseTemplateIDValidToRemove(string bt_expense_template_id, CMysql *db)
 			}
 			else
 			{
-				error_message = "На этот расход субконтракторы отчитались " + counter + " раз. Поэтому нельзя удалить.";
+				error_message = "РќР° СЌС‚РѕС‚ СЂР°СЃС…РѕРґ СЃСѓР±РєРѕРЅС‚СЂР°РєС‚РѕСЂС‹ РѕС‚С‡РёС‚Р°Р»РёСЃСЊ " + counter + " СЂР°Р·. РџРѕСЌС‚РѕРјСѓ РЅРµР»СЊР·СЏ СѓРґР°Р»РёС‚СЊ.";
 				MESSAGE_DEBUG("", "", "subcontractors reported " + counter + " times on bt_expense_templates.id(" + bt_expense_template_id + ")");
 			}
 		}
 		else
 		{
-			error_message = "Ошибка БД.";
+			error_message = "РћС€РёР±РєР° Р‘Р”.";
 			MESSAGE_ERROR("", "", "fail in sql-query syntax");
 		}
 	}
 	else
 	{
-		error_message = "Неопределен идентификатор удаляемого шаблона.";
+		error_message = "РќРµРѕРїСЂРµРґРµР»РµРЅ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ СѓРґР°Р»СЏРµРјРѕРіРѕ С€Р°Р±Р»РѕРЅР°.";
 		MESSAGE_ERROR("", "", "bt_expense_template_id is empty");
 	}
 
@@ -3295,31 +3295,31 @@ auto isExpenseTemplateLineIDValidToRemove(string bt_expense_line_template_id, CM
 					}
 					else
 					{
-						error_message = "Этот документ присутствует в " + counter + " отчетных документах. Нельзя удалить.";
+						error_message = "Р­С‚РѕС‚ РґРѕРєСѓРјРµРЅС‚ РїСЂРёСЃСѓС‚СЃС‚РІСѓРµС‚ РІ " + counter + " РѕС‚С‡РµС‚РЅС‹С… РґРѕРєСѓРјРµРЅС‚Р°С…. РќРµР»СЊР·СЏ СѓРґР°Р»РёС‚СЊ.";
 						MESSAGE_DEBUG("", "", "subcontractors reported " + counter + " times on bt_expense_templates.id(" + bt_expense_line_template_id + ")");
 					}
 				}
 				else
 				{
-					error_message = "Ошибка БД.";
+					error_message = "РћС€РёР±РєР° Р‘Р”.";
 					MESSAGE_ERROR("", "", "fail in sql-query syntax");
 				}
 			}
 			else
 			{
-				error_message = "Нельзя удалять единственный документ из расхода.";
+				error_message = "РќРµР»СЊР·СЏ СѓРґР°Р»СЏС‚СЊ РµРґРёРЅСЃС‚РІРµРЅРЅС‹Р№ РґРѕРєСѓРјРµРЅС‚ РёР· СЂР°СЃС…РѕРґР°.";
 				MESSAGE_DEBUG("", "", "Can't remove single bt_expense_line_templates.id(" + bt_expense_line_template_id + ") from BT expense");
 			}
 		}
 		else
 		{
-			error_message = "Ошибка БД.";
+			error_message = "РћС€РёР±РєР° Р‘Р”.";
 			MESSAGE_ERROR("", "", "fail in sql-query syntax");
 		}
 	}
 	else
 	{
-		error_message = "Некорректные параметры.";
+		error_message = "РќРµРєРѕСЂСЂРµРєС‚РЅС‹Рµ РїР°СЂР°РјРµС‚СЂС‹.";
 		MESSAGE_ERROR("", "", "bt_expense_line_template_id is empty");
 	}
 
@@ -3367,37 +3367,37 @@ auto isTaskIDValidToRemove(string task_id, CMysql *db) -> string
 						else
 						{
 							MESSAGE_ERROR("", "", "fail in sql-query syntax");
-							error_message = "Ошибка БД.";
+							error_message = "РћС€РёР±РєР° Р‘Р”.";
 						}
 					}
 					else
 					{
 						MESSAGE_DEBUG("", "", counter + "subcontractors assigned on task.id(" + task_id + ")");
-						error_message = "Эта задача назначена " + counter + " субконтракторам. Поэтому нельзя удалить.";
+						error_message = "Р­С‚Р° Р·Р°РґР°С‡Р° РЅР°Р·РЅР°С‡РµРЅР° " + counter + " СЃСѓР±РєРѕРЅС‚СЂР°РєС‚РѕСЂР°Рј. РџРѕСЌС‚РѕРјСѓ РЅРµР»СЊР·СЏ СѓРґР°Р»РёС‚СЊ.";
 					}
 				}
 				else
 				{
 					MESSAGE_ERROR("", "", "fail in sql-query syntax");
-					error_message = "Ошибка БД.";
+					error_message = "РћС€РёР±РєР° Р‘Р”.";
 				}
 			}
 			else
 			{
 				MESSAGE_DEBUG("", "", "subcontractors reported " + counter + " times on task.id(" + task_id + ")");
-				error_message = "На эту задачу субконтракторы отчитались. Поэтому нельзя удалить.";
+				error_message = "РќР° СЌС‚Сѓ Р·Р°РґР°С‡Сѓ СЃСѓР±РєРѕРЅС‚СЂР°РєС‚РѕСЂС‹ РѕС‚С‡РёС‚Р°Р»РёСЃСЊ. РџРѕСЌС‚РѕРјСѓ РЅРµР»СЊР·СЏ СѓРґР°Р»РёС‚СЊ.";
 			}
 		}
 		else
 		{
 			MESSAGE_ERROR("", "", "fail in sql-query syntax");
-			error_message = "Ошибка БД.";
+			error_message = "РћС€РёР±РєР° Р‘Р”.";
 		}
 	}
 	else
 	{
 		MESSAGE_ERROR("", "", "task_id is empty");
-		error_message = "Задача не найдена";
+		error_message = "Р—Р°РґР°С‡Р° РЅРµ РЅР°Р№РґРµРЅР°";
 	}
 
 
@@ -3420,7 +3420,7 @@ string isEmployeeIDValidToRemove(string employee_id, CMysql *db)
 
 			if(db->Query("SELECT `id` FROM `company` WHERE `admin_userID`=\"" + user_id + "\";"))
 			{
-				error_message = "Нельзя уволить владельца компании";
+				error_message = "РќРµР»СЊР·СЏ СѓРІРѕР»РёС‚СЊ РІР»Р°РґРµР»СЊС†Р° РєРѕРјРїР°РЅРёРё";
 				MESSAGE_DEBUG("", "", "company_employee.id(" + employee_id + ") is the company.id(" + db->Get(0, "id") + ") owner. He can't be fired.");
 			}
 			else
@@ -3430,13 +3430,13 @@ string isEmployeeIDValidToRemove(string employee_id, CMysql *db)
 		}
 		else
 		{
-			error_message = "Сотрудник не найден";
+			error_message = "РЎРѕС‚СЂСѓРґРЅРёРє РЅРµ РЅР°Р№РґРµРЅ";
 			MESSAGE_DEBUG("", "", "employee.id(" + employee_id + ") not found");
 		}
 	}
 	else
 	{
-		error_message = "Сотрудник не найден";
+		error_message = "РЎРѕС‚СЂСѓРґРЅРёРє РЅРµ РЅР°Р№РґРµРЅ";
 		MESSAGE_ERROR("", "", "employee_id is empty");
 	}
 
@@ -3569,7 +3569,7 @@ static string	isTimeReportedOnTaskIDBeyondPeriod(string task_id, string start, s
 		}
 		else
 		{
-			error_message = "Некрректный формат даты начала (" + start + ")";
+			error_message = "РќРµРєСЂСЂРµРєС‚РЅС‹Р№ С„РѕСЂРјР°С‚ РґР°С‚С‹ РЅР°С‡Р°Р»Р° (" + start + ")";
 			MESSAGE_ERROR("", "", "incorrect start date(" + start + ") format");
 		}
 
@@ -3583,7 +3583,7 @@ static string	isTimeReportedOnTaskIDBeyondPeriod(string task_id, string start, s
 			{
 				// --- placeholder for precise check
 				
-				error_message = "Невозможно сдвинуть дату, поскольку существует таймкарта с отчетным периодом раньше выбранной.";
+				error_message = "РќРµРІРѕР·РјРѕР¶РЅРѕ СЃРґРІРёРЅСѓС‚СЊ РґР°С‚Сѓ, РїРѕСЃРєРѕР»СЊРєСѓ СЃСѓС‰РµСЃС‚РІСѓРµС‚ С‚Р°Р№РјРєР°СЂС‚Р° СЃ РѕС‚С‡РµС‚РЅС‹Рј РїРµСЂРёРѕРґРѕРј СЂР°РЅСЊС€Рµ РІС‹Р±СЂР°РЅРЅРѕР№.";
 				MESSAGE_DEBUG("", "", "Can't change period_start to " + start_year + "-" + start_month + "-" + start_date + ", due to exists timecard.id(" + db->Get(0, "timecard_id") + ") with earlier reporting period");
 			}
 		}
@@ -3611,7 +3611,7 @@ static string	isTimeReportedOnTaskIDBeyondPeriod(string task_id, string start, s
 		}
 		else
 		{
-			error_message = "Некрректный формат даты окончания (" + end + ")";
+			error_message = "РќРµРєСЂСЂРµРєС‚РЅС‹Р№ С„РѕСЂРјР°С‚ РґР°С‚С‹ РѕРєРѕРЅС‡Р°РЅРёСЏ (" + end + ")";
 			MESSAGE_ERROR("", "", "incorrect end date(" + end + ") format");
 		}
 
@@ -3625,7 +3625,7 @@ static string	isTimeReportedOnTaskIDBeyondPeriod(string task_id, string start, s
 			{
 				// --- placeholder for precise check
 				
-				error_message = "Невозможно сдвинуть дату, поскольку существует таймкарта с отчетным периодом позднее выбранной.";
+				error_message = "РќРµРІРѕР·РјРѕР¶РЅРѕ СЃРґРІРёРЅСѓС‚СЊ РґР°С‚Сѓ, РїРѕСЃРєРѕР»СЊРєСѓ СЃСѓС‰РµСЃС‚РІСѓРµС‚ С‚Р°Р№РјРєР°СЂС‚Р° СЃ РѕС‚С‡РµС‚РЅС‹Рј РїРµСЂРёРѕРґРѕРј РїРѕР·РґРЅРµРµ РІС‹Р±СЂР°РЅРЅРѕР№.";
 				MESSAGE_DEBUG("", "", "Can't change period_end to " + end_year + "-" + end_month + "-" + end_date + ", due to exists timecard.id(" + db->Get(0, "timecard_id") + ") with later reporting period");
 			}
 		}
@@ -3740,44 +3740,44 @@ string	isValidToReportTime(string timecard_id, string task_id, string timereport
 							}
 							else
 							{
-								error_message = "Вы не можете отчитываться на задачу. Задача( с " + PrintDate(available_reporting_start) + " по " + PrintDate(available_reporting_end) + "), Ваш отчет( с " + PrintDate(reporting_timeframe_start_date) + " по " + PrintDate(reporting_timeframe_end_date) + ")";
+								error_message = "Р’С‹ РЅРµ РјРѕР¶РµС‚Рµ РѕС‚С‡РёС‚С‹РІР°С‚СЊСЃСЏ РЅР° Р·Р°РґР°С‡Сѓ. Р—Р°РґР°С‡Р°( СЃ " + PrintDate(available_reporting_start) + " РїРѕ " + PrintDate(available_reporting_end) + "), Р’Р°С€ РѕС‚С‡РµС‚( СЃ " + PrintDate(reporting_timeframe_start_date) + " РїРѕ " + PrintDate(reporting_timeframe_end_date) + ")";
 								MESSAGE_ERROR("", "", "Can't report to task_id(" + task_id + "). Available reporting period(" + PrintDate(available_reporting_start) + " - " + PrintDate(available_reporting_end) + "), timereport(" + PrintDate(reporting_timeframe_start_date) + " - " + PrintDate(reporting_timeframe_end_date) + ")");
 							}
 						}
 						else
 						{
-							error_message = "Задача не активна в данном контракте. Задача( с " + PrintDate(task_start_date) + " по " + PrintDate(task_end_date) + "), догвор( с " + PrintDate(sow_start_date) + " по " + PrintDate(sow_end_date) + ")";
+							error_message = "Р—Р°РґР°С‡Р° РЅРµ Р°РєС‚РёРІРЅР° РІ РґР°РЅРЅРѕРј РєРѕРЅС‚СЂР°РєС‚Рµ. Р—Р°РґР°С‡Р°( СЃ " + PrintDate(task_start_date) + " РїРѕ " + PrintDate(task_end_date) + "), РґРѕРіРІРѕСЂ( СЃ " + PrintDate(sow_start_date) + " РїРѕ " + PrintDate(sow_end_date) + ")";
 							MESSAGE_ERROR("", "", "task_id(" + task_id + ") not active in sow_id(" + sow_id + "). Task(" + PrintDate(task_start_date) + " - " + PrintDate(task_end_date) + "), sow(" + PrintDate(sow_start_date) + " - " + PrintDate(sow_end_date) + ")");
 						}
 					}
 					else
 					{
-						error_message = "Начало Вашего отчета(" + PrintDate(reporting_timeframe_start_date) + ") позднее окончания(" + PrintDate(reporting_timeframe_end_date) + ")";
+						error_message = "РќР°С‡Р°Р»Рѕ Р’Р°С€РµРіРѕ РѕС‚С‡РµС‚Р°(" + PrintDate(reporting_timeframe_start_date) + ") РїРѕР·РґРЅРµРµ РѕРєРѕРЅС‡Р°РЅРёСЏ(" + PrintDate(reporting_timeframe_end_date) + ")";
 						MESSAGE_ERROR("", "", "reporting start (" + PrintDate(reporting_timeframe_start_date) + ") later than finish(" + PrintDate(reporting_timeframe_end_date) + ")");
 					}
 				}
 				else
 				{
-					error_message = "Ваш отчет содержит " + to_string(timeentry.size()) + " дней, хотя ожидается " + to_string(round(difftime(mktime(&timecard_end_date), mktime(&timecard_start_date)) / 3600 / 24) + 1);
+					error_message = "Р’Р°С€ РѕС‚С‡РµС‚ СЃРѕРґРµСЂР¶РёС‚ " + to_string(timeentry.size()) + " РґРЅРµР№, С…РѕС‚СЏ РѕР¶РёРґР°РµС‚СЃСЏ " + to_string(round(difftime(mktime(&timecard_end_date), mktime(&timecard_start_date)) / 3600 / 24) + 1);
 					MESSAGE_ERROR("", "", "timecard_id(" + timecard_id + ") size(" + to_string(round(difftime(mktime(&timecard_end_date), mktime(&timecard_start_date)) / 3600 / 24) + 1) + ") differ in size from reported timeentry(" + timereport + ") size (" + to_string(timeentry.size()) + ")");
 				}
 			}
 			else
 			{
 				MESSAGE_ERROR("", "", "task_assignment(task_id/sow_id - " + task_id + "/" + sow_id + ") start and end period can't be defined");
-				error_message = "Вы не назначены на задачу";
+				error_message = "Р’С‹ РЅРµ РЅР°Р·РЅР°С‡РµРЅС‹ РЅР° Р·Р°РґР°С‡Сѓ";
 			}
 
 		}
 		else
 		{
 			MESSAGE_ERROR("", "", "sow(" + sow_id + ") start and end period can't be defined");
-			error_message = "Не найден договор";
+			error_message = "РќРµ РЅР°Р№РґРµРЅ РґРѕРіРѕРІРѕСЂ";
 		}
 	}
 	else
 	{
-		error_message = "Тамкарты нет в БД";
+		error_message = "РўР°РјРєР°СЂС‚С‹ РЅРµС‚ РІ Р‘Р”";
 		MESSAGE_ERROR("", "", "fail to find timecard.id(" + timecard_id + ") in db");
 	}
 
@@ -3840,7 +3840,7 @@ string	ResubmitEntitiesByAction(string action, string id, string sow_id, string 
 						}
 						else
 						{
-							error_message = "Не указан номер договора";
+							error_message = "РќРµ СѓРєР°Р·Р°РЅ РЅРѕРјРµСЂ РґРѕРіРѕРІРѕСЂР°";
 							MESSAGE_ERROR("", "", "sow.id is empty")
 						}
 					}
@@ -3871,32 +3871,32 @@ string	ResubmitEntitiesByAction(string action, string id, string sow_id, string 
 						}
 						else
 						{
-							error_message = "Не указан номер договора";
+							error_message = "РќРµ СѓРєР°Р·Р°РЅ РЅРѕРјРµСЂ РґРѕРіРѕРІРѕСЂР°";
 							MESSAGE_ERROR("", "", "sow.id is empty")
 						}
 					}
 					else
 					{
-						error_message = "Неизвестное действие";
+						error_message = "РќРµРёР·РІРµСЃС‚РЅРѕРµ РґРµР№СЃС‚РІРёРµ";
 						MESSAGE_ERROR("", "", "unknown action (" + action + ")");
 					}
 
 			}
 			else
 			{
-				error_message = "Новое значение некорректно";
+				error_message = "РќРѕРІРѕРµ Р·РЅР°С‡РµРЅРёРµ РЅРµРєРѕСЂСЂРµРєС‚РЅРѕ";
 				MESSAGE_ERROR("", "", "new_value is empty");
 			}
 		}
 		else
 		{
-			error_message = "Неизвестное действие";
+			error_message = "РќРµРёР·РІРµСЃС‚РЅРѕРµ РґРµР№СЃС‚РІРёРµ";
 			MESSAGE_ERROR("", "", "action is empty");
 		}
 	}
 	else
 	{
-		error_message = "Неизвестный идентификатор поля";
+		error_message = "РќРµРёР·РІРµСЃС‚РЅС‹Р№ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РїРѕР»СЏ";
 		MESSAGE_ERROR("", "", "id is empty");
 	}
 
@@ -4100,7 +4100,7 @@ string	SetNewValueByAction(string action, string id, string sow_id, string new_v
 							db->Query(sql_query);
 							if(db->isError())
 							{
-								error_message = "Ошибка БД";
+								error_message = "РћС€РёР±РєР° Р‘Р”";
 								MESSAGE_ERROR("", "", "sql_query has failed (" + db->GetErrorMessage() + ")");
 							}
 							else
@@ -4110,26 +4110,26 @@ string	SetNewValueByAction(string action, string id, string sow_id, string new_v
 						}
 						else
 						{
-							error_message = "Неизвестное действие";
+							error_message = "РќРµРёР·РІРµСЃС‚РЅРѕРµ РґРµР№СЃС‚РІРёРµ";
 							MESSAGE_ERROR("", "", "unknown action (" + action + ")");
 						}
 					}
 				}
 				else
 				{
-					error_message = "Новое значен некорректно";
+					error_message = "РќРѕРІРѕРµ Р·РЅР°С‡РµРЅ РЅРµРєРѕСЂСЂРµРєС‚РЅРѕ";
 					MESSAGE_ERROR("", "", "new_value is empty");
 				}
 			}
 			else
 			{
-				error_message = "Неизвестное действие";
+				error_message = "РќРµРёР·РІРµСЃС‚РЅРѕРµ РґРµР№СЃС‚РІРёРµ";
 				MESSAGE_ERROR("", "", "action is empty");
 			}
 		}
 		else
 		{
-			error_message = "Неизвестный идентификатор поля";
+			error_message = "РќРµРёР·РІРµСЃС‚РЅС‹Р№ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РїРѕР»СЏ";
 			MESSAGE_ERROR("", "", "id is empty");
 		}
 	}
@@ -4363,7 +4363,7 @@ auto	GetSpelledTimecardTaskAssignmentByID(string id, CMysql *db) -> string
 		struct tm	period_end = GetTMObject(db->Get(0, "period_end"));
 		string		task_id = db->Get(0, "timecard_tasks_id");
 
-		result = GetSpelledTimecardTaskByID(task_id, db) + " c " + PrintTime(period_start, RU_DATE_FORMAT) + " по " + PrintTime(period_end, RU_DATE_FORMAT);
+		result = GetSpelledTimecardTaskByID(task_id, db) + " c " + PrintTime(period_start, RU_DATE_FORMAT) + " РїРѕ " + PrintTime(period_end, RU_DATE_FORMAT);
 	}
 	else
 	{
@@ -4580,7 +4580,7 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 
 	if(action == "AJAX_updateCustomerTitle") 	
 	{
-		notification_description = "Данные таймкарты: изменилось название заказчика " + existing_value + " -> " + new_value;
+		notification_description = "Р”Р°РЅРЅС‹Рµ С‚Р°Р№РјРєР°СЂС‚С‹: РёР·РјРµРЅРёР»РѕСЃСЊ РЅР°Р·РІР°РЅРёРµ Р·Р°РєР°Р·С‡РёРєР° " + existing_value + " -> " + new_value;
 		sql_query = "SELECT DISTINCT `contract_sow_id` FROM `timecard_task_assignment` WHERE `timecard_tasks_id` IN ("
 						"SELECT `id` FROM `timecard_tasks` WHERE `timecard_projects_id` IN ("
 							"SELECT `id` FROM `timecard_projects` WHERE `timecard_customers_id`=\"" + id + "\""
@@ -4589,69 +4589,69 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 	}
 	if(action == "AJAX_updateProjectTitle") 	
 	{
-		notification_description = "Данные таймкарты: изменилось название проекта " + existing_value + " -> " + new_value + ". Полная информация: " + GetSpelledTimecardProjectByID(id, db);
+		notification_description = "Р”Р°РЅРЅС‹Рµ С‚Р°Р№РјРєР°СЂС‚С‹: РёР·РјРµРЅРёР»РѕСЃСЊ РЅР°Р·РІР°РЅРёРµ РїСЂРѕРµРєС‚Р° " + existing_value + " -> " + new_value + ". РџРѕР»РЅР°СЏ РёРЅС„РѕСЂРјР°С†РёСЏ: " + GetSpelledTimecardProjectByID(id, db);
 		sql_query = "SELECT DISTINCT `contract_sow_id` FROM `timecard_task_assignment` WHERE `timecard_tasks_id` IN ("
 						"SELECT `id` FROM `timecard_tasks` WHERE `timecard_projects_id`=\"" + id + "\""
 					");";
 	}
 	if(action == "AJAX_updateTaskTitle") 		
 	{
-		notification_description = "Данные таймкарты: изменилось название задачи " + existing_value + " -> " + new_value + ". Полная информация: " + GetSpelledTimecardTaskByID(id, db);
+		notification_description = "Р”Р°РЅРЅС‹Рµ С‚Р°Р№РјРєР°СЂС‚С‹: РёР·РјРµРЅРёР»РѕСЃСЊ РЅР°Р·РІР°РЅРёРµ Р·Р°РґР°С‡Рё " + existing_value + " -> " + new_value + ". РџРѕР»РЅР°СЏ РёРЅС„РѕСЂРјР°С†РёСЏ: " + GetSpelledTimecardTaskByID(id, db);
 		sql_query = "SELECT DISTINCT `contract_sow_id` FROM `timecard_task_assignment` WHERE `timecard_tasks_id`=\"" + id + "\";";
 	}
 	if(action == "AJAX_addTaskAssignment")
 	{
-		notification_description = "Данные таймкарты: добавили назначение на задачу " + new_value + ".";
+		notification_description = "Р”Р°РЅРЅС‹Рµ С‚Р°Р№РјРєР°СЂС‚С‹: РґРѕР±Р°РІРёР»Рё РЅР°Р·РЅР°С‡РµРЅРёРµ РЅР° Р·Р°РґР°С‡Сѓ " + new_value + ".";
 		sql_query = "SELECT DISTINCT `contract_sow_id` FROM `timecard_task_assignment` WHERE `id`=\"" + id + "\";";
 	}
 	if(action == "AJAX_updatePeriodStart") 		
 	{
-		notification_description = "Данные таймкарты: изменилась дата начала работы над задачей " + existing_value + " -> " + new_value + ". Полная информация: " + GetSpelledTimecardTaskAssignmentByID(id, db);
+		notification_description = "Р”Р°РЅРЅС‹Рµ С‚Р°Р№РјРєР°СЂС‚С‹: РёР·РјРµРЅРёР»Р°СЃСЊ РґР°С‚Р° РЅР°С‡Р°Р»Р° СЂР°Р±РѕС‚С‹ РЅР°Рґ Р·Р°РґР°С‡РµР№ " + existing_value + " -> " + new_value + ". РџРѕР»РЅР°СЏ РёРЅС„РѕСЂРјР°С†РёСЏ: " + GetSpelledTimecardTaskAssignmentByID(id, db);
 		sql_query = "SELECT DISTINCT `contract_sow_id` FROM `timecard_task_assignment` WHERE `id`=\"" + id + "\";";
 	}
 	if(action == "AJAX_updatePeriodEnd") 		
 	{
-		notification_description = "Данные таймкарты: изменилась дата окончания работы над задачей " + existing_value + " -> " + new_value + ". Полная информация: " + GetSpelledTimecardTaskAssignmentByID(id, db);
+		notification_description = "Р”Р°РЅРЅС‹Рµ С‚Р°Р№РјРєР°СЂС‚С‹: РёР·РјРµРЅРёР»Р°СЃСЊ РґР°С‚Р° РѕРєРѕРЅС‡Р°РЅРёСЏ СЂР°Р±РѕС‚С‹ РЅР°Рґ Р·Р°РґР°С‡РµР№ " + existing_value + " -> " + new_value + ". РџРѕР»РЅР°СЏ РёРЅС„РѕСЂРјР°С†РёСЏ: " + GetSpelledTimecardTaskAssignmentByID(id, db);
 		sql_query = "SELECT DISTINCT `contract_sow_id` FROM `timecard_task_assignment` WHERE `id`=\"" + id + "\";";
 	}
 	if(action == "AJAX_deleteTaskAssignment")
 	{
-		notification_description = "Данные таймкарты: удалено назначение на задачу " + GetSpelledTimecardTaskAssignmentByID(id, db) + ".";
+		notification_description = "Р”Р°РЅРЅС‹Рµ С‚Р°Р№РјРєР°СЂС‚С‹: СѓРґР°Р»РµРЅРѕ РЅР°Р·РЅР°С‡РµРЅРёРµ РЅР° Р·Р°РґР°С‡Сѓ " + GetSpelledTimecardTaskAssignmentByID(id, db) + ".";
 		sql_query = "SELECT DISTINCT `contract_sow_id` FROM `timecard_task_assignment` WHERE `id`=\"" + id + "\";";
 	}
 	if(action == "AJAX_deleteBTExpenseAssignment")
 	{
-		notification_description = "Данные командировки: удалено возмещение расхода " + GetSpelledBTExpenseTemplateByAssignmentID(id, db) + " из SoW(" + GetSpelledSoWByID(sow_id, db) + ").";
+		notification_description = "Р”Р°РЅРЅС‹Рµ РєРѕРјР°РЅРґРёСЂРѕРІРєРё: СѓРґР°Р»РµРЅРѕ РІРѕР·РјРµС‰РµРЅРёРµ СЂР°СЃС…РѕРґР° " + GetSpelledBTExpenseTemplateByAssignmentID(id, db) + " РёР· SoW(" + GetSpelledSoWByID(sow_id, db) + ").";
 		sql_query = "SELECT DISTINCT `sow_id` AS `contract_sow_id` FROM `bt_sow_assignment` WHERE `id`=\"" + id + "\";";
 	}
 	if(action == "AJAX_addTask")
 	{
-		notification_description = "Данные таймкарты: добавили новую задачу (" + new_value + "). Полная информация: " + GetSpelledTimecardTaskByID(id, db);
+		notification_description = "Р”Р°РЅРЅС‹Рµ С‚Р°Р№РјРєР°СЂС‚С‹: РґРѕР±Р°РІРёР»Рё РЅРѕРІСѓСЋ Р·Р°РґР°С‡Сѓ (" + new_value + "). РџРѕР»РЅР°СЏ РёРЅС„РѕСЂРјР°С†РёСЏ: " + GetSpelledTimecardTaskByID(id, db);
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 	if(action == "AJAX_deleteTask")
 	{
-		notification_description = "Данные таймкарты: удалили задачу " + GetSpelledTimecardTaskByID(id, db);
+		notification_description = "Р”Р°РЅРЅС‹Рµ С‚Р°Р№РјРєР°СЂС‚С‹: СѓРґР°Р»РёР»Рё Р·Р°РґР°С‡Сѓ " + GetSpelledTimecardTaskByID(id, db);
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 	if(action == "AJAX_deleteProject")
 	{
-		notification_description = "Данные таймкарты: удалили проект " + GetSpelledTimecardProjectByID(id, db);
+		notification_description = "Р”Р°РЅРЅС‹Рµ С‚Р°Р№РјРєР°СЂС‚С‹: СѓРґР°Р»РёР»Рё РїСЂРѕРµРєС‚ " + GetSpelledTimecardProjectByID(id, db);
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 	if(action == "AJAX_deleteCustomer")
 	{
-		notification_description = "Данные таймкарты: удалили заказчика " + GetSpelledTimecardCustomerByID(id, db);
+		notification_description = "Р”Р°РЅРЅС‹Рµ С‚Р°Р№РјРєР°СЂС‚С‹: СѓРґР°Р»РёР»Рё Р·Р°РєР°Р·С‡РёРєР° " + GetSpelledTimecardCustomerByID(id, db);
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 	if(action == "AJAX_deleteEmployee")
 	{
-		notification_description = "Данные компании: уволили " + GetSpelledEmployeeByID(id, db);
+		notification_description = "Р”Р°РЅРЅС‹Рµ РєРѕРјРїР°РЅРёРё: СѓРІРѕР»РёР»Рё " + GetSpelledEmployeeByID(id, db);
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 	if(action == "AJAX_updateCompanyTitle")
 	{
-		notification_description = "Данные компании: Название компании " + existing_value + " изменилось на " + new_value;
+		notification_description = "Р”Р°РЅРЅС‹Рµ РєРѕРјРїР°РЅРёРё: РќР°Р·РІР°РЅРёРµ РєРѕРјРїР°РЅРёРё " + existing_value + " РёР·РјРµРЅРёР»РѕСЃСЊ РЅР° " + new_value;
 		if(user->GetType() == "agency")
 			sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `agency_company_id`=\"" + id + "\";";
 		else if(user->GetType() == "subcontractor")
@@ -4663,7 +4663,7 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 	}
 	if(action == "AJAX_updateCompanyDescription")
 	{
-		notification_description = "Данные компании: Описание компании изменилось на " + new_value;
+		notification_description = "Р”Р°РЅРЅС‹Рµ РєРѕРјРїР°РЅРёРё: РћРїРёСЃР°РЅРёРµ РєРѕРјРїР°РЅРёРё РёР·РјРµРЅРёР»РѕСЃСЊ РЅР° " + new_value;
 		if(user->GetType() == "agency")
 			sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `agency_company_id`=\"" + id + "\";";
 		else if(user->GetType() == "subcontractor")
@@ -4675,7 +4675,7 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 	}
 	if(action == "AJAX_updateCompanyWebSite")
 	{
-		notification_description = "Данные компании: Web-сайт компании " + existing_value + " изменился на " + new_value;
+		notification_description = "Р”Р°РЅРЅС‹Рµ РєРѕРјРїР°РЅРёРё: Web-СЃР°Р№С‚ РєРѕРјРїР°РЅРёРё " + existing_value + " РёР·РјРµРЅРёР»СЃСЏ РЅР° " + new_value;
 		if(user->GetType() == "agency")
 			sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `agency_company_id`=\"" + id + "\";";
 		else if(user->GetType() == "subcontractor")
@@ -4687,7 +4687,7 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 	}
 	if(action == "AJAX_updateCompanyTIN")
 	{
-		notification_description = "Данные компании: ИНН компании " + existing_value + " изменился на " + new_value;
+		notification_description = "Р”Р°РЅРЅС‹Рµ РєРѕРјРїР°РЅРёРё: РРќРќ РєРѕРјРїР°РЅРёРё " + existing_value + " РёР·РјРµРЅРёР»СЃСЏ РЅР° " + new_value;
 		if(user->GetType() == "agency")
 			sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `agency_company_id`=\"" + id + "\";";
 		else if(user->GetType() == "subcontractor")
@@ -4699,7 +4699,7 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 	}
 	if(action == "AJAX_updateCompanyAccount")
 	{
-		notification_description = "Данные компании: Р/C компании " + existing_value + " изменился на " + new_value;
+		notification_description = "Р”Р°РЅРЅС‹Рµ РєРѕРјРїР°РЅРёРё: Р /C РєРѕРјРїР°РЅРёРё " + existing_value + " РёР·РјРµРЅРёР»СЃСЏ РЅР° " + new_value;
 		if(user->GetType() == "agency")
 			sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `agency_company_id`=\"" + id + "\";";
 		else if(user->GetType() == "subcontractor")
@@ -4711,7 +4711,7 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 	}
 	if(action == "AJAX_updateCompanyOGRN")
 	{
-		notification_description = "Данные компании: ОГРН компании " + existing_value + " изменился на " + new_value;
+		notification_description = "Р”Р°РЅРЅС‹Рµ РєРѕРјРїР°РЅРёРё: РћР“Р Рќ РєРѕРјРїР°РЅРёРё " + existing_value + " РёР·РјРµРЅРёР»СЃСЏ РЅР° " + new_value;
 		if(user->GetType() == "agency")
 			sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `agency_company_id`=\"" + id + "\";";
 		else if(user->GetType() == "subcontractor")
@@ -4723,7 +4723,7 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 	}
 	if(action == "AJAX_updateCompanyKPP")
 	{
-		notification_description = "Данные компании: КПП компании " + existing_value + " изменился на " + new_value;
+		notification_description = "Р”Р°РЅРЅС‹Рµ РєРѕРјРїР°РЅРёРё: РљРџРџ РєРѕРјРїР°РЅРёРё " + existing_value + " РёР·РјРµРЅРёР»СЃСЏ РЅР° " + new_value;
 		if(user->GetType() == "agency")
 			sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `agency_company_id`=\"" + id + "\";";
 		else if(user->GetType() == "subcontractor")
@@ -4735,7 +4735,7 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 	}
 	if(action == "AJAX_updateCompanyLegalAddress")
 	{
-		notification_description = "Данные компании: Юр. адрес компании " + existing_value + " изменился на " + new_value;
+		notification_description = "Р”Р°РЅРЅС‹Рµ РєРѕРјРїР°РЅРёРё: Р®СЂ. Р°РґСЂРµСЃ РєРѕРјРїР°РЅРёРё " + existing_value + " РёР·РјРµРЅРёР»СЃСЏ РЅР° " + new_value;
 		if(user->GetType() == "agency")
 			sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `agency_company_id`=\"" + id + "\";";
 		else if(user->GetType() == "subcontractor")
@@ -4747,7 +4747,7 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 	}
 	if(action == "AJAX_updateCompanyMailingAddress")
 	{
-		notification_description = "Данные компании: Фактический адрес компании " + existing_value + " изменился на " + new_value;
+		notification_description = "Р”Р°РЅРЅС‹Рµ РєРѕРјРїР°РЅРёРё: Р¤Р°РєС‚РёС‡РµСЃРєРёР№ Р°РґСЂРµСЃ РєРѕРјРїР°РЅРёРё " + existing_value + " РёР·РјРµРЅРёР»СЃСЏ РЅР° " + new_value;
 		if(user->GetType() == "agency")
 			sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `agency_company_id`=\"" + id + "\";";
 		else if(user->GetType() == "subcontractor")
@@ -4764,17 +4764,17 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 	}
 	if(action == "AJAX_updateAgencyEditCapability")
 	{
-		notification_description = "Данные сотрудника: " + GetSpelledEmployeeByID(id, db) + (new_value == "N" ? " не" : "") + " может менять данные агенства";
+		notification_description = "Р”Р°РЅРЅС‹Рµ СЃРѕС‚СЂСѓРґРЅРёРєР°: " + GetSpelledEmployeeByID(id, db) + (new_value == "N" ? " РЅРµ" : "") + " РјРѕР¶РµС‚ РјРµРЅСЏС‚СЊ РґР°РЅРЅС‹Рµ Р°РіРµРЅСЃС‚РІР°";
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 	if(action == "AJAX_updateSoWEditCapability")
 	{
-		notification_description = "Данные сотрудника: " + GetSpelledEmployeeByID(id, db) + (new_value == "N" ? " не" : "") + " может менять SoW";
+		notification_description = "Р”Р°РЅРЅС‹Рµ СЃРѕС‚СЂСѓРґРЅРёРєР°: " + GetSpelledEmployeeByID(id, db) + (new_value == "N" ? " РЅРµ" : "") + " РјРѕР¶РµС‚ РјРµРЅСЏС‚СЊ SoW";
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 	if(action == "AJAX_updateCompanyMailingZipID")
 	{
-		notification_description = "Данные компании: Изменился фактический адрес компании с " + GetSpelledZIPByID(existing_value, db) + " на " + GetSpelledZIPByID(new_value, db);
+		notification_description = "Р”Р°РЅРЅС‹Рµ РєРѕРјРїР°РЅРёРё: РР·РјРµРЅРёР»СЃСЏ С„Р°РєС‚РёС‡РµСЃРєРёР№ Р°РґСЂРµСЃ РєРѕРјРїР°РЅРёРё СЃ " + GetSpelledZIPByID(existing_value, db) + " РЅР° " + GetSpelledZIPByID(new_value, db);
 		if(user->GetType() == "agency")
 			sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `agency_company_id`=\"" + id + "\";";
 		else if(user->GetType() == "subcontractor")
@@ -4786,7 +4786,7 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 	}
 	if(action == "AJAX_updateCompanyLegalZipID")
 	{
-		notification_description = "Данные компании: Изменился юридический адрес компании с " + GetSpelledZIPByID(existing_value, db) + " на " + GetSpelledZIPByID(new_value, db);
+		notification_description = "Р”Р°РЅРЅС‹Рµ РєРѕРјРїР°РЅРёРё: РР·РјРµРЅРёР»СЃСЏ СЋСЂРёРґРёС‡РµСЃРєРёР№ Р°РґСЂРµСЃ РєРѕРјРїР°РЅРёРё СЃ " + GetSpelledZIPByID(existing_value, db) + " РЅР° " + GetSpelledZIPByID(new_value, db);
 		if(user->GetType() == "agency")
 			sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `agency_company_id`=\"" + id + "\";";
 		else if(user->GetType() == "subcontractor")
@@ -4798,7 +4798,7 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 	}
 	if(action == "AJAX_updateCompanyBankID")
 	{
-		notification_description = "Данные компании: Изменился банк компании с " + GetSpelledBankByID(existing_value, db) + " на " + GetSpelledBankByID(new_value, db);
+		notification_description = "Р”Р°РЅРЅС‹Рµ РєРѕРјРїР°РЅРёРё: РР·РјРµРЅРёР»СЃСЏ Р±Р°РЅРє РєРѕРјРїР°РЅРёРё СЃ " + GetSpelledBankByID(existing_value, db) + " РЅР° " + GetSpelledBankByID(new_value, db);
 		if(user->GetType() == "agency")
 			sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `agency_company_id`=\"" + id + "\";";
 		else if(user->GetType() == "subcontractor")
@@ -4810,47 +4810,47 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 	}
 	if(action == "AJAX_addTimecardApproverToSoW")
 	{
-		notification_description = "Данные таймкарты: Добавили нового утвердителя " + GetSpelledUserNameByID(new_value, db) + "  (SoW " + GetSpelledSoWByID(sow_id, db) + ")";
+		notification_description = "Р”Р°РЅРЅС‹Рµ С‚Р°Р№РјРєР°СЂС‚С‹: Р”РѕР±Р°РІРёР»Рё РЅРѕРІРѕРіРѕ СѓС‚РІРµСЂРґРёС‚РµР»СЏ " + GetSpelledUserNameByID(new_value, db) + "  (SoW " + GetSpelledSoWByID(sow_id, db) + ")";
 		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 	}
 	if(action == "AJAX_addBTExpenseApproverToSoW")
 	{
-		notification_description = "Данные командировки: Добавили нового утвердителя " + GetSpelledUserNameByID(new_value, db) + "  (SoW " + GetSpelledSoWByID(sow_id, db) + ")";
+		notification_description = "Р”Р°РЅРЅС‹Рµ РєРѕРјР°РЅРґРёСЂРѕРІРєРё: Р”РѕР±Р°РІРёР»Рё РЅРѕРІРѕРіРѕ СѓС‚РІРµСЂРґРёС‚РµР»СЏ " + GetSpelledUserNameByID(new_value, db) + "  (SoW " + GetSpelledSoWByID(sow_id, db) + ")";
 		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 	}
 	if(action == "AJAX_deleteTimecardApproverFromSoW")
 	{
-		notification_description = "Данные таймкарты: Удалили утвердителя таймкарт " + GetSpelledTimecardApproverNameByID(id, db) + "  (SoW " + GetSpelledSoWByID(sow_id, db) + ")";
+		notification_description = "Р”Р°РЅРЅС‹Рµ С‚Р°Р№РјРєР°СЂС‚С‹: РЈРґР°Р»РёР»Рё СѓС‚РІРµСЂРґРёС‚РµР»СЏ С‚Р°Р№РјРєР°СЂС‚ " + GetSpelledTimecardApproverNameByID(id, db) + "  (SoW " + GetSpelledSoWByID(sow_id, db) + ")";
 		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 	}
 	if(action == "AJAX_deleteBTExpenseApproverFromSoW")
 	{
-		notification_description = "Данные командировки: Удалили утвердителя командировочных расходов " + GetSpelledBTExpenseApproverNameByID(id, db) + " (SoW " + GetSpelledSoWByID(sow_id, db) + ")";
+		notification_description = "Р”Р°РЅРЅС‹Рµ РєРѕРјР°РЅРґРёСЂРѕРІРєРё: РЈРґР°Р»РёР»Рё СѓС‚РІРµСЂРґРёС‚РµР»СЏ РєРѕРјР°РЅРґРёСЂРѕРІРѕС‡РЅС‹С… СЂР°СЃС…РѕРґРѕРІ " + GetSpelledBTExpenseApproverNameByID(id, db) + " (SoW " + GetSpelledSoWByID(sow_id, db) + ")";
 		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 	}
 	if(action == "AJAX_updateSubcontractorCreateTasks")
 	{
-		notification_description = "Данные таймкарты: Субконтрактор " + (new_value == "N" ? string("не ") : string("")) + "может создавать задачи самостоятельно (SoW " + GetSpelledSoWByID(sow_id, db) + ")";
+		notification_description = "Р”Р°РЅРЅС‹Рµ С‚Р°Р№РјРєР°СЂС‚С‹: РЎСѓР±РєРѕРЅС‚СЂР°РєС‚РѕСЂ " + (new_value == "N" ? string("РЅРµ ") : string("")) + "РјРѕР¶РµС‚ СЃРѕР·РґР°РІР°С‚СЊ Р·Р°РґР°С‡Рё СЃР°РјРѕСЃС‚РѕСЏС‚РµР»СЊРЅРѕ (SoW " + GetSpelledSoWByID(sow_id, db) + ")";
 		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 	}
 	if(action == "AJAX_deleteExpenseTemplate")
 	{
-		notification_description = "Данные командировки: удалили возмещаемый расход " + GetSpelledBTExpenseTemplateByID(id, db);
+		notification_description = "Р”Р°РЅРЅС‹Рµ РєРѕРјР°РЅРґРёСЂРѕРІРєРё: СѓРґР°Р»РёР»Рё РІРѕР·РјРµС‰Р°РµРјС‹Р№ СЂР°СЃС…РѕРґ " + GetSpelledBTExpenseTemplateByID(id, db);
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 	if(action == "AJAX_deleteExpenseTemplateLine")
 	{
-		notification_description = "Данные командировки: удалили отчетный документ " + GetSpelledBTExpenseTemplateLineByID(id, db) + " из возмещаемого расхода "  + GetSpelledBTExpenseTemplateByLineID(id, db);
+		notification_description = "Р”Р°РЅРЅС‹Рµ РєРѕРјР°РЅРґРёСЂРѕРІРєРё: СѓРґР°Р»РёР»Рё РѕС‚С‡РµС‚РЅС‹Р№ РґРѕРєСѓРјРµРЅС‚ " + GetSpelledBTExpenseTemplateLineByID(id, db) + " РёР· РІРѕР·РјРµС‰Р°РµРјРѕРіРѕ СЂР°СЃС…РѕРґР° "  + GetSpelledBTExpenseTemplateByLineID(id, db);
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 	if(action == "AJAX_addExpenseTemplate")
 	{
-		notification_description = "Данные командировки: добавили возмещаемый расход "  + GetSpelledBTExpenseTemplateByID(id, db);
+		notification_description = "Р”Р°РЅРЅС‹Рµ РєРѕРјР°РЅРґРёСЂРѕРІРєРё: РґРѕР±Р°РІРёР»Рё РІРѕР·РјРµС‰Р°РµРјС‹Р№ СЂР°СЃС…РѕРґ "  + GetSpelledBTExpenseTemplateByID(id, db);
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 	if(action == "AJAX_addExpenseTemplateLine")
 	{
-		notification_description = "Данные командировки: добавили отчетный документ " + GetSpelledBTExpenseTemplateLineByID(id, db) + " к возмещаемому расходу "  + GetSpelledBTExpenseTemplateByLineID(id, db);
+		notification_description = "Р”Р°РЅРЅС‹Рµ РєРѕРјР°РЅРґРёСЂРѕРІРєРё: РґРѕР±Р°РІРёР»Рё РѕС‚С‡РµС‚РЅС‹Р№ РґРѕРєСѓРјРµРЅС‚ " + GetSpelledBTExpenseTemplateLineByID(id, db) + " Рє РІРѕР·РјРµС‰Р°РµРјРѕРјСѓ СЂР°СЃС…РѕРґСѓ "  + GetSpelledBTExpenseTemplateByLineID(id, db);
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 	if(action == "AJAX_addCostCenter")
@@ -5001,52 +5001,52 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 
 	if(action == "AJAX_updateExpenseTemplateTitle")
 	{
-		notification_description = "Данные командировки: изменилось название расхода с " + existing_value + " на " + new_value;
+		notification_description = "Р”Р°РЅРЅС‹Рµ РєРѕРјР°РЅРґРёСЂРѕРІРєРё: РёР·РјРµРЅРёР»РѕСЃСЊ РЅР°Р·РІР°РЅРёРµ СЂР°СЃС…РѕРґР° СЃ " + existing_value + " РЅР° " + new_value;
 		sql_query = "SELECT `sow_id` AS `contract_sow_id` FROM `bt_sow_assignment` WHERE `bt_expense_template_id`=\"" + id + "\";";
 	}
 	if(action == "AJAX_updateExpenseTemplateAgencyComment")
 	{
-		notification_description = "Данные командировки: изменилось описание расхода (" + GetSpelledBTExpenseTemplateByID(id, db) + ") с " + existing_value + " на " + new_value;
+		notification_description = "Р”Р°РЅРЅС‹Рµ РєРѕРјР°РЅРґРёСЂРѕРІРєРё: РёР·РјРµРЅРёР»РѕСЃСЊ РѕРїРёСЃР°РЅРёРµ СЂР°СЃС…РѕРґР° (" + GetSpelledBTExpenseTemplateByID(id, db) + ") СЃ " + existing_value + " РЅР° " + new_value;
 		sql_query = "SELECT `sow_id` AS `contract_sow_id` FROM `bt_sow_assignment` WHERE `bt_expense_template_id`=\"" + id + "\";";
 	}
 	if(action == "AJAX_updateExpenseTemplateLineTitle")
 	{
-		notification_description = "Данные командировки: изменилось название отчетного документа с " + existing_value + " на " + new_value + " у расхода " + GetSpelledBTExpenseTemplateByLineID(id, db);
+		notification_description = "Р”Р°РЅРЅС‹Рµ РєРѕРјР°РЅРґРёСЂРѕРІРєРё: РёР·РјРµРЅРёР»РѕСЃСЊ РЅР°Р·РІР°РЅРёРµ РѕС‚С‡РµС‚РЅРѕРіРѕ РґРѕРєСѓРјРµРЅС‚Р° СЃ " + existing_value + " РЅР° " + new_value + " Сѓ СЂР°СЃС…РѕРґР° " + GetSpelledBTExpenseTemplateByLineID(id, db);
 		sql_query = "SELECT `sow_id` AS `contract_sow_id` FROM `bt_sow_assignment` WHERE `bt_expense_template_id`=(SELECT `bt_expense_template_id` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\");";
 	}
 	if(action == "AJAX_updateExpenseTemplateLineDescription")
 	{
-		notification_description = "Данные командировки: изменилось описание отчетного документа (" + GetSpelledBTExpenseTemplateLineByID(id, db) + ") с " + existing_value + " на " + new_value + " у расхода " + GetSpelledBTExpenseTemplateByLineID(id, db);
+		notification_description = "Р”Р°РЅРЅС‹Рµ РєРѕРјР°РЅРґРёСЂРѕРІРєРё: РёР·РјРµРЅРёР»РѕСЃСЊ РѕРїРёСЃР°РЅРёРµ РѕС‚С‡РµС‚РЅРѕРіРѕ РґРѕРєСѓРјРµРЅС‚Р° (" + GetSpelledBTExpenseTemplateLineByID(id, db) + ") СЃ " + existing_value + " РЅР° " + new_value + " Сѓ СЂР°СЃС…РѕРґР° " + GetSpelledBTExpenseTemplateByLineID(id, db);
 		sql_query = "SELECT `sow_id` AS `contract_sow_id` FROM `bt_sow_assignment` WHERE `bt_expense_template_id`=(SELECT `bt_expense_template_id` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\");";
 	}
 	if(action == "AJAX_updateExpenseTemplateLineTooltip")
 	{
-		notification_description = "Данные командировки: изменилась подсказка у отчетного документа (" + GetSpelledBTExpenseTemplateLineByID(id, db) + ") с " + existing_value + " на " + new_value + " у расхода " + GetSpelledBTExpenseTemplateByLineID(id, db);
+		notification_description = "Р”Р°РЅРЅС‹Рµ РєРѕРјР°РЅРґРёСЂРѕРІРєРё: РёР·РјРµРЅРёР»Р°СЃСЊ РїРѕРґСЃРєР°Р·РєР° Сѓ РѕС‚С‡РµС‚РЅРѕРіРѕ РґРѕРєСѓРјРµРЅС‚Р° (" + GetSpelledBTExpenseTemplateLineByID(id, db) + ") СЃ " + existing_value + " РЅР° " + new_value + " Сѓ СЂР°СЃС…РѕРґР° " + GetSpelledBTExpenseTemplateByLineID(id, db);
 		sql_query = "SELECT `sow_id` AS `contract_sow_id` FROM `bt_sow_assignment` WHERE `bt_expense_template_id`=(SELECT `bt_expense_template_id` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\");";
 	}
 	if(action == "AJAX_updateExpenseTemplateLineDomType")
 	{
-		notification_description = "Данные командировки: изменился тип отчетного документа (" + GetSpelledBTExpenseTemplateLineByID(id, db) + ") с " + existing_value + " на " + new_value + " у расхода " + GetSpelledBTExpenseTemplateByLineID(id, db);
+		notification_description = "Р”Р°РЅРЅС‹Рµ РєРѕРјР°РЅРґРёСЂРѕРІРєРё: РёР·РјРµРЅРёР»СЃСЏ С‚РёРї РѕС‚С‡РµС‚РЅРѕРіРѕ РґРѕРєСѓРјРµРЅС‚Р° (" + GetSpelledBTExpenseTemplateLineByID(id, db) + ") СЃ " + existing_value + " РЅР° " + new_value + " Сѓ СЂР°СЃС…РѕРґР° " + GetSpelledBTExpenseTemplateByLineID(id, db);
 		sql_query = "SELECT `sow_id` AS `contract_sow_id` FROM `bt_sow_assignment` WHERE `bt_expense_template_id`=(SELECT `bt_expense_template_id` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\");";
 	}
 	if(action == "AJAX_updateExpenseTemplateLinePaymentCash")
 	{
-		notification_description = "Данные командировки: изменилась оплата у отчетного документа (" + GetSpelledBTExpenseTemplateLineByID(id, db) + ") с " + existing_value + " на " + new_value + " у расхода " + GetSpelledBTExpenseTemplateByLineID(id, db);
+		notification_description = "Р”Р°РЅРЅС‹Рµ РєРѕРјР°РЅРґРёСЂРѕРІРєРё: РёР·РјРµРЅРёР»Р°СЃСЊ РѕРїР»Р°С‚Р° Сѓ РѕС‚С‡РµС‚РЅРѕРіРѕ РґРѕРєСѓРјРµРЅС‚Р° (" + GetSpelledBTExpenseTemplateLineByID(id, db) + ") СЃ " + existing_value + " РЅР° " + new_value + " Сѓ СЂР°СЃС…РѕРґР° " + GetSpelledBTExpenseTemplateByLineID(id, db);
 		sql_query = "SELECT `sow_id` AS `contract_sow_id` FROM `bt_sow_assignment` WHERE `bt_expense_template_id`=(SELECT `bt_expense_template_id` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\");";
 	}
 	if(action == "AJAX_updateExpenseTemplateLinePaymentCard")
 	{
-		notification_description = "Данные командировки: изменилась оплата у отчетного документа (" + GetSpelledBTExpenseTemplateLineByID(id, db) + ") с " + existing_value + " на " + new_value + " у расхода " + GetSpelledBTExpenseTemplateByLineID(id, db);
+		notification_description = "Р”Р°РЅРЅС‹Рµ РєРѕРјР°РЅРґРёСЂРѕРІРєРё: РёР·РјРµРЅРёР»Р°СЃСЊ РѕРїР»Р°С‚Р° Сѓ РѕС‚С‡РµС‚РЅРѕРіРѕ РґРѕРєСѓРјРµРЅС‚Р° (" + GetSpelledBTExpenseTemplateLineByID(id, db) + ") СЃ " + existing_value + " РЅР° " + new_value + " Сѓ СЂР°СЃС…РѕРґР° " + GetSpelledBTExpenseTemplateByLineID(id, db);
 		sql_query = "SELECT `sow_id` AS `contract_sow_id` FROM `bt_sow_assignment` WHERE `bt_expense_template_id`=(SELECT `bt_expense_template_id` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\");";
 	}
 	if(action == "AJAX_updateExpenseTemplateLineRequired")
 	{
-		notification_description = "Данные командировки: изменилось требование к отчетному документу (" + GetSpelledBTExpenseTemplateLineByID(id, db) + ") с " + existing_value + " на " + new_value + " у расхода " + GetSpelledBTExpenseTemplateByLineID(id, db);
+		notification_description = "Р”Р°РЅРЅС‹Рµ РєРѕРјР°РЅРґРёСЂРѕРІРєРё: РёР·РјРµРЅРёР»РѕСЃСЊ С‚СЂРµР±РѕРІР°РЅРёРµ Рє РѕС‚С‡РµС‚РЅРѕРјСѓ РґРѕРєСѓРјРµРЅС‚Сѓ (" + GetSpelledBTExpenseTemplateLineByID(id, db) + ") СЃ " + existing_value + " РЅР° " + new_value + " Сѓ СЂР°СЃС…РѕРґР° " + GetSpelledBTExpenseTemplateByLineID(id, db);
 		sql_query = "SELECT `sow_id` AS `contract_sow_id` FROM `bt_sow_assignment` WHERE `bt_expense_template_id`=(SELECT `bt_expense_template_id` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\");";
 	}
 	if(action == "AJAX_addBTExpenseTemplateAssignment")
 	{
-		notification_description = "Данные командировки: добавили возмещаемый расход (" + GetSpelledBTExpenseTemplateByAssignmentID(id, db) + ") к SoW(" + GetSpelledSoWByID(sow_id, db) + ")";
+		notification_description = "Р”Р°РЅРЅС‹Рµ РєРѕРјР°РЅРґРёСЂРѕРІРєРё: РґРѕР±Р°РІРёР»Рё РІРѕР·РјРµС‰Р°РµРјС‹Р№ СЂР°СЃС…РѕРґ (" + GetSpelledBTExpenseTemplateByAssignmentID(id, db) + ") Рє SoW(" + GetSpelledSoWByID(sow_id, db) + ")";
 		sql_query = "SELECT DISTINCT `sow_id` AS `contract_sow_id` FROM `bt_sow_assignment` WHERE `id`=\"" + id + "\";";
 	}
 
@@ -5510,6 +5510,36 @@ auto GetPSoWIDByTimecardIDAndCostCenterID(string timecard_id, string cost_center
 		else
 		{
 			MESSAGE_ERROR("", "", "user.id(" + user->GetID() + ") is not an agency employee (" + user->GetType() + ")");
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "user not initialized");
+	}
+
+	MESSAGE_DEBUG("", "", "finish (result is " + result + ")");
+
+	return result;
+}
+
+auto GetSoWIDByTimecardID(string timecard_id, CMysql *db, CUser *user) -> string
+{
+	auto	result = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(user)
+	{
+		if(db)
+		{
+			if(db->Query("SELECT `contract_sow_id` FROM `timecards` WHERE `id`=\"" + timecard_id + "\";"))
+			{
+				result = db->Get(0, "contract_sow_id");
+			}
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "db not initialized");
 		}
 	}
 	else

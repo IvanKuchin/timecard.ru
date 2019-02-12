@@ -29,6 +29,35 @@ void crash_handler(int sig)
 	exit(1);
 }
 
+// Convert UTF-8 byte string to wstring
+auto multibyte_to_wide(std::string const& s) -> wstring
+{
+	std::wstring_convert<std::codecvt_utf8<wchar_t> > conv;
+	return conv.from_bytes(s);
+}
+
+// Convert wstring to UTF-8 byte string
+auto wide_to_multibyte(std::wstring const& s) -> string
+{
+	std::wstring_convert<std::codecvt_utf8<wchar_t> > conv;
+	return conv.to_bytes(s);
+}
+
+auto GetLocale()
+{
+	auto	result = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	result = setlocale(LC_ALL, "");
+
+	if(result.empty()) MESSAGE_ERROR("", "", "fail to define locale");
+
+	MESSAGE_DEBUG("", "", "finish(result length is " + to_string(result.length()) + ")");
+
+	return result;
+}
+
 std::string rtrim(std::string& str)
 {
 	str.erase(str.find_last_not_of(' ')+1);		 //suffixing spaces
@@ -53,80 +82,134 @@ string	quoted(string src)
 	return '"' + src + '"';
 }
 
+/*
 string  toLower(string src)
 {
 	using namespace std::regex_constants;
 
 	string  result = src;
-	regex	r1("А");
-	regex	r2("Б");
-	regex	r3("В");
-	regex	r4("Г");
-	regex	r5("Д");
-	regex	r6("Е");
-	regex	r7("Ё");
-	regex	r8("Ж");
-	regex	r9("З");
-	regex	r10("И");
-	regex	r11("Й");
-	regex	r12("К");
-	regex	r13("Л");
-	regex	r14("М");
-	regex	r15("Н");
-	regex	r16("О");
-	regex	r17("П");
-	regex	r18("Р");
-	regex	r19("С");
-	regex	r20("Т");
-	regex	r21("У");
-	regex	r22("Ф");
-	regex	r23("Х");
-	regex	r24("Ц");
-	regex	r25("Ч");
-	regex	r26("Ш");
-	regex	r27("Щ");
-	regex	r28("Ь");
-	regex	r29("Ы");
-	regex	r30("Ъ");
-	regex	r31("Э");
-	regex	r32("Ю");
-	regex	r33("Я");
+	regex	r1("Рђ");
+	regex	r2("Р‘");
+	regex	r3("Р’");
+	regex	r4("Р“");
+	regex	r5("Р”");
+	regex	r6("Р•");
+	regex	r7("РЃ");
+	regex	r8("Р–");
+	regex	r9("Р—");
+	regex	r10("Р");
+	regex	r11("Р™");
+	regex	r12("Рљ");
+	regex	r13("Р›");
+	regex	r14("Рњ");
+	regex	r15("Рќ");
+	regex	r16("Рћ");
+	regex	r17("Рџ");
+	regex	r18("Р ");
+	regex	r19("РЎ");
+	regex	r20("Рў");
+	regex	r21("РЈ");
+	regex	r22("Р¤");
+	regex	r23("РҐ");
+	regex	r24("Р¦");
+	regex	r25("Р§");
+	regex	r26("РЁ");
+	regex	r27("Р©");
+	regex	r28("Р¬");
+	regex	r29("Р«");
+	regex	r30("РЄ");
+	regex	r31("Р­");
+	regex	r32("Р®");
+	regex	r33("РЇ");
 
-	src = regex_replace(src, r1, "а");
-	src = regex_replace(src, r2, "б");
-	src = regex_replace(src, r3, "в");
-	src = regex_replace(src, r4, "г");
-	src = regex_replace(src, r5, "д");
-	src = regex_replace(src, r6, "е");
-	src = regex_replace(src, r7, "ё");
-	src = regex_replace(src, r8, "ж");
-	src = regex_replace(src, r9, "з");
-	src = regex_replace(src, r10, "и");
-	src = regex_replace(src, r11, "й");
-	src = regex_replace(src, r12, "к");
-	src = regex_replace(src, r13, "л");
-	src = regex_replace(src, r14, "м");
-	src = regex_replace(src, r15, "н");
-	src = regex_replace(src, r16, "о");
-	src = regex_replace(src, r17, "п");
-	src = regex_replace(src, r18, "р");
-	src = regex_replace(src, r19, "с");
-	src = regex_replace(src, r20, "т");
-	src = regex_replace(src, r21, "у");
-	src = regex_replace(src, r22, "ф");
-	src = regex_replace(src, r23, "х");
-	src = regex_replace(src, r24, "ц");
-	src = regex_replace(src, r25, "ч");
-	src = regex_replace(src, r26, "ш");
-	src = regex_replace(src, r27, "щ");
-	src = regex_replace(src, r28, "ь");
-	src = regex_replace(src, r29, "ы");
-	src = regex_replace(src, r30, "ъ");
-	src = regex_replace(src, r31, "э");
-	src = regex_replace(src, r32, "ю");
-	src = regex_replace(src, r33, "я");
+	src = regex_replace(src, r1, "Р°");
+	src = regex_replace(src, r2, "Р±");
+	src = regex_replace(src, r3, "РІ");
+	src = regex_replace(src, r4, "Рі");
+	src = regex_replace(src, r5, "Рґ");
+	src = regex_replace(src, r6, "Рµ");
+	src = regex_replace(src, r7, "С‘");
+	src = regex_replace(src, r8, "Р¶");
+	src = regex_replace(src, r9, "Р·");
+	src = regex_replace(src, r10, "Рё");
+	src = regex_replace(src, r11, "Р№");
+	src = regex_replace(src, r12, "Рє");
+	src = regex_replace(src, r13, "Р»");
+	src = regex_replace(src, r14, "Рј");
+	src = regex_replace(src, r15, "РЅ");
+	src = regex_replace(src, r16, "Рѕ");
+	src = regex_replace(src, r17, "Рї");
+	src = regex_replace(src, r18, "СЂ");
+	src = regex_replace(src, r19, "СЃ");
+	src = regex_replace(src, r20, "С‚");
+	src = regex_replace(src, r21, "Сѓ");
+	src = regex_replace(src, r22, "С„");
+	src = regex_replace(src, r23, "С…");
+	src = regex_replace(src, r24, "С†");
+	src = regex_replace(src, r25, "С‡");
+	src = regex_replace(src, r26, "С€");
+	src = regex_replace(src, r27, "С‰");
+	src = regex_replace(src, r28, "СЊ");
+	src = regex_replace(src, r29, "С‹");
+	src = regex_replace(src, r30, "СЉ");
+	src = regex_replace(src, r31, "СЌ");
+	src = regex_replace(src, r32, "СЋ");
+	src = regex_replace(src, r33, "СЏ");
 
 	transform(src.begin(), src.end(), result.begin(), (int(*)(int))tolower);
+
+	return result;
+}
+*/
+
+auto toUpper(const string &src) -> string
+{
+	auto	result(""s);
+	auto	locale_str = GetLocale();
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(locale_str.length())
+	{
+		auto	wtemp = multibyte_to_wide(src);
+		locale	loc(locale_str.c_str());
+
+		for(auto &c: wtemp) c = toupper(c, loc);
+
+		result = wide_to_multibyte(wtemp);
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "fail to define locale. Impossible run through toLower")
+	}
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return result;
+}
+
+auto toLower(const string &src) -> string
+{
+	auto	result(""s);
+	auto	locale_str = GetLocale();
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(locale_str.length())
+	{
+		auto	wtemp = multibyte_to_wide(src);
+		locale	loc(locale_str.c_str());
+
+		for(auto &c: wtemp) c = tolower(c, loc);
+
+		result = wide_to_multibyte(wtemp);
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "fail to define locale. Impossible run through toLower")
+	}
+
+	MESSAGE_DEBUG("", "", "finish");
 
 	return result;
 }
@@ -345,14 +428,14 @@ string RemoveSpecialSymbols(string src)
 	}
 
 	pos = 0;
-	while((pos = result.find("№", pos)) != string::npos)
+	while((pos = result.find("в„–", pos)) != string::npos)
 	{
 		result.replace(pos, 1, "N");
 		pos += 1;
 	}
 
 	pos = 0;
-	while((pos = result.find("—", pos)) != string::npos)
+	while((pos = result.find("вЂ”", pos)) != string::npos)
 	{
 		result.replace(pos, 1, "-");
 		pos += 1;
@@ -408,13 +491,13 @@ string RemoveSpecialHTMLSymbols(string src)
 	}
 
 	pos = 0;
-	while((pos = result.find("№", pos)) != string::npos)
+	while((pos = result.find("в„–", pos)) != string::npos)
 	{
 		result.replace(pos, 1, "&#35;");
 	}
 
 	pos = 0;
-	while((pos = result.find("—", pos)) != string::npos)
+	while((pos = result.find("вЂ”", pos)) != string::npos)
 	{
 		result.replace(pos, 1, "-");
 	}
@@ -586,13 +669,13 @@ string RemoveAllNonAlphabetSymbols(const string &src)
 	}
 
 	pos = 0;
-	while((pos = result.find("№", pos)) != string::npos)
+	while((pos = result.find("в„–", pos)) != string::npos)
 	{
 		result.replace(pos, 1, "");
 	}
 
 	pos = 0;
-	while((pos = result.find("—", pos)) != string::npos)
+	while((pos = result.find("вЂ”", pos)) != string::npos)
 	{
 		result.replace(pos, 1, "");
 	}
@@ -1187,9 +1270,9 @@ double GetTimeDifferenceFromNow(const string timeAgo)
 string GetMinutesDeclension(const int value)
 {
 	map<int, string> 	mapDeclension = {
-		{1, "минуту"},
-		{2, "минуты"},
-		{3, "минут"}
+		{1, "РјРёРЅСѓС‚Сѓ"},
+		{2, "РјРёРЅСѓС‚С‹"},
+		{3, "РјРёРЅСѓС‚"}
 	};
 
 	string				result;
@@ -1206,9 +1289,9 @@ string GetMinutesDeclension(const int value)
 string GetHoursDeclension(const int value)
 {
 	map<int, string> 	mapDeclension = {
-		{1, "час"},
-		{2, "часа"},
-		{3, "часов"}
+		{1, "С‡Р°СЃ"},
+		{2, "С‡Р°СЃР°"},
+		{3, "С‡Р°СЃРѕРІ"}
 	};
 	string				result;
 
@@ -1223,9 +1306,9 @@ string GetHoursDeclension(const int value)
 string GetDaysDeclension(const int value)
 {
 	map<int, string> 	mapDeclension = {
-		{1, "день"},
-		{2, "дня"},
-		{3, "дней"}
+		{1, "РґРµРЅСЊ"},
+		{2, "РґРЅСЏ"},
+		{3, "РґРЅРµР№"}
 	};
 	string				result;
 
@@ -1240,9 +1323,9 @@ string GetDaysDeclension(const int value)
 string GetMonthsDeclension(const int value)
 {
 	map<int, string> 	mapDeclension = {
-		{1, "месяц"},
-		{2, "месяца"},
-		{3, "месяцев"}
+		{1, "РјРµСЃСЏС†"},
+		{2, "РјРµСЃСЏС†Р°"},
+		{3, "РјРµСЃСЏС†РµРІ"}
 	};
 	string				result;
 
@@ -1257,9 +1340,9 @@ string GetMonthsDeclension(const int value)
 string GetYearsDeclension(const int value)
 {
 	map<int, string> 	mapDeclension = {
-		{1, "год"},
-		{2, "года"},
-		{3, "лет"}
+		{1, "РіРѕРґ"},
+		{2, "РіРѕРґР°"},
+		{3, "Р»РµС‚"}
 	};
 	string				result;
 
@@ -1305,7 +1388,7 @@ string GetHumanReadableTimeDifferenceFromNow (const string timeAgo)
 		ost << (int)minutes << " " << GetMinutesDeclension(minutes);
 	}
 
-	ost << " назад.";
+	ost << " РЅР°Р·Р°Рґ.";
 
 
 	// --- commented to reduce logs flooding
@@ -1345,7 +1428,7 @@ NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, 
 D ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-int convert_utf8_to_windows1251(const char* utf8, char* windows1251, size_t n)
+int convert_utf8_to_windows1251_legacy(const char* utf8, char* windows1251, size_t n)
 {
 		unsigned int i = 0;
 		unsigned int j = 0;
@@ -1661,6 +1744,13 @@ NEXT_LETTER:
 		return 1;
 }
 
+int convert_utf8_to_windows1251(const char* utf8, char* windows1251, size_t n)
+{
+	strncpy(windows1251, utf8, n);
+
+	return 1;
+}
+
 // --- wrapper to convert_utf8_to_windows1251
 auto	utf8_to_cp1251(const string &src) -> string
 {
@@ -1847,7 +1937,7 @@ bool RmDirRecursive(const char *dirname)
 	{
 		if (strcmp(entry->d_name, ".") && strcmp(entry->d_name, "..")) 
 		{
-			snprintf(path, (size_t) 4095, "%s/%s", dirname, entry->d_name);
+			snprintf(path, (size_t) 4095, "%s%s", dirname, entry->d_name);
 
 			if (entry->d_type == DT_DIR)
 			{
@@ -1856,7 +1946,7 @@ bool RmDirRecursive(const char *dirname)
 			else
 			{
 				MESSAGE_DEBUG("", "", "remove file " + path);
-				// unlink(path);
+				unlink(path);
 			}
 		}
 	}
@@ -1864,7 +1954,7 @@ bool RmDirRecursive(const char *dirname)
 	closedir(dir);
 	
 	MESSAGE_DEBUG("", "", "remove dir " + dirname);
-	// rmdir(dirname);
+	rmdir(dirname);
 	
 	MESSAGE_DEBUG("", "", "finish (" + dirname + ")");
 
@@ -8296,6 +8386,29 @@ pair<struct tm, struct tm> GetFirstAndLastDateOfLastMonth()
 	MESSAGE_DEBUG("", "", "finish");
 
 	return make_pair(start_of_last_mon, end_of_last_mon);
+}
+
+auto GetSpellingFormattedDate(string date, string format) -> string
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	result = ""s;
+	char	buffer[100];
+	auto	date_obj = GetTMObject(date);
+
+	if(strftime(buffer, sizeof(buffer), format.c_str(), &date_obj))
+	{
+		result = buffer;
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "strftime returns 0");
+	}
+
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return result;
 }
 
 struct tm GetTMObject(string date)

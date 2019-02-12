@@ -41,6 +41,8 @@ set(INDEPENDENT_LIBRARIES_SRC
     c_float.cpp
     c_invoice_service.cpp
     cvideoconverter.cpp
+    c_timecard_to_print.cpp
+    c_print_timecard.cpp
     )
 
 # --- MACROSes start ---
@@ -109,7 +111,8 @@ set(CMAKE_INSTALL_RPATH		${XL_LIBRARY_DIR})
 
 set(project_include_directories
     ${PROJECT_SOURCE_DIR}/src/include/
-    ${PROJECT_BINARY_DIR}/src/include/ # --- rendered config.h, generated table.h
+    ${PROJECT_BINARY_DIR}/src/include/      # --- rendered config.h, generated table.h
+    ${PROJECT_SOURCE_DIR}/cyrillic-facets/  # --- mbstowcs 
     ${LIBMYSQLCLIENT_INCLUDE_DIRS}
     ${OPENSSL_INCLUDE_DIR}
     ${IMAGEMAGICK_INCLUDE_DIR}

@@ -34,9 +34,10 @@ bool Test1()
 	vector<string>	email_test_success = {"a@ab.com", "user@mail.mail", "1@24.11", "USER@DOMAIN.NET", "U_S_E_R@domain.com", "my.@mail.com", ".my@mail.com", "my_@mail.com", "_my@mail.com", "U_S_E_R@my-domain.com", "first_name.last_name@secondary.my-domain.com"};
 	vector<string>	timeentry_test_fail = {"8.8.8.8.8", "8,8.009", "1,a,1", "a", "0.10", "0,", "00", "000000000.00000000000,0", "8,8.084", "1.124,1,12", "1-E10,1230", "01,01,01,01", "1-E10,1230","12,123,123.00,24.24", "0", "0.0", "1.125,1,12"};
 	vector<string>	timeentry_test_success = {"8", "", "8,-1,8", ",", "", "8,8.8", "8,8.08", "8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8"};
-	auto			rus_alphabet = "Àà Áá Ââ Ãã Ää Åå ¨¸ Ææ Çç Èè Éé Êê Ëë Ìì Íí Îî Ïï Ğğ Ññ Òò Óó Ôô Õõ Öö ×÷ Øø Ùù Úú Ûû Üü İı Şş ßÿ"s;
+	auto			rus_alphabet = "ĞĞ° Ğ‘Ğ± Ğ’Ğ² Ğ“Ğ³ Ğ”Ğ´ Ğ•Ğµ ĞÑ‘ Ğ–Ğ¶ Ğ—Ğ· Ğ˜Ğ¸ Ğ™Ğ¹ ĞšĞº Ğ›Ğ» ĞœĞ¼ ĞĞ½ ĞĞ¾ ĞŸĞ¿ Ğ Ñ€ Ğ¡Ñ Ğ¢Ñ‚ Ğ£Ñƒ Ğ¤Ñ„ Ğ¥Ñ… Ğ¦Ñ† Ğ§Ñ‡ Ğ¨Ñˆ Ğ©Ñ‰ ĞªÑŠ Ğ«Ñ‹ Ğ¬ÑŒ Ğ­Ñ Ğ®Ñ Ğ¯Ñ"s;
 	auto			us_alphabet = "Aa Bb Cc Dd Ee Ff Gg Hh Ii Jj Kk Ll Mm Nn Oo Pp Qq Rr Ss Tt Uu Vv Ww Xx Yy Zz"s;
 
+/*
 	memset(buffer, 0, sizeof(buffer));
 	if(convert_cp1251_to_utf8(rus_alphabet.c_str(), buffer, sizeof(buffer)))
 	{
@@ -65,6 +66,21 @@ bool Test1()
 	{
 		result = false;
 		cout << "fail to convert src to utf-8" << endl;
+	}
+*/
+
+	if(CheckHTTPParam_Text(rus_alphabet) == rus_alphabet) {}
+	else
+	{
+		result = false;
+		cout << "failed on basic RUS alphabet" << endl;
+	}
+
+	if(CheckHTTPParam_Text(repeat(rus_alphabet, 150)).length() == CheckHTTPParam_Text(repeat(rus_alphabet, 350)).length()) {}
+	else
+	{
+		result = false;
+		cout << "failed on RUS overflow" << endl;
 	}
 
 	if(CheckHTTPParam_Text(us_alphabet) == us_alphabet) {}
@@ -334,7 +350,7 @@ int main(void)
 	}
 
 #ifndef MYSQL_3
-	db.Query("set names cp1251");
+	db.Query("set names utf8;");
 #endif
 
 	indexPage.SetDB(&db);

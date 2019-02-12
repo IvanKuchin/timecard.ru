@@ -27,7 +27,7 @@ bool Test1()
 	// --- error_message expected not empty
 	if(error_message.length())
 	{
-		if(error_message == "Îøèáêà ÁÄ") result = false;
+		if(error_message == "ĞÑˆĞ¸Ğ±ĞºĞ° Ğ‘Ğ”") result = false;
 	}
 
 	MESSAGE_DEBUG("", "", "finish");
@@ -50,7 +50,7 @@ bool Test2()
 	// --- error_message expected not empty
 	if(error_message.length())
 	{
-		if(error_message == "Îøèáêà ÁÄ") result = false;
+		if(error_message == "ĞÑˆĞ¸Ğ±ĞºĞ° Ğ‘Ğ”") result = false;
 	}
 
 	MESSAGE_DEBUG("", "", "finish");
@@ -74,7 +74,7 @@ bool Test3()
 	// --- error_message expected not empty
 	if(error_message.length())
 	{
-		if(error_message == "Îøèáêà ÁÄ") result = false;
+		if(error_message == "ĞÑˆĞ¸Ğ±ĞºĞ° Ğ‘Ğ”") result = false;
 	}
 
 	MESSAGE_DEBUG("", "", "finish");
@@ -98,7 +98,7 @@ bool Test4()
 	// --- error_message expected not empty
 	if(error_message.length())
 	{
-		if(error_message == "Îøèáêà ÁÄ") {}
+		if(error_message == "ĞÑˆĞ¸Ğ±ĞºĞ° Ğ‘Ğ”") {}
 		else { result = false; }
 	}
 
@@ -126,7 +126,7 @@ int main(void)
 	}
 
 #ifndef MYSQL_3
-	db.Query("set names cp1251");
+	db.Query("set names utf8;");
 #endif
 
 	indexPage.SetDB(&db);

@@ -274,37 +274,37 @@ static auto	isActionEntityBelongsToSoW(string action, string id, string sow_id, 
 						}
 						else
 						{
-							error_message = "Нет доступа";
+							error_message = "РќРµС‚ РґРѕСЃС‚СѓРїР°";
 							MESSAGE_ERROR("", "", "Probably hacker action(" + action + "), because action(" + action + ") entity.id(" + id + ") doesn't belong to sow.id(" + sow_id + ")");
 						}
 					}
 					else
 					{
-						error_message = "Нет доступа";
+						error_message = "РќРµС‚ РґРѕСЃС‚СѓРїР°";
 						MESSAGE_ERROR("", "", "action(" + action + ") element.id(" + id + ") doesn't belong to sow.id(" + sow_id + ")");
 					}
 				}
 				else
 				{
-					error_message = "Неизвестное действие";
+					error_message = "РќРµРёР·РІРµСЃС‚РЅРѕРµ РґРµР№СЃС‚РІРёРµ";
 					MESSAGE_ERROR("", "", "unknown action (" + action + ")");
 				}
 			}
 			else
 			{
-				error_message = "Неизвестное действие";
+				error_message = "РќРµРёР·РІРµСЃС‚РЅРѕРµ РґРµР№СЃС‚РІРёРµ";
 				MESSAGE_ERROR("", "", "action is empty");
 			}
 		}
 		else
 		{
-			error_message = "Идентификатор поля не задан";
+			error_message = "РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РїРѕР»СЏ РЅРµ Р·Р°РґР°РЅ";
 			MESSAGE_ERROR("", "", "id is empty");
 		}
 	}
 	else
 	{
-		error_message = "Неизвестный договор";
+		error_message = "РќРµРёР·РІРµСЃС‚РЅС‹Р№ РґРѕРіРѕРІРѕСЂ";
 		MESSAGE_ERROR("", "", "sow_id is empty");
 	}
 
@@ -356,26 +356,26 @@ static string	CheckNewValueByAction(string action, string id, string sow_id, str
 										}
 										else
 										{
-											error_message = "Часы уже были заполнены на " + PrintTime(first_reporting_day, RU_DATE_FORMAT) + " дату.";
+											error_message = "Р§Р°СЃС‹ СѓР¶Рµ Р±С‹Р»Рё Р·Р°РїРѕР»РЅРµРЅС‹ РЅР° " + PrintTime(first_reporting_day, RU_DATE_FORMAT) + " РґР°С‚Сѓ.";
 											MESSAGE_DEBUG("", "", "assignment.id(" + assignment_id + ") has first reported day on " + PrintTime(first_reporting_day, RU_DATE_FORMAT) + ". Start can't be later than this date.");
 										}
 									}
 								}
 								else
 								{
-									error_message = "Начало должно быть раньше окончания";
+									error_message = "РќР°С‡Р°Р»Рѕ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ СЂР°РЅСЊС€Рµ РѕРєРѕРЅС‡Р°РЅРёСЏ";
 									MESSAGE_DEBUG("", "", "timecard_task_assignment.id(" + id + ") requsted start(" + PrintTime(new_assignment_start, RU_DATE_FORMAT) + ") must be earlier than existing finish(" + PrintTime(existing_assignment_end, RU_DATE_FORMAT) + ").")
 								}
 							}
 							else
 							{
-								error_message = "Назначение на задачу не найдено в БД";
+								error_message = "РќР°Р·РЅР°С‡РµРЅРёРµ РЅР° Р·Р°РґР°С‡Сѓ РЅРµ РЅР°Р№РґРµРЅРѕ РІ Р‘Р”";
 								MESSAGE_ERROR("", "", "timecard_task_assignment.id(" + id + ") not found")
 							}
 						}
 						else
 						{
-							error_message = "Неизвестный договор";
+							error_message = "РќРµРёР·РІРµСЃС‚РЅС‹Р№ РґРѕРіРѕРІРѕСЂ";
 							MESSAGE_ERROR("", "", "sow_id is empty");
 						}
 					}
@@ -409,26 +409,26 @@ static string	CheckNewValueByAction(string action, string id, string sow_id, str
 										}
 										else
 										{
-											error_message = "Часы уже были заполнены на " + PrintTime(last_reporting_day, RU_DATE_FORMAT) + " дату.";
+											error_message = "Р§Р°СЃС‹ СѓР¶Рµ Р±С‹Р»Рё Р·Р°РїРѕР»РЅРµРЅС‹ РЅР° " + PrintTime(last_reporting_day, RU_DATE_FORMAT) + " РґР°С‚Сѓ.";
 											MESSAGE_DEBUG("", "", "assignment.id(" + assignment_id + ") has last reported day on " + PrintTime(last_reporting_day, RU_DATE_FORMAT) + ". Finish can't be earlier than this date.");
 										}
 									}
 								}
 								else
 								{
-									error_message = "Окончание должно быть позднее начала";
+									error_message = "РћРєРѕРЅС‡Р°РЅРёРµ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ РїРѕР·РґРЅРµРµ РЅР°С‡Р°Р»Р°";
 									MESSAGE_DEBUG("", "", "timecard_task_assignment.id(" + id + ") requsted finish(" + PrintTime(new_assignment_end, RU_DATE_FORMAT) + ") must be later than existing start(" + PrintTime(existing_assignment_start, RU_DATE_FORMAT) + ").")
 								}
 							}
 							else
 							{
-								error_message = "Назначение на задачу не найдено в БД";
+								error_message = "РќР°Р·РЅР°С‡РµРЅРёРµ РЅР° Р·Р°РґР°С‡Сѓ РЅРµ РЅР°Р№РґРµРЅРѕ РІ Р‘Р”";
 								MESSAGE_ERROR("", "", "timecard_task_assignment.id(" + id + ") not found");
 							}
 						}
 						else
 						{
-							error_message = "Неизвестный договор";
+							error_message = "РќРµРёР·РІРµСЃС‚РЅС‹Р№ РґРѕРіРѕРІРѕСЂ";
 							MESSAGE_ERROR("", "", "sow_id is empty");
 						}
 					}
@@ -440,7 +440,7 @@ static string	CheckNewValueByAction(string action, string id, string sow_id, str
 							");"
 						))
 						{
-							error_message = "Заказчик " + new_value + " уже существует";
+							error_message = "Р—Р°РєР°Р·С‡РёРє " + new_value + " СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚";
 							MESSAGE_DEBUG("", "", "Customer with new_value already exists");
 						}
 					}
@@ -452,7 +452,7 @@ static string	CheckNewValueByAction(string action, string id, string sow_id, str
 							");"
 							))
 						{
-							error_message = "Проект " + new_value + " уже есть у этого Заказчика";
+							error_message = "РџСЂРѕРµРєС‚ " + new_value + " СѓР¶Рµ РµСЃС‚СЊ Сѓ СЌС‚РѕРіРѕ Р—Р°РєР°Р·С‡РёРєР°";
 							MESSAGE_DEBUG("", "", "Project with new_value already assigned to the same Customer");
 						}
 						else
@@ -468,7 +468,7 @@ static string	CheckNewValueByAction(string action, string id, string sow_id, str
 							");"
 							))
 						{
-							error_message = "Задача " + new_value + " уже существует в этом проекте";
+							error_message = "Р—Р°РґР°С‡Р° " + new_value + " СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚ РІ СЌС‚РѕРј РїСЂРѕРµРєС‚Рµ";
 							MESSAGE_DEBUG("", "", "Customer with new_value already assigned to the same Customer/Project");
 						}
 						else
@@ -484,7 +484,7 @@ static string	CheckNewValueByAction(string action, string id, string sow_id, str
 							");"
 						))
 						{
-							error_message = "Нельзя запретить редактирование компании ее владельцу";
+							error_message = "РќРµР»СЊР·СЏ Р·Р°РїСЂРµС‚РёС‚СЊ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ РєРѕРјРїР°РЅРёРё РµРµ РІР»Р°РґРµР»СЊС†Сѓ";
 							MESSAGE_DEBUG("", "", "employee.id(" + id + ") is company owner, he should be able edit company details any time");
 						}
 						else
@@ -656,7 +656,7 @@ static string	CheckNewValueByAction(string action, string id, string sow_id, str
 					{
 						if(db->Query("SELECT `id` FROM `timecard_approvers` WHERE `approver_user_id`=\"" + new_value + "\" AND `contract_sow_id`=\"" + sow_id + "\";"))
 						{
-							error_message = "Уже в списке утвердителей";
+							error_message = "РЈР¶Рµ РІ СЃРїРёСЃРєРµ СѓС‚РІРµСЂРґРёС‚РµР»РµР№";
 							MESSAGE_DEBUG("", "", "user.id(" + new_value + ") already in sow.id(" + sow_id + ") approver list");
 						}
 						else
@@ -693,7 +693,7 @@ static string	CheckNewValueByAction(string action, string id, string sow_id, str
 					{
 						if(db->Query("SELECT `id` FROM `bt_approvers` WHERE `approver_user_id`=\"" + new_value + "\" AND `contract_sow_id`=\"" + sow_id + "\";"))
 						{
-							error_message = "Уже в списке утвердителей";
+							error_message = "РЈР¶Рµ РІ СЃРїРёСЃРєРµ СѓС‚РІРµСЂРґРёС‚РµР»РµР№";
 							MESSAGE_DEBUG("", "", "user.id(" + new_value + ") already in sow.id(" + sow_id + ") approver list");
 						}
 						else
@@ -710,7 +710,7 @@ static string	CheckNewValueByAction(string action, string id, string sow_id, str
 							");"
 						))
 						{
-							error_message = "Расход " + new_value + " уже существует";
+							error_message = "Р Р°СЃС…РѕРґ " + new_value + " СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚";
 							MESSAGE_DEBUG("", "", "BT expense template with same title already exists");
 						}
 					}
@@ -724,7 +724,7 @@ static string	CheckNewValueByAction(string action, string id, string sow_id, str
 							");"
 						))
 						{
-							error_message = "Документ с таким названием (" + new_value + ") уже есть в расходе";
+							error_message = "Р”РѕРєСѓРјРµРЅС‚ СЃ С‚Р°РєРёРј РЅР°Р·РІР°РЅРёРµРј (" + new_value + ") СѓР¶Рµ РµСЃС‚СЊ РІ СЂР°СЃС…РѕРґРµ";
 							MESSAGE_DEBUG("", "", "BT expense template line with same title already exists belongs to the same expense");
 						}
 					}
@@ -732,7 +732,7 @@ static string	CheckNewValueByAction(string action, string id, string sow_id, str
 					else if(action == "AJAX_updateExpenseTemplateLineTooltip") 			{ /* --- good to go */ }
 					else if(action == "AJAX_updateExpenseTemplateLineDomType") 
 					{
-						error_message = "Нельзя поменять тип документа";
+						error_message = "РќРµР»СЊР·СЏ РїРѕРјРµРЅСЏС‚СЊ С‚РёРї РґРѕРєСѓРјРµРЅС‚Р°";
 						MESSAGE_DEBUG("", "", "dom_type can't be changed");
 					}
 					else if(action == "AJAX_updateExpenseTemplateLinePaymentCash") 
@@ -743,7 +743,7 @@ static string	CheckNewValueByAction(string action, string id, string sow_id, str
 							db->Query("SELECT `id` FROM `bt_expense_line_templates` WHERE `payment`=\"cash\" AND `id`=\"" + id + "\";")
 						)
 						{
-							error_message = "Необходимо оставить какой-нибудь способ оплаты";
+							error_message = "РќРµРѕР±С…РѕРґРёРјРѕ РѕСЃС‚Р°РІРёС‚СЊ РєР°РєРѕР№-РЅРёР±СѓРґСЊ СЃРїРѕСЃРѕР± РѕРїР»Р°С‚С‹";
 							MESSAGE_DEBUG("", "", "Fail to disable single methid of payment");
 						}
 					}
@@ -755,7 +755,7 @@ static string	CheckNewValueByAction(string action, string id, string sow_id, str
 							db->Query("SELECT `id` FROM `bt_expense_line_templates` WHERE `payment`=\"card\" AND `id`=\"" + id + "\";")
 						)
 						{
-							error_message = "Необходимо оставить какой-нибудь способ оплаты";
+							error_message = "РќРµРѕР±С…РѕРґРёРјРѕ РѕСЃС‚Р°РІРёС‚СЊ РєР°РєРѕР№-РЅРёР±СѓРґСЊ СЃРїРѕСЃРѕР± РѕРїР»Р°С‚С‹";
 							MESSAGE_DEBUG("", "", "Fail to disable single methid of payment");
 						}
 					}
@@ -909,19 +909,19 @@ static string	CheckNewValueByAction(string action, string id, string sow_id, str
 				}
 				else
 				{
-					error_message = "Новое значение не может быть пустым";
+					error_message = "РќРѕРІРѕРµ Р·РЅР°С‡РµРЅРёРµ РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РїСѓСЃС‚С‹Рј";
 					MESSAGE_ERROR("", "", "new_value is empty");
 				}
 			}
 			else
 			{
-				error_message = "Неизвестное действие";
+				error_message = "РќРµРёР·РІРµСЃС‚РЅРѕРµ РґРµР№СЃС‚РІРёРµ";
 				MESSAGE_ERROR("", "", "action is empty");
 			}
 		}
 		else
 		{
-			error_message = "Неизвестный идентификатор поля";
+			error_message = "РќРµРёР·РІРµСЃС‚РЅС‹Р№ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РїРѕР»СЏ";
 			MESSAGE_ERROR("", "", "id is empty");
 		}
 	}
@@ -1002,37 +1002,37 @@ static string	isActionEntityBelongsToAgency(string action, string id, string age
 						}
 						else
 						{
-							error_message = "Нет доступа";
+							error_message = "РќРµС‚ РґРѕСЃС‚СѓРїР°";
 							MESSAGE_ERROR("", "", "Probably hacker action(" + action + "), because action(" + action + ") entity.id(" + id + ") doesn't belong to agency.id(" + agency_id + ")");
 						}
 					}
 					else
 					{
-						error_message = "Нет доступа";
+						error_message = "РќРµС‚ РґРѕСЃС‚СѓРїР°";
 						MESSAGE_ERROR("", "", "action(" + action + ") element.id(" + id + ") doesn't belong to agency.id(" + agency_id + ")");
 					}
 				}
 				else
 				{
-					error_message = "Неизвестное действие";
+					error_message = "РќРµРёР·РІРµСЃС‚РЅРѕРµ РґРµР№СЃС‚РІРёРµ";
 					MESSAGE_ERROR("", "", "unknown action (" + action + ")");
 				}
 			}
 			else
 			{
-				error_message = "Неизвестное действие";
+				error_message = "РќРµРёР·РІРµСЃС‚РЅРѕРµ РґРµР№СЃС‚РІРёРµ";
 				MESSAGE_ERROR("", "", "action is empty");
 			}
 		}
 		else
 		{
-			error_message = "Идентификатор поля не задан";
+			error_message = "РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РїРѕР»СЏ РЅРµ Р·Р°РґР°РЅ";
 			MESSAGE_ERROR("", "", "id is empty");
 		}
 	}
 	else
 	{
-		error_message = "Неизвестное агенство";
+		error_message = "РќРµРёР·РІРµСЃС‚РЅРѕРµ Р°РіРµРЅСЃС‚РІРѕ";
 		MESSAGE_ERROR("", "", "agency_id is empty");
 	}
 
@@ -1081,7 +1081,7 @@ int main(void)
 		indexPage.SetDB(&db);
 
 #ifndef MYSQL_3
-		db.Query("set names cp1251");
+		db.Query("set names utf8;");
 #endif
 
 		action = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("action"));
@@ -1165,19 +1165,19 @@ int main(void)
 						else
 						{
 							MESSAGE_ERROR("", action, "error get reusable data");
-							ostResult << "{\"result\":\"error\",\"description\":\"Ошибка получения данных\"}";
+							ostResult << "{\"result\":\"error\",\"description\":\"РћС€РёР±РєР° РїРѕР»СѓС‡РµРЅРёСЏ РґР°РЅРЅС‹С…\"}";
 						}
 
 					}
 					else
 					{
 						MESSAGE_ERROR("", action, "user(" + user.GetID() + ") neither approver, nor agency");
-						ostResult << "{\"result\":\"error\",\"description\":\"Вы не должны согласовывать\"}";
+						ostResult << "{\"result\":\"error\",\"description\":\"Р’С‹ РЅРµ РґРѕР»Р¶РЅС‹ СЃРѕРіР»Р°СЃРѕРІС‹РІР°С‚СЊ\"}";
 					}
 				}
 				else
 				{
-					ostResult << "{\"result\":\"error\",\"description\":\"Неизвестный тип обьекта\"}";
+					ostResult << "{\"result\":\"error\",\"description\":\"РќРµРёР·РІРµСЃС‚РЅС‹Р№ С‚РёРї РѕР±СЊРµРєС‚Р°\"}";
 					MESSAGE_ERROR("", action, "unknown object type (" + object + ")");
 				}
 
@@ -1226,7 +1226,7 @@ int main(void)
 						else
 						{
 							MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't allow to see this timecard");
-							ostResult << "{\"result\":\"error\",\"description\":\"У Вас нет доступа к этой таймкарте\"}";
+							ostResult << "{\"result\":\"error\",\"description\":\"РЈ Р’Р°СЃ РЅРµС‚ РґРѕСЃС‚СѓРїР° Рє СЌС‚РѕР№ С‚Р°Р№РјРєР°СЂС‚Рµ\"}";
 						}
 					}
 					else if(user.GetType() == "approver")
@@ -1242,20 +1242,20 @@ int main(void)
 						else
 						{
 							MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't allow to see this timecard");
-							ostResult << "{\"result\":\"error\",\"description\":\"У Вас нет доступа к этой таймкарте\"}";
+							ostResult << "{\"result\":\"error\",\"description\":\"РЈ Р’Р°СЃ РЅРµС‚ РґРѕСЃС‚СѓРїР° Рє СЌС‚РѕР№ С‚Р°Р№РјРєР°СЂС‚Рµ\"}";
 						}
 					}
 					else
 					{
 						MESSAGE_ERROR("", action, "user.id(" + user.GetID() + ") not an approver(" + user.GetType() + ")");
-						ostResult << "{\"result\":\"error\",\"description\":\"Вам не назначена роль согласования\"}";
+						ostResult << "{\"result\":\"error\",\"description\":\"Р’Р°Рј РЅРµ РЅР°Р·РЅР°С‡РµРЅР° СЂРѕР»СЊ СЃРѕРіР»Р°СЃРѕРІР°РЅРёСЏ\"}";
 					}
 
 				}
 				else
 				{
 					MESSAGE_ERROR("", action, "parameter timecard_id is empty");
-					ostResult << "{\"result\":\"error\",\"description\":\"Некорректые параметры\"}";
+					ostResult << "{\"result\":\"error\",\"description\":\"РќРµРєРѕСЂСЂРµРєС‚С‹Рµ РїР°СЂР°РјРµС‚СЂС‹\"}";
 				}
 
 
@@ -1321,7 +1321,7 @@ int main(void)
 										if(db.Query("SELECT `eventTimestamp` FROM `timecard_approvals` WHERE `approver_id`=\"" + approver_id + "\" AND `timecard_id`=\"" + timecard_id + "\" AND `eventTimestamp`>\"" + timecard_submit_date + "\";"))
 										{
 											// --- this approver already approved this bt
-											ostResult << "{\"result\":\"error\",\"description\":\"Вы уже подтвердили\"}";
+											ostResult << "{\"result\":\"error\",\"description\":\"Р’С‹ СѓР¶Рµ РїРѕРґС‚РІРµСЂРґРёР»Рё\"}";
 											MESSAGE_ERROR("", action, "approver.id(" + approver_id + ") already approved timecard.id(" + timecard_id + ") at timestamp(" + db.Get(0, "eventTimestamp") + ")");
 										}
 										else
@@ -1351,19 +1351,19 @@ int main(void)
 													}
 													else
 													{
-														ostResult << "{\"result\":\"error\",\"description\":\"ошибка БД\"}";
+														ostResult << "{\"result\":\"error\",\"description\":\"РѕС€РёР±РєР° Р‘Р”\"}";
 														MESSAGE_ERROR("", action, "error getting info about pending timecards");
 													}
 												}
 												else
 												{
-													ostResult << "{\"result\":\"error\",\"description\":\"ошибка подтверждения таймкарты\"}";
+													ostResult << "{\"result\":\"error\",\"description\":\"РѕС€РёР±РєР° РїРѕРґС‚РІРµСЂР¶РґРµРЅРёСЏ С‚Р°Р№РјРєР°СЂС‚С‹\"}";
 													MESSAGE_ERROR("", action, "fail to submit timecard_id(" + timecard_id + "): ");
 												}
 											}
 											else
 											{
-												ostResult << "{\"result\":\"error\",\"description\":\"ошибка обновления списка апруверов\"}";
+												ostResult << "{\"result\":\"error\",\"description\":\"РѕС€РёР±РєР° РѕР±РЅРѕРІР»РµРЅРёСЏ СЃРїРёСЃРєР° Р°РїСЂСѓРІРµСЂРѕРІ\"}";
 												MESSAGE_ERROR("", action, "fail to insert to timecards table with timecard_id(" + timecard_id + ")");
 											}
 										}
@@ -1372,33 +1372,33 @@ int main(void)
 	/*								else
 									{
 										MESSAGE_ERROR("", action, "user.id(" + user.GetID() + ") not an timecard.id(" + timecard_id + ") approver");
-										ostResult << "{\"result\":\"error\",\"description\":\"Вы не должны подтверждать таймкарту у данного договора\"}";
+										ostResult << "{\"result\":\"error\",\"description\":\"Р’С‹ РЅРµ РґРѕР»Р¶РЅС‹ РїРѕРґС‚РІРµСЂР¶РґР°С‚СЊ С‚Р°Р№РјРєР°СЂС‚Сѓ Сѓ РґР°РЅРЅРѕРіРѕ РґРѕРіРѕРІРѕСЂР°\"}";
 									}
 	*/
 								}
 								else
 								{
 									MESSAGE_ERROR("", action, "timecard.id(" + timecard_id + ") have to be in submit state to be approved/rejected, but it is in \"" + timecard_state + "\" state");
-									ostResult << "{\"result\":\"error\",\"description\":\"таймкарта не требует подтверждения\"}";
+									ostResult << "{\"result\":\"error\",\"description\":\"С‚Р°Р№РјРєР°СЂС‚Р° РЅРµ С‚СЂРµР±СѓРµС‚ РїРѕРґС‚РІРµСЂР¶РґРµРЅРёСЏ\"}";
 								}
 							}
 							else
 							{
 								MESSAGE_ERROR("", action, "issue get info about timecard.id(" + timecard_id + ") from DB");
-								ostResult << "{\"result\":\"error\",\"description\":\"Ошибка ДБ\"}";
+								ostResult << "{\"result\":\"error\",\"description\":\"РћС€РёР±РєР° Р”Р‘\"}";
 							}
 						}
 						else
 						{
 							MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't allow to see this timecard");
-							ostResult << "{\"result\":\"error\",\"description\":\"У Вас нет доступа к этой таймкарте\"}";
+							ostResult << "{\"result\":\"error\",\"description\":\"РЈ Р’Р°СЃ РЅРµС‚ РґРѕСЃС‚СѓРїР° Рє СЌС‚РѕР№ С‚Р°Р№РјРєР°СЂС‚Рµ\"}";
 						}
 					}
 				}
 				else
 				{
 					MESSAGE_ERROR("", action, "parameter timecard_id is empty");
-					ostResult << "{\"result\":\"error\",\"description\":\"Некорректые параметры\"}";
+					ostResult << "{\"result\":\"error\",\"description\":\"РќРµРєРѕСЂСЂРµРєС‚С‹Рµ РїР°СЂР°РјРµС‚СЂС‹\"}";
 				}
 
 
@@ -1439,7 +1439,7 @@ int main(void)
 					if(comment.empty())
 					{
 						MESSAGE_ERROR("", action, "reject reason is empty");
-						ostResult << "{\"result\":\"error\",\"description\":\"Необходимо обосновать отказ\"}";
+						ostResult << "{\"result\":\"error\",\"description\":\"РќРµРѕР±С…РѕРґРёРјРѕ РѕР±РѕСЃРЅРѕРІР°С‚СЊ РѕС‚РєР°Р·\"}";
 					}
 					else
 					{
@@ -1490,52 +1490,52 @@ int main(void)
 												}
 												else
 												{
-													ostResult << "{\"result\":\"error\",\"description\":\"ошибка БД\"}";
+													ostResult << "{\"result\":\"error\",\"description\":\"РѕС€РёР±РєР° Р‘Р”\"}";
 													MESSAGE_ERROR("", action, "error getting info about pending timecards");
 												}
 											}
 											else
 											{
-												ostResult << "{\"result\":\"error\",\"description\":\"ошибка БД\"}";
+												ostResult << "{\"result\":\"error\",\"description\":\"РѕС€РёР±РєР° Р‘Р”\"}";
 												MESSAGE_ERROR("", action, "fail to update timecard_id(" + timecard_id + "): " + db.GetErrorMessage());
 											}
 										}
 										else
 										{
-											ostResult << "{\"result\":\"error\",\"description\":\"ошибка обновления списка апруверов\"}";
+											ostResult << "{\"result\":\"error\",\"description\":\"РѕС€РёР±РєР° РѕР±РЅРѕРІР»РµРЅРёСЏ СЃРїРёСЃРєР° Р°РїСЂСѓРІРµСЂРѕРІ\"}";
 											MESSAGE_ERROR("", action, "fail to insert to timecards table with timecard_id(" + timecard_id + ")");
 										}
 									}
 									else
 									{
 										MESSAGE_ERROR("", action, "user.id(" + user.GetID() + ") not an timecard.id(" + timecard_id + ") approver");
-										ostResult << "{\"result\":\"error\",\"description\":\"Вы не должны подтверждать таймкарту у данного договора\"}";
+										ostResult << "{\"result\":\"error\",\"description\":\"Р’С‹ РЅРµ РґРѕР»Р¶РЅС‹ РїРѕРґС‚РІРµСЂР¶РґР°С‚СЊ С‚Р°Р№РјРєР°СЂС‚Сѓ Сѓ РґР°РЅРЅРѕРіРѕ РґРѕРіРѕРІРѕСЂР°\"}";
 									}
 
 								}
 								else
 								{
 									MESSAGE_ERROR("", action, "timecard.id(" + timecard_id + ") have to be in submit state to be approved/rejected, but it is in \"" + timecard_state + "\" state");
-									ostResult << "{\"result\":\"error\",\"description\":\"таймкарта не требует подтверждения\"}";
+									ostResult << "{\"result\":\"error\",\"description\":\"С‚Р°Р№РјРєР°СЂС‚Р° РЅРµ С‚СЂРµР±СѓРµС‚ РїРѕРґС‚РІРµСЂР¶РґРµРЅРёСЏ\"}";
 								}
 							}
 							else
 							{
 								MESSAGE_ERROR("", action, "issue get info about timecard.id(" + timecard_id + ") from DB");
-								ostResult << "{\"result\":\"error\",\"description\":\"Ошибка ДБ\"}";
+								ostResult << "{\"result\":\"error\",\"description\":\"РћС€РёР±РєР° Р”Р‘\"}";
 							}
 						}
 						else
 						{
 							MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't allow to see this timecard");
-							ostResult << "{\"result\":\"error\",\"description\":\"У Вас нет доступа к этой таймкарте\"}";
+							ostResult << "{\"result\":\"error\",\"description\":\"РЈ Р’Р°СЃ РЅРµС‚ РґРѕСЃС‚СѓРїР° Рє СЌС‚РѕР№ С‚Р°Р№РјРєР°СЂС‚Рµ\"}";
 						}
 					}
 				}
 				else
 				{
 					MESSAGE_ERROR("", action, "parameter timecard_id is empty");
-					ostResult << "{\"result\":\"error\",\"description\":\"Некорректые параметры\"}";
+					ostResult << "{\"result\":\"error\",\"description\":\"РќРµРєРѕСЂСЂРµРєС‚С‹Рµ РїР°СЂР°РјРµС‚СЂС‹\"}";
 				}
 
 
@@ -1574,7 +1574,7 @@ int main(void)
 					if(comment.empty())
 					{
 						MESSAGE_ERROR("", action, "reject reason is empty");
-						ostResult << "{\"result\":\"error\",\"description\":\"Необходимо обосновать отказ\"}";
+						ostResult << "{\"result\":\"error\",\"description\":\"РќРµРѕР±С…РѕРґРёРјРѕ РѕР±РѕСЃРЅРѕРІР°С‚СЊ РѕС‚РєР°Р·\"}";
 					}
 					else
 					{
@@ -1625,58 +1625,58 @@ int main(void)
 													}
 													else
 													{
-														ostResult << "{\"result\":\"error\",\"description\":\"ошибка БД\"}";
+														ostResult << "{\"result\":\"error\",\"description\":\"РѕС€РёР±РєР° Р‘Р”\"}";
 														MESSAGE_ERROR("", action, "error getting info about pending bt");
 													}
 												}
 												else
 												{
-													ostResult << "{\"result\":\"error\",\"description\":\"ошибка БД\"}";
+													ostResult << "{\"result\":\"error\",\"description\":\"РѕС€РёР±РєР° Р‘Р”\"}";
 													MESSAGE_ERROR("", action, "fail to update bt_id(" + bt_id + "): " + db.GetErrorMessage());
 												}
 											}
 											else
 											{
-												ostResult << "{\"result\":\"error\",\"description\":\"ошибка обновления списка апруверов\"}";
+												ostResult << "{\"result\":\"error\",\"description\":\"РѕС€РёР±РєР° РѕР±РЅРѕРІР»РµРЅРёСЏ СЃРїРёСЃРєР° Р°РїСЂСѓРІРµСЂРѕРІ\"}";
 												MESSAGE_ERROR("", action, "fail to insert to bt table with bt_id(" + bt_id + ")");
 											}
 										}
 										else
 										{
 											MESSAGE_ERROR("", action, "user.id(" + user.GetID() + ") not an bt.id(" + bt_id + ") approver");
-											ostResult << "{\"result\":\"error\",\"description\":\"Вы не должны подтверждать командировку у данного договора\"}";
+											ostResult << "{\"result\":\"error\",\"description\":\"Р’С‹ РЅРµ РґРѕР»Р¶РЅС‹ РїРѕРґС‚РІРµСЂР¶РґР°С‚СЊ РєРѕРјР°РЅРґРёСЂРѕРІРєСѓ Сѓ РґР°РЅРЅРѕРіРѕ РґРѕРіРѕРІРѕСЂР°\"}";
 										}
 
 									}
 									else
 									{
 										MESSAGE_ERROR("", action, "bt.id(" + bt_id + ") have to be in submit state to be approved/rejected, but it is in \"" + bt_state + "\" state");
-										ostResult << "{\"result\":\"error\",\"description\":\"командировка не требует подтверждения\"}";
+										ostResult << "{\"result\":\"error\",\"description\":\"РєРѕРјР°РЅРґРёСЂРѕРІРєР° РЅРµ С‚СЂРµР±СѓРµС‚ РїРѕРґС‚РІРµСЂР¶РґРµРЅРёСЏ\"}";
 									}
 								}
 								else
 								{
 									MESSAGE_ERROR("", action, "issue get info about bt.id(" + bt_id + ") from DB");
-									ostResult << "{\"result\":\"error\",\"description\":\"Ошибка ДБ\"}";
+									ostResult << "{\"result\":\"error\",\"description\":\"РћС€РёР±РєР° Р”Р‘\"}";
 								}
 							}
 							else
 							{
 								MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't allow to see this bt");
-								ostResult << "{\"result\":\"error\",\"description\":\"У Вас нет доступа к этой командировке\"}";
+								ostResult << "{\"result\":\"error\",\"description\":\"РЈ Р’Р°СЃ РЅРµС‚ РґРѕСЃС‚СѓРїР° Рє СЌС‚РѕР№ РєРѕРјР°РЅРґРёСЂРѕРІРєРµ\"}";
 							}
 						}
 						else
 						{
 							MESSAGE_ERROR("", action, "user.id(" + user.GetID() + ") is " + user.GetType() + ", who can't approve/reject");
-							ostResult << "{\"result\":\"error\",\"description\":\"У Вас нет доступа к этой таймкарте\"}";
+							ostResult << "{\"result\":\"error\",\"description\":\"РЈ Р’Р°СЃ РЅРµС‚ РґРѕСЃС‚СѓРїР° Рє СЌС‚РѕР№ С‚Р°Р№РјРєР°СЂС‚Рµ\"}";
 						}
 					}
 				}
 				else
 				{
 					MESSAGE_ERROR("", action, "parameter bt_id is empty");
-					ostResult << "{\"result\":\"error\",\"description\":\"Некорректые параметры\"}";
+					ostResult << "{\"result\":\"error\",\"description\":\"РќРµРєРѕСЂСЂРµРєС‚С‹Рµ РїР°СЂР°РјРµС‚СЂС‹\"}";
 				}
 
 
@@ -1739,7 +1739,7 @@ int main(void)
 										if(db.Query("SELECT `eventTimestamp` FROM `bt_approvals` WHERE `approver_id`=\"" + approver_id + "\" AND `bt_id`=\"" + bt_id + "\" AND `eventTimestamp`>\"" + bt_submit_date + "\";"))
 										{
 											// --- this approver already approved this bt
-											ostResult << "{\"result\":\"error\",\"description\":\"Вы уже подтвердили\"}";
+											ostResult << "{\"result\":\"error\",\"description\":\"Р’С‹ СѓР¶Рµ РїРѕРґС‚РІРµСЂРґРёР»Рё\"}";
 											MESSAGE_ERROR("", action, "approver.id(" + approver_id + ") already approved bt.id(" + bt_id + ") at timestamp(" + db.Get(0, "eventTimestamp") + ")");
 										}
 										else
@@ -1769,19 +1769,19 @@ int main(void)
 													}
 													else
 													{
-														ostResult << "{\"result\":\"error\",\"description\":\"ошибка БД\"}";
+														ostResult << "{\"result\":\"error\",\"description\":\"РѕС€РёР±РєР° Р‘Р”\"}";
 														MESSAGE_ERROR("", action, "error getting info about pending bt");
 													}
 												}
 												else
 												{
-													ostResult << "{\"result\":\"error\",\"description\":\"ошибка подтверждения таймкарты\"}";
+													ostResult << "{\"result\":\"error\",\"description\":\"РѕС€РёР±РєР° РїРѕРґС‚РІРµСЂР¶РґРµРЅРёСЏ С‚Р°Р№РјРєР°СЂС‚С‹\"}";
 													MESSAGE_ERROR("", action, "fail to submit bt_id(" + bt_id + "): ");
 												}
 											}
 											else
 											{
-												ostResult << "{\"result\":\"error\",\"description\":\"ошибка обновления списка апруверов\"}";
+												ostResult << "{\"result\":\"error\",\"description\":\"РѕС€РёР±РєР° РѕР±РЅРѕРІР»РµРЅРёСЏ СЃРїРёСЃРєР° Р°РїСЂСѓРІРµСЂРѕРІ\"}";
 												MESSAGE_ERROR("", action, "fail to insert to bt table with bt_id(" + bt_id + ")");
 											}
 										}
@@ -1790,38 +1790,38 @@ int main(void)
 									else
 									{
 										MESSAGE_ERROR("", action, "user.id(" + user.GetID() + ") not an bt.id(" + bt_id + ") approver");
-										ostResult << "{\"result\":\"error\",\"description\":\"Вы не должны подтверждать таймкарту у данного договора\"}";
+										ostResult << "{\"result\":\"error\",\"description\":\"Р’С‹ РЅРµ РґРѕР»Р¶РЅС‹ РїРѕРґС‚РІРµСЂР¶РґР°С‚СЊ С‚Р°Р№РјРєР°СЂС‚Сѓ Сѓ РґР°РЅРЅРѕРіРѕ РґРѕРіРѕРІРѕСЂР°\"}";
 									}
 
 								}
 								else
 								{
 									MESSAGE_ERROR("", action, "bt.id(" + bt_id + ") have to be in submit state to be approved/rejected, but it is in \"" + bt_state + "\" state");
-									ostResult << "{\"result\":\"error\",\"description\":\"таймкарта не требует подтверждения\"}";
+									ostResult << "{\"result\":\"error\",\"description\":\"С‚Р°Р№РјРєР°СЂС‚Р° РЅРµ С‚СЂРµР±СѓРµС‚ РїРѕРґС‚РІРµСЂР¶РґРµРЅРёСЏ\"}";
 								}
 							}
 							else
 							{
 								MESSAGE_ERROR("", action, "issue get info about bt.id(" + bt_id + ") from DB");
-								ostResult << "{\"result\":\"error\",\"description\":\"Ошибка ДБ\"}";
+								ostResult << "{\"result\":\"error\",\"description\":\"РћС€РёР±РєР° Р”Р‘\"}";
 							}
 						}
 						else
 						{
 							MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't allow to see this bt");
-							ostResult << "{\"result\":\"error\",\"description\":\"У Вас нет доступа к этой таймкарте\"}";
+							ostResult << "{\"result\":\"error\",\"description\":\"РЈ Р’Р°СЃ РЅРµС‚ РґРѕСЃС‚СѓРїР° Рє СЌС‚РѕР№ С‚Р°Р№РјРєР°СЂС‚Рµ\"}";
 						}
 					}
 					else
 					{
 						MESSAGE_ERROR("", action, "user.id(" + user.GetID() + ") is " + user.GetType() + ", who can't approve/reject");
-						ostResult << "{\"result\":\"error\",\"description\":\"У Вас нет доступа к этой таймкарте\"}";
+						ostResult << "{\"result\":\"error\",\"description\":\"РЈ Р’Р°СЃ РЅРµС‚ РґРѕСЃС‚СѓРїР° Рє СЌС‚РѕР№ С‚Р°Р№РјРєР°СЂС‚Рµ\"}";
 					}
 				}
 				else
 				{
 					MESSAGE_ERROR("", action, "parameter bt_id is empty");
-					ostResult << "{\"result\":\"error\",\"description\":\"Некорректые параметры\"}";
+					ostResult << "{\"result\":\"error\",\"description\":\"РќРµРєРѕСЂСЂРµРєС‚С‹Рµ РїР°СЂР°РјРµС‚СЂС‹\"}";
 				}
 
 
@@ -1870,13 +1870,13 @@ int main(void)
 					else
 					{
 						MESSAGE_ERROR("", action, "dashboard data not gathered completely");
-						ostResult << "{\"result\":\"error\",\"description\":\"Ошибка построения панели управления\"}";
+						ostResult << "{\"result\":\"error\",\"description\":\"РћС€РёР±РєР° РїРѕСЃС‚СЂРѕРµРЅРёСЏ РїР°РЅРµР»Рё СѓРїСЂР°РІР»РµРЅРёСЏ\"}";
 					}
 				}
 				else
 				{
 					MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't owns company");
-					ostResult << "{\"result\":\"error\",\"description\":\"Вы не работаете ни в каком агенстве\"}";
+					ostResult << "{\"result\":\"error\",\"description\":\"Р’С‹ РЅРµ СЂР°Р±РѕС‚Р°РµС‚Рµ РЅРё РІ РєР°РєРѕРј Р°РіРµРЅСЃС‚РІРµ\"}";
 				}
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
@@ -1922,13 +1922,13 @@ int main(void)
 					else
 					{
 						MESSAGE_ERROR("", action, "dashboard data not gathered completely");
-						ostResult << "{\"result\":\"error\",\"description\":\"Ошибка построения панели управления\"}";
+						ostResult << "{\"result\":\"error\",\"description\":\"РћС€РёР±РєР° РїРѕСЃС‚СЂРѕРµРЅРёСЏ РїР°РЅРµР»Рё СѓРїСЂР°РІР»РµРЅРёСЏ\"}";
 					}
 				}
 				else
 				{
 					MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't owns company");
-					ostResult << "{\"result\":\"error\",\"description\":\"Вы не работаете ни в каком агенстве\"}";
+					ostResult << "{\"result\":\"error\",\"description\":\"Р’С‹ РЅРµ СЂР°Р±РѕС‚Р°РµС‚Рµ РЅРё РІ РєР°РєРѕРј Р°РіРµРЅСЃС‚РІРµ\"}";
 				}
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
@@ -1971,13 +1971,13 @@ int main(void)
 					else
 					{
 						MESSAGE_ERROR("", action, "dashboard data not gathered completely");
-						ostResult << "{\"result\":\"error\",\"description\":\"Ошибка построения панели управления\"}";
+						ostResult << "{\"result\":\"error\",\"description\":\"РћС€РёР±РєР° РїРѕСЃС‚СЂРѕРµРЅРёСЏ РїР°РЅРµР»Рё СѓРїСЂР°РІР»РµРЅРёСЏ\"}";
 					}
 				}
 				else
 				{
 					MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't owns company");
-					ostResult << "{\"result\":\"error\",\"description\":\"Вы не работаете ни в каком агенстве\"}";
+					ostResult << "{\"result\":\"error\",\"description\":\"Р’С‹ РЅРµ СЂР°Р±РѕС‚Р°РµС‚Рµ РЅРё РІ РєР°РєРѕРј Р°РіРµРЅСЃС‚РІРµ\"}";
 				}
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
@@ -2043,14 +2043,14 @@ int main(void)
 					}
 					else
 					{
-						error_message = "Агенство не найдено";
+						error_message = "РђРіРµРЅСЃС‚РІРѕ РЅРµ РЅР°Р№РґРµРЅРѕ";
 						MESSAGE_ERROR("", action, "user.id(" + user.GetID() + ") is not an agency employee");
 					}
 				}
 				else
 				{
 					MESSAGE_ERROR("", action, "user(" + user.GetID() + ") is not an agency employee");
-					error_message = "Информация доступна только для агенства";
+					error_message = "РРЅС„РѕСЂРјР°С†РёСЏ РґРѕСЃС‚СѓРїРЅР° С‚РѕР»СЊРєРѕ РґР»СЏ Р°РіРµРЅСЃС‚РІР°";
 				}
 
 				if(error_message.empty())
@@ -2100,7 +2100,7 @@ int main(void)
 				else
 				{
 					MESSAGE_ERROR("", action, "user(" + user.GetID() + ") is not an agency employee");
-					error_message = "Информация доступна только для агенства";
+					error_message = "РРЅС„РѕСЂРјР°С†РёСЏ РґРѕСЃС‚СѓРїРЅР° С‚РѕР»СЊРєРѕ РґР»СЏ Р°РіРµРЅСЃС‚РІР°";
 				}
 
 				if(error_message.empty())
@@ -2163,13 +2163,13 @@ int main(void)
 					else
 					{
 						MESSAGE_ERROR("", action, "cost_center.id(" + cost_center_id + ") doesn't belongs to agance user(" + user.GetID() + ") employeed");
-						error_message = "Информация доступна только для агенства";
+						error_message = "РРЅС„РѕСЂРјР°С†РёСЏ РґРѕСЃС‚СѓРїРЅР° С‚РѕР»СЊРєРѕ РґР»СЏ Р°РіРµРЅСЃС‚РІР°";
 					}
 				}
 				else
 				{
 					MESSAGE_ERROR("", action, "user(" + user.GetID() + ") is not an agency employee");
-					error_message = "Информация доступна только для агенства";
+					error_message = "РРЅС„РѕСЂРјР°С†РёСЏ РґРѕСЃС‚СѓРїРЅР° С‚РѕР»СЊРєРѕ РґР»СЏ Р°РіРµРЅСЃС‚РІР°";
 				}
 
 				if(error_message.empty())
@@ -2218,14 +2218,14 @@ int main(void)
 					}
 					else
 					{
-						error_message = "Агенство не найдено";
+						error_message = "РђРіРµРЅСЃС‚РІРѕ РЅРµ РЅР°Р№РґРµРЅРѕ";
 						MESSAGE_ERROR("", action, "user.id(" + user.GetID() + ") is not an agency employee");
 					}
 				}
 				else
 				{
 					MESSAGE_ERROR("", action, "user(" + user.GetID() + ") is not an agency employee");
-					error_message = "Информация доступна только для агенства";
+					error_message = "РРЅС„РѕСЂРјР°С†РёСЏ РґРѕСЃС‚СѓРїРЅР° С‚РѕР»СЊРєРѕ РґР»СЏ Р°РіРµРЅСЃС‚РІР°";
 				}
 
 				if(error_message.empty())
@@ -2354,7 +2354,7 @@ int main(void)
 				}
 				else
 				{
-					error_message = "Поле не должно быть пустым";
+					error_message = "РџРѕР»Рµ РЅРµ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ РїСѓСЃС‚С‹Рј";
 					MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") didn't set new value in sow.id(" + sow_id + ")");
 				}
 
@@ -2515,7 +2515,7 @@ int main(void)
 						}
 						else
 						{
-							error_message = "Агенство не найдено";
+							error_message = "РђРіРµРЅСЃС‚РІРѕ РЅРµ РЅР°Р№РґРµРЅРѕ";
 							MESSAGE_ERROR("", action, "agency.id not found by user.id(" + user.GetID() + ") employment");
 						}
 					}
@@ -2526,7 +2526,7 @@ int main(void)
 				}
 				else
 				{
-					error_message = "Поле не должно быть пустым";
+					error_message = "РџРѕР»Рµ РЅРµ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ РїСѓСЃС‚С‹Рј";
 					MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") didn't set new_value");
 				}
 
@@ -2624,7 +2624,7 @@ int main(void)
 												{
 													MESSAGE_DEBUG("", "", "no notification about task creation");
 												}
-												if(NotifySoWContractPartiesAboutChanges(action, task_assignment_id, sow_id, "", customer + " / " + project + " / " + task + " ( с " + assignment_start + " по " + assignment_end + ")", &db, &user))
+												if(NotifySoWContractPartiesAboutChanges(action, task_assignment_id, sow_id, "", customer + " / " + project + " / " + task + " ( СЃ " + assignment_start + " РїРѕ " + assignment_end + ")", &db, &user))
 												{
 												}
 												else
@@ -2635,38 +2635,38 @@ int main(void)
 											else
 											{
 												MESSAGE_DEBUG("", action, "fail to create assignment sow.id(" + sow_id + ") task.id(" + task_id + ")");
-												error_message = "Неудалось создать назначение";
+												error_message = "РќРµСѓРґР°Р»РѕСЃСЊ СЃРѕР·РґР°С‚СЊ РЅР°Р·РЅР°С‡РµРЅРёРµ";
 											}
 										}
 										else
 										{
 											MESSAGE_DEBUG("", action, "assignment Customer/Project/Task already exists for this sow.id(" + sow_id + ")");
-											error_message = "Такое назначение уже существует";
+											error_message = "РўР°РєРѕРµ РЅР°Р·РЅР°С‡РµРЅРёРµ СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚";
 										}
 										
 									}
 									else
 									{
 										MESSAGE_DEBUG("", action, "new assignment finish(" + period_end + ")  earlier than start(" + period_start + ")");
-										error_message = "Начало назначения должно быть раньше, чем окончание";
+										error_message = "РќР°С‡Р°Р»Рѕ РЅР°Р·РЅР°С‡РµРЅРёСЏ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ СЂР°РЅСЊС€Рµ, С‡РµРј РѕРєРѕРЅС‡Р°РЅРёРµ";
 									}
 								}
 								else
 								{
 									MESSAGE_DEBUG("", action, "new assignment end " + period_end + " later than sow.id(" + sow_id + ") end");
-									error_message = "Новое назначение не должно заканчиваться позднее контракта";
+									error_message = "РќРѕРІРѕРµ РЅР°Р·РЅР°С‡РµРЅРёРµ РЅРµ РґРѕР»Р¶РЅРѕ Р·Р°РєР°РЅС‡РёРІР°С‚СЊСЃСЏ РїРѕР·РґРЅРµРµ РєРѕРЅС‚СЂР°РєС‚Р°";
 								}
 							}
 							else
 							{
 								MESSAGE_DEBUG("", action, "new assignment start " + period_start + " earlier than sow.id(" + sow_id + ") start");
-								error_message = "Новое назначение не должно начинаться раньше контракта";
+								error_message = "РќРѕРІРѕРµ РЅР°Р·РЅР°С‡РµРЅРёРµ РЅРµ РґРѕР»Р¶РЅРѕ РЅР°С‡РёРЅР°С‚СЊСЃСЏ СЂР°РЅСЊС€Рµ РєРѕРЅС‚СЂР°РєС‚Р°";
 							}
 						}
 						else
 						{
 							MESSAGE_ERROR("", action, "sow.id" + sow_id + " not found");
-							error_message = "Контракт не найден";
+							error_message = "РљРѕРЅС‚СЂР°РєС‚ РЅРµ РЅР°Р№РґРµРЅ";
 						}
 					}
 					else
@@ -2678,7 +2678,7 @@ int main(void)
 				else
 				{
 					MESSAGE_ERROR("", action, "one of mandatory parameters missed");
-					error_message = "Некоторые параметры не заданы";
+					error_message = "РќРµРєРѕС‚РѕСЂС‹Рµ РїР°СЂР°РјРµС‚СЂС‹ РЅРµ Р·Р°РґР°РЅС‹";
 				}
 
 				if(error_message.empty())
@@ -2748,7 +2748,7 @@ int main(void)
 										else
 										{
 											MESSAGE_DEBUG("", action, "fail to create assignment sow.id(" + sow_id + ") new_bt_expense_template.id(" + new_bt_expense_template_id + ")");
-											error_message = "Неудалось создать назначение";
+											error_message = "РќРµСѓРґР°Р»РѕСЃСЊ СЃРѕР·РґР°С‚СЊ РЅР°Р·РЅР°С‡РµРЅРёРµ";
 											break;
 										}
 									}
@@ -2766,7 +2766,7 @@ int main(void)
 						else
 						{
 							MESSAGE_ERROR("", action, "sow.id" + sow_id + " not found");
-							error_message = "Контракт не найден";
+							error_message = "РљРѕРЅС‚СЂР°РєС‚ РЅРµ РЅР°Р№РґРµРЅ";
 						}
 					}
 					else
@@ -2778,7 +2778,7 @@ int main(void)
 				else
 				{
 					MESSAGE_ERROR("", action, "one of mandatory parameters missed");
-					error_message = "Некоторые параметры не заданы";
+					error_message = "РќРµРєРѕС‚РѕСЂС‹Рµ РїР°СЂР°РјРµС‚СЂС‹ РЅРµ Р·Р°РґР°РЅС‹";
 				}
 
 				if(error_message.empty())
@@ -2846,14 +2846,14 @@ int main(void)
 							}
 							else
 							{
-								error_message = "Задача (" + task + ") уже существует у заказчика " + customer + " в проекте " + project;
+								error_message = "Р—Р°РґР°С‡Р° (" + task + ") СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚ Сѓ Р·Р°РєР°Р·С‡РёРєР° " + customer + " РІ РїСЂРѕРµРєС‚Рµ " + project;
 								MESSAGE_DEBUG("", action, "Customer/Project/Task already exists for this agency.id(" + agency_id + ")");
 							}
 						}
 						else
 						{
 							MESSAGE_ERROR("", action, "agency.id not found by user.id(" + user.GetID() + ") employment");
-							error_message = "Агенство не найдено";
+							error_message = "РђРіРµРЅСЃС‚РІРѕ РЅРµ РЅР°Р№РґРµРЅРѕ";
 						}
 					}
 					else
@@ -2864,7 +2864,7 @@ int main(void)
 				else
 				{
 					MESSAGE_ERROR("", action, "one of mandatory parameters missed");
-					error_message = "Некоторые параметры не заданы";
+					error_message = "РќРµРєРѕС‚РѕСЂС‹Рµ РїР°СЂР°РјРµС‚СЂС‹ РЅРµ Р·Р°РґР°РЅС‹";
 				}
 
 				if(error_message.empty())
@@ -2929,7 +2929,7 @@ int main(void)
 					}
 					else
 					{
-						error_message = "некорректный параметер random у документа";
+						error_message = "РЅРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ РїР°СЂР°РјРµС‚РµСЂ random Сѓ РґРѕРєСѓРјРµРЅС‚Р°";
 						MESSAGE_ERROR("", action, "Can't convert expense_random(" + http_params->Get(expense_random_name) + ") to number")
 					}
 
@@ -2975,7 +2975,7 @@ int main(void)
 						else
 						{
 							MESSAGE_ERROR("", action, "agency.id not found by user.id(" + user.GetID() + ") employment");
-							error_message = "Агенство не найдено";
+							error_message = "РђРіРµРЅСЃС‚РІРѕ РЅРµ РЅР°Р№РґРµРЅРѕ";
 						}
 					}
 					else
@@ -3048,7 +3048,7 @@ int main(void)
 					}
 					else
 					{
-						error_message = "некорректный параметер random у документа";
+						error_message = "РЅРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ РїР°СЂР°РјРµС‚РµСЂ random Сѓ РґРѕРєСѓРјРµРЅС‚Р°";
 						MESSAGE_ERROR("", action, "Can't convert expense_random(" + http_params->Get(expense_random_name) + ") to number")
 					}
 
@@ -3103,7 +3103,7 @@ int main(void)
 						else
 						{
 							MESSAGE_ERROR("", action, "agency.id not found by user.id(" + user.GetID() + ") employment");
-							error_message = "Агенство не найдено";
+							error_message = "РђРіРµРЅСЃС‚РІРѕ РЅРµ РЅР°Р№РґРµРЅРѕ";
 						}
 					}
 					else
@@ -3179,13 +3179,13 @@ int main(void)
 								else
 								{
 									MESSAGE_DEBUG("", action, counter + " instances reported on timecard_task.id(" + task_id + ")");
-									error_message = "Нельзя удалять, поскольку субконтрактор отчитался на это назначение " + counter + " раз(а)";
+									error_message = "РќРµР»СЊР·СЏ СѓРґР°Р»СЏС‚СЊ, РїРѕСЃРєРѕР»СЊРєСѓ СЃСѓР±РєРѕРЅС‚СЂР°РєС‚РѕСЂ РѕС‚С‡РёС‚Р°Р»СЃСЏ РЅР° СЌС‚Рѕ РЅР°Р·РЅР°С‡РµРЅРёРµ " + counter + " СЂР°Р·(Р°)";
 								}
 							}
 							else
 							{
 								MESSAGE_ERROR("", action, "can't define # of reported lines");
-								error_message = "Ошибка БД";
+								error_message = "РћС€РёР±РєР° Р‘Р”";
 							}
 						}
 						else
@@ -3196,14 +3196,14 @@ int main(void)
 					else
 					{
 						MESSAGE_ERROR("", action, "timecard_task_assignment.id(" + timecard_task_assignment_id + ") not found");
-						error_message = "Назначение не найдено";
+						error_message = "РќР°Р·РЅР°С‡РµРЅРёРµ РЅРµ РЅР°Р№РґРµРЅРѕ";
 					}
 
 				}
 				else
 				{
 					MESSAGE_ERROR("", action, "one of mandatory parameters missed");
-					error_message = "Информация доступна только для агенства";
+					error_message = "РРЅС„РѕСЂРјР°С†РёСЏ РґРѕСЃС‚СѓРїРЅР° С‚РѕР»СЊРєРѕ РґР»СЏ Р°РіРµРЅСЃС‚РІР°";
 				}
 
 				if(error_message.empty())
@@ -3272,13 +3272,13 @@ int main(void)
 								else
 								{
 									MESSAGE_DEBUG("", action, counter + " instances reported on bt_expenses.id(" + bt_expense_template_id + ")");
-									error_message = "Нельзя удалять, поскольку субконтрактор использовал этот расход " + counter + " раз(а)";
+									error_message = "РќРµР»СЊР·СЏ СѓРґР°Р»СЏС‚СЊ, РїРѕСЃРєРѕР»СЊРєСѓ СЃСѓР±РєРѕРЅС‚СЂР°РєС‚РѕСЂ РёСЃРїРѕР»СЊР·РѕРІР°Р» СЌС‚РѕС‚ СЂР°СЃС…РѕРґ " + counter + " СЂР°Р·(Р°)";
 								}
 							}
 							else
 							{
 								MESSAGE_ERROR("", action, "can't define # of reported lines");
-								error_message = "Ошибка БД";
+								error_message = "РћС€РёР±РєР° Р‘Р”";
 							}
 						}
 						else
@@ -3289,14 +3289,14 @@ int main(void)
 					else
 					{
 						MESSAGE_ERROR("", action, "bt_sow_assignment.id(" + bt_expense_assignment_id + ") not found");
-						error_message = "Назначение не найдено";
+						error_message = "РќР°Р·РЅР°С‡РµРЅРёРµ РЅРµ РЅР°Р№РґРµРЅРѕ";
 					}
 
 				}
 				else
 				{
 					MESSAGE_ERROR("", action, "one of mandatory parameters missed");
-					error_message = "Информация доступна только для агенства";
+					error_message = "РРЅС„РѕСЂРјР°С†РёСЏ РґРѕСЃС‚СѓРїРЅР° С‚РѕР»СЊРєРѕ РґР»СЏ Р°РіРµРЅСЃС‚РІР°";
 				}
 
 				if(error_message.empty())
@@ -3405,7 +3405,7 @@ int main(void)
 						else
 						{
 							MESSAGE_ERROR("", action, "agency.id not found by user.id(" + user.GetID() + ") employment");
-							error_message = "Агенство не найдено";
+							error_message = "РђРіРµРЅСЃС‚РІРѕ РЅРµ РЅР°Р№РґРµРЅРѕ";
 						}
 					}
 					else
@@ -3416,7 +3416,7 @@ int main(void)
 				else
 				{
 					MESSAGE_ERROR("", action, "task_id missed");
-					error_message = "Не указан номер задачи на удаление";
+					error_message = "РќРµ СѓРєР°Р·Р°РЅ РЅРѕРјРµСЂ Р·Р°РґР°С‡Рё РЅР° СѓРґР°Р»РµРЅРёРµ";
 				}
 
 				if(error_message.empty())
@@ -3492,7 +3492,7 @@ int main(void)
 						else
 						{
 							MESSAGE_ERROR("", action, "agency.id not found by user.id(" + user.GetID() + ") employment");
-							error_message = "Агенство не найдено";
+							error_message = "РђРіРµРЅСЃС‚РІРѕ РЅРµ РЅР°Р№РґРµРЅРѕ";
 						}
 					}
 					else
@@ -3503,7 +3503,7 @@ int main(void)
 				else
 				{
 					MESSAGE_ERROR("", action, "expense_template_id missed");
-					error_message = "Не указан номер расхода на удаление";
+					error_message = "РќРµ СѓРєР°Р·Р°РЅ РЅРѕРјРµСЂ СЂР°СЃС…РѕРґР° РЅР° СѓРґР°Р»РµРЅРёРµ";
 				}
 
 				if(error_message.empty())
@@ -3577,7 +3577,7 @@ int main(void)
 						else
 						{
 							MESSAGE_ERROR("", action, "agency.id not found by user.id(" + user.GetID() + ") employment");
-							error_message = "Агенство не найдено";
+							error_message = "РђРіРµРЅСЃС‚РІРѕ РЅРµ РЅР°Р№РґРµРЅРѕ";
 						}
 					}
 					else
@@ -3588,7 +3588,7 @@ int main(void)
 				else
 				{
 					MESSAGE_ERROR("", action, "expense_template_line_id missed");
-					error_message = "Не указан номер расхода на удаление";
+					error_message = "РќРµ СѓРєР°Р·Р°РЅ РЅРѕРјРµСЂ СЂР°СЃС…РѕРґР° РЅР° СѓРґР°Р»РµРЅРёРµ";
 				}
 
 				if(error_message.empty())
@@ -3844,7 +3844,7 @@ int main(void)
 				}
 				else
 				{
-					error_message = "Агенство не найдено";
+					error_message = "РђРіРµРЅСЃС‚РІРѕ РЅРµ РЅР°Р№РґРµРЅРѕ";
 					MESSAGE_DEBUG("", action, "agency(" + agency_id + ") not found");
 				}
 
@@ -3914,7 +3914,7 @@ int main(void)
 									}
 									else
 									{
-										error_message = "Пользователь не найден в БД";
+										error_message = "РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ РЅРµ РЅР°Р№РґРµРЅ РІ Р‘Р”";
 										MESSAGE_DEBUG("", action, "fail to get user.id by employee_id(" + employee_id + ")");
 									}
 								}
@@ -3931,7 +3931,7 @@ int main(void)
 						else
 						{
 							MESSAGE_ERROR("", action, "agency.id not found by user.id(" + user.GetID() + ") employment");
-							error_message = "Агенство не найдено";
+							error_message = "РђРіРµРЅСЃС‚РІРѕ РЅРµ РЅР°Р№РґРµРЅРѕ";
 						}
 					}
 					else
@@ -3942,7 +3942,7 @@ int main(void)
 				else
 				{
 					MESSAGE_ERROR("", action, "employee_id missed");
-					error_message = "Не указан номер задачи на удаление";
+					error_message = "РќРµ СѓРєР°Р·Р°РЅ РЅРѕРјРµСЂ Р·Р°РґР°С‡Рё РЅР° СѓРґР°Р»РµРЅРёРµ";
 				}
 
 				if(error_message.empty())
@@ -4004,7 +4004,7 @@ int main(void)
 			}
 			else
 			{
-				error_message = "Некорректные параметры";
+				error_message = "РќРµРєРѕСЂСЂРµРєС‚РЅС‹Рµ РїР°СЂР°РјРµС‚СЂС‹";
 				MESSAGE_DEBUG("", "", "mandatory parameter missed");
 			}
 
@@ -4080,7 +4080,7 @@ int main(void)
 			}
 			else
 			{
-				error_message = "Некорректные параметры";
+				error_message = "РќРµРєРѕСЂСЂРµРєС‚РЅС‹Рµ РїР°СЂР°РјРµС‚СЂС‹";
 				MESSAGE_DEBUG("", "", "mandatory parameter missed");
 			}
 
@@ -4162,7 +4162,7 @@ int main(void)
 			}
 			else
 			{
-				error_message = "Некорректные параметры";
+				error_message = "РќРµРєРѕСЂСЂРµРєС‚РЅС‹Рµ РїР°СЂР°РјРµС‚СЂС‹";
 				MESSAGE_DEBUG("", "", "mandatory parameter missed");
 			}
 
@@ -4213,7 +4213,7 @@ int main(void)
 								}
 								else
 								{
-									error_message = "Агенство не найдено";
+									error_message = "РђРіРµРЅСЃС‚РІРѕ РЅРµ РЅР°Р№РґРµРЅРѕ";
 									MESSAGE_DEBUG("", action, "sow_id(" + sow_id + ") not found");
 								}
 							}
@@ -4224,20 +4224,20 @@ int main(void)
 						}
 						else
 						{
-							error_message = "Агенство не найдено";
+							error_message = "РђРіРµРЅСЃС‚РІРѕ РЅРµ РЅР°Р№РґРµРЅРѕ";
 							MESSAGE_ERROR("", action, "user.id(" + user.GetID() + ") is not an agency employee");
 						}
 					}
 					else
 					{
 						MESSAGE_ERROR("", action, "user(" + user.GetID() + ") is not an agency employee");
-						error_message = "Информация доступна только для агенства";
+						error_message = "РРЅС„РѕСЂРјР°С†РёСЏ РґРѕСЃС‚СѓРїРЅР° С‚РѕР»СЊРєРѕ РґР»СЏ Р°РіРµРЅСЃС‚РІР°";
 					}
 				}
 				else
 				{
 					MESSAGE_ERROR("", action, "user(" + user.GetID() + ") is not an agency employee");
-					error_message = "Информация доступна только для агенства";
+					error_message = "РРЅС„РѕСЂРјР°С†РёСЏ РґРѕСЃС‚СѓРїРЅР° С‚РѕР»СЊРєРѕ РґР»СЏ Р°РіРµРЅСЃС‚РІР°";
 				}
 
 

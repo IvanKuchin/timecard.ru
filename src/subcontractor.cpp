@@ -51,18 +51,18 @@ static string isUserAllowedAccessToCompany(string company_id, CMysql *db, CUser 
 			else
 			{
 				MESSAGE_DEBUG("", "", "user(" + user->GetID() + ") have not rights to change company.id(" + company_id + ") data");
-				error_message = "Вы не можете менять данные kompanii";
+				error_message = "Р’С‹ РЅРµ РјРѕР¶РµС‚Рµ РјРµРЅСЏС‚СЊ РґР°РЅРЅС‹Рµ kompanii";
 			}
 		}
 		else
 		{
 			MESSAGE_ERROR("", "", "user(" + user->GetID() + ") must be a subcontractor(" + user->GetType() + ")");
-			error_message = "Информация доступна только для subcontractor";
+			error_message = "РРЅС„РѕСЂРјР°С†РёСЏ РґРѕСЃС‚СѓРїРЅР° С‚РѕР»СЊРєРѕ РґР»СЏ subcontractor";
 		}
 	}
 	else
 	{
-		error_message = "Неизвестный номер kompanii";
+		error_message = "РќРµРёР·РІРµСЃС‚РЅС‹Р№ РЅРѕРјРµСЂ kompanii";
 		MESSAGE_ERROR("", "", "company_id is empty");
 	}
 
@@ -171,7 +171,7 @@ int main()
 	indexPage.SetDB(&db);
 
 #ifndef MYSQL_3
-	db.Query("set names cp1251");
+	db.Query("set names utf8;");
 #endif
 
 	action = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("action"));
@@ -497,7 +497,7 @@ int main()
 					if(temp.empty())
 					{
 						MESSAGE_ERROR("", action, "timecard object is empty. check previous error message.")
-						ostResult << "{\"status\":\"error\",\"description\":\"Ошибка в алгоритме.\"}";
+						ostResult << "{\"status\":\"error\",\"description\":\"РћС€РёР±РєР° РІ Р°Р»РіРѕСЂРёС‚РјРµ.\"}";
 					}
 					else
 					{
@@ -549,7 +549,7 @@ int main()
 				{
 					MESSAGE_DEBUG("", action, "period_start or period_length missed");
 				}
-				ostResult << "{\"status\":\"error\",\"description\":\"Пропущены обязательные параметры. Обратитьесь в тех. поддержку\"}";
+				ostResult << "{\"status\":\"error\",\"description\":\"РџСЂРѕРїСѓС‰РµРЅС‹ РѕР±СЏР·Р°С‚РµР»СЊРЅС‹Рµ РїР°СЂР°РјРµС‚СЂС‹. РћР±СЂР°С‚РёС‚СЊРµСЃСЊ РІ С‚РµС…. РїРѕРґРґРµСЂР¶РєСѓ\"}";
 			}
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
@@ -624,7 +624,7 @@ int main()
 			else
 			{
 				MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't owns company");
-				ostResult << "{\"status\":\"error\",\"description\":\"Вы не создали компанию\"}";
+				ostResult << "{\"status\":\"error\",\"description\":\"Р’С‹ РЅРµ СЃРѕР·РґР°Р»Рё РєРѕРјРїР°РЅРёСЋ\"}";
 			}
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
@@ -749,7 +749,7 @@ int main()
 			else
 			{
 				MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't owns company");
-				ostResult << "{\"status\":\"error\",\"description\":\"Вы не создали компанию\"}";
+				ostResult << "{\"status\":\"error\",\"description\":\"Р’С‹ РЅРµ СЃРѕР·РґР°Р»Рё РєРѕРјРїР°РЅРёСЋ\"}";
 			}
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
@@ -827,20 +827,20 @@ int main()
 					else
 					{
 						MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't owns company");
-						ostResult << "{\"status\":\"error\",\"description\":\"Вы не создали компанию\"}";
+						ostResult << "{\"status\":\"error\",\"description\":\"Р’С‹ РЅРµ СЃРѕР·РґР°Р»Рё РєРѕРјРїР°РЅРёСЋ\"}";
 					}
 */
 				}
 				else
 				{
 					MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't have accee to bt.id(" + bt_id + ")");
-					ostResult << "{\"status\":\"error\",\"description\":\"У Вас нет доступа\"}";
+					ostResult << "{\"status\":\"error\",\"description\":\"РЈ Р’Р°СЃ РЅРµС‚ РґРѕСЃС‚СѓРїР°\"}";
 				}
 			}
 			else
 			{
 				MESSAGE_ERROR("", action, "bt_id is empty")
-				ostResult << "{\"status\":\"error\",\"description\":\"Некорректные параметры\"}";
+				ostResult << "{\"status\":\"error\",\"description\":\"РќРµРєРѕСЂСЂРµРєС‚РЅС‹Рµ РїР°СЂР°РјРµС‚СЂС‹\"}";
 			}
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
@@ -905,7 +905,7 @@ int main()
 			else
 			{
 				MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't owns company");
-				ostResult << "{\"status\":\"error\",\"description\":\"Вы не создали компанию\"}";
+				ostResult << "{\"status\":\"error\",\"description\":\"Р’С‹ РЅРµ СЃРѕР·РґР°Р»Рё РєРѕРјРїР°РЅРёСЋ\"}";
 			}
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
@@ -973,19 +973,19 @@ int main()
 					else
 					{
 						MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't allow to see this timecard");
-						ostResult << "{\"status\":\"error\",\"description\":\"У Вас нет доступа к этой таймкарте\"}";
+						ostResult << "{\"status\":\"error\",\"description\":\"РЈ Р’Р°СЃ РЅРµС‚ РґРѕСЃС‚СѓРїР° Рє СЌС‚РѕР№ С‚Р°Р№РјРєР°СЂС‚Рµ\"}";
 					}
 				}
 				else
 				{
 					MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't owns company");
-					ostResult << "{\"status\":\"error\",\"description\":\"Вы не создали компанию\"}";
+					ostResult << "{\"status\":\"error\",\"description\":\"Р’С‹ РЅРµ СЃРѕР·РґР°Р»Рё РєРѕРјРїР°РЅРёСЋ\"}";
 				}
 			}
 			else
 			{
 				MESSAGE_ERROR("", action, "parameter timecard_id is empty");
-				ostResult << "{\"status\":\"error\",\"description\":\"Некорректые параметры\"}";
+				ostResult << "{\"status\":\"error\",\"description\":\"РќРµРєРѕСЂСЂРµРєС‚С‹Рµ РїР°СЂР°РјРµС‚СЂС‹\"}";
 			}
 
 
@@ -1175,7 +1175,7 @@ int main()
 												{
 													MESSAGE_DEBUG("", "", "no notification about task creation");
 												}
-												if(NotifySoWContractPartiesAboutChanges("AJAX_addTaskAssignment", task_assignment_id, sow_id, "", item.customer + " / " + item.project + " / " + item.task + " ( с " + sow_start_date + " по " + sow_end_date + ")", &db, &user))
+												if(NotifySoWContractPartiesAboutChanges("AJAX_addTaskAssignment", task_assignment_id, sow_id, "", item.customer + " / " + item.project + " / " + item.task + " ( СЃ " + sow_start_date + " РїРѕ " + sow_end_date + ")", &db, &user))
 												{
 												}
 												else
@@ -1186,21 +1186,21 @@ int main()
 											else
 											{
 												MESSAGE_DEBUG("", action, "fail to create assignment sow.id(" + sow_id + ") task.id(" + task_id + ")");
-												error_description = "Неудалось создать назначение";
+												error_description = "РќРµСѓРґР°Р»РѕСЃСЊ СЃРѕР·РґР°С‚СЊ РЅР°Р·РЅР°С‡РµРЅРёРµ";
 												break;
 											}
 										}
 										else
 										{
 											MESSAGE_ERROR("", action, "sow(" + sow_id + ") start and end period can't be defined");
-											error_description = "Ошибка БД";
+											error_description = "РћС€РёР±РєР° Р‘Р”";
 											break;
 										}
 									}
 									else
 									{
 										MESSAGE_ERROR("", action, "SoW(" + sow_id + ") doesn't allows create tasks or consistensy issue");
-										error_description = "SoW не позволяет создавать новые задачи";
+										error_description = "SoW РЅРµ РїРѕР·РІРѕР»СЏРµС‚ СЃРѕР·РґР°РІР°С‚СЊ РЅРѕРІС‹Рµ Р·Р°РґР°С‡Рё";
 										break;
 									}
 								}
@@ -1220,7 +1220,7 @@ int main()
 											if(db.isError())
 											{
 												MESSAGE_ERROR("", action, "DB INSERT issue: (" + db.GetErrorMessage() + ")");
-												error_description = "ошибка БД";
+												error_description = "РѕС€РёР±РєР° Р‘Р”";
 												break;
 											}
 										}
@@ -1240,7 +1240,7 @@ int main()
 												if(!temp)
 												{
 													MESSAGE_ERROR("", action, "DB INSERT issue: (" + db.GetErrorMessage() + ")");
-													error_description = "ошибка БД";
+													error_description = "РѕС€РёР±РєР° Р‘Р”";
 													break;
 												}
 											}
@@ -1255,13 +1255,13 @@ int main()
 								else if((timecard_status == "submit") || (timecard_status == "approved"))
 								{
 									MESSAGE_DEBUG("", action, "timecard_id(" + timecard_id + ") already submit, you can't change it");
-									error_description = "Таймкарта уже отправлена, изменить нельзя";
+									error_description = "РўР°Р№РјРєР°СЂС‚Р° СѓР¶Рµ РѕС‚РїСЂР°РІР»РµРЅР°, РёР·РјРµРЅРёС‚СЊ РЅРµР»СЊР·СЏ";
 									break;
 								}
 								else
 								{
 									MESSAGE_ERROR("", action, "unknown timecard_id(" + timecard_id + ") status (" + timecard_status + ")");
-									error_description = "Ошибка таймкарты";
+									error_description = "РћС€РёР±РєР° С‚Р°Р№РјРєР°СЂС‚С‹";
 									break;
 								}
 							}
@@ -1269,7 +1269,7 @@ int main()
 					}
 					else
 					{
-						error_description = "Таймкарта не найдена";
+						error_description = "РўР°Р№РјРєР°СЂС‚Р° РЅРµ РЅР°Р№РґРµРЅР°";
 						MESSAGE_ERROR("", action, "timecard_id(" + timecard_id + ") or status (" + timecard_status + ") or agency_id(" + agency_id + ") is empty");
 					}
 
@@ -1301,13 +1301,13 @@ int main()
 										}
 										else
 										{
-											error_description = "ошибка отправки таймкарты";
+											error_description = "РѕС€РёР±РєР° РѕС‚РїСЂР°РІРєРё С‚Р°Р№РјРєР°СЂС‚С‹";
 											MESSAGE_ERROR("", action, "fail to submit timecard_id(" + timecard_id + ")");
 										}
 									}
 									else
 									{
-										error_description = "ошибка обновления таймкарты";
+										error_description = "РѕС€РёР±РєР° РѕР±РЅРѕРІР»РµРЅРёСЏ С‚Р°Р№РјРєР°СЂС‚С‹";
 										MESSAGE_ERROR("", action, "fail to update timecards table with timecard_id(" + timecard_id + ")");
 									}
 								}
@@ -1319,12 +1319,12 @@ int main()
 						else if((timecard_status == "submit") || (timecard_status == "approved"))
 						{
 							MESSAGE_DEBUG("", action, "timecard_id(" + timecard_id + ") already submit, you can't change it");
-							error_description = "Таймкарта уже отправлена, изменить нельзя";
+							error_description = "РўР°Р№РјРєР°СЂС‚Р° СѓР¶Рµ РѕС‚РїСЂР°РІР»РµРЅР°, РёР·РјРµРЅРёС‚СЊ РЅРµР»СЊР·СЏ";
 						}
 						else
 						{
 							MESSAGE_ERROR("", action, "unknown timecard_id(" + timecard_id + ") status (" + timecard_status + ")");
-							error_description = "Ошибка таймкарты";
+							error_description = "РћС€РёР±РєР° С‚Р°Р№РјРєР°СЂС‚С‹";
 						}
 					}
 
@@ -1337,7 +1337,7 @@ int main()
 				{
 					MESSAGE_ERROR("", action, "SoW(" + sow_id + ") is not assigned to the user(" + user.GetID() + ") company");
 
-					ostResult << "{\"result\":\"error\",\"description\":\"Данный SoW подписан не с Вами\"}";
+					ostResult << "{\"result\":\"error\",\"description\":\"Р”Р°РЅРЅС‹Р№ SoW РїРѕРґРїРёСЃР°РЅ РЅРµ СЃ Р’Р°РјРё\"}";
 				}
 			}
 			else
@@ -1352,7 +1352,7 @@ int main()
 											"current_period_finish_month:" + current_period_finish_month +
 											"current_period_finish_date:" + current_period_finish_date + ")");
 
-				ostResult << "{\"result\":\"error\",\"description\":\"Пропущены обязательные параметры\"}";
+				ostResult << "{\"result\":\"error\",\"description\":\"РџСЂРѕРїСѓС‰РµРЅС‹ РѕР±СЏР·Р°С‚РµР»СЊРЅС‹Рµ РїР°СЂР°РјРµС‚СЂС‹\"}";
 			}
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
@@ -1417,7 +1417,7 @@ int main()
 				else
 				{
 					MESSAGE_ERROR("", action, "company not found");
-					ostResult << "{\"status\":\"error\",\"description\":\"Не найдена компания с которой заключен этот договор\"}";
+					ostResult << "{\"status\":\"error\",\"description\":\"РќРµ РЅР°Р№РґРµРЅР° РєРѕРјРїР°РЅРёСЏ СЃ РєРѕС‚РѕСЂРѕР№ Р·Р°РєР»СЋС‡РµРЅ СЌС‚РѕС‚ РґРѕРіРѕРІРѕСЂ\"}";
 				}
 			}
 			else
@@ -1425,7 +1425,7 @@ int main()
 				{
 					MESSAGE_ERROR("", action, "lookForKey or sow_id is missed");
 				}
-				ostResult << "{\"status\":\"error\",\"description\":\"Пропущены обязательные параметры. Обратитьесь в тех. поддержку\"}";
+				ostResult << "{\"status\":\"error\",\"description\":\"РџСЂРѕРїСѓС‰РµРЅС‹ РѕР±СЏР·Р°С‚РµР»СЊРЅС‹Рµ РїР°СЂР°РјРµС‚СЂС‹. РћР±СЂР°С‚РёС‚СЊРµСЃСЊ РІ С‚РµС…. РїРѕРґРґРµСЂР¶РєСѓ\"}";
 			}
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
@@ -1494,13 +1494,13 @@ int main()
 				else
 				{
 					MESSAGE_ERROR("", action, "dashboard data not gathered completely");
-					ostResult << "{\"status\":\"error\",\"description\":\"Ошибка построения панели управления\"}";
+					ostResult << "{\"status\":\"error\",\"description\":\"РћС€РёР±РєР° РїРѕСЃС‚СЂРѕРµРЅРёСЏ РїР°РЅРµР»Рё СѓРїСЂР°РІР»РµРЅРёСЏ\"}";
 				}
 			}
 			else
 			{
 				MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't owns company");
-				ostResult << "{\"status\":\"error\",\"description\":\"Вы не создали компанию\"}";
+				ostResult << "{\"status\":\"error\",\"description\":\"Р’С‹ РЅРµ СЃРѕР·РґР°Р»Рё РєРѕРјРїР°РЅРёСЋ\"}";
 			}
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
@@ -1584,7 +1584,7 @@ int main()
 				}
 				else
 				{
-					error_message = "некорректный параметер random у растраты";
+					error_message = "РЅРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ РїР°СЂР°РјРµС‚РµСЂ random Сѓ СЂР°СЃС‚СЂР°С‚С‹";
 					MESSAGE_ERROR("", action, "Can't convert expense_random(" + http_params->Get(expense_random_name) + ") to number")
 				}
 
@@ -1644,25 +1644,25 @@ int main()
 							}
 							else
 							{
-								error_message = "неполучилось определить принажделжность док-та";
+								error_message = "РЅРµРїРѕР»СѓС‡РёР»РѕСЃСЊ РѕРїСЂРµРґРµР»РёС‚СЊ РїСЂРёРЅР°Р¶РґРµР»Р¶РЅРѕСЃС‚СЊ РґРѕРє-С‚Р°";
 								MESSAGE_ERROR("", action, "AssignExpenseLineByParentRandom fail");
 							}
 						}
 						else
 						{
-							error_message = "некорректный тип основного док-та";
+							error_message = "РЅРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ С‚РёРї РѕСЃРЅРѕРІРЅРѕРіРѕ РґРѕРє-С‚Р°";
 							MESSAGE_ERROR("", action, "primary doc-t wrong type(" + dom_type + ")");
 						}
 					}
 					else
 					{
-						error_message = "невозможно определить принажделжность документа";
+						error_message = "РЅРµРІРѕР·РјРѕР¶РЅРѕ РѕРїСЂРµРґРµР»РёС‚СЊ РїСЂРёРЅР°Р¶РґРµР»Р¶РЅРѕСЃС‚СЊ РґРѕРєСѓРјРµРЅС‚Р°";
 						MESSAGE_ERROR("", action, "parent expense.id missed for expense_line.rand(" + expense_line_random + ")");
 					}
 				}
 				else
 				{
-					error_message = "некорректный параметер random у док-та";
+					error_message = "РЅРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ РїР°СЂР°РјРµС‚РµСЂ random Сѓ РґРѕРє-С‚Р°";
 					MESSAGE_ERROR("", action, "Can't convert expense_line_random(" + http_params->Get(expense_random_name) + ") to number")
 				}
 
@@ -1798,40 +1798,40 @@ int main()
 								}
 								else
 								{
-									error_message = "Нельзя удалять единственный расход";
+									error_message = "РќРµР»СЊР·СЏ СѓРґР°Р»СЏС‚СЊ РµРґРёРЅСЃС‚РІРµРЅРЅС‹Р№ СЂР°СЃС…РѕРґ";
 									MESSAGE_DEBUG("", action, "bt.id() have single bt_expense.id(" + expense_id + "), prohibited to remove single expense");
 								}
 
 							}
 							else
 							{
-								error_message = "У вас нет прав на удаление";
+								error_message = "РЈ РІР°СЃ РЅРµС‚ РїСЂР°РІ РЅР° СѓРґР°Р»РµРЅРёРµ";
 								MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") can't remove bt_expense.id(" + expense_id + ")");
 							}
 						}
 						else
 						{
-							error_message = "Нельзя менять подтвержденный отчет";
+							error_message = "РќРµР»СЊР·СЏ РјРµРЅСЏС‚СЊ РїРѕРґС‚РІРµСЂР¶РґРµРЅРЅС‹Р№ РѕС‚С‡РµС‚";
 							MESSAGE_DEBUG("", action, "bt.id(" + bt_id + ") can't be changed, because it approved");
 						}
 					}
 					else
 					{
-						error_message = "Отчет которому принадлежит расход не найден";
+						error_message = "РћС‚С‡РµС‚ РєРѕС‚РѕСЂРѕРјСѓ РїСЂРёРЅР°РґР»РµР¶РёС‚ СЂР°СЃС…РѕРґ РЅРµ РЅР°Р№РґРµРЅ";
 						MESSAGE_DEBUG("", action, "bt.id not found by bt_expense.id(" + expense_id + ")");
 					}
 
 				}
 				else
 				{
-					error_message = "Расход не найден";
+					error_message = "Р Р°СЃС…РѕРґ РЅРµ РЅР°Р№РґРµРЅ";
 					MESSAGE_DEBUG("", action, "bt_expense.id(" + expense_id + ") not found");
 				}
 
 			}
 			else
 			{
-				error_message = "Неизвестный идентификатор удаления";
+				error_message = "РќРµРёР·РІРµСЃС‚РЅС‹Р№ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ СѓРґР°Р»РµРЅРёСЏ";
 				MESSAGE_DEBUG("", action, "HTTP param expense.id is not a number");
 			}
 
@@ -1930,25 +1930,25 @@ int main()
 						}
 						else
 						{
-							error_message = "У вас нет прав на удаление";
+							error_message = "РЈ РІР°СЃ РЅРµС‚ РїСЂР°РІ РЅР° СѓРґР°Р»РµРЅРёРµ";
 							MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") can't remove bt.id(" + bt_id + ")");
 						}
 					}
 					else
 					{
-						error_message = "Нельзя удалить подтвержденный отчет";
-						MESSAGE_DEBUG("", action, "bt.id(" + bt_id + ") can't be куьщмув, because it approved");
+						error_message = "РќРµР»СЊР·СЏ СѓРґР°Р»РёС‚СЊ РїРѕРґС‚РІРµСЂР¶РґРµРЅРЅС‹Р№ РѕС‚С‡РµС‚";
+						MESSAGE_DEBUG("", action, "bt.id(" + bt_id + ") can't be РєСѓСЊС‰РјСѓРІ, because it approved");
 					}
 				}
 				else
 				{
-					error_message = "Отчет  не найден";
+					error_message = "РћС‚С‡РµС‚  РЅРµ РЅР°Р№РґРµРЅ";
 					MESSAGE_DEBUG("", action, "bt.id(" + bt_id + ") not found");
 				}
 			}
 			else
 			{
-				error_message = "Неизвестный идентификатор удаления";
+				error_message = "РќРµРёР·РІРµСЃС‚РЅС‹Р№ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ СѓРґР°Р»РµРЅРёСЏ";
 				MESSAGE_DEBUG("", action, "HTTP param expense.id is not a number");
 			}
 
@@ -2007,7 +2007,7 @@ int main()
 				}
 				else
 				{
-					error_message = "Company не найденa";
+					error_message = "Company РЅРµ РЅР°Р№РґРµРЅa";
 					MESSAGE_DEBUG("", action, "agency(" + agency_id + ") not found");
 				}
 			}
@@ -2139,7 +2139,7 @@ int main()
 					}
 					else
 					{
-						error_message = "Агенство не найдено";
+						error_message = "РђРіРµРЅСЃС‚РІРѕ РЅРµ РЅР°Р№РґРµРЅРѕ";
 						MESSAGE_ERROR("", action, "company.id not found by user.id(" + user.GetID() + ") employment");
 					}
 				}
@@ -2152,7 +2152,7 @@ int main()
 			}
 			else
 			{
-				error_message = "Поле не должно быть пустым";
+				error_message = "РџРѕР»Рµ РЅРµ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ РїСѓСЃС‚С‹Рј";
 				MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") didn't set new_value");
 			}
 
