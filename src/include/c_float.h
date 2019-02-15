@@ -7,6 +7,7 @@
 #include <ios>			// --- getloc()
 
 #include "clog.h"
+#include "utilities.h"
 
 using namespace std;
 

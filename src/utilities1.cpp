@@ -77,90 +77,32 @@ std::string trim(std::string& str)
 	return str;
 }
 
+static auto ReplaceWstringAccordingToMap(const wstring &src, const map<wstring, wstring> &replacements)
+{
+	auto	result(src);
+	auto	pos = result.find(L"1"); // --- fake find to define type
+
+	MESSAGE_DEBUG("", "", "start");
+
+	for(auto &replacement : replacements)
+	{
+		pos = 0;
+
+		while((pos = result.find(replacement.first, pos)) != string::npos)
+		{
+			result.replace(pos, replacement.first.length(), replacement.second);
+		}
+	}
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return result;
+}
+
 string	quoted(string src)
 {
 	return '"' + src + '"';
 }
-
-/*
-string  toLower(string src)
-{
-	using namespace std::regex_constants;
-
-	string  result = src;
-	regex	r1("А");
-	regex	r2("Б");
-	regex	r3("В");
-	regex	r4("Г");
-	regex	r5("Д");
-	regex	r6("Е");
-	regex	r7("Ё");
-	regex	r8("Ж");
-	regex	r9("З");
-	regex	r10("И");
-	regex	r11("Й");
-	regex	r12("К");
-	regex	r13("Л");
-	regex	r14("М");
-	regex	r15("Н");
-	regex	r16("О");
-	regex	r17("П");
-	regex	r18("Р");
-	regex	r19("С");
-	regex	r20("Т");
-	regex	r21("У");
-	regex	r22("Ф");
-	regex	r23("Х");
-	regex	r24("Ц");
-	regex	r25("Ч");
-	regex	r26("Ш");
-	regex	r27("Щ");
-	regex	r28("Ь");
-	regex	r29("Ы");
-	regex	r30("Ъ");
-	regex	r31("Э");
-	regex	r32("Ю");
-	regex	r33("Я");
-
-	src = regex_replace(src, r1, "а");
-	src = regex_replace(src, r2, "б");
-	src = regex_replace(src, r3, "в");
-	src = regex_replace(src, r4, "г");
-	src = regex_replace(src, r5, "д");
-	src = regex_replace(src, r6, "е");
-	src = regex_replace(src, r7, "ё");
-	src = regex_replace(src, r8, "ж");
-	src = regex_replace(src, r9, "з");
-	src = regex_replace(src, r10, "и");
-	src = regex_replace(src, r11, "й");
-	src = regex_replace(src, r12, "к");
-	src = regex_replace(src, r13, "л");
-	src = regex_replace(src, r14, "м");
-	src = regex_replace(src, r15, "н");
-	src = regex_replace(src, r16, "о");
-	src = regex_replace(src, r17, "п");
-	src = regex_replace(src, r18, "р");
-	src = regex_replace(src, r19, "с");
-	src = regex_replace(src, r20, "т");
-	src = regex_replace(src, r21, "у");
-	src = regex_replace(src, r22, "ф");
-	src = regex_replace(src, r23, "х");
-	src = regex_replace(src, r24, "ц");
-	src = regex_replace(src, r25, "ч");
-	src = regex_replace(src, r26, "ш");
-	src = regex_replace(src, r27, "щ");
-	src = regex_replace(src, r28, "ь");
-	src = regex_replace(src, r29, "ы");
-	src = regex_replace(src, r30, "ъ");
-	src = regex_replace(src, r31, "э");
-	src = regex_replace(src, r32, "ю");
-	src = regex_replace(src, r33, "я");
-
-	transform(src.begin(), src.end(), result.begin(), (int(*)(int))tolower);
-
-	return result;
-}
-*/
 
 auto toUpper(const string &src) -> string
 {
@@ -316,15 +258,11 @@ string GetRandom(int len)
 
 string DeleteHTML(string src, bool removeBR /* = true*/)
 {
-	string			  result;
+	auto			  	result = src;
 	string::size_type   firstPos, lastPos;
 
-	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start (src.len = " + to_string(src.length()) + ")");
-	}
+	MESSAGE_DEBUG("", "", "start (src.len = " + to_string(src.length()) + ")");
 
-	result = src;
 	firstPos = result.find("<");
 	if(firstPos != string::npos)
 	{
@@ -361,12 +299,9 @@ string DeleteHTML(string src, bool removeBR /* = true*/)
 			lastPos = result.find(">", firstPos);
 			if(lastPos == string::npos) lastPos = result.length();
 		}
-	} // --- if "<" fount in srcStr
+	} // --- if "<" found in srcStr
 
-	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: finish(result.len = " + to_string(result.length()) + ")");
-	}
+	MESSAGE_DEBUG("", "", "finish(result.len = " + to_string(result.length()) + ")");
 
 	return result;
 }
@@ -376,12 +311,11 @@ string DeleteHTML(string src, bool removeBR /* = true*/)
 */
 string RemoveQuotas(string src)
 {
-	string		result = src;
+	auto				result = src;
 	string::size_type	pos = 0;
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start (src = " + src + ")");
+		MESSAGE_DEBUG("", "", "start (src = " + src + ")");
 	}
 
 	while((pos = result.find("\"", pos)) != string::npos)
@@ -391,8 +325,7 @@ string RemoveQuotas(string src)
 	}
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: finish (result = " + result + ")");
+		MESSAGE_DEBUG("", "", "finish (result = " + result + ")");
 	}
 
 	return result;
@@ -401,120 +334,64 @@ string RemoveQuotas(string src)
 /*
 	Delete special symbols like \t \\ \<
 */
-string RemoveSpecialSymbols(string src)
+auto RemoveSpecialSymbols(wstring src) -> wstring
 {
-	string		result = src;
-	string::size_type	pos = 0;
-
-	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start (src = " + src + ")");
-	}
-
-	while ((result.length()) && (result.at(result.length() - 1) == '\\')) result.replace(result.length() - 1, 1, "");
-
-	pos = 0;
-	while((pos = result.find("\\", pos)) != string::npos)
-	{
-		result.replace(pos, 2, "");
-		pos += 2;
-	}
+	auto					result = src;
+	map<wstring, wstring>	map_replacement_1 = {
+		{L"\\", L""},
+		{L"\t", L" "},
+		{L"№", L"N"},
+		{L"—", L"-"}
+	};
 
 
-	pos = 0;
-	while((pos = result.find("\t", pos)) != string::npos)
-	{
-		result.replace(pos, 1, " ");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
-	pos = 0;
-	while((pos = result.find("№", pos)) != string::npos)
-	{
-		result.replace(pos, 1, "N");
-		pos += 1;
-	}
+	while ((result.length()) && (result.at(result.length() - 1) == L'\\')) result.replace(result.length() - 1, 1, L"");
 
-	pos = 0;
-	while((pos = result.find("—", pos)) != string::npos)
-	{
-		result.replace(pos, 1, "-");
-		pos += 1;
-	}
+	result = ReplaceWstringAccordingToMap(result, map_replacement_1);
 
-
-	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: finish (result = " + result + ")");
-	}
+	MESSAGE_DEBUG("", "", "finish");
 
 	return result;
+}
+
+auto RemoveSpecialSymbols(string src) -> string
+{
+	return(wide_to_multibyte(RemoveSpecialSymbols(multibyte_to_wide(src))));
 }
 
 /*
 	Delete special symbols like \t \\ \<
 */
-string RemoveSpecialHTMLSymbols(string src)
+auto RemoveSpecialHTMLSymbols(const wstring &src) -> wstring
 {
-	string		result = src;
-	string::size_type	pos = 0;
+	auto					result(src);
+	wstring::size_type		pos = 0;
+	map<wstring, wstring>	map_replacement = {
+		{L"\\", L"&#92;"},
+		{L"\t", L" "},
+		{L"<", L"&lt;"},
+		{L">", L"&gt;"},
+		{L"№", L"&#35;"},
+		{L"—", L"-"},
+		{L"\"", L"&quot;"}
+	};
 
-	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
-	while ((result.length()) && (result.at(result.length() - 1) == '\\')) result.replace(result.length() - 1, 1, "");
+	while ((result.length()) && (result.at(result.length() - 1) == L'\\')) result.replace(result.length() - 1, 1, L"");
 
-	pos = 0;
-	while((pos = result.find("\\", pos)) != string::npos)
-	{
-		result.replace(pos, 1, "&#92;");
-	}
+	result = ReplaceWstringAccordingToMap(result, map_replacement);
 
-
-	pos = 0;
-	while((pos = result.find("\t", pos)) != string::npos)
-	{
-		result.replace(pos, 1, " ");
-	}
-
-	pos = 0;
-	while((pos = result.find("<", pos)) != string::npos)
-	{
-		result.replace(pos, 1, "&lt;");
-	}
-
-	pos = 0;
-	while((pos = result.find(">", pos)) != string::npos)
-	{
-		result.replace(pos, 1, "&gt;");
-	}
-
-	pos = 0;
-	while((pos = result.find("№", pos)) != string::npos)
-	{
-		result.replace(pos, 1, "&#35;");
-	}
-
-	pos = 0;
-	while((pos = result.find("—", pos)) != string::npos)
-	{
-		result.replace(pos, 1, "-");
-	}
-
-	pos = 0;
-	while((pos = result.find("\"", pos)) != string::npos)
-	{
-		result.replace(pos, 1, "&quot;");
-	}
-
-
-	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: finish (result.length = " + to_string(result.length()) + ")");
-	}
+	MESSAGE_DEBUG("", "", "finish (result.length = " + to_string(result.length()) + ")");
 
 	return result;
+}
+
+auto RemoveSpecialHTMLSymbols(const string &src) -> string
+{
+	return(wide_to_multibyte(RemoveSpecialHTMLSymbols(multibyte_to_wide(src))));
 }
 
 /*
@@ -522,7 +399,7 @@ string RemoveSpecialHTMLSymbols(string src)
 */
 string ReplaceDoubleQuoteToQuote(string src)
 {
-	string		result = src;
+	auto				result = src;
 	string::size_type	pos = 0;
 
 	while((pos = result.find("\"", pos)) != string::npos)
@@ -534,46 +411,36 @@ string ReplaceDoubleQuoteToQuote(string src)
 	return result;
 }
 
+
 /*
 	Change CR/CRLF symbol to <BR> from string src
 */
-string ReplaceCRtoHTML(string src)
+auto ReplaceCRtoHTML(wstring src) -> wstring
 {
-	string		result = src;
-	string::size_type	pos = 0;
 
-	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
-	}
-
-
-	pos = 0;
-	while((pos = result.find("\r\n", pos)) != string::npos)
-	{
-		result.replace(pos, 2, "<br>");
-		// pos += 1;
-	}
-
-	pos = 0;
-	while((pos = result.find("\n", pos)) != string::npos)
-	{
-		result.replace(pos, 1, "<bR>");
-	}
-
-	pos = 0;
-	while((pos = result.find("\r", pos)) != string::npos)
-	{
-		result.replace(pos, 1, "<Br>");
-	}
+	auto					result = src;
+	map<wstring, wstring>	map_replacement_1 = {
+		{L"\r\n", L"<br>"}
+	};
+	map<wstring, wstring>	map_replacement_2 = {
+		{L"\n", L"<bR>"},
+		{L"\r", L"<Br>"}
+	};
 
 
-	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: finish");
-	}
+	MESSAGE_DEBUG("", "", "start");
+
+	result = ReplaceWstringAccordingToMap(result, map_replacement_1);
+	result = ReplaceWstringAccordingToMap(result, map_replacement_2);
+
+	MESSAGE_DEBUG("", "", "finish");
 
 	return result;
+}
+
+auto ReplaceCRtoHTML(string src) -> string
+{
+	return(wide_to_multibyte(ReplaceCRtoHTML(multibyte_to_wide(src))));
 }
 
 string CleanUPText(const string messageBody, bool removeBR/* = true*/)
@@ -581,8 +448,7 @@ string CleanUPText(const string messageBody, bool removeBR/* = true*/)
 	string	  result = messageBody;
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + string("]: start"));
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	result = DeleteHTML(result, removeBR);
@@ -592,8 +458,7 @@ string CleanUPText(const string messageBody, bool removeBR/* = true*/)
 	trim(result);
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + string("]: end"));
+		MESSAGE_DEBUG("", "", "end");
 	}
 
 	return result;
@@ -601,150 +466,56 @@ string CleanUPText(const string messageBody, bool removeBR/* = true*/)
 
 /*
 	Delete any special symbols
+	ATTENTION !!!
+	use it carefully
+	symbol(N) replaced to ""
 	Used only for matching duplicates
 */
-string RemoveAllNonAlphabetSymbols(const string &src)
+auto RemoveAllNonAlphabetSymbols(const wstring &src) -> wstring
 {
-	string		result = src;
-	string::size_type	pos = 0;
-
-	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + string("]: start"));
-	}
-
-	while ((result.length()) && (result.at(result.length() - 1) == '\\')) result.replace(result.length() - 1, 1, "");
-
-	pos = 0;
-	while((pos = result.find("&lt;", pos)) != string::npos)
-	{
-		result.replace(pos, 4, "");
-	}
-	pos = 0;
-	while((pos = result.find("&gt;", pos)) != string::npos)
-	{
-		result.replace(pos, 4, "");
-	}
-	pos = 0;
-	while((pos = result.find("&quot;", pos)) != string::npos)
-	{
-		result.replace(pos, 6, "");
-	}
-	pos = 0;
-	while((pos = result.find("&#92;", pos)) != string::npos)
-	{
-		result.replace(pos, 5, "");
-	}
-	pos = 0;
-	while((pos = result.find(" ", pos)) != string::npos)
-	{
-		result.replace(pos, 1, "");
-	}
-	pos = 0;
-	while((pos = result.find("\\", pos)) != string::npos)
-	{
-		result.replace(pos, 1, "");
-	}
-	pos = 0;
-	while((pos = result.find("/", pos)) != string::npos)
-	{
-		result.replace(pos, 1, "");
-	}
-	pos = 0;
-	while((pos = result.find("\t", pos)) != string::npos)
-	{
-		result.replace(pos, 1, "");
-	}
-
-	pos = 0;
-	while((pos = result.find("<", pos)) != string::npos)
-	{
-		result.replace(pos, 1, "");
-	}
-
-	pos = 0;
-	while((pos = result.find(">", pos)) != string::npos)
-	{
-		result.replace(pos, 1, "");
-	}
-
-	pos = 0;
-	while((pos = result.find("№", pos)) != string::npos)
-	{
-		result.replace(pos, 1, "");
-	}
-
-	pos = 0;
-	while((pos = result.find("—", pos)) != string::npos)
-	{
-		result.replace(pos, 1, "");
-	}
-
-	pos = 0;
-	while((pos = result.find("\"", pos)) != string::npos)
-	{
-		result.replace(pos, 1, "");
-	}
-
-	pos = 0;
-	while((pos = result.find("'", pos)) != string::npos)
-	{
-		result.replace(pos, 1, "");
-	}
-	pos = 0;
-	while((pos = result.find(";", pos)) != string::npos)
-	{
-		result.replace(pos, 1, "");
-	}
-	pos = 0;
-	while((pos = result.find(":", pos)) != string::npos)
-	{
-		result.replace(pos, 1, "");
-	}
+	auto					result(src);
+	map<wstring, wstring>	map_replacement_1 = {
+		{L"&lt;", L""},
+		{L"&gt;", L""},
+		{L"&quot;", L""},
+		{L"&#92;", L""},
+	};
+	map<wstring, wstring>	map_replacement_2 = {
+		{L" ", L""},
+		{L"\\", L""},
+		{L"/", L""},
+		{L"\t", L""},
+		{L"<", L""},
+		{L">", L""},
+		{L"№", L""},
+		{L"—", L""},
+		{L"\"", L""},
+		{L"'", L""},
+		{L";", L""},
+		{L":", L""},
+		{L"`", L""},
+		{L".", L""},
+		{L",", L""},
+		{L"%", L""},
+		{L"-", L""},
+		{L"N", L""},
+	};
 
 
-	pos = 0;
-	while((pos = result.find("`", pos)) != string::npos)
-	{
-		result.replace(pos, 1, "");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
-	pos = 0;
-	while((pos = result.find(".", pos)) != string::npos)
-	{
-		result.replace(pos, 1, "");
-	}
+	while ((result.length()) && (result.at(result.length() - 1) == L'\\')) result.replace(result.length() - 1, 1, L"");
+	result = ReplaceWstringAccordingToMap(result, map_replacement_1);
+	result = ReplaceWstringAccordingToMap(result, map_replacement_2);
 
-	pos = 0;
-	while((pos = result.find(",", pos)) != string::npos)
-	{
-		result.replace(pos, 1, "");
-	}
-
-	pos = 0;
-	while((pos = result.find("%", pos)) != string::npos)
-	{
-		result.replace(pos, 1, "");
-	}
-
-	pos = 0;
-	while((pos = result.find("-", pos)) != string::npos)
-	{
-		result.replace(pos, 1, "");
-	}
-	pos = 0;
-	while((pos = result.find("N", pos)) != string::npos)
-	{
-		result.replace(pos, 1, "");
-	}
-
-
-	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + string("]: end ( result length = " + to_string(result.length()) + ")"));
-	}
+	MESSAGE_DEBUG("", "", "finish");
 
 	return result;
+}
+
+auto RemoveAllNonAlphabetSymbols(const string &src) -> string
+{
+	return(wide_to_multibyte(RemoveAllNonAlphabetSymbols(multibyte_to_wide(src))));
 }
 
 
@@ -753,8 +524,7 @@ string ConvertTextToHTML(const string &messageBody)
 	string 		result = messageBody;
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + string("]: start"));
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	result = RemoveSpecialHTMLSymbols(result);
@@ -763,11 +533,34 @@ string ConvertTextToHTML(const string &messageBody)
 	trim(result);
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + string("]: end ( result length = " + to_string(result.length()) + ")"));
+		MESSAGE_DEBUG("", "", "end ( result length = " + to_string(result.length()) + ")");
 	}
 
 	return result;
+}
+
+auto ConvertHTMLToText(const wstring &src) -> wstring
+{
+
+	auto					result = src;
+	map<wstring, wstring>	map_replacement_1 = {
+		{L"&quot;", L"\""},
+		{L"&gt;", L">"},
+		{L"&lt;", L"<"}
+	};
+
+	MESSAGE_DEBUG("", "", "start");
+
+	result = ReplaceWstringAccordingToMap(result, map_replacement_1);
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return result;
+}
+
+auto ConvertHTMLToText(const string &src) -> string
+{
+	return(wide_to_multibyte(ConvertHTMLToText(multibyte_to_wide(src))));
 }
 
 string CheckHTTPParam_Text(const string &srcText)
@@ -776,8 +569,7 @@ string CheckHTTPParam_Text(const string &srcText)
 	string	result = "";
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + string("]: start param(" + srcText + ")"));
+		MESSAGE_DEBUG("", "", "start param(" + srcText + ")");
 	}
 
 	memset(convertBuffer, 0, sizeof(convertBuffer));
@@ -785,8 +577,7 @@ string CheckHTTPParam_Text(const string &srcText)
 	result = ConvertTextToHTML(convertBuffer);
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + string("]: end ( result length = " + to_string(result.length()) + ")"));
+		MESSAGE_DEBUG("", "", "end ( result length = " + to_string(result.length()) + ")");
 	}
 
 	return	result;
@@ -928,8 +719,7 @@ string CheckHTTPParam_Email(const string &srcText)
     smatch      matchResult;
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + string("]: start param(" + srcText + ")"));
+		MESSAGE_DEBUG("", "", "start param(" + srcText + ")");
 	}
 
 	memset(convertBuffer, 0, sizeof(convertBuffer));
@@ -952,16 +742,14 @@ string CheckHTTPParam_Email(const string &srcText)
     else
     {
 		{
-			CLog	log;
-			log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + string("]: email doesn't match regex " + result));
+			MESSAGE_DEBUG("", "", "email doesn't match regex " + result);
 		}
 
     	result = "";
     }
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + string("]: end ( result length = " + to_string(result.length()) + ")"));
+		MESSAGE_DEBUG("", "", "end ( result length = " + to_string(result.length()) + ")");
 	}
 
 	return	result;
@@ -984,8 +772,7 @@ string CheckHTTPParam_Timeentry(const string &srcText)
 	}
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + string("]: end ( result length = " + result + ")"));
+		MESSAGE_DEBUG("", "", "end ( result length = " + result + ")");
 	}
 
 	MESSAGE_DEBUG("", "", "finish param(" + result + ")");
@@ -1793,8 +1580,7 @@ bool convert_cp1251_to_utf8(const char *in, char *out, int size)
 	bool result = true;
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	while (*in)
@@ -1841,8 +1627,7 @@ bool convert_cp1251_to_utf8(const char *in, char *out, int size)
 	}
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: end");
+		MESSAGE_DEBUG("", "", "end");
 	}
 	return result;
 }
@@ -1963,24 +1748,22 @@ bool RmDirRecursive(const char *dirname)
 
 string SymbolReplace(const string where, const string src, const string dst)
 {
-	auto				  result = ""s;
-	string::size_type	  pos;
+	auto	  result(where);
+	auto	  pos = result.find(src);
 
-	result = where;
-
-	pos = result.find(src);
 	while(pos != string::npos)
 	{
 		result.replace(pos, src.length(), dst);
 		pos = result.find(src, pos + 1);
 	}
+
 	return result;
 }
 
 auto SymbolReplace_KeepDigitsOnly(const string &where) -> string
 {
-	auto				  	result = where;
-	unsigned int			i = 0;
+	auto	  	result = where;
+	auto		i = 0u;
 
 	while(i < result.length())
 	{
@@ -1999,8 +1782,7 @@ bool CheckUserEmailExisting(string userNameToCheck, CMysql *db) {
 	CUser		user;
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	user.SetDB(db);
@@ -2010,14 +1792,14 @@ bool CheckUserEmailExisting(string userNameToCheck, CMysql *db) {
 	if(user.isLoginExist() or user.isEmailDuplicate()) {
 		{
 			CLog	log;
-			log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: login or email already registered");
+			MESSAGE_DEBUG("", "", "login or email already registered");
 		}
 		return true;
 	}
 	else {
 		{
 			CLog	log;
-			log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: login or email not yet exists");
+			MESSAGE_DEBUG("", "", "login or email not yet exists");
 		}
 		return false;
 	}
@@ -2112,8 +1894,7 @@ string UniqueUserIDInUserIDLine(string userIDLine) //-> decltype(static_cast<str
 	std::size_t		prevPointer {0}, nextPointer;
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start (", userIDLine, ")");
+		MESSAGE_DEBUG("", "", "start (" + userIDLine + ")");
 	}
 
 	do
@@ -2138,8 +1919,7 @@ string UniqueUserIDInUserIDLine(string userIDLine) //-> decltype(static_cast<str
 	}
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: end (result ", result, ")");
+		MESSAGE_DEBUG("", "", "end (result " + result + ")");
 	}
 
 	return result;
@@ -2151,8 +1931,7 @@ string GetChatMessagesInJSONFormat(string dbQuery, CMysql *db)
 	int				affected;
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 	result.str("");
 
@@ -2197,8 +1976,7 @@ bool	isFilenameImage(string filename)
 	result = regex_search(filename, e1);
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + string("]: end (result: ") + (result ? "true" : "false") + ")" );
+		MESSAGE_DEBUG("", "", "end (result: " + (result ? "true" : "false") + ")");
 	}
 	return  result;
 }
@@ -2215,8 +1993,7 @@ bool	isFilenameVideo(string filename)
 	result = regex_search(filename, e1);
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + string("]: end (result: ") + (result ? "true" : "false") + ")" );
+		MESSAGE_DEBUG("", "", "end (result: " + (result ? "true" : "false") + ")");
 	}
 	return  result;
 }
@@ -2228,8 +2005,7 @@ vector<string> GetUserTagsFromText(string srcMessage)
 	regex		   exp1("@([[:digit:]]+)");
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + string("]: start"));
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	regex_token_iterator<string::iterator>   rItr(srcMessage.begin(), srcMessage.end(), exp1, 1);
@@ -2277,8 +2053,7 @@ string GetUserListInJSONFormat(string dbQuery, CMysql *db, CUser *user)
 
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	if((itemsCount = db->Query(dbQuery)) > 0)
@@ -2428,7 +2203,7 @@ string GetUserListInJSONFormat(string dbQuery, CMysql *db, CUser *user)
 		CLog	log;
 
 		ost.str("");
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: there are users returned by request [", dbQuery, "]");
+		MESSAGE_DEBUG("", "", "there are users returned by request [" + dbQuery + "]");
 	}
 
 	{
@@ -2576,8 +2351,7 @@ string GetBookListInJSONFormat(string dbQuery, CMysql *db, bool includeReaders/*
 
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	ostResult.str("");
@@ -2634,13 +2408,11 @@ string GetBookListInJSONFormat(string dbQuery, CMysql *db, bool includeReaders/*
 	} // --- if sql-query on user selection success
 	else
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: there are no books returned by the request [", dbQuery, "]");
+		MESSAGE_DEBUG("", "", "there are no books returned by the request [" + dbQuery + "]");
 	}
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: finish (returning string length = " + to_string(ostResult.str().length()) + ")");
+		MESSAGE_DEBUG("", "", "finish (returning string length = " + to_string(ostResult.str().length()) + ")");
 	}
 
 	return ostResult.str();
@@ -2669,8 +2441,7 @@ string GetComplainListInJSONFormat(string dbQuery, CMysql *db, bool includeReade
 
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	ostResult.str("");
@@ -2714,13 +2485,11 @@ string GetComplainListInJSONFormat(string dbQuery, CMysql *db, bool includeReade
 	} // --- if sql-query on user selection success
 	else
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: there are no complains returned by the request [", dbQuery, "]");
+		MESSAGE_DEBUG("", "", "there are no complains returned by the request [" + dbQuery + "]");
 	}
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: finish (returning string length = " + to_string(ostResult.str().length()) + ")");
+		MESSAGE_DEBUG("", "", "finish (returning string length = " + to_string(ostResult.str().length()) + ")");
 	}
 
 	return ostResult.str();
@@ -2741,8 +2510,7 @@ string GetCertificationListInJSONFormat(string dbQuery, CMysql *db, bool include
 	vector<ItemClass>   itemsList;
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	ostResult.str("");
@@ -2797,13 +2565,11 @@ string GetCertificationListInJSONFormat(string dbQuery, CMysql *db, bool include
 	} // --- if sql-query on user selection success
 	else
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: there are no certifications returned by the request [", dbQuery, "]");
+		MESSAGE_DEBUG("", "", "there are no certifications returned by the request [" + dbQuery + "]");
 	}
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: finish (returning string length = " + to_string(ostResult.str().length()) + ")");
+		MESSAGE_DEBUG("", "", "finish (returning string length = " + to_string(ostResult.str().length()) + ")");
 	}
 
 	return ostResult.str();
@@ -2824,8 +2590,7 @@ string GetCourseListInJSONFormat(string dbQuery, CMysql *db, bool includeStudent
 	vector<ItemClass>   itemsList;
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	ostResult.str("");
@@ -2880,13 +2645,11 @@ string GetCourseListInJSONFormat(string dbQuery, CMysql *db, bool includeStudent
 	} // --- if sql-query on user selection success
 	else
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: there are no courses returned by the request [", dbQuery, "]");
+		MESSAGE_DEBUG("", "", "there are no courses returned by the request [" + dbQuery + "]");
 	}
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: finish (returning string length = " + to_string(ostResult.str().length()) + ")");
+		MESSAGE_DEBUG("", "", "finish (returning string length = " + to_string(ostResult.str().length()) + ")");
 	}
 
 	return ostResult.str();
@@ -2906,8 +2669,7 @@ string GetLanguageListInJSONFormat(string dbQuery, CMysql *db, bool includeStude
 	vector<ItemClass>   itemsList;
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	ostResult.str("");
@@ -2956,13 +2718,11 @@ string GetLanguageListInJSONFormat(string dbQuery, CMysql *db, bool includeStude
 	} // --- if sql-query on user selection success
 	else
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: there are no languages returned by the request [", dbQuery, "]");
+		MESSAGE_DEBUG("", "", "there are no languages returned by the request [" + dbQuery + "]");
 	}
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: finish (returning string length = " + to_string(ostResult.str().length()) + ")");
+		MESSAGE_DEBUG("", "", "finish (returning string length = " + to_string(ostResult.str().length()) + ")");
 	}
 
 	return ostResult.str();
@@ -2980,8 +2740,7 @@ string GetSkillListInJSONFormat(string dbQuery, CMysql *db)
 	vector<ItemClass>   itemsList;
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	ostResult.str("");
@@ -3011,13 +2770,11 @@ string GetSkillListInJSONFormat(string dbQuery, CMysql *db)
 	} // --- if sql-query on user selection success
 	else
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: there are no skills returned by the request [", dbQuery, "]");
+		MESSAGE_DEBUG("", "", "there are no skills returned by the request [" + dbQuery + "]");
 	}
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: finish (returning string length = " + to_string(ostResult.str().length()) + ")");
+		MESSAGE_DEBUG("", "", "finish (returning string length = " + to_string(ostResult.str().length()) + ")");
 	}
 
 	return ostResult.str();
@@ -3039,8 +2796,7 @@ string GetUniversityListInJSONFormat(string dbQuery, CMysql *db, bool includeStu
 	vector<ItemClass>   itemsList;
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	ostResult.str("");
@@ -3095,13 +2851,11 @@ string GetUniversityListInJSONFormat(string dbQuery, CMysql *db, bool includeStu
 	} // --- if sql-query on user selection success
 	else
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: there are no university's returned by the request [", dbQuery, "]");
+		MESSAGE_DEBUG("", "", "there are no university's returned by the request [" + dbQuery + "]");
 	}
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: finish (returning string length = " + to_string(ostResult.str().length()) + ")");
+		MESSAGE_DEBUG("", "", "finish (returning string length = " + to_string(ostResult.str().length()) + ")");
 	}
 
 	return ostResult.str();
@@ -3122,8 +2876,7 @@ string GetSchoolListInJSONFormat(string dbQuery, CMysql *db, bool includeStudent
 	vector<ItemClass>   itemsList;
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	ostResult.str("");
@@ -3178,13 +2931,11 @@ string GetSchoolListInJSONFormat(string dbQuery, CMysql *db, bool includeStudent
 	} // --- if sql-query on user selection success
 	else
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: there are no school's returned by the request [", dbQuery, "]");
+		MESSAGE_DEBUG("", "", "there are no school's returned by the request [" + dbQuery + "]");
 	}
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: finish (returning string length = " + to_string(ostResult.str().length()) + ")");
+		MESSAGE_DEBUG("", "", "finish (returning string length = " + to_string(ostResult.str().length()) + ")");
 	}
 
 	return ostResult.str();
@@ -3195,16 +2946,14 @@ string	AutodetectSexByName(string name, CMysql *db)
 	string		result = "";
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	if(db->Query("SELECT * FROM `name_sex` WHERE `name`=\"" + name + "\";"))
 		result = db->Get(0, "sex");
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: finish (result = " + result + ")");
+		MESSAGE_DEBUG("", "", "finish (result = " + result + ")");
 	}
 
 	return result;
@@ -3524,8 +3273,7 @@ string GetNewsFeedInJSONFormat(string whereStatement, int currPage, int newsOnSi
 					}
 					else
 					{
-						CLog	log;
-						log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + string("]:") + ": can't get information [", itemsList[i].feed_actionId, "] about his/her employment");
+						MESSAGE_DEBUG("", "", "can't get information [" + itemsList[i].feed_actionId + "] about his/her employment");
 					} // --- Message in news feed not found
 
 					{
@@ -3744,7 +3492,7 @@ string GetNewsFeedInJSONFormat(string whereStatement, int currPage, int newsOnSi
 						else
 						{
 							CLog	log;
-							log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: `group`.`id` [" + groupID + "] blocked");
+							MESSAGE_DEBUG("", "", "`group`.`id` [" + groupID + "] blocked");
 						}
 					}
 					else
@@ -4234,8 +3982,7 @@ string GetUnreadChatMessagesInJSONFormat(CUser *user, CMysql *db)
 	int				affected;
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	result.str("");
@@ -4262,8 +4009,7 @@ string GetUnreadChatMessagesInJSONFormat(CUser *user, CMysql *db)
 	}
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: end");
+		MESSAGE_DEBUG("", "", "end");
 	}
 
 	return	result.str();
@@ -4279,8 +4025,7 @@ string GetMessageImageList(string imageSetID, CMysql *db)
 	string		  result = "";
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	if(imageSetID != "0")
@@ -4332,8 +4077,7 @@ string GetMessageLikesUsersList(string messageID, CUser *user, CMysql *db)
 	string		  result = "";
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	affected = db->Query("select * from `feed_message_params` where `parameter`='like' and `messageID`='" + messageID + "';");
@@ -4352,7 +4096,7 @@ string GetMessageLikesUsersList(string messageID, CUser *user, CMysql *db)
 
 	{
 		CLog			log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: end (returning string length " + to_string(result.length()) + ")");
+		MESSAGE_DEBUG("", "", "end (returning string length " + to_string(result.length()) + ")");
 	}
 
 	return result;
@@ -4369,8 +4113,7 @@ string GetBookLikesUsersList(string usersBookID, CUser *user, CMysql *db)
 	string		  result = "";
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	affected = db->Query("select * from `feed_message_params` where `parameter`='likeBook' and `messageID`='" + usersBookID + "';");
@@ -4389,7 +4132,7 @@ string GetBookLikesUsersList(string usersBookID, CUser *user, CMysql *db)
 
 	{
 		CLog			log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: end (returning string length " + to_string(result.length()) + ")");
+		MESSAGE_DEBUG("", "", "end (returning string length " + to_string(result.length()) + ")");
 	}
 
 	return result;
@@ -4406,8 +4149,7 @@ string GetLanguageLikesUsersList(string usersLanguageID, CUser *user, CMysql *db
 	string		  result = "";
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	affected = db->Query("select * from `feed_message_params` where `parameter`='likeLanguage' and `messageID`='" + usersLanguageID + "';");
@@ -4426,7 +4168,7 @@ string GetLanguageLikesUsersList(string usersLanguageID, CUser *user, CMysql *db
 
 	{
 		CLog			log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: end (returning string length " + to_string(result.length()) + ")");
+		MESSAGE_DEBUG("", "", "end (returning string length " + to_string(result.length()) + ")");
 	}
 
 	return result;
@@ -4443,8 +4185,7 @@ string GetCompanyLikesUsersList(string usersCompanyID, CUser *user, CMysql *db)
 	string		  result = "";
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	affected = db->Query("select * from `feed_message_params` where `parameter`='likeCompany' and `messageID`='" + usersCompanyID + "';");
@@ -4463,7 +4204,7 @@ string GetCompanyLikesUsersList(string usersCompanyID, CUser *user, CMysql *db)
 
 	{
 		CLog			log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: end (returning string length " + to_string(result.length()) + ")");
+		MESSAGE_DEBUG("", "", "end (returning string length " + to_string(result.length()) + ")");
 	}
 
 	return result;
@@ -4480,8 +4221,7 @@ string GetCertificationLikesUsersList(string usersCertificationID, CUser *user, 
 	string		  result = "";
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	affected = db->Query("select * from `feed_message_params` where `parameter`='likeCertification' and `messageID`='" + usersCertificationID + "';");
@@ -4500,7 +4240,7 @@ string GetCertificationLikesUsersList(string usersCertificationID, CUser *user, 
 
 	{
 		CLog			log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: end (returning string length " + to_string(result.length()) + ")");
+		MESSAGE_DEBUG("", "", "end (returning string length " + to_string(result.length()) + ")");
 	}
 
 	return result;
@@ -4517,8 +4257,7 @@ string GetCourseLikesUsersList(string usersCourseID, CUser *user, CMysql *db)
 	string		  result = "";
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	affected = db->Query("select * from `feed_message_params` where `parameter`='likeCourse' and `messageID`='" + usersCourseID + "';");
@@ -4537,7 +4276,7 @@ string GetCourseLikesUsersList(string usersCourseID, CUser *user, CMysql *db)
 
 	{
 		CLog			log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: end (returning string length " + to_string(result.length()) + ")");
+		MESSAGE_DEBUG("", "", "end (returning string length " + to_string(result.length()) + ")");
 	}
 
 	return result;
@@ -4591,8 +4330,7 @@ string GetLanguageIDByTitle(string languageTitle, CMysql *db)
 	string			languageID = "0";
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	if(languageTitle.length())
@@ -4606,7 +4344,7 @@ string GetLanguageIDByTitle(string languageTitle, CMysql *db)
 			long int 	tmp;
 			{
 				CLog			log;
-				log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: languageTitle [" + languageTitle + "] not found. Creating new one.");
+				MESSAGE_DEBUG("", "", "languageTitle [" + languageTitle + "] not found. Creating new one.");
 			}
 
 			tmp = db->InsertQuery("INSERT INTO `language` SET `title`=\"" + languageTitle + "\";");
@@ -4623,7 +4361,7 @@ string GetLanguageIDByTitle(string languageTitle, CMysql *db)
 	{
 		{
 			CLog			log;
-			log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: languageTitle is empty");
+			MESSAGE_DEBUG("", "", "languageTitle is empty");
 		}
 	}
 
@@ -4631,7 +4369,7 @@ string GetLanguageIDByTitle(string languageTitle, CMysql *db)
 
 	{
 		CLog			log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: end (returning string length " + to_string(result.length()) + ")");
+		MESSAGE_DEBUG("", "", "end (returning string length " + to_string(result.length()) + ")");
 	}
 
 
@@ -4645,8 +4383,7 @@ string GetSkillIDByTitle(string skillTitle, CMysql *db)
 	string			languageID = "0";
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	if(skillTitle.length())
@@ -4660,7 +4397,7 @@ string GetSkillIDByTitle(string skillTitle, CMysql *db)
 			long int 	tmp;
 			{
 				CLog			log;
-				log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: skillTitle [" + skillTitle + "] not found. Creating new one.");
+				MESSAGE_DEBUG("", "", "skillTitle [" + skillTitle + "] not found. Creating new one.");
 			}
 
 			tmp = db->InsertQuery("INSERT INTO `skill` SET `title`=\"" + skillTitle + "\";");
@@ -4677,7 +4414,7 @@ string GetSkillIDByTitle(string skillTitle, CMysql *db)
 	{
 		{
 			CLog			log;
-			log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: skillTitle is empty");
+			MESSAGE_DEBUG("", "", "skillTitle is empty");
 		}
 	}
 
@@ -4685,7 +4422,7 @@ string GetSkillIDByTitle(string skillTitle, CMysql *db)
 
 	{
 		CLog			log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: end (returning string length " + to_string(result.length()) + ")");
+		MESSAGE_DEBUG("", "", "end (returning string length " + to_string(result.length()) + ")");
 	}
 
 	return result;
@@ -4698,8 +4435,7 @@ string GetGeoLocalityIDByCityAndRegion(string regionName, string cityName, CMysq
 	string			regionID = "", cityID = "";
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	if(regionName.length())
@@ -4713,7 +4449,7 @@ string GetGeoLocalityIDByCityAndRegion(string regionName, string cityName, CMysq
 			long int 	tmp;
 			{
 				CLog			log;
-				log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: region[" + regionName + "] not found. Creating new one.");
+				MESSAGE_DEBUG("", "", "region[" + regionName + "] not found. Creating new one.");
 			}
 
 			tmp = db->InsertQuery("INSERT INTO `geo_region` SET `geo_country_id`=\"0\", `title`=\"" + regionName + "\";");
@@ -4730,7 +4466,7 @@ string GetGeoLocalityIDByCityAndRegion(string regionName, string cityName, CMysq
 	{
 		{
 			CLog			log;
-			log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: regionName is empty");
+			MESSAGE_DEBUG("", "", "regionName is empty");
 		}
 	}
 
@@ -4745,7 +4481,7 @@ string GetGeoLocalityIDByCityAndRegion(string regionName, string cityName, CMysq
 			long int 	tmp;
 			{
 				CLog			log;
-				log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: region[" + cityName + "] not found. Creating new one.");
+				MESSAGE_DEBUG("", "", "region[" + cityName + "] not found. Creating new one.");
 			}
 
 			tmp = db->InsertQuery("INSERT INTO `geo_locality` SET " + (regionID.length() ? "`geo_region_id`=\"" + regionID + "\"," : "") + " `title`=\"" + cityName + "\";");
@@ -4763,13 +4499,13 @@ string GetGeoLocalityIDByCityAndRegion(string regionName, string cityName, CMysq
 	{
 		{
 			CLog			log;
-			log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: cityName is empty");
+			MESSAGE_DEBUG("", "", "cityName is empty");
 		}
 	}
 
 	{
 		CLog			log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: end (returning string length " + to_string(result.length()) + ")");
+		MESSAGE_DEBUG("", "", "end (returning string length " + to_string(result.length()) + ")");
 	}
 
 	return result;
@@ -4786,8 +4522,7 @@ string GetUniversityDegreeLikesUsersList(string universityDegreeID, CUser *user,
 	string		  result = "";
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	affected = db->Query("select * from `feed_message_params` where `parameter`='likeUniversityDegree' and `messageID`='" + universityDegreeID + "';");
@@ -4806,7 +4541,7 @@ string GetUniversityDegreeLikesUsersList(string universityDegreeID, CUser *user,
 
 	{
 		CLog			log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: end (returning string length " + to_string(result.length()) + ")");
+		MESSAGE_DEBUG("", "", "end (returning string length " + to_string(result.length()) + ")");
 	}
 
 	return result;
@@ -4823,8 +4558,7 @@ string GetBookRatingUsersList(string bookID, CUser *user, CMysql *db)
 	string		  result = "";
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	affected = db->Query("select * from `users_books` where `bookID`=\"" + bookID + "\";");
@@ -4843,7 +4577,7 @@ string GetBookRatingUsersList(string bookID, CUser *user, CMysql *db)
 
 	{
 		CLog			log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: end (returning string length " + to_string(result.length()) + ")");
+		MESSAGE_DEBUG("", "", "end (returning string length " + to_string(result.length()) + ")");
 	}
 
 	return result;
@@ -4858,8 +4592,7 @@ string GetBookRatingList(string bookID, CMysql *db)
 	string		  result = "";
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	affected = db->Query("select * from `users_books` where `bookID`=\"" + bookID + "\";");
@@ -4874,7 +4607,7 @@ string GetBookRatingList(string bookID, CMysql *db)
 
 	{
 		CLog			log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: end (returning string length " + to_string(result.length()) + ")");
+		MESSAGE_DEBUG("", "", "end (returning string length " + to_string(result.length()) + ")");
 	}
 
 	return result;
@@ -4889,8 +4622,7 @@ string GetCourseRatingList(string courseID, CMysql *db)
 	string			result = "";
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	affected = db->Query("select * from `users_courses` where `track_id`=\"" + courseID + "\";");
@@ -4905,7 +4637,7 @@ string GetCourseRatingList(string courseID, CMysql *db)
 
 	{
 		CLog			log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: end (returning string length " + to_string(result.length()) + ")");
+		MESSAGE_DEBUG("", "", "end (returning string length " + to_string(result.length()) + ")");
 	}
 
 	return result;
@@ -4918,8 +4650,7 @@ string GetMessageCommentsCount(string messageID, CMysql *db)
 	string		  result = "0";
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	ost.str("");
@@ -4931,8 +4662,7 @@ string GetMessageCommentsCount(string messageID, CMysql *db)
 	}
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: end");
+		MESSAGE_DEBUG("", "", "end");
 	}
 
 	return result;
@@ -4945,8 +4675,7 @@ string GetCompanyCommentsCount(string messageID, CMysql *db)
 	string		  result = "0";
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	ost.str("");
@@ -4958,8 +4687,7 @@ string GetCompanyCommentsCount(string messageID, CMysql *db)
 	}
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: end");
+		MESSAGE_DEBUG("", "", "end");
 	}
 
 	return result;
@@ -4972,8 +4700,7 @@ string GetLanguageCommentsCount(string messageID, CMysql *db)
 	string		  result = "0";
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	ost.str("");
@@ -4985,8 +4712,7 @@ string GetLanguageCommentsCount(string messageID, CMysql *db)
 	}
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: end");
+		MESSAGE_DEBUG("", "", "end");
 	}
 
 	return result;
@@ -4999,8 +4725,7 @@ string GetBookCommentsCount(string messageID, CMysql *db)
 	string		  result = "0";
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	ost.str("");
@@ -5012,8 +4737,7 @@ string GetBookCommentsCount(string messageID, CMysql *db)
 	}
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: end");
+		MESSAGE_DEBUG("", "", "end");
 	}
 
 	return result;
@@ -5026,8 +4750,7 @@ string GetCertificateCommentsCount(string messageID, CMysql *db)
 	string		  result = "0";
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	ost.str("");
@@ -5039,8 +4762,7 @@ string GetCertificateCommentsCount(string messageID, CMysql *db)
 	}
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: end");
+		MESSAGE_DEBUG("", "", "end");
 	}
 
 	return result;
@@ -5053,8 +4775,7 @@ string GetUniversityDegreeCommentsCount(string messageID, CMysql *db)
 	string		  result = "0";
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	ost.str("");
@@ -5066,8 +4787,7 @@ string GetUniversityDegreeCommentsCount(string messageID, CMysql *db)
 	}
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: end");
+		MESSAGE_DEBUG("", "", "end");
 	}
 
 	return result;
@@ -5080,8 +4800,7 @@ string GetMessageSpam(string messageID, CMysql *db)
 	string			result = "0";
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	ost.str("");
@@ -5095,8 +4814,7 @@ string GetMessageSpam(string messageID, CMysql *db)
 	}
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: end");
+		MESSAGE_DEBUG("", "", "end");
 	}
 
 	return result;
@@ -5112,8 +4830,7 @@ string GetMessageSpamUser(string messageID, string userID, CMysql *db)
 	string			result = "0";
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	ost.str("");
@@ -5126,8 +4843,7 @@ string GetMessageSpamUser(string messageID, string userID, CMysql *db)
 
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: end");
+		MESSAGE_DEBUG("", "", "end");
 	}
 
 	return result;
@@ -5138,7 +4854,7 @@ bool AllowMessageInNewsFeed(CUser *me, const string messageOwnerID, const string
 
 	{
 		CLog			log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]:parameters (user [" + me->GetID() + "], messageOwnerID [" + messageOwnerID + "], messageAccessRights [" + messageAccessRights + "]): start");
+		MESSAGE_DEBUG("", "", "parameters (user [" + me->GetID() + "], messageOwnerID [" + messageOwnerID + "], messageAccessRights [" + messageAccessRights + "]): start");
 	}
 
 	// --- messages belons to yourself must be shown unconditionally
@@ -5631,7 +5347,7 @@ string  GetUserNotificationSpecificDataByType(unsigned long typeID, unsigned lon
 						else
 						{
 							CLog log;
-							log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]:typeID=" + to_string(typeID) + ": there is no media assigned to message");
+							MESSAGE_DEBUG("", "", "typeID=" + to_string(typeID) + ": there is no media assigned to message");
 						}
 
 						ostResult << "\"notificationMessageID\":\"" << messageID << "\",";
@@ -5735,7 +5451,7 @@ string  GetUserNotificationSpecificDataByType(unsigned long typeID, unsigned lon
 				else
 				{
 					CLog log;
-					log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]:typeID=" + to_string(typeID) + ": finding users_certifications by (track_id[" + trackID + "] and user_id[" + (user ? user->GetID() : "NULL") + "]) or (user[" + (user ? "not null" : "null") + "] == NULL)");
+					MESSAGE_DEBUG("", "", "typeID=" + to_string(typeID) + ": finding users_certifications by (track_id[" + trackID + "] and user_id[" + (user ? user->GetID() : "NULL") + "]) or (user[" + (user ? "not null" : "null") + "] == NULL)");
 				}
 
 
@@ -5801,7 +5517,7 @@ string  GetUserNotificationSpecificDataByType(unsigned long typeID, unsigned lon
 				else
 				{
 					CLog log;
-					log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]:typeID=" + to_string(typeID) + ": finding users_courses by (track_id[" + trackID + "] and user_id[" + (user ? user->GetID() : "NULL") + "]) or (user[" + (user ? "not null" : "null") + "] == NULL)");
+					MESSAGE_DEBUG("", "", "typeID=" + to_string(typeID) + ": finding users_courses by (track_id[" + trackID + "] and user_id[" + (user ? user->GetID() : "NULL") + "]) or (user[" + (user ? "not null" : "null") + "] == NULL)");
 				}
 
 
@@ -5873,7 +5589,7 @@ string  GetUserNotificationSpecificDataByType(unsigned long typeID, unsigned lon
 				else
 				{
 					CLog log;
-					log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: typeID=" + to_string(typeID) + ": finding users_universitys by (university_id[" + universityID + "] and user_id[" + (user ? user->GetID() : "NULL") + "]) or (user[" + (user ? "not null" : "null") + "] == NULL)");
+					MESSAGE_DEBUG("", "", "typeID=" + to_string(typeID) + ": finding users_universitys by (university_id[" + universityID + "] and user_id[" + (user ? user->GetID() : "NULL") + "]) or (user[" + (user ? "not null" : "null") + "] == NULL)");
 				}
 
 
@@ -5957,7 +5673,7 @@ string  GetUserNotificationSpecificDataByType(unsigned long typeID, unsigned lon
 				else
 				{
 					CLog log;
-					log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]:typeID=" + to_string(typeID) + ": finding users_companys by (company_id[" + companyID + "] and user_id[" + (user ? user->GetID() : "NULL") + "]) or (user[" + (user ? "not null" : "null") + "] == NULL)");
+					MESSAGE_DEBUG("", "", "typeID=" + to_string(typeID) + ": finding users_companys by (company_id[" + companyID + "] and user_id[" + (user ? user->GetID() : "NULL") + "]) or (user[" + (user ? "not null" : "null") + "] == NULL)");
 				}
 
 
@@ -6028,7 +5744,7 @@ string  GetUserNotificationSpecificDataByType(unsigned long typeID, unsigned lon
 				else
 				{
 					CLog log;
-					log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]:typeID=" + to_string(typeID) + ": finding users_languages by (language_id[" + languageID + "] and user_id[" + (user ? user->GetID() : "NULL") + "]) or (user[" + (user ? "not null" : "null") + "] == NULL)");
+					MESSAGE_DEBUG("", "", "typeID=" + to_string(typeID) + ": finding users_languages by (language_id[" + languageID + "] and user_id[" + (user ? user->GetID() : "NULL") + "]) or (user[" + (user ? "not null" : "null") + "] == NULL)");
 				}
 
 
@@ -6357,7 +6073,7 @@ string  GetUserNotificationSpecificDataByType(unsigned long typeID, unsigned lon
 							else
 							{
 								CLog log;
-								log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: typeID=49: there is no media assigned to message");
+								MESSAGE_DEBUG("", "", "typeID=49: there is no media assigned to message");
 							} // --- imageSet is empty
 
 							ostResult << "\"notificationCommentType\":\"" << commentType << "\",";
@@ -6801,7 +6517,7 @@ string  GetUserNotificationSpecificDataByType(unsigned long typeID, unsigned lon
 				else
 				{
 					CLog log;
-					log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: typeID=50: there is no media assigned to message");
+					MESSAGE_DEBUG("", "", "typeID=50: there is no media assigned to message");
 				}
 
 				ostResult << "\"notificationMessageID\":\"" << messageID << "\",";
@@ -8224,7 +7940,7 @@ bool GetSpecificData_AllowedToChange(string itemID, string itemType, CMysql *db,
 				result = false;
 				{
 					CLog	log;
-					log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: access to " + itemType + "(" + itemID + ") denied, because logo already uploaded");
+					MESSAGE_DEBUG("", "", "access to " + itemType + "(" + itemID + ") denied, because logo already uploaded");
 				}
 			}
 		}
@@ -8239,7 +7955,7 @@ bool GetSpecificData_AllowedToChange(string itemID, string itemType, CMysql *db,
 					result = false;
 					{
 						CLog	log;
-						log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: access to " + itemType + "(" + itemID + ") denied, you are not the event host");
+						MESSAGE_DEBUG("", "", "access to " + itemType + "(" + itemID + ") denied, you are not the event host");
 					}
 				}
 			}
@@ -8263,7 +7979,7 @@ bool GetSpecificData_AllowedToChange(string itemID, string itemType, CMysql *db,
 					result = false;
 					{
 						CLog	log;
-						log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: access to " + itemType + "(" + itemID + ") denied, you are not the gift owner");
+						MESSAGE_DEBUG("", "", "access to " + itemType + "(" + itemID + ") denied, you are not the gift owner");
 					}
 				}
 			}
@@ -8287,6 +8003,27 @@ bool GetSpecificData_AllowedToChange(string itemID, string itemType, CMysql *db,
 	}
 
 	MESSAGE_DEBUG("", "", "finish (result: " + (result ? "true" : "false") + ")");
+
+	return result;
+}
+
+auto isAllowed_NoSession_Action(string action) -> bool
+{
+	auto			result = false;
+	vector<string>	allowed_nosession_actions = ALLOWED_NO_SESSION_ACTION;
+
+	MESSAGE_DEBUG("", "", "start (action " + action + ")");
+
+	for(auto &allowed_nosession_action : allowed_nosession_actions)
+	{
+		if(action == allowed_nosession_action)
+		{
+			result = true;
+			break;
+		}
+	}
+
+	MESSAGE_DEBUG("", "", "finish");
 
 	return result;
 }
@@ -8410,6 +8147,8 @@ auto GetSpellingFormattedDate(string date, string format) -> string
 
 	return result;
 }
+
+
 
 struct tm GetTMObject(string date)
 {
@@ -8568,3 +8307,4 @@ string PrintTime(const struct tm &_tm, string format)
 
 	return result;
 }
+

@@ -147,20 +147,15 @@ auto GenerateSession(string action, CCgi *indexPage, CMysql *db, CUser *user) ->
 			}
 		}
 
-		if(action.length())
+		if(isAllowed_NoSession_Action(action))
 		{
+			// --- guest user access,
+			// --- 1) user wall, if exact link known
 		}
 		else
 		{
-			// --- Safari browser issue:
-			// --- 		1) cookie set via HTTP-response
-			// ---		2) JS removed sessid cookie
-			// ---		3) issue: cookie set on (1) step keeps reappear after 5 sec.
-			// --- To address Safari JS cookie issue, cookie should not be set on request "/"
-			MESSAGE_DEBUG("", "", "session cookie doesn't exists. Flow before check persitense session, no need to generate cookie. (workaround with JS cookie issue in Safari)");
+			action = GUEST_USER_DEFAULT_ACTION;
 		}
-
-		action = GUEST_USER_DEFAULT_ACTION;
 	}
 	else
 	{
@@ -208,7 +203,7 @@ auto GenerateSession(string action, CCgi *indexPage, CMysql *db, CUser *user) ->
 							// --- enforce to close session
 							action = "logout";
 
-							MESSAGE_ERROR("", action, "user (" + indexPage->SessID_Get_UserFromDB() + ") session exists on client device, but not in the DB. Change action to logout");
+							MESSAGE_ERROR("", action, "session.user(" + indexPage->SessID_Get_UserFromDB() + ") not found in users.table. Session exists on client side, but not in the DB. Session belonged to unknown user must be terminated.");
 						}
 					}
 					else
@@ -229,7 +224,7 @@ auto GenerateSession(string action, CCgi *indexPage, CMysql *db, CUser *user) ->
 							// --- enforce to close session
 							action = "logout";
 
-							MESSAGE_ERROR("", action, "user (" + indexPage->SessID_Get_UserFromDB() + ") session exists on client device, but not in the DB. Change the [action = logout].");
+							MESSAGE_ERROR("", action, "session.user(" + indexPage->SessID_Get_UserFromDB() + ") not found in users.table. Session exists on client side, but not in the DB. Session belonged to unknown user must be terminated.");
 						}
 					}
 				}

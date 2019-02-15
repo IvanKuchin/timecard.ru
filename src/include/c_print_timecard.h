@@ -26,6 +26,13 @@ using namespace std;
 class C_Print_Timecard
 {
 
+	struct	Day_Summary_Struct
+	{
+		string		date;
+		bool		is_weekend;
+		c_float		efforts = 0;
+	};
+
 	private:
 		// CMysql						*db = NULL;
 		// CUser						*user = NULL;
@@ -33,6 +40,12 @@ class C_Print_Timecard
 		string							filename = "";
 
 		C_Timecard_To_Print				timecard;
+
+		vector<Day_Summary_Struct>		day_summary;
+		c_float							total_efforts = 0;
+
+		auto		isDaySummaryStruct_Filled() -> bool;
+		auto		AssignValuesToDaySummaryStruct() -> bool;
 
 	public:
 					C_Print_Timecard()								{};

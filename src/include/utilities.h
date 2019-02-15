@@ -44,12 +44,14 @@ auto	      	GetRandom(int len) -> string;
 auto	      	DeleteHTML(string src, bool removeBR = true) -> string;
 auto	      	RemoveQuotas(string src) -> string;
 auto	      	RemoveSpecialSymbols(string src) -> string;
-auto	      	RemoveSpecialHTMLSymbols(string src) -> string;
+auto	      	RemoveSpecialHTMLSymbols(const string &src) -> string;
 auto	      	ReplaceDoubleQuoteToQuote(string src) -> string;
 auto	      	ReplaceCRtoHTML(string src) -> string;
 auto	      	CleanUPText(const string messageBody, bool removeBR = true) -> string;
 auto	      	RemoveAllNonAlphabetSymbols(const string &src) -> string;
 auto	      	ConvertTextToHTML(const string &messageBody) -> string;
+auto	      	ConvertHTMLToText(const wstring &messageBody) -> wstring;
+auto	      	ConvertHTMLToText(const string &messageBody) -> string;
 auto	 		CheckHTTPParam_Text(const string &srcText) -> string;
 auto 			CheckHTTPParam_Number(const string &srcText) -> string;
 auto	 		CheckHTTPParam_Date(const string &srcText) -> string;
@@ -68,7 +70,7 @@ auto	      	GetMonthsDeclension(const int value) -> string;
 auto	      	GetYearsDeclension(const int value) -> string;
 auto	      	GetHumanReadableTimeDifferenceFromNow (const string timeAgo) -> string;
 auto	      	SymbolReplace(const string where, const string src, const string dst) -> string;
-auto	      	SymbolReplace_KeepDigitsOnly(const string where) -> string;
+auto	      	SymbolReplace_KeepDigitsOnly(const string &where) -> string;
 auto	        qw(const string src, vector<string> &dst) -> int;
 vector<string>	split(const string& s, const char& c);
 auto			join(const vector<string>& vec, string separator = ",") -> string;
@@ -78,6 +80,7 @@ auto      		AutodetectSexByName(string name, CMysql *) -> string;
 auto			GetPasswordNounsList(CMysql *) -> string;
 auto			GetPasswordAdjectivesList(CMysql *) -> string;
 auto			GetPasswordCharacteristicsList(CMysql *) -> string;
+auto			isAllowed_NoSession_Action(string action) -> bool;
 
 auto      		GetChatMessagesInJSONFormat(string dbQuery, CMysql *) -> string;
 auto      		GetUserListInJSONFormat(string dbQuery, CMysql *, CUser *) -> string;
@@ -174,7 +177,7 @@ auto			PrintDateTime(const struct tm &_tm) -> string;
 auto			PrintTime(const struct tm &_tm, string format) -> string;
 auto			GetZipInJSONFormat(string zip_id, CMysql *, CUser *) -> string;
 auto			GetBankInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
-
+auto			stod_noexcept(const string &) -> double;
 
 
 
@@ -274,6 +277,7 @@ auto 			GetNumberOfSoWActiveThisMonth(CMysql *db, CUser *user) -> string;
 auto 			GetNumberOfSoWActiveLastMonth(CMysql *db, CUser *user) -> string;
 auto			GetPSoWIDByTimecardIDAndCostCenterID(string timecard_id, string cost_center_id, CMysql *db, CUser *user) -> string;
 auto			GetSoWIDByTimecardID(string timecard_id, CMysql *db, CUser *user) -> string;
+// auto			GetTimecardLines_By_TimecardID_And_CostCenterID(string timecard_id, string cost_center_id, CMysql *db, CUser *user);
 
 
 // --- function set for image upload/removal

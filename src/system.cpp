@@ -453,8 +453,6 @@ int main()
 								{
 									MESSAGE_ERROR("", action, "\"sessid\" cookie doesn't exists or expired, UA must be redirected to / page. This is AJAX request called from "s + (getenv("HTTP_REFERER") ? getenv("HTTP_REFERER") : "") + ". Supposed that parent script assign cookie:sessid, BUT cookie hasn't been assigned. Probably this script has been called from cached page or page opened in neighbour tab (check that parallel stream may exists with the same persistency key).");
 								}
-								// --- clean DB to remove number # of stuck sessions and reduce risk of back dooring to old sessions
-								db.Query("DELETE FROM `sessions` WHERE `id`=\"" + sessidPersistence + "\";");
 							}
 							else
 							{
@@ -480,10 +478,15 @@ int main()
 									indexPage.RegisterVariableForce("loginUser", indexPage.SessID_Get_UserFromDB());
 
 									// --- copy session from persisted user to his/her new session
-									if(db.Query("SELECT `user`, `expire` FROM `sessions` WHERE `id`=\"" + sessidPersistence + "\";"))
+									if(db.Query("SELECT `user`, `expire`, `remove_flag`, `remove_flag_timestamp` FROM `sessions` WHERE `id`=\"" + sessidPersistence + "\";"))
 									{
 										string	persistedUser = db.Get(0, "user");
 										string	persistedExpire = db.Get(0, "expire");
+										string	remove_flag = db.Get(0, "remove_flag");
+										string	remove_flag_timestamp = db.Get(0, "remove_flag_timestamp");
+
+										if(remove_flag == "Y")
+											MESSAGE_ERROR("", "", "session(" + sessidPersistence + ") would be deleted at " + remove_flag_timestamp + ", but it is re-used. Investigate why it is re-used.");
 
 										if(sessidPersistence == sessidHTTP)
 										{
@@ -497,7 +500,10 @@ int main()
 										}
 										else
 										{
-											db.Query("DELETE FROM `sessions` WHERE `id`=\"" + sessidPersistence + "\";");
+											// --- following lines used to track re-use legacy sessions. 
+											// --- instead of removal, it will be "marked for removal"
+											// db.Query("DELETE FROM `sessions` WHERE `id`=\"" + sessidPersistence + "\";");
+											db.Query("UDATE `sessions` SET `remove_flag`=\"Y\", `remove_flag_timestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sessidPersistence + "\";");
 										}
 
 										mapResult["redirect"] = GetDefaultActionFromUserType(user.GetType(), &db);

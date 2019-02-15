@@ -23,7 +23,8 @@ bool Test1()
 {
 	auto			result = true;
 	auto			error_message = ""s;
-	char			buffer[1024];
+	auto			translation = ""s;
+	// char			buffer[1024];
 	vector<string>	number_test_fail = {"123.12", "0x123", "", "1E-1", "-1", "-1.234", "-0", "123ABC", "0x7"};
 	vector<string>	number_test_success = {"12312", "0000000000000000000000000", "", "1234567890965432123457908642", "1234567890", "007"};
 	vector<string>	float_test_fail = {"1231..2", ".12312", "12312.", "12.3.12", "0x1.23", "", ".1E-1", "-1", "-1.234", "-0", "123ABC.", "0x7", "007A", "007scdlkm", "007.sdkjcnsdc", "007,98797", "007!"};
@@ -36,38 +37,6 @@ bool Test1()
 	vector<string>	timeentry_test_success = {"8", "", "8,-1,8", ",", "", "8,8.8", "8,8.08", "8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8"};
 	auto			rus_alphabet = "Аа Бб Вв Гг Дд Ее Ёё Жж Зз Ии Йй Кк Лл Мм Нн Оо Пп Рр Сс Тт Уу Фф Хх Цц Чч Шш Щщ Ъъ Ыы Ьь Ээ Юю Яя"s;
 	auto			us_alphabet = "Aa Bb Cc Dd Ee Ff Gg Hh Ii Jj Kk Ll Mm Nn Oo Pp Qq Rr Ss Tt Uu Vv Ww Xx Yy Zz"s;
-
-/*
-	memset(buffer, 0, sizeof(buffer));
-	if(convert_cp1251_to_utf8(rus_alphabet.c_str(), buffer, sizeof(buffer)))
-	{
-		auto	str = ""s;
-		auto	str_long = ""s;
-
-		str = buffer;
-
-		if(CheckHTTPParam_Text(str) == rus_alphabet) {}
-		else
-		{
-			result = false;
-			cout << "failed on basic RUS alphabet" << endl;
-		}
-
-		if(CheckHTTPParam_Text(repeat(str, 150)).length() == CheckHTTPParam_Text(repeat(str, 350)).length()) {}
-		else
-		{
-			result = false;
-			cout << "failed on RUS overflow" << endl;
-		}
-
-
-	}
-	else
-	{
-		result = false;
-		cout << "fail to convert src to utf-8" << endl;
-	}
-*/
 
 	if(CheckHTTPParam_Text(rus_alphabet) == rus_alphabet) {}
 	else
@@ -132,11 +101,108 @@ bool Test1()
 		cout << "failed on <br> test" << endl;
 	}
 
-	if(RemoveAllNonAlphabetSymbols("/\\	<>\"-;':,%N.`:'apo';`,") == "apo") {}
+	if((translation = RemoveAllNonAlphabetSymbols("/\\	<>\"-;':,%N.`:'apo';`,")) == "apo") {}
 	else
 	{
 		result = false;
-		cout << "failed on .`:'apo';`, test" << endl;
+		cout << "failed on RemoveAllNonAlphabetSymbols(.`:'apo';`)=" << translation << ", test" << endl;
+	}
+
+	if(RemoveSpecialHTMLSymbols("<tag>\"value—value\"</tag>") == "&lt;tag&gt;&quot;value-value&quot;&lt;/tag&gt;") {}
+	else
+	{
+		result = false;
+		cout << "failed on RemoveSpecialHTMLSymbols(<tag>\"value—value\"</tag>), test" << endl;
+	}
+
+	if((translation = RemoveSpecialHTMLSymbols("<tag>\"chanel№5\"</tag>")) == "&lt;tag&gt;&quot;chanel&#35;5&quot;&lt;/tag&gt;") {}
+	else
+	{
+		result = false;
+		cout << "failed on RemoveSpecialHTMLSymbols(<tag>\"chanel№5\"</tag>)=" << translation << ", test" << endl;
+	}
+
+	if((translation = RemoveSpecialHTMLSymbols("<tag>\"chanel№5\"</tag>\\\\\\")) == "&lt;tag&gt;&quot;chanel&#35;5&quot;&lt;/tag&gt;") {}
+	else
+	{
+		result = false;
+		cout << "failed on RemoveSpecialHTMLSymbols(\"<tag>\"chanel№5\"</tag>\\\\\\\")=" << translation << ", test" << endl;
+	}
+
+	if((translation = ReplaceDoubleQuoteToQuote("Zdes bwl \"Vasya\"")) == "Zdes bwl 'Vasya'") {}
+	else
+	{
+		result = false;
+		cout << "failed on ReplaceDoubleQuoteToQuote(\"Zdes bwl \"Vasya\"\")=" << translation << ", test" << endl;
+	}
+
+	if((translation = ReplaceCRtoHTML("Zdes bwl \n\"Vasya\"")) == "Zdes bwl <bR>\"Vasya\"") {}
+	else
+	{
+		result = false;
+		cout << "failed on ReplaceCRtoHTML(\"Zdes bwl \n\"Vasya\"\")=" << translation << ", test" << endl;
+	}
+	if((translation = ReplaceCRtoHTML("Zdes bwl \n\"Vasya\"\r")) == "Zdes bwl <bR>\"Vasya\"<Br>") {}
+	else
+	{
+		result = false;
+		cout << "failed on ReplaceCRtoHTML(\"Zdes bwl \n\"Vasya\"\")=" << translation << ", test" << endl;
+	}
+	if((translation = ReplaceCRtoHTML("Zdes bwl \n\"Vasya\"\r\n")) == "Zdes bwl <bR>\"Vasya\"<br>") {}
+	else
+	{
+		result = false;
+		cout << "failed on ReplaceCRtoHTML(\"Zdes bwl \n\"Vasya\"\r\n\")=" << translation << ", test" << endl;
+	}
+
+
+	if((translation = SymbolReplace_KeepDigitsOnly("Zdes bwl \"Vasya\"")) == "") {}
+	else
+	{
+		result = false;
+		cout << "failed on SymbolReplace_KeepDigitsOnly(\"Zdes bwl \"Vasya\"\")=" << translation << ", test" << endl;
+	}
+
+	if((translation = SymbolReplace_KeepDigitsOnly("ЙЦУКЕНГШЩЗ1234567890йцукенгшщз1234567890qwertyuiop")) == "12345678901234567890") {}
+	else
+	{
+		result = false;
+		cout << "failed on SymbolReplace_KeepDigitsOnly(\"1234567890йцукенгшщз1234567890qwertyuiop\")=" << translation << ", test" << endl;
+	}
+
+	if((translation = RemoveSpecialSymbols("\\ 123	chanel№5	——— \\\\")) == " 123 chanelN5 --- ") {}
+	else
+	{
+		result = false;
+		cout << "failed on RemoveSpecialSymbols(\"\\ 123	chanel№5	——— \\\\\")=" << translation << ", test" << endl;
+	}
+
+	if((translation = RemoveAllNonAlphabetSymbols("\\&lt;tag&gt; 123	chanel№5	——— &lt;/tag&gt;\\\\")) == "tag123chanel5tag") {}
+	else
+	{
+		result = false;
+		cout << "failed on RemoveAllNonAlphabetSymbols(\"\\&lt;tag&gt; 123	chanel№5	——— &lt;/tag&gt;\\\\\")=" << translation << ", test" << endl;
+	}
+
+	if((translation = RemoveAllNonAlphabetSymbols("\\<tag> 123	chaNel№5	——— </tag>then , after party ...\\\\")) == "tag123chael5tagthenafterparty") {}
+	else
+	{
+		result = false;
+		cout << "failed on RemoveAllNonAlphabetSymbols(\"\\<tag> 123	chaNel№5	——— </tag>then , after party ...\\\\\")=" << translation << ", test" << endl;
+	}
+
+	if((translation = RemoveAllNonAlphabetSymbols(" \\ / 	< > \"'; : ` . , % - N &lt;&gt;&quot;&#92;")) == "") {}
+	else
+	{
+		result = false;
+		cout << "failed on RemoveAllNonAlphabetSymbols(\" \\ / 	< > \"'; : ` . , % - N &lt;&gt;&quot;&#92;\")=" << translation << ", test" << endl;
+	}
+
+	if((translation = ConvertHTMLToText("&lt;&gt;&quot;&#92;")) == "<>\"&#92;") {}
+	else
+	{
+		result = false;
+		cout << "failed on ConverHTMLToText(\"&lt;&gt;&quot;&#92;\")=" << translation << ", test" << endl;
 	}
 
 	for(auto str: number_test_fail)

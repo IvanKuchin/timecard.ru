@@ -2182,3 +2182,34 @@ string	GetSpelledBankByID(string id, CMysql *db)
 	return result;	
 }
 
+auto	stod_noexcept(const string &num) -> double
+{
+	auto	result = 0.0;
+	auto	decimal_point = (localeconv()->decimal_point ? localeconv()->decimal_point[0] : ',');
+	auto	lc_original = ""s;
+	auto	lc_en = "en_US.utf8"s;
+
+	if(decimal_point != '.')
+	{
+		lc_original = setlocale(LC_NUMERIC, NULL);
+		setlocale(LC_NUMERIC, lc_en.c_str());
+		MESSAGE_DEBUG("", "", "temporary switch locale from " + lc_original + " to " + lc_en)
+	}
+
+	try
+	{
+		result = stod(num);
+	}
+	catch(...)
+	{
+		MESSAGE_ERROR("", "", "can't convert " + num + " to double");
+	}
+
+	if(decimal_point != '.')
+	{
+		setlocale(LC_NUMERIC, lc_original.c_str());
+		MESSAGE_DEBUG("", "", "switch locale back to " + lc_original)
+	}
+
+	return result;
+}

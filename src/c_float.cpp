@@ -81,38 +81,10 @@ c_float::c_float(string param, int prec_param) : precision(prec_param)
 
 void c_float::Set(string param)
 {
-	if(param.empty()) val = 0;
+	if(param.empty()) Set(0);
 	else
 	{
-		double	temp = 0;
-		auto	decimal_point = (localeconv()->decimal_point ? localeconv()->decimal_point[0] : ',');
-		auto	lc_original = ""s;
-		auto	lc_en = "en_US.utf8"s;
-
-		if(decimal_point != '.')
-		{
-			lc_original = setlocale(LC_NUMERIC, NULL);
-			setlocale(LC_NUMERIC, lc_en.c_str());
-			MESSAGE_DEBUG("c_float", "", "temporary switch locale from " + lc_original + " to " + lc_en)
-		}
-
-		try
-		{
-			temp = stod(param);
-		}
-		catch(...)
-		{
-			MESSAGE_ERROR("c_float", "", "can't convert " + param + " to double");
-			temp = 0;
-		}
-
-		if(decimal_point != '.')
-		{
-			setlocale(LC_NUMERIC, lc_original.c_str());
-			MESSAGE_DEBUG("c_float", "", "switch locale back to " + lc_original)
-		}
-
-		Set(temp);
+		Set(stod_noexcept(param));
 	}
 }
 

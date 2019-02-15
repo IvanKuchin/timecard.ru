@@ -10,6 +10,77 @@ static void error_handler  (HPDF_STATUS   error_no,
 }
 */
 
+
+static auto GetTimecardLines_By_TimecardID_And_CostCenterID(string timecard_id, string cost_center_id, CMysql *db, CUser *user)
+{
+	vector<tuple<string, string, string, string>>	result;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(user)
+	{
+		if(user->GetType() == "agency")
+		{
+			if(db)
+			{
+				auto affected = db->Query(
+"SELECT `timecard_customers`.`title` as `customer`, `timecard_projects`.`title` as `project`, `timecard_tasks`.`title` as `task`,  `timecard_lines`.`row` as `hours`"
+"FROM `timecard_lines` "
+"INNER JOIN `timecard_tasks` ON `timecard_tasks`.`id`=`timecard_lines`.`timecard_task_id` "
+"INNER JOIN `timecard_projects` ON `timecard_projects`.`id`=`timecard_tasks`.`timecard_projects_id` "
+"INNER JOIN `timecard_customers` ON `timecard_customers`.`id`=`timecard_projects`.`timecard_customers_id` "
+"WHERE "
+	"("
+		"`timecard_lines`.`timecard_id`=\"" + timecard_id + "\""
+	")"
+	"AND"
+	"("
+		"`timecard_lines`.`timecard_task_id` IN "
+		"("
+			"SELECT `id` FROM `timecard_tasks` WHERE `timecard_projects_id` IN"
+			"("
+				"SELECT `id` FROM `timecard_projects` WHERE `timecard_customers_id` IN"
+				"("
+					"SELECT `timecard_customers_id` FROM `cost_center_assignment` WHERE `cost_center_id`=\"" + cost_center_id + "\" "
+				")"
+			")"
+		")"
+	")"
+					);
+				if(affected)
+				{
+					for(int i = 0; i < affected; ++i)
+					{
+						auto	temp = make_tuple<string, string, string, string>(db->Get(i, "customer"), db->Get(i, "project"), db->Get(i, "task"), db->Get(i, "hours"));
+						result.push_back(temp);
+					}
+				}
+				else
+				{
+					MESSAGE_ERROR("", "", "it is expected that valid entries will be here, otherwise cost_center.id(" + cost_center_id + ") and timecard.id(" + timecard_id + ") should not appear in GUI");
+				}
+			}
+			else
+			{
+				MESSAGE_ERROR("", "", "db not initialized");
+			}
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "user.id(" + user->GetID() + ") is not an agency employee (" + user->GetType() + ")");
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "user not initialized");
+	}
+
+	MESSAGE_DEBUG("", "", "finish (result.size is " + to_string(result.size()) + ")");
+
+	return result;
+}
+
+
 C_Invoice_Service::C_Invoice_Service() {}
 
 C_Invoice_Service::C_Invoice_Service(CMysql *param1, CUser *param2) : db(param1), user(param2) {}
@@ -154,16 +225,25 @@ auto C_Invoice_Service::CreateTimecardObj(string timecard_id) -> C_Timecard_To_P
 												")"
 											");"))
 								{
-									obj.SetSignatureTitle1(db->Get(0, "name"));
+									obj.SetSignatureTitle1(ConvertHTMLToText(db->Get(0, "name")));
 									
 									if(db->Query("SELECT `title` FROM `cost_centers` WHERE `id`=\"" + cost_center_id + "\";"))
 									{
-										obj.SetSignatureTitle2(db->Get(0, "title"));
+										obj.SetSignatureTitle2(ConvertHTMLToText(db->Get(0, "title")));
 										
 										if(db->Query("SELECT `value` FROM `contract_psow_custom_fields` WHERE `var_name`=\"Department\" AND `contract_psow_id`=\"" + psow_id + "\" AND `type`=\"input\";"))
 											obj.SetProjectNumber(db->Get(0, "value"));
 										else
 											MESSAGE_DEBUG("", "", "optional field Department not found for psow.id(" + psow_id + ")");
+
+										{
+											auto		timecard_lines = GetTimecardLines_By_TimecardID_And_CostCenterID(timecard_id, cost_center_id, db, user);
+											
+											for(auto &timecard_line : timecard_lines)
+											{
+												obj.AddTimecardLine(get<0>(timecard_line), get<1>(timecard_line), get<2>(timecard_line), get<3>(timecard_line));
+											}
+										}
 									}
 									else
 										MESSAGE_ERROR("", "", "CostCenter title not found for cost_center.id(" + cost_center_id + ")");

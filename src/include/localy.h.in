@@ -194,6 +194,10 @@
 
 // --- miscelaneous definitions
 #define	DEFAULT_SITE_THEME							".cyborg"
+
+// --- actions allowed w/o session cookie
+#define	ALLOWED_NO_SESSION_ACTION					{ "getUserWall" }
+
 #define	INCLUDE_ADDITIONAL_INFO						true
 
 #define	DO_NOT_INCLUDE_SOW_INFO						false

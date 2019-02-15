@@ -2,12 +2,12 @@
 
 CCookie::CCookie()
 {
-	MESSAGE_DEBUG("CCookie", "", "start default constructor");
+	MESSAGE_DEBUG("", "", "start default constructor");
 }
 
 CCookie::CCookie(string n, string v) : name(n), value(v)
 {
-	MESSAGE_DEBUG("CCookie", "", "start");
+	MESSAGE_DEBUG("", "", "start");
 }
 
 /*
@@ -19,24 +19,23 @@ Header mismatch:
 void	CCookie::SetNew(bool s) 
 {
 	{
-		CLog	log;
-		log.Write(DEBUG, "CCookie::" + string(__func__) + "[" + to_string(__LINE__) + "]: name = " + GetName());
+		MESSAGE_DEBUG("", "", "name = " + GetName());
 	}
 	isNew = s;
 }
 
 CCookie::~CCookie()
 {
-	MESSAGE_DEBUG("CCookie", "", "destructor for " + GetName());
+	MESSAGE_DEBUG("", "", "destructor for " + GetName());
 }
 
 CCookies::CCookies()
 {
-	MESSAGE_DEBUG("CCookies", "", "start");
+	MESSAGE_DEBUG("", "", "start");
 
 	cookies.reserve(8);
 
-	MESSAGE_DEBUG("CCookies", "", "finish (size of cookies=" + to_string(cookies.size()) + " object after reservation)");
+	MESSAGE_DEBUG("", "", "finish (size of cookies=" + to_string(cookies.size()) + " object after reservation)");
 }
 
 void CCookies::Add(string name, string value, string expiration, string domain, string path, string secure, bool newCookie)
@@ -44,21 +43,18 @@ void CCookies::Add(string name, string value, string expiration, string domain, 
 	CCookie		*c;
 
 	{
-		CLog	log;
-		log.Write(DEBUG, "CCookies::" + string(__func__) + "[" + to_string(__LINE__) + "] start (# of cookies are " + to_string(cookies.size()) + " objects)");
+		MESSAGE_DEBUG("", "", "start (# of cookies are " + to_string(cookies.size()) + " objects)");
 	}
 
 	if((cookies.capacity() - cookies.size()) <= 0)
 	{
-		CLog	log;
-		log.Write(ERROR, "Size of cookie vector is overflow. May be reallocating memory.");
+		MESSAGE_ERROR("", "", "Size of cookie vector is overflow. May be reallocating memory.");
 	}
 
 	c = new(CCookie);
 	if(!c)
 	{
-		CLog	log;
-		log.Write(ERROR, "CCookies::" + string(__func__) + "[" + to_string(__LINE__) + "] error allocating memory (cookie module)");
+		MESSAGE_ERROR("", "", "error allocating memory (cookie module)");
 		throw CException("error allocating memory (cookie module)");
 	}
 
@@ -74,8 +70,7 @@ void CCookies::Add(string name, string value, string expiration, string domain, 
 	cookies.push_back(c);
 
 	{
-		CLog	log;
-		log.Write(DEBUG, "CCookies::" + string(__func__) + "[" + to_string(__LINE__) + "] end (size of cookies=" + to_string(cookies.size()) + " object)");
+		MESSAGE_DEBUG("", "", "end (size of cookies=" + to_string(cookies.size()) + " object)");
 	}
 
 }
@@ -85,21 +80,18 @@ void CCookies::Add(string name, string value, string expiration, int maxAge, str
 	CCookie		*c;
 
 	{
-		CLog	log;
-		log.Write(DEBUG, "CCookies::" + string(__func__) + "[" + to_string(__LINE__) + "] start (""name=" + name + " value=" + value + " exp=" + expiration + " maxAge=" + to_string(maxAge) + " domain=" + domain + " path=" + path + " secure=" + secure + " newCookie=" + to_string(newCookie) + ")");
+		MESSAGE_DEBUG("", "", "start (""name=" + name + " value=" + value + " exp=" + expiration + " maxAge=" + to_string(maxAge) + " domain=" + domain + " path=" + path + " secure=" + secure + " newCookie=" + to_string(newCookie) + ")");
 	}
 
 	if((cookies.capacity() - cookies.size()) <= 0)
 	{
-		CLog	log;
-		log.Write(ERROR, "CCookies::" + string(__func__) + "[" + to_string(__LINE__) + "] Size of cookie vector is overflow. May be reallocating memory. (cookies.capacity()=" + to_string(cookies.capacity()) + " cookies.size()=" + to_string(cookies.size()) + " )");
+		MESSAGE_ERROR("", "", "Size of cookie vector is overflow. May be reallocating memory. (cookies.capacity()=" + to_string(cookies.capacity()) + " cookies.size()=" + to_string(cookies.size()) + " )");
 	}
 
 	c = new(CCookie);
 	if(!c)
 	{
-		CLog	log;
-		log.Write(ERROR, "CCookies::" + string(__func__) + "[" + to_string(__LINE__) + "] error allocating memory (cookie module)");
+		MESSAGE_ERROR("", "", "error allocating memory (cookie module)");
 		throw CException("error allocating memory (cookie module)");
 	}
 
@@ -115,8 +107,7 @@ void CCookies::Add(string name, string value, string expiration, int maxAge, str
 	cookies.push_back(c);
 
 	{
-		CLog	log;
-		log.Write(DEBUG, "CCookies::" + string(__func__) + "[" + to_string(__LINE__) + "]end (size of cookies=" + to_string(cookies.size()) + " object)");
+		MESSAGE_DEBUG("", "", "nd (size of cookies=" + to_string(cookies.size()) + " object)");
 	}
 }
 
@@ -148,8 +139,7 @@ string CCookies::GetTimestampShifted(int deltaTimeStamp)
 	string		result = "";
 
 	{
-		CLog	log;
-		log.Write(DEBUG, "CCookies::" + string(__func__) + "[" + to_string(__LINE__) + "]: start (deltaTimeStamp = " + to_string(deltaTimeStamp) + ")");
+		MESSAGE_DEBUG("", "", " start (deltaTimeStamp = " + to_string(deltaTimeStamp) + ")");
 	}
 
 	t = time(NULL) + deltaTimeStamp;
@@ -162,20 +152,17 @@ string CCookies::GetTimestampShifted(int deltaTimeStamp)
 		} 
 		else
 		{
-			CLog	log;
-			log.Write(ERROR, "CCookies::" + string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: in running strftime)(" + utc_str + ", " + to_string(sizeof(utc_str)) + ", '', utc_tm) buffer size is not enough to convert date to GMT");
+			MESSAGE_ERROR("", "", "ERROR: in running strftime)(" + utc_str + ", " + to_string(sizeof(utc_str)) + ", '', utc_tm) buffer size is not enough to convert date to GMT");
 		}
 	}
 	else
 	{
-		CLog	log;
-		log.Write(ERROR, "CCookies::" + string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: in running gmtime(&t)  (possible problem with cookie expiration in IE)");
+		MESSAGE_ERROR("", "", "ERROR: in running gmtime(&t)  (possible problem with cookie expiration in IE)");
 	}
 
 
 	{
-		CLog	log;
-		log.Write(DEBUG, "CCookies::" + string(__func__) + "[" + to_string(__LINE__) + "]: return (result = " + result + ")");
+		MESSAGE_DEBUG("", "", " return (result = " + result + ")");
 	}
 
 	return result;
@@ -191,8 +178,7 @@ bool CCookies::UpdateTS(string name, int deltaTimeStamp)
 	bool						result = true;
 
 	{
-		CLog	log;
-		log.Write(DEBUG, "CCookies::" + string(__func__) + "[" + to_string(__LINE__) + "]: start (name = " + name + ", deltaTimeStamp = " + to_string(deltaTimeStamp) + ")");
+		MESSAGE_DEBUG("", "", " start (name = " + name + ", deltaTimeStamp = " + to_string(deltaTimeStamp) + ")");
 	}
 
 	if(IsExist(name)) {
@@ -228,16 +214,14 @@ bool CCookies::UpdateTS(string name, int deltaTimeStamp)
 	else 
 	{
 		{
-			CLog	log;
-			log.Write(ERROR, "CCookie::" + string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: unable to find cookie (name = " + name + ")");
+			MESSAGE_ERROR("", "", "unable to find cookie (name = " + name + ")");
 		}
 
 		result = false;
 	} // if(IsExist(name)) 
 
 	{
-		CLog	log;
-		log.Write(DEBUG, "CCookie::" + string(__func__) + "[" + to_string(__LINE__) + "]: finish (" + to_string(result) + ")");
+		MESSAGE_DEBUG("", "", "finish (" + to_string(result) + ")");
 	}
 
 	return result;
@@ -312,8 +296,7 @@ string CCookies::GetAll()
 	ostringstream				ost;
 
 	{
-		CLog	log;
-		log.Write(DEBUG, "CCookies::" + string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", " start");
 	}
 
 	result = "";
@@ -350,8 +333,7 @@ string CCookies::GetAll()
 			result += temp;
 
 			{
-				CLog	log;
-				log.Write(DEBUG, "CCookies::" + string(__func__) + "[" + to_string(__LINE__) + "]: add cookie: " + temp);
+				MESSAGE_DEBUG("", "", " add cookie: " + temp);
 			}
 		}
 	}
@@ -359,8 +341,7 @@ string CCookies::GetAll()
 	if(result.length() > 1)	result.erase(result.length() - 1);
 
 	{
-		CLog	log;
-		log.Write(DEBUG, "CCookies::" + string(__func__) + "[" + to_string(__LINE__) + "]: finish (result len = " + to_string(result.length()) + ")");
+		MESSAGE_DEBUG("", "", " finish (result len = " + to_string(result.length()) + ")");
 	}
 	return result;
 }
@@ -370,8 +351,7 @@ void CCookies::RegisterCookieVariables(CVars *v)
 	vector<CCookie *>::iterator	im;
 
 	{
-		CLog	log;
-		log.Write(DEBUG, "CCookies::" + string(__func__) + "[" + to_string(__LINE__) + "]: start ");
+		MESSAGE_DEBUG("", "", " start ");
 	}
 
 	for(im = cookies.begin(); im < cookies.end(); ++im)
@@ -380,14 +360,12 @@ void CCookies::RegisterCookieVariables(CVars *v)
 		else
 		{
 			{
-				CLog	log;
-				log.Write(ERROR, "CCookies::" + string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: cookie name is empty (" + (*im)->GetName() + " = " + (*im)->GetValue() + ")");
+				MESSAGE_ERROR("", "", "ERROR: cookie name is empty (" + (*im)->GetName() + " = " + (*im)->GetValue() + ")");
 			}
 		}
 
 	{
-		CLog	log;
-		log.Write(DEBUG, "CCookies::" + string(__func__) + "[" + to_string(__LINE__) + "]: finish ");
+		MESSAGE_DEBUG("", "", " finish ");
 	}
 }
 
@@ -397,8 +375,7 @@ void CCookies::ParseString(string str)
 	string::size_type	exprPos, eqPos;
 
 	{
-		CLog	log;
-		log.Write(DEBUG, "CCookies::" + string(__func__) + "(" +  str + ")[" + to_string(__LINE__) + "]: start ");
+		MESSAGE_DEBUG("", "", "start ");
 	}
 
 	result = str;
@@ -430,8 +407,7 @@ void CCookies::ParseString(string str)
 		trim(cookValue);
 
 		{
-			CLog	log;
-			log.Write(DEBUG, "CCookies::" + string(__func__) + "(" +  str + ")[" + to_string(__LINE__) + "]: adding cookie: " + cookName + " = " + cookValue);
+			MESSAGE_DEBUG("", "", "adding cookie: " + cookName + " = " + cookValue);
 		}
 
 		if(cookName.length())
@@ -439,8 +415,7 @@ void CCookies::ParseString(string str)
 		else
 		{
 			{
-				CLog	log;
-				log.Write(ERROR, "CCookies::" + string(__func__) + "(" +  str + ")[" + to_string(__LINE__) + "]:ERROR: cookie parsing end-up with empty name() and value(" + cookValue + ")");
+				MESSAGE_ERROR("", "", "cookie parsing end-up with empty name() and value(" + cookValue + ")");
 			}
 
 		}
@@ -449,8 +424,7 @@ void CCookies::ParseString(string str)
 	}
 
 	{
-		CLog	log;
-		log.Write(DEBUG, "CCookies::" + string(__func__) + "[" + to_string(__LINE__) + "]: end ");
+		MESSAGE_DEBUG("", "", " end ");
 	}
 }
 
@@ -459,8 +433,7 @@ CCookies::~CCookies()
 	vector<CCookie *>::iterator	iv;
 
 	{
-		CLog	log;
-		log.Write(DEBUG, "CCookies::" + string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", " start");
 	}
 
 	for(iv = cookies.begin(); iv < cookies.end(); ++iv)
@@ -469,7 +442,6 @@ CCookies::~CCookies()
 	}
 
 	{
-		CLog	log;
-		log.Write(DEBUG, "CCookies::" + string(__func__) + "[" + to_string(__LINE__) + "]: finish");
+		MESSAGE_DEBUG("", "", " finish");
 	}
 }

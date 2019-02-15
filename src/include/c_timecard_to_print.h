@@ -34,6 +34,7 @@ class C_Timecard_To_Print
 		string					signature_title_1 = "";
 		string					signature_title_2 = "";
 		string					project_number = "";
+		string					cost_center_id = "";
 		c_float					dayrate;
 
 		vector<Timecard_Line>	timecard_lines;
@@ -55,6 +56,8 @@ class C_Timecard_To_Print
 		auto		SetSignatureTitle1(string &&param1) 		{ signature_title_1 = move(param1); };
 		auto		SetSignatureTitle2(const string &param1)	{ signature_title_2 = param1; };
 		auto		SetSignatureTitle2(string &&param1) 		{ signature_title_2 = move(param1); };
+		auto		SetCostCenterID(const string &param1)		{ cost_center_id = param1; };
+		auto		SetCostCenterID(string &&param1) 			{ cost_center_id = move(param1); };
 		auto		SetProjectNumber(const string &param1)		{ project_number = param1; };
 		auto		SetProjectNumber(string &&param1) 			{ project_number = move(param1); };
 		auto		SetDayrate(string param1) 					{ dayrate = param1; };
@@ -68,6 +71,7 @@ class C_Timecard_To_Print
 		auto		GetSignatureTitle1()						{ return signature_title_1; };		
 		auto		GetSignatureTitle2()						{ return signature_title_2; };		
 		auto		GetProjectNumber()							{ return project_number; };	
+		auto		GetCostCenterID()							{ return cost_center_id; };	
 		auto		GetDayrate()								{ return dayrate; };
 		auto		GetTimecardLines()							{ return timecard_lines; }
 
