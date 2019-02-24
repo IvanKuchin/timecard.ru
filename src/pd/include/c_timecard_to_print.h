@@ -37,7 +37,7 @@ class C_Timecard_To_Print
 		string					cost_center_id = "";
 		c_float					dayrate;
 
-		vector<Timecard_Line>	timecard_lines;
+		vector<Timecard_Line>	timecard_lines = {};
 	public:
 					C_Timecard_To_Print()						{};
 					// C_Timecard_To_Print(CMysql *, CUser *) : db(param1), user(param2) {};

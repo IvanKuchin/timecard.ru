@@ -129,7 +129,11 @@ c_float	c_float::operator+(const c_float &term2)
 {
 	c_float	result;
 
+#ifdef FP_FAST_FMA
+	result = RoundWithPrecision(fma(1, term2.Get(), Get()));
+#else
 	result = RoundWithPrecision(Get() + term2.Get());
+#endif
 	MESSAGE_DEBUG("c_float", "", to_string(Get()) + " + " + to_string(term2.Get()) + " = " + to_string(result.Get()));
 
 	return result;
@@ -139,7 +143,11 @@ c_float	c_float::operator-(const c_float &term2)
 {
 	c_float	result;
 
+#ifdef FP_FAST_FMA
+	result = RoundWithPrecision(fma(-1, term2.Get(), Get()));
+#else
 	result = RoundWithPrecision(Get() - term2.Get());
+#endif
 	MESSAGE_DEBUG("c_float", "", to_string(Get()) + " - " + to_string(term2.Get()) + " = " + to_string(result.Get()));
 
 	return result;
@@ -149,7 +157,11 @@ c_float	c_float::operator*(const c_float &term2)
 {
 	c_float	result;
 
+#ifdef FP_FAST_FMA
+	result = RoundWithPrecision(fma(Get(), term2.Get(), 0));
+#else
 	result = RoundWithPrecision(Get() * term2.Get());
+#endif
 	MESSAGE_DEBUG("c_float", "", to_string(Get()) + " * " + to_string(term2.Get()) + " = " + to_string(result.Get()));
 
 	return result;

@@ -195,6 +195,8 @@
 // --- miscelaneous definitions
 #define	DEFAULT_SITE_THEME							".cyborg"
 
+#define	VAT_PERCENTAGE								18
+
 // --- actions allowed w/o session cookie
 #define	ALLOWED_NO_SESSION_ACTION					{ "getUserWall" }
 
@@ -213,5 +215,13 @@
 #define	RU_DATE_FORMAT								"%d/%m/%Y"
 
 #define	TEMP_DIRECTORY_PREFIX						"/tmp/"s
+
+#define	HPDF_TEXT_LINE_HEIGHT						10
+#define	HPDF_TABLE_LINE_HEIGHT						10
+#define	HPDF_FIELD_RIGHT							40
+#define	HPDF_FIELD_LEFT								40
+#define	HPDF_TIMECARD_TITLE_WIDTH_PERCENT			35
+#define	HPDF_TIMECARD_DAYS_WIDTH_PERCENT			100 - HPDF_TIMECARD_TITLE_WIDTH_PERCENT
+#define	HPDF_TIMECARD_FONT_SIZE						8
 
 #endif

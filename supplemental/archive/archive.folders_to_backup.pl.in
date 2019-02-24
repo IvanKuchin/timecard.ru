@@ -1,5 +1,5 @@
 #
-# SRCDIR hardcoded word it is used in archive.pl for building from source
+# SRCDIR hardcoded word it is used in archive.pl to build from source
 #
 SRCDIR				=> "${PROJECT_SOURCE_DIR}",
 #

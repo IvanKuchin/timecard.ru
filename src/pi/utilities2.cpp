@@ -2193,7 +2193,8 @@ auto	stod_noexcept(const string &num) -> double
 	{
 		lc_original = setlocale(LC_NUMERIC, NULL);
 		setlocale(LC_NUMERIC, lc_en.c_str());
-		MESSAGE_DEBUG("", "", "temporary switch locale from " + lc_original + " to " + lc_en)
+		// --- commented due to performance
+		// MESSAGE_DEBUG("", "", "temporary switch locale from " + lc_original + " to " + lc_en)
 	}
 
 	try
@@ -2208,7 +2209,8 @@ auto	stod_noexcept(const string &num) -> double
 	if(decimal_point != '.')
 	{
 		setlocale(LC_NUMERIC, lc_original.c_str());
-		MESSAGE_DEBUG("", "", "switch locale back to " + lc_original)
+		// --- commented due to performance
+		// MESSAGE_DEBUG("", "", "switch locale back to " + lc_original)
 	}
 
 	return result;

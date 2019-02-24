@@ -38,7 +38,7 @@ bool ParseXMLAndUpdateDB(const string &xml_block, CMysql *db)
 
 		if(db->Query("SELECT `id` FROM `currency_rate` WHERE `date`=CURDATE();"))
 		{
-			MESSAGE_ERROR("cron_daily", "", "Today exchange rate already in DB");
+			MESSAGE_ERROR("", "", "Today exchange rate already in DB");
 			// --- OR !!!!
 			// MESSAGE_DEBUG("cron_daily", "", "exchange rate for " + date + " already in DB");
 			// result = true;
@@ -308,6 +308,7 @@ bool UpdateGiftsToGive(CMysql *db)
 int main()
 {
 	CStatistics		appStat;  // --- CStatistics must be firts statement to measure end2end param's
+	CMysql			user;
 	CMysql			db;
 	struct timeval	tv;
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-29 09:37-0500\n"
+"POT-Creation-Date: 2019-02-20 04:51-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -143,6 +143,15 @@ msgstr "описание изменено"
 msgid "end date changed"
 msgstr "изменилась дата окончания контракта"
 
+msgid "fail to craft timecard obj"
+msgstr "ошибка создания объекта timecard"
+
+msgid "fail to create temp directory"
+msgstr "невозможно создать временное хранилище"
+
+msgid "fail to initialize hpdf library"
+msgstr "ошибка инициализации библиотеки libharu"
+
 msgid "from"
 msgstr "с"
 
@@ -157,6 +166,9 @@ msgstr "начало должно быть раньше окончания"
 
 msgid "position changed"
 msgstr "изменили должность"
+
+msgid "print to XLS not valid"
+msgstr "невозможно сгенерировать XLS"
 
 msgid "promouted from"
 msgstr "перешел(шла) с должности"

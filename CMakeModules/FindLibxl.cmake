@@ -31,9 +31,9 @@ find_path( XL_INCLUDE_DIR libxl.h
 EXECUTE_PROCESS( COMMAND getconf LONG_BIT COMMAND tr -d '\n' OUTPUT_VARIABLE ARCHITECTURE )
 
 if( ${ARCHITECTURE} STREQUAL "64" )
-    set( XL_LIBRARY_DIR ${CMAKE_SOURCE_DIR}/libxl-3.8.4.0/lib64 )
+    set( XL_LIBRARY_DIR ${LIBXL_INSTALL_DIR}/lib64 )
 else()
-    set( XL_LIBRARY_DIR ${CMAKE_SOURCE_DIR}/libxl-3.8.4.0/lib )
+    set( XL_LIBRARY_DIR ${LIBXL_INSTALL_DIR}/lib )
 endif()
 
 # message( "XL_LIBRARY_DIR is ${XL_LIBRARY_DIR}" )
