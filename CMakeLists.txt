@@ -56,8 +56,8 @@ set(LIBXL_INSTALL_DIR		${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}/libxl)
 # ---- 1) copy libxl to application location
 # ---- 2) work with it as w/ regular library
 message	(STATUS	"install libxl to ${LIBXL_INSTALL_DIR}")
-file	(COPY	${LIBXL_PROJECT_DIR}/lib/libxl.so	DESTINATION	${LIBXL_INSTALL_DIR}/lib)
-file	(COPY	${LIBXL_PROJECT_DIR}/lib64/libxl.so	DESTINATION	${LIBXL_INSTALL_DIR}/lib64)
+file	(COPY	${LIBXL_PROJECT_DIR}lib/libxl.so	DESTINATION	${LIBXL_INSTALL_DIR}/lib)
+file	(COPY	${LIBXL_PROJECT_DIR}lib64/libxl.so	DESTINATION	${LIBXL_INSTALL_DIR}/lib64)
 
 add_subdirectory(src/)
 add_subdirectory(supplemental/cron/)
