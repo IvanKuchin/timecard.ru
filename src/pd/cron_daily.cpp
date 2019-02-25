@@ -142,7 +142,7 @@ string	GetXMLFromRemoteServer()
 	MESSAGE_DEBUG("", "", "start");
 
 	downloader.SetParsingDisable();
-	if(downloader.PerformRequest("http://www.cbr.ru/scripts/XML_daily.asp"))
+	if(downloader.PerformRequest("http://www.cbr.ru/scripts/XML_daily_eng.asp"))
 	{
 		result = downloader.GetContent();
 
