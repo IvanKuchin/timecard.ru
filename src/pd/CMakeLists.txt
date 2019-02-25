@@ -1,4 +1,4 @@
-set(EXECUTABLE_CGIs
+set(EXECUTABLE_CGIs_with_PD_PI_LIBS
     index.cgi
     approver.cgi
     agency.cgi
@@ -6,6 +6,8 @@ set(EXECUTABLE_CGIs
     ajax_anyrole_1.cgi
     admin.cgi
     system.cgi
+    )
+set(EXECUTABLE_CGIs_with_PI_LIBS
     cron_minute
     cron_daily
     )
@@ -64,10 +66,13 @@ source_group("Resources"        FILES ${RESOURCES})
 # add_executable(company.cgi  company.cpp ${SOURCES})
 # target_link_libraries(company.cgi __joint_lib cmysql c_float ccgi cuser cmail ccookie cexception cactivator cvars csession cfiles cstatistics crequest ctemplate)
 # target_compile_features(company.cgi PUBLIC cxx_strong_enums PRIVATE cxx_range_for )
-# list(REMOVE_ITEM EXECUTABLE_CGIs company.cpp)
+# list(REMOVE_ITEM EXECUTABLE_CGIs_with_PD_PI_LIBS company.cpp)
 
 # ---- 2) Normal build link with _all_ libraries (.o), therefore change in any .src trigger re-link for all executables
-foreach(EXECUTABLE_CGI ${EXECUTABLE_CGIs})
+foreach(EXECUTABLE_CGI ${EXECUTABLE_CGIs_with_PI_LIBS})
+    __add_executable_2libs(${EXECUTABLE_CGI} "${PROJECT_ALL_INCLUDE_DIRECTORIES}" "${PROJECT_PI_LIBS}" "${PROJECT_EXTERNAL_LIBS}")
+endforeach()
+foreach(EXECUTABLE_CGI ${EXECUTABLE_CGIs_with_PD_PI_LIBS})
     __add_executable_3libs(${EXECUTABLE_CGI} "${PROJECT_ALL_INCLUDE_DIRECTORIES}" "${PROJECT_PD_LIBS}" "${PROJECT_PI_LIBS}" "${PROJECT_EXTERNAL_LIBS}")
 endforeach()
 
@@ -91,7 +96,7 @@ set_target_properties(agency.cgi    PROPERTIES
                                     INSTALL_RPATH_USE_LINK_PATH TRUE
                                     INSTALL_RPATH "${XL_LIBRARY_DIR}"
                                     )
-message(STATUS  "configure RPATH to ${XL_LIBRARY_DIR}}")
+message(STATUS  "configure libxl RPATH to ${XL_LIBRARY_DIR}}")
 
 # --- Install part
 

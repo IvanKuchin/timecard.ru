@@ -33,7 +33,7 @@ foreach(file ${PI_TESTS})
     string(REGEX REPLACE "(^.*/|\\.[^.]*$)" "" file_without_ext ${file})
 
     __add_executable_2libs("${file_without_ext}" "${PROJECT_PI_INCLUDE_DIRECTORIES}" "${PROJECT_PI_LIBS}" "${PROJECT_EXTERNAL_LIBS}")
-    list(REMOVE_ITEM LINK_DESTINATIONS /home/ikuchin/src/dev.timecard.su/tests/auto/${file})
+    list(REMOVE_ITEM LINK_DESTINATIONS ${PROJECT_SOURCE_DIR}/tests/auto/${file})
 endforeach()
 
 # ---- 2) Normal build link with _all_ libraries (.o), therefore change in any .src trigger re-link for all executables

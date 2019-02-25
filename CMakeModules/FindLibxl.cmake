@@ -84,7 +84,7 @@ if(XL_FOUND)
     endif()
 
     string(REGEX REPLACE "([^/]+$)" "" XL_LIBRARY_DIR ${XL_LIBRARY})
-    message( "XL_LIBRARY_DIR is ${XL_LIBRARY_DIR}" )
+    # message( "XL_LIBRARY_DIR is ${XL_LIBRARY_DIR}" )
     message(STATUS "looking for libxl-dev - done")
 else()
     message(FATAL_ERROR "ERROR: libxl-dev not installed")

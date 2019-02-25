@@ -33,8 +33,10 @@ set(ARCHIVE_PROJECT_DIR		${PROJECT_BINARY_DIR}/share/${PROJECT_NAME}/archive)
 set(MAXMIND_PROJECT_DIR		${PROJECT_BINARY_DIR}/share/${PROJECT_NAME}/maxmind)
 set(CI_SCRIPT_PROJECT_DIR	${PROJECT_BINARY_DIR}/share/${PROJECT_NAME}/ci-scripts)
 set(LOCALE_PROJECT_DIR		${PROJECT_BINARY_DIR}/share/${PROJECT_NAME}/locale)
-set(PDF_FONT_PROJECT_DIR	${PROJECT_SOURCE_DIR}/share/${PROJECT_NAME}/libpdf-font)
+set(PDF_FONT_PROJECT_DIR	${PROJECT_SOURCE_DIR}/supplemental/libpdf-font)
 set(LIBXL_PROJECT_DIR		${PROJECT_SOURCE_DIR}/libxl-3.8.4.0/)
+
+message(STATUS "PDF_FONT_PROJECT_DIR	${PROJECT_SOURCE_DIR}/share/${PROJECT_NAME}/libpdf-font")
 
 # ---- install variables
 # set(CMAKE_INSTALL_RPATH "/home/ikuchin/src/dev.timecard.su/libxl-3.8.4.0/lib64")
