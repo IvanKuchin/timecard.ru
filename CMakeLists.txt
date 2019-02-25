@@ -36,8 +36,6 @@ set(LOCALE_PROJECT_DIR		${PROJECT_BINARY_DIR}/share/${PROJECT_NAME}/locale)
 set(PDF_FONT_PROJECT_DIR	${PROJECT_SOURCE_DIR}/supplemental/libpdf-font)
 set(LIBXL_PROJECT_DIR		${PROJECT_SOURCE_DIR}/libxl-3.8.4.0/)
 
-message(STATUS "PDF_FONT_PROJECT_DIR	${PROJECT_SOURCE_DIR}/share/${PROJECT_NAME}/libpdf-font")
-
 # ---- install variables
 # set(CMAKE_INSTALL_RPATH "/home/ikuchin/src/dev.timecard.su/libxl-3.8.4.0/lib64")
 # set(CMAKE_INSTALL_RPATH ${XL_LIBRARY_DIR})
@@ -57,9 +55,13 @@ set(LIBXL_INSTALL_DIR		${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}/libxl)
 # ---- to treat it as regulat lib I have to copy it to /usr/local/share..... folder
 # ---- 1) copy libxl to application location
 # ---- 2) work with it as w/ regular library
-message	(STATUS	"install libxl to ${LIBXL_INSTALL_DIR}")
-file	(COPY	${LIBXL_PROJECT_DIR}lib/libxl.so	DESTINATION	${LIBXL_INSTALL_DIR}/lib)
-file	(COPY	${LIBXL_PROJECT_DIR}lib64/libxl.so	DESTINATION	${LIBXL_INSTALL_DIR}/lib64)
+if(EXISTS ${LIBXL_INSTALL_DIR})
+    message	(STATUS	"install libxl to ${LIBXL_INSTALL_DIR}")
+    file	(COPY	${LIBXL_PROJECT_DIR}lib/libxl.so	DESTINATION	${LIBXL_INSTALL_DIR}/lib)
+    file	(COPY	${LIBXL_PROJECT_DIR}lib64/libxl.so	DESTINATION	${LIBXL_INSTALL_DIR}/lib64)
+else()
+    message	(WARNING "libxl.so will be taken from source-tree, because ${LIBXL_PROJECT_DIR} isn't exists")
+endif()
 
 add_subdirectory(src/)
 add_subdirectory(supplemental/cron/)
