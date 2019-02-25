@@ -6,6 +6,8 @@ set(EXECUTABLE_CGIs
     ajax_anyrole_1.cgi
     admin.cgi
     system.cgi
+    cron_minute
+    cron_daily
     )
 
 # --- Libraries
@@ -71,21 +73,20 @@ endforeach()
 
 
 # --- cron building
-__add_executable_3libs(cron_minute  "${PROJECT_ALL_INCLUDE_DIRECTORIES}" "${PROJECT_PI_LIBS}" "${PROJECT_PI_LIBS}" "${PROJECT_EXTERNAL_LIBS}")
-__add_executable_3libs(cron_daily   "${PROJECT_ALL_INCLUDE_DIRECTORIES}" "${PROJECT_PI_LIBS}" "${PROJECT_PI_LIBS}" "${PROJECT_EXTERNAL_LIBS}")
+# __add_executable_3libs(cron_minute  "${PROJECT_ALL_INCLUDE_DIRECTORIES}" "${PROJECT_PI_LIBS}" "${PROJECT_PI_LIBS}" "${PROJECT_EXTERNAL_LIBS}")
+# __add_executable_3libs(cron_daily   "${PROJECT_ALL_INCLUDE_DIRECTORIES}" "${PROJECT_PI_LIBS}" "${PROJECT_PI_LIBS}" "${PROJECT_EXTERNAL_LIBS}")
 
 # --- Install settings
+# --- RPATH customization used only for libxl. LibXL didn't installed like any other OS-libraries
+# --- it is downloaded from web-site and placed to src-tree. 
+# --- During "cmake .." it is copied to /usr/local/share/... and then RPATH customized.
+# ---"
 # --- this setting allows to dynalic linker find .so library in custom location
 # --- otherwise it have to be added to ld.so.conf or environment variable
 # --- actual linker options are -Wl,-rpath,/path/to/dynamic/library
 # --- https://gitlab.kitware.com/cmake/community/wikis/doc/cmake/RPATH-handling
-# set(CMAKE_INSTALL_RPATH                 ${XL_LIBRARY_DIR})
-set(CMAKE_INSTALL_RPATH             ${PROJECT_SOURCE_DIR}/libxl-3.8.4.0/lib64)
+set         (CMAKE_INSTALL_RPATH    ${XL_LIBRARY_DIR})
 set_target_properties(agency.cgi    PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
-
-# set(CMAKE_INSTALL_RPATH_USE_LINK_PATH   TRUE)
-
-message(STATUS "PD: configure RPATH to ${CMAKE_INSTALL_RPATH}")
 
 
 # --- Install part

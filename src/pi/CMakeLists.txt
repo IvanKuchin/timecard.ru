@@ -1,19 +1,13 @@
 set(EXECUTABLE_CGIs
     account.cgi
-    avataruploader.cpp
-    generalimageuploader.cpp
-    imageuploader.cpp
+    avataruploader.cgi
+    generalimageuploader.cgi
+    imageuploader.cgi
     )
 
 # --- Libraries
 # ---- big joint librabry
 set(JOINT_LIBRARY_SRCs
-    utilities2.cpp
-    )
-
-# ---- list of independent libraries
-set(INDEPENDENT_LIBRARIES_SRC
-    utilities_common.cpp
     cuser.cpp
     cactivator.cpp
     ccgi.cpp
@@ -31,6 +25,13 @@ set(INDEPENDENT_LIBRARIES_SRC
     cvideoconverter.cpp
     c_float.cpp
     utilities1.cpp
+    utilities2.cpp
+    utilities_common.cpp
+    )
+
+# ---- list of independent libraries
+set(INDEPENDENT_LIBRARIES_SRC
+    # simple_func.cpp
     )
 
 # --- MACROSes start ---
@@ -153,7 +154,7 @@ endforeach()
 # ---- big joint librabry
 # ---- ATTENTION !!!
 # ---- order is important: joint_lib must follow INDEPENDENT LIBS to help g++-linker resolve dependencies
-set_pi_lib_properties(__joint_lib "${JOINT_LIBRARY_SRCs}" "${PROJECT_PI_INCLUDE_DIRECTORIES}" "")
+set_pi_lib_properties(__joint_pi "${JOINT_LIBRARY_SRCs}" "${PROJECT_PI_INCLUDE_DIRECTORIES}" "")
 
 # --- MSVC grouping
 source_group("Headers Private"  FILES ${HDR_PRIVATE})
@@ -166,26 +167,14 @@ source_group("Resources"        FILES ${RESOURCES})
 
 # ---- 2) Normal build link with _all_ libraries (.o), therefore change in any .src trigger re-link for all executables
 foreach(EXECUTABLE_CGI ${EXECUTABLE_CGIs})
-    string(REGEX REPLACE "(^.*/|\\.[^.]*$)" "" file_without_ext ${EXECUTABLE_CGI})
-
-    add_executable          (${file_without_ext}.cgi     ${file_without_ext}.cpp ${SOURCES})
-    target_link_libraries   (${file_without_ext}.cgi     ${PROJECT_PI_LIBS} ${PROJECT_EXTERNAL_LIBS})
-    target_compile_features (${file_without_ext}.cgi
-        PUBLIC
-            cxx_strong_enums
-        PRIVATE
-            cxx_range_for
-    )
-    # message("=== ${file_without_ext}")
+    __add_executable_2libs  (${EXECUTABLE_CGI}      "${PROJECT_PI_INCLUDE_DIRECTORIES}" "${PROJECT_PI_LIBS}" "${PROJECT_EXTERNAL_LIBS}")
 endforeach()
 
 # --- Install settings
-# set(CMAKE_INSTALL_RPATH		${XL_LIBRARY_DIR})        # --- required for libxl only
 
 # --- Install part
-install(TARGETS account.cgi                 DESTINATION		${CGIDIR})
-install(TARGETS avataruploader.cgi          DESTINATION		${CGIDIR})
-install(TARGETS generalimageuploader.cgi    DESTINATION		${CGIDIR})
-install(TARGETS imageuploader.cgi           DESTINATION		${CGIDIR})
+foreach(EXECUTABLE_CGI ${EXECUTABLE_CGIs})
+    install(TARGETS ${EXECUTABLE_CGI}       DESTINATION		${CGIDIR})
+endforeach()
 
 # print_all_variables()

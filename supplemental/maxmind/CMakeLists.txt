@@ -2,7 +2,7 @@ if(NOT ${MAXMIND_DISABLE})
     if(EXISTS "${MAXMIND_PROJECT_DIR}/GeoLite2-City.mmdb")
 	message("-- MaxMindDB exists")
     else()
-	message("-- Dowloading maxmindDB file ...")
+	message("-- Downloading maxmindDB file ...")
         file(DOWNLOAD	http://geolite.maxmind.com/download/geoip/database/GeoLite2-City.tar.gz		"${MAXMIND_PROJECT_DIR}/GeoLite2-City.tar.gz")
 	execute_process(
 	    COMMAND             tar -zxf GeoLite2-City.tar.gz --wildcards *.mmdb --strip-components 1
