@@ -85,9 +85,13 @@ endforeach()
 # --- otherwise it have to be added to ld.so.conf or environment variable
 # --- actual linker options are -Wl,-rpath,/path/to/dynamic/library
 # --- https://gitlab.kitware.com/cmake/community/wikis/doc/cmake/RPATH-handling
-set         (CMAKE_INSTALL_RPATH    ${XL_LIBRARY_DIR})
-set_target_properties(agency.cgi    PROPERTIES INSTALL_RPATH_USE_LINK_PATH TRUE)
-
+# set         (CMAKE_INSTALL_RPATH    ${XL_LIBRARY_DIR})
+set_target_properties(agency.cgi    PROPERTIES
+                                    BUILD_WITH_INSTALL_RPATH TRUE
+                                    INSTALL_RPATH_USE_LINK_PATH TRUE
+                                    INSTALL_RPATH "${XL_LIBRARY_DIR}"
+                                    )
+message(STATUS  "configure RPATH to ${XL_LIBRARY_DIR}}")
 
 # --- Install part
 

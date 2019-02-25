@@ -31,7 +31,6 @@ set(JOINT_LIBRARY_SRCs
 
 # ---- list of independent libraries
 set(INDEPENDENT_LIBRARIES_SRC
-    # simple_func.cpp
     )
 
 # --- MACROSes start ---
