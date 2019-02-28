@@ -32,7 +32,7 @@ using namespace std;
 	string	pretty = __PRETTY_FUNCTION__;  \
 	string	classname = ""s; \
 	size_t	p1 = pretty.find(" "); \
-	size_t	p2 = pretty.find("::"); \
+	size_t	p2 = pretty.find("::", (p1 == string::npos ? 0 : p1)); \
 \
 	if((p1 != string::npos) && (p2 != string::npos) && (p1 < p2)) { classname = pretty.substr(p1 + 1, p2 - p1 + 1); } \
 \
@@ -45,7 +45,7 @@ using namespace std;
 	string	pretty = __PRETTY_FUNCTION__;  \
 	string	classname = ""s; \
 	size_t	p1 = pretty.find(" "); \
-	size_t	p2 = pretty.find("::"); \
+	size_t	p2 = pretty.find("::", (p1 == string::npos ? 0 : p1)); \
 \
 	if((p1 != string::npos) && (p2 != string::npos) && (p1 < p2)) { classname = pretty.substr(p1 + 1, p2 - p1 + 1); } \
 \

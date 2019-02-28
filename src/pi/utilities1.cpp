@@ -1523,7 +1523,7 @@ auto	utf8_to_cp1251(const string &src) -> string
 
 	memset(convertBuffer, 0, sizeof(convertBuffer));
 
-	result = convert_utf8_to_windows1251(gettext(src.c_str()), convertBuffer, sizeof(convertBuffer));
+	result = convert_utf8_to_windows1251(src.c_str(), convertBuffer, sizeof(convertBuffer));
 
 	MESSAGE_DEBUG("", "", "finish (conversation result is " + to_string(result) + ")");
 
@@ -4742,95 +4742,49 @@ bool AllowMessageInNewsFeed(CUser *me, const string messageOwnerID, const string
 // ---		 false, if rate-limit not required
 bool isPersistenceRateLimited(string REMOTE_ADDR, CMysql *db)
 {
-	int 			maxTime = 60, maxAttempts = 3;
-	ostringstream	ost;
-	string			rateLimitID = "";
-	int				affected, attempts;
-	bool			result = false;
+	auto 			maxTime = BRUTEFORCE_TIME_INTERVAL, maxAttempts = BRUTEFORCE_ATTEMPTS;
+	auto			rateLimitID = ""s;
+	auto			affected = 0, attempts = 0;
+	auto			result = false;
 
-	{
-		CLog	log;
-		ostringstream	ostTemp;
-
-		ostTemp.str("");
-		ostTemp << "isPersistenceRateLimited: start. REMOTE_ADDR [" << REMOTE_ADDR << "]";
-		log.Write(DEBUG, ostTemp.str());
-	}
+	MESSAGE_DEBUG("", "", "start (REMOTE_ADDR " + REMOTE_ADDR + ")");
 
 	// --- cleanup rate-limit table
-	ost.str("");
-	ost << "delete from `sessions_persistence_ratelimit` where `eventTimestamp` < (NOW() - interval " << maxTime << " second);";
-	affected = db->Query(ost.str());
+	db->Query("delete from `sessions_persistence_ratelimit` where `eventTimestamp` < (NOW() - interval "s + to_string(maxTime) + " second);");
 
-	ost.str("");
-	ost << "select `id`, `attempts` from `sessions_persistence_ratelimit` where `ip`='" << REMOTE_ADDR << "';";
-	affected = db->Query(ost.str());
+	affected = db->Query("select `id`, `attempts` from `sessions_persistence_ratelimit` where `ip`='"s + REMOTE_ADDR + "';");
 	if(affected)
 	{
-		{
-			CLog	log;
-			ostringstream	ostTemp;
+		MESSAGE_DEBUG("", "", "REMOTE_ADDR is in rate-limit table");
 
-			ostTemp.str("");
-			ostTemp << "isPersistenceRateLimited: REMOTE_ADDR in rate-limit table";
-			log.Write(DEBUG, ostTemp.str());
-		}
 		rateLimitID = db->Get(0, "id");
 		attempts = stoi(db->Get(0, "attempts"));
-		ost.str("");
-		ost << "update `sessions_persistence_ratelimit` set `attempts`=`attempts`+1 where `id`='" << rateLimitID << "';";
-		db->Query(ost.str());
+
+		db->Query("update `sessions_persistence_ratelimit` set `attempts`=`attempts`+1 where `id`='" + rateLimitID + "';");
 
 		if(attempts > maxAttempts)
 		{
-			{
-				CLog	log;
-				ostringstream	ostTemp;
+			MESSAGE_ERROR("", "", "REMOTE_ADDR has tryed " + to_string(attempts) + " times during the last " + to_string(maxTime) + "sec. Needed to be rate-limited.")
 
-				ostTemp.str("");
-				ostTemp << "isPersistenceRateLimited: REMOTE_ADDR has tryed " << attempts << " times during the last " << maxTime << "sec. Needed to be rate-limited.";
-				log.Write(DEBUG, ostTemp.str());
-			}
 			result = true;
 		}
 		else
 		{
-			{
-				CLog	log;
-				ostringstream	ostTemp;
-
-				ostTemp.str("");
-				ostTemp << "isPersistenceRateLimited: REMOTE_ADDR has tryed " << attempts << " times during the last " << maxTime << "sec. No need to rate-limit.";
-				log.Write(DEBUG, ostTemp.str());
-			}
+			MESSAGE_DEBUG("", "", "REMOTE_ADDR has tryed " + to_string(attempts) + " times during the last " + to_string(maxTime) + "sec. No need to rate-limit.")
+			
 			result = false;
 		}
 	}
 	else
 	{
-		{
-			CLog	log;
-			ostringstream	ostTemp;
+		MESSAGE_DEBUG("", "", "REMOTE_ADDR not in rate-limit table.")
 
-			ostTemp.str("");
-			ostTemp << "isPersistenceRateLimited: REMOTE_ADDR not in rate-limit table";
-			log.Write(DEBUG, ostTemp.str());
-		}
-		ost.str("");
-		ost << "insert into `sessions_persistence_ratelimit` set `attempts`='1', `ip`='" << REMOTE_ADDR << "', `eventTimestamp`=NOW();";
-		db->Query(ost.str());
+		db->Query("insert into `sessions_persistence_ratelimit` set `attempts`='1', `ip`='" + REMOTE_ADDR + "', `eventTimestamp`=NOW();");
 
 		result = false;
 	}
 
-	{
-		CLog	log;
-		ostringstream	ostTemp;
-
-		ostTemp.str("");
-		ostTemp << "isPersistenceRateLimited: end. " << (result ? "rate-limit" : "no need rate-limit");
-		log.Write(DEBUG, ostTemp.str());
-	}
+	MESSAGE_DEBUG("", "", "end. "s + (result ? "rate-limit" : "no need rate-limit"))
 
 	return result;
 }
@@ -4839,9 +4793,7 @@ void CopyFile(const string src, const string dst)
 {
 	clock_t start, end;
 
-	{
-		MESSAGE_DEBUG("", "", "start (copy " + src + " -> " + dst + ")");
-	}
+	MESSAGE_DEBUG("", "", "start (" + src + ", " + dst + ")");
 
 	start = clock();
 
@@ -4856,9 +4808,7 @@ void CopyFile(const string src, const string dst)
 
 	end = clock();
 
-	{
-		MESSAGE_DEBUG("", "", "finish (copying time is " + to_string((end - start) / CLOCKS_PER_SEC) + ")");
-	}
+	MESSAGE_DEBUG("", "", "finish (time of file copying is " + to_string((end - start) / CLOCKS_PER_SEC) + " second)");
 }
 
 // --- admin function

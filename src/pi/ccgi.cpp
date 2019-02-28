@@ -536,8 +536,8 @@ string CCgi::SessID_Create_HTTP_DB (int max_age)
 	return "";
 }
 
-bool CCgi::SessID_Load_FromDB(string sessidHTTP) {
-	return sessionDB.Load(sessidHTTP);
+bool CCgi::SessID_Load_FromDB(string sessid) {
+	return sessionDB.Load(sessid);
 }
 
 string CCgi::SessID_Get_UserFromDB() {

@@ -7,6 +7,7 @@
 #define	ROOTDIR "${ROOTDIR}"
 #define	IMAGEROOTDIR "${IMAGEROOTDIR}"
 #define	LOGDIR "${LOGDIR}"
+#define	PDF_FONT_INSTALL_DIR "${PDF_FONT_INSTALL_DIR}"s
 #cmakedefine IMAGEMAGICK_DISABLE
 #cmakedefine MAXMIND_DISABLE
 #cmakedefine FFPMPEG_DISABLE
@@ -164,6 +165,10 @@
 // --- used for presence update and presence caching
 #define	FREQUENCY_ECHO_REQUEST						60
 
+// --- protection from session hijacking by bruteforce
+#define	BRUTEFORCE_TIME_INTERVAL					60
+#define	BRUTEFORCE_ATTEMPTS							10
+
 // --- chat definitions
 #define	CHAT_MAX_MESSAGE_QUEUE						512 - 1 // --- (-1) required to get all "1" in binary representation
 #define	CHAT_LOG_FILE_NAME							string(LOGDIR) + "dev." + DOMAIN_NAME + ".chat"
@@ -216,12 +221,14 @@
 
 #define	TEMP_DIRECTORY_PREFIX						"/tmp/"s
 
-#define	HPDF_TEXT_LINE_HEIGHT						10
-#define	HPDF_TABLE_LINE_HEIGHT						10
+#define	HPDF_FIELD_TOP								40
+#define	HPDF_FIELD_BOTTOM							40
 #define	HPDF_FIELD_RIGHT							40
 #define	HPDF_FIELD_LEFT								40
-#define	HPDF_TIMECARD_TITLE_WIDTH_PERCENT			35
-#define	HPDF_TIMECARD_DAYS_WIDTH_PERCENT			100 - HPDF_TIMECARD_TITLE_WIDTH_PERCENT
+#define	HPDF_TIMECARD_TITLE_WIDTH_PERCENT			35.0
+#define	HPDF_TIMECARD_DAYS_WIDTH_PERCENT			(100 - HPDF_TIMECARD_TITLE_WIDTH_PERCENT)
+#define	HPDF_TIMECARD_DAY_WIDTH_PERCENT				HPDF_TIMECARD_DAYS_WIDTH_PERCENT / 31.0		// --- important to have double here
 #define	HPDF_TIMECARD_FONT_SIZE						8
+#define	HPDF_TIMECARD_TABLE_SPACING					2
 
 #endif

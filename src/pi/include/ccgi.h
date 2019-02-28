@@ -138,8 +138,8 @@ class CCgi
 
 		string	SessID_Get_FromHTTP(void);
 		string	SessID_Create_HTTP_DB(int max_age = SESSION_LEN * 60);
-		bool	SessID_Exist_InDB(string sessionHTTP);
-		bool	SessID_Load_FromDB(string sessidHTTP);
+		// bool	SessID_Exist_InDB(string sessionHTTP);
+		bool	SessID_Load_FromDB(string sessid);
 		bool	SessID_CheckConsistency(void);
 		bool	SessID_Update_HTTP_DB();
 		string	SessID_Get_UserFromDB();

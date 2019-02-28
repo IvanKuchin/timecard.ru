@@ -53,11 +53,15 @@ class C_Print_Timecard
 		HPDF_REAL						__pdf_page_width = 0;
 		HPDF_REAL						__pdf_page_height = 0;
 		HPDF_Font						__pdf_font;
+		string							__pdf_font_name = "Helvetica";
 		HPDF_INT						__pdf_font_descent = 0;
 		HPDF_INT						__pdf_font_ascent = 0;
 		HPDF_INT						__pdf_font_height = 0;
 		HPDF_INT						__pdf_font_xheight = 0;
+		HPDF_INT						__pdf_table_line_height = 0;
 		int								__pdf_line = -1;
+		int								__pdf_table_top = -1;
+		int								__pdf_table_bottom = -1;
 
 		auto		isDaySummaryStruct_Filled() -> bool;
 		auto		AssignValuesToDaySummaryStruct() -> bool;
@@ -66,19 +70,35 @@ class C_Print_Timecard
 		auto		GetEffortCost()									{ return effort_cost; };
 		auto		GetEffortCostVAT()								{ return effort_cost_vat; };
 		auto		GetTotalPayment()								{ return total_payment; };
+		auto		GetNumberOfDaysInTimecard() -> int;
 
 		auto		GetSpelledTitle() -> string;
 
 		auto		__HPDF_init() -> string;
 		auto		__HPDF_SetDocProps() -> string;
+		auto		__HPDF_MoveLineDown() -> string					{ return __HPDF_MoveLineDown(__pdf_font_height); };
 		auto		__HPDF_MoveLineDown(int line_increment) -> string;
+		auto		__HPDF_MoveTableLineDown() -> string			{ return __HPDF_MoveTableLineDown(__pdf_table_line_height); };
+		auto		__HPDF_MoveTableLineDown(int line_increment) -> string;
 		auto		__HPDF_SaveToFile() -> string;
 		auto		__HPDF_PrintText(string text, int x, int y) -> string;
 		auto		__HPDF_DrawHorizontalLine() -> string;
+		auto		__HPDF_DrawTimecardHorizontalLine() -> string;
 		auto		__HPDF_DrawTimecardTitle() -> string;
+		auto		__HPDF_DrawTimecardTable() -> string;
+		auto		__HPDF_DrawTimecardTableHeader() -> string;
+		auto		__HPDF_DrawTimecardTableBody() -> string;
+		auto		__HPDF_DrawTimecardTableFooter() -> string;
 		auto		__HPDF_TableGetXOffset() -> HPDF_REAL;
 		auto		__HPDF_TableGetTitleWidth() -> HPDF_REAL;
 		auto		__HPDF_TableDaysGetXOffset() -> HPDF_REAL;
+		auto		__HPDF_StartTable() -> string;
+		auto		__HPDF_StopTable() -> string;
+		auto		__HPDF_GetTimecardTableXByPercentage(double percent) -> double;
+		auto		__HPDF_DrawTimecardVerticalLine(double x) -> string;
+		auto		__HPDF_PaintDay(int day_number, double red, double green, double blue) -> string;
+
+
 
 	public:
 					C_Print_Timecard();

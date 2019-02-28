@@ -259,10 +259,8 @@ static string GenerateImage(string randStr)
 
 				fileFlagExist = true;
 				do {
-					{
-						CLog	log;
-						log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: checking captha file existance");
-					}
+					MESSAGE_DEBUG("", "", "checking captha file existance");
+
 					fileResult = "_";
 					fileResult += GetRandom(10);
 					fileResult += ".gif";
@@ -272,37 +270,25 @@ static string GenerateImage(string randStr)
 					if(fh < 0)
 					{
 						fileFlagExist = false;
-						{
-							CLog	log;
-							log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: trying file ", fileResultFull, " -> can be used for writing");
-						}
+
+						MESSAGE_DEBUG("", "", ": trying file " + fileResultFull + " -> can be used for writing");
 					}
 					else
 					{
 						close(fh);
-						{
-							CLog	log;
-							log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: trying file ", fileResultFull, " -> can't be used, needs another one");
-						}
+
+						MESSAGE_DEBUG("", "", ": trying file " + fileResultFull + " -> can't be used, needs another one");
 					}
 				} while(fileFlagExist == true);
 
+				MESSAGE_DEBUG("", "", ": write captcha-image to " + fileResultFull);
 
-				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: write captcha-image to ", fileResultFull);
-				}
 				imageDest.write(fileResultFull);
 
 			}
 			catch(Magick::Exception &error_)
 			{
-				CLog			log;
-				ostringstream	ost;
-
-				ost.str("");
-				ost << string(__func__) + "[" + to_string(__LINE__) + "](" << randStr << "): Caught exception: " << error_.what();
-				log.Write(ERROR, ost.str());
+				MESSAGE_ERROR("", "", "Caught exception: " + error_.what())
 
 				fileResult = "";
 			}
@@ -382,8 +368,7 @@ int main()
 				if(sessidHTTP.length() < 5)
 				{
 					{
-						CLog	log;
-						log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "] session cookie doesn't exists, generating new session.");
+						MESSAGE_DEBUG("", action, "session cookie doesn't exists, generating new session.");
 					}
 
 					sessidHTTP = indexPage.SessID_Create_HTTP_DB();
@@ -404,8 +389,7 @@ int main()
 						// ---		3) issue: cookie set on (1) step keeps reappear after 5 sec.
 						// --- To address Safari JS cookie issue, cookie should not be set on request "/"
 						{
-							CLog	log;
-							log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "] session cookie doesn't exists. Flow before check persitense session, no need to generate cookie. (workaround with JS cookie issue in Safari)");
+							MESSAGE_DEBUG("", action, "session cookie doesn't exists. Flow before check persitense session, no need to generate cookie. (workaround with JS cookie issue in Safari)");
 						}
 					}
 
@@ -459,8 +443,7 @@ int main()
 										indexPage.RegisterVariableForce("myUserAvatar", avatarPath);
 
 										{
-											CLog	log;
-											log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "] user [" + user.GetLogin() + "] logged in");
+											MESSAGE_DEBUG("", action, "user [" + user.GetLogin() + "] logged in");
 										}
 									}
 									else
@@ -477,8 +460,7 @@ int main()
 								else
 								{
 									{
-										CLog	log;
-										log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "] user [" + user.GetLogin() + "] surfing");
+										MESSAGE_DEBUG("", action, "user [" + user.GetLogin() + "] surfing");
 									}
 
 									if(user.GetFromDBbyLogin(user.GetLogin()))
@@ -615,8 +597,7 @@ int main()
 	// ------------ end generate common parts
 
 		{
-			CLog	log;
-			log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "] start (action's == \"" + action + "\") condition");
+			MESSAGE_DEBUG("", action, "start (action's == \"" + action + "\") condition");
 		}
 
 		if((action.length() > 10) && (action.compare(action.length() - 9, 9, "_template") == 0))
@@ -655,7 +636,7 @@ int main()
 				MESSAGE_DEBUG("", action, "can't find template " + template_name);
 			}
 
-			MESSAGE_DEBUG("", action, "end");
+			MESSAGE_DEBUG("", action, "finish");
 		}
 
 		if(action == "setlang")
@@ -675,8 +656,8 @@ int main()
 		if(action == "autologin")
 		{
 			{
-				CLog    log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": start");
+				
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			if(!indexPage.SetTemplate("autologin.htmlt"))
@@ -686,8 +667,8 @@ int main()
 			}
 
 			{
-				CLog    log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": finish");
+				
+				MESSAGE_DEBUG("", action, "finish");
 			}
 		}
 
@@ -701,8 +682,8 @@ int main()
 	        string			userLogin = "", userID = "", result = "";
 
 			{
-			    CLog    log;
-			    log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": start");
+			    
+			    MESSAGE_DEBUG("", action, "start");
 			}
 
 	        userID			    = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("id"));
@@ -713,8 +694,8 @@ int main()
 	        if(strPageToGet.empty()) strPageToGet = "0";
 
 	        {
-	            CLog    log;
-	            log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": page " + strPageToGet + " requested");
+	            
+	            MESSAGE_DEBUG("", action, "page " + strPageToGet + " requested");
 	        }
 
 	        try{
@@ -735,8 +716,8 @@ int main()
 	            ostringstream   ost;
 
 	            {
-	                CLog    log;
-	                log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": re-login required");
+	                
+	                MESSAGE_DEBUG("", action, "re-login required");
 	            }
 
 	            indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
@@ -755,8 +736,8 @@ int main()
 				else
 				{
 					{
-						CLog    log;
-						log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": attempt to get a wall of unknown/blocked user (" + userLogin + ")");
+						
+						MESSAGE_DEBUG("", action, "attempt to get a wall of unknown/blocked user (" + userLogin + ")");
 					}
 				}
 	        }
@@ -778,8 +759,8 @@ int main()
 			else
 			{
 				{
-	                CLog    log;
-	                log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": attempt to get a wall of unknown/blocked user (" + userLogin + ")");
+	                
+	                MESSAGE_DEBUG("", action, "attempt to get a wall of unknown/blocked user (" + userLogin + ")");
 				}
 
 		        indexPage.RegisterVariableForce("result", "{\"status\":\"error\",\"description\":\"user blocked or not found\"}");
@@ -793,8 +774,8 @@ int main()
 	        } // if(!indexPage.SetTemplate("json_response.htmlt"))
 
 			{
-			    CLog    log;
-			    log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": end");
+			    
+			    MESSAGE_DEBUG("", action, "finish");
 			}
 	    }
 
@@ -802,21 +783,18 @@ int main()
 	    if(action == "AJAX_getNewsFeed")
 	    {
 	        string          strPageToGet, strNewsOnSinglePage;
-	        string			strFriendList = "";
-	        string			strCompaniesList = "";
-	        string			strGroupsList = "";
-	        string			strEventsList = "";
-	        int             currPage = 0, newsOnSinglePage = 0;
+	        auto			strFriendList = ""s;
+	        auto			strCompaniesList = ""s;
+	        auto			strGroupsList = ""s;
+	        auto			strEventsList = ""s;
+	        auto            currPage = 0, newsOnSinglePage = 0;
 
 	        strNewsOnSinglePage = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("NewsOnSinglePage"));
 	        strPageToGet        = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("page"));
 
 	        if(strPageToGet.empty()) strPageToGet = "0";
 
-	        {
-	            CLog    log;
-	            log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": page ", strPageToGet, " requested");
-	        }
+            MESSAGE_DEBUG("", action, "page " + strPageToGet + " requested");
 
 	        try{
 	            currPage = stoi(strPageToGet);
@@ -832,10 +810,7 @@ int main()
 
 	        if(user.GetLogin() == "Guest")
 	        {
-				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": re-login required");
-				}
+				MESSAGE_DEBUG("", action, "re-login required");
 
 		        indexPage.RegisterVariableForce("result", "{\"status\":\"error\",\"description\":\"re-login required\",\"link\":\"/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10) + "\"}");
 	        }
@@ -961,15 +936,12 @@ int main()
 
 			messageID	= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("messageID"));
 
-			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": start [", messageID, "]");
-			}
+			MESSAGE_DEBUG("", action, "start [" + messageID + "]");
 
 			if(messageID.empty())
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": messageID is not defined");
+				
+				MESSAGE_DEBUG("", action, "messageID is not defined");
 
 				ostFinal.str("");
 				ostFinal << "{";
@@ -984,8 +956,8 @@ int main()
 					ostringstream	ost;
 
 					{
-						CLog	log;
-						log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": re-login required");
+						
+						MESSAGE_DEBUG("", action, "re-login required");
 					}
 
 					indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
@@ -1065,8 +1037,8 @@ int main()
 			}
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": end (messageID " + messageID + ")");
+				
+				MESSAGE_DEBUG("", action, "finish (messageID " + messageID + ")");
 			}
 
 		}
@@ -1080,16 +1052,12 @@ int main()
 
 			commentID	= indexPage.GetVarsHandler()->Get("commentID");
 
-			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": start [", commentID, "]");
-			}
-
+			MESSAGE_DEBUG("", action, "start [" + commentID + "]");
 
 			if(commentID.empty())
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": commentID is not defined");
+				
+				MESSAGE_DEBUG("", action, "commentID is not defined");
 
 				ostFinal.str("");
 				ostFinal << "{" << std::endl;
@@ -1104,8 +1072,8 @@ int main()
 					ostringstream	ost;
 
 					{
-						CLog	log;
-						log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": re-login required");
+						
+						MESSAGE_DEBUG("", action, "re-login required");
 					}
 
 					indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
@@ -1143,8 +1111,8 @@ int main()
 			int			affected;
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": start");
+				
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			ost.str("");
@@ -1318,8 +1286,8 @@ int main()
 			string			url, imageTempSet;
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": start");
+				
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			url = indexPage.GetVarsHandler()->Get("url");
@@ -1348,8 +1316,8 @@ int main()
 				}
 				else
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": url is empty OR too long OR imageTempSet is empty");
+					
+					MESSAGE_DEBUG("", action, "url is empty OR too long OR imageTempSet is empty");
 
 					ostFinal.str("");
 					ostFinal << "{" << std::endl;
@@ -1365,8 +1333,8 @@ int main()
 					ostringstream	ost;
 
 					{
-						CLog	log;
-						log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": re-login required");
+						
+						MESSAGE_DEBUG("", action, "re-login required");
 					}
 
 					ostFinal.str("");
@@ -1392,8 +1360,8 @@ int main()
 							ostringstream   ost;
 
 							{
-								CLog log;
-								log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": youtube video found");
+								
+								MESSAGE_DEBUG("", action, "youtube video found");
 							}
 
 							ost.str("");
@@ -1418,8 +1386,8 @@ int main()
 							ostringstream	ost;
 
 							{
-								CLog log;
-								log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": preview image found");
+								
+								MESSAGE_DEBUG("", action, "preview image found");
 							}
 
 #ifndef IMAGEMAGICK_DISABLE
@@ -1442,8 +1410,7 @@ int main()
 							{
 
 								{
-									CLog	log;
-									log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": choosen filename for feed image [" + finalFile + "]");
+									MESSAGE_DEBUG("", action, "" + action + ": choosen filename for feed image [" + finalFile + "]");
 								}
 
 								CopyFile(tmpImageJPG, finalFile);
@@ -1535,8 +1502,8 @@ int main()
 						}
 						else
 						{
-							CLog log;
-							log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": there are no (youtube_video, preview image)");
+							
+							MESSAGE_DEBUG("", action, "there are no (youtube_video, preview image)");
 						}
 						ostFinal.str("");
 						ostFinal << "{" << std::endl;
@@ -1551,8 +1518,8 @@ int main()
 					else
 					{
 						{
-							CLog	log;
-							log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": can't perform request [" + string(url) + "]");
+							
+							MESSAGE_DEBUG("", action, "can't perform request [" + string(url) + "]");
 						}
 
 						ostFinal.str("");
@@ -1573,8 +1540,8 @@ int main()
 			}
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": end");
+				
+				MESSAGE_DEBUG("", action, "finish");
 			}
 		}
 */
@@ -1589,8 +1556,8 @@ int main()
 			int			affected;
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": start");
+				
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			if(user.GetLogin() == "Guest")
@@ -1598,8 +1565,8 @@ int main()
 				ostringstream	ost;
 
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": re-login required");
+					
+					MESSAGE_DEBUG("", action, "re-login required");
 				}
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
@@ -1622,8 +1589,7 @@ int main()
 					filename += db.Get(0, "filename");
 
 					{
-						CLog	log;
-						log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": removing avatar [id=" + avatarID + "] belongs to user " + user.GetLogin() + " [filename=" + filename + "]");
+						MESSAGE_DEBUG("", action, "" + action + ": removing avatar [id=" + avatarID + "] belongs to user " + user.GetLogin() + " [filename=" + filename + "]");
 					}
 
 					ost.str("");
@@ -1677,11 +1643,7 @@ int main()
 				result.str("");
 				result << "{ \"result\":\"error\", \"description\":\"there is no avatar\" }";
 
-				{
-					CLog	log;
-					ost.str("");
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": there is no avatar [id=", avatarID, "]");
-				}
+				MESSAGE_DEBUG("", action, "there is no avatar [id=" + avatarID + "]");
 			}
 
 			indexPage.RegisterVariableForce("result", result.str());
@@ -1700,8 +1662,8 @@ int main()
 			string			sessid, friendID, currentFriendshipStatus, requestedFriendshipStatus;
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": start");
+				
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			if(user.GetLogin() == "Guest")
@@ -1709,8 +1671,8 @@ int main()
 				ostringstream	ost;
 
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": re-login required");
+					
+					MESSAGE_DEBUG("", action, "re-login required");
 				}
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
@@ -1894,8 +1856,8 @@ int main()
 			ostringstream	ost, result;
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": start");
+				
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			if(user.GetLogin() == "Guest")
@@ -1903,8 +1865,8 @@ int main()
 				ostringstream	ost;
 
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": re-login required");
+					
+					MESSAGE_DEBUG("", action, "re-login required");
 				}
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
@@ -1976,8 +1938,8 @@ int main()
 			ostringstream	ost, result;
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": start");
+				
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			if(user.GetLogin() == "Guest")
@@ -1985,8 +1947,8 @@ int main()
 				ostringstream	ost;
 
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": re-login required");
+					
+					MESSAGE_DEBUG("", action, "re-login required");
 				}
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
@@ -2061,8 +2023,7 @@ int main()
 			string		  failReason = "";
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": start");
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			if(user.GetLogin() == "Guest")
@@ -2070,8 +2031,8 @@ int main()
 				ostringstream   ost;
 
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": re-login required");
+					
+					MESSAGE_DEBUG("", action, "re-login required");
 				}
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
@@ -2212,8 +2173,8 @@ int main()
 				else
 				{
 					{
-						CLog	log;
-						log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": noone " + messageLikeType + " id:" + messageId + " anymore");
+						
+						MESSAGE_DEBUG("", action, "noone " + messageLikeType + " id:" + messageId + " anymore");
 					}
 
 					userList = "";
@@ -2259,8 +2220,8 @@ int main()
 				throw CException("Template file was missing");
 			}
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": end");
+				
+				MESSAGE_DEBUG("", action, "finish");
 			}
 		}
 
@@ -2279,8 +2240,8 @@ int main()
 			vector<int>		vectorFriendList1, vectorFriendList2, vectorFriendList3;
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": start");
+				
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			if(user.GetLogin() == "Guest")
@@ -2288,8 +2249,8 @@ int main()
 				ostringstream	ost;
 
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": re-login required");
+					
+					MESSAGE_DEBUG("", action, "re-login required");
 				}
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
@@ -2426,8 +2387,8 @@ int main()
 			}
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": finish");
+				
+				MESSAGE_DEBUG("", action, "finish");
 			}
 		}
 
@@ -2440,8 +2401,8 @@ int main()
 			CMysql			db1;
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": start");
+				
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			if(user.GetLogin() == "Guest")
@@ -2449,8 +2410,8 @@ int main()
 				ostringstream	ost;
 
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": re-login required");
+					
+					MESSAGE_DEBUG("", action, "re-login required");
 				}
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
@@ -2500,8 +2461,8 @@ int main()
 			}
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": finish");
+				
+				MESSAGE_DEBUG("", action, "finish");
 			}
 		}
 
@@ -2514,8 +2475,8 @@ int main()
 			vector<string>	searchWords;
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": start");
+				
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			// --- Initialization
@@ -2526,8 +2487,8 @@ int main()
 				ostringstream	ost;
 
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": re-login required");
+					
+					MESSAGE_DEBUG("", action, "re-login required");
 				}
 
 		        indexPage.RegisterVariableForce("result", "{\"status\":\"error\",\"description\":\"re-login required\",\"link\":\"/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10) + "\"}");
@@ -2559,8 +2520,7 @@ int main()
 					{
 						// --- Logging
 						CLog			log;
-
-						log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": qw4(" + lookForKey + ")");
+						MESSAGE_DEBUG("", action, "" + action + ": qw4(" + lookForKey + ")");
 		/*				for(vector<string>::iterator it = searchWords.begin(); it != searchWords.end(); ++it, i++)
 						{
 							ost << string(__func__) + "[" + to_string(__LINE__) << "]" + action + ": parsed value at index " << i << " [" << *it << "]" << endl;
@@ -2573,8 +2533,8 @@ int main()
 					if(searchWords.size() == 1)
 					{
 						{
-							CLog log;
-							log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": single word search");
+							
+							MESSAGE_DEBUG("", action, "single word search");
 						}
 
 						// --- Looking through name, surname
@@ -2618,8 +2578,8 @@ int main()
 					if(searchWords.size() == 2)
 					{
 						{
-							CLog log;
-							log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": two words search");
+							
+							MESSAGE_DEBUG("", action, "two words search");
 						}
 
 						// --- Looking through user name,surname and company title
@@ -2655,8 +2615,8 @@ int main()
 							// --- earlier: user _and_ company is not success
 							// --- here: user _or_ company
 							{
-								CLog log;
-								log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": (user _and_ company) has fail, try (user _without_ company) ");
+								
+								MESSAGE_DEBUG("", action, "(user _and_ company) has fail, try (user _without_ company) ");
 							}
 
 							ost.str("");
@@ -2691,8 +2651,8 @@ int main()
 					if(searchWords.size() == 3)
 					{
 						{
-							CLog log;
-							log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": three words search");
+							
+							MESSAGE_DEBUG("", action, "three words search");
 						}
 
 						// --- Looking through user name,surname and company title
@@ -2729,8 +2689,8 @@ int main()
 							// --- earlier: user _and_ company is not success
 							// --- here: user _or_ company
 							{
-								CLog log;
-								log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": (user _and_ company) has fail, try (user _without_ company) ");
+								
+								MESSAGE_DEBUG("", action, "(user _and_ company) has fail, try (user _without_ company) ");
 							}
 
 							ost.str("");
@@ -2780,11 +2740,7 @@ int main()
 					ostFinal << std::endl << "]";
 				}
 
-				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": final response [", ostFinal.str(), "]");
-				}
-
+				MESSAGE_DEBUG("", action, "final response [" + ostFinal.str() + "]");
 
 				indexPage.RegisterVariableForce("result", ostFinal.str());
 			}
@@ -2803,10 +2759,7 @@ int main()
 			string		  sessid, lookForKey, industriesList;
 			vector<string>  searchWords;
 
-			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": start");
-			}
+			MESSAGE_DEBUG("", action, "start");
 
 			// --- Initialization
 			ostFinal.str("");
@@ -2816,8 +2769,8 @@ int main()
 				ostringstream   ost;
 
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": re-login required");
+					
+					MESSAGE_DEBUG("", action, "re-login required");
 				}
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
@@ -2852,8 +2805,8 @@ int main()
 			else
 			{
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": searching key is empty or less than 2");
+					
+					MESSAGE_DEBUG("", action, "searching key is empty or less than 2");
 				}
 				ostFinal << "{\"status\":\"error\",\"description\":\"searching key is empty or less then 2\", \"industries\":[]}";
 			}
@@ -2866,10 +2819,7 @@ int main()
 				throw CException("Template file was missing");
 			}
 
-			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": final response [", ostFinal.str(), "]");
-			}
+			MESSAGE_DEBUG("", action, "final response [" + ostFinal.str() + "]");
 		}
 
 		// --- JSON get list of my friends
@@ -2881,8 +2831,8 @@ int main()
 			int				affected;
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": start");
+				
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			if(user.GetLogin() == "Guest")
@@ -2890,8 +2840,8 @@ int main()
 				ostringstream	ost;
 
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": re-login required");
+					
+					MESSAGE_DEBUG("", action, "re-login required");
 				}
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
@@ -2924,10 +2874,7 @@ int main()
 				}
 				friendsSqlQuery << ");";
 
-				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": query for JSON prepared [", friendsSqlQuery.str(), "]");
-				}
+				MESSAGE_DEBUG("", action, "query for JSON prepared [" + friendsSqlQuery.str() + "]");
 
 				userList = GetUserListInJSONFormat(friendsSqlQuery.str(), &db, &user);
 			}
@@ -2951,8 +2898,8 @@ int main()
 			string			sessid, lookForKey, userArray = "", messageArray = "";
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": start");
+				
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			if(user.GetLogin() == "Guest")
@@ -2960,8 +2907,8 @@ int main()
 				ostringstream	ost;
 
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": re-login required");
+					
+					MESSAGE_DEBUG("", action, "re-login required");
 				}
 
 				ostFinal << "result: fail";
@@ -2984,8 +2931,8 @@ int main()
 					friendsSqlQuery << ");";
 
 					{
-						CLog	log;
-						log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": query for JSON prepared [", friendsSqlQuery.str(), "]");
+						
+						MESSAGE_DEBUG("", action, "query for JSON prepared [" + friendsSqlQuery.str() + "]");
 					}
 					userArray = GetUserListInJSONFormat(friendsSqlQuery.str(), &db, &user);
 
@@ -3011,8 +2958,8 @@ int main()
 			}
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": end");
+				
+				MESSAGE_DEBUG("", action, "finish");
 			}
 		}
 
@@ -3025,8 +2972,8 @@ int main()
 			int			affected;
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": start");
+				
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			if(user.GetLogin() == "Guest")
@@ -3034,8 +2981,8 @@ int main()
 				ostringstream	ost;
 
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": re-login required");
+					
+					MESSAGE_DEBUG("", action, "re-login required");
 				}
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
@@ -3056,7 +3003,7 @@ int main()
 			{
 				CLog	log;
 				ost.str("");
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": there are no avatars for user ", user.GetLogin());
+				MESSAGE_DEBUG("", action, "there are no avatars for user " + user.GetLogin());
 			}
 
 			indexPage.RegisterVariableForce("result", "[" + ost.str() + "]");
@@ -3076,8 +3023,8 @@ int main()
 			int			affected;
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": start");
+				
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			if(user.GetLogin() == "Guest")
@@ -3085,8 +3032,8 @@ int main()
 				ostringstream	ost;
 
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": re-login required");
+					
+					MESSAGE_DEBUG("", action, "re-login required");
 				}
 
 				ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
@@ -3127,8 +3074,8 @@ int main()
 			string		  commentType;
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": start");
+				
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			if(user.GetLogin() == "Guest")
@@ -3136,8 +3083,8 @@ int main()
 				ostringstream	ost;
 
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": re-login required");
+					
+					MESSAGE_DEBUG("", action, "re-login required");
 				}
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
@@ -3230,8 +3177,8 @@ int main()
 			} // if(!indexPage.SetTemplate("json_response.htmlt"))
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": finish");
+				
+				MESSAGE_DEBUG("", action, "finish");
 			}
 		}
 
@@ -3241,8 +3188,8 @@ int main()
 			string			sessid, message = "", toID = "";
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": start");
+				
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			if(user.GetLogin() == "Guest")
@@ -3250,8 +3197,8 @@ int main()
 				ostringstream	ost;
 
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": re-login required");
+					
+					MESSAGE_DEBUG("", action, "re-login required");
 				}
 
 				ostFinal << "result: fail";
@@ -3285,8 +3232,8 @@ int main()
 				trim(toID);
 
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": message [", message, "]");
+					
+					MESSAGE_DEBUG("", action, "message [" + message + "]");
 				}
 
 				if(message.length() && toID.length())
@@ -3377,8 +3324,8 @@ int main()
 				else
 				{
 					{
-						CLog	log;
-						log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": message_body or message_recipient is empty");
+						
+						MESSAGE_DEBUG("", action, "message_body or message_recipient is empty");
 					}
 					ostFinal.str("");
 					ostFinal << "\"result\": \"error\"," << std::endl;
@@ -3401,8 +3348,8 @@ int main()
 			}
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": end");
+				
+				MESSAGE_DEBUG("", action, "finish");
 			}
 		}
 
@@ -3412,8 +3359,8 @@ int main()
 			string			messageID = "";
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": start");
+				
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			if(user.GetLogin() == "Guest")
@@ -3421,8 +3368,8 @@ int main()
 				ostringstream	ost;
 
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": re-login required");
+					
+					MESSAGE_DEBUG("", action, "re-login required");
 				}
 
 				indexPage.RegisterVariableForce("result", "{"
@@ -3452,10 +3399,7 @@ int main()
 				messageID = SymbolReplace(messageID, "\n", "<br>");
 				trim(messageID);
 
-				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": message [", messageID, "]");
-				}
+				MESSAGE_DEBUG("", action, "message [" + messageID + "]");
 
 				if(messageID.length())
 				{
@@ -3491,8 +3435,8 @@ int main()
 			}
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": end");
+				
+				MESSAGE_DEBUG("", action, "finish");
 			}
 		}
 
@@ -3502,8 +3446,8 @@ int main()
 			string			notificationID = "";
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": start");
+				
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			if(user.GetLogin() == "Guest")
@@ -3541,10 +3485,7 @@ int main()
 				notificationID = SymbolReplace(notificationID, "\n", "<br>");
 				trim(notificationID);
 
-				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": message [", notificationID, "]");
-				}
+				MESSAGE_DEBUG("", action, "message [" + notificationID + "]");
 
 				if(notificationID.length())
 				{
@@ -3590,8 +3531,8 @@ int main()
 			}
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": end");
+				
+				MESSAGE_DEBUG("", action, "finish");
 			}
 		}
 
@@ -3601,8 +3542,8 @@ int main()
 			string			userID = "";
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": start");
+				
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			if(user.GetLogin() == "Guest")
@@ -3610,8 +3551,8 @@ int main()
 				ostringstream	ost;
 
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": re-login required");
+					
+					MESSAGE_DEBUG("", action, "re-login required");
 				}
 
 				indexPage.RegisterVariableForce("result", "{"
@@ -3642,8 +3583,8 @@ int main()
 				trim(userID);
 
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": message [", userID, "]");
+					
+					MESSAGE_DEBUG("", action, "message [" + userID + "]");
 				}
 
 				if(userID.length())
@@ -3680,8 +3621,8 @@ int main()
 			}
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": end");
+				
+				MESSAGE_DEBUG("", action, "finish");
 			}
 		}
 
@@ -3694,8 +3635,8 @@ int main()
 			if(user.GetLogin() == "Guest")
 			{
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": re-login required");
+					
+					MESSAGE_DEBUG("", action, "re-login required");
 				}
 
 				indexPage.RegisterVariableForce("result", "{"
@@ -3748,8 +3689,8 @@ int main()
 				ostringstream	ost;
 
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": re-login required");
+					
+					MESSAGE_DEBUG("", action, "re-login required");
 				}
 
 				indexPage.RegisterVariableForce("result", "{"
@@ -3791,8 +3732,7 @@ int main()
 				ostringstream	ost;
 
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": re-login required");
+					MESSAGE_DEBUG("", action, "" + action + ": re-login required");
 				}
 
 				indexPage.RegisterVariableForce("result", "{"
@@ -3840,8 +3780,7 @@ int main()
 								else
 								{
 									{
-										CLog	log;
-										log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": there is no media in this post [messageID: " + messageID + string("]"));
+										MESSAGE_DEBUG("", action, "" + action + ": there is no media in this post [messageID: " + messageID + string("]"));
 									}
 								}
 							}
@@ -3899,8 +3838,8 @@ int main()
 				ostringstream	ost;
 
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": re-login required");
+					
+					MESSAGE_DEBUG("", action, "re-login required");
 				}
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
@@ -3920,8 +3859,7 @@ int main()
 			else
 			{
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": there are no company of current employmant of user ", user.GetID());
+					MESSAGE_DEBUG("", action, "there are no company of current employmant of user " + user.GetID());
 				}
 			}
 			indexPage.RegisterVariableForce("result", ost.str());
@@ -3955,8 +3893,8 @@ int main()
 			string			newsFeedMessageImageSet;
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": start");
+				
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			if(user.GetLogin() == "Guest")
@@ -3964,8 +3902,8 @@ int main()
 				ostringstream	ost;
 
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": re-login required");
+					
+					MESSAGE_DEBUG("", action, "re-login required");
 				}
 
 				ost.str("");
@@ -4070,8 +4008,7 @@ int main()
 						}
 						else
 						{
-							CLog			log;
-							log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": DEBUG: there are no images associated with `tempSet`='" + newsFeedMessageImageTempSet + "' and `userID`='" + user.GetID() + "'");
+							MESSAGE_DEBUG("", action, "" + action + ": DEBUG: there are no images associated with `tempSet`='" + newsFeedMessageImageTempSet + "' and `userID`='" + user.GetID() + "'");
 						}
 					}
 					else
@@ -4138,8 +4075,7 @@ int main()
 						}
 
 						{
-							CLog			log;
-							log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": end (message FROM " + newsFeedMessageSrcType + ".id[" + newsFeedMessageSrcID + "] has been posted)");
+							MESSAGE_DEBUG("", action, "" + action + ": end (message FROM " + newsFeedMessageSrcType + ".id[" + newsFeedMessageSrcID + "] has been posted)");
 						}
 					} // if(!((newsFeedMessageTitle == "") && (newsFeedMessageText == "") && (newsFeedMessageImage == "")))
 					else
@@ -4184,8 +4120,8 @@ int main()
 			} // if(!indexPage.SetTemplate("json_response.htmlt"))
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": end");
+				
+				MESSAGE_DEBUG("", action, "finish");
 			}
 		}
 
@@ -4203,8 +4139,8 @@ int main()
 			string			newsFeedMessageImageSet;
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": start");
+				
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			if(user.GetLogin() == "Guest")
@@ -4212,8 +4148,8 @@ int main()
 				ostringstream	ost;
 
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": re-login required");
+					
+					MESSAGE_DEBUG("", action, "re-login required");
 				}
 
 				ost.str("");
@@ -4265,8 +4201,7 @@ int main()
 							}
 							else
 							{
-								CLog			log;
-								log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": there is no media attached to the message.id [" + newsFeedMessageID + "]");
+								MESSAGE_DEBUG("", action, "" + action + ": there is no media attached to the message.id [" + newsFeedMessageID + "]");
 							}
 
 							if(newsFeedMessageImageSet.length() > 0)
@@ -4295,8 +4230,7 @@ int main()
 								ost << "]";
 
 								{
-									CLog			log;
-									log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": message [id = " + newsFeedMessageID + "] FROM " + messageOwnerType + ".id[" + messageOwnerID + "] has been posted");
+									MESSAGE_DEBUG("", action, "" + action + ": message [id = " + newsFeedMessageID + "] FROM " + messageOwnerType + ".id[" + messageOwnerID + "] has been posted");
 								}
 
 
@@ -4379,8 +4313,8 @@ int main()
 			}
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": finish");
+				
+				MESSAGE_DEBUG("", action, "finish");
 			}
 
 		}
@@ -4398,8 +4332,8 @@ int main()
 			string			strPageToGet, strNewsOnSinglePage;
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": start");
+				
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			if(user.GetLogin() == "Guest")
@@ -4407,8 +4341,8 @@ int main()
 				ostringstream   ost;
 
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": re-login required");
+					
+					MESSAGE_DEBUG("", action, "re-login required");
 				}
 
 				ost.str("");
@@ -4680,8 +4614,8 @@ int main()
 								if(db.InsertQuery(ost.str()))
 								{
 									{
-										CLog	log;
-										log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": success comment submission to userID[" + replyUserID + "]");
+										
+										MESSAGE_DEBUG("", action, "success comment submission to userID[" + replyUserID + "]");
 									}
 
 								}
@@ -4747,8 +4681,8 @@ int main()
 			}
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": finish");
+				
+				MESSAGE_DEBUG("", action, "finish");
 			}
 		}
 
@@ -4764,8 +4698,8 @@ int main()
 				ostringstream	ost;
 
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": re-login required");
+					
+					MESSAGE_DEBUG("", action, "re-login required");
 				}
 
 				ost.str("");
@@ -4813,8 +4747,7 @@ int main()
 
 				if(cleanedPassword != newPassword)
 				{
-					CLog			log;
-					log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": password having wrong symbols change the password to a new one [" + newPassword + "] <> [" + cleanedPassword + "]");
+					MESSAGE_DEBUG("", action, "" + action + ": password having wrong symbols change the password to a new one [" + newPassword + "] <> [" + cleanedPassword + "]");
 
 					ostResult.str("");
 					ostResult << "{";
@@ -4834,8 +4767,7 @@ int main()
 						if(db.Query(ost.str()))
 						{
 
-							CLog			log;
-							log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": new password is the same as earlier");
+							MESSAGE_DEBUG("", action, "" + action + ": new password is the same as earlier");
 
 							ostResult.str("");
 							ostResult << "{";
@@ -4890,8 +4822,8 @@ int main()
 						ostResult << "\"description\": \"can't change to empty password\"";
 						ostResult << "}";
 
-						CLog	log;
-						log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": can't change to empty password");
+						
+						MESSAGE_DEBUG("", action, "can't change to empty password");
 					}
 
 				}
@@ -4917,8 +4849,7 @@ int main()
 			string 		userToCheck;
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": start");
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			userToCheck = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("regEmail"));
@@ -4926,16 +4857,14 @@ int main()
 			if(CheckUserEmailExisting(userToCheck, &db))
 			{
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": login or email already registered");
+					MESSAGE_DEBUG("", action, "" + action + ": login or email already registered");
 				}
 				indexPage.RegisterVariableForce("result", "already used");
 			}
 			else
 			{
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": login or email not yet exists");
+					MESSAGE_DEBUG("", action, "" + action + ": login or email not yet exists");
 				}
 				indexPage.RegisterVariableForce("result", "free");
 			}
@@ -4953,8 +4882,8 @@ int main()
 			string			sessid, friendID;
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": start");
+				
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 /*
@@ -4963,8 +4892,8 @@ int main()
 				ostringstream	ost;
 
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": re-login required");
+					
+					MESSAGE_DEBUG("", action, "re-login required");
 				}
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
@@ -4999,8 +4928,7 @@ int main()
 						}
 						else
 						{
-							CLog	log;
-							log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": not registered user watched profile, no need to insert to DB");
+							MESSAGE_DEBUG("", action, "" + action + ": not registered user watched profile, no need to insert to DB");
 						}
 					}
 				}
@@ -5150,16 +5078,16 @@ int main()
 			string			strPageToGet, strNewsOnSinglePage, strFriendList;
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": start");
+				
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			strNewsOnSinglePage	= indexPage.GetVarsHandler()->Get("NewsOnSinglePage");
 			strPageToGet 		= indexPage.GetVarsHandler()->Get("page");
 			if(strPageToGet.empty()) strPageToGet = "0";
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": page ", strPageToGet, " requested");
+				
+				MESSAGE_DEBUG("", action, "page " + strPageToGet + " requested");
 			}
 
 			if(user.GetLogin() == "Guest")
@@ -5167,8 +5095,8 @@ int main()
 				ostringstream	ost;
 
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": re-login required");
+					
+					MESSAGE_DEBUG("", action, "re-login required");
 				}
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
@@ -5201,8 +5129,8 @@ int main()
 			} // if(!indexPage.SetTemplate("json_response.htmlt"))
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": end");
+				
+				MESSAGE_DEBUG("", action, "finish");
 			}
 		}
 
@@ -5213,8 +5141,8 @@ int main()
 			string			sessid, activeUserID;
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": start");
+				
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			if(user.GetLogin() == "Guest")
@@ -5222,8 +5150,8 @@ int main()
 				ostringstream	ost;
 
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": re-login required");
+					
+					MESSAGE_DEBUG("", action, "re-login required");
 				}
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
@@ -5236,8 +5164,8 @@ int main()
 			}
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": end");
+				
+				MESSAGE_DEBUG("", action, "finish");
 			}
 		}
 
@@ -5247,8 +5175,8 @@ int main()
 			string			sessid, activeUserID;
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": start");
+				
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			if(user.GetLogin() == "Guest")
@@ -5256,8 +5184,8 @@ int main()
 				ostringstream	ost;
 
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": re-login required");
+					
+					MESSAGE_DEBUG("", action, "re-login required");
 				}
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
@@ -5270,82 +5198,87 @@ int main()
 			}
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": end");
+				
+				MESSAGE_DEBUG("", action, "finish");
 			}
 		}
 
 		if(action == "login")
 		{
-			ostringstream	ost;
-			string		sessid;
-			string		randomValue = GetRandom(4);
-			string 		captchaFile = GenerateImage(randomValue);
-			int 		affected;
+			MESSAGE_DEBUG("", action, "start");
 
+			if(user.GetLogin() == "Guest")
 			{
-				MESSAGE_DEBUG("", action, "start");
-			}
+				ostringstream	ost;
+				string		sessid;
+				string		randomValue = GetRandom(4);
+				string 		captchaFile = GenerateImage(randomValue);
+				int 		affected;
 
-			sessid = indexPage.GetCookie("sessid");
+				sessid = indexPage.GetCookie("sessid");
 
-			if(sessid.length() < 5) {
-				MESSAGE_ERROR("", action, "session.id [" + sessid + "] must be 20 symbols long");
-				throw CException("Please enable cookie in browser.");
-			}
-
-			{
-				MESSAGE_DEBUG("", action, "get login captcha for session " + sessid);
-			}
-
-
-			ost.str("");
-			ost << "SELECT id FROM captcha WHERE `session`=\"" << sessid << "\" and `purpose`='regNewUser'";
-
-			if((affected = db.Query(ost.str())) > 0) {
-				// ------ Update session
-				{
-					MESSAGE_DEBUG("", action, "update session.id(" + sessid + ") captcha");
+				if(sessid.length() < 5) {
+					MESSAGE_ERROR("", action, "session.id [" + sessid + "] must be 20 symbols long");
+					throw CException("Please enable cookie in browser.");
 				}
 
-				ost.str("");
-				ost << "UPDATE `captcha` SET `code`='" << randomValue << "', `filename`='" << captchaFile << "', `timestamp`=NOW() WHERE `session`=\"" << sessid << "\" AND `purpose`='regNewUser'";
-			}
-			else {
-				// ------ Create new session
 				{
-					MESSAGE_DEBUG("", action, "create new session.id(" + sessid + ") captcha");
+					MESSAGE_DEBUG("", action, "get login captcha for session " + sessid);
 				}
 
 
 				ost.str("");
-				ost << "INSERT INTO  `captcha` (`session` ,`code` ,`filename` ,`purpose`, `timestamp`) VALUES ('" << sessid << "',  '" << randomValue << "',  '" << captchaFile << "',  'regNewUser', NOW());";
-			}
-			db.Query(ost.str());
+				ost << "SELECT id FROM captcha WHERE `session`=\"" << sessid << "\" and `purpose`='regNewUser'";
 
+				if((affected = db.Query(ost.str())) > 0) {
+					// ------ Update session
+					{
+						MESSAGE_DEBUG("", action, "update session.id(" + sessid + ") captcha");
+					}
+
+					ost.str("");
+					ost << "UPDATE `captcha` SET `code`='" << randomValue << "', `filename`='" << captchaFile << "', `timestamp`=NOW() WHERE `session`=\"" << sessid << "\" AND `purpose`='regNewUser'";
+				}
+				else {
+					// ------ Create new session
+					{
+						MESSAGE_DEBUG("", action, "create new session.id(" + sessid + ") captcha");
+					}
+
+
+					ost.str("");
+					ost << "INSERT INTO  `captcha` (`session` ,`code` ,`filename` ,`purpose`, `timestamp`) VALUES ('" << sessid << "',  '" << randomValue << "',  '" << captchaFile << "',  'regNewUser', NOW());";
+				}
+				db.Query(ost.str());
+
+				{
+					MESSAGE_DEBUG("", action, "register variables");
+				}
+
+				indexPage.RegisterVariableForce("noun_list", GetPasswordNounsList(&db));
+				indexPage.RegisterVariableForce("adjectives_list", GetPasswordAdjectivesList(&db));
+
+				indexPage.RegisterVariableForce("title", "Добро пожаловать");
+				indexPage.RegisterVariable("regEmail_checked", "0");
+
+
+				indexPage.RegisterVariableForce("securityFile", captchaFile);
+
+
+				if(!indexPage.SetTemplate("login.htmlt"))
+				{
+					MESSAGE_ERROR("", action, "template file login.htmlt was missing");
+					throw CException("Template file was missing");
+				}
+			}
+			else
 			{
-				MESSAGE_DEBUG("", action, "register variables");
+				MESSAGE_ERROR("", action, "(not an error, severity error to monitor) registered user(" + user.GetLogin() + ") attempts to access login page, redirect to default page");
+
+				indexPage.Redirect(GetDefaultActionFromUserType(user.GetType(), &db) + "?rand=" + GetRandom(10));
 			}
 
-			indexPage.RegisterVariableForce("noun_list", GetPasswordNounsList(&db));
-			indexPage.RegisterVariableForce("adjectives_list", GetPasswordAdjectivesList(&db));
-
-			indexPage.RegisterVariableForce("title", "Добро пожаловать");
-			indexPage.RegisterVariable("regEmail_checked", "0");
-
-
-			indexPage.RegisterVariableForce("securityFile", captchaFile);
-
-
-			if(!indexPage.SetTemplate("login.htmlt"))
-			{
-				MESSAGE_ERROR("", action, "template file login.htmlt was missing");
-				throw CException("Template file was missing");
-			}
-
-			{
-				MESSAGE_DEBUG("", action, "finish");
-			}
+			MESSAGE_DEBUG("", action, "finish");
 		}
 		if(action == "logout")
 		{
@@ -5353,8 +5286,7 @@ int main()
 			string		sessid;
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": start");
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			sessid = indexPage.GetCookie("sessid");
@@ -5375,16 +5307,15 @@ int main()
 			}
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": end");
+				MESSAGE_DEBUG("", action, "" + action + ": end");
 			}
 		}
 
 		if(action == "forget_password_page")
 		{
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": start");
+				
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			if(!indexPage.SetTemplate("forget_password.htmlt"))
@@ -5394,8 +5325,8 @@ int main()
 			}
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": end");
+				
+				MESSAGE_DEBUG("", action, "finish");
 			}
 
 		}
@@ -5407,15 +5338,15 @@ int main()
 			ostringstream	ost1, ostResult;
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": start");
+				
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			sessid = indexPage.GetCookie("sessid");
 			if(sessid.length() < 5)
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": with session id derived FROM cookies");
+				
+				MESSAGE_DEBUG("", action, "with session id derived FROM cookies");
 
 				ostResult.str("");
 				ostResult << "{";
@@ -5439,8 +5370,7 @@ int main()
 				user.SetDB(&db);
 				if(!user.GetFromDBbyEmail(login))
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": user [", user.GetLogin(), "] not found");
+					MESSAGE_DEBUG("", action, "user [" + user.GetLogin() + "] not found");
 
 					// --- don't alert that user is missing, it make reconaissance attack easier
 					ostResult.str("");
@@ -5468,8 +5398,7 @@ int main()
 						string		activator_id = GetRandom(20);
 
 						{
-							CLog	log;
-							log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": sending mail message with password to user (" + user.GetLogin() + ")");
+							MESSAGE_DEBUG("", action, "" + action + ": sending mail message with password to user (" + user.GetLogin() + ")");
 						}
 
 						db.Query("INSERT INTO `activators` SET `id`=\"" + activator_id + "\", `user`=\"" + user.GetEmail() + "\", `type`=\"password_recovery\", `date`=NOW();");
@@ -5516,8 +5445,8 @@ int main()
 			}
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": finish");
+				
+				MESSAGE_DEBUG("", action, "finish");
 			}
 		}
 
@@ -5752,15 +5681,15 @@ int main()
 			ostringstream	ost1, ostResult;
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": start");
+				
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			sessid = indexPage.GetCookie("sessid");
 			if(sessid.length() < 5)
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": with session id derived FROM cookies");
+				
+				MESSAGE_DEBUG("", action, "with session id derived FROM cookies");
 
 				ostResult.str("");
 				ostResult << "{";
@@ -5780,8 +5709,7 @@ int main()
 				user.SetDB(&db);
 				if(!user.GetFromDBbyEmail(login))
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": user [", user.GetLogin(), "] not found");
+					MESSAGE_DEBUG("", action, "user [" + user.GetLogin() + "] not found");
 
 					ostResult.str("");
 					ostResult << "{";
@@ -5811,8 +5739,8 @@ int main()
 								// --- earlier password is user for user login
 
 								{
-									CLog	log;
-									log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": old password has been used for user [" + user.GetLogin() + "] login");
+									
+									MESSAGE_DEBUG("", action, "old password has been used for user [" + user.GetLogin() + "] login");
 								}
 
 								ostResult.str("");
@@ -5826,8 +5754,8 @@ int main()
 								// --- password is wrong for user
 
 								{
-									CLog	log;
-									log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": user [" + user.GetLogin() + "] failed to login due to passwd error");
+									
+									MESSAGE_DEBUG("", action, "user [" + user.GetLogin() + "] failed to login due to passwd error");
 								}
 
 								ostResult.str("");
@@ -5842,8 +5770,7 @@ int main()
 						{
 
 							{
-								CLog	log;
-								log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": switching session (" + sessid + ") FROM Guest to user (" + user.GetLogin() + ")");
+								MESSAGE_DEBUG("", action, "" + action + ": switching session (" + sessid + ") FROM Guest to user (" + user.GetLogin() + ")");
 							}
 
 							db.Query("UPDATE `sessions` SET `user`=\"" + user.GetEmail() + "\", `ip`=\"" + getenv("REMOTE_ADDR") + "\", `expire`=\"" + (rememberMe == "remember-me" ? "0" : to_string(SESSION_LEN * 60)) + "\" WHERE `id`=\"" + sessid + "\";");
@@ -5897,8 +5824,8 @@ int main()
 			}
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": finish");
+				
+				MESSAGE_DEBUG("", action, "finish");
 			}
 		}
 
@@ -6039,8 +5966,7 @@ int main()
 			string			activatorID;
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": start");
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			activatorID = "";
@@ -6051,8 +5977,7 @@ int main()
 			if(!act.Load(activatorID))
 			{
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": failed to Load activator [", activatorID, "]");
+					MESSAGE_DEBUG("", action, "failed to Load activator [" + activatorID + "]");
 				}
 
 				if(!indexPage.SetTemplate("weberror_activator_notfound.htmlt"))
@@ -6075,8 +6000,8 @@ int main()
 				sessid = indexPage.GetCookie("sessid");
 				if(sessid.length() < 5)
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": with session id derived FROM cookies");
+					
+					MESSAGE_DEBUG("", action, "with session id derived FROM cookies");
 
 					if(!indexPage.SetTemplate("weberror_cookie_disabled.htmlt.htmlt"))
 					{
@@ -6094,8 +6019,7 @@ int main()
 					user.SetDB(&db);
 					if(!user.GetFromDBbyEmail(login))
 					{
-						CLog	log;
-						log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": user [", user.GetLogin(), "] not found");
+						MESSAGE_DEBUG("", action, "" + action + ": user [" + user.GetLogin() + "] not found");
 
 						if(!indexPage.SetTemplate("weberror_user_not_found.htmlt"))
 						{
@@ -6120,8 +6044,7 @@ int main()
 							ostringstream	ost1;
 
 							{
-								CLog	log;
-								log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": switching session (" + sessid + ") FROM Guest to user (" + user.GetLogin() + ")");
+								MESSAGE_DEBUG("", action, "" + action + ": switching session (" + sessid + ") FROM Guest to user (" + user.GetLogin() + ")");
 							}
 
 							// --- 2delete if login works till Nov 1
@@ -6146,8 +6069,7 @@ int main()
 
 
 							{
-								CLog	log;
-								log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "] " + action + ": redirection to \"news_feed?rand=xxxxxx\"");
+								MESSAGE_DEBUG("", action, "" + action + ": redirection to \"news_feed?rand=xxxxxx\"");
 							}
 							ost1.str("");
 							ost1 << "/news_feed?rand=" << GetRandom(10);
@@ -6160,8 +6082,7 @@ int main()
 
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "] action = " + action + ": end");
+				MESSAGE_DEBUG("", action, "action = " + action + ": end");
 			}
 		}
 
@@ -6173,8 +6094,8 @@ int main()
 			string		userID, name, nameLast, age, cv, pass, address, phone, email, isBlocked, avatarFileName, avatarFolderName, current_company;
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": start");
+				
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			if(user.GetLogin() == "Guest")
@@ -6182,8 +6103,8 @@ int main()
 				ostringstream	ost;
 
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": re-login required");
+					
+					MESSAGE_DEBUG("", action, "re-login required");
 				}
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
@@ -6231,8 +6152,8 @@ int main()
 				}
 
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": user details isBlocked:[", isBlocked, "]");
+					
+					MESSAGE_DEBUG("", action, "user details isBlocked:[" + isBlocked + "]");
 				}
 			}
 
@@ -6243,8 +6164,8 @@ int main()
 			}
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": end");
+				
+				MESSAGE_DEBUG("", action, "finish");
 			}
 		}
 
@@ -6299,8 +6220,8 @@ int main()
 					isBlocked = db.Get(0, "users_isblocked");
 
 					{
-						CLog	log;
-						log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": user details isBlocked:[", isBlocked, "]");
+						
+						MESSAGE_DEBUG("", action, "user details isBlocked:[", isBlocked, "]");
 					}
 
 				}
@@ -6330,8 +6251,8 @@ int main()
 			string		userID, name, nameLast, age, cv, pass, address, phone, email, isBlocked, avatarFileName, avatarFolderName, current_company;
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": start");
+				
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			if(user.GetLogin() == "Guest")
@@ -6339,8 +6260,8 @@ int main()
 				ostringstream	ost;
 
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": re-login required");
+					
+					MESSAGE_DEBUG("", action, "re-login required");
 				}
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
@@ -6355,8 +6276,8 @@ int main()
 			}  // if(!indexPage.SetTemplate("edit_company.htmlt"))
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": end");
+				
+				MESSAGE_DEBUG("", action, "finish");
 			}
 		} 	// if(action == "edit_company")
 
@@ -6377,8 +6298,8 @@ int main()
 				ostringstream	ost;
 
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": re-login required");
+					
+					MESSAGE_DEBUG("", action, "re-login required");
 				}
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
@@ -6491,8 +6412,8 @@ int main()
 			string			imageIDMarkToRemove;
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": start");
+				
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			if(user.GetLogin() == "Guest")
@@ -6500,8 +6421,8 @@ int main()
 				ostringstream	ost;
 
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": re-login required");
+					
+					MESSAGE_DEBUG("", action, "re-login required");
 				}
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
@@ -6607,8 +6528,7 @@ int main()
 					else
 					{
 						{
-							CLog	log;
-							log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": `feed_images`.`tempSet` [" + imageIDMarkToRemove + "]  is empty or doesn't belongs to you");
+							MESSAGE_DEBUG("", action, "" + action + ": `feed_images`.`tempSet` [" + imageIDMarkToRemove + "]  is empty or doesn't belongs to you");
 						}
 
 						ostFinal.str("");
@@ -6658,8 +6578,8 @@ int main()
 			}
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": end");
+				
+				MESSAGE_DEBUG("", action, "finish");
 			}
 		}
 
@@ -6672,8 +6592,8 @@ int main()
 			ostringstream	ostFinal;
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": start");
+				
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			if(user.GetLogin() == "Guest")
@@ -6681,8 +6601,8 @@ int main()
 				ostringstream	ost;
 
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": re-login required");
+					
+					MESSAGE_DEBUG("", action, "re-login required");
 				}
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
@@ -6800,8 +6720,8 @@ int main()
 			}
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": end");
+				
+				MESSAGE_DEBUG("", action, "finish");
 			}
 
 		}
@@ -6813,8 +6733,8 @@ int main()
 			ostringstream	ostFinal;
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": start");
+				
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			if(user.GetLogin() == "Guest")
@@ -6822,8 +6742,8 @@ int main()
 				ostringstream	ost;
 
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": re-login required");
+					
+					MESSAGE_DEBUG("", action, "re-login required");
 				}
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
@@ -6941,8 +6861,8 @@ int main()
 			}
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": end");
+				
+				MESSAGE_DEBUG("", action, "finish");
 			}
 		}
 
@@ -6953,8 +6873,8 @@ int main()
 			string			firstName, lastName;
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": start");
+				
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			if(user.GetLogin() == "Guest")
@@ -6962,8 +6882,8 @@ int main()
 				ostringstream	ost;
 
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": re-login required");
+					
+					MESSAGE_DEBUG("", action, "re-login required");
 				}
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
@@ -7160,8 +7080,8 @@ int main()
 			}
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": end");
+				
+				MESSAGE_DEBUG("", action, "finish");
 			}
 		}
 
@@ -7172,8 +7092,7 @@ int main()
 			ostringstream	ostFinal;
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": start");
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			if(user.GetLogin() == "Guest")
@@ -7181,8 +7100,8 @@ int main()
 				ostringstream	ost;
 
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": re-login required");
+					
+					MESSAGE_DEBUG("", action, "re-login required");
 				}
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
@@ -7247,8 +7166,7 @@ int main()
 			}
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": finish");
+				MESSAGE_DEBUG("", action, "" + action + ": finish");
 			}
 		}
 
@@ -7331,8 +7249,7 @@ int main()
 			string			strPageToGet, strNewsOnSinglePage;
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": start");
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			if((user.GetLogin() == "Guest") && (action == "news_feed"))
@@ -7340,8 +7257,8 @@ int main()
 				ostringstream	ost;
 
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": re-login required");
+					
+					MESSAGE_DEBUG("", action, "re-login required");
 				}
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
@@ -7351,8 +7268,8 @@ int main()
 			strPageToGet 		= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("page"));
 			if(strPageToGet.empty()) strPageToGet = "0";
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": page ", strPageToGet, " requested");
+				
+				MESSAGE_DEBUG("", action, "page " + strPageToGet + " requested");
 			}
 
 // TODO: remove Dec 1 '18
@@ -7373,8 +7290,7 @@ int main()
 			} // if(!indexPage.SetTemplate("news_feed.htmlt"))
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": finish");
+				MESSAGE_DEBUG("", action, "" + action + ": finish");
 			}
 		}
 
@@ -7384,8 +7300,7 @@ int main()
 			string			strPageToGet, strFriendsOnSinglePage;
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": start");
+				MESSAGE_DEBUG("", action, "start");
 			}
 
 			if(user.GetLogin() == "Guest")
@@ -7393,8 +7308,8 @@ int main()
 				ostringstream	ost;
 
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": re-login required");
+					
+					MESSAGE_DEBUG("", action, "re-login required");
 				}
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
@@ -7408,8 +7323,7 @@ int main()
 			strPageToGet 			= indexPage.GetVarsHandler()->Get("page");
 			if(strPageToGet.empty()) strPageToGet = "0";
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": page ", strPageToGet, " requested");
+				MESSAGE_DEBUG("", action, "page " + strPageToGet + " requested");
 			}
 
 			indexPage.RegisterVariableForce("myFirstName", user.GetName());
@@ -7423,8 +7337,7 @@ int main()
 			} // if(!indexPage.SetTemplate("my_network.htmlt"))
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": finish");
+				MESSAGE_DEBUG("", action, "" + action + ": finish");
 			}
 		}
 
@@ -7438,8 +7351,8 @@ int main()
 				ostringstream	ost;
 
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": re-login required");
+					
+					MESSAGE_DEBUG("", action, "re-login required");
 				}
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
@@ -7451,8 +7364,8 @@ int main()
 			strPageToGet 			= indexPage.GetVarsHandler()->Get("page");
 			if(strPageToGet.empty()) strPageToGet = "0";
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": page ", strPageToGet, " requested");
+				
+				MESSAGE_DEBUG("", action, "page " + strPageToGet + " requested");
 			}
 
 			indexPage.RegisterVariableForce("myFirstName", user.GetName());
@@ -7468,12 +7381,21 @@ int main()
 
 		if(action == "showmain")
 		{
+			if(user.GetLogin() == "Guest")
+			{
 				indexPage.RegisterVariableForce("title", "Добро пожаловать");
 				if(!indexPage.SetTemplate("main.htmlt"))
 				{
 					MESSAGE_ERROR("", action, "template file anketa.htmlt was missing");
 					throw CException("Template file was missing");
 				}
+			}
+			else
+			{
+				MESSAGE_ERROR("", action, "(not an error, severity error to monitor) registered user(" + user.GetLogin() + ") attempts to access showmain page, redirect to default page");
+
+				indexPage.Redirect(GetDefaultActionFromUserType(user.GetType(), &db) + "?rand=" + GetRandom(10));
+			}
 		}
 
 		if(action == "forget")
@@ -7482,13 +7404,10 @@ int main()
 			CMailLocal	mail;
 
 			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]" + action + ": start");
+				MESSAGE_DEBUG("", action, "start");
 			}
 
-{
-	string gggg="123c";
-}			login = RemoveQuotas(indexPage.GetVarsHandler()->Get("login"));
+			login = RemoveQuotas(indexPage.GetVarsHandler()->Get("login"));
 			if(login.length() > 0)
 			{
 				ostringstream	ost;
@@ -7523,8 +7442,7 @@ int main()
 		}
 
 		{
-			CLog	log;
-			log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "] end (action's == \"" + action + "\") condition");
+			MESSAGE_DEBUG("", action, "finish (action's == \"" + action + "\") condition");
 		}
 
 		indexPage.OutTemplate();
@@ -7536,10 +7454,7 @@ int main()
 		c.SetLanguage(indexPage.GetLanguage());
 		c.SetDB(&db);
 
-		{
-			CLog	log;
-			log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "] catch CExceptionHTML: exception reason: [", c.GetReason(), "]");
-		}
+		MESSAGE_DEBUG("", action, "catch CExceptionHTML: exception reason: [" + c.GetReason() + "]");
 
 		if(c.GetTemplate().length())
 		{
