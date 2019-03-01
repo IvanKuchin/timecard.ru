@@ -1091,12 +1091,12 @@ string	C_BT::CheckValidity() const
 	}
 	else if(!isSubcontractorAssignedToCustomerID())
 	{
-		result = utf8_to_cp1251(gettext("you are not assigned to customer"));
+		result = (gettext("you are not assigned to customer"));
 		MESSAGE_DEBUG("C_BT", "", "user.id(" + user->GetID() + ") not assigned to customer.id(" + GetCustomerID() + ")");
 	}
 	else if(!isCustomerAssignmentInsideBTPeriod())
 	{
-		result = utf8_to_cp1251(gettext("customer assignment outside bt travel"));
+		result = (gettext("customer assignment outside bt travel"));
 		MESSAGE_DEBUG("C_BT", "", "user.id(" + user->GetID() + ") assignment to customer.id(" + GetCustomerID() + ") beyond the business travle period (" + GetStartDate() + " -> " + GetEndDate() + ")");
 	}
 	else

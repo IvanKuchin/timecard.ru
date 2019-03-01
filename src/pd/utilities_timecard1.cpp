@@ -6270,7 +6270,7 @@ auto isTaskIDValidToRemove(string task_id, CMysql *db) -> string
 							else
 							{
 								MESSAGE_DEBUG("", "", "cost center assigned on task.id(" + task_id + ")");
-								error_message = utf8_to_cp1251(gettext("This task assigned to cost center")) + ". " + utf8_to_cp1251(gettext("removal prohibited")) + ".";
+								error_message = gettext("This task assigned to cost center") + ". "s + gettext("removal prohibited") + ".";
 							}
 						}
 						else
@@ -7448,7 +7448,7 @@ string	GetSpelledSoWByID(string sow_id, CMysql *db)
 
 	if(db->Query("SELECT `sign_date`, `number` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";"))
 	{
-		result = string(db->Get(0, "number")) + " " + utf8_to_cp1251(gettext("agreement from")) + " " + db->Get(0, "sign_date");
+		result = string(db->Get(0, "number")) + " " + gettext("agreement from") + " " + db->Get(0, "sign_date");
 	}
 	else
 	{
@@ -7469,7 +7469,7 @@ string	GetSpelledPSoWByID(string psow_id, CMysql *db)
 
 	if(db->Query("SELECT `sign_date`, `number` FROM `contracts_psow` WHERE `id`=\"" + psow_id + "\";"))
 	{
-		result = string(db->Get(0, "number")) + " " + utf8_to_cp1251(gettext("agreement from")) + " " + db->Get(0, "sign_date");
+		result = string(db->Get(0, "number")) + " " + gettext("agreement from") + " " + db->Get(0, "sign_date");
 	}
 	else
 	{
@@ -7668,7 +7668,7 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 	}
 	if(action == "AJAX_updateAgencyPosition")
 	{
-		notification_description = utf8_to_cp1251(gettext("Employee data")) + ": " + GetSpelledEmployeeByID(id, db) + " " + utf8_to_cp1251(gettext("promouted from")) + " " + existing_value;
+		notification_description = gettext("Employee data") + ": "s + GetSpelledEmployeeByID(id, db) + " " + gettext("promouted from") + " " + existing_value;
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 	if(action == "AJAX_updateAgencyEditCapability")
@@ -7764,145 +7764,145 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 	}
 	if(action == "AJAX_addCostCenter")
 	{
-		notification_description = utf8_to_cp1251(gettext("Agency: cost center added")) + " "s + GetSpelledCostCenterByID(id, db);
+		notification_description = gettext("Agency: cost center added") + " "s + GetSpelledCostCenterByID(id, db);
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 	if(action == "AJAX_updateCostCenterToCustomer")
 	{
-		notification_description = utf8_to_cp1251(gettext("Agency: cost center belongs to customer")) + " "s + GetSpelledTimecardCustomerByID(id, db) + " "s + utf8_to_cp1251(gettext("updated")) + " "s + (existing_value.length() ? utf8_to_cp1251(gettext("from")) + " "s + GetSpelledCostCenterByID(existing_value, db) : "") + " "s + utf8_to_cp1251(gettext("to")) + " "s + GetSpelledCostCenterByID(new_value, db);
+		notification_description = gettext("Agency: cost center belongs to customer") + " "s + GetSpelledTimecardCustomerByID(id, db) + " "s + gettext("updated") + " "s + (existing_value.length() ? gettext("from") + " "s + GetSpelledCostCenterByID(existing_value, db) : "") + " "s + gettext("to") + " "s + GetSpelledCostCenterByID(new_value, db);
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 	if(action == "AJAX_deleteCostCenterFromCustomer")
 	{
-		notification_description = utf8_to_cp1251(gettext("Agency: cost center belongs to customer")) + " "s + GetSpelledTimecardCustomerByID(id, db) + " "s + (existing_value.length() ? " ("s + GetSpelledCostCenterByID(existing_value, db) : "") + ") "s + utf8_to_cp1251(gettext("removed"));
+		notification_description = gettext("Agency: cost center belongs to customer") + " "s + GetSpelledTimecardCustomerByID(id, db) + " "s + (existing_value.length() ? " ("s + GetSpelledCostCenterByID(existing_value, db) : "") + ") "s + gettext("removed");
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 	if(action == "AJAX_deleteCostCenter")
 	{
-		notification_description = utf8_to_cp1251(gettext("Agency: cost center")) + " ("s + GetSpelledCostCenterByID(existing_value, db) + ") "s + utf8_to_cp1251(gettext("removed"));
+		notification_description = gettext("Agency: cost center") + " ("s + GetSpelledCostCenterByID(existing_value, db) + ") "s + gettext("removed");
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 	if(action == "AJAX_updateCostCenterTitle")
 	{
-		notification_description = utf8_to_cp1251(gettext("Agency: cost center title updated")) + " "s + utf8_to_cp1251(gettext("from")) + " "s + existing_value + " "s + utf8_to_cp1251(gettext("to")) + " "s + new_value;
+		notification_description = gettext("Agency: cost center title updated") + " "s + gettext("from") + " "s + existing_value + " "s + gettext("to") + " "s + new_value;
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 	if(action == "AJAX_updateCostCenterDescription")
 	{
-		notification_description = utf8_to_cp1251(gettext("Agency: cost center"))  + " ("s + GetSpelledCostCenterByID(id, db) + ") "  + utf8_to_cp1251(gettext("description updated")) + " "s + utf8_to_cp1251(gettext("from")) + " "s + existing_value + " "s + utf8_to_cp1251(gettext("to")) + " "s + new_value;
+		notification_description = gettext("Agency: cost center")  + " ("s + GetSpelledCostCenterByID(id, db) + ") "  + gettext("description updated") + " "s + gettext("from") + " "s + existing_value + " "s + gettext("to") + " "s + new_value;
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 
 	if(action == "AJAX_updateSoWNumber")
 	{
-		notification_description = utf8_to_cp1251(gettext("SoW: number")) + " " + utf8_to_cp1251(gettext("updated")) + " " + utf8_to_cp1251(gettext("from")) + " "s + existing_value + " "  + utf8_to_cp1251(gettext("to")) + " "s + new_value;
+		notification_description = gettext("SoW: number") + " "s + gettext("updated") + " " + gettext("from") + " "s + existing_value + " "  + gettext("to") + " "s + new_value;
 		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 	}
 	if(action == "AJAX_updateSoWAct")
 	{
-		notification_description = utf8_to_cp1251(gettext("SoW")) + " (" + GetSpelledSoWByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("updated")) + " " + utf8_to_cp1251(gettext("act number")) + " " + " " + utf8_to_cp1251(gettext("from")) + " "s + existing_value + " "  + utf8_to_cp1251(gettext("to")) + " "s + new_value;
+		notification_description = gettext("SoW") + " ("s + GetSpelledSoWByID(sow_id, db) + "): " + gettext("updated") + " " + gettext("act number") + " " + " " + gettext("from") + " "s + existing_value + " "  + gettext("to") + " "s + new_value;
 		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 	}
 	if(action == "AJAX_updateSoWPosition")
 	{
-		notification_description = utf8_to_cp1251(gettext("SoW")) + " (" + GetSpelledSoWByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("position changed")) + " " + utf8_to_cp1251(gettext("from")) + " " + existing_value + " " + utf8_to_cp1251(gettext("to")) + " " + new_value;
+		notification_description = gettext("SoW") + " ("s + GetSpelledSoWByID(sow_id, db) + "): " + gettext("position changed") + " " + gettext("from") + " " + existing_value + " " + gettext("to") + " " + new_value;
 		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 	}
 	if(action == "AJAX_updateSoWDayRate")
 	{
-		notification_description = utf8_to_cp1251(gettext("SoW")) + " (" + GetSpelledSoWByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("dayrate changed")) + " " + utf8_to_cp1251(gettext("from")) + " " + existing_value + " " + utf8_to_cp1251(gettext("to")) + " " + new_value;
+		notification_description = gettext("SoW") + " ("s + GetSpelledSoWByID(sow_id, db) + "): " + gettext("dayrate changed") + " " + gettext("from") + " " + existing_value + " " + gettext("to") + " " + new_value;
 		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 	}
 	if(action == "AJAX_updateSoWSignDate")
 	{
-		notification_description = utf8_to_cp1251(gettext("SoW")) + " (" + GetSpelledSoWByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("sign date changed")) + " " + utf8_to_cp1251(gettext("from")) + " " + existing_value + " " + utf8_to_cp1251(gettext("to")) + " " + new_value;
+		notification_description = gettext("SoW") + " ("s + GetSpelledSoWByID(sow_id, db) + "): " + gettext("sign date changed") + " " + gettext("from") + " " + existing_value + " " + gettext("to") + " " + new_value;
 		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 	}
 	if(action == "AJAX_updateSoWStartDate")
 	{
-		notification_description = utf8_to_cp1251(gettext("SoW")) + " (" + GetSpelledSoWByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("start date changed")) + " " + utf8_to_cp1251(gettext("from")) + " " + existing_value + " " + utf8_to_cp1251(gettext("to")) + " " + new_value;
+		notification_description = gettext("SoW") + " ("s + GetSpelledSoWByID(sow_id, db) + "): " + gettext("start date changed") + " " + gettext("from") + " " + existing_value + " " + gettext("to") + " " + new_value;
 		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 	}
 	if(action == "AJAX_updateSoWEndDate")
 	{
-		notification_description = utf8_to_cp1251(gettext("SoW")) + " (" + GetSpelledSoWByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("end date changed")) + " " + utf8_to_cp1251(gettext("from")) + " " + existing_value + " " + utf8_to_cp1251(gettext("to")) + " " + new_value;
+		notification_description = gettext("SoW") + " ("s + GetSpelledSoWByID(sow_id, db) + "): " + gettext("end date changed") + " " + gettext("from") + " " + existing_value + " " + gettext("to") + " " + new_value;
 		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 	}
 	if(action == "AJAX_updateSoWCustomField")
 	{
-		notification_description = utf8_to_cp1251(gettext("SoW")) + " (" + GetSpelledSoWByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("custom field")) + "(" + GetSpelledSoWCustomFieldNameByID(id, db) + ") " + utf8_to_cp1251(gettext("changed")) + " " + utf8_to_cp1251(gettext("from")) + " " + existing_value + " " + utf8_to_cp1251(gettext("to")) + " " + new_value;
+		notification_description = gettext("SoW") + " ("s + GetSpelledSoWByID(sow_id, db) + "): " + gettext("custom field") + "(" + GetSpelledSoWCustomFieldNameByID(id, db) + ") " + gettext("changed") + " " + gettext("from") + " " + existing_value + " " + gettext("to") + " " + new_value;
 		sql_query = "SELECT `contract_sow_id` AS `contract_sow_id` FROM `contract_sow_custom_fields` WHERE `id`=\"" + id + "\";";
 	}
 
 	if(action == "AJAX_updatePSoWNumber")
 	{
-		notification_description = utf8_to_cp1251(gettext("PSoW: number")) + " " + utf8_to_cp1251(gettext("updated")) + " " + utf8_to_cp1251(gettext("from")) + " "s + existing_value + " "  + utf8_to_cp1251(gettext("to")) + " "s + new_value;
+		notification_description = gettext("PSoW: number") + " "s + gettext("updated") + " " + gettext("from") + " "s + existing_value + " "  + gettext("to") + " "s + new_value;
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 	if(action == "AJAX_updatePSoWAct")
 	{
-		notification_description = utf8_to_cp1251(gettext("PSoW")) + " (" + GetSpelledPSoWByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("updated")) + " " + utf8_to_cp1251(gettext("act number")) + " " + " " + utf8_to_cp1251(gettext("from")) + " "s + existing_value + " "  + utf8_to_cp1251(gettext("to")) + " "s + new_value;
+		notification_description = gettext("PSoW") + " ("s + GetSpelledPSoWByID(sow_id, db) + "): " + gettext("updated") + " " + gettext("act number") + " " + " " + gettext("from") + " "s + existing_value + " "  + gettext("to") + " "s + new_value;
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 	if(action == "AJAX_updatePSoWPosition")
 	{
-		notification_description = utf8_to_cp1251(gettext("PSoW")) + " (" + GetSpelledPSoWByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("position changed")) + " " + utf8_to_cp1251(gettext("from")) + " " + existing_value + " " + utf8_to_cp1251(gettext("to")) + " " + new_value;
+		notification_description = gettext("PSoW") + " ("s + GetSpelledPSoWByID(sow_id, db) + "): " + gettext("position changed") + " " + gettext("from") + " " + existing_value + " " + gettext("to") + " " + new_value;
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 	if(action == "AJAX_updatePSoWDayRate")
 	{
-		notification_description = utf8_to_cp1251(gettext("PSoW")) + " (" + GetSpelledPSoWByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("dayrate changed")) + " " + utf8_to_cp1251(gettext("from")) + " " + existing_value + " " + utf8_to_cp1251(gettext("to")) + " " + new_value;
+		notification_description = gettext("PSoW") + " ("s + GetSpelledPSoWByID(sow_id, db) + "): " + gettext("dayrate changed") + " " + gettext("from") + " " + existing_value + " " + gettext("to") + " " + new_value;
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 	if(action == "AJAX_updatePSoWSignDate")
 	{
-		notification_description = utf8_to_cp1251(gettext("PSoW")) + " (" + GetSpelledPSoWByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("sign date changed")) + " " + utf8_to_cp1251(gettext("from")) + " " + existing_value + " " + utf8_to_cp1251(gettext("to")) + " " + new_value;
+		notification_description = gettext("PSoW") + " ("s + GetSpelledPSoWByID(sow_id, db) + "): " + gettext("sign date changed") + " " + gettext("from") + " " + existing_value + " " + gettext("to") + " " + new_value;
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 	if(action == "AJAX_updatePSoWStartDate")
 	{
-		notification_description = utf8_to_cp1251(gettext("PSoW")) + " (" + GetSpelledPSoWByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("start date changed")) + " " + utf8_to_cp1251(gettext("from")) + " " + existing_value + " " + utf8_to_cp1251(gettext("to")) + " " + new_value;
+		notification_description = gettext("PSoW") + " ("s + GetSpelledPSoWByID(sow_id, db) + "): " + gettext("start date changed") + " " + gettext("from") + " " + existing_value + " " + gettext("to") + " " + new_value;
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 	if(action == "AJAX_updatePSoWEndDate")
 	{
-		notification_description = utf8_to_cp1251(gettext("PSoW")) + " (" + GetSpelledPSoWByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("end date changed")) + " " + utf8_to_cp1251(gettext("from")) + " " + existing_value + " " + utf8_to_cp1251(gettext("to")) + " " + new_value;
+		notification_description = gettext("PSoW") + " ("s + GetSpelledPSoWByID(sow_id, db) + "): " + gettext("end date changed") + " " + gettext("from") + " " + existing_value + " " + gettext("to") + " " + new_value;
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 	if(action == "AJAX_updatePSoWCustomField")
 	{
-		notification_description = utf8_to_cp1251(gettext("PSoW")) + " (" + GetSpelledPSoWByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("custom field")) + "(" + GetSpelledPSoWCustomFieldNameByID(id, db) + ") " + utf8_to_cp1251(gettext("changed")) + " " + utf8_to_cp1251(gettext("from")) + " " + existing_value + " " + utf8_to_cp1251(gettext("to")) + " " + new_value;
+		notification_description = gettext("PSoW") + " ("s + GetSpelledPSoWByID(sow_id, db) + "): " + gettext("custom field") + "(" + GetSpelledPSoWCustomFieldNameByID(id, db) + ") " + gettext("changed") + " " + gettext("from") + " " + existing_value + " " + gettext("to") + " " + new_value;
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 
 	if(action == "AJAX_updateCostCenterNumber")
 	{
-		notification_description = utf8_to_cp1251(gettext("Cost Center: number")) + " " + utf8_to_cp1251(gettext("updated")) + " " + utf8_to_cp1251(gettext("from")) + " "s + existing_value + " "  + utf8_to_cp1251(gettext("to")) + " "s + new_value;
+		notification_description = gettext("Cost Center: number") + " "s + gettext("updated") + " " + gettext("from") + " "s + existing_value + " "  + gettext("to") + " "s + new_value;
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 	if(action == "AJAX_updateCostCenterAct")
 	{
-		notification_description = utf8_to_cp1251(gettext("Cost Center")) + " (" + GetSpelledCostCenterByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("updated")) + " " + utf8_to_cp1251(gettext("act number")) + " " + " " + utf8_to_cp1251(gettext("from")) + " "s + existing_value + " "  + utf8_to_cp1251(gettext("to")) + " "s + new_value;
+		notification_description = gettext("Cost Center") + " ("s + GetSpelledCostCenterByID(sow_id, db) + "): " + gettext("updated") + " " + gettext("act number") + " " + " " + gettext("from") + " "s + existing_value + " "  + gettext("to") + " "s + new_value;
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 	if(action == "AJAX_updateCostCenterSignDate")
 	{
-		notification_description = utf8_to_cp1251(gettext("Cost Center")) + " (" + GetSpelledCostCenterByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("sign date changed")) + " " + utf8_to_cp1251(gettext("from")) + " " + existing_value + " " + utf8_to_cp1251(gettext("to")) + " " + new_value;
+		notification_description = gettext("Cost Center") + " ("s + GetSpelledCostCenterByID(sow_id, db) + "): " + gettext("sign date changed") + " " + gettext("from") + " " + existing_value + " " + gettext("to") + " " + new_value;
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 	if(action == "AJAX_updateCostCenterStartDate")
 	{
-		notification_description = utf8_to_cp1251(gettext("Cost Center")) + " (" + GetSpelledCostCenterByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("start date changed")) + " " + utf8_to_cp1251(gettext("from")) + " " + existing_value + " " + utf8_to_cp1251(gettext("to")) + " " + new_value;
+		notification_description = gettext("Cost Center") + " ("s + GetSpelledCostCenterByID(sow_id, db) + "): " + gettext("start date changed") + " " + gettext("from") + " " + existing_value + " " + gettext("to") + " " + new_value;
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 	if(action == "AJAX_updateCostCenterEndDate")
 	{
-		notification_description = utf8_to_cp1251(gettext("Cost Center")) + " (" + GetSpelledCostCenterByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("end date changed")) + " " + utf8_to_cp1251(gettext("from")) + " " + existing_value + " " + utf8_to_cp1251(gettext("to")) + " " + new_value;
+		notification_description = gettext("Cost Center") + " ("s + GetSpelledCostCenterByID(sow_id, db) + "): " + gettext("end date changed") + " " + gettext("from") + " " + existing_value + " " + gettext("to") + " " + new_value;
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 	if(action == "AJAX_updateCostCenterCustomField")
 	{
-		notification_description = utf8_to_cp1251(gettext("Cost Center")) + " (" + GetSpelledCostCenterByID(sow_id, db) + "): " + utf8_to_cp1251(gettext("custom field")) + "(" + GetSpelledCostCenterCustomFieldNameByID(id, db) + ") " + utf8_to_cp1251(gettext("changed")) + " " + utf8_to_cp1251(gettext("from")) + " " + existing_value + " " + utf8_to_cp1251(gettext("to")) + " " + new_value;
+		notification_description = gettext("Cost Center") + " ("s + GetSpelledCostCenterByID(sow_id, db) + "): " + gettext("custom field") + "(" + GetSpelledCostCenterCustomFieldNameByID(id, db) + ") " + gettext("changed") + " " + gettext("from") + " " + existing_value + " " + gettext("to") + " " + new_value;
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 
@@ -8029,6 +8029,10 @@ bool NotifySoWContractPartiesAboutChanges(string action, string id, string sow_i
 						MESSAGE_ERROR("", "", "Two or more agencies are sharing entities (either Customer/Project/Task or BTexpense/line templates) (" + action + ":" + id + ") - FORBIDDEN");
 					}
 
+					// --- if agency must be notified but no SoW-s singed, then agency_list will be empty
+					// --- to avoid ERROR-message in logs nad notify agency itself, below W/A applied
+					if((user->GetType() == "agency") && (agency_list.empty())) agency_list.push_back(id);
+
 					if(agency_list.size())
 					{
 						auto				initiator_company_id = ""s;
@@ -8118,7 +8122,7 @@ bool NotifySoWContractPartiesAboutChanges(string action, string id, string sow_i
 					}
 					else
 					{
-						MESSAGE_ERROR("", "", "Company not found");
+						MESSAGE_ERROR("", "", "Contract entities list is empty (probably list is empty due to no signed SoW-s yet.)");
 					}
 
 				}

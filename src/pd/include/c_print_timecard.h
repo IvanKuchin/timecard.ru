@@ -73,6 +73,20 @@ class C_Print_Timecard
 		auto		GetNumberOfDaysInTimecard() -> int;
 
 		auto		GetSpelledTitle() -> string;
+		auto		GetSpelledPSoW() -> string;
+		auto		GetSpelledProjectID() -> string;
+		auto		GetSpelledTotalHours() -> string;
+		auto		GetSpelledTotalDays() -> string;
+		auto		GetSpelledDayrate() -> string;
+		auto		GetSpelledTotalPayment() -> string;
+		auto		GetSpelledVAT() -> string;
+		auto		GetSpelledTotalPaymentNoVAT() -> string;
+		auto		GetSpelledSignature() -> string;
+		auto		GetSpelledInitials() -> string;
+		auto		GetSpelledPosition() -> string;
+		auto		GetSpelledDate() -> string;
+		auto		GetSpelledRur() -> string;
+		auto		GetSpelledKop() -> string;
 
 		auto		__HPDF_init() -> string;
 		auto		__HPDF_SetDocProps() -> string;
@@ -81,7 +95,7 @@ class C_Print_Timecard
 		auto		__HPDF_MoveTableLineDown() -> string			{ return __HPDF_MoveTableLineDown(__pdf_table_line_height); };
 		auto		__HPDF_MoveTableLineDown(int line_increment) -> string;
 		auto		__HPDF_SaveToFile() -> string;
-		auto		__HPDF_PrintText(string text, int x, int y) -> string;
+		auto		__HPDF_PrintText(string text, int x) -> string;
 		auto		__HPDF_DrawHorizontalLine() -> string;
 		auto		__HPDF_DrawTimecardHorizontalLine() -> string;
 		auto		__HPDF_DrawTimecardTitle() -> string;
@@ -89,6 +103,7 @@ class C_Print_Timecard
 		auto		__HPDF_DrawTimecardTableHeader() -> string;
 		auto		__HPDF_DrawTimecardTableBody() -> string;
 		auto		__HPDF_DrawTimecardTableFooter() -> string;
+		auto		__HPDF_DrawTimecardFooter() -> string;
 		auto		__HPDF_TableGetXOffset() -> HPDF_REAL;
 		auto		__HPDF_TableGetTitleWidth() -> HPDF_REAL;
 		auto		__HPDF_TableDaysGetXOffset() -> HPDF_REAL;

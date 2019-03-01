@@ -45,7 +45,7 @@ bool Test1()
 		cout << "failed on basic RUS alphabet" << endl;
 	}
 
-	if(CheckHTTPParam_Text(repeat(rus_alphabet, 150)).length() == CheckHTTPParam_Text(repeat(rus_alphabet, 350)).length()) {}
+	if(CheckHTTPParam_Text(repeat(rus_alphabet, 150)).length() == CheckHTTPParam_Text(repeat(rus_alphabet, 150)).length()) {}
 	else
 	{
 		result = false;
@@ -59,7 +59,7 @@ bool Test1()
 		cout << "failed on basic US alphabet" << endl;
 	}
 
-	if(CheckHTTPParam_Text(repeat(us_alphabet, 1501)).length() == CheckHTTPParam_Text(repeat(us_alphabet, 3501)).length()) {}
+	if(CheckHTTPParam_Text(repeat(us_alphabet, 350)).length() == CheckHTTPParam_Text(repeat(us_alphabet, 350)).length()) {}
 	else
 	{
 		result = false;

@@ -311,7 +311,7 @@ int main()
 								if(filesCounter  > 0) ostJSONResult << ",";
 								ostJSONResult << "{" << std::endl;
 								ostJSONResult << "\"result\": \"error\"," << std::endl;
-								ostJSONResult << "\"textStatus\": \"" << utf8_to_cp1251(gettext("wrong format")) << "\"," << std::endl;
+								ostJSONResult << "\"textStatus\": \"" << (gettext("wrong format")) << "\"," << std::endl;
 								ostJSONResult << "\"fileName\": \"" << indexPage.GetFilesHandler()->GetName(filesCounter) << "\" ," << std::endl;
 								ostJSONResult << "\"jqXHR\": \"\"" << std::endl;
 								ostJSONResult << "}" << std::endl;
@@ -333,7 +333,7 @@ int main()
 						ostJSONResult.str("");
 						ostJSONResult << "{" << std::endl;
 						ostJSONResult << "\"result\": \"error\"," << std::endl;
-						ostJSONResult << "\"textStatus\": \"" << utf8_to_cp1251(gettext("number uploaded images must be 1")) << "\"," << std::endl;
+						ostJSONResult << "\"textStatus\": \"" << (gettext("number uploaded images must be 1")) << "\"," << std::endl;
 						ostJSONResult << "\"fileName\": \"\" ," << std::endl;
 						ostJSONResult << "\"jqXHR\": \"\"" << std::endl;
 						ostJSONResult << "}" << std::endl;
@@ -349,7 +349,7 @@ int main()
 					ostJSONResult.str("");
 					ostJSONResult << "{";
 					ostJSONResult << "\"result\": \"error\",";
-					ostJSONResult << "\"textStatus\": \"" << utf8_to_cp1251(gettext("Access prohibited")) << "\",";
+					ostJSONResult << "\"textStatus\": \"" << (gettext("Access prohibited")) << "\",";
 					ostJSONResult << "\"fileName\": \"\" ,";
 					ostJSONResult << "\"jqXHR\": \"\"";
 					ostJSONResult << "}";
@@ -368,7 +368,7 @@ int main()
 				ost.str("");
 				ost << "{" << std::endl;
 				ost << "\"result\": \"error\"," << std::endl;
-				ost << "\"textStatus\": \"" << utf8_to_cp1251(gettext("mandatory parameter missed")) << "\"," << std::endl;
+				ost << "\"textStatus\": \"" << (gettext("mandatory parameter missed")) << "\"," << std::endl;
 				ost << "\"fileName\": \"\" ," << std::endl;
 				ost << "\"jqXHR\": \"\"" << std::endl;
 				ost << "}" << std::endl;

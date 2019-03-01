@@ -76,51 +76,19 @@ string CHTML::ExtractContentAttribute(string prefix, string postfix)
 		if(closeTagPos != string::npos)
 		{
 			result = headTag.substr(openTagPos, closeTagPos - openTagPos);
-
-			if(result.length())
-			{
-				unique_ptr<char[]>	tempSmartPointer(new char[result.length() * 4]);
-				char	*tmpMessage = tempSmartPointer.get();
-
-				memset(tmpMessage, 0, result.length() * 4);
-				if(convert_utf8_to_windows1251(result.c_str(), tmpMessage, result.length() * 4 - 1))
-				{
-					result = tmpMessage;
-				}
-				else
-				{
-					{
-						CLog			log;
-						ostringstream	ost;
-
-						ost.str("");
-				        ost << "CHTML::" << __func__ << "[" << __LINE__ << "]:" << ":converting utf8->cp1251 fail, most probably src string is non-UTF8";
-						log.Write(DEBUG, ost.str());
-					}
-				}
-			}
 		}
 		else
 		{
-			{
-				CLog	log;
-				log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]: close part not found");
-			}
+			MESSAGE_DEBUG("", "", "close part not found");
 		}
 
 	}
 	else
 	{
-		{
-			CLog	log;
-			log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]: open part not found");
-		}
+		MESSAGE_DEBUG("", "", "open part not found");
 	}
 
-	{
-		CLog	log;
-		log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]:end (return string with len()=" + to_string(result.length()) + ")");
-	}
+	MESSAGE_DEBUG("", "", "end (return string with len()=" + to_string(result.length()) + ")");
 
 	return result;
 }

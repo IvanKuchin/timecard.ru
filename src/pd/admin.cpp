@@ -371,15 +371,8 @@ int main()
 			}
 
 			ostResult.str("");
-			name = indexPage.GetVarsHandler()->Get("name");
-			value = indexPage.GetVarsHandler()->Get("value");
-			{
-				char			convertBuffer[1024];
-				
-				memset(convertBuffer, 0, sizeof(convertBuffer));
-				convert_utf8_to_windows1251(value.c_str(), convertBuffer, sizeof(convertBuffer));
-				value = ConvertTextToHTML(convertBuffer);
-			}
+			name = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("name"));
+			value = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("value"));
 
 			if(name.length() && value.length())
 			{
@@ -415,15 +408,8 @@ int main()
 				log.Write(DEBUG, __func__ + string("[") + to_string(__LINE__) + "]: act == AJAX_setBookComplainResolveComment: begin");
 			}
 
-			complainID = indexPage.GetVarsHandler()->Get("complainID");
-			resolveComment = indexPage.GetVarsHandler()->Get("resolveComment");
-			{
-				char			convertBuffer[1024];
-				
-				memset(convertBuffer, 0, sizeof(convertBuffer));
-				convert_utf8_to_windows1251(resolveComment.c_str(), convertBuffer, sizeof(convertBuffer));
-				resolveComment = ConvertTextToHTML(convertBuffer);
-			}
+			complainID = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("complainID"));
+			resolveComment = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("resolveComment"));
 
 			if(complainID.length() && resolveComment.length())
 			{
@@ -461,15 +447,8 @@ int main()
 				log.Write(DEBUG, __func__ + string("[") + to_string(__LINE__) + "]: act == AJAX_setComplainResolveComment: begin");
 			}
 
-			complainID = indexPage.GetVarsHandler()->Get("complainID");
-			resolveComment = indexPage.GetVarsHandler()->Get("resolveComment");
-			{
-				char			convertBuffer[1024];
-				
-				memset(convertBuffer, 0, sizeof(convertBuffer));
-				convert_utf8_to_windows1251(resolveComment.c_str(), convertBuffer, sizeof(convertBuffer));
-				resolveComment = ConvertTextToHTML(convertBuffer);
-			}
+			complainID = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("complainID"));
+			resolveComment = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("resolveComment"));
 
 			if(complainID.length() && resolveComment.length())
 			{

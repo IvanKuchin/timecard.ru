@@ -101,7 +101,7 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 		else
 		{
 			MESSAGE_ERROR("", "", "fail to create temp directory");
-			error_message = utf8_to_cp1251(gettext("fail to create temp directory"));
+			error_message = (gettext("fail to create temp directory"));
 		}
 	}
 
@@ -117,7 +117,7 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 			else
 			{
 				MESSAGE_ERROR("", "", "timecard_obj(" + timecard_id + ") is broken don't add it to the list");
-				error_message = utf8_to_cp1251(gettext("fail to craft timecard obj"));
+				error_message = (gettext("fail to craft timecard obj"));
 			}
 		}
 	}

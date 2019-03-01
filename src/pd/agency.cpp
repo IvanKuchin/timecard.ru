@@ -15,7 +15,7 @@ static string isTimecardsHavePSOWAssigned(const vector<string> &timecard_list, s
 			if(psow_id.empty())
 			{
 				MESSAGE_ERROR("", "", "timecard.id(" + timecard_id + ") have no PSoW associated");
-				error_message = utf8_to_cp1251(gettext("Some timecards have no PSoW associated"));
+				error_message = gettext("Some timecards have no PSoW associated");
 				break;
 			}
 		}
@@ -23,7 +23,7 @@ static string isTimecardsHavePSOWAssigned(const vector<string> &timecard_list, s
 	else
 	{
 		MESSAGE_ERROR("", "", "db is NULL");
-		error_message = utf8_to_cp1251(gettext("Data has not been initialized"));
+		error_message = gettext("Data has not been initialized");
 	}
 
 	MESSAGE_DEBUG("", "", "finish (error_message.length = " + to_string(error_message.length()) + ")");
@@ -50,21 +50,21 @@ static string isTimecardsBelongToAgency(const vector<string> &timecard_list, str
 				else
 				{
 					MESSAGE_ERROR("", "", "timecard.id(" + timecard_id + ") doesn't belongs to agency.id(" + agency_id + ")");
-					error_message = utf8_to_cp1251(gettext("Timecard doesn't belongs to agency"));
+					error_message = gettext("Timecard doesn't belongs to agency");
 					break;
 				}
 			}
 			else
 			{
 				MESSAGE_ERROR("", "", "timecard.id(" + timecard_id + ") doesn't exists");
-				error_message = utf8_to_cp1251(gettext("Timecard not found"));
+				error_message = gettext("Timecard not found");
 			}
 		}
 	}
 	else
 	{
 		MESSAGE_ERROR("", "", "db is NULL");
-		error_message = utf8_to_cp1251(gettext("Data has not been initialized"));
+		error_message = gettext("Data has not been initialized");
 	}
 
 	MESSAGE_DEBUG("", "", "finish (error_message.length = " + to_string(error_message.length()) + ")");
@@ -89,19 +89,19 @@ static string isAgencyEmployeeAllowedToChangeSoW(string sow_id, CMysql *db, CUse
 			else
 			{
 				MESSAGE_DEBUG("", "", "user(" + user->GetID() + ") have not rights to change SoW(" + sow_id + ")");
-				error_message = utf8_to_cp1251(gettext("You are not authorized"));
+				error_message = gettext("You are not authorized");
 			}
 		}
 		else
 		{
 			MESSAGE_ERROR("", "", "user(" + user->GetID() + ") is not an agency employee");
-			error_message = utf8_to_cp1251(gettext("You are not agency employee"));
+			error_message = gettext("You are not agency employee");
 		}
 	}
 	else
 	{
 		MESSAGE_ERROR("", "", "sow_id is empty");
-		error_message = utf8_to_cp1251(gettext("Data has not been initialized"));
+		error_message = gettext("Data has not been initialized");
 	}
 
 	MESSAGE_DEBUG("", "", "finish (result length is " + to_string(error_message.length()) + ")");
@@ -126,19 +126,19 @@ static string isAgencyEmployeeAllowedToChangeAgencyData(CMysql *db, CUser *user)
 			else
 			{
 				MESSAGE_DEBUG("", "", "user(" + user->GetID() + ") have no rights to change agency data");
-				error_message = utf8_to_cp1251(gettext("You are not authorized"));
+				error_message = gettext("You are not authorized");
 			}
 		}
 		else
 		{
 			MESSAGE_ERROR("", "", "user(" + user->GetID() + ") is not an agency employee");
-			error_message = utf8_to_cp1251(gettext("You are not agency employee"));
+			error_message = gettext("You are not agency employee");
 		}
 	}
 	else
 	{
 		MESSAGE_ERROR("", "", "db or user is NULL");
-		error_message = utf8_to_cp1251(gettext("Data has not been initialized"));
+		error_message = gettext("Data has not been initialized");
 	}
 
 	MESSAGE_DEBUG("", "", "finish (result length is " + to_string(error_message.length()) + ")");
@@ -536,25 +536,25 @@ static string	CheckNewValueByAction(string action, string id, string sow_id, str
 									}
 									else
 									{
-										error_message = utf8_to_cp1251(gettext("Subcontractor reported time on")) + " " + PrintDate(tm_timecard_report_date);
+										error_message = gettext("Subcontractor reported time on") + " "s + PrintDate(tm_timecard_report_date);
 										MESSAGE_DEBUG("", "", "Subcontractor reported time on " + PrintDate(tm_timecard_report_date) + " earlier than SoW start " + PrintDate(tm_start));
 									}
 								}
 								else
 								{
-									error_message = utf8_to_cp1251(gettext("SQL syntax issue"));
+									error_message = gettext("SQL syntax issue");
 									MESSAGE_ERROR("", "", "issue in SQL-syntax");
 								}
 							}
 							else
 							{
-								error_message = utf8_to_cp1251(gettext("period start have to precede period end")) + " (" + string_start + " - " +  string_end + ")";
+								error_message = gettext("period start have to precede period end") + " ("s + string_start + " - " +  string_end + ")";
 								MESSAGE_DEBUG("", "", "period start have to precede period end (" + string_start + " - " + string_end + ")");
 							}
 						}
 						else
 						{
-							error_message = utf8_to_cp1251(gettext("SQL syntax issue"));
+							error_message = gettext("SQL syntax issue");
 							MESSAGE_ERROR("", "", "issue in SQL-syntax");
 						}
 					}
@@ -583,25 +583,25 @@ static string	CheckNewValueByAction(string action, string id, string sow_id, str
 									}
 									else
 									{
-										error_message = utf8_to_cp1251(gettext("Subcontractor reported time on")) + " " + PrintDate(tm_timecard_report_date);
+										error_message = gettext("Subcontractor reported time on") + " "s + PrintDate(tm_timecard_report_date);
 										MESSAGE_DEBUG("", "", "Subcontractor reported time on " + PrintDate(tm_timecard_report_date) + " earlier than SoW start " + PrintDate(tm_start));
 									}
 								}
 								else
 								{
-									error_message = utf8_to_cp1251(gettext("SQL syntax issue"));
+									error_message = gettext("SQL syntax issue");
 									MESSAGE_ERROR("", "", "issue in SQL-syntax");
 								}
 							}
 							else
 							{
-								error_message = utf8_to_cp1251(gettext("period start have to precede period end")) + " (" + string_start + " - " +  string_end + ")";
+								error_message = gettext("period start have to precede period end") + " ("s + string_start + " - " +  string_end + ")";
 								MESSAGE_DEBUG("", "", "period start have to precede period end (" + string_start + " - " + string_end + ")");
 							}
 						}
 						else
 						{
-							error_message = utf8_to_cp1251(gettext("SQL syntax issue"));
+							error_message = gettext("SQL syntax issue");
 							MESSAGE_ERROR("", "", "issue in SQL-syntax");
 						}
 					}
@@ -626,7 +626,7 @@ static string	CheckNewValueByAction(string action, string id, string sow_id, str
 								char	buffer[50];
 								sprintf(buffer, ngettext("%d customers", "%d customers", counter), counter);
 
-								error_message = utf8_to_cp1251(gettext("cost center assigned")) + " " + utf8_to_cp1251(buffer) + ". " +  utf8_to_cp1251(gettext("removal prohibited"));
+								error_message = gettext("cost center assigned") + " "s + (buffer) + ". " +  gettext("removal prohibited");
 								MESSAGE_DEBUG("", "", "cost_center.id(" + id + ") assigned to " + to_string(counter) + " customers. Removal prohibited.");
 							}
 							else
@@ -636,7 +636,7 @@ static string	CheckNewValueByAction(string action, string id, string sow_id, str
 						}
 						else
 						{
-							error_message = utf8_to_cp1251(gettext("SQL syntax issue"));
+							error_message = gettext("SQL syntax issue");
 							MESSAGE_ERROR("", "", "issue in SQL-syntax");
 						}
 					}					
@@ -644,7 +644,7 @@ static string	CheckNewValueByAction(string action, string id, string sow_id, str
 					{
 						if(db->Query("SELECT `id` FROM `contracts_sow` WHERE `number`=\"" + new_value + "\" AND `id`!=\"" + sow_id + "\" AND `agency_company_id`=(SELECT `agency_company_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\");"))
 						{
-							error_message = utf8_to_cp1251(gettext("SoW number already exists"));
+							error_message = gettext("SoW number already exists");
 							MESSAGE_DEBUG("", "", "sow.number already exists in agency.id");
 						}
 						else
@@ -668,7 +668,7 @@ static string	CheckNewValueByAction(string action, string id, string sow_id, str
 					{
 						if(db->Query("SELECT `id` FROM `cost_centers` WHERE `title`=\"" + new_value + "\" AND `agency_company_id`=\"" + id + "\";"))
 						{
-							error_message = utf8_to_cp1251(gettext("cost center already exists"));
+							error_message = gettext("cost center already exists");
 							MESSAGE_DEBUG("", "", "cost_center with the same name already exists in agency.id(" + id + ")");
 						}
 						else
@@ -685,7 +685,7 @@ static string	CheckNewValueByAction(string action, string id, string sow_id, str
 						}
 						else
 						{
-							error_message = utf8_to_cp1251(gettext("cost center doesn't belongs to your company"));
+							error_message = gettext("cost center doesn't belongs to your company");
 							MESSAGE_DEBUG("", "", "cost center doesn't belongs to your company");
 						}
 					}
@@ -710,7 +710,7 @@ static string	CheckNewValueByAction(string action, string id, string sow_id, str
 							");"
 						))
 						{
-							error_message = "Расход " + new_value + " уже существует";
+							error_message = "Расход "s + new_value + " уже существует";
 							MESSAGE_DEBUG("", "", "BT expense template with same title already exists");
 						}
 					}
@@ -781,13 +781,13 @@ static string	CheckNewValueByAction(string action, string id, string sow_id, str
 							}
 							else
 							{
-								error_message = utf8_to_cp1251(gettext("period start have to precede period end")) + " (" + string_start + " - " +  string_end + ")";
+								error_message = gettext("period start have to precede period end") + " ("s + string_start + " - " +  string_end + ")";
 								MESSAGE_DEBUG("", "", "period start have to precede period end (" + string_start + " - " + string_end + ")");
 							}
 						}
 						else
 						{
-							error_message = utf8_to_cp1251(gettext("SQL syntax issue"));
+							error_message = gettext("SQL syntax issue");
 							MESSAGE_ERROR("", "", "issue in SQL-syntax");
 						}
 					}
@@ -809,13 +809,13 @@ static string	CheckNewValueByAction(string action, string id, string sow_id, str
 							}
 							else
 							{
-								error_message = utf8_to_cp1251(gettext("period start have to precede period end")) + " (" + string_start + " - " +  string_end + ")";
+								error_message = gettext("period start have to precede period end") + " ("s + string_start + " - " +  string_end + ")";
 								MESSAGE_DEBUG("", "", "period start have to precede period end (" + string_start + " - " + string_end + ")");
 							}
 						}
 						else
 						{
-							error_message = utf8_to_cp1251(gettext("SQL syntax issue"));
+							error_message = gettext("SQL syntax issue");
 							MESSAGE_ERROR("", "", "issue in SQL-syntax");
 						}
 					}
@@ -833,7 +833,7 @@ static string	CheckNewValueByAction(string action, string id, string sow_id, str
 					{
 						if(db->Query("SELECT `id` FROM `contracts_psow` WHERE `number`=\"" + new_value + "\" AND `id`!=\"" + sow_id + "\" AND `cost_center_id`=(SELECT `cost_center_id` FROM `contracts_psow` WHERE `id`=\"" + sow_id + "\");"))
 						{
-							error_message = utf8_to_cp1251(gettext("PSoW number already exists"));
+							error_message = gettext("PSoW number already exists");
 							MESSAGE_DEBUG("", "", "psow.number already exists in agency.id");
 						}
 						else
@@ -862,13 +862,13 @@ static string	CheckNewValueByAction(string action, string id, string sow_id, str
 							}
 							else
 							{
-								error_message = utf8_to_cp1251(gettext("period start have to precede period end")) + " (" + string_start + " - " +  string_end + ")";
+								error_message = gettext("period start have to precede period end") + " ("s + string_start + " - " +  string_end + ")";
 								MESSAGE_DEBUG("", "", "period start have to precede period end (" + string_start + " - " + string_end + ")");
 							}
 						}
 						else
 						{
-							error_message = utf8_to_cp1251(gettext("SQL syntax issue"));
+							error_message = gettext("SQL syntax issue");
 							MESSAGE_ERROR("", "", "issue in SQL-syntax");
 						}
 					}
@@ -890,13 +890,13 @@ static string	CheckNewValueByAction(string action, string id, string sow_id, str
 							}
 							else
 							{
-								error_message = utf8_to_cp1251(gettext("period start have to precede period end")) + " (" + string_start + " - " +  string_end + ")";
+								error_message = gettext("period start have to precede period end") + " ("s + string_start + " - " +  string_end + ")";
 								MESSAGE_DEBUG("", "", "period start have to precede period end (" + string_start + " - " + string_end + ")");
 							}
 						}
 						else
 						{
-							error_message = utf8_to_cp1251(gettext("SQL syntax issue"));
+							error_message = gettext("SQL syntax issue");
 							MESSAGE_ERROR("", "", "issue in SQL-syntax");
 						}
 					}
@@ -3768,13 +3768,13 @@ int main(void)
 									else
 									{
 										MESSAGE_ERROR("", action, "Can't define agency.id by user.id(" + user.GetID() + ")");
-										error_message = utf8_to_cp1251(gettext("You are not agency employee"));
+										error_message = gettext("You are not agency employee");
 									}
 								}
 								else
 								{
 									MESSAGE_ERROR("", action, "cost_center.id(" + cost_center_id + ") doesn't belongs to agance user(" + user.GetID() + ") employeed");
-									error_message = utf8_to_cp1251(gettext("You are not agency employee"));
+									error_message = gettext("You are not agency employee");
 								}
 							}
 							else
@@ -3785,19 +3785,19 @@ int main(void)
 						else
 						{
 							MESSAGE_ERROR("", action, "user(" + user.GetID() + ") is not an agency employee");
-							error_message = utf8_to_cp1251(gettext("You are not agency employee"));
+							error_message = gettext("You are not agency employee");
 						}
 					}
 					else
 					{
 						MESSAGE_ERROR("", action, "cost_center_id id is missed");
-						error_message = utf8_to_cp1251(gettext("mandatory parameter missed"));
+						error_message = gettext("mandatory parameter missed");
 					}
 				}
 				else
 				{
 					MESSAGE_ERROR("", action, "timecard list(" + timecard_list_param + ") is incorrect");
-					error_message = utf8_to_cp1251(gettext("Incorrect timecard list"));
+					error_message = gettext("Incorrect timecard list");
 				}
 
 				if(error_message.empty())

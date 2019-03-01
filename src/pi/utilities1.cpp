@@ -447,9 +447,7 @@ string CleanUPText(const string messageBody, bool removeBR/* = true*/)
 {
 	string	  result = messageBody;
 
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	result = DeleteHTML(result, removeBR);
 	result = ReplaceDoubleQuoteToQuote(result);
@@ -457,9 +455,7 @@ string CleanUPText(const string messageBody, bool removeBR/* = true*/)
 	result = RemoveSpecialSymbols(result);
 	trim(result);
 
-	{
-		MESSAGE_DEBUG("", "", "end");
-	}
+	MESSAGE_DEBUG("", "", "finish");
 
 	return result;
 }
@@ -523,18 +519,14 @@ string ConvertTextToHTML(const string &messageBody)
 {
 	string 		result = messageBody;
 
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	result = RemoveSpecialHTMLSymbols(result);
 	result = DeleteHTML(result);
 	result = ReplaceCRtoHTML(result);
 	trim(result);
 
-	{
-		MESSAGE_DEBUG("", "", "end ( result length = " + to_string(result.length()) + ")");
-	}
+	MESSAGE_DEBUG("", "", "finish ( result length = " + to_string(result.length()) + ")");
 
 	return result;
 }
@@ -563,33 +555,16 @@ auto ConvertHTMLToText(const string &src) -> string
 	return(wide_to_multibyte(ConvertHTMLToText(multibyte_to_wide(src))));
 }
 
-string CheckHTTPParam_Text(const string &srcText)
+auto CheckHTTPParam_Text(const string &srcText) -> string
 {
-	char	convertBuffer[16384];
-	string	result = "";
-
-	{
-		MESSAGE_DEBUG("", "", "start param(" + srcText + ")");
-	}
-
-	memset(convertBuffer, 0, sizeof(convertBuffer));
-	convert_utf8_to_windows1251(srcText.c_str(), convertBuffer, sizeof(convertBuffer) - 1);
-	result = ConvertTextToHTML(convertBuffer);
-
-	{
-		MESSAGE_DEBUG("", "", "end ( result length = " + to_string(result.length()) + ")");
-	}
-
-	return	result;
+	return	ConvertTextToHTML(srcText);
 }
 
 auto CheckHTTPParam_Number(const string &srcText) -> string
 {
 	auto	result = ""s;
 
-	{
-		MESSAGE_DEBUG("", "", "start param(" + srcText + ")");
-	}
+	MESSAGE_DEBUG("", "", "start param(" + srcText + ")");
 
 	if(srcText.length())
 	{
@@ -606,9 +581,7 @@ auto CheckHTTPParam_Number(const string &srcText) -> string
 		}
 	}
 
-	{
-		MESSAGE_DEBUG("", "", "end ( result length = " + to_string(result.length()) + ")");
-	}
+	MESSAGE_DEBUG("", "", "finish ( result length = " + to_string(result.length()) + ")");
 
 	return	result;
 }
@@ -636,7 +609,7 @@ string CheckHTTPParam_Float(const string &srcText)
 	}
 
 	{
-		MESSAGE_DEBUG("", "", "end ( result length = " + to_string(result.length()) + ")");
+		MESSAGE_DEBUG("", "", "finish ( result length = " + to_string(result.length()) + ")");
 	}
 
 	return	result;
@@ -704,7 +677,7 @@ string CheckHTTPParam_Date(const string &srcText)
 	}
 
 	{
-		MESSAGE_DEBUG("", "", "end (result length = " + to_string(result.length()) + ")");
+		MESSAGE_DEBUG("", "", "finish (result length = " + to_string(result.length()) + ")");
 	}
 
 	return	result;
@@ -712,21 +685,15 @@ string CheckHTTPParam_Date(const string &srcText)
 
 string CheckHTTPParam_Email(const string &srcText)
 {
-	char		convertBuffer[16384];
 	string		result = "";
 
     regex       positionRegex(".*([+-][[:digit:]]+\\.[[:digit:]]+)([+-][[:digit:]]+\\.[[:digit:]]+)([+-][[:digit:]]+\\.[[:digit:]]+).*");
     smatch      matchResult;
 
-	{
-		MESSAGE_DEBUG("", "", "start param(" + srcText + ")");
-	}
+	MESSAGE_DEBUG("", "", "start param(" + srcText + ")");
 
-	memset(convertBuffer, 0, sizeof(convertBuffer));
-	convert_utf8_to_windows1251(srcText.c_str(), convertBuffer, sizeof(convertBuffer) - 1);
-	result = ConvertTextToHTML(convertBuffer);
+	result = ConvertTextToHTML(srcText);
 
-//  if(regex_match(srcText, regex("^[[:alnum:]][._[:alnum:]]+[[:alnum:]]@[[:alnum:]][.-[:alnum:]]+[[:alnum:]].[[:alnum:]]{2,5}$") ))
 	if(regex_match(srcText, regex("^[._[:alnum:]]+@[[:alnum:]][\\-.[:alnum:]]*[[:alnum:]]\\.[[:alnum:]]{2,5}$") ))
     {
     	if(result.length() > 128)
@@ -741,16 +708,12 @@ string CheckHTTPParam_Email(const string &srcText)
     }
     else
     {
-		{
-			MESSAGE_DEBUG("", "", "email doesn't match regex " + result);
-		}
+		MESSAGE_DEBUG("", "", "email doesn't match regex " + result);
 
     	result = "";
     }
 
-	{
-		MESSAGE_DEBUG("", "", "end ( result length = " + to_string(result.length()) + ")");
-	}
+	MESSAGE_DEBUG("", "", "finish ( result length = " + to_string(result.length()) + ")");
 
 	return	result;
 }
@@ -1190,7 +1153,7 @@ NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, 
 D ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
  OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-int convert_utf8_to_windows1251_legacy(const char* utf8, char* windows1251, size_t n)
+int convert_utf8_to_windows1251(const char* utf8, char* windows1251, size_t n)
 {
 		unsigned int i = 0;
 		unsigned int j = 0;
@@ -1506,24 +1469,16 @@ NEXT_LETTER:
 		return 1;
 }
 
-int convert_utf8_to_windows1251(const char* utf8, char* windows1251, size_t n)
-{
-	strncpy(windows1251, utf8, n);
-
-	return 1;
-}
-
-// --- wrapper to convert_utf8_to_windows1251
 auto	utf8_to_cp1251(const string &src) -> string
 {
-	char	convertBuffer[1024];
+	char	convertBuffer[100 * 1024];
 	auto	result = 0;
 	
 	MESSAGE_DEBUG("", "", "start");
 
 	memset(convertBuffer, 0, sizeof(convertBuffer));
 
-	result = convert_utf8_to_windows1251(src.c_str(), convertBuffer, sizeof(convertBuffer));
+	result = convert_utf8_to_windows1251(src.c_str(), convertBuffer, sizeof(convertBuffer) - 1);
 
 	MESSAGE_DEBUG("", "", "finish (conversation result is " + to_string(result) + ")");
 
@@ -1602,7 +1557,7 @@ bool convert_cp1251_to_utf8(const char *in, char *out, int size)
 	}
 
 	{
-		MESSAGE_DEBUG("", "", "end");
+		MESSAGE_DEBUG("", "", "finish");
 	}
 	return result;
 }
@@ -1894,7 +1849,7 @@ string UniqueUserIDInUserIDLine(string userIDLine) //-> decltype(static_cast<str
 	}
 
 	{
-		MESSAGE_DEBUG("", "", "end (result " + result + ")");
+		MESSAGE_DEBUG("", "", "finish (result " + result + ")");
 	}
 
 	return result;
@@ -1951,7 +1906,7 @@ bool	isFilenameImage(string filename)
 	result = regex_search(filename, e1);
 
 	{
-		MESSAGE_DEBUG("", "", "end (result: " + (result ? "true" : "false") + ")");
+		MESSAGE_DEBUG("", "", "finish (result: " + (result ? "true" : "false") + ")");
 	}
 	return  result;
 }
@@ -1968,7 +1923,7 @@ bool	isFilenameVideo(string filename)
 	result = regex_search(filename, e1);
 
 	{
-		MESSAGE_DEBUG("", "", "end (result: " + (result ? "true" : "false") + ")");
+		MESSAGE_DEBUG("", "", "finish (result: " + (result ? "true" : "false") + ")");
 	}
 	return  result;
 }
@@ -3867,7 +3822,7 @@ string GetUnreadChatMessagesInJSONFormat(CUser *user, CMysql *db)
 	}
 
 	{
-		MESSAGE_DEBUG("", "", "end");
+		MESSAGE_DEBUG("", "", "finish");
 	}
 
 	return	result.str();
@@ -3954,7 +3909,7 @@ string GetMessageLikesUsersList(string messageID, CUser *user, CMysql *db)
 
 	{
 		CLog			log;
-		MESSAGE_DEBUG("", "", "end (returning string length " + to_string(result.length()) + ")");
+		MESSAGE_DEBUG("", "", "finish (returning string length " + to_string(result.length()) + ")");
 	}
 
 	return result;
@@ -3990,7 +3945,7 @@ string GetBookLikesUsersList(string usersBookID, CUser *user, CMysql *db)
 
 	{
 		CLog			log;
-		MESSAGE_DEBUG("", "", "end (returning string length " + to_string(result.length()) + ")");
+		MESSAGE_DEBUG("", "", "finish (returning string length " + to_string(result.length()) + ")");
 	}
 
 	return result;
@@ -4026,7 +3981,7 @@ string GetLanguageLikesUsersList(string usersLanguageID, CUser *user, CMysql *db
 
 	{
 		CLog			log;
-		MESSAGE_DEBUG("", "", "end (returning string length " + to_string(result.length()) + ")");
+		MESSAGE_DEBUG("", "", "finish (returning string length " + to_string(result.length()) + ")");
 	}
 
 	return result;
@@ -4062,7 +4017,7 @@ string GetCompanyLikesUsersList(string usersCompanyID, CUser *user, CMysql *db)
 
 	{
 		CLog			log;
-		MESSAGE_DEBUG("", "", "end (returning string length " + to_string(result.length()) + ")");
+		MESSAGE_DEBUG("", "", "finish (returning string length " + to_string(result.length()) + ")");
 	}
 
 	return result;
@@ -4098,7 +4053,7 @@ string GetCertificationLikesUsersList(string usersCertificationID, CUser *user, 
 
 	{
 		CLog			log;
-		MESSAGE_DEBUG("", "", "end (returning string length " + to_string(result.length()) + ")");
+		MESSAGE_DEBUG("", "", "finish (returning string length " + to_string(result.length()) + ")");
 	}
 
 	return result;
@@ -4134,7 +4089,7 @@ string GetCourseLikesUsersList(string usersCourseID, CUser *user, CMysql *db)
 
 	{
 		CLog			log;
-		MESSAGE_DEBUG("", "", "end (returning string length " + to_string(result.length()) + ")");
+		MESSAGE_DEBUG("", "", "finish (returning string length " + to_string(result.length()) + ")");
 	}
 
 	return result;
@@ -4176,7 +4131,7 @@ string GetCompanyPositionIDByTitle(string positionTitle, CMysql *db)
 
 	result = positionID;
 
-	MESSAGE_DEBUG("", "", "end (returning string length " + to_string(result.length()) + ")");
+	MESSAGE_DEBUG("", "", "finish (returning string length " + to_string(result.length()) + ")");
 
 	return result;
 }
@@ -4227,7 +4182,7 @@ string GetLanguageIDByTitle(string languageTitle, CMysql *db)
 
 	{
 		CLog			log;
-		MESSAGE_DEBUG("", "", "end (returning string length " + to_string(result.length()) + ")");
+		MESSAGE_DEBUG("", "", "finish (returning string length " + to_string(result.length()) + ")");
 	}
 
 
@@ -4280,7 +4235,7 @@ string GetSkillIDByTitle(string skillTitle, CMysql *db)
 
 	{
 		CLog			log;
-		MESSAGE_DEBUG("", "", "end (returning string length " + to_string(result.length()) + ")");
+		MESSAGE_DEBUG("", "", "finish (returning string length " + to_string(result.length()) + ")");
 	}
 
 	return result;
@@ -4363,7 +4318,7 @@ string GetGeoLocalityIDByCityAndRegion(string regionName, string cityName, CMysq
 
 	{
 		CLog			log;
-		MESSAGE_DEBUG("", "", "end (returning string length " + to_string(result.length()) + ")");
+		MESSAGE_DEBUG("", "", "finish (returning string length " + to_string(result.length()) + ")");
 	}
 
 	return result;
@@ -4399,7 +4354,7 @@ string GetUniversityDegreeLikesUsersList(string universityDegreeID, CUser *user,
 
 	{
 		CLog			log;
-		MESSAGE_DEBUG("", "", "end (returning string length " + to_string(result.length()) + ")");
+		MESSAGE_DEBUG("", "", "finish (returning string length " + to_string(result.length()) + ")");
 	}
 
 	return result;
@@ -4435,7 +4390,7 @@ string GetBookRatingUsersList(string bookID, CUser *user, CMysql *db)
 
 	{
 		CLog			log;
-		MESSAGE_DEBUG("", "", "end (returning string length " + to_string(result.length()) + ")");
+		MESSAGE_DEBUG("", "", "finish (returning string length " + to_string(result.length()) + ")");
 	}
 
 	return result;
@@ -4465,7 +4420,7 @@ string GetBookRatingList(string bookID, CMysql *db)
 
 	{
 		CLog			log;
-		MESSAGE_DEBUG("", "", "end (returning string length " + to_string(result.length()) + ")");
+		MESSAGE_DEBUG("", "", "finish (returning string length " + to_string(result.length()) + ")");
 	}
 
 	return result;
@@ -4495,7 +4450,7 @@ string GetCourseRatingList(string courseID, CMysql *db)
 
 	{
 		CLog			log;
-		MESSAGE_DEBUG("", "", "end (returning string length " + to_string(result.length()) + ")");
+		MESSAGE_DEBUG("", "", "finish (returning string length " + to_string(result.length()) + ")");
 	}
 
 	return result;
@@ -4520,7 +4475,7 @@ string GetMessageCommentsCount(string messageID, CMysql *db)
 	}
 
 	{
-		MESSAGE_DEBUG("", "", "end");
+		MESSAGE_DEBUG("", "", "finish");
 	}
 
 	return result;
@@ -4545,7 +4500,7 @@ string GetCompanyCommentsCount(string messageID, CMysql *db)
 	}
 
 	{
-		MESSAGE_DEBUG("", "", "end");
+		MESSAGE_DEBUG("", "", "finish");
 	}
 
 	return result;
@@ -4570,7 +4525,7 @@ string GetLanguageCommentsCount(string messageID, CMysql *db)
 	}
 
 	{
-		MESSAGE_DEBUG("", "", "end");
+		MESSAGE_DEBUG("", "", "finish");
 	}
 
 	return result;
@@ -4595,7 +4550,7 @@ string GetBookCommentsCount(string messageID, CMysql *db)
 	}
 
 	{
-		MESSAGE_DEBUG("", "", "end");
+		MESSAGE_DEBUG("", "", "finish");
 	}
 
 	return result;
@@ -4620,7 +4575,7 @@ string GetCertificateCommentsCount(string messageID, CMysql *db)
 	}
 
 	{
-		MESSAGE_DEBUG("", "", "end");
+		MESSAGE_DEBUG("", "", "finish");
 	}
 
 	return result;
@@ -4645,7 +4600,7 @@ string GetUniversityDegreeCommentsCount(string messageID, CMysql *db)
 	}
 
 	{
-		MESSAGE_DEBUG("", "", "end");
+		MESSAGE_DEBUG("", "", "finish");
 	}
 
 	return result;
@@ -4672,7 +4627,7 @@ string GetMessageSpam(string messageID, CMysql *db)
 	}
 
 	{
-		MESSAGE_DEBUG("", "", "end");
+		MESSAGE_DEBUG("", "", "finish");
 	}
 
 	return result;
@@ -4701,7 +4656,7 @@ string GetMessageSpamUser(string messageID, string userID, CMysql *db)
 
 
 	{
-		MESSAGE_DEBUG("", "", "end");
+		MESSAGE_DEBUG("", "", "finish");
 	}
 
 	return result;
@@ -4784,7 +4739,7 @@ bool isPersistenceRateLimited(string REMOTE_ADDR, CMysql *db)
 		result = false;
 	}
 
-	MESSAGE_DEBUG("", "", "end. "s + (result ? "rate-limit" : "no need rate-limit"))
+	MESSAGE_DEBUG("", "", "finish. "s + (result ? "rate-limit" : "no need rate-limit"))
 
 	return result;
 }

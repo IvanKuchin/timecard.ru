@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-20 04:51-0500\n"
+"POT-Creation-Date: 2019-03-01 06:32-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -59,32 +59,53 @@ msgstr "Центр Затрат: номер договора"
 msgid "Data has not been initialized"
 msgstr "Ошибка инициализации данных"
 
+msgid "Date"
+msgstr "Дата"
+
+msgid "Dayrate"
+msgstr "Ежедневный тариф"
+
 msgid "Employee data"
 msgstr "Данные сотрудника"
 
 msgid "Incorrect timecard list"
 msgstr "Некорректный список таймкарт"
 
+msgid "Initials"
+msgstr "Ф.И.О."
+
 msgid "PSoW"
-msgstr "PSoW"
+msgstr "ТЗ"
 
 msgid "PSoW number already exists"
-msgstr "PSoW с таким номером уже есть"
+msgstr "ТЗ с таким номером уже есть"
 
 msgid "PSoW: number"
-msgstr "PSoW: номер договора"
+msgstr "Номер ТЗ"
+
+msgid "Title"
+msgstr "Должность"
+
+msgid "Project ID"
+msgstr "Идентификационный номер проекта"
 
 msgid "SQL syntax issue"
 msgstr "Ошибка БД"
 
+msgid "Service report over period"
+msgstr "Отчет об оказанных услугах за период"
+
+msgid "Signature"
+msgstr "Подпись"
+
 msgid "SoW"
-msgstr "SoW"
+msgstr "Договор"
 
 msgid "SoW number already exists"
-msgstr "SoW с таким номером уже есть"
+msgstr "Договор с таким номером уже есть"
 
 msgid "SoW: number"
-msgstr "SoW: номер договора"
+msgstr "Номер договора"
 
 msgid "Some timecards have no PSoW associated"
 msgstr "У некоторых таймкарт не хватает PSoW-контракта"
@@ -100,6 +121,18 @@ msgstr "Таймкарта не принадлежит агенству"
 
 msgid "Timecard not found"
 msgstr "Таймкарта не найдена"
+
+msgid "Total days on duty"
+msgstr "Количество дней оказания услуг"
+
+msgid "Total hours on duty"
+msgstr "Количество часов оказания услуг"
+
+msgid "Total payment in reported timecard"
+msgstr "Стоимость услуг по настоящему отчету"
+
+msgid "VAT"
+msgstr "НДС"
 
 msgid "You are not agency employee"
 msgstr "Вы не сотрудник агенства"
@@ -155,6 +188,36 @@ msgstr "ошибка инициализации библиотеки libharu"
 msgid "from"
 msgstr "с"
 
+msgid "hpdf: fail save to file"
+msgstr "hpdf: не удалось сохранить фаил"
+
+msgid "hpdf: fail to add page"
+msgstr "hpdf: не удалось добавить страницу к фаилу"
+
+msgid "hpdf: fail to draw the line"
+msgstr "hpdf: не удалось нарисовать линию"
+
+msgid "hpdf: fail to draw timecard table body"
+msgstr "hpdf: не удалось нарисовать основную часть таймкарты"
+
+msgid "hpdf: fail to draw timecard table header"
+msgstr "hpdf: не удалось нарисовать заголовок таймкарты"
+
+msgid "hpdf: fail to print text"
+msgstr "hpdf: не удалось напечатать текст"
+
+msgid "hpdf: fail to print timecard footer"
+msgstr "hpdf: не удалось напечатать нижнюю часть таймкарты"
+
+msgid "hpdf: fail to print timecard title"
+msgstr "hpdf: не удалось напечатать заголовок таймкарты"
+
+msgid "hpdf: table top must be higher than bottom"
+msgstr "hpdf: верх таблицы должен быть выше чем нижняя часть"
+
+msgid "kop."
+msgstr "коп."
+
 msgid "mandatory parameter missed"
 msgstr "пропущен обязательный параметр"
 
@@ -179,17 +242,29 @@ msgstr "Нельзя удалить"
 msgid "removed"
 msgstr "удален"
 
+msgid "rur."
+msgstr "руб."
+
 msgid "sign date changed"
 msgstr "изменилась дата начала контракта"
 
 msgid "start date changed"
 msgstr "изменилась дата подписания контракта"
 
+msgid "till"
+msgstr "до"
+
 msgid "to"
 msgstr "на"
 
+msgid "up to"
+msgstr "по"
+
 msgid "updated"
 msgstr "изменен"
+
+msgid "w/o"
+msgstr "без"
 
 msgid "wrong format"
 msgstr "некорректный формат"

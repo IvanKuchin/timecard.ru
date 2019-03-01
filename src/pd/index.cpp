@@ -2235,49 +2235,20 @@ int main()
 			string			sessid, lookForKey;
 			string			user1, user2, handshakeUserStatus = "";
 			string			user1Data, user2Data, hopUserList;
-			char			*convertBuffer = new char[1024];
 			CMysql			db1;
 			vector<int>		vectorFriendList1, vectorFriendList2, vectorFriendList3;
 
-			{
-				
-				MESSAGE_DEBUG("", action, "start");
-			}
+			MESSAGE_DEBUG("", action, "start");
 
 			if(user.GetLogin() == "Guest")
 			{
-				ostringstream	ost;
-
-				{
-					
-					MESSAGE_DEBUG("", action, "re-login required");
-				}
+				MESSAGE_DEBUG("", action, "re-login required");
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
 			}
 
-			user1 = indexPage.GetVarsHandler()->Get("user1");
-			user2 = indexPage.GetVarsHandler()->Get("user2");
-
-			memset(convertBuffer, 0, 1024);
-			convert_utf8_to_windows1251(user1.c_str(), convertBuffer, 1024);
-			user1 = convertBuffer;
-			trim(user1);
-
-			delete[] convertBuffer;
-
-			// --- Clean-up the text
-			user1 = ReplaceDoubleQuoteToQuote(user1);
-			user1 = DeleteHTML(user1);
-			user1 = SymbolReplace(user1, "\r\n", "");
-			user1 = SymbolReplace(user1, "\r", "");
-			user1 = SymbolReplace(user1, "\n", "");
-			user2 = ReplaceDoubleQuoteToQuote(user2);
-			user2 = DeleteHTML(user2);
-			user2 = SymbolReplace(user2, "\r\n", "");
-			user2 = SymbolReplace(user2, "\r", "");
-			user2 = SymbolReplace(user2, "\n", "");
-
+			user1 = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("user1"));
+			user2 = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("user2"));
 
 			if(user1 != user2)
 			{
@@ -2397,13 +2368,9 @@ int main()
 		{
 			ostringstream	ost, ostFinal;
 			string			sessid, lookForKey, userList;
-			char			*convertBuffer;
 			CMysql			db1;
 
-			{
-				
-				MESSAGE_DEBUG("", action, "start");
-			}
+			MESSAGE_DEBUG("", action, "start");
 
 			if(user.GetLogin() == "Guest")
 			{
@@ -2428,15 +2395,7 @@ int main()
 			db1.Query("set names utf8;");
 #endif
 
-			lookForKey = indexPage.GetVarsHandler()->Get("lookForKey");
-
-			convertBuffer = new char[1024];
-			memset(convertBuffer, 0, 1024);
-			convert_utf8_to_windows1251(lookForKey.c_str(), convertBuffer, 1024);
-			lookForKey = convertBuffer;
-			trim(lookForKey);
-
-			delete[] convertBuffer;
+			lookForKey = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("lookForKey"));
 
 			// --- Clean-up the text
 			lookForKey = ReplaceDoubleQuoteToQuote(lookForKey);
@@ -2471,7 +2430,6 @@ int main()
 		{
 			ostringstream	ost, ostFinal;
 			string			sessid, lookForKey, userList;
-			char			*convertBuffer = new char[1024];
 			vector<string>	searchWords;
 
 			{
@@ -2482,37 +2440,10 @@ int main()
 			// --- Initialization
 			ostFinal.str("");
 
-/*			if(user.GetLogin() == "Guest")
-			{
-				ostringstream	ost;
-
-				{
-					
-					MESSAGE_DEBUG("", action, "re-login required");
-				}
-
-		        indexPage.RegisterVariableForce("result", "{\"status\":\"error\",\"description\":\"re-login required\",\"link\":\"/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10) + "\"}");
-			}
-			else
-*/
 			{
 
-				lookForKey = indexPage.GetVarsHandler()->Get("lookForKey");
+				lookForKey = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("lookForKey"));
 
-
-				memset(convertBuffer, 0, 1024);
-				convert_utf8_to_windows1251(lookForKey.c_str(), convertBuffer, 1024);
-				lookForKey = convertBuffer;
-				trim(lookForKey);
-
-				delete[] convertBuffer;
-
-				// --- Clean-up the text
-				lookForKey = ReplaceDoubleQuoteToQuote(lookForKey);
-				lookForKey = DeleteHTML(lookForKey);
-				lookForKey = SymbolReplace(lookForKey, "\r\n", "");
-				lookForKey = SymbolReplace(lookForKey, "\r", "");
-				lookForKey = SymbolReplace(lookForKey, "\n", "");
 				if(qw(lookForKey, searchWords))
 				{
 
@@ -2776,23 +2707,13 @@ int main()
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
 			}
 
-			lookForKey = indexPage.GetVarsHandler()->Get("lookForKey");
+			lookForKey = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("lookForKey"));
 
-			if(lookForKey.length() >= 2)
 			{
-				ostringstream   ost;
-				string		  tmpStr = "";
-				char			convertBuffer[1024];
+				auto			tmpStr = ""s;
+				auto			affected = db.Query("SELECT * FROM `company_industry` WHERE `name` LIKE \"%" + lookForKey + "%\" LIMIT 0, 20;");
 
-				memset(convertBuffer, 0, sizeof(convertBuffer));
-				convert_utf8_to_windows1251(lookForKey.c_str(), convertBuffer, sizeof(convertBuffer));
-				lookForKey = ConvertTextToHTML(convertBuffer);
-
-				// --- Looking through company name
-				ost.str("");
-				ost << "SELECT * FROM `company_industry` WHERE `name` LIKE \"%" << lookForKey << "%\";";
-
-				for(int i = 0; i < db.Query(ost.str()); ++i)
+				for(int i = 0; i < affected; ++i)
 				{
 					if(i) tmpStr += ",";
 					tmpStr += string("{\"id\":\"") + string(db.Get(i, "id")) + "\",";
@@ -2801,14 +2722,6 @@ int main()
 				// industriesList = GetCompanyListInJSONFormat(ost.str(), &db, &user);
 				ostFinal << "{\"status\":\"success\",\"industries\":[" << tmpStr << "]}";
 
-			}
-			else
-			{
-				{
-					
-					MESSAGE_DEBUG("", action, "searching key is empty or less than 2");
-				}
-				ostFinal << "{\"status\":\"error\",\"description\":\"searching key is empty or less then 2\", \"industries\":[]}";
 			}
 
 			indexPage.RegisterVariableForce("result", ostFinal.str());
@@ -3205,36 +3118,10 @@ int main()
 			}
 			else
 			{
-				char			*convertBuffer = new char[ 1024 * 1024];
+				message = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("message"));
+				toID = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("toID"));
 
-				message = indexPage.GetVarsHandler()->Get("message");
-				toID = indexPage.GetVarsHandler()->Get("toID");
-
-
-				// --- clean-up message parameter
-				// --- Convert FROM UTF-8 to cp1251
-				memset(convertBuffer, 0, 1024*1024);
-				convert_utf8_to_windows1251(message.c_str(), convertBuffer, 1024*1024-1);
-				message = convertBuffer;
-				delete[] convertBuffer;
-
-				message = ReplaceDoubleQuoteToQuote(message);
-				message = RemoveSpecialSymbols(message);
-				message = DeleteHTML(message);
-				message = SymbolReplace(message, "\r\n", "<br>");
-				message = SymbolReplace(message, "\r", "");
-				message = SymbolReplace(message, "\n", "<br>");
-				trim(message);
-
-				// --- clean-up recipient parameter
-				toID = ReplaceDoubleQuoteToQuote(toID);
-				toID = DeleteHTML(toID);
-				trim(toID);
-
-				{
-					
-					MESSAGE_DEBUG("", action, "message [" + message + "]");
-				}
+				MESSAGE_DEBUG("", action, "message [" + message + "]");
 
 				if(message.length() && toID.length())
 				{
@@ -3358,19 +3245,11 @@ int main()
 			ostringstream	ost, ostFinal;
 			string			messageID = "";
 
-			{
-				
-				MESSAGE_DEBUG("", action, "start");
-			}
+			MESSAGE_DEBUG("", action, "start");
 
 			if(user.GetLogin() == "Guest")
 			{
-				ostringstream	ost;
-
-				{
-					
-					MESSAGE_DEBUG("", action, "re-login required");
-				}
+				MESSAGE_DEBUG("", action, "re-login required");
 
 				indexPage.RegisterVariableForce("result", "{"
 															"\"result\":\"error\","
@@ -3380,34 +3259,11 @@ int main()
 			}
 			else
 			{
-				char			*convertBuffer = new char[ 1024 * 1024];
-
-				messageID = indexPage.GetVarsHandler()->Get("messageid");
-
-				// --- clean-up message parameter
-				// --- Convert FROM UTF-8 to cp1251
-				memset(convertBuffer, 0, 1024*1024);
-				convert_utf8_to_windows1251(messageID.c_str(), convertBuffer, 1024*1024-1);
-				messageID = convertBuffer;
-				delete[] convertBuffer;
-
-				messageID = ReplaceDoubleQuoteToQuote(messageID);
-				messageID = RemoveSpecialSymbols(messageID);
-				messageID = DeleteHTML(messageID);
-				messageID = SymbolReplace(messageID, "\r\n", "<br>");
-				messageID = SymbolReplace(messageID, "\r", "");
-				messageID = SymbolReplace(messageID, "\n", "<br>");
-				trim(messageID);
-
-				MESSAGE_DEBUG("", action, "message [" + messageID + "]");
+				messageID = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("messageid"));
 
 				if(messageID.length())
 				{
-					ost.str("");
-					ost << "UPDATE `chat_messages` SET `messageStatus`=\"read\" \
-							WHERE `toID`='" << user.GetID() << "' and `id`='" << messageID << "';";
-
-					db.Query(ost.str());
+					db.Query("UPDATE `chat_messages` SET `messageStatus`=\"read\" WHERE `toID`='" + user.GetID() + "' and `id`='" + messageID + "';");
 
 					{
 						ostFinal.str("");
@@ -3416,9 +3272,8 @@ int main()
 				}
 				else
 				{
-					{
-						MESSAGE_ERROR("", action, "messageID is empty");
-					}
+					MESSAGE_ERROR("", action, "messageID is empty");
+
 					ostFinal.str("");
 					ostFinal << "\"result\": \"error\"," << std::endl;
 					ostFinal << "\"description\": \"messageID is empty\"" << std::endl;
@@ -3445,18 +3300,11 @@ int main()
 			ostringstream	ost, ostFinal;
 			string			notificationID = "";
 
-			{
-				
-				MESSAGE_DEBUG("", action, "start");
-			}
+			MESSAGE_DEBUG("", action, "start");
 
 			if(user.GetLogin() == "Guest")
 			{
-				ostringstream	ost;
-
-				{
-					MESSAGE_ERROR("", action, "re-login required");
-				}
+				MESSAGE_ERROR("", action, "re-login required");
 
 				indexPage.RegisterVariableForce("result", "{"
 															"\"result\":\"error\","
@@ -3466,34 +3314,11 @@ int main()
 			}
 			else
 			{
-				char			*convertBuffer = new char[ 1024 * 1024];
-
-				notificationID = indexPage.GetVarsHandler()->Get("notificationID");
-
-				// --- clean-up message parameter
-				// --- Convert FROM UTF-8 to cp1251
-				memset(convertBuffer, 0, 1024*1024);
-				convert_utf8_to_windows1251(notificationID.c_str(), convertBuffer, 1024*1024-1);
-				notificationID = convertBuffer;
-				delete[] convertBuffer;
-
-				notificationID = ReplaceDoubleQuoteToQuote(notificationID);
-				notificationID = RemoveSpecialSymbols(notificationID);
-				notificationID = DeleteHTML(notificationID);
-				notificationID = SymbolReplace(notificationID, "\r\n", "<br>");
-				notificationID = SymbolReplace(notificationID, "\r", "");
-				notificationID = SymbolReplace(notificationID, "\n", "<br>");
-				trim(notificationID);
-
-				MESSAGE_DEBUG("", action, "message [" + notificationID + "]");
+				notificationID = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("notificationID"));
 
 				if(notificationID.length())
 				{
-					ost.str("");
-					ost << "UPDATE `users_notification` SET `notificationStatus`=\"read\" \
-							WHERE `userId`='" << user.GetID() << "' and `id`='" << notificationID << "';";
-
-					db.Query(ost.str());
+					db.Query("UPDATE `users_notification` SET `notificationStatus`=\"read\" WHERE `userId`='" + user.GetID() + "' and `id`='" + notificationID + "';");
 
 					if(!db.isError())
 					{
@@ -3541,19 +3366,11 @@ int main()
 			ostringstream	ost, ostFinal;
 			string			userID = "";
 
-			{
-				
-				MESSAGE_DEBUG("", action, "start");
-			}
+			MESSAGE_DEBUG("", action, "start");
 
 			if(user.GetLogin() == "Guest")
 			{
-				ostringstream	ost;
-
-				{
-					
-					MESSAGE_DEBUG("", action, "re-login required");
-				}
+				MESSAGE_DEBUG("", action, "re-login required");
 
 				indexPage.RegisterVariableForce("result", "{"
 															"\"result\":\"error\","
@@ -3563,29 +3380,7 @@ int main()
 			}
 			else
 			{
-				char			*convertBuffer = new char[ 1024 * 1024];
-
-				userID = indexPage.GetVarsHandler()->Get("userID");
-
-				// --- clean-up message parameter
-				// --- Convert FROM UTF-8 to cp1251
-				memset(convertBuffer, 0, 1024*1024);
-				convert_utf8_to_windows1251(userID.c_str(), convertBuffer, 1024*1024-1);
-				userID = convertBuffer;
-				delete[] convertBuffer;
-
-				userID = ReplaceDoubleQuoteToQuote(userID);
-				userID = RemoveSpecialSymbols(userID);
-				userID = DeleteHTML(userID);
-				userID = SymbolReplace(userID, "\r\n", "<br>");
-				userID = SymbolReplace(userID, "\r", "");
-				userID = SymbolReplace(userID, "\n", "<br>");
-				trim(userID);
-
-				{
-					
-					MESSAGE_DEBUG("", action, "message [" + userID + "]");
-				}
+				userID = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("userID"));
 
 				if(userID.length())
 				{
@@ -3620,10 +3415,7 @@ int main()
 				throw CException("Template file was missing");
 			}
 
-			{
-				
-				MESSAGE_DEBUG("", action, "finish");
-			}
+			MESSAGE_DEBUG("", action, "finish");
 		}
 
 
@@ -3634,10 +3426,7 @@ int main()
 
 			if(user.GetLogin() == "Guest")
 			{
-				{
-					
-					MESSAGE_DEBUG("", action, "re-login required");
-				}
+				MESSAGE_DEBUG("", action, "re-login required");
 
 				indexPage.RegisterVariableForce("result", "{"
 															"\"result\":\"error\","
@@ -3686,12 +3475,7 @@ int main()
 
 			if(user.GetLogin() == "Guest")
 			{
-				ostringstream	ost;
-
-				{
-					
-					MESSAGE_DEBUG("", action, "re-login required");
-				}
+				MESSAGE_DEBUG("", action, "re-login required");
 
 				indexPage.RegisterVariableForce("result", "{"
 															"\"result\":\"error\","
@@ -3729,11 +3513,7 @@ int main()
 
 			if(user.GetLogin() == "Guest")
 			{
-				ostringstream	ost;
-
-				{
-					MESSAGE_DEBUG("", action, "" + action + ": re-login required");
-				}
+				MESSAGE_DEBUG("", action, "" + action + ": re-login required");
 
 				indexPage.RegisterVariableForce("result", "{"
 															"\"result\":\"error\","
@@ -3744,8 +3524,8 @@ int main()
 			else
 			{
 
-				messageID = indexPage.GetVarsHandler()->Get("messageID");
-				imageTempSet = indexPage.GetVarsHandler()->Get("imageTempSet");
+				messageID = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("messageID"));
+				imageTempSet = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("imageTempSet"));
 
 				if((messageID.length() > 0) and (messageID != "0") and (imageTempSet.length() > 0) and (imageTempSet != "0"))
 				{
@@ -4715,35 +4495,9 @@ int main()
 			}
 			else
 			{
-				// --- "new" used due to possibility of drop "standard exception"
-				char			*convertBuffer = new char[ 1024 * 1024];
-
-				// --- This line will not be reached in case of error in memory allocation
-				// --- To avoid throw std exception use char *a = new(std::nothrow) char[ 0x7FFFFFFF ];
-				if(!convertBuffer)
-				{
-					MESSAGE_ERROR("", action, "can't allocate memory");
-				}
-
 				// --- Authorized user
 				newPassword = indexPage.GetVarsHandler()->Get("password");
-
-				// --- Convert FROM UTF-8 to cp1251
-				memset(convertBuffer, 0, 1024*1024);
-				convert_utf8_to_windows1251(newPassword.c_str(), convertBuffer, 1024*1024-1);
-				newPassword = convertBuffer;
-				cleanedPassword = newPassword;
-
-				trim(cleanedPassword);
-
-				delete[] convertBuffer;
-
-				// --- Clean-up the text
-				cleanedPassword = ReplaceDoubleQuoteToQuote(cleanedPassword);
-				cleanedPassword = DeleteHTML(cleanedPassword);
-				cleanedPassword = SymbolReplace(cleanedPassword, "\r\n", "<br>");
-				cleanedPassword = SymbolReplace(cleanedPassword, "\r", "<br>");
-				cleanedPassword = SymbolReplace(cleanedPassword, "\n", "<br>");
+				cleanedPassword = CheckHTTPParam_Text(newPassword);
 
 				if(cleanedPassword != newPassword)
 				{
@@ -6289,28 +6043,18 @@ int main()
 			string			site_theme_id;
 			string			geo_locality_id, city = "";
 			string			appliedVacanciesRender = "";
-			char			convertBuffer[1024];
 
 
 /*
 			if(user.GetLogin() == "Guest")
 			{
-				ostringstream	ost;
-
-				{
-					
-					MESSAGE_DEBUG("", action, "re-login required");
-				}
+				MESSAGE_DEBUG("", action, "re-login required");
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
 			}
 */
 
-			userID = indexPage.GetVarsHandler()->Get("id");
-
-			memset(convertBuffer, 0, sizeof(convertBuffer));
-			convert_utf8_to_windows1251(userID.c_str(), convertBuffer, sizeof(convertBuffer));
-			userID = ConvertTextToHTML(convertBuffer);
+			userID = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
 
 			if(!userID.length())
 			{
@@ -6591,55 +6335,36 @@ int main()
 			string			firstName;
 			ostringstream	ostFinal;
 
-			{
-				
-				MESSAGE_DEBUG("", action, "start");
-			}
+			MESSAGE_DEBUG("", action, "start");
 
 			if(user.GetLogin() == "Guest")
 			{
-				ostringstream	ost;
-
-				{
-					
-					MESSAGE_DEBUG("", action, "re-login required");
-				}
+				MESSAGE_DEBUG("", action, "re-login required");
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
 			}
 
-			firstName = indexPage.GetVarsHandler()->Get("value");
+			firstName = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("value"));
+
 			ostFinal.str("");
 
 			if((firstName.length() > 0))
 			{
 				ostringstream	ost;
-				char			firstName_cp1251_char[1024];
-				string			firstName_cp1251;
-
-				memset(firstName_cp1251_char, 0, sizeof(firstName_cp1251_char));
-				convert_utf8_to_windows1251(firstName.c_str(), firstName_cp1251_char, sizeof(firstName_cp1251_char));
-				firstName_cp1251 = firstName_cp1251_char;
-				trim(firstName_cp1251);
-				firstName_cp1251 = ReplaceDoubleQuoteToQuote(firstName_cp1251);
 
 				{
 					CLog	log;
 					ostringstream	ost;
 
 					ost.str("");
-					ost << string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": name [" << firstName_cp1251 << "]";
+					ost << string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": name [" << firstName << "]";
 					log.Write(DEBUG, ost.str());
 				}
 
-				ost.str("");
-				ost << "update `users` set `name`=\"" << firstName_cp1251 << "\" , `sex`=\"" << AutodetectSexByName(firstName_cp1251, &db) << "\"  WHERE `id`=\"" << user.GetID() << "\";";
-				db.Query(ost.str());
+				db.Query("update `users` set `name`=\"" + firstName + "\" , `sex`=\"" + AutodetectSexByName(firstName, &db) + "\"  WHERE `id`=\"" + user.GetID() + "\";");
 
 				// --- Update live feed
-				ost.str("");
-				ost << "INSERT INTO `feed` (`title`, `userId`, `actionTypeId`, `actionId`, `eventTimestamp`) values(\"\",\"" << user.GetID() << "\", \"5\", \"0\", NOW())";
-				if(db.InsertQuery(ost.str()))
+				if(db.InsertQuery("INSERT INTO `feed` (`title`, `userId`, `actionTypeId`, `actionId`, `eventTimestamp`) values(\"\",\"" + user.GetID() + "\", \"5\", \"0\", NOW())"))
 				{
 					ostFinal.str("");
 					ostFinal << "{" << std::endl;
@@ -6732,54 +6457,23 @@ int main()
 			string			lastName;
 			ostringstream	ostFinal;
 
-			{
-				
-				MESSAGE_DEBUG("", action, "start");
-			}
+			MESSAGE_DEBUG("", action, "start");
 
 			if(user.GetLogin() == "Guest")
 			{
-				ostringstream	ost;
-
-				{
-					
-					MESSAGE_DEBUG("", action, "re-login required");
-				}
+				MESSAGE_DEBUG("", action, "re-login required");
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
 			}
 
-			lastName = indexPage.GetVarsHandler()->Get("value");
+			lastName = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("value"));
 
 			if((lastName.length() > 0))
 			{
-				ostringstream	ost;
-				char			lastName_cp1251_char[1024];
-				string			lastName_cp1251;
-
-				memset(lastName_cp1251_char, 0, sizeof(lastName_cp1251_char));
-				convert_utf8_to_windows1251(lastName.c_str(), lastName_cp1251_char, sizeof(lastName_cp1251_char));
-				lastName_cp1251 = lastName_cp1251_char;
-				trim(lastName_cp1251);
-				lastName_cp1251 = ReplaceDoubleQuoteToQuote(lastName_cp1251);
-
-				{
-					CLog	log;
-					ostringstream	ost;
-
-					ost.str("");
-					ost << string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": name [" << lastName_cp1251 << "]";
-					log.Write(DEBUG, ost.str());
-				}
-
-				ost.str("");
-				ost << "update users set `nameLast`=\"" << lastName_cp1251 << "\" WHERE `id`='" << user.GetID() << "'";
-				db.Query(ost.str());
+				db.Query("update users set `nameLast`=\"" + lastName + "\" WHERE `id`='" + user.GetID() + "'");
 
 				// --- Update live feed
-				ost.str("");
-				ost << "INSERT INTO `feed` (`title`, `userId`, `actionTypeId`, `actionId`, `eventTimestamp`) values(\"\",\"" << user.GetID() << "\", \"4\", \"0\", NOW())";
-				if(db.InsertQuery(ost.str()))
+				if(db.InsertQuery("INSERT INTO `feed` (`title`, `userId`, `actionTypeId`, `actionId`, `eventTimestamp`) values(\"\",\"" + user.GetID() + "\", \"4\", \"0\", NOW())"))
 				{
 					ostFinal.str("");
 					ostFinal << "{" << std::endl;
@@ -6789,15 +6483,7 @@ int main()
 				}
 				else
 				{
-
-					{
-						CLog			log;
-						ostringstream	ostTmp;
-
-						ostTmp.str("");
-						ostTmp << string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": inserting into DB (" << ost.str() << ")";
-						log.Write(ERROR, ostTmp.str());
-					}
+					MESSAGE_ERROR("", "", "fail insert to DB");
 
 					ostFinal.str("");
 					ostFinal << "{" << std::endl;
@@ -6808,22 +6494,9 @@ int main()
 			}
 			else
 			{
-				ostringstream	ost;
-				{
-					CLog	log;
-					ost.str("");
-					ost << string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": lastName [" << lastName << "] is empty";
-					log.Write(DEBUG, ost.str());
-				}
+				db.Query("update users set `nameLast`=\"\" WHERE `id`='" + user.GetID() + "'");
 
-				ost.str("");
-				ost << "update users set `nameLast`=\"\" WHERE `id`='" << user.GetID() << "'";
-				db.Query(ost.str());
-
-				// --- Update live feed
-				ost.str("");
-				ost << "INSERT INTO `feed` (`title`, `userId`, `actionTypeId`, `actionId`, `eventTimestamp`) values(\"\",\"" << user.GetID() << "\", \"7\", \"0\", NOW())";
-				if(db.InsertQuery(ost.str()))
+				if(db.InsertQuery("INSERT INTO `feed` (`title`, `userId`, `actionTypeId`, `actionId`, `eventTimestamp`) values(\"\",\"" + user.GetID() + "\", \"7\", \"0\", NOW())"))
 				{
 					ostFinal.str("");
 					ostFinal << "{" << std::endl;
@@ -6833,15 +6506,7 @@ int main()
 				}
 				else
 				{
-
-					{
-						CLog			log;
-						ostringstream	ostTmp;
-
-						ostTmp.str("");
-						ostTmp << string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": inserting into DB (" << ost.str() << ")";
-						log.Write(ERROR, ostTmp.str());
-					}
+					MESSAGE_ERROR("", "", "fail insert to DB");
 
 					ostFinal.str("");
 					ostFinal << "{" << std::endl;
@@ -6872,132 +6537,49 @@ int main()
 			ostringstream	ostFinal;
 			string			firstName, lastName;
 
-			{
-				
-				MESSAGE_DEBUG("", action, "start");
-			}
+			MESSAGE_DEBUG("", action, "start");
 
 			if(user.GetLogin() == "Guest")
 			{
-				ostringstream	ost;
-
-				{
-					
-					MESSAGE_DEBUG("", action, "re-login required");
-				}
+				MESSAGE_DEBUG("", action, "re-login required");
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
 			}
 
-			firstName = indexPage.GetVarsHandler()->Get("firstName");
-			lastName = indexPage.GetVarsHandler()->Get("lastName");
+			firstName = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("firstName"));
+			lastName = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("lastName"));
 
 			if((lastName.length() > 0))
 			{
-				ostringstream	ost;
-				char			lastName_cp1251_char[1024];
-				string			lastName_cp1251;
+				db.Query("update users set `nameLast`=\"" + lastName + "\" WHERE `id`='" + user.GetID() + "'");
 
-				memset(lastName_cp1251_char, 0, sizeof(lastName_cp1251_char));
-				convert_utf8_to_windows1251(lastName.c_str(), lastName_cp1251_char, sizeof(lastName_cp1251_char));
-				lastName_cp1251 = lastName_cp1251_char;
-				trim(lastName_cp1251);
-				lastName_cp1251 = ReplaceDoubleQuoteToQuote(lastName_cp1251);
-
-				{
-					CLog	log;
-					ostringstream	ost;
-
-					ost.str("");
-					ost << string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": name [" << lastName_cp1251 << "]";
-					log.Write(DEBUG, ost.str());
-				}
-
-				ost.str("");
-				ost << "update users set `nameLast`=\"" << lastName_cp1251 << "\" WHERE `id`='" << user.GetID() << "'";
-				db.Query(ost.str());
-
-				// --- Update live feed
-				ost.str("");
-				ost << "INSERT INTO `feed` (`title`, `userId`, `actionTypeId`, `actionId`, `eventTimestamp`) values(\"\",\"" << user.GetID() << "\", \"4\", \"0\", NOW())";
-				if(db.InsertQuery(ost.str()))
+				if(db.InsertQuery("INSERT INTO `feed` (`title`, `userId`, `actionTypeId`, `actionId`, `eventTimestamp`) values(\"\",\"" + user.GetID() + "\", \"4\", \"0\", NOW())"))
 				{
 				}
 				else
 				{
-					{
-						CLog			log;
-						ostringstream	ostTmp;
-
-						ostTmp.str("");
-						ostTmp << string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": inserting into DB (" << ost.str() << ")";
-						log.Write(ERROR, ostTmp.str());
-					}
+					MESSAGE_ERROR("", "", "fail insert to DB");
 				}
 			}
 			else
 			{
-				ostringstream	ost;
-				{
-					CLog	log;
-					ost.str("");
-					ost << string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": lastName [" << lastName << "] is empty";
-					log.Write(DEBUG, ost.str());
-				}
+				db.Query("update users set `nameLast`=\"\" WHERE `id`='" + user.GetID() + "'");
 
-				ost.str("");
-				ost << "update users set `nameLast`=\"\" WHERE `id`='" << user.GetID() << "'";
-				db.Query(ost.str());
-
-				// --- Update live feed
-				ost.str("");
-				ost << "INSERT INTO `feed` (`title`, `userId`, `actionTypeId`, `actionId`, `eventTimestamp`) values(\"\",\"" << user.GetID() << "\", \"7\", \"0\", NOW())";
-				if(db.InsertQuery(ost.str()))
+				if(db.InsertQuery("INSERT INTO `feed` (`title`, `userId`, `actionTypeId`, `actionId`, `eventTimestamp`) values(\"\",\"" + user.GetID() + "\", \"7\", \"0\", NOW())"))
 				{
 				}
 				else
 				{
-					{
-						CLog			log;
-						ostringstream	ostTmp;
-
-						ostTmp.str("");
-						ostTmp << string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": inserting into DB (" << ost.str() << ")";
-						log.Write(ERROR, ostTmp.str());
-					}
+					MESSAGE_ERROR("", "", "fail insert to DB");
 				}
 
 			}
 
 			if((firstName.length() > 0))
 			{
-				ostringstream	ost;
-				char			firstName_cp1251_char[1024];
-				string			firstName_cp1251;
+				db.Query("update `users` set `name`=\"" + firstName + "\", `sex`=\"" + AutodetectSexByName(firstName, &db) + "\" WHERE `id`='" + user.GetID() + "'");
 
-				memset(firstName_cp1251_char, 0, sizeof(firstName_cp1251_char));
-				convert_utf8_to_windows1251(firstName.c_str(), firstName_cp1251_char, sizeof(firstName_cp1251_char));
-				firstName_cp1251 = firstName_cp1251_char;
-				trim(firstName_cp1251);
-				firstName_cp1251 = ReplaceDoubleQuoteToQuote(firstName_cp1251);
-
-				{
-					CLog	log;
-					ostringstream	ost;
-
-					ost.str("");
-					ost << string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": name [" << firstName_cp1251 << "]";
-					log.Write(DEBUG, ost.str());
-				}
-
-				ost.str("");
-				ost << "update `users` set `name`=\"" << firstName_cp1251 << "\", `sex`=\"" << AutodetectSexByName(firstName_cp1251, &db) << "\" WHERE `id`='" << user.GetID() << "'";
-				db.Query(ost.str());
-
-				// --- Update live feed
-				ost.str("");
-				ost << "INSERT INTO `feed` (`title`, `userId`, `actionTypeId`, `actionId`, `eventTimestamp`) values(\"\",\"" << user.GetID() << "\", \"5\", \"0\", NOW())";
-				if(db.InsertQuery(ost.str()))
+				if(db.InsertQuery("INSERT INTO `feed` (`title`, `userId`, `actionTypeId`, `actionId`, `eventTimestamp`) values(\"\",\"" + user.GetID() + "\", \"5\", \"0\", NOW())"))
 				{
 					ostFinal.str("");
 					ostFinal << "{" << std::endl;
@@ -7008,14 +6590,7 @@ int main()
 				else
 				{
 
-					{
-						CLog			log;
-						ostringstream	ostTmp;
-
-						ostTmp.str("");
-						ostTmp << string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": inserting into DB (" << ost.str() << ")";
-						log.Write(ERROR, ostTmp.str());
-					}
+					MESSAGE_ERROR("", "", "fail insert to DB");
 
 					ostFinal.str("");
 					ostFinal << "{" << std::endl;
@@ -7026,22 +6601,9 @@ int main()
 			}
 			else
 			{
-				ostringstream	ost;
-				{
-					CLog	log;
-					ost.str("");
-					ost << string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": firstName [" << firstName << "] is empty";
-					log.Write(DEBUG, ost.str());
-				}
+				db.Query("update `users` set `name`=\"\" WHERE `id`='" + user.GetID() + "'");
 
-				ost.str("");
-				ost << "update `users` set `name`=\"\" WHERE `id`='" << user.GetID() << "'";
-				db.Query(ost.str());
-
-				// --- Update live feed
-				ost.str("");
-				ost << "INSERT INTO `feed` (`title`, `userId`, `actionTypeId`, `actionId`, `eventTimestamp`) values(\"\",\"" << user.GetID() << "\", \"6\", \"0\", NOW())";
-				if(db.InsertQuery(ost.str()))
+				if(db.InsertQuery("INSERT INTO `feed` (`title`, `userId`, `actionTypeId`, `actionId`, `eventTimestamp`) values(\"\",\"" + user.GetID() + "\", \"6\", \"0\", NOW())"))
 				{
 					ostFinal.str("");
 					ostFinal << "{" << std::endl;
@@ -7051,15 +6613,7 @@ int main()
 				}
 				else
 				{
-
-					{
-						CLog			log;
-						ostringstream	ostTmp;
-
-						ostTmp.str("");
-						ostTmp << string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": inserting into DB (" << ost.str() << ")";
-						log.Write(ERROR, ostTmp.str());
-					}
+					MESSAGE_ERROR("", "", "fail insert to DB");
 
 					ostFinal.str("");
 					ostFinal << "{" << std::endl;
@@ -7079,10 +6633,7 @@ int main()
 				throw CException("Template file was missing");
 			}
 
-			{
-				
-				MESSAGE_DEBUG("", action, "finish");
-			}
+			MESSAGE_DEBUG("", action, "finish");
 		}
 
 		// --- AJAX_updateActiveAvatar
@@ -7091,52 +6642,22 @@ int main()
 			string			avatarID, companyId;
 			ostringstream	ostFinal;
 
-			{
-				MESSAGE_DEBUG("", action, "start");
-			}
+			MESSAGE_DEBUG("", action, "start");
 
 			if(user.GetLogin() == "Guest")
 			{
-				ostringstream	ost;
-
-				{
-					
-					MESSAGE_DEBUG("", action, "re-login required");
-				}
+				MESSAGE_DEBUG("", action, "re-login required");
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
 			}
 
-			avatarID = indexPage.GetVarsHandler()->Get("id");
+			avatarID = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
 
 			if((avatarID.length() > 0))
 			{
-				ostringstream	ost;
-				char			avatarID_cp1251_char[1024];
-				string			avatarID_cp1251;
-
-				memset(avatarID_cp1251_char, 0, sizeof(avatarID_cp1251_char));
-				convert_utf8_to_windows1251(avatarID.c_str(), avatarID_cp1251_char, sizeof(avatarID_cp1251_char));
-				avatarID_cp1251 = avatarID_cp1251_char;
-				trim(avatarID_cp1251);
-				avatarID_cp1251 = ReplaceDoubleQuoteToQuote(avatarID_cp1251);
-
-				{
-					CLog	log;
-					ostringstream	ost;
-
-					ost.str("");
-					ost << string(__func__) + "[" + to_string(__LINE__) + "]" + action + ": new avatar id [" << avatarID_cp1251 << "]";
-					log.Write(DEBUG, ost.str());
-				}
-
 				db.Query("update `users_avatars` set `isActive`=\"0\" WHERE `userid`='" + user.GetID() + "';");
-				db.Query("update `users_avatars` set `isActive`=\"1\" WHERE `id`=\"" + avatarID_cp1251 + "\" and `userid`=\"" + user.GetID() + "\";");
-
-				// --- Update live feed
-				ost.str("");
-				ost << "INSERT INTO `feed` (`title`, `userId`, `actionTypeId`, `actionId`, `eventTimestamp`) values(\"\",\"" << user.GetID() << "\", \"8\", \"" << avatarID_cp1251 << "\", NOW())";
-				db.Query(ost.str());
+				db.Query("update `users_avatars` set `isActive`=\"1\" WHERE `id`=\"" + avatarID + "\" and `userid`=\"" + user.GetID() + "\";");
+				db.Query("INSERT INTO `feed` (`title`, `userId`, `actionTypeId`, `actionId`, `eventTimestamp`) values(\"\",\"" + user.GetID() + "\", \"8\", \"" + avatarID + "\", NOW())");
 
 				ostFinal.str("");
 				ostFinal << "{" << std::endl;
@@ -7145,9 +6666,7 @@ int main()
 			}
 			else
 			{
-				{
-					MESSAGE_ERROR("", action, "required html parameter avatarID is empty");
-				}
+				MESSAGE_ERROR("", action, "required html parameter avatarID is empty");
 
 				ostFinal.str("");
 				ostFinal << "{" << std::endl;
@@ -7165,9 +6684,7 @@ int main()
 				throw CException("Template file was missing");
 			}
 
-			{
-				MESSAGE_DEBUG("", action, "" + action + ": finish");
-			}
+			MESSAGE_DEBUG("", action, "" + action + ": finish");
 		}
 
 		if(action == "AJAX_updateSiteTheme")

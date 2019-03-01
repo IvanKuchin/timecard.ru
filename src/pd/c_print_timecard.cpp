@@ -17,6 +17,15 @@ C_Print_Timecard::C_Print_Timecard()
 
 	if(__pdf)
 	{
+		try
+		{
+			__pdf_font_name =  HPDF_LoadType1FontFromFile (__pdf, (PDF_FONT_INSTALL_DIR + "/type1/a010013l.afm").c_str(), (PDF_FONT_INSTALL_DIR + "/type1/a010013l.pfb").c_str());
+		}
+		catch(...)
+		{
+			MESSAGE_ERROR("", "", "HPDF trown exception");
+		}
+
 	}
 	else
 	{
@@ -24,6 +33,86 @@ C_Print_Timecard::C_Print_Timecard()
 	}
 
 	MESSAGE_DEBUG("", "", "start");
+}
+
+auto	C_Print_Timecard::GetSpelledTitle() -> string
+{
+	auto			start_spelling_date = GetSpellingFormattedDate(timecard.GetDateStart(), "%d %b %G");
+	auto			finish_spelling_date = GetSpellingFormattedDate(timecard.GetDateFinish(), "%d %b %G");
+
+	return gettext("Service report over period") + " "s + gettext("from") + " " + start_spelling_date + " " + gettext("up to") + " " + finish_spelling_date;
+}
+
+auto	C_Print_Timecard::GetSpelledPSoW() -> string
+{
+	auto			sign_spelling_date = GetSpellingFormattedDate(timecard.GetDateSign(), "%d %b %G");
+
+	return gettext("PSoW") + " №"s + timecard.GetAgreementNumber() + " " + gettext("agreement from") + " " + sign_spelling_date;
+}
+
+auto	C_Print_Timecard::GetSpelledProjectID() -> string
+{
+	return timecard.GetProjectNumber().length() ? gettext("Project ID") + ": "s + timecard.GetProjectNumber() : "";
+}
+
+auto	C_Print_Timecard::GetSpelledTotalHours() -> string
+{
+	return gettext("Total hours on duty") + ": "s;
+}
+
+auto	C_Print_Timecard::GetSpelledTotalDays() -> string
+{
+	return gettext("Total days on duty") + ": "s;
+}
+
+auto	C_Print_Timecard::GetSpelledDayrate() -> string
+{
+	return gettext("Dayrate") + ": "s;
+}
+
+auto	C_Print_Timecard::GetSpelledTotalPayment() -> string
+{
+	return gettext("Total payment in reported timecard") + ": "s;
+}
+
+auto	C_Print_Timecard::GetSpelledVAT() -> string
+{
+	return gettext("VAT") + ": "s;
+}
+
+auto	C_Print_Timecard::GetSpelledTotalPaymentNoVAT() -> string
+{
+	return gettext("Total payment in reported timecard") + " "s + gettext("w/o") + " " + gettext("VAT") + ": ";
+}
+
+auto	C_Print_Timecard::GetSpelledSignature() -> string
+{
+	return gettext("Signature") + ":_________________________________"s;
+}
+
+auto	C_Print_Timecard::GetSpelledInitials() -> string
+{
+	return gettext("Initials") + ": _________________________________"s;
+}
+
+auto	C_Print_Timecard::GetSpelledPosition() -> string
+{
+	return gettext("Title") + ": _______________________________"s;
+}
+
+auto	C_Print_Timecard::GetSpelledDate() -> string
+{
+	return gettext("Date") + ": ____________________________________"s;
+}
+
+auto	C_Print_Timecard::GetSpelledRur() -> string
+{
+	return gettext("rur.");
+}
+
+auto	C_Print_Timecard::GetSpelledKop() -> string
+{
+	return gettext("kop.");
 }
 
 auto	C_Print_Timecard::isDaySummaryStruct_Filled() -> bool
@@ -127,15 +216,6 @@ auto	C_Print_Timecard::AssignValuesToDaySummaryStruct() -> bool
 	return result;
 }
 
-auto	C_Print_Timecard::GetSpelledTitle() -> string
-{
-	auto			start_spelling_date = GetSpellingFormattedDate(timecard.GetDateStart(), "%d %b %G");
-	auto			finish_spelling_date = GetSpellingFormattedDate(timecard.GetDateFinish(), "%d %b %G");
-
-	return "Отчет об оказанных услугах за период с " + start_spelling_date + " по " + finish_spelling_date;
-}
-
-
 auto	C_Print_Timecard::PrintAsXLS() -> string
 {
 	auto	error_message = ""s;
@@ -167,6 +247,25 @@ auto	C_Print_Timecard::PrintAsXLS() -> string
 
 	if(good2go)
 	{
+		// --- after instantiation libxl-object locale switch over to wide-byte string representation
+		// --- gettext is not working properly with multibyte strings, therefore all gettext constants
+		// --- must be defined before libxl-instantiation
+		auto	spelled_title				= multibyte_to_wide(GetSpelledTitle());
+		auto	spelled_psow				= multibyte_to_wide(GetSpelledPSoW());
+		auto	spelled_projectid			= multibyte_to_wide(GetSpelledProjectID());
+		auto	spelled_totalhours			= multibyte_to_wide(GetSpelledTotalHours());
+		auto	spelled_totaldays			= multibyte_to_wide(GetSpelledTotalDays());
+		auto	spelled_dayrate				= multibyte_to_wide(GetSpelledDayrate());
+		auto	spelled_totalpayment		= multibyte_to_wide(GetSpelledTotalPayment());
+		auto	spelled_vat					= multibyte_to_wide(GetSpelledVAT());
+		auto	spelled_totalpaymentnovat	= multibyte_to_wide(GetSpelledTotalPaymentNoVAT());
+		auto	spelled_signature			= multibyte_to_wide(GetSpelledSignature());
+		auto	spelled_initials			= multibyte_to_wide(GetSpelledInitials());
+		auto	spelled_position			= multibyte_to_wide(GetSpelledPosition());
+		auto	spelled_date				= multibyte_to_wide(GetSpelledDate());
+		auto	spelled_rur					= multibyte_to_wide(GetSpelledRur());
+		auto	spelled_kop					= multibyte_to_wide(GetSpelledKop());
+
 		libxl::Book* book = xlCreateBook();
 		if(book)
 		{
@@ -183,9 +282,6 @@ auto	C_Print_Timecard::PrintAsXLS() -> string
 				auto			font_summary_right = book->addFont();
 				auto			start_spelling_date = multibyte_to_wide(GetSpellingFormattedDate(timecard.GetDateStart(), "%d %b %G"));
 				auto			finish_spelling_date = multibyte_to_wide(GetSpellingFormattedDate(timecard.GetDateFinish(), "%d %b %G"));
-				auto			title = multibyte_to_wide(GetSpelledTitle());
-				auto			psow_title = L"ТЗ №" + multibyte_to_wide(timecard.GetAgreementNumber()) + L" от " + multibyte_to_wide(GetSpellingFormattedDate(timecard.GetDateSign(), "%d %b %G"));
-				auto			project_title = L""s;
 				auto			timecard_lines = timecard.GetTimecardLines();
 				auto			row_counter = 6;
 				auto			column_counter = 0;
@@ -214,9 +310,6 @@ auto	C_Print_Timecard::PrintAsXLS() -> string
 
 				format_number_d2->setNumFormat(libxl::NUMFORMAT_NUMBER_D2);
 
-				if(timecard.GetProjectNumber().length())
-					project_title = L"Идентификационный номер проекта: " + multibyte_to_wide(timecard.GetProjectNumber());
-
 				// --- print proerties
 				sheet->setPaper(libxl::PAPER_A4);
 				sheet->setLandscape();
@@ -226,9 +319,9 @@ auto	C_Print_Timecard::PrintAsXLS() -> string
 				sheet->setCol(1, 1, 45);
 				sheet->setCol(2, 31 + 2, 5);
 
-				sheet->writeStr(2, 2, title.c_str());
-				sheet->writeStr(3, 1, psow_title.c_str());
-				sheet->writeStr(4, 1, project_title.c_str());
+				sheet->writeStr(2, 2, spelled_title.c_str());
+				sheet->writeStr(3, 1, spelled_psow.c_str());
+				sheet->writeStr(4, 1, spelled_projectid.c_str());
 
 				// --- table header
 				column_counter = 0;
@@ -244,11 +337,11 @@ auto	C_Print_Timecard::PrintAsXLS() -> string
 				// --- table body
 				for(auto &timcard_line: timecard_lines)
 				{
-					wstring		timcard_line_title = multibyte_to_wide(timcard_line.customer) + L" / " + multibyte_to_wide(timcard_line.project) + L" / " + multibyte_to_wide(timcard_line.task);
+					wstring		timecard_line_title = multibyte_to_wide(timcard_line.customer + TIMECARD_ENTRY_TITLE_SEPARATOR + timcard_line.project + TIMECARD_ENTRY_TITLE_SEPARATOR + timcard_line.task);
 					wstring		timcard_line_hours = multibyte_to_wide(timcard_line.hours);
 					auto		time_entries = SplitTimeentry(timcard_line.hours);
 
-					sheet->writeStr(row_counter, 1, timcard_line_title.c_str(), format_title);
+					sheet->writeStr(row_counter, 1, timecard_line_title.c_str(), format_title);
 
 					if(time_entries.size())
 					{
@@ -301,7 +394,7 @@ auto	C_Print_Timecard::PrintAsXLS() -> string
 				}
 
 				{
-					sheet->writeStr(row_counter, 1, L"Количество часов оказания услуг:");
+					sheet->writeStr(row_counter, 1, spelled_totalhours.c_str());
 					sheet->setMerge(row_counter, row_counter, 3, 5);
 					sheet->writeNum(row_counter, 3, double(GetEffortHours()), format_number_d2);
 
@@ -309,7 +402,7 @@ auto	C_Print_Timecard::PrintAsXLS() -> string
 				}
 
 				{
-					sheet->writeStr(row_counter, 1, L"Количество дней оказания услуг:");
+					sheet->writeStr(row_counter, 1, spelled_totaldays.c_str());
 					sheet->setMerge(row_counter, row_counter, 3, 5);
 					sheet->writeNum(row_counter, 3, double(GetEffortDays()), format_number_d2);
 					
@@ -319,12 +412,12 @@ auto	C_Print_Timecard::PrintAsXLS() -> string
 				{
 					auto		temp = timecard.GetDayrate();
 
-					sheet->writeStr(row_counter, 1, L"Ежедневный тариф: ");
+					sheet->writeStr(row_counter, 1, spelled_dayrate.c_str());
 					sheet->setMerge(row_counter, row_counter, 3, 5);
 					sheet->writeNum(row_counter, 3, temp.GetWhole());
-					sheet->writeStr(row_counter, 6, L"руб.");
+					sheet->writeStr(row_counter, 6, spelled_rur.c_str());
 					sheet->writeNum(row_counter, 7, temp.GetFraction());
-					sheet->writeStr(row_counter, 8, L"коп.");
+					sheet->writeStr(row_counter, 8, spelled_kop.c_str());
 
 					row_counter++;
 				}
@@ -332,12 +425,12 @@ auto	C_Print_Timecard::PrintAsXLS() -> string
 				{
 					auto		temp = GetEffortCost();
 
-					sheet->writeStr(row_counter, 1, L"Стоимость услуг по настоящему отчету составляет");
+					sheet->writeStr(row_counter, 1, spelled_totalpayment.c_str());
 					sheet->setMerge(row_counter, row_counter, 3, 5);
 					sheet->writeNum(row_counter, 3, temp.GetWhole());
-					sheet->writeStr(row_counter, 6, L"руб.");
+					sheet->writeStr(row_counter, 6, spelled_rur.c_str());
 					sheet->writeNum(row_counter, 7, temp.GetFraction());
-					sheet->writeStr(row_counter, 8, L"коп.");
+					sheet->writeStr(row_counter, 8, spelled_kop.c_str());
 					
 					row_counter++;
 				}
@@ -345,12 +438,12 @@ auto	C_Print_Timecard::PrintAsXLS() -> string
 				{
 					auto	vat = GetEffortCostVAT();
 
-					sheet->writeStr(row_counter, 1, L"НДС:");
+					sheet->writeStr(row_counter, 1, spelled_vat.c_str());
 					sheet->setMerge(row_counter, row_counter, 3, 5);
 					sheet->writeNum(row_counter, 3, vat.GetWhole());
-					sheet->writeStr(row_counter, 6, L"руб.");
+					sheet->writeStr(row_counter, 6, spelled_rur.c_str());
 					sheet->writeNum(row_counter, 7, vat.GetFraction());
-					sheet->writeStr(row_counter, 8, L"коп.");
+					sheet->writeStr(row_counter, 8, spelled_kop.c_str());
 					
 					row_counter++;
 				}
@@ -358,52 +451,56 @@ auto	C_Print_Timecard::PrintAsXLS() -> string
 				{
 					auto	temp = GetTotalPayment();
 
-					sheet->writeStr(row_counter, 1, (L"Итого за период с "s + start_spelling_date + L" по " + finish_spelling_date + L": ").c_str());
+					sheet->writeStr(row_counter, 1, spelled_totalpaymentnovat.c_str());
 					sheet->setMerge(row_counter, row_counter, 3, 5);
 					sheet->writeNum(row_counter, 3, temp.GetWhole());
-					sheet->writeStr(row_counter, 6, L"руб.");
+					sheet->writeStr(row_counter, 6, spelled_rur.c_str());
 					sheet->writeNum(row_counter, 7, temp.GetFraction());
-					sheet->writeStr(row_counter, 8, L"коп.");
+					sheet->writeStr(row_counter, 8, spelled_kop.c_str());
 					
 					row_counter++;
 				}
 
-				{
-					row_counter++;
-				}
+				row_counter++;
+				row_counter++;
 
 				{
 					sheet->writeStr(row_counter, 1, multibyte_to_wide(timecard.GetSignatureTitle1()).c_str());
-					sheet->writeStr(row_counter, 3, multibyte_to_wide(timecard.GetSignatureTitle2()).c_str());
+					sheet->writeStr(row_counter, 9, multibyte_to_wide(timecard.GetSignatureTitle2()).c_str());
 
+					row_counter++;
 					row_counter++;
 				}
 
 				{
-					sheet->writeStr(row_counter, 1, L"By/ Подпись:_________________________________");
-					sheet->writeStr(row_counter, 3, L"By/ Подпись:_________________________________");
+					sheet->writeStr(row_counter, 1, spelled_signature.c_str());
+					sheet->writeStr(row_counter, 9, spelled_signature.c_str());
 
+					row_counter++;
 					row_counter++;
 				}
 
 				{
-					sheet->writeStr(row_counter, 1, L"Name/ Ф. И. О.:_______________________________");
-					sheet->writeStr(row_counter, 3, L"Name/ Ф. И. О.:_______________________________");
+					sheet->writeStr(row_counter, 1, spelled_initials.c_str());
+					sheet->writeStr(row_counter, 9, spelled_initials.c_str());
 
+					row_counter++;
 					row_counter++;
 				}
 
 				{
-					sheet->writeStr(row_counter, 1, L"Title/ Должность:______________________________");
-					sheet->writeStr(row_counter, 3, L"Title/ Должность:______________________________");
+					sheet->writeStr(row_counter, 1, spelled_position.c_str());
+					sheet->writeStr(row_counter, 9, spelled_position.c_str());
 
+					row_counter++;
 					row_counter++;
 				}
 
 				{
-					sheet->writeStr(row_counter, 1, L"Date/ Дата:___________________________________");
-					sheet->writeStr(row_counter, 3, L"Date/ Дата:___________________________________");
+					sheet->writeStr(row_counter, 1, spelled_date.c_str());
+					sheet->writeStr(row_counter, 9, spelled_date.c_str());
 
+					row_counter++;
 					row_counter++;
 				}
 
@@ -467,7 +564,6 @@ auto	C_Print_Timecard::__HPDF_SetDocProps() -> string
 		HPDF_SetPageMode (__pdf, HPDF_PAGE_MODE_USE_OUTLINE);
 
 		__pdf_line = -1;
-		__pdf_font_name =  HPDF_LoadType1FontFromFile (__pdf, (PDF_FONT_INSTALL_DIR + "/type1/a010013l.afm").c_str(), (PDF_FONT_INSTALL_DIR + "/type1/a010013l.pfb").c_str());
 	    __pdf_font = HPDF_GetFont(__pdf, __pdf_font_name.c_str(), "CP1251");
 
 	    __pdf_font_descent = HPDF_Font_GetDescent(__pdf_font) * HPDF_TIMECARD_FONT_SIZE / 1000;
@@ -725,7 +821,7 @@ auto	C_Print_Timecard::__HPDF_DrawHorizontalLine() -> string
 	return error_message;
 }
 
-auto	C_Print_Timecard::__HPDF_PrintText(string text, int x, int y) -> string
+auto	C_Print_Timecard::__HPDF_PrintText(string text, int x) -> string
 {
 	auto	error_message = ""s;
 
@@ -733,19 +829,14 @@ auto	C_Print_Timecard::__HPDF_PrintText(string text, int x, int y) -> string
 
 	try
 	{
-		HPDF_REAL	width;
-
 		HPDF_Page_BeginText (__pdf_page);
-		HPDF_Page_SetFontAndSize (__pdf_page, __pdf_font, 20);
-		HPDF_Page_MoveTextPos (__pdf_page, x, y);
-		HPDF_Page_ShowText (__pdf_page, (text + " " + GetFilename()).c_str());
-		HPDF_Page_MoveTextPos (__pdf_page, 0, - 50);
-		width = HPDF_Page_TextWidth(__pdf_page, (text + " " + GetFilename()).c_str());
+		HPDF_Page_SetFontAndSize (__pdf_page, __pdf_font, HPDF_TIMECARD_FONT_SIZE);
+		HPDF_Page_TextRect (__pdf_page, x, __pdf_line + __pdf_font_height, __pdf_page_width - HPDF_FIELD_RIGHT, __pdf_line, (utf8_to_cp1251(text)).c_str(), HPDF_TALIGN_LEFT, NULL);
 		HPDF_Page_EndText (__pdf_page);
 	}
 	catch(...)
 	{
-		MESSAGE_ERROR("", "", "hpdf: fail to print text");
+		MESSAGE_ERROR("", "", "hpdf: fail to print timecard title");
 		error_message = gettext("hpdf: fail to print text");
 	}
 
@@ -791,68 +882,6 @@ auto	C_Print_Timecard::__HPDF_TableDaysGetXOffset() -> HPDF_REAL
 	MESSAGE_DEBUG("", "", "finish");
 
 	return result;
-}
-
-auto	C_Print_Timecard::__HPDF_DrawTimecardTitle() -> string
-{
-	auto	error_message = ""s;
-
-	MESSAGE_DEBUG("", "", "start");
-
-	try
-	{
-		if((error_message = __HPDF_MoveLineDown()).empty())
-		{
-			HPDF_Page_BeginText (__pdf_page);
-			HPDF_Page_SetFontAndSize (__pdf_page, __pdf_font, HPDF_TIMECARD_FONT_SIZE);
-			HPDF_Page_TextRect (__pdf_page, __HPDF_TableDaysGetXOffset(), __pdf_line + __pdf_font_height, __pdf_page_width - __HPDF_TableDaysGetXOffset() - HPDF_FIELD_RIGHT, __pdf_line, (utf8_to_cp1251(GetSpelledTitle())).c_str(), HPDF_TALIGN_LEFT, NULL);
-			HPDF_Page_EndText (__pdf_page);
-
-			HPDF_Page_Rectangle (__pdf_page, __HPDF_TableDaysGetXOffset(), __pdf_line, __pdf_page_width - __HPDF_TableDaysGetXOffset() - HPDF_FIELD_RIGHT, __pdf_font_height);
-			MESSAGE_DEBUG("", "", "msg ---- "s + GetSpelledTitle());
-			MESSAGE_DEBUG("", "", "msg ---- "s + utf8_to_cp1251(GetSpelledTitle()));
-
-			HPDF_Page_Stroke (__pdf_page);
-			
-			if((error_message = __HPDF_MoveLineDown()).empty())
-			{
-				HPDF_Page_BeginText (__pdf_page);
-				HPDF_Page_SetFontAndSize (__pdf_page, __pdf_font, HPDF_TIMECARD_FONT_SIZE);
-				HPDF_Page_TextRect (__pdf_page, __HPDF_TableGetXOffset(), __pdf_line + __pdf_font_height, __pdf_page_width - __HPDF_TableGetXOffset() - HPDF_FIELD_RIGHT, __pdf_line, ("--------[second line]-------"s).c_str(), HPDF_TALIGN_LEFT, NULL);
-				HPDF_Page_EndText (__pdf_page);
-
-				if((error_message = __HPDF_MoveLineDown()).empty())
-				{
-					HPDF_Page_BeginText (__pdf_page);
-					HPDF_Page_SetFontAndSize (__pdf_page, __pdf_font, HPDF_TIMECARD_FONT_SIZE);
-					HPDF_Page_TextRect (__pdf_page, __HPDF_TableGetXOffset(), __pdf_line + __pdf_font_height, __pdf_page_width - __HPDF_TableGetXOffset() - HPDF_FIELD_RIGHT, __pdf_line, ("--------[3-rd line]q-G-h-g-l-|-||||||-"s).c_str(), HPDF_TALIGN_LEFT, NULL);
-					HPDF_Page_EndText (__pdf_page);
-				}
-				else
-				{
-					MESSAGE_ERROR("", "", "hpdf: fail to move line down");
-				}
-			}
-			else
-			{
-				MESSAGE_ERROR("", "", "hpdf: fail to move line down");
-			}
-		}
-		else
-		{
-			MESSAGE_ERROR("", "", "hpdf: fail to move line down");
-		}
-
-	}
-	catch(...)
-	{
-		MESSAGE_ERROR("", "", "hpdf: fail to print timecard title");
-		error_message = gettext("hpdf: fail to print timecard title");
-	}
-
-	MESSAGE_DEBUG("", "", "finish");
-
-	return error_message;
 }
 
 auto	C_Print_Timecard::GetNumberOfDaysInTimecard() -> int
@@ -956,6 +985,62 @@ auto	C_Print_Timecard::__HPDF_PaintDay(int day_number, double red, double green,
 	return error_message;
 }
 
+auto	C_Print_Timecard::__HPDF_DrawTimecardTitle() -> string
+{
+	auto	error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	try
+	{
+		if((error_message = __HPDF_MoveLineDown()).empty())
+		{
+			HPDF_Page_BeginText (__pdf_page);
+			HPDF_Page_SetFontAndSize (__pdf_page, __pdf_font, HPDF_TIMECARD_FONT_SIZE);
+			HPDF_Page_TextRect (__pdf_page, __HPDF_TableDaysGetXOffset(), __pdf_line + __pdf_font_height, __pdf_page_width - HPDF_FIELD_RIGHT, __pdf_line, (utf8_to_cp1251(GetSpelledTitle())).c_str(), HPDF_TALIGN_LEFT, NULL);
+			HPDF_Page_EndText (__pdf_page);
+
+			if((error_message = __HPDF_MoveLineDown()).empty())
+			{
+				HPDF_Page_BeginText (__pdf_page);
+				HPDF_Page_SetFontAndSize (__pdf_page, __pdf_font, HPDF_TIMECARD_FONT_SIZE);
+				HPDF_Page_TextRect (__pdf_page, __HPDF_TableGetXOffset(), __pdf_line + __pdf_font_height, __pdf_page_width - __HPDF_TableGetXOffset() - HPDF_FIELD_RIGHT, __pdf_line, (utf8_to_cp1251(GetSpelledPSoW())).c_str(), HPDF_TALIGN_LEFT, NULL);
+				HPDF_Page_EndText (__pdf_page);
+
+				if((error_message = __HPDF_MoveLineDown()).empty())
+				{
+					HPDF_Page_BeginText (__pdf_page);
+					HPDF_Page_SetFontAndSize (__pdf_page, __pdf_font, HPDF_TIMECARD_FONT_SIZE);
+					HPDF_Page_TextRect (__pdf_page, __HPDF_TableGetXOffset(), __pdf_line + __pdf_font_height, __pdf_page_width - __HPDF_TableGetXOffset() - HPDF_FIELD_RIGHT, __pdf_line, (utf8_to_cp1251(GetSpelledProjectID())).c_str(), HPDF_TALIGN_LEFT, NULL);
+					HPDF_Page_EndText (__pdf_page);
+				}
+				else
+				{
+					MESSAGE_ERROR("", "", "hpdf: fail to move line down");
+				}
+			}
+			else
+			{
+				MESSAGE_ERROR("", "", "hpdf: fail to move line down");
+			}
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "hpdf: fail to move line down");
+		}
+
+	}
+	catch(...)
+	{
+		MESSAGE_ERROR("", "", "hpdf: fail to print timecard title");
+		error_message = gettext("hpdf: fail to print timecard title");
+	}
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return error_message;
+}
+
 auto	C_Print_Timecard::__HPDF_DrawTimecardTableHeader() -> string
 {
 	MESSAGE_DEBUG("", "", "start");
@@ -1036,9 +1121,72 @@ auto	C_Print_Timecard::__HPDF_DrawTimecardTableBody() -> string
 		{
 			auto	timecard_lines = timecard.GetTimecardLines();
 
+
+			{
+				auto text = "1";
+				auto text_width = HPDF_Font_TextWidth(__pdf_font, (HPDF_BYTE *)utf8_to_cp1251(text).c_str(), utf8_to_cp1251(text).length());
+				MESSAGE_DEBUG("", "", "text(" + text + ") width: " + to_string(text_width.width) + ", reserved width " + to_string(__HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT)));
+			}
+			{
+				auto text = "3";
+				auto text_width = HPDF_Font_TextWidth(__pdf_font, (HPDF_BYTE *)utf8_to_cp1251(text).c_str(), utf8_to_cp1251(text).length());
+				MESSAGE_DEBUG("", "", "text(" + text + ") width: " + to_string(text_width.width) + ", reserved width " + to_string(__HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT)));
+			}
+			{
+				auto text = "ш";
+				auto text_width = HPDF_Font_TextWidth(__pdf_font, (HPDF_BYTE *)utf8_to_cp1251(text).c_str(), utf8_to_cp1251(text).length());
+				MESSAGE_DEBUG("", "", "text(" + text + ") width: " + to_string(text_width.width) + ", reserved width " + to_string(__HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT)));
+			}
+			{
+				auto text = "щ";
+				auto text_width = HPDF_Font_TextWidth(__pdf_font, (HPDF_BYTE *)utf8_to_cp1251(text).c_str(), utf8_to_cp1251(text).length());
+				MESSAGE_DEBUG("", "", "text(" + text + ") width: " + to_string(text_width.width) + ", reserved width " + to_string(__HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT)));
+			}
+			{
+				auto text = "ф";
+				auto text_width = HPDF_Font_TextWidth(__pdf_font, (HPDF_BYTE *)utf8_to_cp1251(text).c_str(), utf8_to_cp1251(text).length());
+				MESSAGE_DEBUG("", "", "text(" + text + ") width: " + to_string(text_width.width) + ", reserved width " + to_string(__HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT)));
+			}
+
+			{
+				auto text = "11";
+				auto text_width = HPDF_Font_TextWidth(__pdf_font, (HPDF_BYTE *)utf8_to_cp1251(text).c_str(), utf8_to_cp1251(text).length());
+				MESSAGE_DEBUG("", "", "text(" + text + ") width: " + to_string(text_width.width) + ", reserved width " + to_string(__HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT)));
+			}
+			{
+				auto text = "33";
+				auto text_width = HPDF_Font_TextWidth(__pdf_font, (HPDF_BYTE *)utf8_to_cp1251(text).c_str(), utf8_to_cp1251(text).length());
+				MESSAGE_DEBUG("", "", "text(" + text + ") width: " + to_string(text_width.width) + ", reserved width " + to_string(__HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT)));
+			}
+
 			for(auto &timcard_line : timecard_lines)
 			{
 				auto		time_entries = SplitTimeentry(timcard_line.hours);
+				auto		timecard_line_title = "123456789_123456789_123 "s + timcard_line.customer + TIMECARD_ENTRY_TITLE_SEPARATOR + timcard_line.project + TIMECARD_ENTRY_TITLE_SEPARATOR + timcard_line.task;
+				auto		text_width = HPDF_Font_TextWidth(__pdf_font, (HPDF_BYTE *)utf8_to_cp1251(timecard_line_title).c_str(), utf8_to_cp1251(timecard_line_title).length());
+/*
+				HPDF_Page_BeginText (__pdf_page);
+				HPDF_Page_SetFontAndSize (__pdf_page, __pdf_font, HPDF_TIMECARD_FONT_SIZE);
+				auto		text_width = HPDF_Page_TextWidth(__pdf_page, utf8_to_cp1251(timecard_line_title).c_str());
+				HPDF_Page_EndText (__pdf_page);
+
+				MESSAGE_DEBUG("", "", "text width: " + to_string(text_width) + ", reserved width " + to_string(__HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT)));
+*/
+				MESSAGE_DEBUG("", "", "text width: " + to_string(text_width.width) + ", reserved width " + to_string(__HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT)));
+
+				HPDF_Page_BeginText (__pdf_page);
+				HPDF_Page_SetFontAndSize (__pdf_page, __pdf_font, HPDF_TIMECARD_FONT_SIZE);
+				HPDF_Page_TextRect (__pdf_page, 
+									__HPDF_GetTimecardTableXByPercentage(0), 
+									__pdf_line + __pdf_table_line_height - 1, 
+									__HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT), 
+									__pdf_line - __pdf_table_line_height, 
+									(timecard_line_title).c_str(), 
+									HPDF_TALIGN_LEFT, 
+									NULL);
+				HPDF_Page_EndText (__pdf_page);
+
+
 
 				if(time_entries.size())
 				{
@@ -1217,6 +1365,78 @@ auto	C_Print_Timecard::__HPDF_DrawTimecardTable() -> string
 	return error_message;
 }
 
+auto	C_Print_Timecard::__HPDF_DrawTimecardFooter() -> string
+{
+	auto	error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	try
+	{
+		if((error_message = __HPDF_MoveLineDown()).length())																																													{MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		else if((error_message = __HPDF_MoveLineDown()).length())																																												{MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		else if((error_message = __HPDF_PrintText(GetSpelledTotalHours(), HPDF_FIELD_LEFT)).length())																																			{MESSAGE_ERROR("", "", "hpdf: fail to print total hours title"); }
+		else if((error_message = __HPDF_PrintText(string(GetEffortHours()), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT))).length())																					{MESSAGE_ERROR("", "", "hpdf: fail to print total hours"); }
+		else if((error_message = __HPDF_MoveLineDown()).length())																																												{MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		else if((error_message = __HPDF_PrintText(GetSpelledTotalDays(), HPDF_FIELD_LEFT)).length())																																			{MESSAGE_ERROR("", "", "hpdf: fail to print total days title"); }
+		else if((error_message = __HPDF_PrintText(string(GetEffortDays()), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT))).length())																					{MESSAGE_ERROR("", "", "hpdf: fail to print total days"); }
+		else if((error_message = __HPDF_MoveLineDown()).length())																																												{MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		else if((error_message = __HPDF_PrintText(GetSpelledDayrate(), HPDF_FIELD_LEFT)).length())																																				{MESSAGE_ERROR("", "", "hpdf: fail to print dayrate title"); }
+		else if((error_message = __HPDF_PrintText(to_string(long(timecard.GetDayrate().GetWhole()))			, __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT))).length())												{MESSAGE_ERROR("", "", "hpdf: fail to print dayrate whole"); }
+		else if((error_message = __HPDF_PrintText(string(GetSpelledRur())									, __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 3.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())		{MESSAGE_ERROR("", "", "hpdf: fail to print dayrate rur"); }
+		else if((error_message = __HPDF_PrintText(to_string(long(timecard.GetDayrate().GetFraction()))		, __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 5.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())		{MESSAGE_ERROR("", "", "hpdf: fail to print dayrate fraction"); }
+		else if((error_message = __HPDF_PrintText(string(GetSpelledKop())									, __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 6.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())		{MESSAGE_ERROR("", "", "hpdf: fail to print dayrate kop"); }
+		else if((error_message = __HPDF_MoveLineDown()).length())																																												{MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		else if((error_message = __HPDF_PrintText(GetSpelledTotalPayment(), HPDF_FIELD_LEFT)).length())																																			{MESSAGE_ERROR("", "", "hpdf: fail to print total payment title"); }
+		else if((error_message = __HPDF_PrintText(to_string(long(GetEffortCost().GetWhole()))				, __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT))).length())												{MESSAGE_ERROR("", "", "hpdf: fail to print total payment whole"); }
+		else if((error_message = __HPDF_PrintText(string(GetSpelledRur())									, __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 3.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())		{MESSAGE_ERROR("", "", "hpdf: fail to print total payment rur"); }
+		else if((error_message = __HPDF_PrintText(to_string(long(GetEffortCost().GetFraction()))			, __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 5.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())		{MESSAGE_ERROR("", "", "hpdf: fail to print total payment fraction"); }
+		else if((error_message = __HPDF_PrintText(string(GetSpelledKop())									, __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 6.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())		{MESSAGE_ERROR("", "", "hpdf: fail to print total payment kop"); }
+		else if((error_message = __HPDF_MoveLineDown()).length())																																												{MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		else if((error_message = __HPDF_PrintText(GetSpelledVAT(), HPDF_FIELD_LEFT)).length())																																					{MESSAGE_ERROR("", "", "hpdf: fail to print vat title"); }
+		else if((error_message = __HPDF_PrintText(to_string(long(GetEffortCostVAT().GetWhole()))			, __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT))).length())												{MESSAGE_ERROR("", "", "hpdf: fail to print vat payment whole"); }
+		else if((error_message = __HPDF_PrintText(string(GetSpelledRur())									, __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 3.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())		{MESSAGE_ERROR("", "", "hpdf: fail to print vat payment rur"); }
+		else if((error_message = __HPDF_PrintText(to_string(long(GetEffortCostVAT().GetFraction()))			, __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 5.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())		{MESSAGE_ERROR("", "", "hpdf: fail to print vat payment fraction"); }
+		else if((error_message = __HPDF_PrintText(string(GetSpelledKop())									, __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 6.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())		{MESSAGE_ERROR("", "", "hpdf: fail to print vat payment kop"); }
+		else if((error_message = __HPDF_MoveLineDown()).length())																																												{MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		else if((error_message = __HPDF_PrintText(GetSpelledTotalPaymentNoVAT(), HPDF_FIELD_LEFT)).length())																																	{MESSAGE_ERROR("", "", "hpdf: fail to print total payment w/o vat title"); }
+		else if((error_message = __HPDF_PrintText(to_string(long(GetTotalPayment().GetWhole()))				, __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT))).length())												{MESSAGE_ERROR("", "", "hpdf: fail to print total payment w/o vat whole"); }
+		else if((error_message = __HPDF_PrintText(string(GetSpelledRur())									, __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 3.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())		{MESSAGE_ERROR("", "", "hpdf: fail to print total payment w/o vat rur"); }
+		else if((error_message = __HPDF_PrintText(to_string(long(GetTotalPayment().GetFraction()))			, __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 5.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())		{MESSAGE_ERROR("", "", "hpdf: fail to print total payment w/o vat fraction"); }
+		else if((error_message = __HPDF_PrintText(string(GetSpelledKop())									, __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 6.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())		{MESSAGE_ERROR("", "", "hpdf: fail to print total payment w/o vat kop"); }
+		else if((error_message = __HPDF_MoveLineDown()).length())																																												{MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		else if((error_message = __HPDF_MoveLineDown()).length())																																												{MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		else if((error_message = __HPDF_MoveLineDown()).length())																																												{MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		else if((error_message = __HPDF_PrintText(timecard.GetSignatureTitle1(), HPDF_FIELD_LEFT)).length())																																	{MESSAGE_ERROR("", "", "hpdf: fail to print total payment w/o vat title"); }
+		else if((error_message = __HPDF_PrintText(timecard.GetSignatureTitle2(), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 10.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())									{MESSAGE_ERROR("", "", "hpdf: fail to print total payment w/o vat title"); }
+		else if((error_message = __HPDF_MoveLineDown()).length())																																												{MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		else if((error_message = __HPDF_MoveLineDown()).length())																																												{MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		else if((error_message = __HPDF_PrintText(GetSpelledSignature(), HPDF_FIELD_LEFT)).length())																																			{MESSAGE_ERROR("", "", "hpdf: fail to print total payment w/o vat title"); }
+		else if((error_message = __HPDF_PrintText(GetSpelledSignature(), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 10.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())											{MESSAGE_ERROR("", "", "hpdf: fail to print total payment w/o vat title"); }
+		else if((error_message = __HPDF_MoveLineDown()).length())																																												{MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		else if((error_message = __HPDF_MoveLineDown()).length())																																												{MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		else if((error_message = __HPDF_PrintText(GetSpelledInitials(), HPDF_FIELD_LEFT)).length())																																				{MESSAGE_ERROR("", "", "hpdf: fail to print total payment w/o vat title"); }
+		else if((error_message = __HPDF_PrintText(GetSpelledInitials(), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 10.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())											{MESSAGE_ERROR("", "", "hpdf: fail to print total payment w/o vat title"); }
+		else if((error_message = __HPDF_MoveLineDown()).length())																																												{MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		else if((error_message = __HPDF_MoveLineDown()).length())																																												{MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		else if((error_message = __HPDF_PrintText(GetSpelledPosition(), HPDF_FIELD_LEFT)).length())																																				{MESSAGE_ERROR("", "", "hpdf: fail to print total payment w/o vat title"); }
+		else if((error_message = __HPDF_PrintText(GetSpelledPosition(), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 10.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())											{MESSAGE_ERROR("", "", "hpdf: fail to print total payment w/o vat title"); }
+		else if((error_message = __HPDF_MoveLineDown()).length())																																												{MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		else if((error_message = __HPDF_MoveLineDown()).length())																																												{MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		else if((error_message = __HPDF_PrintText(GetSpelledDate(), HPDF_FIELD_LEFT)).length())																																					{MESSAGE_ERROR("", "", "hpdf: fail to print total payment w/o vat title"); }
+		else if((error_message = __HPDF_PrintText(GetSpelledDate(), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 10.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())												{MESSAGE_ERROR("", "", "hpdf: fail to print total payment w/o vat title"); }
+	}
+	catch(...)
+	{
+		MESSAGE_ERROR("", "", "hpdf: fail to print timecard footer");
+		error_message = gettext("hpdf: fail to print timecard footer");
+	}
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return error_message;
+}
+
 auto	C_Print_Timecard::__HPDF_SaveToFile() -> string
 {
 	auto	error_message = ""s;
@@ -1255,7 +1475,7 @@ auto	C_Print_Timecard::PrintAsPDF() -> string
 				{
 					if((error_message = __HPDF_DrawTimecardTable()).empty())
 					{
-						if((error_message = __HPDF_PrintText("My text " + GetRandom(10), 100, 100)).empty())
+						if((error_message = __HPDF_DrawTimecardFooter()).empty())
 						{
 							if((error_message = __HPDF_SaveToFile()).empty())
 							{
