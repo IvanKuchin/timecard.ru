@@ -8,7 +8,6 @@
 #include <unordered_set>
 #include <algorithm>
 #include <regex>
-#include <cctype> 		//--- used for tolower
 #include <sys/stat.h>
 #include <sys/types.h>	// --- DIR
 #include <dirent.h>		// --- opendir, rmdir

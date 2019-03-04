@@ -657,15 +657,6 @@ auto	C_Print_Timecard::__HPDF_StartTable() -> string
 	{
 		if((error_message = __HPDF_MoveTableLineDown()).empty())
 		{
-/*
-			if((error_message = __HPDF_DrawTimecardHorizontalLine()).empty())
-			{
-			}
-			else
-			{
-				MESSAGE_ERROR("", "", "hpdf: fail to stop timecard table");
-			}
-*/
 		}
 		else
 		{
@@ -954,7 +945,7 @@ auto	C_Print_Timecard::__HPDF_DrawTimecardVerticalLine(double x) -> string
 	return error_message;
 }
 
-auto	C_Print_Timecard::__HPDF_PaintDay(int day_number, double red, double green, double blue) -> string
+auto	C_Print_Timecard::__HPDF_PaintDay(int day_number, double red, double green, double blue, int number_of_lines) -> string
 {
 	MESSAGE_DEBUG("", "", "start");
 
@@ -965,7 +956,7 @@ auto	C_Print_Timecard::__HPDF_PaintDay(int day_number, double red, double green,
 		auto	rect_left = __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + HPDF_TIMECARD_DAY_WIDTH_PERCENT * day_number);
 		auto	rect_width = __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + HPDF_TIMECARD_DAY_WIDTH_PERCENT * (day_number + 1)) - rect_left;
 		auto	rect_bottom = __pdf_line;
-		auto	rect_height = __pdf_table_line_height;
+		auto	rect_height = __pdf_table_line_height * number_of_lines;
 
 		HPDF_Page_SetRGBFill(__pdf_page, red, green, blue);
 		HPDF_Page_Rectangle (__pdf_page,
@@ -1078,14 +1069,6 @@ auto	C_Print_Timecard::__HPDF_DrawTimecardTableHeader() -> string
 				}
 				if((error_message = __HPDF_DrawTimecardHorizontalLine()).empty())
 				{
-					if((error_message = __HPDF_MoveTableLineDown()).empty())
-					{
-					
-					}
-					else
-					{
-						MESSAGE_ERROR("", "", "hpdf: fail to move table line down");
-					}
 				}
 				else
 				{
@@ -1125,11 +1108,27 @@ auto	C_Print_Timecard::__HPDF_DrawTimecardTableBody() -> string
 
 			for(auto &timcard_line : timecard_lines)
 			{
-				auto		time_entries = SplitTimeentry(timcard_line.hours);
-				auto		timecard_line_title = "123456789_123456789_123 "s + timcard_line.customer + TIMECARD_ENTRY_TITLE_SEPARATOR + timcard_line.project + TIMECARD_ENTRY_TITLE_SEPARATOR + timcard_line.task;
-				auto		text_width = HPDF_Font_TextWidth(__pdf_font, (HPDF_BYTE *)utf8_to_cp1251(timecard_line_title).c_str(), utf8_to_cp1251(timecard_line_title).length());
+				auto	time_entries			= SplitTimeentry(timcard_line.hours);
+				auto	timecard_line_title		= timcard_line.customer + TIMECARD_ENTRY_TITLE_SEPARATOR + timcard_line.project + TIMECARD_ENTRY_TITLE_SEPARATOR + timcard_line.task;
+				auto	text_width_pdf_struct	= HPDF_Font_TextWidth(__pdf_font, (HPDF_BYTE *)utf8_to_cp1251(timecard_line_title).c_str(), utf8_to_cp1251(timecard_line_title).length());
+				auto	text_width				= text_width_pdf_struct.width * HPDF_TIMECARD_FONT_SIZE / 1000.0;
+				auto	title_cell_width		= __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT);
+				auto	number_of_lines			= ceil(HPDF_TIMECARD_FONT_MULTIPLIER * text_width / title_cell_width);
 
-				MESSAGE_DEBUG("", "", "text width: " + to_string(text_width.width) + ", reserved width " + to_string(__HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT)));
+				if(number_of_lines) {}
+				else
+				{
+					MESSAGE_ERROR("", "", "number of lines reuired to write cu / proj / task is 0 (probably string is empty)");
+					number_of_lines = 1;
+				}
+
+				MESSAGE_DEBUG("", "", "text width is " + to_string(text_width) + ", reserved width " + to_string(title_cell_width) + ", text will fit to " + to_string(number_of_lines) + " number of lines");
+
+				if((error_message = __HPDF_MoveTableLineDown(__pdf_table_line_height * number_of_lines)).length())
+				{
+					MESSAGE_DEBUG("", "", "hpdf: fail to move line down");
+					break;
+				}
 
 /*
 				HPDF_Page_BeginText (__pdf_page);
@@ -1140,14 +1139,13 @@ auto	C_Print_Timecard::__HPDF_DrawTimecardTableBody() -> string
 				MESSAGE_DEBUG("", "", "text width: " + to_string(text_width) + ", reserved width " + to_string(__HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT)));
 */
 
-
 				HPDF_Page_BeginText (__pdf_page);
 				HPDF_Page_SetFontAndSize (__pdf_page, __pdf_font, HPDF_TIMECARD_FONT_SIZE);
 				HPDF_Page_TextRect (__pdf_page, 
-									__HPDF_GetTimecardTableXByPercentage(0), 
-									__pdf_line + __pdf_table_line_height - 1, 
-									__HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT), 
-									__pdf_line - __pdf_table_line_height, 
+									__HPDF_GetTimecardTableXByPercentage(0) + 1, 
+									__pdf_line + __pdf_table_line_height * number_of_lines - 1, 
+									__HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT) - 1, 
+									__pdf_line + 1, 
 									utf8_to_cp1251(timecard_line_title).c_str(), 
 									HPDF_TALIGN_LEFT, 
 									NULL);
@@ -1163,7 +1161,7 @@ auto	C_Print_Timecard::__HPDF_DrawTimecardTableBody() -> string
 						{
 							auto	time_entry = time_entries[i];
 
-							if(day_summary[i].is_weekend) __HPDF_PaintDay(i, 0.8, 0.8, 0.8);
+							if(day_summary[i].is_weekend) __HPDF_PaintDay(i, 0.8, 0.8, 0.8, number_of_lines);
 
 							if(time_entry.length() && (time_entry != "0"))
 							{
@@ -1171,7 +1169,7 @@ auto	C_Print_Timecard::__HPDF_DrawTimecardTableBody() -> string
 								HPDF_Page_SetFontAndSize (__pdf_page, __pdf_font, HPDF_TIMECARD_FONT_SIZE - 3);
 								HPDF_Page_TextRect (__pdf_page, 
 													__HPDF_GetTimecardTableXByPercentage(percentage), 
-													__pdf_line + __pdf_table_line_height - 1, 
+													__pdf_line + __pdf_table_line_height * number_of_lines - 2, 
 													__HPDF_GetTimecardTableXByPercentage(percentage + HPDF_TIMECARD_DAY_WIDTH_PERCENT), 
 													__pdf_line, 
 													(time_entries[i]).c_str(), 
@@ -1186,12 +1184,6 @@ auto	C_Print_Timecard::__HPDF_DrawTimecardTableBody() -> string
 				else
 				{
 					MESSAGE_ERROR("", "", "time report(" + timcard_line.hours + ") have no entries. This flow expect to have time entries reported.");
-				}
-
-				if((error_message = __HPDF_MoveTableLineDown()).length())
-				{
-					MESSAGE_DEBUG("", "", "hpdf: fail to move line down");
-					break;
 				}
 			}
 		}
@@ -1226,6 +1218,11 @@ auto	C_Print_Timecard::__HPDF_DrawTimecardTableFooter() -> string
 			{
 				auto		percentage = HPDF_TIMECARD_TITLE_WIDTH_PERCENT;
 
+				if((error_message = __HPDF_MoveTableLineDown()).length())
+				{
+					MESSAGE_DEBUG("", "", "hpdf: fail to move line down");
+				}
+
 				for(auto i = 0; i < number_of_days; ++i)
 				{
 					if(day_summary[i].is_weekend) __HPDF_PaintDay(i, 0.8, 0.8, 0.8);
@@ -1246,7 +1243,7 @@ auto	C_Print_Timecard::__HPDF_DrawTimecardTableFooter() -> string
 						HPDF_Page_SetFontAndSize (__pdf_page, __pdf_font, HPDF_TIMECARD_FONT_SIZE - 3);
 						HPDF_Page_TextRect (__pdf_page, 
 											__HPDF_GetTimecardTableXByPercentage(percentage), 
-											__pdf_line + __pdf_table_line_height - 1, 
+											__pdf_line + __pdf_table_line_height - 3, 
 											__HPDF_GetTimecardTableXByPercentage(percentage + HPDF_TIMECARD_DAY_WIDTH_PERCENT), 
 											__pdf_line, 
 											(string(day_summary[i].efforts)).c_str(), 
@@ -1337,6 +1334,8 @@ auto	C_Print_Timecard::__HPDF_DrawTimecardFooter() -> string
 	auto	error_message = ""s;
 
 	MESSAGE_DEBUG("", "", "start");
+
+	MESSAGE_DEBUG("", "", "dayrate " + to_string(timecard.GetDayrate()) + " kop. " + to_string(timecard.GetDayrate().GetFraction()) + ", long kop. " + to_string(long(timecard.GetDayrate().GetFraction())));
 
 	try
 	{

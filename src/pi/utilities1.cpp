@@ -718,107 +718,6 @@ string CheckHTTPParam_Email(const string &srcText)
 	return	result;
 }
 
-/*
-string CheckIfFurtherThanNow(string occupationStart_cp1251)
-{
-	time_t	  now_t, checked_t;
-	// char		utc_str[100];
-	struct tm   *local_tm, check_tm;
-	ostringstream	ost;
-
-	{
-		CLog	log;
-		ostringstream	ost;
-
-		ost.str("");
-		ost << "CheckIfFurtherThanNow(" << occupationStart_cp1251 << "): start";
-		log.Write(DEBUG, ost.str());
-	}
-
-
-	now_t = time(NULL);
-	local_tm = localtime(&now_t);
-	if(local_tm == NULL)
-	{
-		CLog	log;
-		ostringstream	ost;
-
-		ost.str("");
-		ost << "CheckIfFurtherThanNow(now): ERROR in running localtime(&t)";
-		log.Write(ERROR, ost.str());
-	}
-
-	{
-		CLog	log;
-		ostringstream	ost;
-
-		ost.str("");
-		ost << "CheckIfFurtherThanNow(now): now_t = " << now_t;
-		log.Write(DEBUG, ost.str());
-	}
-
-
-	// now2_t = time(NULL);
-	// check_tm = localtime(&now2_t);
-	sscanf(occupationStart_cp1251.c_str(), "%4d-%2d-%2d", &check_tm.tm_year, &check_tm.tm_mon, &check_tm.tm_mday);
-	check_tm.tm_year -= 1900;
-	check_tm.tm_mon -= 1;
-	check_tm.tm_hour = 23;
-	check_tm.tm_min = 59;
-	check_tm.tm_isdst = 0;	// --- Summer time is OFF. Be carefull with it.
-
-	{
-		CLog	log;
-		ostringstream	ost;
-
-		ost.str("");
-		ost << "CheckIfFurtherThanNow(" << occupationStart_cp1251 << "): checked year = " << check_tm.tm_year << " checked month = " << check_tm.tm_mon << " checked day = " << check_tm.tm_mday << "";
-		log.Write(DEBUG, ost.str());
-	}
-
-	checked_t = mktime(&check_tm);
-
-	{
-		CLog	log;
-		ostringstream	ost;
-		char	buffer[80];
-
-		ost.str("");
-		strftime(buffer,80,"check_tm: date regenerated: %02d-%b-%Y %T %Z  %I:%M%p.", &check_tm);
-		ost << "CheckIfFurtherThanNow(" << occupationStart_cp1251 << "): " << buffer << "";
-		log.Write(DEBUG, ost.str());
-
-		memset(buffer, 0, 80);
-		strftime(buffer,80,"local_tm: date regenerated: %02d-%b-%Y %T %Z  %I:%M%p.", local_tm);
-		ost.str("");
-		ost << "CheckIfFurtherThanNow(" << occupationStart_cp1251 << "): " << buffer << "";
-		log.Write(DEBUG, ost.str());
-
-		ost.str("");
-		ost << "CheckIfFurtherThanNow(" << occupationStart_cp1251 << "): difftime( now_t=" << now_t << ", checked_t=" << checked_t << ")";
-		log.Write(DEBUG, ost.str());
-
-		ost.str("");
-		ost << "CheckIfFurtherThanNow(" << occupationStart_cp1251 << "): difference = " << difftime(now_t, checked_t);
-		log.Write(DEBUG, ost.str());
-	}
-
-	if(difftime(now_t, checked_t) <= 0)
-	{
-		CLog	log;
-		ostringstream	ost;
-
-		ost.str("");
-		ost << "CheckIfFurtherThanNow(" << occupationStart_cp1251 << "): clicked date further in futer than now, therefore considered as a 0000-00-00";
-		log.Write(DEBUG, ost.str());
-
-		return "0000-00-00";
-	}
-
-	return occupationStart_cp1251;
-}
-*/
-
 string	GetDefaultActionFromUserType(string role, CMysql *db)
 {
 	string	result = GUEST_USER_DEFAULT_ACTION;
@@ -1601,7 +1500,7 @@ bool isDirExists(const std::string& name)
 		MESSAGE_DEBUG("", "", name + " isn't directory");
 	}
 
-	MESSAGE_DEBUG("", "", "finish");
+	MESSAGE_DEBUG("", "", "finish (file " + name + " " + (result ? "" : "not") + " exists)");
 
 	return result;
 }
@@ -1611,7 +1510,7 @@ bool CreateDir(const string &dir)
 	auto		result = false;
 	struct stat buffer;
 
-	MESSAGE_DEBUG("", "", "start");
+	MESSAGE_DEBUG("", "", "start (" + dir + ")");
 
 	if(stat(dir.c_str(), &buffer) != 0)
 	{
@@ -1627,7 +1526,7 @@ bool CreateDir(const string &dir)
 		MESSAGE_ERROR("", "", "dir(" + dir + ") already exists")
 	}
 
-	MESSAGE_DEBUG("", "", "finish");
+	MESSAGE_DEBUG("", "", "finish (result = " + (result ? "true" : "false") + ")");
 
 	return result;
 }
@@ -1656,12 +1555,13 @@ bool RmDirRecursive(const char *dirname)
 
 			if (entry->d_type == DT_DIR)
 			{
-				RmDirRecursive(path);
+				RmDirRecursive((string(path) + "/").c_str());
 			} 
 			else
 			{
+
 				MESSAGE_DEBUG("", "", "remove file " + path);
-				unlink(path);
+				// unlink(path);
 			}
 		}
 	}
@@ -1669,7 +1569,7 @@ bool RmDirRecursive(const char *dirname)
 	closedir(dir);
 	
 	MESSAGE_DEBUG("", "", "remove dir " + dirname);
-	rmdir(dirname);
+	// rmdir(dirname);
 	
 	MESSAGE_DEBUG("", "", "finish (" + dirname + ")");
 

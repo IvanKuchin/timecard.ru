@@ -135,8 +135,8 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 			do
 			{
 				++i;
-				filename_xls = temp_dir + "timecard_" + to_string(i) + ".xls";
-				filename_pdf = temp_dir + "timecard_" + to_string(i) + ".pdf";
+				filename_xls = temp_dir_timecards + "timecard_" + to_string(i) + ".xls";
+				filename_pdf = temp_dir_timecards + "timecard_" + to_string(i) + ".pdf";
 			} while(isFileExists(filename_xls) || isFileExists(filename_pdf));
 
 			printer.SetTimecard(timecard);
@@ -157,6 +157,14 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 				break;
 			}
 		}
+
+		{
+			c_archive	ar;
+
+			ar.SetFilename(archive_file);
+			ar.SetFolderToArchive(temp_dir);
+			ar.Archive();
+		}
 	}
 
 	MESSAGE_DEBUG("", "", "finish");
@@ -170,13 +178,32 @@ auto C_Invoice_Service::CreateTempDirectory() -> bool
 
 	do
 	{
-		temp_dir = TEMP_DIRECTORY_PREFIX + GetRandom(15);
-	} while(isDirExists(temp_dir));
+		auto		rand = GetRandom(15);
+		temp_dir = TEMP_DIRECTORY_PREFIX + rand;
+		archive_file = TEMP_DIRECTORY_PREFIX + rand + ARCHIVE_FILE_EXTENSION;
+	} while(isDirExists(temp_dir) || isFileExists(archive_file));
 
 	if(CreateDir(temp_dir))
 	{
 		temp_dir += "/";
-		result = true;
+		temp_dir_timecards = temp_dir + "timecards/";
+		temp_dir_cost_center_invoices = temp_dir + "invoices/";
+
+		if(CreateDir(temp_dir_timecards))
+		{
+			if(CreateDir(temp_dir_cost_center_invoices))
+			{
+				result = true;
+			}
+			else
+			{
+				MESSAGE_ERROR("", "", "fail to create " + temp_dir_cost_center_invoices);
+			}
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "fail to create " + temp_dir_timecards);
+		}
 	}
 	else
 	{
@@ -344,7 +371,7 @@ C_Invoice_Service::~C_Invoice_Service()
 {
 	if(temp_dir.length())
 	{
-		// RmDirRecursive(temp_dir.c_str());
+		RmDirRecursive(temp_dir.c_str());
 	}
 	else
 	{

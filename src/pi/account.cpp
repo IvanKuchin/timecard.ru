@@ -11,7 +11,7 @@ int main()
 
 	{
 		CLog	log;
-		log.Write(DEBUG, __func__ + string("[") + to_string(__LINE__) + "]: " + __FILE__);
+		log.Write(DEBUG, __func__ + "["s + to_string(__LINE__) + "]: " + __FILE__);
 	}
 
 	signal(SIGSEGV, crash_handler); 
@@ -29,7 +29,7 @@ int main()
 	{
 		CLog	log;
 
-		log.Write(ERROR, string(__func__) + string("[") + to_string(__LINE__) + "]:ERROR: template file was missing");
+		log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: template file was missing");
 		throw CException("Template file was missing");
 	}
 
@@ -37,7 +37,7 @@ int main()
 	{
 		CLog	log;
 
-		log.Write(ERROR, string(__func__) + string("[") + to_string(__LINE__) + "]:ERROR: Can not connect to mysql database");
+		log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: Can not connect to mysql database");
 		throw CExceptionHTML("MySql connection");
 	}
 
@@ -67,209 +67,10 @@ int main()
 
 		//------- Generate session
 		action = GenerateSession(action, &indexPage, &db, &user);
-
-// TODO: remove Jan 1 '19
-	/*
-		ostringstream		query, ost1, ost2;
-		string				partNum;
-		string				content;
-		// Menu				m;
-
-		indexPage.RegisterVariableForce("rand", GetRandom(10));
-		indexPage.RegisterVariableForce("random", GetRandom(10));
-		indexPage.RegisterVariableForce("style", "style.css");
-
-		// --- Generate session
-		{
-			string			lng, sessidHTTP;
-			ostringstream	ost;
-
-
-			sessidHTTP = indexPage.SessID_Get_FromHTTP();
-			if(sessidHTTP.length() < 5) {
-				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + ": session cookie is not exist, generating new session.");
-				}
-				sessidHTTP = indexPage.SessID_Create_HTTP_DB();
-				if(sessidHTTP.length() < 5) {
-					CLog	log;
-					log.Write(ERROR, string(__func__) + ": error in generating session ID");
-					throw CExceptionHTML("session can't be created");
-				}
-			} 
-			else {
-				if(indexPage.SessID_Load_FromDB(sessidHTTP)) 
-				{
-					if(indexPage.SessID_CheckConsistency()) 
-					{
-						if(indexPage.SessID_Update_HTTP_DB()) 
-						{
-							indexPage.RegisterVariableForce("loginUser", "");
-							indexPage.RegisterVariableForce("loginUserID", "");
-
-							if(indexPage.SessID_Get_UserFromDB() != "Guest") {
-								user.SetDB(&db);
-								// --- place 2change user from user.email to user.id 
-								if(user.GetFromDBbyEmail(indexPage.SessID_Get_UserFromDB()))
-								{
-									ostringstream	ost1;
-									string			avatarPath;
-
-									indexPage.RegisterVariableForce("loginUser", indexPage.SessID_Get_UserFromDB());
-									indexPage.RegisterVariableForce("loginUserID", user.GetID());
-									indexPage.RegisterVariableForce("myFirstName", user.GetName());
-									indexPage.RegisterVariableForce("myLastName", user.GetNameLast());
-
-									// --- Get user avatars
-									ost1.str("");
-									ost1 << "select * from `users_avatars` where `userid`='" << user.GetID() << "' and `isActive`='1';";
-									avatarPath = "empty";
-									if(db.Query(ost1.str()))
-									{
-										ost1.str("");
-										ost1 << "/images/avatars/avatars" << db.Get(0, "folder") << "/" << db.Get(0, "filename");
-										avatarPath = ost1.str();
-									}
-									indexPage.RegisterVariableForce("myUserAvatar", avatarPath);
-
-
-									{
-										CLog	log;
-										ostringstream	ost;
-
-										ost << __func__ << "[" << __LINE__ << "]: user [" << user.GetLogin() << "] logged in";
-										log.Write(DEBUG, ost.str());
-									}
-								}
-								else
-								{
-									// --- enforce to close session
-									action = "logout";
-
-									{
-										CLog	log;
-										ostringstream	ost;
-
-										ost << __func__ << "[" << __LINE__ << "]: ERROR user [" << indexPage.SessID_Get_UserFromDB() << "] session exists on client device, but not in the DB. Change the [action = logout].";
-										log.Write(ERROR, ost.str());
-									}
-
-								}
-							}
-						
-
-						}
-						else
-						{
-							CLog	log;
-							log.Write(ERROR, string(__func__) + ": ERROR update session in HTTP or DB failed");
-						}
-					}
-					else {
-						CLog	log;
-						log.Write(ERROR, string(__func__) + ": ERROR session consistency check failed");
-					}
-				}
-				else 
-				{
-					ostringstream	ost;
-
-					{
-						CLog	log;
-						log.Write(DEBUG, string(__func__) + ": cookie session and DB session is not equal. Need to recreate session");
-					}
-
-					ost.str("");
-					ost << "/?rand=" << GetRandom(10);
-
-					if(!indexPage.Cookie_Expire()) {
-						CLog	log;
-						log.Write(ERROR, string(__func__) + ": Error in session expiration");			
-					} // --- if(!indexPage.Cookie_Expire())
-					indexPage.Redirect(ost.str());
-				} // --- if(indexPage.SessID_Load_FromDB(sessidHTTP)) 
-			} // --- if(sessidHTTP.length() < 5)
-		}
-//------- End generate session
-
-
-//------- Register html META-tags
-		if(db.Query("select `value` from `settings_default` where `setting`=\"keywords_head\"") > 0)
-			indexPage.RegisterVariable("keywords_head", db.Get(0, "value"));
-		else
-		{
-			CLog	log;
-			log.Write(ERROR, string(__func__) + ": ERROR getting keywords_head from settings_default");
-		}
-
-		if(db.Query("select `value` from `settings_default` where `setting`=\"title_head\"") > 0)
-			indexPage.RegisterVariable("title_head", db.Get(0, "value"));
-		else
-		{
-			CLog	log;
-			log.Write(ERROR, string(__func__) + ": ERROR getting title_head from settings_default");
-		}
-
-		if(db.Query("select `value` from `settings_default` where `setting`=\"description_head\"") > 0)
-			indexPage.RegisterVariable("description_head", db.Get(0, "value"));
-		else
-		{
-			CLog	log;
-			log.Write(ERROR, string(__func__) + ": ERROR getting description_head from settings_default");
-		}
-
-		if(db.Query("select `value` from `settings_default` where `setting`=\"NewsOnSinglePage\"") > 0)
-			indexPage.RegisterVariable("NewsOnSinglePage", db.Get(0, "value"));
-		else
-		{
-			CLog			log;
-			log.Write(ERROR, string(__func__) + ": ERROR getting NewsOnSinglePage from settings_default");
-
-			indexPage.RegisterVariable("NewsOnSinglePage", to_string(NEWS_ON_SINGLE_PAGE));
-		}
-
-		if(db.Query("select `value` from `settings_default` where `setting`=\"FriendsOnSinglePage\"") > 0)
-			indexPage.RegisterVariable("FriendsOnSinglePage", db.Get(0, "value"));
-		else
-		{
-			CLog			log;
-			log.Write(ERROR, string(__func__) + ": ERROR getting FriendsOnSinglePage from settings_default");
-
-			indexPage.RegisterVariable("FriendsOnSinglePage", to_string(FRIENDS_ON_SINGLE_PAGE));
-		}
-
-		if(action.empty() and user.GetLogin().length() and (user.GetLogin() != "Guest"))
-		{
-			action = GetDefaultActionFromUserType(user.GetType(), &db);
-
-			{
-				CLog	log;
-				log.Write(DEBUG, __func__ + string("[") + to_string(__LINE__) + string("]:") + ": META-registration: action has been overriden to 'logged-in user' default action [action = ", action, "]");
-			}
-
-		}
-		else if(!action.length())
-		{
-			action = GUEST_USER_DEFAULT_ACTION;
-
-			{
-				CLog	log;
-				log.Write(DEBUG, __func__ + string("[") + to_string(__LINE__) + string("]:") + ": META-registration: action has been overriden to 'guest user' default action [action = ", action, "]");
-			} // --- log block
-		} // --- default action
-//------- End register html META-tags
-	*/}
+	}
 // ------------ end generate common parts
 
-	{
-		CLog	log;
-		ostringstream	ost;
-
-		ost.str("");
-		ost << __func__ << "[" << __LINE__ << "]: start (action's == \"" << action << "\") condition";
-		log.Write(DEBUG, ost.str());
-	}
+	MESSAGE_DEBUG("", "", "pre-condition action = " + action);
 
 	if(action == "AJAX_changeLogin")
 	{
@@ -286,7 +87,7 @@ int main()
 		{
 			{
 				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]:action == " + action + ": re-login required");
+				log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]:action == " + action + ": re-login required");
 			}
 
 			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
@@ -305,7 +106,7 @@ int main()
 					{
 						{
 							CLog	log;
-							log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]:action == " + action + ": Login already used");
+							log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]:action == " + action + ": Login already used");
 						}
 
 						ostResult << "{" 
@@ -343,7 +144,7 @@ int main()
 					
 					{
 						CLog	log;
-						log.Write(ERROR, string(__func__) + string("[") + to_string(__LINE__) + "]:action == " + action + ":ERROR: login containing symbols \\ or /");
+						log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:action == " + action + ":ERROR: login containing symbols \\ or /");
 					}
 
 					ostResult << "{" 
@@ -357,7 +158,7 @@ int main()
 				
 				{
 					CLog	log;
-					log.Write(ERROR, string(__func__) + string("[") + to_string(__LINE__) + "]:action == " + action + ":ERROR: login too short");
+					log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:action == " + action + ":ERROR: login too short");
 				}
 
 				ostResult << "{" 
@@ -400,7 +201,7 @@ int main()
 		{
 			{
 				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]:action == " + action + ": re-login required");
+				log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]:action == " + action + ": re-login required");
 			}
 
 			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
@@ -439,7 +240,7 @@ int main()
 				
 				{
 					CLog	log;
-					log.Write(ERROR, string(__func__) + string("[") + to_string(__LINE__) + "]:action == " + action + ":ERROR: wrong userSex[" + userSex + "]");
+					log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:action == " + action + ":ERROR: wrong userSex[" + userSex + "]");
 				}
 
 				ostResult << "{" 
@@ -482,7 +283,7 @@ int main()
 		{
 			{
 				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]:action == " + action + ": re-login required");
+				log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]:action == " + action + ": re-login required");
 			}
 
 			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
@@ -521,7 +322,7 @@ int main()
 				
 				{
 					CLog	log;
-					log.Write(ERROR, string(__func__) + string("[") + to_string(__LINE__) + "]:action == " + action + ":ERROR: wrong date format dd/mm/yy userBirthday[" + userBirthday + "]");
+					log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:action == " + action + ":ERROR: wrong date format dd/mm/yy userBirthday[" + userBirthday + "]");
 				}
 
 				ostResult << "{" 
@@ -564,7 +365,7 @@ int main()
 		{
 			{
 				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]:action == " + action + ": re-login required");
+				log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]:action == " + action + ": re-login required");
 			}
 
 			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
@@ -616,7 +417,7 @@ int main()
 				
 				{
 					CLog	log;
-					log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]:action == " + action + ": city is empty");
+					log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]:action == " + action + ": city is empty");
 				}
 
 				ostResult << "{" 
@@ -659,7 +460,7 @@ int main()
 		{
 			{
 				CLog	log;
-				log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "]:action == " + action + ": re-login required");
+				log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]:action == " + action + ": re-login required");
 			}
 
 			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";

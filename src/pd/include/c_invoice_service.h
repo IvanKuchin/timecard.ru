@@ -8,6 +8,7 @@
 #include "clog.h"
 #include "utilities.h"
 #include "c_print_timecard.h"
+#include "c_archive.h"
 
 using namespace std;
 
@@ -21,6 +22,9 @@ class C_Invoice_Service
 		string							cost_center_id = "";
 
 		string							temp_dir = "";
+		string							temp_dir_timecards = "";
+		string							temp_dir_cost_center_invoices = "";
+		string							archive_file = "";
 
 		auto		CreateTempDirectory() -> bool;
 		auto		CreateTimecardObj(string timecard_id) -> C_Timecard_To_Print;

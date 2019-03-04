@@ -358,241 +358,6 @@ int main()
 
 			//------- Generate session
 			action = GenerateSession(action, &indexPage, &db, &user);
-
-			/*
-			{
-				string			lng, sessidHTTP;
-				ostringstream	ost;
-
-				sessidHTTP = indexPage.SessID_Get_FromHTTP();
-				if(sessidHTTP.length() < 5)
-				{
-					{
-						MESSAGE_DEBUG("", action, "session cookie doesn't exists, generating new session.");
-					}
-
-					sessidHTTP = indexPage.SessID_Create_HTTP_DB();
-					if(sessidHTTP.length() < 5)
-					{
-						MESSAGE_ERROR("", action, "in generating session ID");
-						throw CExceptionHTML("session can't be created");
-					}
-
-					if(action.length())
-					{
-					}
-					else
-					{
-						// --- Safari browser issue:
-						// --- 		1) cookie set via HTTP-response
-						// ---		2) JS removed sessid cookie
-						// ---		3) issue: cookie set on (1) step keeps reappear after 5 sec.
-						// --- To address Safari JS cookie issue, cookie should not be set on request "/"
-						{
-							MESSAGE_DEBUG("", action, "session cookie doesn't exists. Flow before check persitense session, no need to generate cookie. (workaround with JS cookie issue in Safari)");
-						}
-					}
-
-					action = GUEST_USER_DEFAULT_ACTION;
-				}
-				else
-				{
-					if(indexPage.SessID_Load_FromDB(sessidHTTP))
-					{
-						if(indexPage.SessID_CheckConsistency())
-						{
-							if(indexPage.SessID_Update_HTTP_DB())
-							{
-								indexPage.RegisterVariableForce("loginUser", "");
-								indexPage.RegisterVariableForce("loginUserID", "");
-
-								user.SetDB(&db);
-								if(indexPage.SessID_Get_UserFromDB() != "Guest")
-								{
-									// --- place 2change user FROM user.email to user.id
-									if(user.GetFromDBbyEmail(indexPage.SessID_Get_UserFromDB()))
-									{
-										ostringstream	ost1;
-										string			avatarPath;
-
-										indexPage.RegisterVariableForce("loginUser", indexPage.SessID_Get_UserFromDB());
-										indexPage.RegisterVariableForce("loginUserID", user.GetID());
-										indexPage.RegisterVariableForce("myLogin", user.GetLogin());
-										indexPage.RegisterVariableForce("myFirstName", user.GetName());
-										indexPage.RegisterVariableForce("myLastName", user.GetNameLast());
-
-										if((action.find("AJAX_") != string::npos) || (action.find("JSON_") != string::npos))
-										{
-											// --- don't look for user theme if it is AJAX_ or JSON_ request
-											// --- Site theme required only if it is template request
-											// --- this will save one request to DB
-										}
-										else
-										{
-											indexPage.RegisterVariableForce("site_theme", user.GetSiteTheme());
-										}
-
-										// --- Get user avatars
-										avatarPath = "empty";
-										if(db.Query("SELECT * FROM `users_avatars` WHERE `userid`='" + user.GetID() + "' and `isActive`='1';"))
-										{
-											ost1.str("");
-											ost1 << "/images/avatars/avatars" << db.Get(0, "folder") << "/" << db.Get(0, "filename");
-											avatarPath = ost1.str();
-										}
-										indexPage.RegisterVariableForce("myUserAvatar", avatarPath);
-
-										{
-											MESSAGE_DEBUG("", action, "user [" + user.GetLogin() + "] logged in");
-										}
-									}
-									else
-									{
-										// --- enforce to close session
-										action = "logout";
-
-										{
-											MESSAGE_ERROR("", action, "user [" + indexPage.SessID_Get_UserFromDB() + "] session exists on client device, but not in the DB. Change the [action = logout].");
-										}
-
-									}
-								}
-								else
-								{
-									{
-										MESSAGE_DEBUG("", action, "user [" + user.GetLogin() + "] surfing");
-									}
-
-									if(user.GetFromDBbyLogin(user.GetLogin()))
-									{
-										indexPage.RegisterVariableForce("loginUser", user.GetLogin());
-										indexPage.RegisterVariableForce("loginUserID", user.GetID());
-										indexPage.RegisterVariableForce("myLogin", user.GetLogin());
-										indexPage.RegisterVariableForce("myFirstName", user.GetName());
-										indexPage.RegisterVariableForce("myLastName", user.GetNameLast());
-										indexPage.RegisterVariableForce("site_theme", user.GetSiteTheme());
-									}
-									else
-									{
-										// --- enforce to close session
-										action = "logout";
-
-										{
-											MESSAGE_ERROR("", action, "user [" + indexPage.SessID_Get_UserFromDB() + "] session exists on client device, but not in the DB. Change the [action = logout].");
-										}
-
-									}
-
-								}
-							}
-							else
-							{
-								MESSAGE_ERROR("", action, "update session in HTTP or DB failed");
-							}
-						}
-						else
-						{
-							MESSAGE_ERROR("", action, "session consistency check failed");
-						}
-					}
-					else
-					{
-						MESSAGE_DEBUG("", "", "cookie session and DB session is not equal. Need to recreate session")
-
-						if(!indexPage.Cookie_Expire()) MESSAGE_ERROR("", action, "fail to expire session");
-
-						indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
-					} // --- if(indexPage.SessID_Load_FromDB(sessidHTTP))
-				} // --- if(sessidHTTP.length() < 5)
-			}
-	//------- End generate session
-
-
-	//------- Register html META-tags
-			{
-				int	affected;
-
-				affected = db.Query("SELECT `value` FROM `settings_default` WHERE `setting`=\"keywords_head\"");
-				if(affected > 0)
-				{
-					indexPage.RegisterVariable("keywords_head", db.Get(0, "value"));
-				}
-				else
-				{
-					MESSAGE_ERROR("", action, "getting keywords_head FROM settings_default");
-				}
-
-				affected = db.Query("SELECT `value` FROM `settings_default` WHERE `setting`=\"title_head\"");
-				if(affected > 0)
-				{
-					indexPage.RegisterVariable("title_head", db.Get(0, "value"));
-				}
-				else
-				{
-					MESSAGE_ERROR("", action, "getting title_head FROM settings_default");
-				}
-
-				affected = db.Query("SELECT `value` FROM `settings_default` WHERE `setting`=\"description_head\"");
-				if(affected > 0)
-				{
-					indexPage.RegisterVariable("description_head", db.Get(0, "value"));
-				}
-				else
-				{
-					MESSAGE_ERROR("", action, "getting description_head FROM settings_default");
-				}
-
-				affected = db.Query("SELECT `value` FROM `settings_default` WHERE `setting`=\"NewsOnSinglePage\"");
-				if(affected > 0)
-				{
-					indexPage.RegisterVariable("NewsOnSinglePage", db.Get(0, "value"));
-				}
-				else
-				{
-					ostringstream	ost;
-					MESSAGE_ERROR("", action, "getting NewsOnSinglePage FROM settings_default");
-
-					ost.str("");
-					ost << NEWS_ON_SINGLE_PAGE;
-					indexPage.RegisterVariable("NewsOnSinglePage", ost.str());
-				}
-
-				affected = db.Query("SELECT `value` FROM `settings_default` WHERE `setting`=\"FriendsOnSinglePage\"");
-				if(affected > 0)
-				{
-					indexPage.RegisterVariable("FriendsOnSinglePage", db.Get(0, "value"));
-				}
-				else
-				{
-					ostringstream	ost;
-					MESSAGE_ERROR("", action, "getting FriendsOnSinglePage FROM settings_default");
-
-					ost.str("");
-					ost << FRIENDS_ON_SINGLE_PAGE;
-					indexPage.RegisterVariable("FriendsOnSinglePage", ost.str());
-				}
-
-				if((action.empty()) and (user.GetLogin().length()) and (user.GetLogin() != "Guest"))
-				{
-					action = GetDefaultActionFromUserType(user.GetType(), &db);
-
-					{
-						CLog	log;
-						log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "] META-registration: action has been overriden to 'logged-in user' default action [action = ", action, "]");
-					}
-				}
-				else if(action.empty())
-				{
-					action = GUEST_USER_DEFAULT_ACTION;
-
-					{
-						CLog	log;
-						log.Write(DEBUG, string(__func__) + string("[") + to_string(__LINE__) + "] META-registration: action has been overriden to 'guest user' default action [action = ", action, "]");
-					}
-				}
-			}
-			*/
-	//------- End register html META-tags
 		}
 	// ------------ end generate common parts
 
@@ -5029,7 +4794,7 @@ int main()
 			{
 				MESSAGE_ERROR("", action, "(not an error, severity error to monitor) registered user(" + user.GetLogin() + ") attempts to access login page, redirect to default page");
 
-				indexPage.Redirect(GetDefaultActionFromUserType(user.GetType(), &db) + "?rand=" + GetRandom(10));
+				indexPage.Redirect("/" + GetDefaultActionFromUserType(user.GetType(), &db) + "?rand=" + GetRandom(10));
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
@@ -5553,9 +5318,7 @@ int main()
 								indexPage.RegisterVariableForce("loginUser", user.GetLogin());
 								indexPage.RegisterVariableForce("menu_main_active", "active");
 
-								{
-									MESSAGE_DEBUG("", action, "redirect to \"" + GetDefaultActionFromUserType(user.GetType(), &db) + "?rand=xxxxxx\"");
-								}
+								MESSAGE_DEBUG("", action, "redirect to \"/" + GetDefaultActionFromUserType(user.GetType(), &db) + "?rand=xxxxxx\"");
 
 								ostResult.str("");
 								ostResult << "{";
@@ -5715,129 +5478,132 @@ int main()
 
 		if(action == "activateNewUser")
 		{
-			ostringstream 	ost;
-			CActivator 		act;
-			string			activatorID;
+			MESSAGE_DEBUG("", action, "start");
 
+			if(user.GetLogin() == "Guest")
 			{
-				MESSAGE_DEBUG("", action, "start");
-			}
+				CActivator 		act;
+				auto			activatorID = indexPage.GetVarsHandler()->Get("activator");
 
-			activatorID = "";
-			activatorID = indexPage.GetVarsHandler()->Get("activator");
 
-			act.SetCgi(&indexPage);
-			act.SetDB(&db);
-			if(!act.Load(activatorID))
-			{
+				act.SetCgi(&indexPage);
+				act.SetDB(&db);
+				if(!act.Load(activatorID)) 
 				{
 					MESSAGE_DEBUG("", action, "failed to Load activator [" + activatorID + "]");
-				}
 
-				if(!indexPage.SetTemplate("weberror_activator_notfound.htmlt"))
-				{
-					MESSAGE_ERROR("", action, "template file weberror_activator_notfound.htmlt was missing");
-					throw CExceptionHTML("Template file was missing");
-				}
-
-			}
-			else
-			{
-				// --- account activated
-				act.Activate();
-
-				// --- improve the user expirience by automatically sign-in user
-				// --- automatic sing-in
-				string		sessid, login, rememberMe, lng;
-				CUser		user;
-
-				sessid = indexPage.GetCookie("sessid");
-				if(sessid.length() < 5)
-				{
-					
-					MESSAGE_DEBUG("", action, "with session id derived FROM cookies");
-
-					if(!indexPage.SetTemplate("weberror_cookie_disabled.htmlt.htmlt"))
+					if(!indexPage.SetTemplate("weberror_activator_notfound.htmlt"))
 					{
-						MESSAGE_ERROR("", action, "template weberror_cookie_disabled.htmlt can't be found");
-						throw CExceptionHTML("cookies");
+						CLog	log;
+
+						MESSAGE_ERROR("", action, "template file weberror_activator_notfound.htmlt was missing");
+						throw CExceptionHTML("Template file was missing");
 					}
 
-				} // --- if(sessid.length() < 5)
-				else
+				}
+				else 
 				{
-					login = act.GetUser();
-					rememberMe = "remember-me";
-					lng = indexPage.GetLanguage();
+					// --- account activated
+					act.Activate();
 
-					user.SetDB(&db);
-					if(!user.GetFromDBbyEmail(login))
+					// --- improve the user expirience by automatically sign-in user
+					// --- automatic sing-in
+					string		sessid, login, rememberMe, lng;
+					CUser		user;
+
+					sessid = indexPage.GetCookie("sessid");
+					if(sessid.length() < 5)
 					{
-						MESSAGE_DEBUG("", action, "" + action + ": user [" + user.GetLogin() + "] not found");
+						MESSAGE_DEBUG("", action, "with session id derived FROM cookies");
 
-						if(!indexPage.SetTemplate("weberror_user_not_found.htmlt"))
+						if(!indexPage.SetTemplate("weberror_cookie_disabled.htmlt.htmlt"))
 						{
-							throw CExceptionHTML("template page missing");
+							CLog	log;
+							MESSAGE_ERROR("", action, "template weberror_cookie_disabled.htmlt can't be found");
+							throw CExceptionHTML("cookies");
 						}
 
-					}
-					else
+					} // --- if(sessid.length() < 5)
+					else 
 					{
+						login = act.GetUser();
+						rememberMe = "remember-me";
+						lng = indexPage.GetLanguage();
 
-						if(!user.isActive())
+						user.SetDB(&db);
+						if(!user.GetFromDBbyEmail(login)) 
 						{
-							MESSAGE_ERROR("", action, "user [" + user.GetLogin() + "] not activated");
+							MESSAGE_DEBUG("", action, "user [" + user.GetLogin() + "] not found");
 
-							if(!indexPage.SetTemplate("weberror_user_not_activared.htmlt"))
+							if(!indexPage.SetTemplate("weberror_user_not_found.htmlt"))
 							{
 								throw CExceptionHTML("template page missing");
 							}
+
 						}
-						else
+						else 
 						{
-							ostringstream	ost1;
 
+							if(!user.isActive()) 
 							{
-								MESSAGE_DEBUG("", action, "" + action + ": switching session (" + sessid + ") FROM Guest to user (" + user.GetLogin() + ")");
-							}
+								CLog	log;
+								MESSAGE_ERROR("", action, "user [" + user.GetLogin() + "] not activated");
 
-							// --- 2delete if login works till Nov 1
-							// ost1.str("");
-							// ost1 << "update `users` set `last_online`=NOW(), `ip`='" << getenv("REMOTE_ADDR") << "' WHERE `login`='" << user.GetLogin() << "';";
-							// db.Query(ost1.str());
-
-							ost1.str("");
-							ost1 << "update `sessions` set `user`='" << login << "', `ip`='" << getenv("REMOTE_ADDR") << "', `expire`=" << (rememberMe == "remember-me" ? 0 : SESSION_LEN * 60) << " WHERE `id`='" << sessid << "';";
-							db.Query(ost1.str());
-
-							if(rememberMe == "remember-me")
-							{
-								if(!indexPage.CookieUpdateTS("sessid", 0))
+								if(!indexPage.SetTemplate("weberror_user_not_activared.htmlt"))
 								{
-									MESSAGE_ERROR("", action, "in setting up expiration sessid cookie to infinite");
+									throw CExceptionHTML("template page missing");
 								}
 							}
-
-							indexPage.RegisterVariableForce("loginUser", user.GetLogin());
-							indexPage.RegisterVariableForce("menu_main_active", "active");
-
-
+							else 
 							{
-								MESSAGE_DEBUG("", action, "" + action + ": redirection to \"news_feed?rand=xxxxxx\"");
-							}
-							ost1.str("");
-							ost1 << "/news_feed?rand=" << GetRandom(10);
-							indexPage.Redirect(ost1.str());
+								ostringstream	ost1;
 
-						}  // if(!user.isActive())
-					}  // if(!user.isFound())
-				} // if(sessid.length() < 5)
-			} // if(!act.Load(activatorID))
+								{
+									MESSAGE_DEBUG("", action, "switching session (" + sessid + ") FROM Guest to user (" + user.GetLogin() + ")");
+								}
+
+								// --- 2delete if login works till Nov 1
+								// ost1.str("");
+								// ost1 << "update `users` set `last_online`=NOW(), `ip`='" << getenv("REMOTE_ADDR") << "' WHERE `login`='" << user.GetLogin() << "';";
+								// db.Query(ost1.str());
+
+								ost1.str("");
+								ost1 << "update `sessions` set `user`='" << login << "', `ip`='" << getenv("REMOTE_ADDR") << "', `expire`=" << (rememberMe == "remember-me" ? 0 : SESSION_LEN * 60) << " WHERE `id`='" << sessid << "';";
+								db.Query(ost1.str());
+
+								if(rememberMe == "remember-me") 
+								{
+									if(!indexPage.CookieUpdateTS("sessid", 0))
+									{
+										MESSAGE_ERROR("", action, "sets expiration sessid cookie to infinite");
+									}
+								}
+
+								indexPage.RegisterVariableForce("loginUser", user.GetLogin());
+								indexPage.RegisterVariableForce("menu_main_active", "active");
 
 
-			{
-				MESSAGE_DEBUG("", action, "action = " + action + ": end");
+								{
+									MESSAGE_DEBUG("", action, "redirection to \"news_feed?rand=xxxxxx\"");
+								}
+								ost1.str("");
+								ost1 << "/news_feed?rand=" << GetRandom(10);
+								indexPage.Redirect(ost1.str());
+
+							}  // if(!user.isActive()) 
+						}  // if(!user.isFound()) 
+					} // if(sessid.length() < 5)
+				} // if(!act.Load(activatorID))
 			}
+			else
+			{
+				MESSAGE_ERROR("", action, "(not an error, severity error should be monitor) registered user(" + user.GetLogin() + ") attempts to access activateNewUser page, redirect to default page");
+
+				indexPage.Redirect("/" + GetDefaultActionFromUserType(user.GetType(), &db) + "?rand=" + GetRandom(10));
+			}
+
+
+			MESSAGE_DEBUG("", action, "finish");
 		}
 
 		// --- Account properties
@@ -6911,7 +6677,7 @@ int main()
 			{
 				MESSAGE_ERROR("", action, "(not an error, severity error to monitor) registered user(" + user.GetLogin() + ") attempts to access showmain page, redirect to default page");
 
-				indexPage.Redirect(GetDefaultActionFromUserType(user.GetType(), &db) + "?rand=" + GetRandom(10));
+				indexPage.Redirect("/" + GetDefaultActionFromUserType(user.GetType(), &db) + "?rand=" + GetRandom(10));
 			}
 		}
 

@@ -1047,18 +1047,19 @@ int main(void)
 	CStatistics		appStat;  // --- CStatistics must be firts statement to measure end2end param's
 	CCgi			indexPage(EXTERNAL_TEMPLATE);
 	CUser			user;
-	string			action, partnerID;
 	CMysql			db;
-	struct timeval	tv;
+	string			action = "";
 
-	{
-		MESSAGE_DEBUG("", action, __FILE__);
-	}
+	MESSAGE_DEBUG("", action, __FILE__);
 
 	signal(SIGSEGV, crash_handler);
 
-	gettimeofday(&tv, NULL);
-	srand(tv.tv_sec * tv.tv_usec * 100000);
+	// --- randomization
+	{
+		struct timeval	tv;
+		gettimeofday(&tv, NULL);
+		srand(tv.tv_sec * tv.tv_usec * 100000);
+	}
 
 	try
 	{

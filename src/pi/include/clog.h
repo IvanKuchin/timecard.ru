@@ -26,17 +26,20 @@ using namespace std;
 #define	PANIC		3
 
 #define	CURRENT_LOG_LEVEL			DEBUG
+
 #define	MESSAGE_DEBUG(classname_legacy, action, mess) \
 { \
 	CLog	obj; \
 	string	pretty = __PRETTY_FUNCTION__;  \
 	string	classname = ""s; \
+	string	action_output = ""s; \
 	size_t	p1 = pretty.find(" "); \
 	size_t	p2 = pretty.find("::", (p1 == string::npos ? 0 : p1)); \
 \
 	if((p1 != string::npos) && (p2 != string::npos) && (p1 < p2)) { classname = pretty.substr(p1 + 1, p2 - p1 + 1); } \
+	if(string(action).length()) action_output = " "s + action + ":"; \
 \
-	obj.Write(DEBUG, classname + string(__func__) + "[" + to_string(__LINE__) + "]" + (string(action) == "" ? "" : " "s + action + ":") + " " + mess); \
+	obj.Write(DEBUG, classname + string(__func__) + "[" + to_string(__LINE__) + "]" + action_output + " " + mess); \
 }
 
 #define	MESSAGE_ERROR(classname_legacy, action, mess) \
@@ -44,12 +47,14 @@ using namespace std;
 	CLog	obj; \
 	string	pretty = __PRETTY_FUNCTION__;  \
 	string	classname = ""s; \
+	string	action_output = ""s; \
 	size_t	p1 = pretty.find(" "); \
 	size_t	p2 = pretty.find("::", (p1 == string::npos ? 0 : p1)); \
 \
 	if((p1 != string::npos) && (p2 != string::npos) && (p1 < p2)) { classname = pretty.substr(p1 + 1, p2 - p1 + 1); } \
+	if(string(action).length()) action_output = " "s + action + ":"; \
 \
-	obj.Write(ERROR, classname + string(__func__) + "[" + to_string(__LINE__) + "]" + (string(action) == "" ? "" : " "s + action + ":") + " " + mess); \
+	obj.Write(ERROR, classname + string(__func__) + "[" + to_string(__LINE__) + "]" + action_output + " " + mess); \
 }
 
 using namespace std::chrono;

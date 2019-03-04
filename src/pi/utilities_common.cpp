@@ -133,7 +133,7 @@ auto GenerateSession(string action, CCgi *indexPage, CMysql *db, CUser *user) ->
 			// ---              it will request many AJAX-s: EchoRequest, GetNavChatStatus, GetNewsFeed
 			// ---              some of those will assign _new_sessid_ cookies and these cookies will be diffferent
 			// ---              prohibiting AJAX to assign sessid cookies, help to avoid assignment multiple sessid cookies 
-			MESSAGE_ERROR("", action, "no sessid cookie assignment in AJAX/JSON handler, this is not normal workflow. This line may appear in the log only if AJAX_ been requested prior to _main_doc_ or _main_doc_ with clean cookies has been cached in a browser.");
+			MESSAGE_DEBUG("", action, "no sessid cookie assignment in AJAX/JSON handler. This line may appear in the log only if AJAX_ been requested prior to _main_doc_ or _main_doc_ with clean cookies has been cached in a browser.");
 		}
 		else
 		{

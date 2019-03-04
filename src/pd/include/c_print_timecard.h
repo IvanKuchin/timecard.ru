@@ -111,7 +111,7 @@ class C_Print_Timecard
 		auto		__HPDF_StopTable() -> string;
 		auto		__HPDF_GetTimecardTableXByPercentage(double percent) -> double;
 		auto		__HPDF_DrawTimecardVerticalLine(double x) -> string;
-		auto		__HPDF_PaintDay(int day_number, double red, double green, double blue) -> string;
+		auto		__HPDF_PaintDay(int day_number, double red, double green, double blue, int number_of_lines = 1) -> string;
 
 
 

@@ -24,6 +24,7 @@ set(JOINT_LIBRARY_SRCs
     cstatistics.cpp
     cvideoconverter.cpp
     c_float.cpp
+    c_archive.cpp
     utilities1.cpp
     utilities2.cpp
     utilities_common.cpp
@@ -85,6 +86,7 @@ find_package(OpenSSL REQUIRED)
 find_package(CURL REQUIRED)
 find_package(LibWebSockets REQUIRED)
 find_package(Libhpdf REQUIRED)
+find_package(Libarchive REQUIRED)
 find_package(Libxl REQUIRED)
 
 if(IMAGEMAGICK_DISABLE)
@@ -118,6 +120,7 @@ set(PROJECT_PI_INCLUDE_DIRECTORIES
     ${AVUTIL_INCLUDE_DIR}
     ${AVFORMAT_INCLUDE_DIR}
     ${HPDF_INCLUDE_DIR}
+    ${ARCHIVE_INCLUDE_DIR}
     ${XL_INCLUDE_DIR}
     )
 
@@ -130,6 +133,7 @@ set(PROJECT_EXTERNAL_LIBS
     ${AVFORMAT_LIBRARY}
     ${MAXMINDDB_LIBRARY}
     ${HPDF_LIBRARY}
+    ${ARCHIVE_LIBRARY}
     ${XL_LIBRARY}
     )
 

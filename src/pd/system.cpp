@@ -322,7 +322,7 @@ int main()
 			mapResult["result"] = "error";
 			mapResult["sessionPersistence"] = "false";
 			mapResult["userPersistence"] = "false";
-			mapResult["redirect"] = GetDefaultActionFromUserType(user.GetType(), &db);
+			mapResult["redirect"] = "/" + GetDefaultActionFromUserType(user.GetType(), &db) + "?rand=" + GetRandom(10);
 
 			if(remoteAddr && (!isPersistenceRateLimited(remoteAddr, &db)))
 			{
@@ -397,7 +397,7 @@ int main()
 										string	remove_flag_timestamp = db.Get(0, "remove_flag_timestamp");
 
 										if(remove_flag == "Y")
-											MESSAGE_ERROR("", action, "session(" + sessidPersistence + ") would be deleted at " + remove_flag_timestamp + ", but it is re-used. Investigate why it is re-used.");
+											MESSAGE_DEBUG("", action, "session(" + sessidPersistence + ") would be deleted at " + remove_flag_timestamp + " timestamp, but it is re-used (probably pressed back-button in browser or refreshed old tab).");
 
 										if(sessidPersistence == sessidHTTP)
 										{
@@ -407,7 +407,7 @@ int main()
 											// --- 3) /autologin use completely different sessid (WRONG behavior)
 											// --- 4) /checkSessionPersistense have sessidHTTP == sessidPersistence
 											// --- 5) you are here ! No need to remove session from DB
-											MESSAGE_ERROR("", action, "App sessid == cookie sessid. Call flow should not send you to autologin, check the call flow.");
+											MESSAGE_ERROR("", action, "App sessid == cookie sessid. Normal call flow should not send you to autologin. Probably you get here trying to close another tab (check timestamp whan HTTP_REFERER: " + (getenv("HTTP_REFERER") ? getenv("HTTP_REFERER") : "") + " was requested from the server)");
 										}
 										else
 										{
@@ -417,7 +417,7 @@ int main()
 											db.Query("UPDATE `sessions` SET `remove_flag`=\"Y\", `remove_flag_timestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sessidPersistence + "\";");
 										}
 
-										mapResult["redirect"] = GetDefaultActionFromUserType(user.GetType(), &db);
+										mapResult["redirect"] = "/" + GetDefaultActionFromUserType(user.GetType(), &db) + "?rand=" + GetRandom(10);
 
 										db.Query("UPDATE `sessions` SET `user`=\"" + persistedUser + "\", expire=\"" + persistedExpire + "\" WHERE `id`=\"" + sessidHTTP + "\";");
 										if(db.isError())
