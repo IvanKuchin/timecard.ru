@@ -1561,7 +1561,7 @@ bool RmDirRecursive(const char *dirname)
 			{
 
 				MESSAGE_DEBUG("", "", "remove file " + path);
-				// unlink(path);
+				unlink(path);
 			}
 		}
 	}
@@ -1569,7 +1569,7 @@ bool RmDirRecursive(const char *dirname)
 	closedir(dir);
 	
 	MESSAGE_DEBUG("", "", "remove dir " + dirname);
-	// rmdir(dirname);
+	rmdir(dirname);
 	
 	MESSAGE_DEBUG("", "", "finish (" + dirname + ")");
 

@@ -1,5 +1,18 @@
 #include "account.h"
 
+static auto RemovePhoneConfirmationCodes(string sessid, CMysql *db)
+{
+	auto	error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	db->Query("DELETE FROM `phone_confirmation` WHERE `session`=\"" + sessid + "\";");
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return error_message;
+}
+
 int main()
 {
 	CStatistics		appStat;  // --- CStatistics must be firts statement to measure end2end param's
@@ -9,10 +22,7 @@ int main()
 	CMysql			db;
 	struct timeval	tv;
 
-	{
-		CLog	log;
-		log.Write(DEBUG, __func__ + "["s + to_string(__LINE__) + "]: " + __FILE__);
-	}
+	MESSAGE_DEBUG("", "", __FILE__);
 
 	signal(SIGSEGV, crash_handler); 
 
@@ -47,11 +57,9 @@ int main()
 	db.Query("set names utf8;");
 #endif
 
-	action = indexPage.GetVarsHandler()->Get("action");
-	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + ": action = ", action);
-	}
+	action = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("action"));
+
+	MESSAGE_DEBUG("", "", "action = " + action);
 
 	// --- generate common parts
 	{
@@ -67,6 +75,7 @@ int main()
 
 		//------- Generate session
 		action = GenerateSession(action, &indexPage, &db, &user);
+		action = LogoutIfGuest(action, &indexPage, &db, &user);
 	}
 // ------------ end generate common parts
 
@@ -83,6 +92,7 @@ int main()
 		}
 
 		ostResult.str("");
+/*
 		if(user.GetLogin() == "Guest")
 		{
 			{
@@ -93,6 +103,7 @@ int main()
 			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
 		}
 		else
+*/
 		{
 			loginFromUser = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("login"));
 
@@ -197,7 +208,7 @@ int main()
 		}
 
 		ostResult.str("");
-		if(user.GetLogin() == "Guest")
+/*		if(user.GetLogin() == "Guest")
 		{
 			{
 				CLog	log;
@@ -207,6 +218,7 @@ int main()
 			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
 		}
 		else
+*/
 		{
 			userSex = indexPage.GetVarsHandler()->Get("userSex");
 
@@ -279,7 +291,7 @@ int main()
 		}
 
 		ostResult.str("");
-		if(user.GetLogin() == "Guest")
+/*		if(user.GetLogin() == "Guest")
 		{
 			{
 				CLog	log;
@@ -289,6 +301,7 @@ int main()
 			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
 		}
 		else
+*/
 		{
 			userBirthday = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("value"));
 
@@ -361,7 +374,7 @@ int main()
 		}
 
 		ostResult.str("");
-		if(user.GetLogin() == "Guest")
+/*		if(user.GetLogin() == "Guest")
 		{
 			{
 				CLog	log;
@@ -371,6 +384,7 @@ int main()
 			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
 		}
 		else
+*/
 		{
 			string::size_type 	openBrace;
 			string				cityID = "";
@@ -456,7 +470,7 @@ int main()
 		}
 
 		ostResult.str("");
-		if(user.GetLogin() == "Guest")
+/*		if(user.GetLogin() == "Guest")
 		{
 			{
 				CLog	log;
@@ -466,6 +480,7 @@ int main()
 			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
 		}
 		else
+*/
 		{
 			db.Query("UPDATE `users` SET `birthdayAccess`=\"" + birthdayAccess + "\" WHERE `id`=\"" + user.GetID() + "\";");
 			if(!db.isError())
@@ -506,47 +521,178 @@ int main()
 		}
 	}   // if(action == "AJAX_editProfile_setBirthdayPrivate")
 
-
-
-
-
+	if(action == "AJAX_sendPhoneConfirmationSMS")
 	{
-		CLog	log;
-		ostringstream	ost;
+		auto			template_file = "json_response.htmlt"s;
+		auto			error_message = ""s;
+		ostringstream   ostResult;
 
-		ost.str("");
-		ost << __func__ << "[" << __LINE__ << "]: end (action's == \"" << action << "\") condition";
-		log.Write(DEBUG, ost.str());
+/*		if(user.GetLogin() == "Guest")
+		{
+			MESSAGE_DEBUG("", "", "re-login required");
+			error_message = "re-login required";
+		}
+		else
+*/
+		{
+			auto			country_code = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("country_code"));
+			auto			phone_number = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("phone_number"));
+			auto			confirmation_code = GetRandom(4);
+			c_smsc			smsc(&db);
+
+			MESSAGE_DEBUG("", action, "start");
+
+			if(country_code.length() && phone_number.length())
+			{
+				auto	phone_confirmation_id = db.InsertQuery("INSERT INTO `phone_confirmation` (`session`, `confirmation_code`, `country_code`, `phone_number`, `eventTimestamp`)"
+								" VALUES ("
+								"\"" + indexPage.SessID_Get_FromHTTP() + "\","
+								"\"" + confirmation_code + "\","
+								"\"" + country_code + "\","
+								"\"" + phone_number + "\","
+								"UNIX_TIMESTAMP()"
+								")"
+								);
+
+				if(phone_confirmation_id)
+				{
+					auto	ret = smsc.send_sms(country_code + phone_number, "Код для привязки телефона " + confirmation_code, 0, "", 0, 0, DOMAIN_NAME, "", "");
+				}
+				else
+				{
+					MESSAGE_ERROR("", action, "fail to insert to db");
+					error_message = gettext("SQL syntax issue");
+				}
+			}
+			else
+			{
+				error_message = gettext("phone number is incorrect");
+				MESSAGE_ERROR("", action, "country_code(" + country_code + ") or phone_number(" + phone_number + ") is empty");
+			}
+		}
+
+		ostResult.str("");
+		if(error_message.empty())
+		{
+			ostResult << "{" 
+					  << "\"result\":\"success\""
+					  << "}";
+		}
+		else
+		{
+			MESSAGE_ERROR("", action, "fail to send phone confirmation sms");
+
+			ostResult << "{" 
+					  << "\"result\":\"error\","
+					  << "\"description\":\"" + error_message + "\""
+					  << "}";
+		}
+
+		indexPage.RegisterVariableForce("result", ostResult.str());
+
+		if(!indexPage.SetTemplate(template_file))
+		{
+			MESSAGE_ERROR("", action, "template file " + template_file + " was missing");
+			throw CException("Template file " + template_file + " was missing");
+		}
+
+		MESSAGE_DEBUG("", action, "finish");
 	}
+
+	if(action == "AJAX_checkPhoneConfirmationCode")
+	{
+		auto			template_file = "json_response.htmlt"s;
+		auto			error_message = ""s;
+		auto			extra_fields = ""s;
+		ostringstream   ostResult;
+
+		{
+			auto			confirmation_code = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("confirmation_code"));
+
+			MESSAGE_DEBUG("", action, "start");
+
+			if(db.Query("SELECT * FROM `phone_confirmation` WHERE "
+							"`confirmation_code`=\"" + confirmation_code + "\" AND "
+							"`session`=\"" + indexPage.SessID_Get_FromHTTP() + "\" AND "
+							"`attempt`<=\"3\" AND "
+							"`eventTimestamp`>=(UNIX_TIMESTAMP() - " + to_string(SMSC_EXPIRATION) + ")"
+							";"))
+			{
+				auto	country_code = db.Get(0, "country_code");
+				auto	phone_number = db.Get(0, "phone_number");
+
+				db.Query("UPDATE `users` SET `country_code`=\"" + country_code + "\", `phone`=\"" + phone_number + "\" , `is_phone_confirmed`=\"Y\" WHERE `id`=\"" + user.GetID() + "\";");
+				if(db.isError())
+				{
+					MESSAGE_ERROR("", action, "fail to update db");
+					error_message = gettext("SQL syntax issue");
+				}
+				else
+				{
+					RemovePhoneConfirmationCodes(indexPage.SessID_Get_FromHTTP(), &db);
+				}
+			}
+			else
+			{
+				db.Query("UPDATE `phone_confirmation` SET `attempt`=`attempt` + 1 WHERE"
+							"`session`=\"" + indexPage.SessID_Get_FromHTTP() + "\" AND "
+							"`eventTimestamp`>=(UNIX_TIMESTAMP() - " + to_string(SMSC_EXPIRATION) + ")"
+							);
+
+				if(db.Query("SELECT `attempt` FROM `phone_confirmation` WHERE "
+								"`session`=\"" + indexPage.SessID_Get_FromHTTP() + "\" AND "
+								"`eventTimestamp`>=(UNIX_TIMESTAMP() - " + to_string(SMSC_EXPIRATION) + ")"
+								";"))
+				{
+					auto	attempts = db.Get(0, "attempt");
+
+					if(stoi(attempts) >= 3) RemovePhoneConfirmationCodes(indexPage.SessID_Get_FromHTTP(), &db);
+					extra_fields = "\"attempt\":\"" + attempts + "\",";
+				}
+				else
+				{
+					MESSAGE_ERROR("", "", "fail to select data");
+				}
+				error_message = gettext("incorrect confirmation code");
+				MESSAGE_ERROR("", action, "incorrect confirmation code");
+			}
+		}
+
+		ostResult.str("");
+		if(error_message.empty())
+		{
+			ostResult << "{" 
+					  << "\"result\":\"success\""
+					  << "}";
+		}
+		else
+		{
+			MESSAGE_ERROR("", action, "fail to send phone confirmation sms");
+
+			ostResult << "{" 
+					  << "\"result\":\"error\","
+					  << extra_fields
+					  << "\"description\":\"" + error_message + "\""
+					  << "}";
+		}
+
+		indexPage.RegisterVariableForce("result", ostResult.str());
+
+		if(!indexPage.SetTemplate(template_file))
+		{
+			MESSAGE_ERROR("", action, "template file " + template_file + " was missing");
+			throw CException("Template file " + template_file + " was missing");
+		}
+
+		MESSAGE_DEBUG("", action, "finish");
+	}
+
+
+	MESSAGE_DEBUG("", action, "finish condition")
 
 	indexPage.OutTemplate();
 
 	}
-/*
-	catch(CExceptionRedirect &c) {
-		CLog	log;
-		ostringstream	ost;
-
-		ost.str("");
-		ost << string(__func__) + ":: catch CRedirectHTML: exception used for redirection";
-		log.Write(DEBUG, ost.str());
-
-		c.SetDB(&db);
-
-		if(!indexPage.SetTemplate(c.GetTemplate())) {
-
-			ost.str("");
-			ost << string(__func__) + ":: catch CRedirectHTML: ERROR, template redirect.htmlt not found";
-			log.Write(ERROR, ost.str());
-
-			throw CException("Template file was missing");
-		}
-
-		indexPage.RegisterVariableForce("content", "redirect page");
-		indexPage.OutTemplate();
-
-	}
-*/
 	catch(CExceptionHTML &c)
 	{
 		CLog	log;

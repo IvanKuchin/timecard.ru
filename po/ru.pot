@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-01 06:32-0500\n"
+"POT-Creation-Date: 2019-03-10 20:08-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -83,9 +83,6 @@ msgstr "ТЗ с таким номером уже есть"
 msgid "PSoW: number"
 msgstr "Номер ТЗ"
 
-msgid "Title"
-msgstr "Должность"
-
 msgid "Project ID"
 msgstr "Идентификационный номер проекта"
 
@@ -122,6 +119,9 @@ msgstr "Таймкарта не принадлежит агенству"
 msgid "Timecard not found"
 msgstr "Таймкарта не найдена"
 
+msgid "Title"
+msgstr "Должность"
+
 msgid "Total days on duty"
 msgstr "Количество дней оказания услуг"
 
@@ -149,6 +149,12 @@ msgstr "агенство не найдено"
 msgid "agreement from"
 msgstr "от"
 
+msgid "can't close archive"
+msgstr "не удалось закрыть фаил архива"
+
+msgid "can't create archive"
+msgstr "не удалось создать фаил архива"
+
 msgid "changed"
 msgstr "изменилось"
 
@@ -170,6 +176,9 @@ msgstr "даты командировки вне периода назначен
 msgid "dayrate changed"
 msgstr "dayrate изменился"
 
+msgid "db is not initialized"
+msgstr "ошибка БД"
+
 msgid "description updated"
 msgstr "описание изменено"
 
@@ -184,6 +193,9 @@ msgstr "невозможно создать временное хранилищ�
 
 msgid "fail to initialize hpdf library"
 msgstr "ошибка инициализации библиотеки libharu"
+
+msgid "fail to insert to db"
+msgstr "ошибка БД"
 
 msgid "from"
 msgstr "с"
@@ -215,6 +227,9 @@ msgstr "hpdf: не удалось напечатать заголовок тай
 msgid "hpdf: table top must be higher than bottom"
 msgstr "hpdf: верх таблицы должен быть выше чем нижняя часть"
 
+msgid "incorrect confirmation code"
+msgstr "некорректный код"
+
 msgid "kop."
 msgstr "коп."
 
@@ -226,6 +241,9 @@ msgstr "выберите один фаил"
 
 msgid "period start have to precede period end"
 msgstr "начало должно быть раньше окончания"
+
+msgid "phone number is incorrect"
+msgstr "некорректный номер телефона"
 
 msgid "position changed"
 msgstr "изменили должность"

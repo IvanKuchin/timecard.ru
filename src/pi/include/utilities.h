@@ -182,6 +182,7 @@ auto			PrintTime(const struct tm &_tm, string format) -> string;
 auto			GetZipInJSONFormat(string zip_id, CMysql *, CUser *) -> string;
 auto			GetBankInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			stod_noexcept(const string &) -> double;
+auto			MaskSymbols(string src, int first_pos, int last_pos) -> string;
 
 // --- function set for image upload/removal
 auto 			GetSpecificData_GetNumberOfFolders(string itemType) -> int;

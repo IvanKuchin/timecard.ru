@@ -25,6 +25,7 @@ set(JOINT_LIBRARY_SRCs
     cvideoconverter.cpp
     c_float.cpp
     c_archive.cpp
+    c_smsc.cpp
     utilities1.cpp
     utilities2.cpp
     utilities_common.cpp

@@ -4324,12 +4324,8 @@ int main()
 								ostResult << "\"description\": \"Ошибка БД\"";
 								ostResult << "}";
 							}
-
-
-
-							{
-								MESSAGE_ERROR("", action, "password has been changed successfully");
-							}
+							
+							MESSAGE_DEBUG("", action, "password has been changed successfully");
 						}
 					} // if(newPassword.length() > 0)
 					else
@@ -5805,10 +5801,27 @@ int main()
 		{
 			ostringstream	ost, ostResult;
 			int				affected;
-			string			userID, name, nameLast, age, sex, birthday, birthdayAccess, cv, pass, address, phone, email, isBlocked, avatarFileName, avatarFolderName, current_company;
-			string			site_theme_id;
-			string			geo_locality_id, city = "";
-			string			appliedVacanciesRender = "";
+			auto			userID = ""s;
+			auto			name = ""s;
+			auto			nameLast = ""s;
+			auto			age = ""s;
+			auto			sex = ""s;
+			auto			birthday = ""s;
+			auto			birthdayAccess = ""s;
+			auto			cv = ""s;
+			auto			pass = ""s;
+			auto			address = ""s;
+			auto			phone = ""s;
+			auto			country_code = ""s;
+			auto			email = ""s;
+			auto			isBlocked = ""s;
+			auto			avatarFileName = ""s;
+			auto			avatarFolderName = ""s;
+			auto			current_company = ""s;
+			auto			site_theme_id = ""s;
+			auto			geo_locality_id = ""s;
+			auto			city = ""s;
+			auto			appliedVacanciesRender = ""s;
 
 
 /*
@@ -5819,39 +5832,32 @@ int main()
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
 			}
 */
-
 			userID = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
 
-			if(!userID.length())
-			{
-				ostringstream		ost;
-
-				ost.str("");
-				ost << user.GetID();
-				userID = ost.str();
-			}
+			if(userID.empty()) userID = user.GetID();
 
 			ostResult.str("");
 			ost.str("");
-			ost << "SELECT \
-						`users`.`id` 						as `users_id`, \
-						`users`.`name` 						as `users_name`, \
-						`users`.`nameLast`					as `users_nameLast`, \
-						`users`.`geo_locality_id`			as `users_geo_locality_id`, \
-						`users`.`cv` 						as `users_cv`, \
-						`users_passwd`.`passwd` 			as `users_passwd_passwd`, \
-						`users`.`address`					as `users_address`, \
-						`users`.`phone`						as `users_phone`, \
-						`users`.`email`						as `users_email`, \
-						`users`.`sex`						as `users_sex`, \
-						`users`.`birthday`					as `users_birthday`, \
-						`users`.`birthdayAccess`			as `users_birthdayAccess`, \
-						`users`.`site_theme_id`				as `users_site_theme_id`, \
-						`users`.`appliedVacanciesRender`	as `users_appliedVacanciesRender`, \
-						`users`.`isblocked`					as `users_isblocked` \
-					FROM `users` \
-					INNER JOIN `users_passwd` ON `users_passwd`.`userID`=`users`.`id` \
-					WHERE `users`.`id`='" << userID << "' AND `users_passwd`.`isActive`='true';";
+			ost << "SELECT "
+						"`users`.`id` 						as `users_id`, "
+						"`users`.`name` 					as `users_name`, "
+						"`users`.`nameLast`					as `users_nameLast`, "
+						"`users`.`geo_locality_id`			as `users_geo_locality_id`, "
+						"`users`.`cv` 						as `users_cv`, "
+						"`users_passwd`.`passwd` 			as `users_passwd_passwd`, "
+						"`users`.`address`					as `users_address`, "
+						"`users`.`country_code`				as `users_country_code`, "
+						"`users`.`phone`					as `users_phone`, "
+						"`users`.`email`					as `users_email`, "
+						"`users`.`sex`						as `users_sex`, "
+						"`users`.`birthday`					as `users_birthday`, "
+						"`users`.`birthdayAccess`			as `users_birthdayAccess`, "
+						"`users`.`site_theme_id`			as `users_site_theme_id`, "
+						"`users`.`appliedVacanciesRender`	as `users_appliedVacanciesRender`, "
+						"`users`.`isblocked`				as `users_isblocked` "
+					"FROM `users` "
+					"INNER JOIN `users_passwd` ON `users_passwd`.`userID`=`users`.`id` "
+					"WHERE `users`.`id`='" << userID << "' AND `users_passwd`.`isActive`='true';";
 			affected = db.Query(ost.str());
 			if(affected)
 			{
@@ -5864,6 +5870,7 @@ int main()
 				geo_locality_id = db.Get(0, "users_geo_locality_id");
 				pass = db.Get(0, "users_passwd_passwd");
 				address = db.Get(0, "users_address");
+				country_code = db.Get(0, "users_country_code");
 				phone = db.Get(0, "users_phone");
 				email = db.Get(0, "users_email");
 				sex = db.Get(0, "users_sex");
@@ -5879,16 +5886,29 @@ int main()
 				if(geo_locality_id.length() && db.Query("SELECT `title` FROM `geo_locality` WHERE `id`=\"" + geo_locality_id + "\";"))
 					city = db.Get(0, "title");
 
+				if(user.GetID() == userID)
+				{
+					// --- don't hide anything
+				}
+				else
+				{
+					if(phone.length() > 2)
+						phone = MaskSymbols(phone, 0, phone.length() - 2);
+					if(email.length() > 10)
+						email = MaskSymbols(email, 4, email.length() - 5);
+				}
 
 				ostResult << "{"
 					<< "\"result\": \"success\","
 					<< "\"userID\": \"" << userID << "\","
 					<< "\"name\": \"" << name << "\","
+					<< "\"email\": \"" << email << "\","
 					<< "\"nameLast\": \"" << nameLast << "\","
 					<< "\"cv\": \"" << cv << "\","
 					<< "\"geo_locality_id\": \"" << geo_locality_id << "\","
 					<< "\"city\": \"" << city << "\","
 					<< "\"address\": \"" << address << "\","
+					<< "\"country_code\": \"" << country_code << "\","
 					<< "\"phone\": \"" << phone << "\","
 					<< "\"isBlocked\": \"" << isBlocked << "\","
 					<< "\"sex\": \"" << sex << "\","

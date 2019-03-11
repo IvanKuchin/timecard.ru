@@ -4,3 +4,7 @@ IMAGECAPTCHADIR 		=> "IMAGEROOTDIR_HTML/images/captcha/",
 IMAGEFEEDDIR 			=> "IMAGEROOTDIR_HTML/images/feed/",
 IMAGETEMPDIR 			=> "IMAGEROOTDIR_HTML/images/temp/", # --- temp images downloaded as a part of pulling info out of 3-rd party sites
 VIDEOFEEDDIR 			=> "IMAGEROOTDIR_HTML/video/feed/",
+INVOICESCCDIR 			=> "IMAGEROOTDIR_HTML/invoices_cc/",
+INVOICESSUBCDIR 		=> "IMAGEROOTDIR_HTML/invoices_subc/",
+TEMPLATESSOWDIR 		=> "IMAGEROOTDIR_HTML/templates_sow/",
+TEMPLATESPSOWDIR 		=> "IMAGEROOTDIR_HTML/templates_psow/",

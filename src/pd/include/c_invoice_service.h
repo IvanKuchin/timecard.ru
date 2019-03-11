@@ -24,7 +24,9 @@ class C_Invoice_Service
 		string							temp_dir = "";
 		string							temp_dir_timecards = "";
 		string							temp_dir_cost_center_invoices = "";
-		string							archive_file = "";
+		string							temp_archive_file = "";	// --- archive in temp_dir
+		string							archive_folder = "";	// --- production archive folder
+		string							archive_file = "";		// --- archive in production folder
 
 		auto		CreateTempDirectory() -> bool;
 		auto		CreateTimecardObj(string timecard_id) -> C_Timecard_To_Print;

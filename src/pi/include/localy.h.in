@@ -31,8 +31,11 @@
 #define IMAGE_FLAGS_DIRECTORY						string(IMAGE_DIRECTORY) + string("flags")
 #define IMAGE_TEMP_DIRECTORY						string(IMAGE_DIRECTORY) + string("temp")
 #define IMAGE_EXPENSELINES_DIRECTORY				string(IMAGE_DIRECTORY) + string("expense_lines")
-#define TEMPLATE_SOW_DIRECTORY						string(IMAGEROOTDIR) + string("/html/templates")
-#define TEMPLATE_PSOW_DIRECTORY						string(IMAGEROOTDIR) + string("/html/templates")
+
+#define INVOICES_SUBC_DIRECTORY						string(IMAGEROOTDIR) + string("/html/invoices_subc/")
+#define INVOICES_CC_DIRECTORY						string(IMAGEROOTDIR) + string("/html/invoices_cc/")
+#define TEMPLATE_SOW_DIRECTORY						string(IMAGEROOTDIR) + string("/html/templates_sow/")
+#define TEMPLATE_PSOW_DIRECTORY						string(IMAGEROOTDIR) + string("/html/templates_psow/")
 
 #define BROWSER_FILE_PREFIX							"/"	// for instance "\\server\folder" or "http://dev.file.serever/com"
 
@@ -152,6 +155,9 @@
 #define	TEMPLATE_PSOW_NUMBER_OF_FOLDERS				512
 #define	TEMPLATE_PSOW_MAX_FILE_SIZE					2 * 1024 * 1024 // --- 1 MegaByte
 
+#define	INVOICES_SUBC_NUMBER_OF_FOLDERS				2048
+#define	INVOICES_CC_NUMBER_OF_FOLDERS				2048
+
 
 #define	FFMPEG_FILE_NAME							"ffmpeg"
 #define	FEEDVIDEO_STDOUT							string(LOGDIR) + "dev." + DOMAIN_NAME + ".ffmpeg.stdout"
@@ -234,6 +240,10 @@
 #define	HPDF_TIMECARD_FONT_MULTIPLIER				1.2		// --- font_width calculated by HPDF_Font_TextWidth or HPDF_Page_TextWidth return incorrect width wich is lower than actual space taken by the string. To compensate it space utilization should be corrected with this multiplier.
 
 #define	TIMECARD_ENTRY_TITLE_SEPARATOR				" / "s
+
+#define	SMSC_LOGIN									"ivan.kuchin"s
+#define	SMSC_PASSWORD								"ivankuchinsupersecret"s
+#define	SMSC_EXPIRATION								120
 
 #endif
 

@@ -158,13 +158,17 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 			}
 		}
 
+		// --- important to keep it scoped
+		// --- archive closed in destructor
 		{
 			c_archive	ar;
 
-			ar.SetFilename(archive_file);
+			ar.SetFilename(INVOICES_CC_DIRECTORY + archive_folder + "/" + archive_file);
 			ar.SetFolderToArchive(temp_dir);
 			ar.Archive();
 		}
+
+		CopyFile(INVOICES_CC_DIRECTORY + archive_folder + "/" + archive_file, temp_archive_file);
 	}
 
 	MESSAGE_DEBUG("", "", "finish");
@@ -178,10 +182,14 @@ auto C_Invoice_Service::CreateTempDirectory() -> bool
 
 	do
 	{
-		auto		rand = GetRandom(15);
-		temp_dir = TEMP_DIRECTORY_PREFIX + rand;
-		archive_file = TEMP_DIRECTORY_PREFIX + rand + ARCHIVE_FILE_EXTENSION;
-	} while(isDirExists(temp_dir) || isFileExists(archive_file));
+		auto		__random = GetRandom(15);
+
+		archive_folder = to_string( (int)(rand()/(RAND_MAX + 1.0) * INVOICES_CC_NUMBER_OF_FOLDERS) + 1);
+		archive_file = GetRandom(15) + ARCHIVE_FILE_EXTENSION;
+
+		temp_dir = TEMP_DIRECTORY_PREFIX + __random;
+		temp_archive_file = TEMP_DIRECTORY_PREFIX + __random + ARCHIVE_FILE_EXTENSION;
+	} while(isDirExists(temp_dir) || isFileExists(temp_archive_file) || isFileExists(INVOICES_CC_DIRECTORY + archive_folder + "/" + archive_file));
 
 	if(CreateDir(temp_dir))
 	{

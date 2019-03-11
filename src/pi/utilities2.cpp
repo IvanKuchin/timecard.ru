@@ -2215,3 +2215,15 @@ auto	stod_noexcept(const string &num) -> double
 
 	return result;
 }
+
+auto	MaskSymbols(string src, int first_pos, int last_pos) -> string
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	for(auto i = first_pos; i < last_pos; ++i)
+		src[i] = '.';
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return src;
+}
