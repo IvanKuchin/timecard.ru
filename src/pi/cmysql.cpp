@@ -300,7 +300,15 @@ CMysql::CMysql(const char *dbName, const char *login, const char *pass)
 
 int CMysql::Connect(const char *dbName, const char *login, const char *pass)
 {
-    return InitDB(dbName, login, pass);
+    auto    result = InitDB(dbName, login, pass);
+
+    if(result == 0)
+    {
+        // --- sucessfull init
+        Query("set names " + DB_CHARSET);
+    }
+
+    return result;
 }
 
 int CMysql::Query(string query)

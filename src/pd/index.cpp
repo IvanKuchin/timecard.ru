@@ -332,7 +332,6 @@ int main()
 			MESSAGE_ERROR("", action, "can't connect to DB");
 			throw CExceptionHTML("MySql connection");
 		}
-		db.Query("set names " + DB_CHARSET);
 
 		indexPage.SetDB(&db);
 
@@ -2153,8 +2152,6 @@ int main()
 				log.Write(ERROR, "Can not connect to mysql database");
 				return(1);
 			}
-			db1.Query("set names " + DB_CHARSET);
-
 
 			lookForKey = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("lookForKey"));
 
@@ -2527,8 +2524,6 @@ int main()
 				log.Write(ERROR, "Can not connect to mysql database");
 				return(1);
 			}
-			db1.Query("set names " + DB_CHARSET);
-
 
 			friendsSqlQuery.str("");
 			ost.str("");

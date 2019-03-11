@@ -56,7 +56,6 @@ int main()
 			MESSAGE_ERROR("", action, "Can not connect to mysql database");
 			throw CExceptionHTML("MySql connection");
 		}
-		db.Query("set names " + DB_CHARSET);
 
 		indexPage.SetDB(&db);
 

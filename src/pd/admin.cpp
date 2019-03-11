@@ -40,7 +40,6 @@ int main()
 			log.Write(ERROR, string(__func__) + ": ERROR: Can not connect to mysql database");
 			return(1);
 		}
-		db.Query("set names " + DB_CHARSET);
 
 		act = indexPage.GetVarsHandler()->Get("act");
 

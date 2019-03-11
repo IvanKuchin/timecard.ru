@@ -332,8 +332,6 @@ int main()
 			log.Write(ERROR, string(__func__) + string("[") + to_string(__LINE__) + "]:ERROR: Can not connect to mysql database");
 			throw CExceptionHTML("MySql connection");
 		}
-		db.Query("set names " + DB_CHARSET);
-
 
 		//--- start of daily cron main functionality
 		CleanupActivators(&db);
