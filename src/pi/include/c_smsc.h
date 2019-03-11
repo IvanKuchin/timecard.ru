@@ -17,7 +17,6 @@ private:
 	string					__SMSC_PASSWORD = SMSC_PASSWORD;// пароль
 	char					__SMSC_HTTPS = 1;// использовать протокол HTTPS
 	char					__SMSC_POST = 0;// использовать метод POST
-	string 					__SMSC_CHARSET = "utf-8"s;
 
 	// Константы для отправки SMS по SMTP 
 	string			 		__SMTP_FROM = "api@smsc.ru";        // e-mail адрес отправителя 

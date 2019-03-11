@@ -56,12 +56,10 @@ int main()
 			MESSAGE_ERROR("", action, "Can not connect to mysql database");
 			throw CExceptionHTML("MySql connection");
 		}
+		db.Query("set names " + DB_CHARSET);
 
 		indexPage.SetDB(&db);
 
-#ifndef MYSQL_3
-	db.Query("set names utf8;");
-#endif
 
 		action = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("action"));
 		action = action.substr(0, 128);

@@ -50,12 +50,10 @@ int main()
 		log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: Can not connect to mysql database");
 		throw CExceptionHTML("MySql connection");
 	}
+	db.Query("set names " + DB_CHARSET);
 
 	indexPage.SetDB(&db);
 
-#ifndef MYSQL_3
-	db.Query("set names utf8;");
-#endif
 
 	action = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("action"));
 

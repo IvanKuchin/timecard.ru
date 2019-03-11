@@ -204,7 +204,7 @@ string c_smsc::_smsc_send_cmd(string cmd, string arg, string files)
     {
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *) &chunk);
-        _arg = "login=" + urlencode(__SMSC_LOGIN) + "&psw=" + urlencode(__SMSC_PASSWORD) + "&fmt=1&charset=" + __SMSC_CHARSET + "&" + arg;
+        _arg = "login=" + urlencode(__SMSC_LOGIN) + "&psw=" + urlencode(__SMSC_PASSWORD) + "&fmt=1&charset=" + SMSC_CHARSET + "&" + arg;
     
         post = __SMSC_POST || files.length() || (_arg.length() > 2000);
         do {

@@ -40,8 +40,8 @@ int main()
 			log.Write(ERROR, string(__func__) + ": ERROR: Can not connect to mysql database");
 			return(1);
 		}
+		db.Query("set names " + DB_CHARSET);
 
-		db.Query("set names utf8;");
 		act = indexPage.GetVarsHandler()->Get("act");
 
 		indexPage.RegisterVariable("rand", GetRandom(10).c_str());

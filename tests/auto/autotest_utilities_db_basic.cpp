@@ -42,13 +42,7 @@ int main(void)
 		MESSAGE_ERROR("", "", "Can not connect to mysql database");
 		throw CExceptionHTML("MySql connection");
 	}
-
-#ifndef MYSQL_3
-	db.Query("set names utf8;");
-#endif
-
-	// indexPage.SetDB(&db);
-
+	db.Query("set names " + DB_CHARSET);
 
 	if(!Test1(&db))
 	{
