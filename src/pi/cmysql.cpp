@@ -1,5 +1,4 @@
 #include "cmysql.h"
-#include "clog.h"
 #include "cexception.h"
 
 int CMysqlSkel::InitDB(const char *dbName, const char *user = "root", const char *pass = "" )

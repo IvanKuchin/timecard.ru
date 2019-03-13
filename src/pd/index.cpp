@@ -5750,6 +5750,8 @@ int main()
 			MESSAGE_DEBUG("", action, "finish");
 		}
 */
+/*
+		// --- no reference to this code
 		if(action == "edit_company")
 		{
 			ostringstream	ost;
@@ -5785,7 +5787,7 @@ int main()
 				MESSAGE_DEBUG("", action, "finish");
 			}
 		} 	// if(action == "edit_company")
-
+*/
 		if(action == "JSON_getUserProfile")
 		{
 			ostringstream	ost, ostResult;

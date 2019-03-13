@@ -1,18 +1,4 @@
-#include <sstream>
-#include "localy.h"
 #include "cexception.h"
-
-CExceptionHTML::CExceptionHTML() : messageID("unknown error"), lng(DEFAULT_LANGUAGE), db(NULL)
-{
-}
-
-CExceptionHTML::CExceptionHTML(string m) : messageID(m), lng(DEFAULT_LANGUAGE), db(NULL)
-{
-}
-
-CExceptionHTML::CExceptionHTML(string m, string n) : messageID(m), lng(DEFAULT_LANGUAGE), param1(n), db(NULL)
-{
-}
 
 string CExceptionHTML::GetReason()
 {
@@ -51,11 +37,4 @@ string CExceptionHTML::GetTemplate()
 
 	return result;
 }
-
-CExceptionHTML::~CExceptionHTML() {}
-
-
-
-
-
 

@@ -60,7 +60,7 @@ if(EXISTS ${LIBXL_INSTALL_DIR})
     file	(COPY	${LIBXL_PROJECT_DIR}lib/libxl.so	DESTINATION	${LIBXL_INSTALL_DIR}/lib)
     file	(COPY	${LIBXL_PROJECT_DIR}lib64/libxl.so	DESTINATION	${LIBXL_INSTALL_DIR}/lib64)
 else()
-    message	(WARNING "libxl.so will be taken from source-tree, because ${LIBXL_PROJECT_DIR} isn't exist")
+    message	(WARNING "libxl.so will be taken from source-tree(${LIBXL_PROJECT_DIR}), because ${LIBXL_INSTALL_DIR} doesn't exist. Consider create ${LIBXL_INSTALL_DIR} manually.")
 endif()
 
 add_subdirectory(src/)
