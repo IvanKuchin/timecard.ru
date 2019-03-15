@@ -67,6 +67,8 @@ ar-lib
 build/
 *.swp
 doc
+docs/
+etc/
 /build2/
 /build3/
 /cov-int/

@@ -37,6 +37,19 @@ C_Print_Timecard::C_Print_Timecard()
 	MESSAGE_DEBUG("", "", "start");
 }
 
+auto C_Print_Timecard::SetTimecard(const C_Timecard_To_Print &param1) -> void
+{
+	timecard = param1;
+	day_summary = {};
+	effort_hours = 0;
+	__pdf_line = -1;
+	effort_hours = 0;
+	effort_days = 0;
+	effort_cost = 0;
+	effort_cost_vat = 0;
+	total_payment = 0;
+}
+
 auto	C_Print_Timecard::GetSpelledTitle() -> string
 {
 	auto			start_spelling_date = GetSpellingFormattedDate(timecard.GetDateStart(), "%d %b %G");

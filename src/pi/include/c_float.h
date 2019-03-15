@@ -34,8 +34,8 @@ class c_float
 		double		Get()	const 							{ return val; };
 		double		GetPrecision()	const					{ return precision; };
 
-		double		GetWhole()								{ return trunc(val); };
-		double		GetFraction()							{ return val * 100.00 - GetWhole() * 100.0; }
+		long		GetWhole();
+		long		GetFraction();
 
 					operator double() 						{ return Get(); };
 					operator string();

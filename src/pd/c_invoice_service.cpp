@@ -156,6 +156,13 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 				MESSAGE_ERROR("", "", "fail to build timecard_" + to_string(i) + ".pdf");
 				break;
 			}
+
+			// --- we don't want to count total payment again, instead take it from printer
+			// --- this may not be a good idea
+			if((error_message = UpdateDBWithInvoiceData(timecard.GetID(), printer.GetTotalPayment())).length())
+			{
+				break;
+			}
 		}
 
 		// --- important to keep it scoped
@@ -167,8 +174,6 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 			ar.SetFolderToArchive(temp_dir);
 			ar.Archive();
 		}
-
-		CopyFile(INVOICES_CC_DIRECTORY + archive_folder + "/" + archive_file, temp_archive_file);
 	}
 
 	MESSAGE_DEBUG("", "", "finish");
@@ -327,53 +332,77 @@ auto C_Invoice_Service::CreateTimecardObj(string timecard_id) -> C_Timecard_To_P
 	return obj;
 }
 
-/*
-auto C_Invoice_Service::GeneratePDF() -> string
+auto C_Invoice_Service::UpdateDBWithInvoiceData(const string timecard_id, c_float amount) -> string
 {
-	HPDF_Doc  pdf;
+	auto	error_message = ""s;
 
-	pdf = HPDF_NewEx (error_handler, NULL, NULL, 0, NULL);
-    if (!pdf) {
-        printf ("error: cannot create PdfDoc object\n");
-    }
-    HPDF_Free (pdf);
+	MESSAGE_DEBUG("", "", "start");
 
-    return "ok";
-}
+	if(user)
+	{
+		if(db)
+		{
+			if(invoice_cost_center_service_id == 0)
+			{
+				// --- new invoice
+				invoice_cost_center_service_id = db->InsertQuery( "INSERT INTO `invoice_cost_center_service` (`cost_center_id`, `file`, `owner_user_id`, `eventTimestamp`)"
+									"VALUES (" + 
+										quoted(cost_center_id) + "," +
+										quoted(INVOICES_CC_DIRECTORY + archive_folder + "/" + archive_file) + "," +
+										quoted(user->GetID()) + "," +
+										"UNIX_TIMESTAMP()"
+									");");
+				if(invoice_cost_center_service_id)
+				{
+					// --- everything is fine
+				}
+				else
+				{
+					MESSAGE_ERROR("", "", "fail to insert to db");
+					error_message = gettext("fail to insert to db");
+				}
+			}
 
-auto C_Invoice_Service::GenerateXLSTimecard(string timecard_id) -> string
-{
-	string		error_message = "";
-	
-	MESSAGE_DEBUG("", "", "start (timecard_id: " + timecard_id + ")");
+			// --- don't merge it with previous if()
+			if(invoice_cost_center_service_id)
+			{
+				if(db->InsertQuery( "INSERT INTO `invoice_cost_center_service_details` (`invoice_cost_center_service_id`, `timecard_id`, `amount`)"
+									"VALUES (" + 
+										quoted(to_string(invoice_cost_center_service_id)) + "," +
+										quoted(timecard_id) + "," +
+										quoted(string(amount)) +
+									");"))
+				{
+				}
+				else
+				{
+					MESSAGE_ERROR("", "", "fail to insert to db");
+					error_message = gettext("fail to insert to db");
+				}
+			}
+			else
+			{
+				MESSAGE_ERROR("", "", "invoice id is empty. Most probably insert to invoice_cost_center_service failed");
+				error_message = gettext("fail to insert to db");
+			}
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "db is not initialized");
+			error_message = gettext("db is not initialized");
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "user is not initialized");
+		error_message = gettext("user is not initialized");
+	}
 
-	auto f_name = temp_dir + "example" + GetRandom(3) + ".xls"; 
-    libxl::Book* book = xlCreateBook();
-    if(book)
-    {    
-        libxl::Sheet* sheet = book->addSheet("Sheet1");
-        if(sheet)
-        {
-            sheet->writeStr(2, 1, "Hello, World !");
-            sheet->writeNum(3, 1, 1000);
-            
-            libxl::Format* dateFormat = book->addFormat();
-            dateFormat->setNumFormat(libxl::NUMFORMAT_DATE);
-            sheet->writeNum(4, 1, book->datePack(2008, 4, 22), dateFormat);
-            
-            sheet->setCol(1, 1, 12);
-        }
-
-        if(book->save(f_name.c_str())) {
-    	}
-        book->release();
-    } 
 
 	MESSAGE_DEBUG("", "", "finish");
 
 	return error_message;
 }
-*/
 
 C_Invoice_Service::~C_Invoice_Service()
 {

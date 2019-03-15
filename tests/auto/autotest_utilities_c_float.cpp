@@ -547,16 +547,20 @@ auto RunTest13()
 {
 	auto	result = true;
 
-	for(auto i = 0; i < 100; ++i)
-	{
-		c_float	num("0." + to_string(i));
-		string	target =	(i ? "0." + (i % 10 ? to_string(i) : to_string(i / 10)) : "0");
 
-		if(string(num) == target) {}
-		else
+	for(auto i1 = 0; i1 < 100; ++i1)
+	{
+		for(auto i2 = 0; i2 < 100; ++i2)
 		{
-			result = false;
-			cout << "[" << __LINE__ << "] failed on (0." << i << ")" << endl;
+			c_float	num(to_string(i1) + "." + to_string(i2));
+			string	target = CutTrailingZeroes(to_string(i1) + "." + to_string(i2));
+
+			if(string(num) == target) {}
+			else
+			{
+				result = false;
+				cout << "[" << __LINE__ << "] failed (string(" << num << ") != " << i1 << "." << i2 << ")" << endl;
+			}
 		}
 	}
 
@@ -567,15 +571,63 @@ auto RunTest14()
 {
 	auto	result = true;
 
-	for(auto i = 0; i < 100; ++i)
+	for(auto i1 = 0; i1 < 100; ++i1)
 	{
-		c_float	num(i/100);
-
-		if(num.Get() == i/100) {}
-		else
+		for(auto i = 0; i < 10000; ++i)
 		{
-			result = false;
-			cout << "[" << __LINE__ << "] failed on (0." << i << ")" << endl;
+			c_float	num(to_string(i1) + "." + to_string(i), 4);
+			string	target = CutTrailingZeroes(to_string(i1) + "." + to_string(i));
+
+			if(string(num) == target) {}
+			else
+			{
+				result = false;
+				cout << "[" << __LINE__ << "] failed (string(" << num << ") != " << i1 << "." << i << ")" << endl;
+			}
+		}
+	}
+
+	return result;
+}
+
+auto RunTest15()
+{
+	auto	result = true;
+
+	for(auto i1 = 0; i1 < 100; ++i1)
+	{
+		for(auto i = 0; i < 100; ++i)
+		{
+			c_float	num(i1 + i/100);
+
+			if(num.Get() == i1 + i/100) {}
+			else
+			{
+				result = false;
+				cout << "[" << __LINE__ << "] failed on (" << i1 << "." << i << ")" << endl;
+			}
+		}
+	}
+
+	return result;
+}
+
+auto RunTest16()
+{
+	auto	result = true;
+
+	for(auto i1 = 0; i1 < 100; ++i1)
+	{
+		for(auto i = 0; i < 10000; ++i)
+		{
+			c_float	num(i1 + i/10000, 4);
+
+			if(num.Get() == i1 + i/10000) {}
+			else
+			{
+				result = false;
+				cout << "[" << __LINE__ << "] failed on (" << i1 << "." << i << ")" << endl;
+			}
 		}
 	}
 
@@ -597,6 +649,7 @@ vector<bool (*)(void)>	func_v = {
 	RunTest12,
 	RunTest13,
 	RunTest14,
+	RunTest15,
 };
 
 

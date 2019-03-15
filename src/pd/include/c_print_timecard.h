@@ -69,7 +69,6 @@ class C_Print_Timecard
 		auto		GetEffortDays()									{ return effort_days; };
 		auto		GetEffortCost()									{ return effort_cost; };
 		auto		GetEffortCostVAT()								{ return effort_cost_vat; };
-		auto		GetTotalPayment()								{ return total_payment; };
 		auto		GetNumberOfDaysInTimecard() -> int;
 
 		auto		GetSpelledTitle() -> string;
@@ -117,9 +116,10 @@ class C_Print_Timecard
 
 	public:
 					C_Print_Timecard();
-					// C_Print_Timecard(CMysql *, CUser *) : db(param1), user(param2) {};
+					
+		auto		GetTotalPayment()								{ return total_payment; };
 
-		auto		SetTimecard(const C_Timecard_To_Print &param1)	{ timecard = param1; day_summary = {}; __pdf_line = -1; };
+		auto		SetTimecard(const C_Timecard_To_Print &param1) -> void;
 
 		auto		SetFilename(const string &param1)				{ filename = param1; };
 		auto		SetFilename(string &&param1) 					{ filename = move(param1); };

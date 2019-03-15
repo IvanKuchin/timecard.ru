@@ -21,6 +21,9 @@ class C_Invoice_Service
 		vector<C_Timecard_To_Print>		timecard_obj_list;
 		string							cost_center_id = "";
 
+		long							invoice_cost_center_service_id = 0;
+		c_float							total_payment;
+
 		string							temp_dir = "";
 		string							temp_dir_timecards = "";
 		string							temp_dir_cost_center_invoices = "";
@@ -28,6 +31,8 @@ class C_Invoice_Service
 		string							archive_folder = "";	// --- production archive folder
 		string							archive_file = "";		// --- archive in production folder
 
+
+		auto		UpdateDBWithInvoiceData(const string timecard_id, c_float amount) -> string;
 		auto		CreateTempDirectory() -> bool;
 		auto		CreateTimecardObj(string timecard_id) -> C_Timecard_To_Print;
 

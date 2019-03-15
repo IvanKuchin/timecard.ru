@@ -1,27 +1,5 @@
 #include "c_float.h"
 
-static string CutTrailingZeroes(string number)
-{
-    size_t   dec_point_place = number.find(".");
-    
-    if(dec_point_place != string::npos)
-    {
-        bool   domore = true;
-        int    symbols_to_cut = 0;
-
-        for(string::reverse_iterator rit = number.rbegin(); domore && (rit != number.rend()); ++rit)
-        {
-            if(*rit == '0') ++symbols_to_cut;
-            else if(*rit == '.') { ++symbols_to_cut; domore = false;}
-            else domore = false;
-        }
-
-        number.erase(number.length() - symbols_to_cut);
-    }
-    
-    return number;
-}
-
 static string GetFormattedOutput(double val, int prec)
 {
 	long			multiplier = pow(10, prec);
@@ -120,6 +98,36 @@ double c_float::RoundWithPrecision(double num)
 	return	RoundWithPrecision(num, precision);
 }
 
+long c_float::GetWhole()
+{
+    double	intpart;
+    long	result;
+
+    modf (val , &intpart);
+
+    result = lround(intpart);
+
+    MESSAGE_DEBUG("", "", "finish (result = " + to_string(result) + ")");
+
+    return result;
+
+}
+
+long c_float::GetFraction()
+{
+    double	fractpart, intpart;
+    long	result;
+
+    fractpart = modf (val , &intpart);
+
+    result = lround(fma(fractpart, 100, 0));
+
+    MESSAGE_DEBUG("", "", "finish (result = " + to_string(result) + ")");
+
+    return result;
+
+}
+
 c_float::operator string()
 {
 	return GetFormattedOutput(Get(), GetPrecision());
@@ -129,11 +137,8 @@ c_float	c_float::operator+(const c_float &term2)
 {
 	c_float	result;
 
-#ifdef FP_FAST_FMA
 	result = RoundWithPrecision(fma(1, term2.Get(), Get()));
-#else
-	result = RoundWithPrecision(Get() + term2.Get());
-#endif
+
 	MESSAGE_DEBUG("c_float", "", to_string(Get()) + " + " + to_string(term2.Get()) + " = " + to_string(result.Get()));
 
 	return result;
@@ -143,11 +148,8 @@ c_float	c_float::operator-(const c_float &term2)
 {
 	c_float	result;
 
-#ifdef FP_FAST_FMA
 	result = RoundWithPrecision(fma(-1, term2.Get(), Get()));
-#else
-	result = RoundWithPrecision(Get() - term2.Get());
-#endif
+
 	MESSAGE_DEBUG("c_float", "", to_string(Get()) + " - " + to_string(term2.Get()) + " = " + to_string(result.Get()));
 
 	return result;
@@ -157,11 +159,8 @@ c_float	c_float::operator*(const c_float &term2)
 {
 	c_float	result;
 
-#ifdef FP_FAST_FMA
 	result = RoundWithPrecision(fma(Get(), term2.Get(), 0));
-#else
-	result = RoundWithPrecision(Get() * term2.Get());
-#endif
+
 	MESSAGE_DEBUG("c_float", "", to_string(Get()) + " * " + to_string(term2.Get()) + " = " + to_string(result.Get()));
 
 	return result;
@@ -171,7 +170,8 @@ c_float	c_float::operator/(const c_float &term2)
 {
 	c_float	result;
 
-	result = RoundWithPrecision(Get() / term2.Get());
+	result = RoundWithPrecision(fma(Get(), 1 / term2.Get(), 0));
+
 	MESSAGE_DEBUG("c_float", "", to_string(Get()) + " / " + to_string(term2.Get()) + " = " + to_string(result.Get()));
 
 	return result;

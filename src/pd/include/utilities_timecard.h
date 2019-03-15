@@ -109,5 +109,4 @@ auto			GetPSoWIDByTimecardIDAndCostCenterID(string timecard_id, string cost_cent
 auto			GetSoWIDByTimecardID(string timecard_id, CMysql *db, CUser *user) -> string;
 // auto			GetTimecardLines_By_TimecardID_And_CostCenterID(string timecard_id, string cost_center_id, CMysql *db, CUser *user);
 
-
 #endif

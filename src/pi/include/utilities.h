@@ -85,6 +85,7 @@ auto			GetPasswordNounsList(CMysql *) -> string;
 auto			GetPasswordAdjectivesList(CMysql *) -> string;
 auto			GetPasswordCharacteristicsList(CMysql *) -> string;
 auto			isAllowed_NoSession_Action(string action) -> bool;
+auto			CutTrailingZeroes(string number) -> string;
 
 auto      		GetChatMessagesInJSONFormat(string dbQuery, CMysql *) -> string;
 // auto      		GetCompanyListInJSONFormat(string dbQuery, CMysql *, CUser *, bool quickSearch = true, bool includeEmployedUsersList = false) -> string;

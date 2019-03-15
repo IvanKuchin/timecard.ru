@@ -2227,3 +2227,25 @@ auto	MaskSymbols(string src, int first_pos, int last_pos) -> string
 
 	return src;
 }
+
+string CutTrailingZeroes(string number)
+{
+    size_t   dec_point_place = number.find(".");
+    
+    if(dec_point_place != string::npos)
+    {
+        bool   domore = true;
+        int    symbols_to_cut = 0;
+
+        for(string::reverse_iterator rit = number.rbegin(); domore && (rit != number.rend()); ++rit)
+        {
+            if(*rit == '0') ++symbols_to_cut;
+            else if(*rit == '.') { ++symbols_to_cut; domore = false;}
+            else domore = false;
+        }
+
+        number.erase(number.length() - symbols_to_cut);
+    }
+    
+    return number;
+}
