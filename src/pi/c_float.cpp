@@ -87,7 +87,7 @@ double c_float::RoundWithPrecision(double num, int precision)
 	long	multiplier;
 
 	multiplier = pow(10, precision);
-	result = round(num * multiplier) / multiplier;
+	result = round(fma(num, multiplier, 0)) / multiplier;
 
 	// MESSAGE_DEBUG("c_float", "", to_string(num) + " -> " + to_string(result));
 	return	result;
