@@ -344,23 +344,40 @@ auto C_Invoice_Service::UpdateDBWithInvoiceData(const string timecard_id, c_floa
 		{
 			if(invoice_cost_center_service_id == 0)
 			{
-				// --- new invoice
-				invoice_cost_center_service_id = db->InsertQuery( "INSERT INTO `invoice_cost_center_service` (`cost_center_id`, `file`, `owner_user_id`, `eventTimestamp`)"
-									"VALUES (" + 
-										quoted(cost_center_id) + "," +
-										quoted(INVOICES_CC_DIRECTORY + archive_folder + "/" + archive_file) + "," +
-										quoted(user->GetID()) + "," +
-										"UNIX_TIMESTAMP()"
-									");");
-				if(invoice_cost_center_service_id)
+				auto	owner_company_id = GetAgencyIDByUserID(db, user);
+				
+				if(owner_company_id.length())
 				{
-					// --- everything is fine
+					// --- new invoice
+					invoice_cost_center_service_id = db->InsertQuery( "INSERT INTO `invoice_cost_center_service` (`cost_center_id`, `file`, `owner_company_id`, `owner_user_id`, `eventTimestamp`)"
+										"VALUES (" + 
+											quoted(cost_center_id) + "," +
+											quoted(archive_folder + "/" + archive_file) + "," +
+											quoted(owner_company_id) + "," +
+											quoted(user->GetID()) + "," +
+											"UNIX_TIMESTAMP()"
+										");");
+					if(invoice_cost_center_service_id)
+					{
+						// --- everything is fine, increase act_number assigned to this cost_center
+						db->Query("UPDATE `cost_centers` SET `act_number`=`act_number`+1 WHERE `id`=\"" + cost_center_id + "\";");
+						if(db->isError())
+						{
+							MESSAGE_ERROR("", "", "fail to increase act_number in cost_center table");
+						}
+					}
+					else
+					{
+						MESSAGE_ERROR("", "", "fail to insert to db");
+						error_message = gettext("fail to insert to db");
+					}
 				}
 				else
 				{
-					MESSAGE_ERROR("", "", "fail to insert to db");
-					error_message = gettext("fail to insert to db");
+					MESSAGE_ERROR("", "", "agency not found where user.id(" + user->GetID() + ") working at");
+					error_message = gettext("employeer not found");
 				}
+
 			}
 
 			// --- don't merge it with previous if()

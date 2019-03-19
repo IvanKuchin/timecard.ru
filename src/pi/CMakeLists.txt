@@ -29,6 +29,7 @@ set(JOINT_LIBRARY_SRCs
     utilities1.cpp
     utilities2.cpp
     utilities_common.cpp
+    c_cache_obj.cpp
     )
 
 # ---- list of independent libraries

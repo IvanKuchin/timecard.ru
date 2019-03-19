@@ -1721,22 +1721,20 @@ string ParseGPSAltitude(const string altitudeStr)
 	string  result = "";
 	smatch  cm;
 	regex   format1("[-+]?[[:digit:]]+(\\.[[:digit:]]+)?");
-	regex   format2(".?\\:[[:space:]]*([[:digit:]]+)(\\/)([[:digit:]]+).*");
+	regex   format2(".*\\:[[:space:]]*([[:digit:]]+)(\\/)([[:digit:]]+).*");
 	regex   format3(".*unknown.*");
 	regex   format4(".[[:space:]]*");
 	regex   format5("([[:digit:]]+)(\\/)([[:digit:]]+)\n.*");
+	regex   format6("[^[:digit:]]*([[:digit:]]+)(\\/)([[:digit:]]+)[^[:digit:]]*");
 
-	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start(" + altitudeStr + ")");
-	}
+	MESSAGE_DEBUG("", "", "start(" + altitudeStr + ")");
 	
 	// --- format: +74.56 or 74.56 or 74
 	if(regex_match(altitudeStr, regex(format1)))
 	{
 		result = altitudeStr;
 	}
-	else if(regex_match(altitudeStr, cm, format2) || regex_match(altitudeStr, cm, format5))
+	else if(regex_match(altitudeStr, cm, format2) || regex_match(altitudeStr, cm, format5) || regex_match(altitudeStr, cm, format6))
 	{
 		string		altitudeNumerator = cm[1];
 		string		altitudeDivisor = cm[3];
@@ -1758,16 +1756,10 @@ string ParseGPSAltitude(const string altitudeStr)
 	}
 	else
 	{
-			{
-				CLog	log;
-				log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]: altitude(" + altitudeStr + ") didn't match any pattern");
-			}
+		MESSAGE_ERROR("", "", "altitude(" + altitudeStr + ") didn't match any pattern");
 	}
 
-	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: finish (" + result + ")");
-	}
+	MESSAGE_DEBUG("", "", "finish (" + result + ")");
 
 	return result;
 }
@@ -2228,7 +2220,7 @@ auto	MaskSymbols(string src, int first_pos, int last_pos) -> string
 	return src;
 }
 
-string CutTrailingZeroes(string number)
+auto CutTrailingZeroes(string number) -> string
 {
     size_t   dec_point_place = number.find(".");
     

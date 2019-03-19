@@ -8,6 +8,7 @@ set(PI_TESTS
     autotest_utilities_rus_to_lower.cpp
     autotest_utilities_date.cpp
     autotest_utilities_db_basic.cpp
+    autotest_utilities_c_float.cpp
     )
 
 # --- MACROSes start ---
@@ -36,13 +37,6 @@ foreach(file ${PI_TESTS})
     __add_executable_2libs("${file_without_ext}" "${PROJECT_PI_INCLUDE_DIRECTORIES}" "${PROJECT_PI_LIBS}" "${PROJECT_EXTERNAL_LIBS}")
     list(REMOVE_ITEM LINK_DESTINATIONS ${PROJECT_SOURCE_DIR}/tests/auto/${file})
 endforeach()
-
-__add_executable_2libs(autotest_utilities_c_float "${PROJECT_ALL_INCLUDE_DIRECTORIES}" "${PROJECT_PI_LIBS}" "${PROJECT_EXTERNAL_LIBS}")
-list(REMOVE_ITEM LINK_DESTINATIONS ${PROJECT_SOURCE_DIR}/tests/auto/autotest_utilities_c_float.cpp)
-
-__add_executable_3libs(autotest_utilities_http_params "${PROJECT_ALL_INCLUDE_DIRECTORIES}" "utilities_timecard1" "${PROJECT_PI_LIBS}" "${PROJECT_EXTERNAL_LIBS}")
-list(REMOVE_ITEM LINK_DESTINATIONS ${PROJECT_SOURCE_DIR}/tests/auto/autotest_utilities_http_params.cpp)
-
 
 # ---- 2) Normal build link with _all_ libraries (.o), therefore change in any .src trigger re-link for all executables
 foreach(file ${LINK_DESTINATIONS})

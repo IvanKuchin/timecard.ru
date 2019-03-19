@@ -2048,126 +2048,7 @@ int main(void)
 				else
 				{
 					MESSAGE_ERROR("", action, "user(" + user.GetID() + ") is not an agency employee");
-					error_message = "Информация доступна только для агенства";
-				}
-
-				if(error_message.empty())
-				{
-				}
-				else
-				{
-					MESSAGE_DEBUG("", action, "failed");
-					ostResult.str("");
-					ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
-				}
-
-				indexPage.RegisterVariableForce("result", ostResult.str());
-
-				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
-			}
-
-			MESSAGE_DEBUG("", action, "finish");
-		}
-
-		if(action == "AJAX_getCostCenterList")
-		{
-			ostringstream	ostResult;
-
-			MESSAGE_DEBUG("", action, "start");
-
-			ostResult.str("");
-
-			{
-				string			template_name = "json_response.htmlt";
-				string			error_message = "";
-
-				if(user.GetType() == "agency")
-				{
-					{
-						ostResult << "{"
-										"\"result\":\"success\","
-										"\"cost_centers\":[" << GetCostCentersInJSONFormat(
-												"SELECT * FROM `cost_centers` WHERE `agency_company_id`=("
-													"SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id`=("
-														"SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user.GetID() + "\""
-													")"
-												");", &db, &user) << "]";
-						ostResult << "}";
-					}
-				}
-				else
-				{
-					MESSAGE_ERROR("", action, "user(" + user.GetID() + ") is not an agency employee");
-					error_message = "Информация доступна только для агенства";
-				}
-
-				if(error_message.empty())
-				{
-				}
-				else
-				{
-					MESSAGE_DEBUG("", action, "failed");
-					ostResult.str("");
-					ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
-				}
-
-				indexPage.RegisterVariableForce("result", ostResult.str());
-
-				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
-			}
-
-			MESSAGE_DEBUG("", action, "finish");
-		}
-
-		if(action == "AJAX_getApprovedTimecardList")
-		{
-			ostringstream	ostResult;
-
-			MESSAGE_DEBUG("", action, "start");
-
-			ostResult.str("");
-
-			{
-				string			template_name = "json_response.htmlt";
-				string			error_message = "";
-				string			cost_center_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("cost_center_id"));
-
-				if(user.GetType() == "agency")
-				{
-					if(isCostCenterBelongsToAgency(cost_center_id, &db, &user))
-					{
-						ostResult << "{"
-										"\"result\":\"success\","
-										"\"timecards\":[" << GetTimecardsInJSONFormat(
-																"SELECT * FROM `timecards` WHERE `status`=\"approved\" AND ("
-																	"`id` IN ("
-																		"SELECT `timecard_id` FROM `timecard_lines` WHERE `timecard_task_id` IN ("
-																			"SELECT `id` FROM `timecard_tasks` WHERE `timecard_projects_id` IN ("
-																				"SELECT `id` FROM `timecard_projects` WHERE `timecard_customers_id` IN ("
-																					"SELECT `timecard_customer_id` FROM `cost_center_assignment` WHERE `cost_center_id`=\"" + cost_center_id + "\""
-																				")"
-																			")"
-																		")"
-																	")"
-																") AND NOT("
-																	"`id` IN ("
-																		"SELECT `timecard_id` FROM `invoice_cost_center_service_details` WHERE `invoice_cost_center_service_id` IN ("
-																			"SELECT `id` FROM `invoice_cost_center_service` WHERE `cost_center_id`=\"" + cost_center_id + "\""
-																		")"
-																	")"
-																")", &db, &user) << "]";
-						ostResult << "}";
-					}
-					else
-					{
-						MESSAGE_ERROR("", action, "cost_center.id(" + cost_center_id + ") doesn't belongs to agance user(" + user.GetID() + ") employeed");
-						error_message = "Информация доступна только для агенства";
-					}
-				}
-				else
-				{
-					MESSAGE_ERROR("", action, "user(" + user.GetID() + ") is not an agency employee");
-					error_message = "Информация доступна только для агенства";
+					error_message = gettext("You are not authorized");
 				}
 
 				if(error_message.empty())
@@ -2223,7 +2104,7 @@ int main(void)
 				else
 				{
 					MESSAGE_ERROR("", action, "user(" + user.GetID() + ") is not an agency employee");
-					error_message = "Информация доступна только для агенства";
+					error_message = gettext("You are not authorized");
 				}
 
 				if(error_message.empty())
@@ -3201,7 +3082,7 @@ int main(void)
 				else
 				{
 					MESSAGE_ERROR("", action, "one of mandatory parameters missed");
-					error_message = "Информация доступна только для агенства";
+					error_message = gettext("You are not authorized");
 				}
 
 				if(error_message.empty())
@@ -3294,7 +3175,7 @@ int main(void)
 				else
 				{
 					MESSAGE_ERROR("", action, "one of mandatory parameters missed");
-					error_message = "Информация доступна только для агенства";
+					error_message = gettext("You are not authorized");
 				}
 
 				if(error_message.empty())
@@ -3771,7 +3652,7 @@ int main(void)
 								}
 								else
 								{
-									MESSAGE_ERROR("", action, "cost_center.id(" + cost_center_id + ") doesn't belongs to agance user(" + user.GetID() + ") employeed");
+									MESSAGE_ERROR("", action, "cost_center.id(" + cost_center_id + ") doesn't belongs to agency user(" + user.GetID() + ") employeed");
 									error_message = gettext("You are not agency employee");
 								}
 							}
@@ -4229,13 +4110,13 @@ int main(void)
 					else
 					{
 						MESSAGE_ERROR("", action, "user(" + user.GetID() + ") is not an agency employee");
-						error_message = "Информация доступна только для агенства";
+						error_message = gettext("You are not authorized");
 					}
 				}
 				else
 				{
 					MESSAGE_ERROR("", action, "user(" + user.GetID() + ") is not an agency employee");
-					error_message = "Информация доступна только для агенства";
+					error_message = gettext("You are not authorized");
 				}
 
 
@@ -4256,6 +4137,298 @@ int main(void)
 
 			MESSAGE_DEBUG("", action, "finish");
 		}
+
+
+
+		// --- service invoicing
+
+		if(action == "AJAX_getCostCenterList")
+		{
+			ostringstream	ostResult;
+
+			MESSAGE_DEBUG("", action, "start");
+
+			ostResult.str("");
+
+			{
+				string			template_name = "json_response.htmlt";
+				string			error_message = "";
+
+				if(user.GetType() == "agency")
+				{
+					{
+						ostResult << "{"
+										"\"result\":\"success\","
+										"\"cost_centers\":[" << GetCostCentersInJSONFormat(
+												"SELECT * FROM `cost_centers` WHERE `agency_company_id`=("
+													"SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id`=("
+														"SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user.GetID() + "\""
+													")"
+												");", &db, &user) << "]";
+						ostResult << "}";
+					}
+				}
+				else
+				{
+					MESSAGE_ERROR("", action, "user(" + user.GetID() + ") is not an agency employee");
+					error_message = gettext("You are not authorized");
+				}
+
+				if(error_message.empty())
+				{
+				}
+				else
+				{
+					MESSAGE_DEBUG("", action, "failed");
+					ostResult.str("");
+					ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+				}
+
+				indexPage.RegisterVariableForce("result", ostResult.str());
+
+				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			}
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
+
+		if(action == "AJAX_getServiceInvoiceList")
+		{
+			ostringstream	ostResult;
+
+			MESSAGE_DEBUG("", action, "start");
+
+			ostResult.str("");
+
+			{
+				auto			template_name = "json_response.htmlt"s;
+				auto			error_message = ""s;
+				auto			cost_center_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("cost_center_id"));
+
+				if(user.GetType() == "agency")
+				{
+					if(isCostCenterBelongsToAgency(cost_center_id, &db, &user))
+					{
+						ostResult << "{"
+										"\"result\":\"success\","
+										"\"service_invoices\":[" << GetServiceInvoicesInJSONFormat(
+																"SELECT * FROM `invoice_cost_center_service` WHERE `cost_center_id`=\"" + cost_center_id + "\";"
+																, &db, &user) << "]";
+						ostResult << "}";
+					}
+					else
+					{
+						MESSAGE_ERROR("", action, "cost_center.id(" + cost_center_id + ") doesn't belongs to agency user(" + user.GetID() + ") employeed");
+						error_message = gettext("You are not authorized");
+					}
+				}
+				else
+				{
+					MESSAGE_ERROR("", action, "user(" + user.GetID() + ") is not an agency employee");
+					error_message = gettext("You are not authorized");
+				}
+
+				if(error_message.empty())
+				{
+				}
+				else
+				{
+					MESSAGE_DEBUG("", action, "failed");
+					ostResult.str("");
+					ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+				}
+
+				indexPage.RegisterVariableForce("result", ostResult.str());
+
+				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			}
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
+
+		if(action == "AJAX_getServiceInvoiceDetails")
+		{
+			ostringstream	ostResult;
+
+			MESSAGE_DEBUG("", action, "start");
+
+			ostResult.str("");
+
+			{
+				auto			template_name = "json_response.htmlt"s;
+				auto			error_message = ""s;
+				auto			service_invoice_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("service_invoice_id"));
+
+				if(user.GetType() == "agency")
+				{
+					if(isServiceInvoiceBelongsToAgency(service_invoice_id, &db, &user))
+					{
+						ostResult << "{"
+										"\"result\":\"success\","
+										"\"timecards\":[" + GetTimecardsInJSONFormat(	"SELECT * FROM `timecards` WHERE `id` IN ("
+																							"SELECT `timecard_id` FROM `invoice_cost_center_service_details` WHERE `invoice_cost_center_service_id`=\"" + service_invoice_id + "\""
+																						");", &db, &user) + "]"
+									"}";
+					}
+					else
+					{
+						MESSAGE_ERROR("", action, "invoice_cost_center_service.id(" + service_invoice_id + ") doesn't belongs to agency user.id(" + user.GetID() + ") working at");
+						error_message = gettext("You are not authorized");
+					}
+				}
+				else
+				{
+					MESSAGE_ERROR("", action, "user(" + user.GetID() + ") is not an agency employee");
+					error_message = gettext("You are not authorized");
+				}
+
+				if(error_message.empty())
+				{
+				}
+				else
+				{
+					MESSAGE_DEBUG("", action, "failed");
+					ostResult.str("");
+					ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+				}
+
+				indexPage.RegisterVariableForce("result", ostResult.str());
+
+				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			}
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
+
+		if(action == "AJAX_recallServiceInvoice")
+		{
+			ostringstream	ostResult;
+
+			MESSAGE_DEBUG("", action, "start");
+
+			ostResult.str("");
+
+			{
+				auto			template_name = "json_response.htmlt"s;
+				auto			error_message = ""s;
+				auto			service_invoice_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("service_invoice_id"));
+
+				if(user.GetType() == "agency")
+				{
+					if(isServiceInvoiceBelongsToUser(service_invoice_id, &db, &user))
+					{
+						if((error_message = RecallServiceInvoice(service_invoice_id, &db, &user)).empty())
+						{
+							ostResult << "{\"result\":\"success\"}";
+						}
+						else
+						{
+							MESSAGE_ERROR("", "", "can't recall service invoice(" + service_invoice_id + ")");
+						}
+					}
+					else
+					{
+						MESSAGE_ERROR("", action, "invoice_cost_center_service.id(" + service_invoice_id + ") doesn't belongs to user(" + user.GetID() + ")");
+						error_message = gettext("You are not authorized") + ". "s + gettext("Only owner can recall an invoice");
+					}
+				}
+				else
+				{
+					MESSAGE_ERROR("", action, "user(" + user.GetID() + ") is not an agency employee");
+					error_message = gettext("You are not authorized");
+				}
+
+				if(error_message.empty())
+				{
+				}
+				else
+				{
+					MESSAGE_DEBUG("", action, "failed");
+					ostResult.str("");
+					ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+				}
+
+				indexPage.RegisterVariableForce("result", ostResult.str());
+
+				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			}
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
+
+		if(action == "AJAX_getApprovedTimecardList")
+		{
+			ostringstream	ostResult;
+
+			MESSAGE_DEBUG("", action, "start");
+
+			ostResult.str("");
+
+			{
+				string			template_name = "json_response.htmlt";
+				string			error_message = "";
+				string			cost_center_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("cost_center_id"));
+
+				if(user.GetType() == "agency")
+				{
+					if(isCostCenterBelongsToAgency(cost_center_id, &db, &user))
+					{
+						ostResult << "{"
+										"\"result\":\"success\","
+										"\"timecards\":[" << GetTimecardsInJSONFormat(
+																"SELECT * FROM `timecards` WHERE `status`=\"approved\" AND ("
+																	"`id` IN ("
+																		"SELECT `timecard_id` FROM `timecard_lines` WHERE `timecard_task_id` IN ("
+																			"SELECT `id` FROM `timecard_tasks` WHERE `timecard_projects_id` IN ("
+																				"SELECT `id` FROM `timecard_projects` WHERE `timecard_customers_id` IN ("
+																					"SELECT `timecard_customer_id` FROM `cost_center_assignment` WHERE `cost_center_id`=\"" + cost_center_id + "\""
+																				")"
+																			")"
+																		")"
+																	")"
+																") AND NOT("
+																	"`id` IN ("
+																		"SELECT `timecard_id` FROM `invoice_cost_center_service_details` WHERE `invoice_cost_center_service_id` IN ("
+																			"SELECT `id` FROM `invoice_cost_center_service` WHERE `cost_center_id`=\"" + cost_center_id + "\""
+																		")"
+																	")"
+																")", &db, &user) << "]";
+						ostResult << "}";
+					}
+					else
+					{
+						MESSAGE_ERROR("", action, "cost_center.id(" + cost_center_id + ") doesn't belongs to agency user(" + user.GetID() + ") employeed");
+						error_message = gettext("You are not authorized");
+					}
+				}
+				else
+				{
+					MESSAGE_ERROR("", action, "user(" + user.GetID() + ") is not an agency employee");
+					error_message = gettext("You are not authorized");
+				}
+
+				if(error_message.empty())
+				{
+				}
+				else
+				{
+					MESSAGE_DEBUG("", action, "failed");
+					ostResult.str("");
+					ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+				}
+
+				indexPage.RegisterVariableForce("result", ostResult.str());
+
+				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			}
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
+
+
+
+
+
 
 
 

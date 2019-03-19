@@ -3,16 +3,12 @@
 
 int CMysqlSkel::InitDB(const char *dbName, const char *user = "root", const char *pass = "" )
 {
-    {
-        MESSAGE_DEBUG("CMysqlSkel", "", "start (db/login: " + dbName + "/" + user + ")");
-    }
+    MESSAGE_DEBUG("", "", "start (db/login: " + dbName + "/" + user + ")");
 
     db = mysql_init( NULL );
     if( db == NULL )
     {
-        CLog    log;
-
-        log.Write(ERROR, "CMysqlSkel::" + string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: Failed to allocate memory when init MYSQL\n");
+        MESSAGE_ERROR("", "", "failed to allocate memory when init MYSQL");
         return(-1);
     }
 
@@ -22,47 +18,22 @@ int CMysqlSkel::InitDB(const char *dbName, const char *user = "root", const char
 
     if( db == NULL )
     {
-        CLog    log;
-
-        log.Write(ERROR, "CMysqlSkel::" + string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: Failed to connect to MYQSL server (mysql_real_connect return NULL)");
+        MESSAGE_ERROR("", "", "Failed to connect to MYQSL server (mysql_real_connect return NULL)");
         return(-1);
     }
 
-    {
-        CLog            log;
-        ostringstream   ost;
+    MESSAGE_DEBUG("", "", "finish");
 
-        ost.str("");
-        ost << "CMysqlSkel::" << __func__ << "[" << __LINE__ << "]: end (result = 0[ok])";
-
-        log.Write(DEBUG, ost.str());
-    }
     return(0);
 }
 
 void CMysqlSkel::CloseDB( void )
 {
-    {
-        CLog            log;
-        ostringstream   ost;
-
-        ost.str("");
-        ost << "CMysqlSkel::" << __func__ << "[" << __LINE__ << "]: start";
-
-        log.Write(DEBUG, ost.str());
-    }
+    MESSAGE_DEBUG("", "", "start");
 
     if( db ) mysql_close( db );
 
-    {
-        CLog            log;
-        ostringstream   ost;
-
-        ost.str("");
-        ost << "CMysqlSkel::" << __func__ << "[" << __LINE__ << "]: end";
-
-        log.Write(DEBUG, ost.str());
-    }
+    MESSAGE_DEBUG("", "", "finish");
 }
 
 // --- Run Insert query only with autoincrement field
@@ -74,17 +45,12 @@ unsigned long CMysqlSkel::InsertQueryDB(string query)
     int             r;
     my_ulonglong    resultAutoIncrement = 0;
 
-    {
-        CLog    log;
-        log.Write(DEBUG, "CMysqlSkel::" + string(__func__) + "[" + to_string(__LINE__) + "]: start (query [", query, "])");
-    }
+    MESSAGE_DEBUG("", "", "start (query [" + query + "])");
 
     r = mysql_query( db, query.c_str());
     if( r )
     {
-        CLog    log;
-
-        log.Write(ERROR, "CMysqlSkel::" + string(__func__) + "[" + to_string(__LINE__) + "]: ERROR in query ", query, mysql_error(db) );
+        MESSAGE_ERROR("", "", "failed insert query (" + query + ") " + mysql_error(db));
     }
     else
     {
@@ -96,21 +62,11 @@ unsigned long CMysqlSkel::InsertQueryDB(string query)
         }
         else
         {
-            CLog    log;
-
-            log.Write(ERROR, "CMysqlSkel::" + string(__func__) + "[" + to_string(__LINE__) + "]: ERROR: in query ", query, ": (returned > 0 cols) or (resultSet != NULL) or (table missing AUTO_INCREMENT_FIELD)");
+            MESSAGE_ERROR("", "", "failed insert query " + query + ": (returned > 0 cols) or (resultSet != NULL) or (table missing AUTO_INCREMENT_FIELD)");
         }
     }
 
-    {
-        CLog    log;
-        ostringstream   ost;
-
-        ost.str("");
-        ost << "CMysqlSkel::" << __func__ << "[" << __LINE__ << "]: end (return [" << to_string((unsigned long)resultAutoIncrement) << "])";
-
-        log.Write(DEBUG, ost.str());
-    }
+    MESSAGE_DEBUG("", "", "finish (return [" + to_string((unsigned long)resultAutoIncrement) + "])");
 
     return (unsigned long)resultAutoIncrement;
 }
@@ -125,16 +81,13 @@ MYSQL_RES *CMysqlSkel::QueryDB(string query)
     MYSQL_RES   *result;
     int         r;
 
-    {
-        CLog    log;
-        log.Write(DEBUG, "CMysqlSkel::" + string(__func__) + "[" + to_string(__LINE__) + "]: query [" + query + "]");
-    }
+    MESSAGE_DEBUG("", "", "start (query [" + query + "])");
+
     r = mysql_query( db, query.c_str());
     if( r )
     {
-        CLog    log;
+        MESSAGE_ERROR("", "", "failed query (" + query + ") " + mysql_error(db));
 
-        log.Write(ERROR, "CMysqlSkel::" + string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: query [" + query + "] returned error: " + mysql_error(db) );
         return NULL;
     }
     else
@@ -175,9 +128,9 @@ const char *CMysqlSkel::GetErrorMessage(void)
 
 int CMysqlSkel::FieldsIndex(const char *fieldName )
 {
-    for(unsigned int i = 0; i < numFields; i++ )
-	if( strcmp( fieldName, fieldsInfo[i].name ) == 0 )
-	    return(i);
+    for(auto i = 0; i < numFields; i++ )
+    	if( strcmp( fieldName, fieldsInfo[i].name ) == 0 )
+            return(i);
     return(-1);
 }
 
@@ -192,13 +145,25 @@ void CMysqlSkel::FreeResultSet()
 
 char *CMysqlSkel::ResultValue( MYSQL_RES *result, unsigned int row, const char *name )
 {
-    MYSQL_ROW		fr;
-    int	            fi = FieldsIndex( name );
+    auto            fi = FieldsIndex( name );
 
     if(fi < 0)
     {
-        CLog    log;
-        log.Write(ERROR, "CMysqlSkel::" + string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: DB-field [", name, "] does not exist");
+        MESSAGE_ERROR("", "", "DB-field [" + name + "] doesn't exists");
+
+        throw CException("error db");
+    }
+
+    return ResultValue(result, row, fi);
+}
+
+char *CMysqlSkel::ResultValue( MYSQL_RES *result, unsigned int row, int fi )
+{
+    MYSQL_ROW       fr;
+
+    if(fi < 0)
+    {
+        MESSAGE_ERROR("", "", "field index can't be negative");
 
         throw CException("error db");
     }
@@ -210,43 +175,14 @@ char *CMysqlSkel::ResultValue( MYSQL_RES *result, unsigned int row, const char *
     {
         if(!fr[fi])
         {
-            CLog    log(LOG_FILE_NAME);
-            log.Write(ERROR, __func__ + string("[") + to_string(__LINE__) + "]:ERROR: mysql field(" + string(name) + ") returned NULL");
+            MESSAGE_ERROR("", "", "mysql result value(row " + to_string(row) + ", index " + to_string(fi) + ") is NULL");
         }
         return(fr[fi] ? fr[fi] : (char *)"");
     }
     else
     {
-        CLog    log;
-        log.Write(ERROR, "CMysqlSkel::" + string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: calling mysql_fetch_row(", name, ")");
+        MESSAGE_ERROR("", "", "mysql_fetch_row( " + to_string(row) + " ) returned NULL")
 
-        return(NULL);
-    }
-}
-
-char *CMysqlSkel::ResultValue( MYSQL_RES *result, unsigned int row, unsigned int fi )
-{
-    MYSQL_ROW       fr;
-
-    mysql_data_seek(result, row);
-    fr = mysql_fetch_row(result);
-    if(fr)
-    {
-        if(!fr[fi])
-        {
-            CLog    log(LOG_FILE_NAME);
-            log.Write(ERROR, __func__ + string("[") + to_string(__LINE__) + "]:ERROR: mysql field(" + to_string(fi) + ") returned NULL");
-        }
-        return(fr[fi] ? fr[fi] : (char *)"");
-    }
-    else
-    {
-        CLog    log;
-    	char	tmp[10];
-
-    	memset(tmp, 0, sizeof(tmp));
-    	snprintf(tmp, 9, "%d", fi);
-    	log.Write(ERROR, "CMysqlSkel::" + string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: in calling mysql_fetch_row( ", tmp, " )");
     	return(NULL);
     }
 }
@@ -256,9 +192,8 @@ MYSQL_ROW CMysqlSkel::NextFetch(MYSQL_RES *result)
 	currentRow = mysql_fetch_row(result);
 	if(!currentRow)
 	{
-        	CLog    log;
-        	log.Write(ERROR, "CMysqlSkel::" + string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: in calling mysql_fetch_row()");
-	        return NULL;
+        MESSAGE_ERROR("", "", "fail calling mysql_fetch_row()");
+        return NULL;
 	}
 	return currentRow;
 }
@@ -266,16 +201,11 @@ MYSQL_ROW CMysqlSkel::NextFetch(MYSQL_RES *result)
 char *CMysqlSkel::ResultValueFast(unsigned int fi)
 {
 	if(currentRow)
-        	return(currentRow[fi]);
-    	else
-    	{
-        	CLog    log;
-        	char    tmp[10];
-
-        	memset(tmp, 0, sizeof(tmp));
-        	snprintf(tmp, 9, "%d", fi);
-        	log.Write(ERROR, "CMysqlSkel::" + string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: extracting info from currentRow( ", tmp, " )");
-        	return(NULL);
+    	return(currentRow[fi]);
+	else
+	{
+        MESSAGE_ERROR("", "", "fail extracting info from currentRow( " + to_string(fi) + " )");
+    	return(NULL);
 	}
 }
 

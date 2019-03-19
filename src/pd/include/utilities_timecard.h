@@ -3,6 +3,7 @@
 
 #include "utilities.h"
 #include "c_float.h"
+#include "c_cache_obj.h"
 
 // --- timecard functions
 auto	 		CheckHTTPParam_Timeentry(const string &srcText) -> string;
@@ -18,6 +19,7 @@ auto			GetTimecardTasksInJSONFormat(string sqlQuery, CMysql *, CUser *) -> strin
 auto			GetTimecardTaskAssignmentInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetBTExpenseAssignmentInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetTimecardsInJSONFormat(string sqlQuery, CMysql *, CUser *, bool isExtended = false) -> string;
+auto			GetServiceInvoicesInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string;
 auto			GetSoWCustomFieldsInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string;
 auto			GetSOWInJSONFormat(string sqlQuery, CMysql *, CUser *, bool include_tasks = true, bool include_bt = false, bool include_cost_centers = false) -> string;
 auto			GetPSoWCustomFieldsInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string;
@@ -108,5 +110,10 @@ auto 			GetNumberOfSoWActiveLastMonth(CMysql *db, CUser *user) -> string;
 auto			GetPSoWIDByTimecardIDAndCostCenterID(string timecard_id, string cost_center_id, CMysql *db, CUser *user) -> string;
 auto			GetSoWIDByTimecardID(string timecard_id, CMysql *db, CUser *user) -> string;
 // auto			GetTimecardLines_By_TimecardID_And_CostCenterID(string timecard_id, string cost_center_id, CMysql *db, CUser *user);
+
+auto			isServiceInvoiceBelongsToUser(string service_invoice_id, CMysql *db, CUser *user) -> bool;
+auto			RecallServiceInvoice(string service_invoice_id, CMysql *db, CUser *user) -> string;
+auto			isServiceInvoiceBelongsToAgency(string service_invoice_id, CMysql *db, CUser *user) -> bool;
+auto			GetAgencyIDByUserID(CMysql *db, CUser *user) -> string;
 
 #endif

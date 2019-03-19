@@ -19,7 +19,7 @@ class CMysqlSkel
 		MYSQL_RES		*resultSet;
 		MYSQL_FIELD		*fieldsInfo;
 		unsigned int	numRows;
-		unsigned int	numFields;
+		int				numFields;
 
 		int				FieldsIndex(const char *fieldName);
 		MYSQL_ROW		NextFetch(MYSQL_RES *result);
@@ -34,7 +34,7 @@ class CMysqlSkel
 		MYSQL_RES*		QueryDB(string query );
 		unsigned long	InsertQueryDB(string query );
 		char*			ResultValue( MYSQL_RES *result, unsigned int row, const char *name );
-		char*			ResultValue( MYSQL_RES *result, unsigned int row, unsigned int fi );
+		char*			ResultValue( MYSQL_RES *result, unsigned int row, int fi );
 		int				ResultRows( MYSQL_RES *result );
 		void			FreeResultSet();
 		bool			isError();
