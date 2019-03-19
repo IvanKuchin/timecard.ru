@@ -196,3 +196,62 @@ auto GetAgencyIDByUserID(CMysql *db, CUser *user) -> string
 
 	return result;
 }
+
+auto			CreatePSoWfromTimecardCustomerIDAndCostCenterID(string timecard_customer_id, string cost_center_id, CMysql *db, CUser *user) -> bool
+{
+	auto result = false;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(db && user)
+	{
+		// --- get SoW by CustomerID
+		map<string, string> sow_to_positions;
+		auto number_of_sow = db->Query(	"SELECT `id`, `company_position_id` FROM `contracts_sow` WHERE `id` IN ("
+											"SELECT `contract_sow_id` FROM `timecard_task_assignment` WHERE `timecard_tasks_id` IN ("
+												"SELECT `id` FROM `timecard_tasks` WHERE `timecard_projects_id` IN ("
+													"SELECT `id` FROM `timecard_projects` WHERE `timecard_customers_id`=\"" + timecard_customer_id + "\""
+												")"
+											")"
+										")");
+
+		for(auto i = 0; i < number_of_sow; ++i)
+			sow_to_positions[db->Get(i, "id")] = db->Get(i, "company_position_id");
+
+		for(const auto &sow_to_position: sow_to_positions)
+		{
+			auto	sow_id = sow_to_position.first;
+			auto	company_position_id = sow_to_position.second;
+
+			if(db->Query("SELECT `id` FROM `contracts_psow` WHERE `contract_sow_id`=\"" + sow_id + "\" AND `cost_center_id`=\"" + cost_center_id + "\";"))
+			{
+				auto	psow_id = db->Get(0, "id");
+				MESSAGE_DEBUG("", "", "psow.id(" + psow_id + ") already exists with cost_center.id(" + cost_center_id + ") and sow.id(" + sow_id + ")");
+			}
+			else
+			{
+				auto	new_psow_id = db->InsertQuery("INSERT INTO `contracts_psow` (`contract_sow_id`, `cost_center_id`, `company_position_id`) VALUES ("
+														+ quoted(sow_id)
+														+ quoted(cost_center_id)
+														+ quoted(company_position_id)
+														+ ")");
+				if(new_psow_id)
+				{
+				}
+				else
+				{
+					MESSAGE_ERROR("", "", "fail to insert to contract_psow table");
+				}
+			}
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "db or user not initialized");
+	}
+
+	MESSAGE_DEBUG("", "", "finish (result is " + to_string(result) + ")");
+
+	return result;
+}
+

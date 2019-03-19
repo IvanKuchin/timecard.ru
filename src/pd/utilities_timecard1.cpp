@@ -6969,24 +6969,34 @@ string	SetNewValueByAction(string action, string id, string sow_id, string new_v
 						}
 						if(action == "AJAX_updateCostCenterToCustomer")
 						{
-							string	position_id = "";
+							auto	cost_center_assignment_id = ""s;
+
 							if(db->Query("SELECT `id` FROM `cost_center_assignment` WHERE `timecard_customer_id`=\"" + id + "\";"))
 							{
-								position_id = db->Get(0, "id");
+								cost_center_assignment_id = db->Get(0, "id");
 							}
 							else
 							{
 								long int temp = db->InsertQuery("INSERT INTO `cost_center_assignment` (`cost_center_id`,`timecard_customer_id`,`assignee_user_id`,`eventTimestamp`) VALUES (\"" + new_value + "\",\"" + id + "\",\"" + user->GetID() + "\", UNIX_TIMESTAMP());");
 								if(temp)
 								{
-									position_id = to_string(temp);
-									MESSAGE_DEBUG("", "", "new cost_center_assignment.id(" + position_id + ") created.");
+									cost_center_assignment_id = to_string(temp);
+									MESSAGE_DEBUG("", "", "new cost_center_assignment.id(" + cost_center_assignment_id + ") created.");
 								}
 								else
 								{
-									position_id = "0";
+									cost_center_assignment_id = "0";
 									MESSAGE_ERROR("", "", "fail to insert to cost_center_assignment table");
 								}
+							}
+
+							if(CreatePSoWfromTimecardCustomerIDAndCostCenterID(id, new_value, db, user))
+							{
+								// --- good to go
+							}
+							else
+							{
+								MESSAGE_ERROR("", "", "fail to create PSoW while cost_center.id(" + new_value + ") assigned to timecard_customer.id(" + id + ")")
 							}
 
 							sql_query = "UPDATE	`cost_center_assignment` SET `cost_center_id` =\"" + new_value + "\" WHERE `timecard_customer_id`=\"" + id + "\";";

@@ -42,8 +42,6 @@ addons:
     - pkg-config
 
 script:
-    - ls /home/travis/build/IvanKuchin/timecard.su/libxl-3.8.4.0
-    - ls /home/travis/build/IvanKuchin/timecard.su/libxl-3.8.4.0/lib64
     # --- libxl will be installed to /usr/local/share/...
     # --- don't fail unit tests, if folder can't be created
     # --- use libxl from source-tree

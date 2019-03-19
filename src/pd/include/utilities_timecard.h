@@ -19,11 +19,11 @@ auto			GetTimecardTasksInJSONFormat(string sqlQuery, CMysql *, CUser *) -> strin
 auto			GetTimecardTaskAssignmentInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetBTExpenseAssignmentInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetTimecardsInJSONFormat(string sqlQuery, CMysql *, CUser *, bool isExtended = false) -> string;
-auto			GetServiceInvoicesInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string;
-auto			GetSoWCustomFieldsInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string;
+auto			GetServiceInvoicesInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
+auto			GetSoWCustomFieldsInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetSOWInJSONFormat(string sqlQuery, CMysql *, CUser *, bool include_tasks = true, bool include_bt = false, bool include_cost_centers = false) -> string;
-auto			GetPSoWCustomFieldsInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string;
-auto			GetPSoWInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string;
+auto			GetPSoWCustomFieldsInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
+auto			GetPSoWInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetTimecardApprovalsInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			SubmitTimecard(string timecard_id, CMysql *, CUser *) -> bool;
 auto			SubmitBT(string bt_id, CMysql *, CUser *) -> bool;
@@ -89,7 +89,7 @@ auto			GetBTsInJSONFormat(string sqlQuery, CMysql *, CUser *, bool isExtended) -
 auto			GetBTExpensesInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetCurrencyRatesInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto 			isUserAllowedAccessToBT(string bt_id, CMysql *, CUser *) -> string;
-auto			isCostCenterBelongsToAgency(string cost_center_id, CMysql *db, CUser *user) -> bool;
+auto			isCostCenterBelongsToAgency(string cost_center_id, CMysql *, CUser *) -> bool;
 
 // string			isAgencyEmployeeAllowedToChangeSoW(string sow_id, CMysql *, CUser *);
 // string			isAgencyEmployeeAllowedToChangeAgencyData(CMysql *, CUser *);
@@ -103,17 +103,18 @@ auto			ResubmitEntitiesByAction(string action, string id, string sow_id, string 
 auto			GetAgencyEmployeesInJSONFormat(string sql_query, CMysql *, CUser *) -> string;
 auto			GetAgencyObjectInJSONFormat(string agency_id, bool include_tasks, bool include_bt, CMysql *, CUser *) -> string;
 auto			GetInfoToReturnByAction(string action, string id, string sow_id, string new_value, CMysql *, CUser *) -> string;
-auto			GetNumberOfApprovedTimecardsThisMonth(CMysql *db, CUser *user) -> string;
-auto			GetNumberOfApprovedTimecardsLastMonth(CMysql *db, CUser *user) -> string;
-auto 			GetNumberOfSoWActiveThisMonth(CMysql *db, CUser *user) -> string;
-auto 			GetNumberOfSoWActiveLastMonth(CMysql *db, CUser *user) -> string;
-auto			GetPSoWIDByTimecardIDAndCostCenterID(string timecard_id, string cost_center_id, CMysql *db, CUser *user) -> string;
-auto			GetSoWIDByTimecardID(string timecard_id, CMysql *db, CUser *user) -> string;
-// auto			GetTimecardLines_By_TimecardID_And_CostCenterID(string timecard_id, string cost_center_id, CMysql *db, CUser *user);
+auto			GetNumberOfApprovedTimecardsThisMonth(CMysql *, CUser *) -> string;
+auto			GetNumberOfApprovedTimecardsLastMonth(CMysql *, CUser *) -> string;
+auto 			GetNumberOfSoWActiveThisMonth(CMysql *, CUser *) -> string;
+auto 			GetNumberOfSoWActiveLastMonth(CMysql *, CUser *) -> string;
+auto			GetPSoWIDByTimecardIDAndCostCenterID(string timecard_id, string cost_center_id, CMysql *, CUser *) -> string;
+auto			GetSoWIDByTimecardID(string timecard_id, CMysql *, CUser *) -> string;
+// auto			GetTimecardLines_By_TimecardID_And_CostCenterID(string timecard_id, string cost_center_id, CMysql *, CUser *);
 
-auto			isServiceInvoiceBelongsToUser(string service_invoice_id, CMysql *db, CUser *user) -> bool;
-auto			RecallServiceInvoice(string service_invoice_id, CMysql *db, CUser *user) -> string;
-auto			isServiceInvoiceBelongsToAgency(string service_invoice_id, CMysql *db, CUser *user) -> bool;
-auto			GetAgencyIDByUserID(CMysql *db, CUser *user) -> string;
+auto			isServiceInvoiceBelongsToUser(string service_invoice_id, CMysql *, CUser *) -> bool;
+auto			RecallServiceInvoice(string service_invoice_id, CMysql *, CUser *) -> string;
+auto			isServiceInvoiceBelongsToAgency(string service_invoice_id, CMysql *, CUser *) -> bool;
+auto			GetAgencyIDByUserID(CMysql *, CUser *) -> string;
+auto			CreatePSoWfromTimecardCustomerIDAndCostCenterID(string timecard_customer_id, string cost_center_id, CMysql *, CUser *) -> bool;
 
 #endif
