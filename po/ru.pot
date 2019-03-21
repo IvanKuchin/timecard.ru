@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-18 10:43-0400\n"
+"POT-Creation-Date: 2019-03-21 08:40-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -152,6 +152,9 @@ msgstr "агенство не найдено"
 msgid "agreement from"
 msgstr "от"
 
+msgid "agreement number is empty"
+msgstr "не указан номер договора"
+
 msgid "can't close archive"
 msgstr "не удалось закрыть фаил архива"
 
@@ -179,11 +182,17 @@ msgstr "даты командировки вне периода назначен
 msgid "dayrate changed"
 msgstr "dayrate изменился"
 
+msgid "dayrate not set"
+msgstr "не указан dayrate"
+
 msgid "db is not initialized"
 msgstr "ошибка БД"
 
 msgid "description updated"
 msgstr "описание изменено"
+
+msgid "employeer not found"
+msgstr "не найден работодатель"
 
 msgid "end date changed"
 msgstr "изменилась дата окончания контракта"
@@ -267,13 +276,31 @@ msgid "rur."
 msgstr "руб."
 
 msgid "sign date changed"
-msgstr "изменилась дата начала контракта"
+msgstr "изменилась дата подписания контракта"
+
+msgid "sign date is empty"
+msgstr "не указана дата подписания контракта"
+
+msgid "signature title 1 is empty"
+msgstr "не указан подписант 1"
+
+msgid "signature title 2 is empty"
+msgstr "не указан подписант 2"
 
 msgid "start date changed"
 msgstr "изменилась дата подписания контракта"
 
 msgid "till"
 msgstr "до"
+
+msgid "timecard date finish is empty"
+msgstr "не определена дата окончания таймкарты"
+
+msgid "timecard date start is empty"
+msgstr "не определена дата окончания таймкарты"
+
+msgid "timecard id is empty"
+msgstr "таймкарта не найдена"
 
 msgid "to"
 msgstr "на"
