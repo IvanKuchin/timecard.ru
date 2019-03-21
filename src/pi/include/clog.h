@@ -18,7 +18,7 @@
 using namespace std;
 
 #include "localy.h"
-#include "clock.h"
+// #include "clock.h"
 
 #define DEBUG		0
 #define	WARNING		1
@@ -31,12 +31,28 @@ using namespace std;
 { \
 	CLog	obj; \
 	string	pretty = __PRETTY_FUNCTION__;  \
-	string	classname = ""s; \
-	string	action_output = ""s; \
-	size_t	p1 = pretty.find(" "); \
-	size_t	p2 = pretty.find("::", (p1 == string::npos ? 0 : p1)); \
+    auto    classname = ""s; \
+	auto    action_output = ""s; \
+    auto    func_name_finish = pretty.find("(");\
+    \
+    if(func_name_finish != string::npos)\
+    {\
+        auto    func_name_start = pretty.find_last_of(" :", func_name_finish);\
+        auto    class_name_start = pretty.find_last_of(" ", func_name_finish);\
+        auto    class_separator = pretty.find("::");\
 \
-	if((p1 != string::npos) && (p2 != string::npos) && (p1 < p2)) { classname = pretty.substr(p1 + 1, p2 - p1 + 1); } \
+    	if(\
+    	    (func_name_start != string::npos) &&\
+    	    (class_name_start != string::npos) &&\
+    	    (class_name_start < func_name_finish - 3)\
+    	    ) \
+    	{ classname = pretty.substr(class_name_start + 1, func_name_start - class_name_start); } \
+    	else if(\
+    	    (class_separator != string::npos) &&\
+    	    (class_name_start == string::npos)\
+    	    )\
+    	{ classname = pretty.substr(0, class_separator + 2); /* --- this case address constructors / destructors "Class1::~Class1()"  */ } \
+    }\
 	if(string(action).length()) action_output = " "s + action + ":"; \
 \
 	obj.Write(DEBUG, classname + string(__func__) + "[" + to_string(__LINE__) + "]" + action_output + " " + mess); \
@@ -46,12 +62,28 @@ using namespace std;
 { \
 	CLog	obj; \
 	string	pretty = __PRETTY_FUNCTION__;  \
-	string	classname = ""s; \
-	string	action_output = ""s; \
-	size_t	p1 = pretty.find(" "); \
-	size_t	p2 = pretty.find("::", (p1 == string::npos ? 0 : p1)); \
+    auto    classname = ""s; \
+	auto    action_output = ""s; \
+    auto    func_name_finish = pretty.find("(");\
+    \
+    if(func_name_finish != string::npos)\
+    {\
+        auto    func_name_start = pretty.find_last_of(" :", func_name_finish);\
+        auto    class_name_start = pretty.find_last_of(" ", func_name_finish);\
+        auto    class_separator = pretty.find("::");\
 \
-	if((p1 != string::npos) && (p2 != string::npos) && (p1 < p2)) { classname = pretty.substr(p1 + 1, p2 - p1 + 1); } \
+    	if(\
+    	    (func_name_start != string::npos) &&\
+    	    (class_name_start != string::npos) &&\
+    	    (class_name_start < func_name_finish - 3)\
+    	    ) \
+    	{ classname = pretty.substr(class_name_start + 1, func_name_start - class_name_start); } \
+    	else if(\
+    	    (class_separator != string::npos) &&\
+    	    (class_name_start == string::npos)\
+    	    )\
+    	{ classname = pretty.substr(0, class_separator + 2); } \
+    }\
 	if(string(action).length()) action_output = " "s + action + ":"; \
 \
 	obj.Write(ERROR, classname + string(__func__) + "[" + to_string(__LINE__) + "]" + action_output + " " + mess); \

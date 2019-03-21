@@ -77,7 +77,7 @@ class C_Timecard_To_Print
 
 		auto		AddTimecardLine(string customer, string project, string task, string hours) -> string;
 
-		auto		isValid() -> bool;
+		auto		isValid() -> string;
 };
 
 ostream&	operator<<(ostream& os, const C_Timecard_To_Print &);

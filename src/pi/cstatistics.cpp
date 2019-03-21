@@ -18,15 +18,15 @@ CStatistics::~CStatistics()
 		ostringstream	ost;
 
 		ost.str("");
-		ost	<< "~CStatistics: time duration (in ticks) = " << (float)(endClock - startClock) /  CLOCKS_PER_SEC;
+		ost	<< "CStatistics::~CStatistics: time duration (in ticks) = " << (float)(endClock - startClock) /  CLOCKS_PER_SEC;
 		log.Write(DEBUG, ost.str());
 
 		ost.str("");
-		ost	<< "~CStatistics: sec duration = " << (endTime - startTime);
+		ost	<< "CStatistics::~CStatistics: sec duration = " << (endTime - startTime);
 		log.Write(DEBUG, ost.str());
 
 		ost.str("");
-		ost	<< "~CStatistics: chrono duration = " << to_string(endChrono.count() - startChrono.count()) << " microseconds";
+		ost	<< "CStatistics::~CStatistics: chrono duration = " << to_string(endChrono.count() - startChrono.count()) << " microseconds";
 		log.Write(DEBUG, ost.str());
 	}
 }

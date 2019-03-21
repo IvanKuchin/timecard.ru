@@ -19,33 +19,24 @@ string C_Timecard_To_Print::AddTimecardLine(string customer, string project, str
 	return error_message;
 }
 
-auto C_Timecard_To_Print::isValid() -> bool
+auto C_Timecard_To_Print::isValid() -> string
 {
-	auto result = false;
+	auto error_message = ""s;
 
 	MESSAGE_DEBUG("", "", "start");
 
-	if(
-		GetID().length() &&
-		GetDateStart().length() &&
-		GetDateFinish().length() &&
-		GetAgreementNumber().length() &&
-		GetDateSign().length() &&
-		GetSignatureTitle1().length() &&
-		GetSignatureTitle2().length() &&
-		string(GetDayrate()).length()
-	)
-	{
-		result = true;
-	}
-	else
-	{
-		MESSAGE_ERROR("", "", "object is invalid");
-	}
+	if(GetID().empty())						{ MESSAGE_ERROR("", "", "timecard.id is empty"); 			error_message = gettext("timecard id is empty"); }
+	else if(GetDateStart().empty()) 		{ MESSAGE_ERROR("", "", "timecard date start is empty"); 	error_message = gettext("timecard date start is empty"); }
+	else if(GetDateFinish().empty()) 		{ MESSAGE_ERROR("", "", "timecard date finish is empty"); 	error_message = gettext("timecard date finish is empty"); }
+	else if(GetAgreementNumber().empty()) 	{ MESSAGE_ERROR("", "", "agreement number is empty"); 		error_message = gettext("agreement number is empty"); }
+	else if(GetDateSign().empty())			{ MESSAGE_ERROR("", "", "sign date is empty"); 				error_message = gettext("sign date is empty"); }
+	else if(GetSignatureTitle1().empty())	{ MESSAGE_ERROR("", "", "signature title 1 is empty"); 		error_message = gettext("signature title 1 is empty"); }
+	else if(GetSignatureTitle2().empty())	{ MESSAGE_ERROR("", "", "signature title 2 is empty"); 		error_message = gettext("signature title 2 is empty"); }
+	else if(string(GetDayrate()).empty())	{ MESSAGE_ERROR("", "", "dayrate not set");					error_message = gettext("dayrate not set"); }
 
 	MESSAGE_DEBUG("", "", "finish");
 
-	return result;
+	return error_message;
 }
 
 ostream& operator<<(ostream& os, const C_Timecard_To_Print &var)

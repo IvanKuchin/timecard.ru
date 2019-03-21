@@ -17,6 +17,7 @@ set(EXECUTABLE_CGIs_with_PI_LIBS
 set(INVOICE_LIB_SRCs
     c_invoice_service.cpp
     c_print_timecard.cpp
+    c_print_invoice_service.cpp
     c_timecard_to_print.cpp
     )
 

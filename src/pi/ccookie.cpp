@@ -1,15 +1,5 @@
 #include "ccookie.h"
 
-CCookie::CCookie()
-{
-	MESSAGE_DEBUG("", "", "start default constructor");
-}
-
-CCookie::CCookie(string n, string v) : name(n), value(v)
-{
-	MESSAGE_DEBUG("", "", "start");
-}
-
 /*
 Header mismatch:
 	Expected: Set-Cookie: name=value; expires=Thu, 24-Apr-2014 22:36:43 GMT; Max-Age=5
@@ -18,33 +8,21 @@ Header mismatch:
 
 void	CCookie::SetNew(bool s) 
 {
-	{
-		MESSAGE_DEBUG("", "", "name = " + GetName());
-	}
-	isNew = s;
-}
+	MESSAGE_DEBUG("", "", "name = " + GetName());
 
-CCookie::~CCookie()
-{
-	MESSAGE_DEBUG("", "", "destructor for " + GetName());
+	isNew = s;
 }
 
 CCookies::CCookies()
 {
-	MESSAGE_DEBUG("", "", "start");
-
 	cookies.reserve(8);
-
-	MESSAGE_DEBUG("", "", "finish (size of cookies=" + to_string(cookies.size()) + " object after reservation)");
 }
 
 void CCookies::Add(string name, string value, string expiration, string domain, string path, string secure, bool newCookie)
 {
 	CCookie		*c;
 
-	{
-		MESSAGE_DEBUG("", "", "start (# of cookies are " + to_string(cookies.size()) + " objects)");
-	}
+	MESSAGE_DEBUG("", "", "start (add " + name + "=" + value + ";expiration=" + expiration + ";newCookie=" + to_string(newCookie) + ")");
 
 	if((cookies.capacity() - cookies.size()) <= 0)
 	{
@@ -69,23 +47,18 @@ void CCookies::Add(string name, string value, string expiration, string domain, 
 
 	cookies.push_back(c);
 
-	{
-		MESSAGE_DEBUG("", "", "end (size of cookies=" + to_string(cookies.size()) + " object)");
-	}
-
+	MESSAGE_DEBUG("", "", "finish (size of cookies=" + to_string(cookies.size()) + " object)");
 }
 
 void CCookies::Add(string name, string value, string expiration, int maxAge, string domain, string path, string secure, bool newCookie)
 {
 	CCookie		*c;
 
-	{
-		MESSAGE_DEBUG("", "", "start (""name=" + name + " value=" + value + " exp=" + expiration + " maxAge=" + to_string(maxAge) + " domain=" + domain + " path=" + path + " secure=" + secure + " newCookie=" + to_string(newCookie) + ")");
-	}
+	MESSAGE_DEBUG("", "", "start (" + name + "=" + value + ";exp=" + expiration + ";maxAge=" + to_string(maxAge) + ";domain=" + domain + ";path=" + path + ";secure=" + secure + ";newCookie=" + to_string(newCookie) + ")");
 
 	if((cookies.capacity() - cookies.size()) <= 0)
 	{
-		MESSAGE_ERROR("", "", "Size of cookie vector is overflow. May be reallocating memory. (cookies.capacity()=" + to_string(cookies.capacity()) + " cookies.size()=" + to_string(cookies.size()) + " )");
+		MESSAGE_ERROR("", "", "Size of cookie vector is overflowed. Memory reallocating possible. (cookies.capacity()=" + to_string(cookies.capacity()) + " cookies.size()=" + to_string(cookies.size()) + " )");
 	}
 
 	c = new(CCookie);
@@ -106,9 +79,7 @@ void CCookies::Add(string name, string value, string expiration, int maxAge, str
 
 	cookies.push_back(c);
 
-	{
-		MESSAGE_DEBUG("", "", "nd (size of cookies=" + to_string(cookies.size()) + " object)");
-	}
+	MESSAGE_DEBUG("", "", "finish (size of cookies=" + to_string(cookies.size()) + " object)");
 }
 
 bool CCookies::IsExist(string name)
@@ -138,9 +109,7 @@ string CCookies::GetTimestampShifted(int deltaTimeStamp)
 	struct tm	*utc_tm;
 	string		result = "";
 
-	{
-		MESSAGE_DEBUG("", "", " start (deltaTimeStamp = " + to_string(deltaTimeStamp) + ")");
-	}
+	MESSAGE_DEBUG("", "", " start (deltaTimeStamp = " + to_string(deltaTimeStamp) + ")");
 
 	t = time(NULL) + deltaTimeStamp;
 	utc_tm = gmtime(&t);
@@ -161,9 +130,7 @@ string CCookies::GetTimestampShifted(int deltaTimeStamp)
 	}
 
 
-	{
-		MESSAGE_DEBUG("", "", " return (result = " + result + ")");
-	}
+	MESSAGE_DEBUG("", "", " return (result = " + result + ")");
 
 	return result;
 }
@@ -177,9 +144,7 @@ bool CCookies::UpdateTS(string name, int deltaTimeStamp)
 	vector<CCookie *>::iterator	im;
 	bool						result = true;
 
-	{
-		MESSAGE_DEBUG("", "", " start (name = " + name + ", deltaTimeStamp = " + to_string(deltaTimeStamp) + ")");
-	}
+	MESSAGE_DEBUG("", "", " start (name = " + name + ", deltaTimeStamp = " + to_string(deltaTimeStamp) + ")");
 
 	if(IsExist(name)) {
 		value = Get(name);
@@ -220,9 +185,7 @@ bool CCookies::UpdateTS(string name, int deltaTimeStamp)
 		result = false;
 	} // if(IsExist(name)) 
 
-	{
-		MESSAGE_DEBUG("", "", "finish (" + to_string(result) + ")");
-	}
+	MESSAGE_DEBUG("", "", "finish (" + to_string(result) + ")");
 
 	return result;
 }
@@ -295,9 +258,7 @@ string CCookies::GetAll()
 	vector<CCookie *>::iterator	im;
 	ostringstream				ost;
 
-	{
-		MESSAGE_DEBUG("", "", " start");
-	}
+	MESSAGE_DEBUG("", "", " start");
 
 	result = "";
 	for(im = cookies.begin(); im < cookies.end(); ++im)
@@ -340,9 +301,8 @@ string CCookies::GetAll()
 	
 	if(result.length() > 1)	result.erase(result.length() - 1);
 
-	{
-		MESSAGE_DEBUG("", "", " finish (result len = " + to_string(result.length()) + ")");
-	}
+	MESSAGE_DEBUG("", "", " finish (result len = " + to_string(result.length()) + ")");
+
 	return result;
 }
 
@@ -350,9 +310,7 @@ void CCookies::RegisterCookieVariables(CVars *v)
 {
 	vector<CCookie *>::iterator	im;
 
-	{
-		MESSAGE_DEBUG("", "", " start ");
-	}
+	MESSAGE_DEBUG("", "", " start ");
 
 	for(im = cookies.begin(); im < cookies.end(); ++im)
 		if((*im)->GetName().length())
@@ -364,9 +322,7 @@ void CCookies::RegisterCookieVariables(CVars *v)
 			}
 		}
 
-	{
-		MESSAGE_DEBUG("", "", " finish ");
-	}
+	MESSAGE_DEBUG("", "", " finish ");
 }
 
 void CCookies::ParseString(string str)
@@ -374,9 +330,7 @@ void CCookies::ParseString(string str)
 	string				result, expr, cookName, cookValue;
 	string::size_type	exprPos, eqPos;
 
-	{
-		MESSAGE_DEBUG("", "", "start ");
-	}
+	MESSAGE_DEBUG("", "", "start ");
 
 	result = str;
 	exprPos = result.find(";");
@@ -423,25 +377,19 @@ void CCookies::ParseString(string str)
 		exprPos = result.find(";");
 	}
 
-	{
-		MESSAGE_DEBUG("", "", " end ");
-	}
+	MESSAGE_DEBUG("", "", "finish");
 }
 
 CCookies::~CCookies()
 {
 	vector<CCookie *>::iterator	iv;
 
-	{
-		MESSAGE_DEBUG("", "", " start");
-	}
+	MESSAGE_DEBUG("", "", " start");
 
 	for(iv = cookies.begin(); iv < cookies.end(); ++iv)
 	{
 		delete(*iv);
 	}
 
-	{
-		MESSAGE_DEBUG("", "", " finish");
-	}
+	MESSAGE_DEBUG("", "", " finish");
 }

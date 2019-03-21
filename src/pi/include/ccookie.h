@@ -15,8 +15,8 @@ class CCookie
 		int		maxAge = -1;
 		bool	isNew;		// this parameter control sentback coockie to server
 	public:
-				CCookie();
-				CCookie(string n, string v);
+				CCookie() {};
+				CCookie(string n, string v) : name(n), value(v) {};
 
 		void	SetName(const string &s)				{ name = s; }
 		void	SetName(string &&s) 		noexcept	{ name = move(s); }
@@ -41,8 +41,6 @@ class CCookie
 		int		GetMaxAge()					const		{ return maxAge; }
 		string	GetSecure()					const		{ return secure; }
 		bool	GetNew()					const		{ return isNew; }
-
-			~CCookie();
 };
 
 class CCookies

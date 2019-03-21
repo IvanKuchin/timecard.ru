@@ -8,6 +8,7 @@
 #include "clog.h"
 #include "utilities.h"
 #include "c_print_timecard.h"
+#include "c_print_invoice_service.h"
 #include "c_archive.h"
 
 using namespace std;
@@ -48,6 +49,8 @@ class C_Invoice_Service
 
 		auto		SetCostCenterID(const string &param1)			{ cost_center_id = param1; };
 		auto		SetCostCenterID(string &&param1) 				{ cost_center_id = move(param1); };
+
+		auto		GetInvoiceID()									{ return invoice_cost_center_service_id; };
 
 		auto		GenerateDocumentArchive() -> string;
 

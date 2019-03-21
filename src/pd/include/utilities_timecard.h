@@ -117,4 +117,14 @@ auto			isServiceInvoiceBelongsToAgency(string service_invoice_id, CMysql *, CUse
 auto			GetAgencyIDByUserID(CMysql *, CUser *) -> string;
 auto			CreatePSoWfromTimecardCustomerIDAndCostCenterID(string timecard_customer_id, string cost_center_id, CMysql *, CUser *) -> bool;
 
+auto			isTimecardsHavePSOWAssigned(const vector<string> &timecard_list, string cost_center_id, CMysql *db, CUser *user) -> string;
+auto			isTimecardsBelongToAgency(const vector<string> &timecard_list, string agency_id, CMysql *db, CUser *user) -> string;
+auto			isAgencyEmployeeAllowedToChangeSoW(string sow_id, CMysql *db, CUser *user) -> string;
+auto			isAgencyEmployeeAllowedToChangePSoW(string sow_id, CMysql *db, CUser *user) -> string;
+auto			isAgencyEmployeeAllowedToChangeAgencyData(CMysql *db, CUser *user) -> string;
+struct tm 		GetFirstDayReportedOnAssignmentID(string sow_id, string task_id, CMysql *db);
+struct tm 		GetLastDayReportedOnAssignmentID(string sow_id, string task_id, CMysql *db);
+auto			isActionEntityBelongsToSoW(string action, string id, string sow_id, CMysql *db, CUser *user) -> string;
+auto			CheckNewValueByAction(string action, string id, string sow_id, string new_value, CMysql *db, CUser *user) -> string;
+auto			isActionEntityBelongsToAgency(string action, string id, string agency_id, CMysql *db, CUser *user) -> string;
 #endif

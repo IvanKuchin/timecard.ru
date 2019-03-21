@@ -87,8 +87,9 @@ C_Invoice_Service::C_Invoice_Service(CMysql *param1, CUser *param2) : db(param1)
 
 auto C_Invoice_Service::GenerateDocumentArchive() -> string
 {
-	C_Print_Timecard	printer;
-	auto				error_message = ""s;
+	C_Print_Timecard		timecard_printer;
+	C_Print_Invoice_Service	invoice_printer;
+	auto					error_message = ""s;
 
 	MESSAGE_DEBUG("", "", "start");
 
@@ -112,21 +113,28 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 		{
 			auto	temp_obj = CreateTimecardObj(timecard_id);
 
-			if(temp_obj.isValid())
+			if((error_message = temp_obj.isValid()).empty())
+			{
 				timecard_obj_list.push_back(temp_obj);
+			}
 			else
 			{
 				MESSAGE_ERROR("", "", "timecard_obj(" + timecard_id + ") is broken don't add it to the list");
-				error_message = (gettext("fail to craft timecard obj"));
+				break;
 			}
 		}
 	}
+	else
+	{
+		MESSAGE_ERROR("", "", "timecard won't be built due to previous error");
+	}
 
+	// --- timecard generator
 	if(error_message.empty())
 	{
 		auto	i = 0;
 
-		// --- print timecard to XLS
+		// --- print timecard to XLS / PDF
 		for(auto &timecard: timecard_obj_list)
 		{
 			auto		filename_xls = ""s;
@@ -139,18 +147,18 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 				filename_pdf = temp_dir_timecards + "timecard_" + to_string(i) + ".pdf";
 			} while(isFileExists(filename_xls) || isFileExists(filename_pdf));
 
-			printer.SetTimecard(timecard);
+			timecard_printer.SetTimecard(timecard);
 
-			printer.SetFilename(filename_xls);
-			error_message = printer.PrintAsXLS();
+			timecard_printer.SetFilename(filename_xls);
+			error_message = timecard_printer.PrintAsXLS();
 			if(error_message.length())
 			{
 				MESSAGE_ERROR("", "", "fail to build timecard_" + to_string(i) + ".xls");
 				break;
 			}
 
-			printer.SetFilename(filename_pdf);
-			error_message = printer.PrintAsPDF();
+			timecard_printer.SetFilename(filename_pdf);
+			error_message = timecard_printer.PrintAsPDF();
 			if(error_message.length())
 			{
 				MESSAGE_ERROR("", "", "fail to build timecard_" + to_string(i) + ".pdf");
@@ -159,12 +167,63 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 
 			// --- we don't want to count total payment again, instead take it from printer
 			// --- this may not be a good idea
-			if((error_message = UpdateDBWithInvoiceData(timecard.GetID(), printer.GetTotalPayment())).length())
+			if((error_message = UpdateDBWithInvoiceData(timecard.GetID(), timecard_printer.GetTotalPayment())).length())
 			{
 				break;
 			}
 		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "timecards won't be written to files due to previous error");
+	}
 
+	if(error_message.empty())
+	{
+		auto		i = 0;
+		auto		invoice_filename_xls = ""s;
+		auto		invoice_filename_pdf = ""s;
+		auto		act_filename_xls = ""s;
+		auto		act_filename_pdf = ""s;
+		auto		vat_filename_xls = ""s;
+		auto		vat_filename_pdf = ""s;
+
+		do
+		{
+			++i;
+			invoice_filename_xls = temp_dir_cost_center_invoices + "invoice_" + to_string(i) + ".xls";
+			invoice_filename_pdf = temp_dir_cost_center_invoices + "invoice_" + to_string(i) + ".pdf";
+			act_filename_xls = temp_dir_cost_center_invoices + "act_" + to_string(i) + ".xls";
+			act_filename_pdf = temp_dir_cost_center_invoices + "act_" + to_string(i) + ".pdf";
+			vat_filename_xls = temp_dir_cost_center_invoices + "vat_" + to_string(i) + ".xls";
+			vat_filename_pdf = temp_dir_cost_center_invoices + "vat_" + to_string(i) + ".pdf";
+		} while(
+				isFileExists(invoice_filename_xls) || isFileExists(invoice_filename_pdf) ||
+				isFileExists(act_filename_xls)     || isFileExists(act_filename_pdf) ||
+				isFileExists(vat_filename_xls)     || isFileExists(vat_filename_pdf)
+				);
+
+		invoice_printer.SetTimecards(timecard_obj_list);		
+		invoice_printer.SetDB(db);
+
+		invoice_printer.SetFilename(invoice_filename_xls);
+		error_message = invoice_printer.PrintInvoiceAsXLS();
+		if(error_message.empty())
+		{
+
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "fail to build invoice.xls");
+		}
+	}	
+	else
+	{
+		MESSAGE_ERROR("", "", "invoice to cost center won't be written to files due to previous error");
+	}
+
+	if(error_message.empty())
+	{
 		// --- important to keep it scoped
 		// --- archive closed in destructor
 		{
@@ -174,6 +233,10 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 			ar.SetFolderToArchive(temp_dir);
 			ar.Archive();
 		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "archive won't be generated due to previous error");
 	}
 
 	MESSAGE_DEBUG("", "", "finish");
