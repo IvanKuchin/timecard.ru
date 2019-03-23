@@ -27,8 +27,10 @@ class C_Print_Invoice_Service
 {
 	private:
 		CMysql							*db = NULL;
+		CVars							vars;
 
 		string							filename = "";
+		string							cost_center_id = "";
 
 		vector<C_Timecard_To_Print>		timecards;
 
@@ -37,6 +39,7 @@ class C_Print_Invoice_Service
 		string							__pdf_font_name = "Helvetica";
 		int								__pdf_line = -1;
 
+		auto		BuildInvoiceData() -> string;
 	public:
 					C_Print_Invoice_Service();
 
@@ -44,10 +47,11 @@ class C_Print_Invoice_Service
 		auto		SetTimecards(const vector<C_Timecard_To_Print> &param1) -> void;
 		auto		SetFilename(const string &param1)				{ filename = param1; };
 		auto		SetFilename(string &&param1) 					{ filename = move(param1); };
+		auto		SetCostCenterID(const string &param1)			{ cost_center_id = param1; };
+		auto		SetCostCenterID(string &&param1) 				{ cost_center_id = move(param1); };
 
 		auto		GetFilename()									{ return filename; }
 
-		auto		isInvoiceData_Correct() -> string;
 		auto		PrintInvoiceAsXLS() -> string;
 
 					~C_Print_Invoice_Service()						{ if(__pdf) { HPDF_Free(__pdf); }; };

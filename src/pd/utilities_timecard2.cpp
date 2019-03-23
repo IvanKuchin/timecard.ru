@@ -1280,18 +1280,19 @@ string	isActionEntityBelongsToAgency(string action, string id, string agency_id,
 				if(action == "AJAX_updateAgencyPosition")				sql_query = "SELECT `company_id` AS `agency_id` FROM `company_employees` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateAgencyEditCapability")			sql_query = "SELECT `company_id` AS `agency_id` FROM `company_employees` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateSoWEditCapability")			sql_query = "SELECT `company_id` AS `agency_id` FROM `company_employees` WHERE `id`=\"" + id + "\";";
-				if(action == "AJAX_updateCompanyTitle")					sql_query = "SELECT \"" + agency_id + "\" AS `agency_id`;"; // --- entity always belongs to agency
-				if(action == "AJAX_updateCompanyDescription")			sql_query = "SELECT \"" + agency_id + "\" AS `agency_id`;"; // --- entity always belongs to agency
-				if(action == "AJAX_updateCompanyWebSite")				sql_query = "SELECT \"" + agency_id + "\" AS `agency_id`;"; // --- entity always belongs to agency
-				if(action == "AJAX_updateCompanyTIN")					sql_query = "SELECT \"" + agency_id + "\" AS `agency_id`;"; // --- entity always belongs to agency
-				if(action == "AJAX_updateCompanyAccount")				sql_query = "SELECT \"" + agency_id + "\" AS `agency_id`;"; // --- entity always belongs to agency
-				if(action == "AJAX_updateCompanyOGRN")					sql_query = "SELECT \"" + agency_id + "\" AS `agency_id`;"; // --- entity always belongs to agency
-				if(action == "AJAX_updateCompanyKPP")					sql_query = "SELECT \"" + agency_id + "\" AS `agency_id`;"; // --- entity always belongs to agency
-				if(action == "AJAX_updateCompanyLegalAddress")			sql_query = "SELECT \"" + agency_id + "\" AS `agency_id`;"; // --- entity always belongs to agency
-				if(action == "AJAX_updateCompanyMailingAddress")		sql_query = "SELECT \"" + agency_id + "\" AS `agency_id`;"; // --- entity always belongs to agency
-				if(action == "AJAX_updateCompanyMailingZipID")			sql_query = "SELECT \"" + agency_id + "\" AS `agency_id`;"; // --- entity always belongs to agency
-				if(action == "AJAX_updateCompanyLegalZipID")			sql_query = "SELECT \"" + agency_id + "\" AS `agency_id`;"; // --- entity always belongs to agency
-				if(action == "AJAX_updateCompanyBankID")				sql_query = "SELECT \"" + agency_id + "\" AS `agency_id`;"; // --- entity always belongs to agency
+
+				if(action == "AJAX_updateCompanyTitle")					sql_query = "SELECT `company_id` AS `agency_id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\";";
+				if(action == "AJAX_updateCompanyDescription")			sql_query = "SELECT `company_id` AS `agency_id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\";";
+				if(action == "AJAX_updateCompanyWebSite")				sql_query = "SELECT `company_id` AS `agency_id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\";";
+				if(action == "AJAX_updateCompanyTIN")					sql_query = "SELECT `company_id` AS `agency_id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\";";
+				if(action == "AJAX_updateCompanyAccount")				sql_query = "SELECT `company_id` AS `agency_id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\";";
+				if(action == "AJAX_updateCompanyOGRN")					sql_query = "SELECT `company_id` AS `agency_id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\";";
+				if(action == "AJAX_updateCompanyKPP")					sql_query = "SELECT `company_id` AS `agency_id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\";";
+				if(action == "AJAX_updateCompanyLegalAddress")			sql_query = "SELECT `company_id` AS `agency_id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\";";
+				if(action == "AJAX_updateCompanyMailingAddress")		sql_query = "SELECT `company_id` AS `agency_id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\";";
+				if(action == "AJAX_updateCompanyMailingZipID")			sql_query = "SELECT `company_id` AS `agency_id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\";";
+				if(action == "AJAX_updateCompanyLegalZipID")			sql_query = "SELECT `company_id` AS `agency_id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\";";
+				if(action == "AJAX_updateCompanyBankID")				sql_query = "SELECT `company_id` AS `agency_id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\";";
 
 				if(sql_query.length())
 				{

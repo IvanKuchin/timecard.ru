@@ -42,11 +42,147 @@ auto	C_Print_Invoice_Service::SetTimecards(const vector<C_Timecard_To_Print> &pa
 }
 
 
-auto	C_Print_Invoice_Service::isInvoiceData_Correct() -> string
+auto	C_Print_Invoice_Service::BuildInvoiceData() -> string
 {
 	auto	error_message = ""s;
 
 	MESSAGE_DEBUG("", "", "start");
+
+	if(db)
+	{
+		if(error_message.empty())
+		{
+			if(vars.Get("cost_center_id").empty())
+			{
+				MESSAGE_DEBUG("", "", "build cost center id");
+
+				if(cost_center_id.length())
+				{
+					vars.Add("cost_center_id", cost_center_id);
+				}
+				else
+				{
+					MESSAGE_ERROR("", "", "cost center id is empty");
+					error_message = gettext("cost center id is empty");
+				}
+			}
+		}
+		if(error_message.empty())
+		{
+			if(vars.Get("agency_id").empty())
+			{
+				MESSAGE_DEBUG("", "", "build agency id");
+
+				if(db->Query("SELECT * FROM `cost_centers` WHERE `id`=\"" + vars.Get("cost_center_id") + "\";"))
+				{
+					vars.Add("agency_id", db->Get(0, "agency_company_id"));
+
+					// --- take same results 
+					vars.Add("cost_center_title", ConvertHTMLToText(db->Get(0, "title")));
+					vars.Add("cost_center_agreement_start_date", db->Get(0, "start_date"));
+					vars.Add("cost_center_agreement_end_date", db->Get(0, "end_date"));
+					vars.Add("cost_center_agreement_number", db->Get(0, "number"));
+					vars.Add("cost_center_agreement_sign_date", db->Get(0, "sign_date"));
+				}
+				else
+				{
+					MESSAGE_ERROR("", "", "agency id not found");
+					error_message = gettext("agency id not found");
+				}
+			}
+		}
+		if(error_message.empty())
+		{
+			if(vars.Get("cost_center_title").empty())
+			{
+				MESSAGE_DEBUG("", "", "build cost center title");
+
+				if(db->Query("SELECT `title` FROM `cost_centers` WHERE `id`=\"" + vars.Get("cost_center_id") + "\";"))
+				{
+					vars.Add("cost_center_title", ConvertHTMLToText(db->Get(0, "title")));
+				}
+				else
+				{
+					MESSAGE_ERROR("", "", "cost center title not found");
+					error_message = gettext("cost center title not found");
+				}
+			}
+		}
+		if(error_message.empty())
+		{
+			if(vars.Get("cost_center_agreement_start_date").empty())
+			{
+				MESSAGE_DEBUG("", "", "build cost center start date");
+
+				if(db->Query("SELECT `start_date` FROM `cost_centers` WHERE `id`=\"" + vars.Get("cost_center_id") + "\";"))
+				{
+					vars.Add("cost_center_agreement_start_date", ConvertHTMLToText(db->Get(0, "start_date")));
+				}
+				else
+				{
+					MESSAGE_ERROR("", "", "cost center start date not found");
+					error_message = gettext("cost center start date not found");
+				}
+			}
+		}
+		if(error_message.empty())
+		{
+			if(vars.Get("cost_center_agreement_end_date").empty())
+			{
+				MESSAGE_DEBUG("", "", "build cost center end date");
+
+				if(db->Query("SELECT `end_date` FROM `cost_centers` WHERE `id`=\"" + vars.Get("cost_center_id") + "\";"))
+				{
+					vars.Add("cost_center_agreement_end_date", ConvertHTMLToText(db->Get(0, "end_date")));
+				}
+				else
+				{
+					MESSAGE_ERROR("", "", "cost center end date not found");
+					error_message = gettext("cost center end date not found");
+				}
+			}
+		}
+		if(error_message.empty())
+		{
+			if(vars.Get("cost_center_agreement_number").empty())
+			{
+				MESSAGE_DEBUG("", "", "build cost center number");
+
+				if(db->Query("SELECT `number` FROM `cost_centers` WHERE `id`=\"" + vars.Get("cost_center_id") + "\";"))
+				{
+					vars.Add("cost_center_agreement_number", ConvertHTMLToText(db->Get(0, "number")));
+				}
+				else
+				{
+					MESSAGE_ERROR("", "", "cost center number not found");
+					error_message = gettext("cost center number not found");
+				}
+			}
+		}
+		if(error_message.empty())
+		{
+			if(vars.Get("cost_center_agreement_sign_date").empty())
+			{
+				MESSAGE_DEBUG("", "", "build cost center sign date");
+
+				if(db->Query("SELECT `sign_date` FROM `cost_centers` WHERE `id`=\"" + vars.Get("cost_center_id") + "\";"))
+				{
+					vars.Add("cost_center_agreement_sign_date", ConvertHTMLToText(db->Get(0, "sign_date")));
+				}
+				else
+				{
+					MESSAGE_ERROR("", "", "cost center sign date not found");
+					error_message = gettext("cost center sign date not found");
+				}
+			}
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "db is not initialized");
+		error_message = gettext("db is not initialized");
+	}
+
 	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
 
 	return	error_message;
@@ -62,7 +198,7 @@ auto	C_Print_Invoice_Service::PrintInvoiceAsXLS() -> string
 	// locale cp1251_locale("ru_RU.UTF-8");
 	// std::locale::global(cp1251_locale);
 
-	if((error_message = isInvoiceData_Correct()).empty())
+	if((error_message = BuildInvoiceData()).empty())
 	{
 		// --- after instantiation libxl-object locale switch over to wide-byte string representation
 		// --- gettext is not working properly with multibyte strings, therefore all gettext constants

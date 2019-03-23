@@ -1325,6 +1325,7 @@ int main(void)
 				string			template_name = "json_response.htmlt";
 				string			error_message = "";
 
+				string			company_id		= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("company_id"));
 				string			id				= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
 				string			new_value		= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("value"));
 
@@ -1336,18 +1337,18 @@ int main(void)
 						string	agency_id = GetAgencyID(&user, &db);
 						if(agency_id.length())
 						{
-							if(action == "AJAX_updateCompanyTitle") 		{	id = agency_id; }
-							if(action == "AJAX_updateCompanyDescription")	{	id = agency_id; }
-							if(action == "AJAX_updateCompanyWebSite")		{	id = agency_id; }
-							if(action == "AJAX_updateCompanyTIN")			{	id = agency_id; }
-							if(action == "AJAX_updateCompanyAccount")		{	id = agency_id; }
-							if(action == "AJAX_updateCompanyOGRN")			{	id = agency_id; }
-							if(action == "AJAX_updateCompanyKPP")			{	id = agency_id; }
-							if(action == "AJAX_updateCompanyLegalAddress") 	{	id = agency_id; }
-							if(action == "AJAX_updateCompanyMailingAddress"){	id = agency_id; }
-							if(action == "AJAX_updateCompanyMailingZipID") 	{	new_value = id; id = agency_id; }
-							if(action == "AJAX_updateCompanyLegalZipID") 	{	new_value = id; id = agency_id; }
-							if(action == "AJAX_updateCompanyBankID") 		{	new_value = id; id = agency_id; }
+							if(action == "AJAX_updateCompanyTitle") 		{					if(company_id.empty())	id = agency_id; else id = company_id; }
+							if(action == "AJAX_updateCompanyDescription")	{					if(company_id.empty())	id = agency_id; else id = company_id; }
+							if(action == "AJAX_updateCompanyWebSite")		{					if(company_id.empty())	id = agency_id; else id = company_id; }
+							if(action == "AJAX_updateCompanyTIN")			{					if(company_id.empty())	id = agency_id; else id = company_id; }
+							if(action == "AJAX_updateCompanyAccount")		{					if(company_id.empty())	id = agency_id; else id = company_id; }
+							if(action == "AJAX_updateCompanyOGRN")			{					if(company_id.empty())	id = agency_id; else id = company_id; }
+							if(action == "AJAX_updateCompanyKPP")			{					if(company_id.empty())	id = agency_id; else id = company_id; }
+							if(action == "AJAX_updateCompanyLegalAddress") 	{					if(company_id.empty())	id = agency_id; else id = company_id; }
+							if(action == "AJAX_updateCompanyMailingAddress"){					if(company_id.empty())	id = agency_id; else id = company_id; }
+							if(action == "AJAX_updateCompanyMailingZipID") 	{	new_value = id; if(company_id.empty())	id = agency_id; else id = company_id; }
+							if(action == "AJAX_updateCompanyLegalZipID") 	{	new_value = id; if(company_id.empty())	id = agency_id; else id = company_id; }
+							if(action == "AJAX_updateCompanyBankID") 		{	new_value = id; if(company_id.empty())	id = agency_id; else id = company_id; }
 
 							error_message = isActionEntityBelongsToAgency(action, id, agency_id, &db, &user);
 							if(error_message.empty())

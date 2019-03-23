@@ -207,6 +207,8 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 		invoice_printer.SetDB(db);
 
 		invoice_printer.SetFilename(invoice_filename_xls);
+		invoice_printer.SetCostCenterID(cost_center_id);
+
 		error_message = invoice_printer.PrintInvoiceAsXLS();
 		if(error_message.empty())
 		{
