@@ -5616,7 +5616,7 @@ string GetSpecificData_GetFinalFileExtenstion(string itemType)
 	else if(itemType == "template_psow")		result = ".txt";
 	else
 	{
-		MESSAGE_ERROR("", "", "default extension taken");
+		MESSAGE_DEBUG("", "", "default extension(" + result + ") taken");
 	}
 
 	MESSAGE_DEBUG("", "", "finish (result = " + result + ")");
