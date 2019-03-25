@@ -174,6 +174,45 @@ int main(void)
 			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 		}
 
+		if(action == "AJAX_getGeoCountryList")
+		{
+			string			template_name = "json_response.htmlt";
+			string			error_message = "";
+			ostringstream	ostResult;
+			auto			affected = 0;
+
+			ostResult.str("");
+
+			affected = db.Query("SELECT * FROM `geo_country`;");
+			if(affected)
+			{
+				ostResult << "{\"result\":\"success\",\"countries\":[";
+				for(auto i = 0; i < affected; ++i)
+					ostResult << (i ? "," : "") << "{\"id\":\"" + db.Get(i, "id") + "\",\"title\":\"" + db.Get(i, "title") + "\"}";
+				ostResult << "]}";
+			}
+			else
+			{
+				MESSAGE_ERROR("", "", "country list is empty");
+				error_message = gettext("country list is empty");
+			}	
+				
+
+			if(error_message.empty())
+			{
+			}
+			else
+			{
+				MESSAGE_DEBUG("", action, "failed");
+				ostResult.str("");
+				ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+			}
+
+			indexPage.RegisterVariableForce("result", ostResult.str());
+
+			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+		}
+
 		if(action == "AJAX_getGeoRegionAndLocalityNames")
 		{
 			string			country = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("country"));
