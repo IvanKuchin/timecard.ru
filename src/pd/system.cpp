@@ -358,10 +358,10 @@ int main()
 									// --- Temporary Guest cookie must be generated before getting here
 									// --- if workflow gets here, you need to check why cookies has not been created before.
 									// ---
-									// --- 4 cases so far:
+									// --- 4 cases so far: 
 									// --- 1) text/html expiration 30 secs. (internally found)
 									// ----		1.a) If user open site from bookmark 
-									// ----		1.b) while 30 secs didn't expire close browser and re-open from bookmark again 
+									// ----		1.b) until 30 secs expire close browser and re-open from bookmark again 
 									// ----		1.c) this should take page from cache
 									// ----   Not fixing this because it is unlike event consequences
 									// --- 2) bug on iPhone / Safari: cookie doesn't assigned in short time interval up to 5 sec
@@ -453,7 +453,7 @@ int main()
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
-		} // --- if(action == "CheckSessionPersistence")
+		}
 
 
 		if(action == "logout")
