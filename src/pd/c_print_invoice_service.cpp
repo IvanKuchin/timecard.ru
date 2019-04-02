@@ -41,153 +41,6 @@ auto	C_Print_Invoice_Service::SetTimecards(const vector<C_Timecard_To_Print> &pa
 	__pdf_line = -1;
 }
 
-
-auto	C_Print_Invoice_Service::BuildInvoiceData() -> string
-{
-	auto	error_message = ""s;
-
-	MESSAGE_DEBUG("", "", "start");
-
-	if(db)
-	{
-		if(error_message.empty())
-		{
-			if(vars.Get("cost_center_id").empty())
-			{
-				MESSAGE_DEBUG("", "", "build cost center id");
-
-				if(cost_center_id.length())
-				{
-					vars.Add("cost_center_id", cost_center_id);
-				}
-				else
-				{
-					MESSAGE_ERROR("", "", "cost center id is empty");
-					error_message = gettext("cost center id is empty");
-				}
-			}
-		}
-		if(error_message.empty())
-		{
-			if(vars.Get("agency_id").empty())
-			{
-				MESSAGE_DEBUG("", "", "build agency id");
-
-				if(db->Query("SELECT * FROM `cost_centers` WHERE `id`=\"" + vars.Get("cost_center_id") + "\";"))
-				{
-					vars.Add("agency_id", db->Get(0, "agency_company_id"));
-
-					// --- take same results 
-					vars.Add("cost_center_title", ConvertHTMLToText(db->Get(0, "title")));
-					vars.Add("cost_center_agreement_start_date", db->Get(0, "start_date"));
-					vars.Add("cost_center_agreement_end_date", db->Get(0, "end_date"));
-					vars.Add("cost_center_agreement_number", db->Get(0, "number"));
-					vars.Add("cost_center_agreement_sign_date", db->Get(0, "sign_date"));
-				}
-				else
-				{
-					MESSAGE_ERROR("", "", "agency id not found");
-					error_message = gettext("agency id not found");
-				}
-			}
-		}
-		if(error_message.empty())
-		{
-			if(vars.Get("cost_center_title").empty())
-			{
-				MESSAGE_DEBUG("", "", "build cost center title");
-
-				if(db->Query("SELECT `title` FROM `cost_centers` WHERE `id`=\"" + vars.Get("cost_center_id") + "\";"))
-				{
-					vars.Add("cost_center_title", ConvertHTMLToText(db->Get(0, "title")));
-				}
-				else
-				{
-					MESSAGE_ERROR("", "", "cost center title not found");
-					error_message = gettext("cost center title not found");
-				}
-			}
-		}
-		if(error_message.empty())
-		{
-			if(vars.Get("cost_center_agreement_start_date").empty())
-			{
-				MESSAGE_DEBUG("", "", "build cost center start date");
-
-				if(db->Query("SELECT `start_date` FROM `cost_centers` WHERE `id`=\"" + vars.Get("cost_center_id") + "\";"))
-				{
-					vars.Add("cost_center_agreement_start_date", ConvertHTMLToText(db->Get(0, "start_date")));
-				}
-				else
-				{
-					MESSAGE_ERROR("", "", "cost center start date not found");
-					error_message = gettext("cost center start date not found");
-				}
-			}
-		}
-		if(error_message.empty())
-		{
-			if(vars.Get("cost_center_agreement_end_date").empty())
-			{
-				MESSAGE_DEBUG("", "", "build cost center end date");
-
-				if(db->Query("SELECT `end_date` FROM `cost_centers` WHERE `id`=\"" + vars.Get("cost_center_id") + "\";"))
-				{
-					vars.Add("cost_center_agreement_end_date", ConvertHTMLToText(db->Get(0, "end_date")));
-				}
-				else
-				{
-					MESSAGE_ERROR("", "", "cost center end date not found");
-					error_message = gettext("cost center end date not found");
-				}
-			}
-		}
-		if(error_message.empty())
-		{
-			if(vars.Get("cost_center_agreement_number").empty())
-			{
-				MESSAGE_DEBUG("", "", "build cost center number");
-
-				if(db->Query("SELECT `number` FROM `cost_centers` WHERE `id`=\"" + vars.Get("cost_center_id") + "\";"))
-				{
-					vars.Add("cost_center_agreement_number", ConvertHTMLToText(db->Get(0, "number")));
-				}
-				else
-				{
-					MESSAGE_ERROR("", "", "cost center number not found");
-					error_message = gettext("cost center number not found");
-				}
-			}
-		}
-		if(error_message.empty())
-		{
-			if(vars.Get("cost_center_agreement_sign_date").empty())
-			{
-				MESSAGE_DEBUG("", "", "build cost center sign date");
-
-				if(db->Query("SELECT `sign_date` FROM `cost_centers` WHERE `id`=\"" + vars.Get("cost_center_id") + "\";"))
-				{
-					vars.Add("cost_center_agreement_sign_date", ConvertHTMLToText(db->Get(0, "sign_date")));
-				}
-				else
-				{
-					MESSAGE_ERROR("", "", "cost center sign date not found");
-					error_message = gettext("cost center sign date not found");
-				}
-			}
-		}
-	}
-	else
-	{
-		MESSAGE_ERROR("", "", "db is not initialized");
-		error_message = gettext("db is not initialized");
-	}
-
-	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
-
-	return	error_message;
-}
-
 auto	C_Print_Invoice_Service::PrintInvoiceAsXLS() -> string
 {
 	auto	error_message = ""s;
@@ -198,7 +51,7 @@ auto	C_Print_Invoice_Service::PrintInvoiceAsXLS() -> string
 	// locale cp1251_locale("ru_RU.UTF-8");
 	// std::locale::global(cp1251_locale);
 
-	if((error_message = BuildInvoiceData()).empty())
+	if(vars)
 	{
 		// --- after instantiation libxl-object locale switch over to wide-byte string representation
 		// --- gettext is not working properly with multibyte strings, therefore all gettext constants
@@ -210,7 +63,7 @@ auto	C_Print_Invoice_Service::PrintInvoiceAsXLS() -> string
 			libxl::Sheet* sheet = book->addSheet(L"Sheet1");
 			if(sheet)
 			{
-				auto			row_counter = 6;
+				auto			row_counter = 1;
 				auto			column_counter = 0;
 
 				auto			font_big			= book->addFont();
@@ -233,15 +86,26 @@ auto	C_Print_Invoice_Service::PrintInvoiceAsXLS() -> string
 				format_number_d2->setNumFormat(libxl::NUMFORMAT_NUMBER_D2);
 
 				// --- set columns width
-				sheet->setCol(1, 1, 45);
-				sheet->setCol(2, 31 + 2, 5);
+				sheet->setCol(0, 0, 1);
+				sheet->setCol(1, 1, 5);
+				sheet->setCol(2, 2, 31 + 2);
+				// sheet->setCol(2, 31 + 2, 5);
 
-				sheet->writeStr(2, 2, L"spelled_title");
-				sheet->writeStr(3, 1, L"spelled_psow");
-				sheet->writeStr(4, 1, L"spelled_projectid");
+				sheet->writeStr(row_counter, 1, multibyte_to_wide(vars->Get("agency_bank_title")).c_str());
+				sheet->writeStr(row_counter, 6, multibyte_to_wide(vars->Get("Bank Identifier")).c_str());
+				sheet->writeStr(row_counter, 7, multibyte_to_wide(vars->Get("agency_bank_bik")).c_str());
+
+				++row_counter;
+				sheet->writeStr(row_counter, 6, multibyte_to_wide(vars->Get("Account")).c_str());
+				sheet->writeStr(row_counter, 7, multibyte_to_wide(vars->Get("agency_bank_account")).c_str());
+
+				++row_counter;
+				sheet->writeStr(row_counter, 1, multibyte_to_wide(vars->Get("Destination bank")).c_str());
+
 
 				// --- table header
-				sheet->writeStr(5, 2, L"put header here", format_bold);
+				++row_counter;
+				sheet->writeStr(row_counter, 2, L"put header here", format_bold);
 
 				// --- table body
 				for(auto &timecard: timecards)
@@ -278,7 +142,8 @@ auto	C_Print_Invoice_Service::PrintInvoiceAsXLS() -> string
 	}
 	else
 	{
-		MESSAGE_ERROR("", "", "print XLS-invoice to cost_center failed");
+		error_message = gettext("fail to initialize variable set");
+		MESSAGE_ERROR("", "", "set variables before generating documanets. Invoke SetVariableSet before printing.");
 	}
 
 	MESSAGE_DEBUG("", "", "finish (error_message.length() = " + to_string(error_message.length()) + ")");

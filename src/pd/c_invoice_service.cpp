@@ -87,6 +87,7 @@ C_Invoice_Service::C_Invoice_Service(CMysql *param1, CUser *param2) : db(param1)
 
 auto C_Invoice_Service::GenerateDocumentArchive() -> string
 {
+	C_Invoicing_Vars		invoicing_vars(db, user);
 	C_Print_Timecard		timecard_printer;
 	C_Print_Invoice_Service	invoice_printer;
 	auto					error_message = ""s;
@@ -178,6 +179,19 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 		MESSAGE_ERROR("", "", "timecards won't be written to files due to previous error");
 	}
 
+	// --- generte variable for invoicing
+	if(error_message.empty())
+	{
+		invoicing_vars.SetCostCenterID(cost_center_id);
+
+		error_message = invoicing_vars.GenerateVariableSet();
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "invoicing_vars won't be generated due to previous error");
+	}
+
+	// --- invoice generator
 	if(error_message.empty())
 	{
 		auto		i = 0;
@@ -205,6 +219,7 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 
 		invoice_printer.SetTimecards(timecard_obj_list);		
 		invoice_printer.SetDB(db);
+		invoice_printer.SetVariableSet(&invoicing_vars);
 
 		invoice_printer.SetFilename(invoice_filename_xls);
 		invoice_printer.SetCostCenterID(cost_center_id);

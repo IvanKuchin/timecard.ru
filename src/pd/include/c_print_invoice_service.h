@@ -18,6 +18,7 @@
 
 #include "utilities_timecard.h" 
 #include "c_timecard_to_print.h"
+#include "c_invoicing_vars.h"
 #include "c_float.h"
 #include "clog.h"
 
@@ -27,7 +28,7 @@ class C_Print_Invoice_Service
 {
 	private:
 		CMysql							*db = NULL;
-		CVars							vars;
+		C_Invoicing_Vars				*vars;
 
 		string							filename = "";
 		string							cost_center_id = "";
@@ -39,7 +40,6 @@ class C_Print_Invoice_Service
 		string							__pdf_font_name = "Helvetica";
 		int								__pdf_line = -1;
 
-		auto		BuildInvoiceData() -> string;
 	public:
 					C_Print_Invoice_Service();
 
@@ -49,6 +49,7 @@ class C_Print_Invoice_Service
 		auto		SetFilename(string &&param1) 					{ filename = move(param1); };
 		auto		SetCostCenterID(const string &param1)			{ cost_center_id = param1; };
 		auto		SetCostCenterID(string &&param1) 				{ cost_center_id = move(param1); };
+		auto		SetVariableSet(C_Invoicing_Vars *param)			{ vars = param; };
 
 		auto		GetFilename()									{ return filename; }
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-29 16:28-0400\n"
+"POT-Creation-Date: 2019-04-02 16:32-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -35,6 +35,9 @@ msgstr[2] "%d субконтракторам"
 msgid "Access prohibited"
 msgstr "Нет доступа"
 
+msgid "Account"
+msgstr "Сч. №"
+
 msgid "Agency: cost center"
 msgstr "Данные агенства: центр затрат"
 
@@ -49,6 +52,9 @@ msgstr "Данные агенства: описание центра затра�
 
 msgid "Agency: cost center title updated"
 msgstr "Данные агенства: название центра затрат изменено"
+
+msgid "Bank Identifier"
+msgstr "БИК"
 
 msgid "Company not found"
 msgstr "Компания не найдена"
@@ -67,6 +73,9 @@ msgstr "Дата"
 
 msgid "Dayrate"
 msgstr "Ежедневный тариф"
+
+msgid "Destination bank"
+msgstr "Банк получателя"
 
 msgid "Employee data"
 msgstr "Данные сотрудника"
@@ -152,6 +161,12 @@ msgstr "не указан счет"
 msgid "act number"
 msgstr "номер акта"
 
+msgid "agency bank id not found"
+msgstr "банк не найден"
+
+msgid "agency company id not found"
+msgstr "агенство не найдено"
+
 msgid "agency id not found"
 msgstr "Агенство не найдено"
 
@@ -224,6 +239,15 @@ msgstr "Дата начала договора с центром затрат н
 msgid "cost center title not found"
 msgstr "Наименование центра затрат не найдено"
 
+msgid "cost_center bank id not found"
+msgstr "банк не найден"
+
+msgid "cost_center company id not found"
+msgstr "центр затрат не найден"
+
+msgid "cost_center id not found"
+msgstr "центр затрат не найден"
+
 msgid "country list is empty"
 msgstr "Список стран пустой"
 
@@ -259,6 +283,9 @@ msgstr "невозможно создать временное хранилищ�
 
 msgid "fail to initialize hpdf library"
 msgstr "ошибка инициализации библиотеки libharu"
+
+msgid "fail to initialize variable set"
+msgstr "ошибка инициализации переменных"
 
 msgid "fail to insert to db"
 msgstr "ошибка БД"
@@ -397,6 +424,9 @@ msgstr "изменен"
 
 msgid "user is not initialized"
 msgstr "пользователь не существует"
+
+msgid "variable not found"
+msgstr "перенеменная не найдена"
 
 msgid "w/o"
 msgstr "без"
