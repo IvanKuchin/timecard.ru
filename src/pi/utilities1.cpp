@@ -718,16 +718,16 @@ string CheckHTTPParam_Email(const string &srcText)
 	return	result;
 }
 
-string	GetDefaultActionFromUserType(string role, CMysql *db)
+string	GetDefaultActionFromUserType(CUser *user, CMysql *db)
 {
 	string	result = GUEST_USER_DEFAULT_ACTION;
 
 	MESSAGE_DEBUG("", "", "start");
 
-	if(role == "subcontractor") result = LOGGEDIN_SUBCONTRACTOR_DEFAULT_ACTION;
-	if(role == "agency") result = LOGGEDIN_AGENCY_DEFAULT_ACTION;
-	if(role == "approver") result = LOGGEDIN_APPROVER_DEFAULT_ACTION;
-	if(role == "no role") result = LOGGEDIN_NOROLE_DEFAULT_ACTION;
+	if(user->GetType() == "subcontractor") result = LOGGEDIN_SUBCONTRACTOR_DEFAULT_ACTION;
+	if(user->GetType() == "agency") result = LOGGEDIN_AGENCY_DEFAULT_ACTION;
+	if(user->GetType() == "approver") result = LOGGEDIN_APPROVER_DEFAULT_ACTION;
+	if(user->GetType() == "no role") result = LOGGEDIN_NOROLE_DEFAULT_ACTION;
 
 	MESSAGE_DEBUG("", "", "finish (result = " + result + ")");
 
@@ -5484,6 +5484,7 @@ int GetSpecificData_GetNumberOfFolders(string itemType)
 	else if(itemType == "expense_line")				result = EXPENSELINE_NUMBER_OF_FOLDERS;
 	else if(itemType == "template_sow")				result = TEMPLATE_SOW_NUMBER_OF_FOLDERS;
 	else if(itemType == "template_psow")			result = TEMPLATE_PSOW_NUMBER_OF_FOLDERS;
+	else if(itemType == "template_costcenter")		result = TEMPLATE_CC_NUMBER_OF_FOLDERS;
 	else
 	{
 		MESSAGE_ERROR("", "", "itemType (" + itemType + ") is unknown");
@@ -5513,6 +5514,7 @@ int GetSpecificData_GetMaxFileSize(string itemType)
 	else if(itemType == "expense_line")				result = EXPENSELINE_MAX_FILE_SIZE;
 	else if(itemType == "template_sow")				result = TEMPLATE_SOW_MAX_FILE_SIZE;
 	else if(itemType == "template_psow")			result = TEMPLATE_PSOW_MAX_FILE_SIZE;
+	else if(itemType == "template_costcenter")		result = TEMPLATE_CC_MAX_FILE_SIZE;
 	else
 	{
 		MESSAGE_ERROR("", "", "itemType (" + itemType + ") is unknown");
@@ -5596,6 +5598,7 @@ string GetSpecificData_GetBaseDirectory(string itemType)
 	else if(itemType == "expense_line")				result = IMAGE_EXPENSELINES_DIRECTORY;
 	else if(itemType == "template_sow")				result = TEMPLATE_SOW_DIRECTORY;
 	else if(itemType == "template_psow")			result = TEMPLATE_PSOW_DIRECTORY;
+	else if(itemType == "template_costcenter")		result = TEMPLATE_CC_DIRECTORY;
 	else
 	{
 		MESSAGE_ERROR("", "", "itemType (" + itemType + ") is unknown");
@@ -5614,6 +5617,7 @@ string GetSpecificData_GetFinalFileExtenstion(string itemType)
 
 	if(itemType == "template_sow")				result = ".txt";
 	else if(itemType == "template_psow")		result = ".txt";
+	else if(itemType == "template_costcenter")	result = ".txt";
 	else
 	{
 		MESSAGE_DEBUG("", "", "default extension(" + result + ") taken");
@@ -5642,6 +5646,7 @@ string GetSpecificData_SelectQueryItemByID(string itemID, string itemType)
 	else if(itemType == "event")					result = "SELECT * FROM `events` WHERE `id`=\"" + itemID + "\";";
 	else if(itemType == "template_sow")				result = "SELECT * FROM `contract_sow_custom_fields` WHERE `id`=\"" + itemID + "\" AND `type`=\"file\";";
 	else if(itemType == "template_psow")			result = "SELECT * FROM `contract_psow_custom_fields` WHERE `id`=\"" + itemID + "\" AND `type`=\"file\";";
+	else if(itemType == "template_costcenter")		result = "SELECT * FROM `cost_center_custom_fields` WHERE `id`=\"" + itemID + "\" AND `type`=\"file\";";
 	else
 	{
 		MESSAGE_ERROR("", "", "itemType (" + itemType + ") is unknown");
@@ -5677,6 +5682,7 @@ string GetSpecificData_UpdateQueryItemByID(string itemID, string itemType, strin
 		else if(itemType == "event")					result = "update `events`						set `" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
 		else if(itemType == "template_sow")				result = "update `contract_sow_custom_fields`	set `" + logo_filename + "`='" + folderID + "/" + fileName + "' where `id`=\"" + itemID + "\";";
 		else if(itemType == "template_psow")			result = "update `contract_psow_custom_fields`	set `" + logo_filename + "`='" + folderID + "/" + fileName + "' where `id`=\"" + itemID + "\";";
+		else if(itemType == "template_costcenter")		result = "update `cost_center_custom_fields`	set `" + logo_filename + "`='" + folderID + "/" + fileName + "' where `id`=\"" + itemID + "\";";
 		else
 		{
 			MESSAGE_ERROR("", "", "itemType (" + itemType + ") is unknown");
@@ -5711,6 +5717,7 @@ string GetSpecificData_GetDBCoverPhotoFolderString(string itemType)
 	else if(itemType == "event")	  				result = "logo_folder";
 	else if(itemType == "template_sow")				result = "";
 	else if(itemType == "template_psow")			result = "";
+	else if(itemType == "template_costcenter")		result = "";
 	else
 	{
 		MESSAGE_ERROR("", "", "itemType (" + itemType + ") is unknown");
@@ -5739,6 +5746,7 @@ string GetSpecificData_GetDBCoverPhotoFilenameString(string itemType)
 	else if(itemType == "event")					result = "logo_filename";
 	else if(itemType == "template_sow")				result = "value";
 	else if(itemType == "template_psow")			result = "value";
+	else if(itemType == "template_costcenter")		result = "value";
 	else
 	{
 		MESSAGE_ERROR("", "", "itemType (" + itemType + ") is unknown");
@@ -5755,8 +5763,9 @@ string GetSpecificData_GetDataTypeByItemType(const string &itemType)
 
 	MESSAGE_DEBUG("", "", "start");
 
-	if(itemType == "template_sow") result = "template";
-	if(itemType == "template_psow") result = "template";
+	if(itemType == "template_sow")			result = "template";
+	if(itemType == "template_psow")			result = "template";
+	if(itemType == "template_costcenter")	result = "template";
 
 	MESSAGE_DEBUG("", "", "finish (result = " + result + ")");
 
@@ -5819,6 +5828,27 @@ bool GetSpecificData_AllowedToChange(string itemID, string itemType, CMysql *db,
 		}
 		
 	}
+	else if(itemType == "template_costcenter")
+	{
+		if((user->GetType() == "agency"))
+		{
+			if(db->Query("SELECT `id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\" AND `allowed_change_sow`=\"Y\" AND `company_id`=("
+							"SELECT `agency_company_id` FROM `cost_centers` WHERE `id`=("
+								"SELECT `cost_center_id` FROM `cost_center_custom_fields` WHERE `id`=\"" + itemID + "\""
+							")"
+						");"))
+				result = true;
+			else
+			{
+				MESSAGE_DEBUG("", "", "user.id(" + user->GetID() + ") doesn't allowed to change cost_center_custom_fields.id(" + itemID + ")");
+			}
+		}
+		else
+		{
+			MESSAGE_DEBUG("", "", "user.type(" + user->GetType() + ") must be agency employee to change");
+		}
+		
+	}
 	else if(itemType == "company_profile_logo")
 	{
 		if((user->GetType() == "subcontractor"))
@@ -5832,7 +5862,11 @@ bool GetSpecificData_AllowedToChange(string itemID, string itemType, CMysql *db,
 		}
 		else if((user->GetType() == "agency"))
 		{
-			if(db->Query("SELECT `id` FROM `company_employees` WHERE `company_id`=\"" + itemID + "\" AND `user_id`=\"" + user->GetID() + "\" AND `allowed_change_agency_data`=\"Y\";"))
+			if(db->Query(	"SELECT `id` FROM `company_employees` WHERE `company_id`=("
+								"SELECT `company_id` FROM `company_employees` WHERE `user_id`=("
+									"SELECT `admin_userID` FROM `company` WHERE `id`=\"" + itemID + "\""
+								")"
+							") AND `user_id`=\"" + user->GetID() + "\" AND `allowed_change_agency_data`=\"Y\""))
 				result = true;
 			else
 			{

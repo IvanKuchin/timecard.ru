@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-21 08:40-0400\n"
+"POT-Creation-Date: 2019-03-29 16:28-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -49,6 +49,9 @@ msgstr "Данные агенства: описание центра затра�
 
 msgid "Agency: cost center title updated"
 msgstr "Данные агенства: название центра затрат изменено"
+
+msgid "Company not found"
+msgstr "Компания не найдена"
 
 msgid "Cost Center"
 msgstr "Центр Затрат"
@@ -143,8 +146,14 @@ msgstr "Вы не сотрудник агенства"
 msgid "You are not authorized"
 msgstr "У Вас нет доступа"
 
+msgid "account is empty"
+msgstr "не указан счет"
+
 msgid "act number"
 msgstr "номер акта"
+
+msgid "agency id not found"
+msgstr "Агенство не найдено"
 
 msgid "agency not found"
 msgstr "агенство не найдено"
@@ -155,6 +164,27 @@ msgstr "от"
 msgid "agreement number is empty"
 msgstr "не указан номер договора"
 
+msgid "bank_id is empty"
+msgstr "не указан банк"
+
+msgid "bik issue"
+msgstr "Внутренняя ошибка с БИК"
+
+msgid "bik not found"
+msgstr "не указан БИК"
+
+msgid "but BIK is different"
+msgstr "но отличается БИК"
+
+msgid "but KPP is different"
+msgstr "но отличается КПП"
+
+msgid "but OGRN is different"
+msgstr "но отличается ОГРН"
+
+msgid "but account is different"
+msgstr "но отличается корр счет"
+
 msgid "can't close archive"
 msgstr "не удалось закрыть фаил архива"
 
@@ -164,6 +194,9 @@ msgstr "не удалось создать фаил архива"
 msgid "changed"
 msgstr "изменилось"
 
+msgid "company doesn't exists"
+msgstr "такой компании нет"
+
 msgid "cost center already exists"
 msgstr "такой центр затрат уже есть"
 
@@ -172,6 +205,27 @@ msgstr "центр затрат назначен"
 
 msgid "cost center doesn't belongs to your company"
 msgstr "Центр затрат не принадлежит компании"
+
+msgid "cost center end date not found"
+msgstr "Дата окончания договора с центром затрат не найдена"
+
+msgid "cost center id is empty"
+msgstr "Центр затрат не найден"
+
+msgid "cost center number not found"
+msgstr "Номер договора с центром затрат не найдена"
+
+msgid "cost center sign date not found"
+msgstr "Дата подписания договора с центром затрат не найдена"
+
+msgid "cost center start date not found"
+msgstr "Дата начала договора с центром затрат не найдена"
+
+msgid "cost center title not found"
+msgstr "Наименование центра затрат не найдено"
+
+msgid "country list is empty"
+msgstr "Список стран пустой"
 
 msgid "custom field"
 msgstr "доп. поле"
@@ -245,11 +299,29 @@ msgstr "некорректный код"
 msgid "kop."
 msgstr "коп."
 
+msgid "kpp is empty"
+msgstr "не указан КПП"
+
+msgid "legal_address is empty"
+msgstr "не указан юр. адрес"
+
+msgid "legal_geo_zip_id is empty"
+msgstr "не указан юр. адрес"
+
+msgid "mailing_geo_zip_id is empty"
+msgstr "не указан адрес доставки"
+
 msgid "mandatory parameter missed"
 msgstr "пропущен обязательный параметр"
 
+msgid "name is empty"
+msgstr "не указано название"
+
 msgid "number uploaded images must be 1"
 msgstr "выберите один фаил"
+
+msgid "ogrn is empty"
+msgstr "не указан ОГРН"
 
 msgid "period start have to precede period end"
 msgstr "начало должно быть раньше окончания"
@@ -302,8 +374,17 @@ msgstr "не определена дата окончания таймкарты
 msgid "timecard id is empty"
 msgstr "таймкарта не найдена"
 
+msgid "tin already exists"
+msgstr "компания с таким ИНН уже существует"
+
+msgid "tin is empty"
+msgstr "не указан ИНН"
+
 msgid "to"
 msgstr "на"
+
+msgid "type is empty"
+msgstr "не указан тип"
 
 msgid "unknown invoice"
 msgstr "Неизвестный счет"
@@ -325,3 +406,6 @@ msgstr "некорректный формат"
 
 msgid "you are not assigned to customer"
 msgstr "вы не назначены на этого заказчика"
+
+msgid "zip not found"
+msgstr "индекс не найден"

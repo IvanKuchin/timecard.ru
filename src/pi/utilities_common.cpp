@@ -253,7 +253,7 @@ auto GenerateSession(string action, CCgi *indexPage, CMysql *db, CUser *user) ->
 	{
 		if(user)
 		{
-			action = GetDefaultActionFromUserType(user->GetType(), db);
+			action = GetDefaultActionFromUserType(user, db);
 
 			MESSAGE_DEBUG("", "", "META-registration: action has been overriden user.type(" + user->GetType() + ") default action [action = " + action + "]");
 

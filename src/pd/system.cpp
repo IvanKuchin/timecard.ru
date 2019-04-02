@@ -319,7 +319,7 @@ int main()
 			mapResult["result"] = "error";
 			mapResult["sessionPersistence"] = "false";
 			mapResult["userPersistence"] = "false";
-			mapResult["redirect"] = "/" + GetDefaultActionFromUserType(user.GetType(), &db) + "?rand=" + GetRandom(10);
+			mapResult["redirect"] = "/" + GetDefaultActionFromUserType(&user, &db) + "?rand=" + GetRandom(10);
 
 			if(remoteAddr && (!isPersistenceRateLimited(remoteAddr, &db)))
 			{
@@ -414,7 +414,7 @@ int main()
 											db.Query("UPDATE `sessions` SET `remove_flag`=\"Y\", `remove_flag_timestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sessidPersistence + "\";");
 										}
 
-										mapResult["redirect"] = "/" + GetDefaultActionFromUserType(user.GetType(), &db) + "?rand=" + GetRandom(10);
+										mapResult["redirect"] = "/" + GetDefaultActionFromUserType(&user, &db) + "?rand=" + GetRandom(10);
 
 										db.Query("UPDATE `sessions` SET `user`=\"" + persistedUser + "\", expire=\"" + persistedExpire + "\" WHERE `id`=\"" + sessidHTTP + "\";");
 										if(db.isError())

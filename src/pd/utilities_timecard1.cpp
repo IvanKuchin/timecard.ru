@@ -1061,76 +1061,83 @@ string GetCompanyListInJSONFormat(string dbQuery, CMysql *db, CUser *user, bool 
 
 	ostFinal.str("");
 
-	if((affected = db->Query(dbQuery)) > 0)
+	if(db)
 	{
-		companyCounter = affected;
-		companiesList.reserve(companyCounter);  // --- reserving allows avoid moving vector in memory
-												// --- to fit vector into continous memory piece
-
-		for(int i = 0; i < affected; i++)
+		if((affected = db->Query(dbQuery)) > 0)
 		{
-			CompanyClass	company;
+			companyCounter = affected;
+			companiesList.reserve(companyCounter);  // --- reserving allows avoid moving vector in memory
+													// --- to fit vector into continous memory piece
 
-			company.id = db->Get(i, "id");
-			company.type = db->Get(i, "type");
-			company.name = db->Get(i, "name");
-			company.legal_geo_zip_id = db->Get(i, "legal_geo_zip_id");
-			company.legal_address = db->Get(i, "legal_address");
-			company.mailing_geo_zip_id = db->Get(i, "mailing_geo_zip_id");
-			company.mailing_address = db->Get(i, "mailing_address");
-			company.tin = db->Get(i, "tin");
-			company.bank_id = db->Get(i, "bank_id");
-			company.account = db->Get(i, "account");
-			company.kpp = db->Get(i, "kpp");
-			company.ogrn = db->Get(i, "ogrn");
-			company.link = db->Get(i, "link");
-			company.admin_userID = db->Get(i, "admin_userID");
-			company.foundationDate = db->Get(i, "foundationDate");
-			company.numberOfEmployee = db->Get(i, "numberOfEmployee");
-			company.webSite = db->Get(i, "webSite");
-			company.description = db->Get(i, "description");
-			company.logo_folder = db->Get(i, "logo_folder");
-			company.logo_filename = db->Get(i, "logo_filename");
-			company.employedUsersList = "";
-			companiesList.push_back(company);
+			for(int i = 0; i < affected; i++)
+			{
+				CompanyClass	company;
+
+				company.id = db->Get(i, "id");
+				company.type = db->Get(i, "type");
+				company.name = db->Get(i, "name");
+				company.legal_geo_zip_id = db->Get(i, "legal_geo_zip_id");
+				company.legal_address = db->Get(i, "legal_address");
+				company.mailing_geo_zip_id = db->Get(i, "mailing_geo_zip_id");
+				company.mailing_address = db->Get(i, "mailing_address");
+				company.tin = db->Get(i, "tin");
+				company.bank_id = db->Get(i, "bank_id");
+				company.account = db->Get(i, "account");
+				company.kpp = db->Get(i, "kpp");
+				company.ogrn = db->Get(i, "ogrn");
+				company.link = db->Get(i, "link");
+				company.admin_userID = db->Get(i, "admin_userID");
+				company.foundationDate = db->Get(i, "foundationDate");
+				company.numberOfEmployee = db->Get(i, "numberOfEmployee");
+				company.webSite = db->Get(i, "webSite");
+				company.description = db->Get(i, "description");
+				company.logo_folder = db->Get(i, "logo_folder");
+				company.logo_filename = db->Get(i, "logo_filename");
+				company.employedUsersList = "";
+				companiesList.push_back(company);
+			}
+
+			for(int i = 0; i < companyCounter; i++)
+			{
+					if(ostFinal.str().length()) ostFinal << ", ";
+
+					ostFinal << "{";
+					ostFinal << "\"id\": \""				<< companiesList[i].id << "\",";
+					ostFinal << "\"type\": \""				<< companiesList[i].type << "\", ";
+					ostFinal << "\"name\": \""				<< companiesList[i].name << "\", ";
+					ostFinal << "\"legal_geo_zip_id\": \""	<< companiesList[i].legal_geo_zip_id << "\", ";
+					ostFinal << "\"legal_geo_zip\": ["		<< GetZipInJSONFormat(companiesList[i].legal_geo_zip_id, db, user) << "], ";
+					ostFinal << "\"legal_address\": \""		<< companiesList[i].legal_address << "\", ";
+					ostFinal << "\"mailing_geo_zip_id\": \""<< companiesList[i].mailing_geo_zip_id << "\", ";
+					ostFinal << "\"mailing_geo_zip\": ["	<< GetZipInJSONFormat(companiesList[i].mailing_geo_zip_id, db, user) << "], ";
+					ostFinal << "\"mailing_address\": \""	<< companiesList[i].mailing_address << "\", ";
+					ostFinal << "\"tin\": \""				<< companiesList[i].tin << "\", ";
+					ostFinal << "\"bank_id\": \""			<< companiesList[i].bank_id << "\", ";
+					ostFinal << "\"banks\": ["				<< GetBankInJSONFormat("SELECT * FROM `banks` WHERE `id`=\"" + companiesList[i].bank_id + "\";", db, user) << "], ";
+					ostFinal << "\"account\": \""			<< companiesList[i].account << "\", ";
+					ostFinal << "\"kpp\": \""				<< companiesList[i].kpp << "\", ";
+					ostFinal << "\"ogrn\": \""				<< companiesList[i].ogrn << "\", ";
+					ostFinal << "\"link\": \""				<< companiesList[i].link << "\", ";
+					ostFinal << "\"foundationDate\": \""	<< companiesList[i].foundationDate << "\",";
+					ostFinal << "\"numberOfEmployee\": \""	<< companiesList[i].numberOfEmployee << "\",";
+					ostFinal << "\"webSite\": \""			<< companiesList[i].webSite << "\",";
+					ostFinal << "\"description\": \""		<< companiesList[i].description << "\",";
+					ostFinal << "\"logo_folder\": \""		<< companiesList[i].logo_folder << "\",";
+					ostFinal << "\"logo_filename\": \""	   	<< companiesList[i].logo_filename << "\",";
+					ostFinal << "\"owners\": ["			   	<< (include_employees ? GetUserListInJSONFormat("SELECT * FROM `users` WHERE `id`=\"" + companiesList[i].admin_userID + "\";", db, user) : "") << "],";
+					ostFinal << "\"employees\": ["			<< (include_employees ? GetAgencyEmployeesInJSONFormat(companiesList[i].id, db, user) : "") << "],";
+					ostFinal << "\"isMine\": \""			<< (user ? companiesList[i].admin_userID == user->GetID() : false) << "\"";
+					ostFinal << "}";
+			} // --- for loop through company list
+		} // --- if sql-query on company selection success
+		else
+		{
+			MESSAGE_DEBUG("", "", "there are no companies returned by request [" + dbQuery + "]");
 		}
-
-		for(int i = 0; i < companyCounter; i++)
-		{
-				if(ostFinal.str().length()) ostFinal << ", ";
-
-				ostFinal << "{";
-				ostFinal << "\"id\": \""				<< companiesList[i].id << "\",";
-				ostFinal << "\"type\": \""				<< companiesList[i].type << "\", ";
-				ostFinal << "\"name\": \""				<< companiesList[i].name << "\", ";
-				ostFinal << "\"legal_geo_zip_id\": \""	<< companiesList[i].legal_geo_zip_id << "\", ";
-				ostFinal << "\"legal_geo_zip\": ["		<< GetZipInJSONFormat(companiesList[i].legal_geo_zip_id, db, user) << "], ";
-				ostFinal << "\"legal_address\": \""		<< companiesList[i].legal_address << "\", ";
-				ostFinal << "\"mailing_geo_zip_id\": \""<< companiesList[i].mailing_geo_zip_id << "\", ";
-				ostFinal << "\"mailing_geo_zip\": ["	<< GetZipInJSONFormat(companiesList[i].mailing_geo_zip_id, db, user) << "], ";
-				ostFinal << "\"mailing_address\": \""	<< companiesList[i].mailing_address << "\", ";
-				ostFinal << "\"tin\": \""				<< companiesList[i].tin << "\", ";
-				ostFinal << "\"bank_id\": \""			<< companiesList[i].bank_id << "\", ";
-				ostFinal << "\"banks\": ["				<< GetBankInJSONFormat("SELECT * FROM `banks` WHERE `id`=\"" + companiesList[i].bank_id + "\";", db, user) << "], ";
-				ostFinal << "\"account\": \""			<< companiesList[i].account << "\", ";
-				ostFinal << "\"kpp\": \""				<< companiesList[i].kpp << "\", ";
-				ostFinal << "\"ogrn\": \""				<< companiesList[i].ogrn << "\", ";
-				ostFinal << "\"link\": \""				<< companiesList[i].link << "\", ";
-				ostFinal << "\"foundationDate\": \""	<< companiesList[i].foundationDate << "\",";
-				ostFinal << "\"numberOfEmployee\": \""	<< companiesList[i].numberOfEmployee << "\",";
-				ostFinal << "\"webSite\": \""			<< companiesList[i].webSite << "\",";
-				ostFinal << "\"description\": \""		<< companiesList[i].description << "\",";
-				ostFinal << "\"logo_folder\": \""		<< companiesList[i].logo_folder << "\",";
-				ostFinal << "\"logo_filename\": \""	   	<< companiesList[i].logo_filename << "\",";
-				ostFinal << "\"owners\": ["			   	<< (include_employees ? GetUserListInJSONFormat("SELECT * FROM `users` WHERE `id`=\"" + companiesList[i].admin_userID + "\";", db, user) : "") << "],";
-				ostFinal << "\"employees\": ["			<< (include_employees ? GetAgencyEmployeesInJSONFormat(companiesList[i].id, db, user) : "") << "],";
-				ostFinal << "\"isMine\": \""			<< (user ? companiesList[i].admin_userID == user->GetID() : false) << "\"";
-				ostFinal << "}";
-		} // --- for loop through company list
-	} // --- if sql-query on company selection success
+	}
 	else
 	{
-		MESSAGE_DEBUG("", "", "there are no companies returned by request [" + dbQuery + "]");
+		MESSAGE_ERROR("", "", "db not initialized");
 	}
 
 	MESSAGE_DEBUG("", "", "finish (number of companies returned is " + to_string(companyCounter) + ")");
@@ -3685,6 +3692,7 @@ auto	GetCostCentersInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> str
 		string	id;
 		string	title;
 		string	description;
+		string	company_id;
 		string	start_date;
 		string	end_date;
 		string	number;
@@ -3711,6 +3719,7 @@ auto	GetCostCentersInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> str
 			item.id = db->Get(i, "id");
 			item.title = db->Get(i, "title");
 			item.description = db->Get(i, "description");
+			item.company_id = db->Get(i, "company_id");
 			item.start_date = db->Get(i, "start_date");
 			item.end_date = db->Get(i, "end_date");
 			item.number = db->Get(i, "number");
@@ -3731,6 +3740,7 @@ auto	GetCostCentersInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> str
 			result += "\"id\":\"" + item.id + "\",";
 			result += "\"title\":\"" + item.title + "\",";
 			result += "\"description\":\"" + item.description + "\",";
+			result += "\"companies\":[" + GetCompanyListInJSONFormat("SELECT * FROM `company` WHERE `id`=\"" + item.company_id + "\";", db, user) + "],";
 			result += "\"start_date\":\"" + item.start_date + "\",";
 			result += "\"end_date\":\"" + item.end_date + "\",";
 			result += "\"number\":\"" + item.number + "\",";
@@ -3738,6 +3748,10 @@ auto	GetCostCentersInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> str
 			result += "\"act_number\":\"" + item.act_number + "\",";
 			result += "\"agency_company_id\":\"" + item.agency_company_id + "\",";
 			result += "\"assignee_user_id\":\"" + item.assignee_user_id + "\",";
+			result += "\"custom_fields\":[" + GetCostCenterCustomFieldsInJSONFormat("SELECT * FROM `cost_center_custom_fields` WHERE `cost_center_id`=\"" + item.id + "\" "
+						+ (user->GetType() == "subcontractor" ? " AND (`visible_by_subcontractor`=\"Y\" OR `editable_by_subcontractor`=\"Y\") " : "")
+						+ ";", db, user)
+						+ "],";
 			result += "\"eventTimestamp\":\"" + item.eventTimestamp + "\"";
 
 			result +=	"}";

@@ -309,25 +309,32 @@ if(($action eq "--restore") or ($action eq "--restore_structure"))
 		system("mysqldump --no-create-info --skip-add-drop-table -Q -u $mysqllogin -p$mysqlpass -h $mysqlhost $mysqldb >> sql");
 	}
 
-	#
-	# rename all "..htaccess" to ".htaccess"
-	# this trick used in development env to avoid headache with troubleshooting
-	#
-	print "activating .htaccess\n";
-	Activate_Files(".htaccess");
-	# activate_htaccess("./cgi-bin");
-	# activate_htaccess("./html");
-	# activate_htaccess($backupImageDomainDir);
+	if(isDevServer())
+	{
+		# --- no need to activate .ht____ if it is develpment environment
+	}
+	else
+	{
+		#
+		# rename all "..htaccess" to ".htaccess"
+		# this trick used in development env to avoid headache with troubleshooting
+		#
+		print "activating .htaccess\n";
+		Activate_Files(".htaccess");
+		# activate_htaccess("./cgi-bin");
+		# activate_htaccess("./html");
+		# activate_htaccess($backupImageDomainDir);
 
-	#
-	# rename all "..htpasswd" to ".htpasswd"
-	# this trick used in development env to avoid headache with troubleshooting
-	#
-	print "activating .htpasswd\n";
-	Activate_Files(".htpasswd");
-	# activate_htpasswd("./cgi-bin");
-	# activate_htpasswd("./html");
-	# activate_htpasswd($backupImageDomainDir);
+		#
+		# rename all "..htpasswd" to ".htpasswd"
+		# this trick used in development env to avoid headache with troubleshooting
+		#
+		print "activating .htpasswd\n";
+		Activate_Files(".htpasswd");
+		# activate_htpasswd("./cgi-bin");
+		# activate_htpasswd("./html");
+		# activate_htpasswd($backupImageDomainDir);
+	}
 
 	print "\n\n--- SHUTDOWN PRODUCTION ENVIRONMENT ---\n\n";
 

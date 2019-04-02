@@ -22,7 +22,9 @@ auto			GetTimecardsInJSONFormat(string sqlQuery, CMysql *, CUser *, bool isExten
 auto			GetServiceInvoicesInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetSoWCustomFieldsInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetSOWInJSONFormat(string sqlQuery, CMysql *, CUser *, bool include_tasks = true, bool include_bt = false, bool include_cost_centers = false) -> string;
+auto			GetCountryListInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetPSoWCustomFieldsInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
+auto			GetCostCenterCustomFieldsInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetPSoWInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetTimecardApprovalsInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			SubmitTimecard(string timecard_id, CMysql *, CUser *) -> bool;
@@ -127,4 +129,5 @@ struct tm 		GetLastDayReportedOnAssignmentID(string sow_id, string task_id, CMys
 auto			isActionEntityBelongsToSoW(string action, string id, string sow_id, CMysql *db, CUser *user) -> string;
 auto			CheckNewValueByAction(string action, string id, string sow_id, string new_value, CMysql *db, CUser *user) -> string;
 auto			isActionEntityBelongsToAgency(string action, string id, string agency_id, CMysql *db, CUser *user) -> string;
+
 #endif

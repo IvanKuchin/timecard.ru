@@ -1,4 +1,4 @@
-#include "agency.h"
+#include "ajax_anyrole.h"
 
 int main(void)
 {
@@ -93,22 +93,39 @@ int main(void)
 		if(action == "AJAX_getCompanyInfo")
 		{
 			auto			id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
-			string			template_name = "json_response.htmlt";
-			string			error_message = "";
+			auto			tin = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("tin"));
+			auto			template_name = "json_response.htmlt"s;
+			auto			error_message = ""s;
+			auto			company_obj = ""s;
 			ostringstream	ostResult;
 
 			ostResult.str("");
 
 			if(id.length())
 			{
-				string		company_obj = GetCompanyListInJSONFormat("SELECT * FROM `company` WHERE `id`=\"" + id + "\";", &db, &user);
+				company_obj = GetCompanyListInJSONFormat("SELECT * FROM `company` WHERE `id`=\"" + id + "\";", &db, &user);
 
 				if(company_obj.length())
-					ostResult << "{\"result\":\"success\",\"companies\":[" + company_obj + "]}";
+				{
+				}
 				else
 				{
-					error_message = "Kompaniya не найдена";
+					error_message = gettext("Company not found");
 					MESSAGE_DEBUG("", "", "company.id(" + id + ") not found");
+				}	
+					
+			}
+			else if(tin.length())
+			{
+				company_obj = GetCompanyListInJSONFormat("SELECT * FROM `company` WHERE `tin`=\"" + tin + "\";", &db, &user);
+
+				if(company_obj.length())
+				{
+				}
+				else
+				{
+					error_message = gettext("Company not found");
+					MESSAGE_DEBUG("", "", "company.tin(" + tin + ") not found");
 				}	
 					
 			}
@@ -120,6 +137,7 @@ int main(void)
 
 			if(error_message.empty())
 			{
+				ostResult << "{\"result\":\"success\",\"companies\":[" + company_obj + "]}";
 			}
 			else
 			{
@@ -694,6 +712,69 @@ int main(void)
 
 			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 		}
+
+		if(action == "AJAX_addNewCompany")
+		{
+			auto			id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
+			auto			legal_geo_zip		= CheckHTTPParam_Number	(indexPage.GetVarsHandler()->Get("geo_zip_legal"));
+			auto			legal_address		= CheckHTTPParam_Text	(indexPage.GetVarsHandler()->Get("legal_address"));
+			auto			mailing_geo_zip		= CheckHTTPParam_Number	(indexPage.GetVarsHandler()->Get("geo_zip_mailing"));
+			auto			mailing_address		= CheckHTTPParam_Text	(indexPage.GetVarsHandler()->Get("mailing_address"));
+			auto			template_name = "json_response.htmlt"s;
+			auto			error_message = ""s;
+			auto			company_obj = ""s;
+			C_Company		company(&db, &user);
+
+			ostringstream	ostResult;
+
+			ostResult.str("");
+
+			if(mailing_geo_zip.empty()) mailing_geo_zip = legal_geo_zip;
+			if(mailing_address.empty()) mailing_address = legal_address;
+
+			company.SetName				(CheckHTTPParam_Text  (indexPage.GetVarsHandler()->Get("company_title")));
+			company.SetType				(CheckHTTPParam_Text  (indexPage.GetVarsHandler()->Get("type")));
+			company.SetLegalGeoZip		(legal_geo_zip);
+			company.SetLegal_address	(legal_address);
+			company.SetMailingGeoZip	(mailing_geo_zip);
+			company.SetMailing_address	(mailing_address);
+			company.SetBIK				(CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("bank_bik")));
+			company.SetAccount			(CheckHTTPParam_Text  (indexPage.GetVarsHandler()->Get("company_account")));
+			company.SetTIN				(CheckHTTPParam_Text  (indexPage.GetVarsHandler()->Get("company_tin")));
+			company.SetOGRN				(CheckHTTPParam_Text  (indexPage.GetVarsHandler()->Get("company_ogrn")));
+			company.SetKPP				(CheckHTTPParam_Text  (indexPage.GetVarsHandler()->Get("company_kpp")));
+
+			if((error_message = company.CheckValidity()).empty())
+			{
+				if((error_message = company.InsertToDB()).empty())
+				{
+				}
+				else
+				{
+					MESSAGE_ERROR("", "", "company InsertToDB failed");
+				}
+			}
+			else
+			{
+				MESSAGE_ERROR("", "", "company CheckValidity failed");
+			}
+
+			if(error_message.empty())
+			{
+				ostResult << "{\"result\":\"success\",\"company_id\":\"" + company.GetID() + "\"}";
+			}
+			else
+			{
+				MESSAGE_DEBUG("", action, "failed");
+				ostResult.str("");
+				ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+			}
+
+			indexPage.RegisterVariableForce("result", ostResult.str());
+
+			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+		}
+
 
 
 		{

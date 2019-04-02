@@ -966,14 +966,14 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 					}					
 					else if(action == "AJAX_addCostCenter")
 					{
-						if(db->Query("SELECT `id` FROM `cost_centers` WHERE `title`=\"" + new_value + "\" AND `agency_company_id`=\"" + id + "\";"))
+						if(db->Query("SELECT `id` FROM `company` WHERE `id`=\"" + new_value + "\";"))
 						{
-							error_message = gettext("cost center already exists");
-							MESSAGE_DEBUG("", "", "cost_center with the same name already exists in agency.id(" + id + ")");
+							// --- good to go
 						}
 						else
 						{
-							// --- good to go
+							error_message = gettext("company doesn't exists");
+							MESSAGE_DEBUG("", "", "company.id(" + new_value + ") doesn't exists");
 						}
 					}
 					else if(action == "AJAX_updateCostCenterToCustomer")
@@ -1281,18 +1281,32 @@ string	isActionEntityBelongsToAgency(string action, string id, string agency_id,
 				if(action == "AJAX_updateAgencyEditCapability")			sql_query = "SELECT `company_id` AS `agency_id` FROM `company_employees` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateSoWEditCapability")			sql_query = "SELECT `company_id` AS `agency_id` FROM `company_employees` WHERE `id`=\"" + id + "\";";
 
-				if(action == "AJAX_updateCompanyTitle")					sql_query = "SELECT `company_id` AS `agency_id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\";";
-				if(action == "AJAX_updateCompanyDescription")			sql_query = "SELECT `company_id` AS `agency_id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\";";
-				if(action == "AJAX_updateCompanyWebSite")				sql_query = "SELECT `company_id` AS `agency_id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\";";
-				if(action == "AJAX_updateCompanyTIN")					sql_query = "SELECT `company_id` AS `agency_id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\";";
-				if(action == "AJAX_updateCompanyAccount")				sql_query = "SELECT `company_id` AS `agency_id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\";";
-				if(action == "AJAX_updateCompanyOGRN")					sql_query = "SELECT `company_id` AS `agency_id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\";";
-				if(action == "AJAX_updateCompanyKPP")					sql_query = "SELECT `company_id` AS `agency_id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\";";
-				if(action == "AJAX_updateCompanyLegalAddress")			sql_query = "SELECT `company_id` AS `agency_id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\";";
-				if(action == "AJAX_updateCompanyMailingAddress")		sql_query = "SELECT `company_id` AS `agency_id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\";";
-				if(action == "AJAX_updateCompanyMailingZipID")			sql_query = "SELECT `company_id` AS `agency_id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\";";
-				if(action == "AJAX_updateCompanyLegalZipID")			sql_query = "SELECT `company_id` AS `agency_id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\";";
-				if(action == "AJAX_updateCompanyBankID")				sql_query = "SELECT `company_id` AS `agency_id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\";";
+				if(
+					(action == "AJAX_updateCompanyTitle")			||
+					(action == "AJAX_updateCompanyDescription")		||
+					(action == "AJAX_updateCompanyWebSite")			||
+					(action == "AJAX_updateCompanyTIN")				||
+					(action == "AJAX_updateCompanyAccount")			||
+					(action == "AJAX_updateCompanyOGRN")			||
+					(action == "AJAX_updateCompanyKPP")				||
+					(action == "AJAX_updateCompanyLegalAddress")	||
+					(action == "AJAX_updateCompanyMailingAddress")	||
+					(action == "AJAX_updateCompanyMailingZipID")	||
+					(action == "AJAX_updateCompanyLegalZipID")		||
+					(action == "AJAX_updateCompanyBankID")
+				)
+				{
+					sql_query = "SELECT `company_id` AS `agency_id` FROM `company_employees` WHERE "
+									"`user_id`=\"" + user->GetID() + "\""
+									"AND"
+									"("
+										"`company_id` = ("
+											"SELECT `company_id` FROM `company_employees` WHERE `user_id`= ("
+												"SELECT `admin_userID` FROM `company` WHERE `id`=\"" + id + "\""
+											")"
+										")"
+									")";
+				}
 
 				if(sql_query.length())
 				{
@@ -1344,5 +1358,107 @@ string	isActionEntityBelongsToAgency(string action, string id, string agency_id,
 	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
 
 	return error_message;
+}
+
+auto	GetCountryListInJSONFormat(string sqlQuery, CMysql *db, CUser *) -> string
+{
+	auto	result = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	auto affected = db->Query("SELECT * FROM `geo_country`;");
+	if(affected)
+	{
+		for(auto i = 0; i < affected; ++i)
+			result += (i ? ","s : ""s) + "{\"id\":\"" + db->Get(i, "id") + "\",\"title\":\"" + db->Get(i, "title") + "\"}";
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "country list is empty");
+	}	
+
+	MESSAGE_DEBUG("", "", "finish (result length is " + to_string(result.length()) + ")");
+
+	return result;
+}
+
+auto	GetCostCenterCustomFieldsInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
+{
+	int		affected;
+	auto	result = ""s;
+	struct ItemClass
+	{
+		string	id;
+		string	cost_center_id;
+		string	title;
+		string	description;
+		string	type;
+		string	var_name;
+		string	value;
+		string	visible_by_subcontractor;
+		string	editable_by_subcontractor;
+		string	owner_user_id;
+		string	eventTimestamp;
+	};
+	vector<ItemClass>		itemsList;
+
+	{
+		MESSAGE_DEBUG("", "", "start");
+	}
+
+	affected = db->Query(sqlQuery);
+	if(affected)
+	{
+		for(int i = 0; i < affected; i++)
+		{
+			ItemClass	item;
+
+			item.id = db->Get(i, "id");
+			item.cost_center_id = db->Get(i, "cost_center_id");
+			item.title = db->Get(i, "title");
+			item.description = db->Get(i, "description");
+			item.type = db->Get(i, "type");
+			item.var_name = db->Get(i, "var_name");
+			item.value = db->Get(i, "value");
+			item.visible_by_subcontractor = db->Get(i, "visible_by_subcontractor");
+			item.editable_by_subcontractor = db->Get(i, "editable_by_subcontractor");
+			item.owner_user_id = db->Get(i, "owner_user_id");
+			item.eventTimestamp = db->Get(i, "eventTimestamp");
+
+			itemsList.push_back(item);
+		}
+
+		for (const auto& item : itemsList)
+		{
+			if(result.length()) result += ",";
+			result +=	"{";
+
+			result += "\"id\":\""							+ item.id + "\",";
+			result += "\"cost_center_id\":\""				+ item.cost_center_id + "\",";
+			result += "\"title\":\""						+ item.title + "\",";
+			result += "\"description\":\""					+ item.description + "\",";
+			result += "\"type\":\""							+ item.type + "\",";
+			result += "\"var_name\":\""						+ item.var_name + "\",";
+			result += "\"value\":\""						+ item.value + "\",";
+			result += "\"visible_by_subcontractor\":\""		+ item.visible_by_subcontractor + "\",";
+			result += "\"editable_by_subcontractor\":\""	+ item.editable_by_subcontractor + "\",";
+			result += "\"owner_user_id\":\""				+ item.owner_user_id + "\",";
+			result += "\"eventTimestamp\":\""				+ item.eventTimestamp + "\"";
+
+			result +=	"}";
+		}
+	}
+	else
+	{
+		{
+			MESSAGE_DEBUG("", "", "no bt items assigned");
+		}
+	}
+
+	{
+		MESSAGE_DEBUG("", "", "finish");
+	}
+
+	return result;
 }
 

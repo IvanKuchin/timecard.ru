@@ -1789,6 +1789,7 @@ int main()
 		else
 		{
 			string			agency_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
+			auto			include_countries = indexPage.GetVarsHandler()->Get("include_countries") == "true";
 
 			if(db.Query("SELECT `id` FROM `company` WHERE `admin_userID`=\"" + user.GetID() + "\";"))
 			{
@@ -1800,7 +1801,8 @@ int main()
 					// --- get short info
 					ostResult << "{\"result\":\"success\","
 									"\"companies\":[" + company_obj + "]"
-									"}";
+									+ (include_countries ? ","s + "\"countries\":[" + GetCountryListInJSONFormat("SELECT * FROM `geo_country`;", &db, &user) + "]" : "")
+									+ "}";
 				}
 				else
 				{

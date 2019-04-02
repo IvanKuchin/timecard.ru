@@ -68,7 +68,7 @@ string c_smsc::send_sms (string phones, string message, int translit, string tim
     	}
     	else
     	{
-    		MESSAGE_ERROR("", "", "report.size() must be 4, (" + res + ")");
+            MESSAGE_ERROR("", "", "report.size() must be 4, (" + res + "). Probably sms has _NOT_ been sent.");
     	}
     }
     else

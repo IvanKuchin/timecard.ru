@@ -1337,87 +1337,94 @@ int main(void)
 						string	agency_id = GetAgencyID(&user, &db);
 						if(agency_id.length())
 						{
-							if(action == "AJAX_updateCompanyTitle") 		{					if(company_id.empty())	id = agency_id; else id = company_id; }
-							if(action == "AJAX_updateCompanyDescription")	{					if(company_id.empty())	id = agency_id; else id = company_id; }
-							if(action == "AJAX_updateCompanyWebSite")		{					if(company_id.empty())	id = agency_id; else id = company_id; }
-							if(action == "AJAX_updateCompanyTIN")			{					if(company_id.empty())	id = agency_id; else id = company_id; }
-							if(action == "AJAX_updateCompanyAccount")		{					if(company_id.empty())	id = agency_id; else id = company_id; }
-							if(action == "AJAX_updateCompanyOGRN")			{					if(company_id.empty())	id = agency_id; else id = company_id; }
-							if(action == "AJAX_updateCompanyKPP")			{					if(company_id.empty())	id = agency_id; else id = company_id; }
-							if(action == "AJAX_updateCompanyLegalAddress") 	{					if(company_id.empty())	id = agency_id; else id = company_id; }
-							if(action == "AJAX_updateCompanyMailingAddress"){					if(company_id.empty())	id = agency_id; else id = company_id; }
-							if(action == "AJAX_updateCompanyMailingZipID") 	{	new_value = id; if(company_id.empty())	id = agency_id; else id = company_id; }
-							if(action == "AJAX_updateCompanyLegalZipID") 	{	new_value = id; if(company_id.empty())	id = agency_id; else id = company_id; }
-							if(action == "AJAX_updateCompanyBankID") 		{	new_value = id; if(company_id.empty())	id = agency_id; else id = company_id; }
+							if(action == "AJAX_updateCompanyTitle") 		{					if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
+							if(action == "AJAX_updateCompanyDescription")	{					if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
+							if(action == "AJAX_updateCompanyWebSite")		{					if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
+							if(action == "AJAX_updateCompanyTIN")			{					if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
+							if(action == "AJAX_updateCompanyAccount")		{					if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
+							if(action == "AJAX_updateCompanyOGRN")			{					if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
+							if(action == "AJAX_updateCompanyKPP")			{					if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
+							if(action == "AJAX_updateCompanyLegalAddress") 	{					if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
+							if(action == "AJAX_updateCompanyMailingAddress"){					if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
+							if(action == "AJAX_updateCompanyMailingZipID") 	{	new_value = id; if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
+							if(action == "AJAX_updateCompanyLegalZipID") 	{	new_value = id; if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
+							if(action == "AJAX_updateCompanyBankID") 		{	new_value = id; if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
 
-							error_message = isActionEntityBelongsToAgency(action, id, agency_id, &db, &user);
 							if(error_message.empty())
 							{
-								error_message = CheckNewValueByAction(action, id, "", new_value, &db, &user);
+								error_message = isActionEntityBelongsToAgency(action, id, agency_id, &db, &user);
 								if(error_message.empty())
 								{
-									if((action.find("update") != string::npos))
+									error_message = CheckNewValueByAction(action, id, "", new_value, &db, &user);
+									if(error_message.empty())
 									{
-										string		existing_value = GetDBValueByAction(action, id, "", &db, &user);
-
-										error_message = SetNewValueByAction(action, id, "", new_value, &db, &user);
-										if(error_message.empty())
+										if((action.find("update") != string::npos))
 										{
-											// --- good finish
+											string		existing_value = GetDBValueByAction(action, id, "", &db, &user);
+
+											error_message = SetNewValueByAction(action, id, "", new_value, &db, &user);
+											if(error_message.empty())
+											{
+												// --- good finish
+
+												if(NotifySoWContractPartiesAboutChanges(action, id, "", existing_value, new_value, &db, &user))
+												{
+												}
+												else
+												{
+													MESSAGE_DEBUG("", action, "fail to notify agency about changes");
+												}
+											}
+											else
+											{
+												MESSAGE_DEBUG("", action, "unable to set new value (action/id/value = " + action + "/" + id + "/[" + FilterCP1251Symbols(new_value) + "])");
+											}
+										}
+										else if(action.find("insert") != string::npos)
+										{
+											
+										}
+										else if(action.find("delete") != string::npos)
+										{
+											string		existing_value = GetDBValueByAction(action, id, "", &db, &user);
 
 											if(NotifySoWContractPartiesAboutChanges(action, id, "", existing_value, new_value, &db, &user))
 											{
 											}
 											else
 											{
-												MESSAGE_DEBUG("", action, "fail to notify agency about changes");
+												MESSAGE_ERROR("", action, "fail to notify agency about changes");
+											}
+
+											error_message = SetNewValueByAction(action, id, "", new_value, &db, &user);
+											if(error_message.empty())
+											{
+												// --- good finish
+											}
+											else
+											{
+												MESSAGE_DEBUG("", action, "unable to set new value (action/id/value = " + action + "/" + id + "/[" + FilterCP1251Symbols(new_value) + "])");
 											}
 										}
 										else
 										{
-											MESSAGE_DEBUG("", action, "unable to set new value (action/id/value = " + action + "/" + id + "/[" + FilterCP1251Symbols(new_value) + "])");
-										}
-									}
-									else if(action.find("insert") != string::npos)
-									{
-										
-									}
-									else if(action.find("delete") != string::npos)
-									{
-										string		existing_value = GetDBValueByAction(action, id, "", &db, &user);
-
-										if(NotifySoWContractPartiesAboutChanges(action, id, "", existing_value, new_value, &db, &user))
-										{
-										}
-										else
-										{
-											MESSAGE_ERROR("", action, "fail to notify agency about changes");
+											MESSAGE_ERROR("", action, "unsupported action type(" + action + ")");
 										}
 
-										error_message = SetNewValueByAction(action, id, "", new_value, &db, &user);
-										if(error_message.empty())
-										{
-											// --- good finish
-										}
-										else
-										{
-											MESSAGE_DEBUG("", action, "unable to set new value (action/id/value = " + action + "/" + id + "/[" + FilterCP1251Symbols(new_value) + "])");
-										}
 									}
 									else
 									{
-										MESSAGE_ERROR("", action, "unsupported action type(" + action + ")");
+										MESSAGE_DEBUG("", action, "new value failed to pass validity check");
 									}
-
 								}
 								else
 								{
-									MESSAGE_DEBUG("", action, "new value failed to pass validity check");
+									MESSAGE_DEBUG("", action, "action entity id(" + user.GetID() + ") doesn't belongs to agency.id(" + agency_id + ")");
 								}
 							}
 							else
 							{
-								MESSAGE_DEBUG("", action, "action entity id(" + user.GetID() + ") doesn't belongs to agency.id(" + agency_id + ")");
+								MESSAGE_ERROR("", action, "company.id not defined")
 							}
 						}
 						else
@@ -2525,14 +2532,13 @@ int main(void)
 
 			ostResult.str("");
 			{
-				auto			template_name = "json_response.htmlt"s;
-				auto			error_message = ""s;
+				auto			template_name	= "json_response.htmlt"s;
+				auto			error_message	= ""s;
 
-				auto			title			= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("title"));
-				auto			description		= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("description"));
-				auto			cost_center_id = 0l;
+				auto			company_id		= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("company_id"));
+				auto			cost_center_id	= 0l;
 
-				if(title.length())
+				if(company_id.length())
 				{
 					error_message = isAgencyEmployeeAllowedToChangeAgencyData(&db, &user);
 					if(error_message.empty())
@@ -2541,10 +2547,10 @@ int main(void)
 
 						if(agency_id.length())
 						{
-							error_message = CheckNewValueByAction(action, agency_id, "", title, &db, &user);
+							error_message = CheckNewValueByAction(action, agency_id, "", company_id, &db, &user);
 							if(error_message.empty())
 							{
-								cost_center_id = db.InsertQuery("INSERT INTO `cost_centers` (`title`, `description`, `agency_company_id`, `assignee_user_id`, `eventTimestamp`) VALUES (\"" + title + "\", \"" + description + "\", \"" + agency_id + "\", \"" + user.GetID() + "\", UNIX_TIMESTAMP());");
+								cost_center_id = db.InsertQuery("INSERT INTO `cost_centers` (`company_id`, `agency_company_id`, `assignee_user_id`, `eventTimestamp`) VALUES (\"" + company_id + "\", \"" + agency_id + "\", \"" + user.GetID() + "\", UNIX_TIMESTAMP());");
 								if(cost_center_id)
 								{
 									if(NotifySoWContractPartiesAboutChanges(action, to_string(cost_center_id), "", "", "", &db, &user))
@@ -2738,8 +2744,9 @@ int main(void)
 				string			error_message = "";
 				string			agency_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
 
-				bool			include_bt = indexPage.GetVarsHandler()->Get("include_bt") == "true";
-				bool			include_tasks = indexPage.GetVarsHandler()->Get("include_tasks") == "true";
+				auto			include_bt = indexPage.GetVarsHandler()->Get("include_bt") == "true";
+				auto			include_tasks = indexPage.GetVarsHandler()->Get("include_tasks") == "true";
+				auto			include_countries = indexPage.GetVarsHandler()->Get("include_countries") == "true";
 
 				string			agency_obj = GetAgencyObjectInJSONFormat(agency_id, include_tasks, include_bt, &db, &user);
 
@@ -2748,7 +2755,8 @@ int main(void)
 					// --- get short info
 					ostResult << "{\"result\":\"success\","
 									"\"agencies\":[" + agency_obj + "]"
-									"}";
+									+ (include_countries ? ",\"countries\":[" + GetCountryListInJSONFormat("SELECT * FROM `geo_country`;", &db, &user) + "]" : "")
+									+ "}";
 				}
 				else
 				{

@@ -63,7 +63,7 @@ auto	 		CheckHTTPParam_Date(const string &srcText) -> string;
 auto	 		CheckHTTPParam_Float(const string &srcText) -> string;
 auto	 		CheckHTTPParam_Email(const string &srcText) -> string;
 // auto	      	CheckIfFurtherThanNow(string occupationStart_cp1251) -> string;
-auto			GetDefaultActionFromUserType(string role, CMysql *) -> string;
+auto			GetDefaultActionFromUserType(CUser *, CMysql *) -> string;
 auto	      	GetSecondsSinceY2k() -> double;
 auto	      	GetLocalFormattedTimestamp() -> string;
 auto	      	GetTimeDifferenceFromNow(const string timeAgo) -> double;

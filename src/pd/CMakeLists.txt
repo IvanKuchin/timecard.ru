@@ -26,6 +26,7 @@ set(INDEPENDENT_LIBRARIES_SRCs
 
 set(JOINT_LIBRARY_SRCs
     c_bt.cpp
+    c_company.cpp
     utilities_timecard1.cpp     # --- order is important, must follow c_bt
     utilities_timecard2.cpp
     )
