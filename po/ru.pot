@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-02 16:32-0400\n"
+"POT-Creation-Date: 2019-04-03 14:45-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -53,6 +53,18 @@ msgstr "Данные агенства: описание центра затра�
 msgid "Agency: cost center title updated"
 msgstr "Данные агенства: название центра затрат изменено"
 
+msgid "April"
+msgstr "Апрель"
+
+msgid "April declension"
+msgstr "Апреля"
+
+msgid "August"
+msgstr "Август"
+
+msgid "August declension"
+msgstr "Авнуста"
+
 msgid "Bank Identifier"
 msgstr "БИК"
 
@@ -74,17 +86,77 @@ msgstr "Дата"
 msgid "Dayrate"
 msgstr "Ежедневный тариф"
 
+msgid "December"
+msgstr "Декабрь"
+
+msgid "December declension"
+msgstr "Декабря"
+
 msgid "Destination bank"
 msgstr "Банк получателя"
 
 msgid "Employee data"
 msgstr "Данные сотрудника"
 
+msgid "February"
+msgstr "Февраль"
+
+msgid "February declension"
+msgstr "Февраля"
+
 msgid "Incorrect timecard list"
 msgstr "Некорректный список таймкарт"
 
 msgid "Initials"
 msgstr "Ф.И.О."
+
+msgid "Invoice"
+msgstr "Счёт"
+
+msgid "January"
+msgstr "Январь"
+
+msgid "January declension"
+msgstr "Января"
+
+msgid "July"
+msgstr "Июль"
+
+msgid "July declension"
+msgstr "Июля"
+
+msgid "June"
+msgstr "Июнь"
+
+msgid "June declension"
+msgstr "Июня"
+
+msgid "KPP"
+msgstr "КПП"
+
+msgid "March"
+msgstr "Март"
+
+msgid "March declension"
+msgstr "Марта"
+
+msgid "May"
+msgstr "Май"
+
+msgid "May declension"
+msgstr "Мая"
+
+msgid "November"
+msgstr "Ноябрь"
+
+msgid "November declension"
+msgstr "Ноября"
+
+msgid "October"
+msgstr "Октябрь"
+
+msgid "October declension"
+msgstr "Октября"
 
 msgid "Only owner can recall an invoice"
 msgstr "Только владелец может отозвать счет"
@@ -101,8 +173,44 @@ msgstr "Номер ТЗ"
 msgid "Project ID"
 msgstr "Идентификационный номер проекта"
 
+msgid "Recipient"
+msgstr "Получатель"
+
+msgid "Supplier"
+msgstr "Поставщик"
+
+msgid "Customer"
+msgstr "Заказчик"
+
+msgid "Basis"
+msgstr "Основание"
+
+msgid "Goods"
+msgstr "Товары"
+
+msgid "Quantity short"
+msgstr "Кол-во"
+
+msgid "Items short"
+msgstr "Ед."
+
+msgid "Price"
+msgstr "Цена"
+
+msgid "Total"
+msgstr "Сумма"
+
+msgid "item short"
+msgstr "шт"
+
 msgid "SQL syntax issue"
 msgstr "Ошибка БД"
+
+msgid "September"
+msgstr "Сентябрь"
+
+msgid "September declension"
+msgstr "Сентября"
 
 msgid "Service report over period"
 msgstr "Отчет об оказанных услугах за период"
@@ -124,6 +232,9 @@ msgstr "У некоторых таймкарт не хватает PSoW-конт
 
 msgid "Subcontractor reported time on"
 msgstr "Субконтрактор отчитался за"
+
+msgid "TIN"
+msgstr "ИНН"
 
 msgid "This task assigned to cost center"
 msgstr "Этой задаче назначена Центр Затрат"
@@ -439,3 +550,4 @@ msgstr "вы не назначены на этого заказчика"
 
 msgid "zip not found"
 msgstr "индекс не найден"
+

@@ -75,6 +75,8 @@ class C_Timecard_To_Print
 		auto		GetDayrate()								{ return dayrate; };
 		auto		GetTimecardLines()							{ return timecard_lines; }
 
+		auto		GetTotalHours() -> c_float;
+
 		auto		AddTimecardLine(string customer, string project, string task, string hours) -> string;
 
 		auto		isValid() -> string;

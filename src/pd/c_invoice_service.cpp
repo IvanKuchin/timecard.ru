@@ -183,6 +183,7 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 	if(error_message.empty())
 	{
 		invoicing_vars.SetCostCenterID(cost_center_id);
+		invoicing_vars.SetTimecards(timecard_obj_list);
 
 		error_message = invoicing_vars.GenerateVariableSet();
 	}
@@ -217,7 +218,6 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 				isFileExists(vat_filename_xls)     || isFileExists(vat_filename_pdf)
 				);
 
-		invoice_printer.SetTimecards(timecard_obj_list);		
 		invoice_printer.SetDB(db);
 		invoice_printer.SetVariableSet(&invoicing_vars);
 

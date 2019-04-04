@@ -8,6 +8,7 @@ set(EXECUTABLE_CGIs
 # --- Libraries
 # ---- big joint librabry
 set(JOINT_LIBRARY_SRCs
+    c_date_spelling.cpp
     cuser.cpp
     cactivator.cpp
     ccgi.cpp

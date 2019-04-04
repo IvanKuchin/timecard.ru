@@ -33,8 +33,6 @@ class C_Print_Invoice_Service
 		string							filename = "";
 		string							cost_center_id = "";
 
-		vector<C_Timecard_To_Print>		timecards;
-
 		HPDF_Doc						__pdf;
 		HPDF_Font						__pdf_font;
 		string							__pdf_font_name = "Helvetica";
@@ -43,8 +41,8 @@ class C_Print_Invoice_Service
 	public:
 					C_Print_Invoice_Service();
 
+		auto		Restart() -> void;
 		auto		SetDB(CMysql *param)							{ db = param; };
-		auto		SetTimecards(const vector<C_Timecard_To_Print> &param1) -> void;
 		auto		SetFilename(const string &param1)				{ filename = param1; };
 		auto		SetFilename(string &&param1) 					{ filename = move(param1); };
 		auto		SetCostCenterID(const string &param1)			{ cost_center_id = param1; };

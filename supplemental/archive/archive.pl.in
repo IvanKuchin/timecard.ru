@@ -16,6 +16,8 @@ my	%config				= do 'archive.config.pl';
 my	%folders_to_backup	= do 'archive.folders_to_backup.pl';
 my	%persistent_folders	= do 'archive.persistent_folders.pl';
 
+my	$config_files		= ["archive.config.pl", "archive.folders_to_backup.pl", "archive.persistent_folders.pl"];
+
 my	$domainSuffix = $config{project_domain}; # --- init later with $mysqldb value
 
 #
@@ -35,10 +37,13 @@ $DEBUG = 0;
 $action = "";
 if($num_args eq 1)
 {
-	if($ARGV[0] eq "--backup")				{ $action = "--backup"; }
-	if($ARGV[0] eq "--backup_structure") 	{ $action = "--backup_structure"; }
-	if($ARGV[0] eq "--restore")				{ $action = "--restore"; }
-	if($ARGV[0] eq "--restore_structure")	{ $action = "--restore_structure"; }
+	if($ARGV[0] eq "--backup")							{ $action = "--backup"; }
+	if($ARGV[0] eq "--backup_structure") 				{ $action = "--backup_structure"; }
+	if($ARGV[0] eq "--restore")							{ $action = "--restore"; }
+	if($ARGV[0] eq "--restore_structure")				{ $action = "--restore_structure"; }
+	if($ARGV[0] eq "--prepare_to_restore_production")	{ $action = "--prepare_to_restore_production"; }
+	if($ARGV[0] eq "--prepare_to_restore_dev")			{ $action = "--prepare_to_restore_dev"; }
+	if($ARGV[0] eq "--prepare_to_restore_demo")			{ $action = "--prepare_to_restore_demo"; }
 }
 
 if($action eq "")
@@ -48,6 +53,54 @@ if($action eq "")
 }
 
 print "action = $action\n" if($DEBUG);
+
+if(($action =~ /^--prepare_to_restore_production/))
+{
+	if(isDevServer())
+	{
+		die "this is dev-server\n";
+	}
+	else
+	{
+		print "Changing from dev.domain.name to www.domain.name in src files\n";
+
+		ChangeDevToWWW($config_files);
+		ChangeDevImagesToImages($config_files);
+	}
+	die;
+}
+
+if(($action =~ /^--prepare_to_restore_dev/))
+{
+	if(isDevServer())
+	{
+		print "Changing from www.domain.name to dev.domain.name in src files\n";
+
+		ChangeWWWToDev($config_files);
+		ChangeImagesToDevImages($config_files);
+	}
+	else
+	{
+		die "this is not dev-server\n";
+	}
+	die;
+}
+
+if(($action =~ /^--prepare_to_restore_demo/))
+{
+	if(isDevServer())
+	{
+		die "this is dev-server, demo must be run on production server\n";
+	}
+	else
+	{
+		print "Changing from dev.domain.name to demo.domain.name in src files\n";
+
+		ChangeDevToDemo($config_files);
+		ChangeDevImagesToDemoImages($config_files);
+	}
+	die;
+}
 
 DefineDBCredentials();
 
@@ -190,7 +243,7 @@ if(($action eq "--backup") or ($action eq "--backup_structure"))
 		}
 		else
 		{
-			print "\n ---recover cli: \nsudo date && rm -rf ./tmp/recover/ && mkdir -p ./tmp/recover/ && cd tmp/recover/ && scp ".$config{backup_hostname}.":/storage/".$config{backup_username}."/backup/dev.".$domainSuffix."/".$archive_filename." tmp/recover/ && tar -zxf ".$archive_filename." && time sudo ./archive.pl --restore_structure;\n\n";
+			print "\n ---recover cli: \nsudo date && rm -rf ./tmp/recover/ && mkdir -p ./tmp/recover/ && cd tmp/recover/ && scp ".$config{backup_hostname}.":/storage/".$config{backup_username}."/backup/dev.".$domainSuffix."/".$archive_filename." tmp/recover/ && tar -zxf ".$archive_filename." && ./archive.pl --prepare_to_restore_production && time sudo ./archive.pl --restore_structure;\n\n";
 		}
 	}
 	if($action eq "--backup")
@@ -200,7 +253,7 @@ if(($action eq "--backup") or ($action eq "--backup_structure"))
 		}
 		else
 		{
-			print "\n ---recover cli: \nsudo date && rm -rf ./tmp/recover/ && mkdir -p ./tmp/recover/ && cd ./tmp/recover/ && cp /storage/".$config{backup_username}."/backup/www.".$domainSuffix."/".$archive_filename." ./tmp/recover/ && tar -zxf ".$archive_filename." && time sudo ./archive.pl --restore;\n\n";
+			print "\n ---recover cli: \nsudo date && rm -rf ./tmp/recover/ && mkdir -p ./tmp/recover/ && cd ./tmp/recover/ && cp /storage/".$config{backup_username}."/backup/www.".$domainSuffix."/".$archive_filename." ./tmp/recover/ && tar -zxf ".$archive_filename." && ./archive --prepare_to_restore_production && time sudo ./archive.pl --restore;\n\n";
 		}
 	}
 }
@@ -711,6 +764,28 @@ sub ChangeDevToWWW
 	return $result;
 }
 
+sub ChangeDevToDemo
+{
+	my	@files_arr = @{$_[0]};
+	my	$file_item;
+	my	$result = 1;
+
+	foreach $file_item(@files_arr)
+	{
+		if(isFileExist($file_item))
+		{
+		    ReplaceSubstringInFile($file_item, "\bdev\.", "demo\.");
+		}
+		else
+		{
+			print "ChangeDevToDemo: ERROR: file($file_item) not found\n";
+			$result = 0;
+		}
+	}
+
+	return $result;
+}
+
 sub ChangeDevImagesToImages
 {
 	my	@files_arr = @{$_[0]};
@@ -726,6 +801,28 @@ sub ChangeDevImagesToImages
 		else
 		{
 			print "ChangeDevImagesToImages: ERROR: file($file_item) not found\n";
+			$result = 0;
+		}
+	}
+
+	return $result;
+}
+
+sub ChangeDevImagesToDemoImages
+{
+	my	@files_arr = @{$_[0]};
+	my	$file_item;
+	my	$result = 1;
+
+	foreach $file_item(@files_arr)
+	{
+		if(isFileExist($file_item))
+		{
+		    ReplaceSubstringInFile($file_item, "\bdevimages\.", "demoimages\.");
+		}
+		else
+		{
+			print "ChangeDevImagesToDemoImages: ERROR: file($file_item) not found\n";
 			$result = 0;
 		}
 	}
@@ -1104,6 +1201,9 @@ sub usage
 	print "usage: archive.pl [OPT]\n";
 	print " --backup - full backup\n";
 	print " --backup_structure - structure backup\n";
+	print " --prepare_to_restore_production - must have step before recovery prod\n";
+	print " --prepare_to_restore_dev - must have step before recovery dev\n";
+	print " --prepare_to_restore_demo - must have step before recovery demo\n";
 	print " --restore - restore from archive\n";
 	print " --restore_structure - restore structure only\n";
 }

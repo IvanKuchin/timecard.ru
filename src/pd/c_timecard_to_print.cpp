@@ -39,6 +39,28 @@ auto C_Timecard_To_Print::isValid() -> string
 	return error_message;
 }
 
+auto C_Timecard_To_Print::GetTotalHours() -> c_float
+{
+	c_float	result = 0;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	for(auto &timecard_line: timecard_lines)
+	{
+		auto hours = split(timecard_line.hours, ',');
+
+		for(auto &hour: hours)
+		{	
+			result = result + c_float(hour);
+		}
+	}
+
+	MESSAGE_DEBUG("", "", "end(result = " + string(result) + ")");
+
+	return result;
+}
+
+
 ostream& operator<<(ostream& os, const C_Timecard_To_Print &var)
 {
 	os << "object C_Timecard_To_Print [empty for now]";

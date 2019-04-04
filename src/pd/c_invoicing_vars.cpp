@@ -76,7 +76,23 @@ auto	C_Invoicing_Vars::GenerateVariableSet() -> string
 			if(error_message.empty()) error_message = AssignVariableValue("Bank Identifier", gettext("Bank Identifier"), true);
 			if(error_message.empty()) error_message = AssignVariableValue("Account", gettext("Account"), true);
 			if(error_message.empty()) error_message = AssignVariableValue("Destination bank", gettext("Destination bank"), true);
-			
+			if(error_message.empty()) error_message = AssignVariableValue("TIN", gettext("TIN"), true);
+			if(error_message.empty()) error_message = AssignVariableValue("KPP", gettext("KPP"), true);
+			if(error_message.empty()) error_message = AssignVariableValue("Recipient", gettext("Recipient"), true);
+			if(error_message.empty()) error_message = AssignVariableValue("Invoice", gettext("Invoice"), true);
+			if(error_message.empty()) error_message = AssignVariableValue("agreement from", gettext("agreement from"), true);
+			if(error_message.empty()) error_message = AssignVariableValue("Provider", gettext("Provider"), true);
+			if(error_message.empty()) error_message = AssignVariableValue("Customer", gettext("Customer"), true);
+			if(error_message.empty()) error_message = AssignVariableValue("Supplier", gettext("Supplier"), true);
+			if(error_message.empty()) error_message = AssignVariableValue("Goods", gettext("Goods"), true);
+			if(error_message.empty()) error_message = AssignVariableValue("Basis", gettext("Basis"), true);
+			if(error_message.empty()) error_message = AssignVariableValue("Price", gettext("Price"), true);
+			if(error_message.empty()) error_message = AssignVariableValue("Total", gettext("Total"), true);
+			if(error_message.empty()) error_message = AssignVariableValue("Quantity short", gettext("Quantity short"), true);
+			if(error_message.empty()) error_message = AssignVariableValue("Items short", gettext("Items short"), true);
+			if(error_message.empty()) error_message = AssignVariableValue("item short", gettext("item short"), true);
+
+
 			if(error_message.empty()) error_message = AssignVariableValue("cost_center_id", cost_center_id, true);
 			if(error_message.empty())
 			{
@@ -92,6 +108,7 @@ auto	C_Invoicing_Vars::GenerateVariableSet() -> string
 						vars.Add("cost_center_agreement_end_date", db->Get(0, "end_date"));
 						vars.Add("cost_center_agreement_number", db->Get(0, "number"));
 						vars.Add("cost_center_agreement_sign_date", db->Get(0, "sign_date"));
+						vars.Add("cost_center_act_number", db->Get(0, "act_number"));
 					}
 					else
 					{
@@ -100,6 +117,30 @@ auto	C_Invoicing_Vars::GenerateVariableSet() -> string
 					}
 				}
 			}
+
+			// --- cost_center number
+			if(error_message.empty())
+			{
+				C_Date_Spelling		date_obj(GetTMObject(Get("cost_center_agreement_sign_date")));
+
+				error_message = AssignVariableValue("cost_center_agreement", "№" + Get("cost_center_agreement_number") + " " + gettext("agreement from") + " " + date_obj.Spell(), true);
+			}
+
+			// --- invoice number
+			if(error_message.empty())
+			{
+				time_t 				rawtime;
+				struct tm * 		timeinfo;
+				C_Date_Spelling		date_obj;
+
+				time (&rawtime);
+				timeinfo = localtime (&rawtime);
+
+				date_obj.SetTMObj(*timeinfo);
+
+				error_message = AssignVariableValue("invoice_agreement", "№" + Get("cost_center_act_number") + " " + gettext("agreement from") + " " + date_obj.Spell(), true);
+			}
+
             if(error_message.empty()) error_message = AssignVariableFromDB("cost_center_company_id"                  , "SELECT `company_id` FROM `cost_centers` WHERE `id`=\"" + Get("cost_center_id") + "\";", true);
             if(error_message.empty())
             {
@@ -251,6 +292,8 @@ auto	C_Invoicing_Vars::GenerateVariableSet() -> string
 			if(error_message.empty()) error_message = AssignVariableFromDB("agency_mailing_region_title"		, "SELECT `title` FROM `geo_region` WHERE `id`=(SELECT `geo_region_id` FROM `geo_locality` WHERE `id`=(SELECT `geo_locality_id` FROM `geo_zip` WHERE `id`=\"" + Get("agency_mailing_geo_zip_id") + "\"));", true);
 			if(error_message.empty()) error_message = AssignVariableFromDB("agency_mailing_country_title"		, "SELECT `title` FROM `geo_country` WHERE `id`=(SELECT `geo_country_id` FROM `geo_region` WHERE `id`=(SELECT `geo_region_id` FROM `geo_locality` WHERE `id`=(SELECT `geo_locality_id` FROM `geo_zip` WHERE `id`=\"" + Get("agency_mailing_geo_zip_id") + "\")));", true);
 
+			// --- cost center custom fields 
+			if(error_message.empty())
 			{
 				auto	affected = db->Query("SELECT * FROM `cost_center_custom_fields` WHERE `cost_center_id`=\"" + vars.Get("cost_center_id") + "\";");
 
@@ -260,6 +303,29 @@ auto	C_Invoicing_Vars::GenerateVariableSet() -> string
 				}
 			}
 
+			// --- define timecards variables
+			if(error_message.empty())
+			{
+				auto	i = 0;
+				for(auto &timecard: timecard_obj_list)
+				{
+					c_float		price;
+					c_float		days = timecard.GetTotalHours() / c_float(8.0);
+					price = timecard.GetDayrate() * days;
+
+					++i;
+					error_message = AssignVariableValue("timecard_index_" + to_string(i), to_string(i).c_str(), true);
+					error_message = AssignVariableValue("timecard_quantity_" + to_string(i), "1", true);
+					error_message = AssignVariableValue("timecard_item_" + to_string(i), Get("item short").c_str(), true);
+					error_message = AssignVariableValue("timecard_price_" + to_string(i), string(price).c_str(), true);
+					error_message = AssignVariableValue("timecard_total_" + to_string(i), string(price).c_str(), true);
+
+/*
+					cache.Get(	"SELECT `local_service_description` FROM `company_position` WHERE `id`=("
+									"SELECT `company_position_id` FROM `contact_sow` WHERE `id`=\"" +  + "\""
+								");")
+*/				}
+			}
 		}
 		else
 		{

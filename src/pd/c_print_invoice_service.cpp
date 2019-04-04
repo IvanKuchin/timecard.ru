@@ -35,9 +35,8 @@ C_Print_Invoice_Service::C_Print_Invoice_Service()
 	MESSAGE_DEBUG("", "", "start");
 }
 
-auto	C_Print_Invoice_Service::SetTimecards(const vector<C_Timecard_To_Print> &param1) -> void
+auto	C_Print_Invoice_Service::Restart() -> void
 {
-	timecards = param1;
 	__pdf_line = -1;
 }
 
@@ -64,7 +63,6 @@ auto	C_Print_Invoice_Service::PrintInvoiceAsXLS() -> string
 			if(sheet)
 			{
 				auto			row_counter = 1;
-				auto			column_counter = 0;
 
 				auto			font_big			= book->addFont();
 				auto			font_bold			= book->addFont();
@@ -78,7 +76,8 @@ auto	C_Print_Invoice_Service::PrintInvoiceAsXLS() -> string
 				sheet->setLandscape(false);
 				// sheet->setPrintZoom(50);
 
-				font_big->setSize(24);
+				font_big->setSize(12);
+				font_big->setBold();
 				font_bold->setBold();
 
 				format_big->setFont(font_big);
@@ -88,7 +87,8 @@ auto	C_Print_Invoice_Service::PrintInvoiceAsXLS() -> string
 				// --- set columns width
 				sheet->setCol(0, 0, 1);
 				sheet->setCol(1, 1, 5);
-				sheet->setCol(2, 2, 31 + 2);
+				sheet->setCol(8, 9, 11);  // --- price and total columns
+//				sheet->setCol(2, 2, 31 + 2);
 				// sheet->setCol(2, 31 + 2, 5);
 
 				sheet->writeStr(row_counter, 1, multibyte_to_wide(vars->Get("agency_bank_title")).c_str());
@@ -102,22 +102,65 @@ auto	C_Print_Invoice_Service::PrintInvoiceAsXLS() -> string
 				++row_counter;
 				sheet->writeStr(row_counter, 1, multibyte_to_wide(vars->Get("Destination bank")).c_str());
 
+				++row_counter;
+				sheet->writeStr(row_counter, 1, multibyte_to_wide(vars->Get("TIN")).c_str());
+				sheet->writeStr(row_counter, 2, multibyte_to_wide(vars->Get("agency_tin")).c_str());
+				sheet->writeStr(row_counter, 4, multibyte_to_wide(vars->Get("KPP") + " " + vars->Get("agency_kpp")).c_str());
+				sheet->writeStr(row_counter, 6, multibyte_to_wide(vars->Get("Account")).c_str());
+				sheet->writeStr(row_counter, 7, multibyte_to_wide(vars->Get("agency_account")).c_str());
+
+				++row_counter;
+				sheet->writeStr(row_counter, 1, multibyte_to_wide(vars->Get("agency_name")).c_str());
+
+				++row_counter;
+				++row_counter;
+				sheet->writeStr(row_counter, 1, multibyte_to_wide(vars->Get("Recipient")).c_str());
+
+				++row_counter;
+				++row_counter;
+				sheet->writeStr(row_counter, 1, multibyte_to_wide(vars->Get("Invoice") + " " + vars->Get("invoice_agreement")).c_str(), format_big);
+
+				++row_counter;
+				++row_counter;
+				sheet->writeStr(row_counter, 1, multibyte_to_wide(vars->Get("Supplier")).c_str());
+				sheet->writeStr(row_counter, 3, multibyte_to_wide(vars->Get("agency_name") + ", " + vars->Get("TIN") + " " + vars->Get("agency_tin") + ", " + vars->Get("KPP") + " " + vars->Get("agency_kpp") + ", " + vars->Get("agency_legal_geo_zip") + " " + vars->Get("agency_legal_locality_title") + ", " + vars->Get("agency_legal_address")).c_str());
+
+				++row_counter;
+				++row_counter;
+				sheet->writeStr(row_counter, 1, multibyte_to_wide(vars->Get("Customer")).c_str());
+				sheet->writeStr(row_counter, 3, multibyte_to_wide(vars->Get("cost_center_name") + ", " + vars->Get("TIN") + " " + vars->Get("cost_center_tin") + ", " + vars->Get("KPP") + " " + vars->Get("cost_center_kpp") + ", " + vars->Get("cost_center_legal_geo_zip") + " " + vars->Get("cost_center_legal_locality_title") + ", " + vars->Get("cost_center_legal_address")).c_str());
+
+				++row_counter;
+				++row_counter;
+				sheet->writeStr(row_counter, 1, multibyte_to_wide(vars->Get("Basis")).c_str());
+				sheet->writeStr(row_counter, 3, multibyte_to_wide(vars->Get("act_basis")).c_str());
 
 				// --- table header
 				++row_counter;
-				sheet->writeStr(row_counter, 2, L"put header here", format_bold);
+				++row_counter;
+				++row_counter;
+				sheet->writeStr(row_counter, 1, L"№", format_bold);
+				sheet->writeStr(row_counter, 2, multibyte_to_wide(vars->Get("Goods")).c_str(), format_bold);
+				sheet->writeStr(row_counter, 5, multibyte_to_wide(vars->Get("Quantity short")).c_str(), format_bold);
+				sheet->writeStr(row_counter, 6, multibyte_to_wide(vars->Get("Items short")).c_str(), format_bold);
+				sheet->writeStr(row_counter, 7, multibyte_to_wide(vars->Get("Price")).c_str(), format_bold);
+				sheet->writeStr(row_counter, 8, multibyte_to_wide(vars->Get("Total")).c_str(), format_bold);
 
 				// --- table body
-				for(auto &timecard: timecards)
+				for(auto i = 1; vars->Get("timecard_index_" + to_string(i)).length(); ++i)
 				{
-					sheet->writeStr(row_counter, 1, (L"timecard " + to_wstring(row_counter)).c_str());
-
-					row_counter++;
+					++row_counter;
+					sheet->writeNum(row_counter, 1, stod_noexcept(vars->Get("timecard_index_" + to_string(i))));
+					sheet->writeStr(row_counter, 2, multibyte_to_wide("service index ").c_str());
+					sheet->writeNum(row_counter, 5, stod_noexcept(vars->Get("timecard_quantity_" + to_string(i))));
+					sheet->writeStr(row_counter, 6, multibyte_to_wide(vars->Get("timecard_item_" + to_string(i))).c_str());
+					sheet->writeNum(row_counter, 7, stod_noexcept(vars->Get("timecard_price_" + to_string(i))));
+					sheet->writeNum(row_counter, 8, stod_noexcept(vars->Get("timecard_total_" + to_string(i))));
 				}
 
 				// --- table summary
-				sheet->writeStr(row_counter, 1, L"Итого:", format_bold);
 				row_counter++;
+				sheet->writeStr(row_counter, 1, multibyte_to_wide(vars->Get("Total")).c_str(), format_bold);
 
 				{
 					row_counter++;
