@@ -73,6 +73,10 @@ auto	C_Invoicing_Vars::GenerateVariableSet() -> string
 	{
 		if(db)
 		{
+			c_float	timecards_sum;
+			c_float	vat;
+			c_float	total_payment;
+
 			if(error_message.empty()) error_message = AssignVariableValue("Bank Identifier", gettext("Bank Identifier"), true);
 			if(error_message.empty()) error_message = AssignVariableValue("Account", gettext("Account"), true);
 			if(error_message.empty()) error_message = AssignVariableValue("Destination bank", gettext("Destination bank"), true);
@@ -81,6 +85,11 @@ auto	C_Invoicing_Vars::GenerateVariableSet() -> string
 			if(error_message.empty()) error_message = AssignVariableValue("Recipient", gettext("Recipient"), true);
 			if(error_message.empty()) error_message = AssignVariableValue("Invoice", gettext("Invoice"), true);
 			if(error_message.empty()) error_message = AssignVariableValue("agreement from", gettext("agreement from"), true);
+			if(error_message.empty()) error_message = AssignVariableValue("agreement declensioned", gettext("agreement declensioned"), true);
+			if(error_message.empty()) error_message = AssignVariableValue("Technical Requirement agreement short", gettext("Technical Requirement agreement short"), true);
+			if(error_message.empty()) error_message = AssignVariableValue("from", gettext("from"), true);
+			if(error_message.empty()) error_message = AssignVariableValue("up to", gettext("up to"), true);
+			if(error_message.empty()) error_message = AssignVariableValue("in scope", gettext("in scope"), true);
 			if(error_message.empty()) error_message = AssignVariableValue("Provider", gettext("Provider"), true);
 			if(error_message.empty()) error_message = AssignVariableValue("Customer", gettext("Customer"), true);
 			if(error_message.empty()) error_message = AssignVariableValue("Supplier", gettext("Supplier"), true);
@@ -91,6 +100,13 @@ auto	C_Invoicing_Vars::GenerateVariableSet() -> string
 			if(error_message.empty()) error_message = AssignVariableValue("Quantity short", gettext("Quantity short"), true);
 			if(error_message.empty()) error_message = AssignVariableValue("Items short", gettext("Items short"), true);
 			if(error_message.empty()) error_message = AssignVariableValue("item short", gettext("item short"), true);
+			if(error_message.empty()) error_message = AssignVariableValue("VAT short", gettext("VAT short"), true);
+			if(error_message.empty()) error_message = AssignVariableValue("Total payment", gettext("Total payment"), true);
+			if(error_message.empty()) error_message = AssignVariableValue("Sum items", gettext("Sum items"), true);
+			if(error_message.empty()) error_message = AssignVariableValue("total amount", gettext("total amount"), true);
+			if(error_message.empty()) error_message = AssignVariableValue("rur.", gettext("rur."), true);
+			if(error_message.empty()) error_message = AssignVariableValue("Director", gettext("Director"), true);
+			if(error_message.empty()) error_message = AssignVariableValue("Accountant", gettext("Accountant"), true);
 
 
 			if(error_message.empty()) error_message = AssignVariableValue("cost_center_id", cost_center_id, true);
@@ -240,6 +256,7 @@ auto	C_Invoicing_Vars::GenerateVariableSet() -> string
 						vars.Add("agency_account", 				ConvertHTMLToText(db->Get(0, "account")));
 						vars.Add("agency_kpp", 					ConvertHTMLToText(db->Get(0, "kpp")));
 						vars.Add("agency_ogrn", 				ConvertHTMLToText(db->Get(0, "ogrn")));
+						vars.Add("agency_vat",	 				ConvertHTMLToText(db->Get(0, "vat")));
 						vars.Add("agency_link", 				ConvertHTMLToText(db->Get(0, "link")));
 						vars.Add("agency_admin_userID", 		ConvertHTMLToText(db->Get(0, "admin_userID")));
 						vars.Add("agency_isConfirmed", 			ConvertHTMLToText(db->Get(0, "isConfirmed")));
@@ -314,17 +331,272 @@ auto	C_Invoicing_Vars::GenerateVariableSet() -> string
 					price = timecard.GetDayrate() * days;
 
 					++i;
-					error_message = AssignVariableValue("timecard_index_" + to_string(i), to_string(i).c_str(), true);
-					error_message = AssignVariableValue("timecard_quantity_" + to_string(i), "1", true);
-					error_message = AssignVariableValue("timecard_item_" + to_string(i), Get("item short").c_str(), true);
-					error_message = AssignVariableValue("timecard_price_" + to_string(i), string(price).c_str(), true);
-					error_message = AssignVariableValue("timecard_total_" + to_string(i), string(price).c_str(), true);
+					if(error_message.empty()) error_message = AssignVariableValue("timecard_id_" + to_string(i), timecard.GetID(), true);
+					if(error_message.empty()) error_message = AssignVariableValue("timecard_index_" + to_string(i), to_string(i), true);
+					if(error_message.empty()) error_message = AssignVariableValue("timecard_quantity_" + to_string(i), "1", true);
+					if(error_message.empty()) error_message = AssignVariableValue("timecard_item_" + to_string(i), Get("item short"), true);
+					if(error_message.empty()) error_message = AssignVariableValue("timecard_price_" + to_string(i), string(price), true);
+					if(error_message.empty()) error_message = AssignVariableValue("timecard_total_" + to_string(i), string(price), true);
 
-/*
-					cache.Get(	"SELECT `local_service_description` FROM `company_position` WHERE `id`=("
-									"SELECT `company_position_id` FROM `contact_sow` WHERE `id`=\"" +  + "\""
-								");")
-*/				}
+					if(db->Query(	
+									"SELECT `number`,`sign_date` FROM `contracts_sow` WHERE `id`=("
+										"SELECT `contract_sow_id` FROM `timecards` WHERE `id`=\"" + vars.Get("timecard_id_" + to_string(i)) + "\""
+									");"))
+					{
+						auto	sow_number = db->Get(0, "number");
+						auto	sow_date = db->Get(0, "sign_date");
+
+						if(sow_number.length())
+						{
+							error_message = AssignVariableValue("timecard_sow_number_" + to_string(i), sow_number, true);
+						}
+						else
+						{
+							error_message = gettext("Agreement") + " "s + db->Get(0, "number") + " " + gettext("agreement from") + " " + db->Get(0, "sign_date") + " " + gettext("number is empty");
+							MESSAGE_ERROR("", "", "Agreement( " + db->Get(0, "number") + " " + gettext("agreement from") + db->Get(0, "sign_date") + " ) number is empty");
+						}
+
+						if(sow_date.length())
+						{
+							error_message = AssignVariableValue("timecard_sow_sign_date_" + to_string(i), sow_date, true);
+						}
+						else
+						{
+							error_message = gettext("Agreement") + " "s + db->Get(0, "number") + " " + gettext("agreement from") + " " + db->Get(0, "sign_date") + " " + gettext("date is empty");
+							MESSAGE_ERROR("", "", "Agreement( " + db->Get(0, "number") + " " + gettext("agreement from") + db->Get(0, "sign_date") + " ) date is empty");
+						}
+					}
+					else
+					{
+						error_message = gettext("SQL syntax issue");
+						MESSAGE_ERROR("", "", "SQL syntax issue");
+					}
+
+					if(error_message.empty())
+						error_message = AssignVariableValue("timecard_sow_agreement_" + to_string(i), Get("timecard_sow_number_" + to_string(i)) + " " + gettext("agreement from") + " " + Get("timecard_sow_sign_date_" + to_string(i)), true);
+
+					if(error_message.empty())
+					{
+						auto	company_position_id = cache.Get(	
+																	"SELECT `company_position_id` FROM `contracts_sow` WHERE `id`=("
+																		"SELECT `contract_sow_id` FROM `timecards` WHERE `id`=\"" + timecard.GetID() + "\""
+																	");", db, user, [](string sql_query, CMysql *db, CUser *)
+																					{
+																						return (db->Query(sql_query) ? db->Get(0, 0) : ""s);
+																					});
+
+						if(company_position_id.length())
+						{
+							auto	service_description = cache.Get(	"SELECT `local_service_description` FROM `company_position` WHERE `id`=\"" + company_position_id + "\";", db, user,
+																					[](string sql_query, CMysql *db, CUser *)
+																					{
+																						return (db->Query(sql_query) ? db->Get(0, 0) : ""s);
+																					});
+
+							if(service_description.length())
+							{
+								error_message = AssignVariableValue("timecard_company_position_id_" + to_string(i), company_position_id, true);
+								error_message = AssignVariableValue("timecard_local_service_description_" + to_string(i), service_description, true);
+							}
+							else
+							{
+								if(db->Query("SELECT `title` FROM `company_position` WHERE `id`=\"" + company_position_id + "\";"))
+								{
+									error_message = gettext("Occupancy") + " "s + db->Get(0, 0) + " " + gettext("missed service description");
+									MESSAGE_ERROR("", "", "Occupancy " + db->Get(0, 0) + " missed service description");
+								}
+								else
+								{
+									error_message = gettext("SQL syntax issue");
+									MESSAGE_ERROR("", "", "SQL syntax issue");
+								}
+							}
+						}
+						else
+						{
+							if(db->Query(	
+											"SELECT `number`,`sign_date` FROM `contracts_sow` WHERE `id`=("
+												"SELECT `contract_sow_id` FROM `timecards` WHERE `id`=\"" + vars.Get("timecard_index_" + to_string(i)) + "\""
+											");"))
+							{
+								error_message = gettext("Agreement") + " "s + Get("timecard_sow_agreement_" + to_string(i)) + " " + gettext("missed occupancy title");
+								MESSAGE_ERROR("", "", error_message);
+							}
+							else
+							{
+								error_message = gettext("SQL syntax issue");
+								MESSAGE_ERROR("", "", "SQL syntax issue");
+							}
+						};
+					}
+
+					if(error_message.empty())
+					{
+						auto	vat = cache.Get(
+											"SELECT `vat` FROM `company` WHERE `id`=("
+												"SELECT `subcontractor_company_id` FROM `contracts_sow` WHERE `id`=("
+													"SELECT `contract_sow_id` FROM `timecards` WHERE `id`=\"" + timecard.GetID() + "\""
+												")"
+											");", db, user, [](string sql_query, CMysql *db, CUser *)
+																{
+																	return (db->Query(sql_query) ? db->Get(0, 0) : ""s);
+																});
+						if(vat.length())
+						{
+							error_message = AssignVariableValue("timecard_company_vat_" + to_string(i), vat, true);
+							error_message = AssignVariableValue("timecard_company_vat_spelling_" + to_string(i), vat == "N" ? gettext("no VAT") : ""s, true);
+						}
+						else
+						{
+							error_message = "PSOW("s + Get("timecard_psow_contract_number_" + to_string(i)) + ") " + gettext("vat") + " " + gettext("is empty");
+							MESSAGE_ERROR("", "", error_message);
+						}
+
+					}
+
+					// --- get psow_id
+					if(error_message.empty())
+					{
+						auto	psow_id = GetPSoWIDByTimecardIDAndCostCenterID(vars.Get("timecard_id_" + to_string(i)), vars.Get("cost_center_id"), db, user);
+
+						if(psow_id.length())
+						{
+							if(error_message.empty()) error_message = AssignVariableValue("timecard_psow_id_" + to_string(i), psow_id, true);
+
+							if(db->Query("SELECT * FROM `contracts_psow` WHERE `id`=\"" + vars.Get("timecard_psow_id_" + to_string(i)) + "\";"))
+							{
+								C_Date_Spelling		date_obj;
+
+								if(error_message.empty())
+								{
+									if(db->Get(0, "number").length())
+									{
+										error_message = AssignVariableValue("timecard_psow_contract_number_" + to_string(i), db->Get(0, "number"), true);
+									}
+									else
+									{
+										error_message = "PSOW "s + gettext("number") + " " + gettext("is empty") + "(" + Get("timecard_sow_agreement_" + to_string(i)) + ")";
+										MESSAGE_ERROR("", "", error_message);
+									}
+								}
+								if(error_message.empty())
+								{
+									if(db->Get(0, "sign_date").length())
+									{
+										error_message = AssignVariableValue("timecard_psow_contract_sign_date_" + to_string(i), db->Get(0, "sign_date"), true);
+									}
+									else
+									{
+										error_message = "PSOW("s + Get("timecard_psow_contract_number_" + to_string(i)) + ") " + gettext("sign date") + " " + gettext("is empty");
+										MESSAGE_ERROR("", "", error_message);
+									}
+								}
+								if(error_message.empty())
+								{
+									if(db->Get(0, "start_date").length())
+									{
+										error_message = AssignVariableValue("timecard_psow_contract_start_date_" + to_string(i), db->Get(0, "start_date"), true);
+									}
+									else
+									{
+										error_message = "PSOW("s + Get("timecard_psow_contract_number_" + to_string(i)) + ") " + gettext("start date") + " " + gettext("is empty");
+										MESSAGE_ERROR("", "", error_message);
+									}
+								}
+								if(error_message.empty())
+								{
+									if(db->Get(0, "end_date").length())
+									{
+										error_message = AssignVariableValue("timecard_psow_contract_end_date_" + to_string(i), db->Get(0, "end_date"), true);
+									}
+									else
+									{
+										error_message = "PSOW("s + Get("timecard_psow_contract_number_" + to_string(i)) + ") " + gettext("end date") + " " + gettext("is empty");
+										MESSAGE_ERROR("", "", error_message);
+									}
+								}
+
+								date_obj.SetTMObj(GetTMObject(vars.Get("timecard_psow_contract_sign_date_" + to_string(i))));
+
+								if(error_message.empty()) error_message = AssignVariableValue("psow_agreement_" + to_string(i), "№" + vars.Get("timecard_psow_contract_number_" + to_string(i)) + " " + gettext("agreement from") + " " + date_obj.Spell(), true);
+							}
+							else
+							{
+
+							}
+						}
+						else
+						{
+							error_message = gettext("Agreement") + " "s + Get("timecard_sow_agreement_" + to_string(i)) + " " + gettext("missed PSoW number");
+							MESSAGE_ERROR("", "", error_message);
+						}
+					}
+
+					// --- get report start date and finish date
+					if(error_message.empty())
+					{
+						C_Date_Spelling		report_period_start;
+						C_Date_Spelling		report_period_finish;
+						auto				timecard_period_start = GetTMObject(timecard.GetDateStart());
+						auto				timecard_period_finish = GetTMObject(timecard.GetDateFinish());
+						auto				psow_period_start = GetTMObject(Get("timecard_psow_contract_start_date_" + to_string(i)));
+						auto				psow_period_finish = GetTMObject(Get("timecard_psow_contract_end_date_" + to_string(i)));
+						auto				psow_sign_date = GetTMObject(Get("timecard_psow_contract_sign_date_" + to_string(i)));
+
+						if(psow_period_start <= GetTMObject("2000-01-01"))
+						{
+							error_message = "PSOW("s + Get("timecard_psow_contract_number_" + to_string(i)) + ") " + gettext("start date") + " " + gettext("must be in 20-th century");
+							MESSAGE_ERROR("", "", error_message);
+						}
+						else if(psow_period_finish <= GetTMObject("2000-01-01"))
+						{
+							error_message = "PSOW("s + Get("timecard_psow_contract_number_" + to_string(i)) + ") " + gettext("end date") + " " + gettext("must be in 20-th century");
+							MESSAGE_ERROR("", "", error_message);
+						}
+						else if(psow_sign_date <= GetTMObject("2000-01-01"))
+						{
+							error_message = "PSOW("s + Get("timecard_psow_contract_number_" + to_string(i)) + ") " + gettext("sign date") + " " + gettext("must be in 20-th century");
+							MESSAGE_ERROR("", "", error_message);
+						}
+						else
+						{
+							report_period_start	.SetTMObj(psow_period_start  > timecard_period_start  ? psow_period_start  : timecard_period_start);
+							report_period_finish.SetTMObj(psow_period_finish < timecard_period_finish ? psow_period_finish : timecard_period_finish);
+
+							error_message = AssignVariableValue("timecard_date_start" + to_string(i), report_period_start.GetFormatted("%d.%m.%Y"), true);
+							error_message = AssignVariableValue("timecard_date_finish" + to_string(i), report_period_finish.GetFormatted("%d.%m.%Y"), true);
+						}
+
+					}
+
+					// --- cost center custom fields 
+					if(error_message.empty())
+					{
+						auto	affected = db->Query("SELECT * FROM `contract_psow_custom_fields` WHERE `contract_psow_id`=\"" + vars.Get("timecard_psow_id_" + to_string(i)) + "\";");
+
+						for(auto j = 0; j < affected; ++j)
+						{
+							if(error_message.empty()) error_message = AssignVariableValue("timecard_contract_psow_" + to_string(i) + "_" + db->Get(j, "var_name"), db->Get(j, "value"), true);
+						}
+					}
+
+					timecards_sum = timecards_sum + price;
+
+					error_message = AssignVariableValue("timecard_contract_psow_" + to_string(i) + "_Department_spelling", 
+											Get("timecard_contract_psow_" + to_string(i) + "_Department").length()
+											? " ("s + gettext("department") + " " + Get("timecard_contract_psow_" + to_string(i) + "_Department") + ")"
+											: "", true);
+
+					if(error_message.length()) break;
+				}
+
+				if(Get("agency_vat") == "Y")
+					vat = timecards_sum * c_float(VAT_PERCENTAGE) / c_float(100);
+				total_payment = timecards_sum + vat;
+
+				if(error_message.empty()) error_message = AssignVariableValue("timecards_sum_amount", string(timecards_sum), true);
+				if(error_message.empty()) error_message = AssignVariableValue("vat_amount", string(vat), true);
+				if(error_message.empty()) error_message = AssignVariableValue("total_payment", string(total_payment), true);
 			}
 		}
 		else

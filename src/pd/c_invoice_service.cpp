@@ -89,7 +89,9 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 {
 	C_Invoicing_Vars		invoicing_vars(db, user);
 	C_Print_Timecard		timecard_printer;
-	C_Print_Invoice_Service	invoice_printer;
+	C_Print_Invoice_Agency	invoice_agency;
+	C_Print_Invoice_Service	*invoice_printer = &invoice_agency;
+
 	auto					error_message = ""s;
 
 	MESSAGE_DEBUG("", "", "start");
@@ -168,10 +170,7 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 
 			// --- we don't want to count total payment again, instead take it from printer
 			// --- this may not be a good idea
-			if((error_message = UpdateDBWithInvoiceData(timecard.GetID(), timecard_printer.GetTotalPayment())).length())
-			{
-				break;
-			}
+			timecard.SetTotalPayment(timecard_printer.GetTotalPayment());
 		}
 	}
 	else
@@ -218,13 +217,13 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 				isFileExists(vat_filename_xls)     || isFileExists(vat_filename_pdf)
 				);
 
-		invoice_printer.SetDB(db);
-		invoice_printer.SetVariableSet(&invoicing_vars);
+		invoice_printer->SetDB(db);
+		invoice_printer->SetVariableSet(&invoicing_vars);
 
-		invoice_printer.SetFilename(invoice_filename_xls);
-		invoice_printer.SetCostCenterID(cost_center_id);
+		invoice_printer->SetFilename(invoice_filename_xls);
+		invoice_printer->SetCostCenterID(cost_center_id);
 
-		error_message = invoice_printer.PrintInvoiceAsXLS();
+		error_message = invoice_printer->PrintInvoiceAsXLS();
 		if(error_message.empty())
 		{
 
@@ -237,6 +236,22 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 	else
 	{
 		MESSAGE_ERROR("", "", "invoice to cost center won't be written to files due to previous error");
+	}
+
+	// --- update DB only if no errors earlier
+	if(error_message.empty())
+	{
+		for(auto &timecard: timecard_obj_list)
+		{
+			if((error_message = UpdateDBWithInvoiceData(timecard.GetID(), timecard.GetTotalPayment())).length())
+			{
+				break;
+			}
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "db won't be updated due to previous error");
 	}
 
 	if(error_message.empty())

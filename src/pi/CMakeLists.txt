@@ -31,6 +31,7 @@ set(JOINT_LIBRARY_SRCs
     utilities2.cpp
     utilities_common.cpp
     c_cache_obj.cpp
+    c_price_spelling.cpp
     )
 
 # ---- list of independent libraries

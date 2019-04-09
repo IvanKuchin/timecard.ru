@@ -56,6 +56,18 @@ auto C_Date_Spelling::Spell() -> string
 	return result;
 }
 
+auto C_Date_Spelling::GetFormatted(string format) -> string
+{
+	char	buffer[256];
+
+	MESSAGE_DEBUG("", "", "start");
+
+	strftime(buffer, sizeof(buffer) - 1, format.c_str(), &date_struct);
+
+	MESSAGE_DEBUG("", "", "end (result = " + buffer + ")");
+
+	return string(buffer);
+}
 
 
 ostream& operator<<(ostream& os, const C_Date_Spelling &var)

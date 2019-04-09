@@ -1040,6 +1040,7 @@ string GetCompanyListInJSONFormat(string dbQuery, CMysql *db, CUser *user, bool 
 		string	account;
 		string	kpp;
 		string	ogrn;
+		string	vat;
 		string	link;
 		string	foundationDate;
 		string	numberOfEmployee;
@@ -1085,6 +1086,7 @@ string GetCompanyListInJSONFormat(string dbQuery, CMysql *db, CUser *user, bool 
 				company.account = db->Get(i, "account");
 				company.kpp = db->Get(i, "kpp");
 				company.ogrn = db->Get(i, "ogrn");
+				company.vat = db->Get(i, "vat");
 				company.link = db->Get(i, "link");
 				company.admin_userID = db->Get(i, "admin_userID");
 				company.foundationDate = db->Get(i, "foundationDate");
@@ -1117,6 +1119,7 @@ string GetCompanyListInJSONFormat(string dbQuery, CMysql *db, CUser *user, bool 
 					ostFinal << "\"account\": \""			<< companiesList[i].account << "\", ";
 					ostFinal << "\"kpp\": \""				<< companiesList[i].kpp << "\", ";
 					ostFinal << "\"ogrn\": \""				<< companiesList[i].ogrn << "\", ";
+					ostFinal << "\"vat\": \""				<< companiesList[i].vat << "\", ";
 					ostFinal << "\"link\": \""				<< companiesList[i].link << "\", ";
 					ostFinal << "\"foundationDate\": \""	<< companiesList[i].foundationDate << "\",";
 					ostFinal << "\"numberOfEmployee\": \""	<< companiesList[i].numberOfEmployee << "\",";

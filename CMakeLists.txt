@@ -12,6 +12,9 @@ project("timecard.su" CXX)
 set(My_VERSION_MAJOR 0)
 set(My_VERSION_MINOR 1)
 
+set(MAIN_DOMAIN_NAME "dev.${PROJECT_NAME}")
+set(IMAGE_DOMAIN_NAME "devimages.${PROJECT_NAME}")
+
 set(CMAKE_CXX_STANDARD 14)
 # --- changing CXX_FLAGS is _not_ the best practise
 # --- cmake 3.12 have -D switch, capable remove definition per-target
@@ -28,28 +31,28 @@ option(FFPMPEG_DISABLE		"turn off VideoConverter" OFF)
 
 # --- Set required variables
 # ---- build variables
-set(CRON_PROJECT_DIR		${PROJECT_BINARY_DIR}/share/${PROJECT_NAME}/cron)
-set(ARCHIVE_PROJECT_DIR		${PROJECT_BINARY_DIR}/share/${PROJECT_NAME}/archive)
-set(MAXMIND_PROJECT_DIR		${PROJECT_BINARY_DIR}/share/${PROJECT_NAME}/maxmind)
-set(CI_SCRIPT_PROJECT_DIR	${PROJECT_BINARY_DIR}/share/${PROJECT_NAME}/ci-scripts)
-set(LOCALE_PROJECT_DIR		${PROJECT_BINARY_DIR}/share/${PROJECT_NAME}/locale)
+set(CRON_PROJECT_DIR		${PROJECT_BINARY_DIR}/share/${MAIN_DOMAIN_NAME}/cron)
+set(ARCHIVE_PROJECT_DIR		${PROJECT_BINARY_DIR}/share/${MAIN_DOMAIN_NAME}/archive)
+set(MAXMIND_PROJECT_DIR		${PROJECT_BINARY_DIR}/share/${MAIN_DOMAIN_NAME}/maxmind)
+set(CI_SCRIPT_PROJECT_DIR	${PROJECT_BINARY_DIR}/share/${MAIN_DOMAIN_NAME}/ci-scripts)
+set(LOCALE_PROJECT_DIR		${PROJECT_BINARY_DIR}/share/${MAIN_DOMAIN_NAME}/locale)
 set(PDF_FONT_PROJECT_DIR	${PROJECT_SOURCE_DIR}/supplemental/libpdf-font)
 set(LIBXL_PROJECT_DIR		${PROJECT_SOURCE_DIR}/libxl-3.8.4.0/)
 
 # ---- install variables
 # set(CMAKE_INSTALL_RPATH "/home/ikuchin/src/dev.timecard.su/libxl-3.8.4.0/lib64")
 # set(CMAKE_INSTALL_RPATH ${XL_LIBRARY_DIR})
-set(ROOTDIR			"/home/httpd/dev.${PROJECT_NAME}")
-set(IMAGEROOTDIR		"/home/httpd/devimages.${PROJECT_NAME}")
+set(ROOTDIR			"/home/httpd/${MAIN_DOMAIN_NAME}")
+set(IMAGEROOTDIR		"/home/httpd/${IMAGE_DOMAIN_NAME}")
 set(LOGDIR			"/home/ikuchin/src_logs/")
 set(CGIDIR			${ROOTDIR}/cgi-bin)
 set(CGIADMINDIR			${ROOTDIR}/cgi-bin/admin)
-set(CRON_INSTALL_DIR		${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}/cron)
-set(ARCHIVE_INSTALL_DIR		${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}/archive)
-set(MAXMIND_INSTALL_DIR		${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}/maxmind)
-set(LOCALE_INSTALL_DIR		${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}/locale)
-set(PDF_FONT_INSTALL_DIR	${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}/libpdf-font)
-set(LIBXL_INSTALL_DIR		${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}/libxl)
+set(CRON_INSTALL_DIR		${CMAKE_INSTALL_PREFIX}/share/${MAIN_DOMAIN_NAME}/cron)
+set(ARCHIVE_INSTALL_DIR		${CMAKE_INSTALL_PREFIX}/share/${MAIN_DOMAIN_NAME}/archive)
+set(MAXMIND_INSTALL_DIR		${CMAKE_INSTALL_PREFIX}/share/${MAIN_DOMAIN_NAME}/maxmind)
+set(LOCALE_INSTALL_DIR		${CMAKE_INSTALL_PREFIX}/share/${MAIN_DOMAIN_NAME}/locale)
+set(PDF_FONT_INSTALL_DIR	${CMAKE_INSTALL_PREFIX}/share/${MAIN_DOMAIN_NAME}/libpdf-font)
+set(LIBXL_INSTALL_DIR		${CMAKE_INSTALL_PREFIX}/share/${MAIN_DOMAIN_NAME}/libxl)
 
 # ---- libxl library is not in apt-reporsitory, therefore is not installed on the OS
 # ---- to treat it as regulat lib I have to copy it to /usr/local/share..... folder

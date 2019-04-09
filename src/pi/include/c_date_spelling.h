@@ -22,6 +22,7 @@ class C_Date_Spelling
 		auto				SetTMObj(struct tm param) { date_struct = param; };
 
 		auto				Spell() -> string;
+		auto 				GetFormatted(string format) -> string;
 };
 
 ostream&	operator<<(ostream& os, const C_Date_Spelling &);

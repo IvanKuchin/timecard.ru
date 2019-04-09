@@ -43,8 +43,7 @@ void CSession::InitMaxMind()
 		int		status;
 
 		{
-			string	temp = MMDB_fname;
-		    status = MMDB_open(temp.c_str(), MMDB_MODE_MMAP, &mmdb);
+		    status = MMDB_open(MMDB_fname, MMDB_MODE_MMAP, &mmdb);
 		}
 	    if (status == MMDB_SUCCESS)
 	    {

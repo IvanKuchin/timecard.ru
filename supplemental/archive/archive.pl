@@ -12,13 +12,8 @@ my	($action);
 my	$timestamp = strftime "%Y%m%d%H%M%S", localtime;
 my	$num_args = $#ARGV + 1;
 
-my	%config				= do 'archive.config.pl';
-my	%folders_to_backup	= do 'archive.folders_to_backup.pl';
-my	%persistent_folders	= do 'archive.persistent_folders.pl';
-
 my	$config_files		= ["archive.config.pl", "archive.folders_to_backup.pl", "archive.persistent_folders.pl"];
 
-my	$domainSuffix = $config{project_domain}; # --- init later with $mysqldb value
 
 #
 # unbuffer output
@@ -39,11 +34,12 @@ if($num_args eq 1)
 {
 	if($ARGV[0] eq "--backup")							{ $action = "--backup"; }
 	if($ARGV[0] eq "--backup_structure") 				{ $action = "--backup_structure"; }
-	if($ARGV[0] eq "--restore")							{ $action = "--restore"; }
-	if($ARGV[0] eq "--restore_structure")				{ $action = "--restore_structure"; }
-	if($ARGV[0] eq "--prepare_to_restore_production")	{ $action = "--prepare_to_restore_production"; }
-	if($ARGV[0] eq "--prepare_to_restore_dev")			{ $action = "--prepare_to_restore_dev"; }
-	if($ARGV[0] eq "--prepare_to_restore_demo")			{ $action = "--prepare_to_restore_demo"; }
+	if($ARGV[0] eq "--restore_production")				{ $action = "--restore_production"; }
+	if($ARGV[0] eq "--restore_production_structure")	{ $action = "--restore_production_structure"; }
+	if($ARGV[0] eq "--restore_dev")						{ $action = "--restore_dev"; }
+	if($ARGV[0] eq "--restore_dev_structure")			{ $action = "--restore_dev_structure"; }
+	if($ARGV[0] eq "--restore_demo")					{ $action = "--restore_demo"; }
+	if($ARGV[0] eq "--restore_demo_structure")			{ $action = "--restore_demo_structure"; }
 }
 
 if($action eq "")
@@ -54,7 +50,7 @@ if($action eq "")
 
 print "action = $action\n" if($DEBUG);
 
-if(($action =~ /^--prepare_to_restore_production/))
+if(($action =~ /^--restore_production/))
 {
 	if(isDevServer())
 	{
@@ -62,19 +58,18 @@ if(($action =~ /^--prepare_to_restore_production/))
 	}
 	else
 	{
-		print "Changing from dev.domain.name to www.domain.name in src files\n";
+		print "Changing from DEV -> WWW in src files\n";
 
 		ChangeDevToWWW($config_files);
 		ChangeDevImagesToImages($config_files);
 	}
-	die;
 }
 
-if(($action =~ /^--prepare_to_restore_dev/))
+if(($action =~ /^--restore_dev/))
 {
 	if(isDevServer())
 	{
-		print "Changing from www.domain.name to dev.domain.name in src files\n";
+		print "Changing from WWW -> DEV in src files\n";
 
 		ChangeWWWToDev($config_files);
 		ChangeImagesToDevImages($config_files);
@@ -83,10 +78,9 @@ if(($action =~ /^--prepare_to_restore_dev/))
 	{
 		die "this is not dev-server\n";
 	}
-	die;
 }
 
-if(($action =~ /^--prepare_to_restore_demo/))
+if(($action =~ /^--restore_demo/))
 {
 	if(isDevServer())
 	{
@@ -94,39 +88,68 @@ if(($action =~ /^--prepare_to_restore_demo/))
 	}
 	else
 	{
-		print "Changing from dev.domain.name to demo.domain.name in src files\n";
+		print "Changing from DEV -> DEMO in src files\n";
 
 		ChangeDevToDemo($config_files);
 		ChangeDevImagesToDemoImages($config_files);
 	}
-	die;
 }
 
-DefineDBCredentials();
-
-print "MYSQL db: $mysqldb\n";
-print "MYSQL login: $mysqllogin\n";
-print "MYSQL pass: $mysqlpass\n";
-print "MYSQL host: $mysqlhost\n";
+# --- DO NOT move it higher than previous conditions
+# --- condition workflow changing configuration files
+my	%config				= do 'archive.config.pl';
+my	%folders_to_backup	= do 'archive.folders_to_backup.pl';
+my	%persistent_folders	= do 'archive.persistent_folders.pl';
+my	$domainSuffix = $config{project_domain};
 
 if($action =~ /^--restore/)
 {
 	isFilesReadyToRestore() || die "ERROR: not all files are exists in the restore folder\n";
 	isRoot() 				|| die "ERROR: recover can be run with root privilege only\n";
 
-	if(isDevServer())
+	if(($action =~ /^--restore_production/))
 	{
-		print "Changing from www.domain.name to dev.domain.name in src files\n";
+		if(isDevServer())
+		{
+			die "this is dev-server\n";
+		}
+		else
+		{
+			print "Changing DEV -> WWW in src files\n";
 
-		ChangeWWWToDev($config{replace_dev_to_www_files});
-		ChangeImagesToDevImages($config{replace_devimages_to_images_files});
+			ChangeDevToWWW($config{replace_dev_to_www_files});
+			ChangeDevImagesToImages($config{replace_devimages_to_images_files});
+		}
 	}
-	else
-	{
-		print "Changing from dev.domain.name to www.domain.name in src files\n";
 
-		ChangeDevToWWW($config{replace_dev_to_www_files});
-		ChangeDevImagesToImages($config{replace_devimages_to_images_files});
+	if(($action =~ /^--restore_dev/))
+	{
+		if(isDevServer())
+		{
+			print "Changing WWW -> DEV in src files\n";
+
+			ChangeWWWToDev($config{replace_dev_to_www_files});
+			ChangeImagesToDevImages($config{replace_devimages_to_images_files});
+		}
+		else
+		{
+			die "this is not dev-server\n";
+		}
+	}
+
+	if(($action =~ /^--restore_demo/))
+	{
+		if(isDevServer())
+		{
+			die "this is dev-server, demo must be run on production server\n";
+		}
+		else
+		{
+			print "Changing DEV -> DEMO in src files\n";
+
+			ChangeDevToDemo($config{replace_dev_to_www_files});
+			ChangeDevImagesToDemoImages($config{replace_devimages_to_images_files});
+		}
 	}
 }
 
@@ -146,6 +169,13 @@ if($DEBUG)
 	}
 }
 
+DefineDBCredentials();
+
+print "\tMYSQL db: $mysqldb\n";
+print "\tMYSQL login: $mysqllogin\n";
+# print "\tMYSQL pass: $mysqlpass\n";
+print "\tMYSQL host: $mysqlhost\n";
+
 #
 # Build archive filename
 #
@@ -154,7 +184,7 @@ $archive_filename  = $mysqldb."_".($action eq "--backup" ? "full_" : "struct_").
 #
 # Start main action
 #
-if(($action eq "--backup") or ($action eq "--backup_structure"))
+if($action =~ /^--backup/)
 {
 	print "\n\nPerforming ".($action eq "--backup" ? "full" : "structure")." backup\n";
 	# print "performing clean-up\n";
@@ -179,53 +209,54 @@ if(($action eq "--backup") or ($action eq "--backup_structure"))
 	}
 
 	print "mysqldump ....\n";
-
-	if($action eq "--backup")
-	{
-		system("mysqldump  -Q -u $mysqllogin -p$mysqlpass -h $mysqlhost $mysqldb > sql");
-	}
-	if($action eq "--backup_structure")
+	if($action =~ /_structure/)
 	{
 		system("mysqldump --no-data -Q -u $mysqllogin -p$mysqlpass -h $mysqlhost $mysqldb > sql");
 		system("mysqldump --add-drop-table -Q -u $mysqllogin -p$mysqlpass -h $mysqlhost $mysqldb ".$config{tables_to_upgrade}." > sql_controltables");
 	}
+	else
+	{
+		system("mysqldump  -Q -u $mysqllogin -p$mysqlpass -h $mysqlhost $mysqldb > sql");
+	}
 
 	print "archiving ....\n";
 	system("tar -czf ".$archive_filename." *");
+	print "copying ".$domainSuffix." development environment ....\n";
+	system("cp ".$archive_filename." /storage/".$config{backup_username}."/backup/".$domainSuffix."/");
+
 	if(isDevServer())
 	{
-		if(isMDev())
-		{
-			print "copying mob development environment ....\n";
+		# if(isMDev())
+		# {
+		# 	print "copying ".$domainSuffix." development environment ....\n";
 
-			system("cp ".$archive_filename." /storage/".$config{backup_username}."/backup/mdev.".$domainSuffix."/");
-		}
-		else
-		{
-			print "copying web development environment ....\n";
+		# 	system("cp ".$archive_filename." /storage/".$config{backup_username}."/backup/mdev.".$domainSuffix."/");
+		# }
+		# else
+		# {
+		# 	print "copying web development environment ....\n";
 
-			system("cp ".$archive_filename." /storage/".$config{backup_username}."/backup/dev.".$domainSuffix."/");
-		}
+		# 	system("cp ".$archive_filename." /storage/".$config{backup_username}."/backup/dev.".$domainSuffix."/");
+		# }
 
 	}
 	else
 	{
-		if(isMobileVersion())
-		{
-			print "copying to backup location ....\n";
+		# if(isMobileVersion())
+		# {
+		# 	print "copying to backup location ....\n";
 
-		    # system("scp ".$archive_filename." ".$config{backup_username}."\@".$config{backup_hostname}.":/storage/".$config{backup_username}."/backup/m.".$domainSuffix."/");
-			system("cp ".$archive_filename." /storage/".$config{backup_username}."/backup/m.".$domainSuffix."/");
-		}
-		else
-		{
-			print "copying to backup location ....\n";
+		# 	system("cp ".$archive_filename." /storage/".$config{backup_username}."/backup/m.".$domainSuffix."/");
+		# }
+		# else
+		# {
+		# 	print "copying to backup location ....\n";
 
-			system("cp ".$archive_filename." /storage/".$config{backup_username}."/backup/www.".$domainSuffix."/");
+		# 	system("cp ".$archive_filename." /storage/".$config{backup_username}."/backup/www.".$domainSuffix."/");
 
-			print "rsync to remote server ....\n";
-			system("rsync -alzhe ssh --exclude '*.tar.gz' ./ ".$config{backup_username}."\@".$config{backup_hostname}.":/storage/".$config{backup_username}."/backup/www.".$domainSuffix."/rsync/");
-		}
+		# }
+		print "rsync to remote server ....\n";
+		system("rsync -alzhe ssh --exclude '*.tar.gz' ./ ".$config{backup_username}."\@".$config{backup_hostname}.":/storage/".$config{backup_username}."/backup/".$domainSuffix."/rsync/");
 	}
 
 	print "cleaning-up development folder ...\n";
@@ -236,31 +267,19 @@ if(($action eq "--backup") or ($action eq "--backup_structure"))
 	remove_dir_recursively("/home/".$config{backup_username}."/home/"); # Sublime create this folder, when "browse remote files"
 
 
-	if(isDevServer() and ($action eq "--backup_structure"))
+	if($action =~ /_structure/)
 	{
-		if(isMDev())
-		{
-		}
-		else
-		{
-			print "\n ---recover cli: \nsudo date && rm -rf ./tmp/recover/ && mkdir -p ./tmp/recover/ && cd tmp/recover/ && scp ".$config{backup_hostname}.":/storage/".$config{backup_username}."/backup/dev.".$domainSuffix."/".$archive_filename." tmp/recover/ && tar -zxf ".$archive_filename." && ./archive.pl --prepare_to_restore_production && time sudo ./archive.pl --restore_structure;\n\n";
-		}
+		print "\n ---recover cli: \nsudo date && rm -rf ./tmp/recover/ && mkdir -p ./tmp/recover/ && cd tmp/recover/ && scp ".$config{backup_hostname}.":/storage/".$config{backup_username}."/backup/".$domainSuffix."/".$archive_filename." tmp/recover/ && tar -zxf ".$archive_filename." && time sudo ./archive.pl --restore_structure;\n\n";
 	}
-	if($action eq "--backup")
+	else
 	{
-		if(isMDev())
-		{
-		}
-		else
-		{
-			print "\n ---recover cli: \nsudo date && rm -rf ./tmp/recover/ && mkdir -p ./tmp/recover/ && cd ./tmp/recover/ && cp /storage/".$config{backup_username}."/backup/www.".$domainSuffix."/".$archive_filename." ./tmp/recover/ && tar -zxf ".$archive_filename." && ./archive --prepare_to_restore_production && time sudo ./archive.pl --restore;\n\n";
-		}
+		print "\n ---recover cli: \nsudo date && rm -rf ./tmp/recover/ && mkdir -p ./tmp/recover/ && cd ./tmp/recover/ && cp /storage/".$config{backup_username}."/backup/".$domainSuffix."/".$archive_filename." ./tmp/recover/ && tar -zxf ".$archive_filename." && time sudo ./archive.pl --restore;\n\n";
 	}
 }
 
-if(($action eq "--restore") or ($action eq "--restore_structure"))
+if($action =~ /^--restore/)
 {
-	print "\n\nPerforming ".($action eq "--restore" ? "full" : "structure")." restore ($action)\n";
+	print "\n\nPerforming ".($action =~ "_structure" ? "structure" : "full")." restore ($action)\n";
 
 	#
 	# clean-up from old garbage
@@ -279,7 +298,7 @@ if(($action eq "--restore") or ($action eq "--restore_structure"))
 	CreateRecoveryPoint($config{recovery_point_folder});
 
 
-	if($action eq "--restore_structure")
+	if($action =~ /_structure/)
 	{
 		#
 		# because of the hard naming in DATA dirs
@@ -399,7 +418,7 @@ if(($action eq "--restore") or ($action eq "--restore_structure"))
 
 	print "restoring production DB from ./sql\n";
 	system("mysql -u $mysqllogin -p$mysqlpass -h $mysqlhost $mysqldb < sql");
-	if($action eq "--restore_structure")
+	if($action =~ /_structure/)
 	{
 		system("mysql -u $mysqllogin -p$mysqlpass -h $mysqlhost $mysqldb < sql_controltables");
 	}
@@ -661,6 +680,18 @@ sub isDesktopVersion()
 
 sub isFilesReadyToRestore()
 {
+	if(($action =~ /_structure/) and (!isFileExist("sql_controltables")))
+	{
+		print "ERROR: sql_controltables missed, while you are trying to restore _structure. Probably you want to restore full backup.\n";
+		return 0;
+	}
+
+	if(!($action =~ /_structure/) and (isFileExist("sql_controltables")))
+	{
+		print "ERROR: sql_controltables present, while you are trying to restore full backup. Probably you want to restore _structure\n";
+		return 0;
+	}
+
 	unless(isFileExist("sql"))
 	{
 		print "ERROR: sql is missed\n";
@@ -730,7 +761,7 @@ sub ChangeWWWToDev
 	{
 		if(isFileExist($file_item))
 		{
-		    ReplaceSubstringInFile($file_item, "\bwww\.", "dev\.");
+		    ReplaceSubstringInFile($file_item, qr/\bwww\./, "dev\.");
 		}
 		else
 		{
@@ -752,7 +783,7 @@ sub ChangeDevToWWW
 	{
 		if(isFileExist($file_item))
 		{
-		    ReplaceSubstringInFile($file_item, "\bdev\.", "www\.");
+		    ReplaceSubstringInFile($file_item, qr/\bdev\./, "www\.");
 		}
 		else
 		{
@@ -774,7 +805,7 @@ sub ChangeDevToDemo
 	{
 		if(isFileExist($file_item))
 		{
-		    ReplaceSubstringInFile($file_item, "\bdev\.", "demo\.");
+		    ReplaceSubstringInFile($file_item, qr/\bdev\./, "demo\.");
 		}
 		else
 		{
@@ -796,7 +827,7 @@ sub ChangeDevImagesToImages
 	{
 		if(isFileExist($file_item))
 		{
-		    ReplaceSubstringInFile($file_item, "\bdevimages\.", "images\.");
+		    ReplaceSubstringInFile($file_item, qr/\bdevimages\./, "images\.");
 		}
 		else
 		{
@@ -818,7 +849,7 @@ sub ChangeDevImagesToDemoImages
 	{
 		if(isFileExist($file_item))
 		{
-		    ReplaceSubstringInFile($file_item, "\bdevimages\.", "demoimages\.");
+		    ReplaceSubstringInFile($file_item, qr/\bdevimages\./, "demoimages\.");
 		}
 		else
 		{
@@ -840,7 +871,7 @@ sub ChangeImagesToDevImages
 	{
 		if(isFileExist($file_item))
 		{
-		    ReplaceSubstringInFile($file_item, "\bimages\.", "devimages\.");
+		    ReplaceSubstringInFile($file_item, qr/\bimages\./, "devimages\.");
 		}
 		else
 		{
@@ -877,7 +908,7 @@ sub DefineDBCredentials
 		if($str =~ /#define\s+DB_NAME\s*\"(.*)\"/)
 		{
 			$mysqldb = $1;
-			$domainSuffix = $mysqldb;
+			# $domainSuffix = $mysqldb;
 		}
 		if($str =~ /#define\s+DB_LOGIN\s*\"(.*)\"/)
 		{
@@ -896,103 +927,6 @@ sub DefineDBCredentials
 
 	CheckValidityLoadedVariables() || die "ERROR: reading variables any of following variable from ".$config{localy_h_file_backup_location}.": mysqldb, mysqllogin, mysqlhost\n";
 }
-
-# sub Build_FoldersToBackup_FromMakefile
-# {
-# 	my		%makefile_config;
-# 	my		$folder_id;
-# 	my		$folder_name;
-# 	my		$needToRender;
-# 	my		$key;
-
-# 	#
-# 	# parse Makefile on "key = value" hash
-# 	#
-# 	print "opening Makefile";
-# 	open(F, "Makefile") || die "(can't open Makefile)\n";
-# 	print "....\n";
-
-# 	while (<F>)
-# 	{
-# 		$str = $_;
-# 		if($str =~ /(\w+)\s*=\s*(.*)/)
-# 		{
-# 			my	$configKey = $1;
-# 			my	$configValue = $2;
-
-# 			$makefile_config{$configKey} = $configValue;
-# 		}
-# 	}
-# 	close(F);
-
-# 	if($DEBUG)
-# 	{
-# 		foreach my $key (keys %makefile_config)
-# 		{
-# 			print $key." = ".$makefile_config{$key}."\n";
-# 		}
-# 	}
-
-# 	foreach $folder_id(keys %folders_to_backup)
-# 	{
-# 		$folder_name = $makefile_config{$folder_id};
-
-# 		$needToRender = 1;
-# 		while($needToRender)
-# 		{
-# 			$needToRender = 0;
-
-# 			foreach $key (keys %makefile_config)
-# 			{
-# 				if($folder_name =~ /\$\($key\)/)
-# 				{
-# 					my	$prev_value = $folder_name;
-
-# 					$folder_name =~ s/\$\($key\)/$makefile_config{$key}/e;
-# 					$needToRender = 1;
-
-# 					if($folder_name eq $prev_value)
-# 					{
-# 						print "ERROR rendering folder_name($prev_value -> $folder_name) against key($key) might be infinite loop\n";
-# 					}
-# 				}
-# 			}
-# 		}
-
-# 		$folders_to_backup{$folder_id} = $folder_name;
-
-# 		isDirExists($folders_to_backup{$folder_id}) || die "Build_FoldersToBackup_FromMakefile:ERROR: backup folder($folder_id: $folder_name) doesn't exist";
-# 	}
-
-# 	# --- scoping for domainSuffix
-# 	{
-# 		$domainSuffix = $makefile_config{$config{domain_from_makefile}};
-
-# 		$needToRender = 1;
-# 		while($needToRender)
-# 		{
-# 			$needToRender = 0;
-
-# 			foreach $key (keys %makefile_config)
-# 			{
-# 				if($domainSuffix =~ /\$\($key\)/)
-# 				{
-# 					my	$prev_value = $domainSuffix;
-
-# 					$domainSuffix =~ s/\$\($key\)/$makefile_config{$key}/e;
-# 					$needToRender = 1;
-
-# 					if($domainSuffix eq $prev_value)
-# 					{
-# 						print "ERROR rendering domainSuffix($prev_value -> $domainSuffix) against key($key) might be infinite loop\n";
-# 					}
-# 				}
-# 			}
-# 		}
-
-# 		if($domainSuffix eq "") { die "domainSuffix is empty"; }
-# 	}
-# }
 
 sub CleanBuildDirectory
 {
@@ -1201,9 +1135,10 @@ sub usage
 	print "usage: archive.pl [OPT]\n";
 	print " --backup - full backup\n";
 	print " --backup_structure - structure backup\n";
-	print " --prepare_to_restore_production - must have step before recovery prod\n";
-	print " --prepare_to_restore_dev - must have step before recovery dev\n";
-	print " --prepare_to_restore_demo - must have step before recovery demo\n";
-	print " --restore - restore from archive\n";
-	print " --restore_structure - restore structure only\n";
+	print " --restore_production - restore production from backup\n";
+	print " --restore_production_structure - upgrade production structure\n";
+	print " --restore_dev - restore dev from backup\n";
+	print " --restore_dev_structure - upgrade dev structure (seems useless)\n";
+	print " --restore_demo - restore demo from backup\n";
+	print " --restore_demo_structure - upgrade demo structure\n";
 }

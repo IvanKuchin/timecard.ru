@@ -36,6 +36,7 @@ class C_Timecard_To_Print
 		string					project_number = "";
 		string					cost_center_id = "";
 		c_float					dayrate;
+		c_float					total_payment;
 
 		vector<Timecard_Line>	timecard_lines = {};
 	public:
@@ -61,6 +62,7 @@ class C_Timecard_To_Print
 		auto		SetProjectNumber(const string &param1)		{ project_number = param1; };
 		auto		SetProjectNumber(string &&param1) 			{ project_number = move(param1); };
 		auto		SetDayrate(string param1) 					{ dayrate = param1; };
+		auto		SetTotalPayment(string param1) 				{ total_payment = param1; };
 
 
 		auto		GetID()										{ return id; };
@@ -73,6 +75,7 @@ class C_Timecard_To_Print
 		auto		GetProjectNumber()							{ return project_number; };	
 		auto		GetCostCenterID()							{ return cost_center_id; };	
 		auto		GetDayrate()								{ return dayrate; };
+		auto		GetTotalPayment()							{ return total_payment; };
 		auto		GetTimecardLines()							{ return timecard_lines; }
 
 		auto		GetTotalHours() -> c_float;

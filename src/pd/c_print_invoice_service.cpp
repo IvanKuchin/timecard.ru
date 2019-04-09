@@ -40,6 +40,190 @@ auto	C_Print_Invoice_Service::Restart() -> void
 	__pdf_line = -1;
 }
 
+auto	C_Print_Invoice_Service::DrawXLSBorder(int left, int top, int right, int bottom) -> string
+{
+	auto	result = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(right < left)
+	{
+		// --- swap left right
+		int temp = right;
+
+		right = left;
+		left = temp;
+	}
+
+	if(bottom < top)
+	{
+		// --- swap top bottom
+		int temp = top;
+
+		top = bottom;
+		bottom = temp;
+	}
+
+	if((left == right) && (bottom == top))
+	{
+		// --- single cell border
+		auto	format_border_cell = __book->addFormat();
+
+		format_border_cell->setBorder(libxl::BORDERSTYLE_THIN);
+		__sheet->setCellFormat(top, left, format_border_cell);
+	}
+	else if((left == right) && (top < bottom))
+	{
+		auto	format_top_cell = __book->addFormat();
+		auto	format_middle_cell = __book->addFormat();
+		auto	format_bottom_cell = __book->addFormat();
+
+		format_top_cell->setBorderLeft(libxl::BORDERSTYLE_THIN);
+		format_top_cell->setBorderRight(libxl::BORDERSTYLE_THIN);
+		format_top_cell->setBorderTop(libxl::BORDERSTYLE_THIN);
+		format_bottom_cell->setBorderLeft(libxl::BORDERSTYLE_THIN);
+		format_bottom_cell->setBorderRight(libxl::BORDERSTYLE_THIN);
+		format_bottom_cell->setBorderBottom(libxl::BORDERSTYLE_THIN);
+		format_middle_cell->setBorderLeft(libxl::BORDERSTYLE_THIN);
+		format_middle_cell->setBorderRight(libxl::BORDERSTYLE_THIN);
+
+		for(auto i = top + 1; i < bottom; ++i)
+			__sheet->setCellFormat(i, left, format_middle_cell);
+
+		__sheet->setCellFormat(top, left, format_top_cell);
+		__sheet->setCellFormat(bottom, left, format_bottom_cell);
+	}
+	else if((left < right) && (top == bottom))
+	{
+		auto	format_left_cell = __book->addFormat();
+		auto	format_middle_cell = __book->addFormat();
+		auto	format_right_cell = __book->addFormat();
+
+		format_left_cell->setBorderLeft(libxl::BORDERSTYLE_THIN);
+		format_left_cell->setBorderTop(libxl::BORDERSTYLE_THIN);
+		format_left_cell->setBorderBottom(libxl::BORDERSTYLE_THIN);
+		format_right_cell->setBorderRight(libxl::BORDERSTYLE_THIN);
+		format_right_cell->setBorderTop(libxl::BORDERSTYLE_THIN);
+		format_right_cell->setBorderBottom(libxl::BORDERSTYLE_THIN);
+		format_middle_cell->setBorderTop(libxl::BORDERSTYLE_THIN);
+		format_middle_cell->setBorderBottom(libxl::BORDERSTYLE_THIN);
+
+		for(auto i = left + 1; i < right; ++i)
+			__sheet->setCellFormat(top, i, format_middle_cell);
+
+		__sheet->setCellFormat(top, left, format_left_cell);
+		__sheet->setCellFormat(bottom, right, format_right_cell);
+	}
+	else
+	{
+		auto	format_top_left			= __book->addFormat();
+		auto	format_top				= __book->addFormat();
+		auto	format_top_right		= __book->addFormat();
+		auto	format_right			= __book->addFormat();
+		auto	format_bottom_right		= __book->addFormat();
+		auto	format_bottom			= __book->addFormat();
+		auto	format_bottom_left		= __book->addFormat();
+		auto	format_left				= __book->addFormat();
+
+		format_top_left			->setBorderTop		(libxl::BORDERSTYLE_THIN);
+		format_top_left			->setBorderLeft		(libxl::BORDERSTYLE_THIN);
+		format_top				->setBorderTop		(libxl::BORDERSTYLE_THIN);
+		format_top_right		->setBorderTop		(libxl::BORDERSTYLE_THIN);
+		format_top_right		->setBorderRight	(libxl::BORDERSTYLE_THIN);
+		format_right			->setBorderRight	(libxl::BORDERSTYLE_THIN);
+		format_bottom_right		->setBorderBottom	(libxl::BORDERSTYLE_THIN);
+		format_bottom_right		->setBorderRight	(libxl::BORDERSTYLE_THIN);
+		format_bottom			->setBorderBottom	(libxl::BORDERSTYLE_THIN);
+		format_bottom_left		->setBorderBottom	(libxl::BORDERSTYLE_THIN);
+		format_bottom_left		->setBorderLeft		(libxl::BORDERSTYLE_THIN);
+		format_left				->setBorderLeft		(libxl::BORDERSTYLE_THIN);
+
+		for(auto i = left + 1; i < right; ++i)
+		{
+			__sheet->setCellFormat(top, i, format_top);
+			__sheet->setCellFormat(bottom, i, format_bottom);
+		}
+		for(auto i = top + 1; i < bottom; ++i)
+		{
+			__sheet->setCellFormat(i, left, format_left);
+			__sheet->setCellFormat(i, right, format_right);
+		}
+
+		__sheet->setCellFormat(top, left, format_top_left);
+		__sheet->setCellFormat(top, right, format_top_right);
+		__sheet->setCellFormat(bottom, left, format_bottom_left);
+		__sheet->setCellFormat(bottom, right, format_bottom_right);
+
+	}
+
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return result;
+}
+
+auto	C_Print_Invoice_Service::PrintXLSHeaderTable() -> string
+{
+	auto	result = ""s;
+	auto	top = __row_counter;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	__sheet->writeStr(__row_counter, 1, multibyte_to_wide(GetSupplierBankName()).c_str());
+	__sheet->writeStr(__row_counter, 6, multibyte_to_wide(vars->Get("Bank Identifier")).c_str());
+	__sheet->writeStr(__row_counter, 7, multibyte_to_wide(GetSupplierBIK()).c_str());
+
+	++__row_counter;
+	__sheet->writeStr(__row_counter, 6, multibyte_to_wide(vars->Get("Account")).c_str());
+	__sheet->writeStr(__row_counter, 7, multibyte_to_wide(GetSupplierBankAccount()).c_str());
+
+	++__row_counter;
+	__sheet->writeStr(__row_counter, 1, multibyte_to_wide(vars->Get("Destination bank")).c_str());
+
+	++__row_counter;
+	__sheet->writeStr(__row_counter, 1, multibyte_to_wide(vars->Get("TIN")).c_str());
+	__sheet->writeStr(__row_counter, 2, multibyte_to_wide(GetSupplierTIN()).c_str());
+	__sheet->writeStr(__row_counter, 4, multibyte_to_wide(vars->Get("KPP") + " " + GetSupplierKPP()).c_str());
+	__sheet->writeStr(__row_counter, 6, multibyte_to_wide(vars->Get("Account")).c_str());
+	__sheet->writeStr(__row_counter, 7, multibyte_to_wide(GetSupplierAccount()).c_str());
+
+	// bottom = __row_counter;
+
+	DrawXLSBorder(1, top	, 5, top + 2);											DrawXLSBorder(6, top	, 6, top	);	DrawXLSBorder(7, top	, 9, top	);
+																					DrawXLSBorder(6, top + 1, 6, top + 2);	DrawXLSBorder(7, top + 1, 9, top + 2);
+	DrawXLSBorder(1, top + 3, 3, top + 3);	DrawXLSBorder(4, top + 3, 5, top + 3);	DrawXLSBorder(6, top + 3, 6, top + 6);	DrawXLSBorder(7, top + 3, 9, top + 6);
+	DrawXLSBorder(1, top + 4, 5, top + 6);
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return result;
+}
+
+auto	C_Print_Invoice_Service::DrawXLSRowUnderline() -> string
+{
+	auto	result = ""s;
+	auto	format_underline = __book->addFormat();
+
+	MESSAGE_DEBUG("", "", "start");
+
+	format_underline->setBorderBottom(libxl::BORDERSTYLE_THICK);
+
+	__sheet->setRow(__row_counter, LIBXL_DEFAULT_ROW_HEIGHT / 2);
+	__sheet->writeStr(__row_counter, 1, L"", format_underline);
+	__sheet->writeStr(__row_counter, 2, L"", format_underline);
+	__sheet->writeStr(__row_counter, 3, L"", format_underline);
+	__sheet->writeStr(__row_counter, 4, L"", format_underline);
+	__sheet->writeStr(__row_counter, 5, L"", format_underline);
+	__sheet->writeStr(__row_counter, 6, L"", format_underline);
+	__sheet->writeStr(__row_counter, 7, L"", format_underline);
+	__sheet->writeStr(__row_counter, 8, L"", format_underline);
+	__sheet->writeStr(__row_counter, 9, L"", format_underline);
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return result;
+}
+
 auto	C_Print_Invoice_Service::PrintInvoiceAsXLS() -> string
 {
 	auto	error_message = ""s;
@@ -56,25 +240,34 @@ auto	C_Print_Invoice_Service::PrintInvoiceAsXLS() -> string
 		// --- gettext is not working properly with multibyte strings, therefore all gettext constants
 		// --- must be defined before libxl-instantiation
 
-		libxl::Book* book = xlCreateBook();
-		if(book)
+		__book = xlCreateBook();
+		if(__book)
 		{
-			libxl::Sheet* sheet = book->addSheet(L"Sheet1");
-			if(sheet)
+			__sheet = __book->addSheet(L"Sheet1");
+			if(__sheet)
 			{
-				auto			row_counter = 1;
 
-				auto			font_big			= book->addFont();
-				auto			font_bold			= book->addFont();
-				auto			format_big			= book->addFormat();
-				auto			format_bold			= book->addFormat();
-				auto			format_number_d2	= book->addFormat();
+				auto			font_big					= __book->addFont();
+				auto			font_bold					= __book->addFont();
+				auto			format_big					= __book->addFormat();
+				auto			format_bold					= __book->addFormat();
+				auto			format_bold_right			= __book->addFormat();
+				auto			format_bold_border			= __book->addFormat();
+				auto			format_number_d2			= __book->addFormat();
+				auto			format_number_d2_bold_right	= __book->addFormat();
+				auto			format_table_left			= __book->addFormat();
+				auto			format_table_right			= __book->addFormat();
+				auto			format_table_center			= __book->addFormat();
+				auto			format_top_left				= __book->addFormat();
+				auto			format_top_left_bold		= __book->addFormat();
+				auto			total_items					= 0;
 
+				__row_counter = 1;
 
 				// --- print proerties
-				sheet->setPaper(libxl::PAPER_A4);
-				sheet->setLandscape(false);
-				// sheet->setPrintZoom(50);
+				__sheet->setPaper(libxl::PAPER_A4);
+				__sheet->setLandscape(false);
+				// __sheet->setPrintZoom(50);
 
 				font_big->setSize(12);
 				font_big->setBold();
@@ -82,105 +275,179 @@ auto	C_Print_Invoice_Service::PrintInvoiceAsXLS() -> string
 
 				format_big->setFont(font_big);
 				format_bold->setFont(font_bold);
+				format_bold_right->setFont(font_bold);
+				format_bold_right->setAlignH(libxl::ALIGNH_RIGHT);
+				format_bold_border->setFont(font_bold);
+				format_bold_border->setBorder(libxl::BORDERSTYLE_THIN);
 				format_number_d2->setNumFormat(libxl::NUMFORMAT_NUMBER_D2);
+				format_number_d2_bold_right->setNumFormat(libxl::NUMFORMAT_NUMBER_D2);
+				format_number_d2_bold_right->setFont(font_bold);
+				format_number_d2_bold_right->setAlignH(libxl::ALIGNH_RIGHT);
+				format_table_left->setWrap(true);
+				format_table_left->setAlignV(libxl::ALIGNV_TOP);
+				format_table_left->setAlignH(libxl::ALIGNH_LEFT);
+				format_table_left->setBorder(libxl::BORDERSTYLE_THIN);
+				format_table_right->setWrap(true);
+				format_table_right->setAlignV(libxl::ALIGNV_TOP);
+				format_table_right->setAlignH(libxl::ALIGNH_RIGHT);
+				format_table_right->setBorder(libxl::BORDERSTYLE_THIN);
+				format_table_center->setWrap(true);
+				format_table_center->setAlignV(libxl::ALIGNV_TOP);
+				format_table_center->setAlignH(libxl::ALIGNH_CENTER);
+				format_table_center->setBorder(libxl::BORDERSTYLE_THIN);
+				format_top_left->setWrap(true);
+				format_top_left->setAlignV(libxl::ALIGNV_TOP);
+				format_top_left->setAlignH(libxl::ALIGNH_LEFT);
+				format_top_left_bold->setFont(font_bold);
+				format_top_left_bold->setWrap(true);
+				format_top_left_bold->setAlignV(libxl::ALIGNV_TOP);
+				format_top_left_bold->setAlignH(libxl::ALIGNH_LEFT);
+
 
 				// --- set columns width
-				sheet->setCol(0, 0, 1);
-				sheet->setCol(1, 1, 5);
-				sheet->setCol(8, 9, 11);  // --- price and total columns
-//				sheet->setCol(2, 2, 31 + 2);
-				// sheet->setCol(2, 31 + 2, 5);
+				__sheet->setCol(0, 0, 0.1);
+				__sheet->setCol(1, 1, 5);
+				__sheet->setCol(5, 5, 18.45);
+				__sheet->setCol(6, 6, 6.71);
+				__sheet->setCol(7, 7, 3);
+				__sheet->setCol(8, 9, 11);  // --- price and total columns
+//				__sheet->setCol(2, 2, 31 + 2);
+				// __sheet->setCol(2, 31 + 2, 5);
 
-				sheet->writeStr(row_counter, 1, multibyte_to_wide(vars->Get("agency_bank_title")).c_str());
-				sheet->writeStr(row_counter, 6, multibyte_to_wide(vars->Get("Bank Identifier")).c_str());
-				sheet->writeStr(row_counter, 7, multibyte_to_wide(vars->Get("agency_bank_bik")).c_str());
+				PrintXLSHeader();
 
-				++row_counter;
-				sheet->writeStr(row_counter, 6, multibyte_to_wide(vars->Get("Account")).c_str());
-				sheet->writeStr(row_counter, 7, multibyte_to_wide(vars->Get("agency_bank_account")).c_str());
+				++__row_counter;
+				__sheet->writeStr(__row_counter, 1, multibyte_to_wide(GetCustomerName()).c_str());
 
-				++row_counter;
-				sheet->writeStr(row_counter, 1, multibyte_to_wide(vars->Get("Destination bank")).c_str());
+				++__row_counter;
+				++__row_counter;
+				__sheet->writeStr(__row_counter, 1, multibyte_to_wide(vars->Get("Recipient")).c_str());
 
-				++row_counter;
-				sheet->writeStr(row_counter, 1, multibyte_to_wide(vars->Get("TIN")).c_str());
-				sheet->writeStr(row_counter, 2, multibyte_to_wide(vars->Get("agency_tin")).c_str());
-				sheet->writeStr(row_counter, 4, multibyte_to_wide(vars->Get("KPP") + " " + vars->Get("agency_kpp")).c_str());
-				sheet->writeStr(row_counter, 6, multibyte_to_wide(vars->Get("Account")).c_str());
-				sheet->writeStr(row_counter, 7, multibyte_to_wide(vars->Get("agency_account")).c_str());
+				++__row_counter;
+				++__row_counter;
+				__sheet->writeStr(__row_counter, 1, multibyte_to_wide(vars->Get("Invoice") + " " + vars->Get("invoice_agreement")).c_str(), format_big);
 
-				++row_counter;
-				sheet->writeStr(row_counter, 1, multibyte_to_wide(vars->Get("agency_name")).c_str());
+				++__row_counter;
+				DrawXLSRowUnderline();
 
-				++row_counter;
-				++row_counter;
-				sheet->writeStr(row_counter, 1, multibyte_to_wide(vars->Get("Recipient")).c_str());
+				++__row_counter;
+				++__row_counter;
+				__sheet->setMerge(__row_counter, __row_counter, 1, 2);
+				__sheet->setMerge(__row_counter, __row_counter, 3, 9);
+				__sheet->setRow(__row_counter, LIBXL_DEFAULT_ROW_HEIGHT * 2);
+				__sheet->writeStr(__row_counter, 1, multibyte_to_wide(vars->Get("Supplier")).c_str(), format_top_left);
+				// __sheet->writeStr(__row_counter, 3, multibyte_to_wide(GetCustomerName() + ", " + vars->Get("TIN") + " " + GetCustomerTIN() + ", " + vars->Get("KPP") + " " + GetCustomerKPP() + ", " + GetCustomerLegalZIP() + " " + GetCustomerLegalLocality() + ", " + GetCustomerLegalAddress()).c_str(), format_top_left);
+				__sheet->writeStr(__row_counter, 3, multibyte_to_wide(GetSupplierName() + ", " + vars->Get("TIN") + " " + GetSupplierTIN() + ", " + vars->Get("KPP") + " " + GetSupplierKPP() + ", " + GetSupplierLegalZIP() + " " + GetSupplierLegalLocality() + ", " + GetSupplierLegalAddress()).c_str(), format_top_left);
 
-				++row_counter;
-				++row_counter;
-				sheet->writeStr(row_counter, 1, multibyte_to_wide(vars->Get("Invoice") + " " + vars->Get("invoice_agreement")).c_str(), format_big);
+				++__row_counter;
+				++__row_counter;
+				__sheet->setMerge(__row_counter, __row_counter, 1, 2);
+				__sheet->setMerge(__row_counter, __row_counter, 3, 9);
+				__sheet->setRow(__row_counter, LIBXL_DEFAULT_ROW_HEIGHT * 2);
+				__sheet->writeStr(__row_counter, 1, multibyte_to_wide(vars->Get("Customer")).c_str(), format_top_left);
+				// __sheet->writeStr(__row_counter, 3, multibyte_to_wide(GetSupplierName() + ", " + vars->Get("TIN") + " " + GetSupplierTIN() + ", " + vars->Get("KPP") + " " + GetSupplierKPP() + ", " + vars->Get("cost_center_legal_geo_zip") + " " + vars->Get("cost_center_legal_locality_title") + ", " + vars->Get("cost_center_legal_address")).c_str(), format_top_left);
+				__sheet->writeStr(__row_counter, 3, multibyte_to_wide(GetCustomerName() + ", " + vars->Get("TIN") + " " + GetCustomerTIN() + ", " + vars->Get("KPP") + " " + GetCustomerKPP() + ", " + GetCustomerLegalZIP() + " " + GetCustomerLegalLocality() + ", " + GetCustomerLegalAddress()).c_str(), format_top_left);
 
-				++row_counter;
-				++row_counter;
-				sheet->writeStr(row_counter, 1, multibyte_to_wide(vars->Get("Supplier")).c_str());
-				sheet->writeStr(row_counter, 3, multibyte_to_wide(vars->Get("agency_name") + ", " + vars->Get("TIN") + " " + vars->Get("agency_tin") + ", " + vars->Get("KPP") + " " + vars->Get("agency_kpp") + ", " + vars->Get("agency_legal_geo_zip") + " " + vars->Get("agency_legal_locality_title") + ", " + vars->Get("agency_legal_address")).c_str());
-
-				++row_counter;
-				++row_counter;
-				sheet->writeStr(row_counter, 1, multibyte_to_wide(vars->Get("Customer")).c_str());
-				sheet->writeStr(row_counter, 3, multibyte_to_wide(vars->Get("cost_center_name") + ", " + vars->Get("TIN") + " " + vars->Get("cost_center_tin") + ", " + vars->Get("KPP") + " " + vars->Get("cost_center_kpp") + ", " + vars->Get("cost_center_legal_geo_zip") + " " + vars->Get("cost_center_legal_locality_title") + ", " + vars->Get("cost_center_legal_address")).c_str());
-
-				++row_counter;
-				++row_counter;
-				sheet->writeStr(row_counter, 1, multibyte_to_wide(vars->Get("Basis")).c_str());
-				sheet->writeStr(row_counter, 3, multibyte_to_wide(vars->Get("act_basis")).c_str());
+				++__row_counter;
+				++__row_counter;
+				__sheet->setMerge(__row_counter, __row_counter, 1, 2);
+				__sheet->setMerge(__row_counter, __row_counter, 3, 9);
+				__sheet->setRow(__row_counter, LIBXL_DEFAULT_ROW_HEIGHT * 2);
+				__sheet->writeStr(__row_counter, 1, multibyte_to_wide(vars->Get("Basis")).c_str(), format_top_left);
+				__sheet->writeStr(__row_counter, 3, multibyte_to_wide(vars->Get("act_basis")).c_str(), format_top_left);
 
 				// --- table header
-				++row_counter;
-				++row_counter;
-				++row_counter;
-				sheet->writeStr(row_counter, 1, L"№", format_bold);
-				sheet->writeStr(row_counter, 2, multibyte_to_wide(vars->Get("Goods")).c_str(), format_bold);
-				sheet->writeStr(row_counter, 5, multibyte_to_wide(vars->Get("Quantity short")).c_str(), format_bold);
-				sheet->writeStr(row_counter, 6, multibyte_to_wide(vars->Get("Items short")).c_str(), format_bold);
-				sheet->writeStr(row_counter, 7, multibyte_to_wide(vars->Get("Price")).c_str(), format_bold);
-				sheet->writeStr(row_counter, 8, multibyte_to_wide(vars->Get("Total")).c_str(), format_bold);
+				++__row_counter;
+				++__row_counter;
+				++__row_counter;
+				__sheet->setMerge(__row_counter, __row_counter, 2, 5);
+				__sheet->writeStr(__row_counter, 1, L"№", format_bold_border);
+				__sheet->writeStr(__row_counter, 2, multibyte_to_wide(vars->Get("Goods")).c_str(), format_bold_border);
+				__sheet->writeStr(__row_counter, 3, L"", format_bold_border);
+				__sheet->writeStr(__row_counter, 4, L"", format_bold_border);
+				__sheet->writeStr(__row_counter, 5, L"", format_bold_border);
+				__sheet->writeStr(__row_counter, 6, multibyte_to_wide(vars->Get("Quantity short")).c_str(), format_bold_border);
+				__sheet->writeStr(__row_counter, 7, multibyte_to_wide(vars->Get("Items short")).c_str(), format_bold_border);
+				__sheet->writeStr(__row_counter, 8, multibyte_to_wide(vars->Get("Price")).c_str(), format_bold_border);
+				__sheet->writeStr(__row_counter, 9, multibyte_to_wide(vars->Get("Total")).c_str(), format_bold_border);
 
 				// --- table body
-				for(auto i = 1; vars->Get("timecard_index_" + to_string(i)).length(); ++i)
+				for(auto i = 1; isTableRowExists(i); ++i)
 				{
-					++row_counter;
-					sheet->writeNum(row_counter, 1, stod_noexcept(vars->Get("timecard_index_" + to_string(i))));
-					sheet->writeStr(row_counter, 2, multibyte_to_wide("service index ").c_str());
-					sheet->writeNum(row_counter, 5, stod_noexcept(vars->Get("timecard_quantity_" + to_string(i))));
-					sheet->writeStr(row_counter, 6, multibyte_to_wide(vars->Get("timecard_item_" + to_string(i))).c_str());
-					sheet->writeNum(row_counter, 7, stod_noexcept(vars->Get("timecard_price_" + to_string(i))));
-					sheet->writeNum(row_counter, 8, stod_noexcept(vars->Get("timecard_total_" + to_string(i))));
+					auto	description = GetTableRowDescription(i);
+
+					++__row_counter;
+
+					__sheet->setMerge(__row_counter, __row_counter, 2, 5);
+					__sheet->setRow(__row_counter, ceil(double(description.length()) / 60) * LIBXL_DEFAULT_ROW_HEIGHT);
+
+					__sheet->writeNum(__row_counter, 1, stod_noexcept(GetTableRowIndex(i)), format_table_center);
+					__sheet->writeStr(__row_counter, 2, multibyte_to_wide(description).c_str(), format_table_left);
+
+					__sheet->writeStr(__row_counter, 3, L"", format_table_left);
+					__sheet->writeStr(__row_counter, 4, L"", format_table_left);
+					__sheet->writeStr(__row_counter, 5, L"", format_table_left);
+
+					__sheet->writeNum(__row_counter, 6, stod_noexcept(GetTableRowQuantity(i)), format_table_right);
+					__sheet->writeStr(__row_counter, 7, multibyte_to_wide(GetTableRowItem(i)).c_str(), format_table_left);
+					__sheet->writeNum(__row_counter, 8, stod_noexcept(GetTableRowPrice(i)), format_table_right);
+					__sheet->writeNum(__row_counter, 9, stod_noexcept(GetTableRowTotal(i)), format_table_right);
+
+					++total_items;
 				}
 
 				// --- table summary
-				row_counter++;
-				sheet->writeStr(row_counter, 1, multibyte_to_wide(vars->Get("Total")).c_str(), format_bold);
+				++__row_counter;
+				++__row_counter;
+				__sheet->writeStr(__row_counter, 7, multibyte_to_wide(vars->Get("Total") + ":").c_str(), format_bold_right);
+				__sheet->writeNum(__row_counter, 9, stod_noexcept(GetTableSum()), format_number_d2_bold_right);
+
+				++__row_counter;
+				__sheet->writeStr(__row_counter, 7, multibyte_to_wide(vars->Get("VAT short") + ":").c_str(), format_bold_right);
+				__sheet->writeNum(__row_counter, 9, stod_noexcept(GetTableVAT()), format_number_d2_bold_right);
+
+				++__row_counter;
+				__sheet->writeStr(__row_counter, 7, multibyte_to_wide(vars->Get("Total payment") + ":").c_str(), format_bold_right);
+				__sheet->writeNum(__row_counter, 9, stod_noexcept(GetTableTotal()), format_number_d2_bold_right);
+
+				++__row_counter;
+				++__row_counter;
+				__sheet->setMerge(__row_counter, __row_counter, 1, 9);
+				__sheet->writeStr(__row_counter, 1, multibyte_to_wide(vars->Get("Sum items") + " " + to_string(total_items) + ", " + vars->Get("total amount") + " " + GetTableTotal() + " " + vars->Get("rub.")).c_str());
 
 				{
-					row_counter++;
+					C_Price_Spelling	price(stod_noexcept(GetTableTotal()));
+
+					++__row_counter;
+
+					__sheet->setRow(__row_counter, LIBXL_DEFAULT_ROW_HEIGHT * 2);
+					__sheet->setMerge(__row_counter, __row_counter, 1, 9);
+					__sheet->writeStr(__row_counter, 1, multibyte_to_wide(vars->Get("Total payment") + ": " + price.Spelling()).c_str(), format_top_left_bold);
 				}
 
-				{
-					sheet->writeStr(row_counter, 1, L"spelled_totalhours");
-					sheet->setMerge(row_counter, row_counter, 3, 5);
-					sheet->writeNum(row_counter, 3, 98742.34987, format_number_d2);
+				++__row_counter;
+				++__row_counter;
+				__sheet->setRow(__row_counter, LIBXL_DEFAULT_ROW_HEIGHT * 2);
+				__sheet->setMerge(__row_counter, __row_counter, 1, 9);
+				__sheet->writeStr(__row_counter, 1, multibyte_to_wide(vars->Get("act_footnote")).c_str(), format_top_left);
 
-					row_counter++;
-				}
+				PrintXLSFooter();
+
+				++__row_counter;
+				++__row_counter;
+				DrawXLSRowUnderline();
+
+				++__row_counter;
+				PrintXLSSignature();
+
 			}
 
-			if(book->save(multibyte_to_wide(GetFilename()).c_str())) {}
+			if(__book->save(multibyte_to_wide(GetFilename()).c_str())) {}
 			else
 			{
 				MESSAGE_ERROR("", "", "can't save " + filename + ".xls")
 			}
-			book->release();
+			__book->release();
 		} 
 	}
 	else
@@ -197,11 +464,82 @@ auto	C_Print_Invoice_Service::PrintInvoiceAsXLS() -> string
 
 
 
-
 ostream& operator<<(ostream& os, const C_Print_Invoice_Service &var)
 {
 	os << "object C_Print_Invoice_Service [empty for now]";
 
 	return os;
+}
+
+
+
+
+
+
+
+
+auto C_Print_Invoice_Agency::PrintXLSHeader() -> string
+{
+	auto	error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	PrintXLSHeaderTable();
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return error_message;
+}
+
+auto C_Print_Invoice_Agency::PrintXLSFooter() -> string
+{
+	auto	error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return error_message;
+}
+
+auto C_Print_Invoice_Agency::PrintXLSSignature() -> string
+{
+	auto	error_message = ""s;
+	auto	font_bold = __book->addFont();
+	auto	font_small = __book->addFont();
+	auto	format_bold = __book->addFormat();
+	auto	format_right = __book->addFormat();
+	auto	format_right_small = __book->addFormat();
+	auto	format_underline = __book->addFormat();
+
+	MESSAGE_DEBUG("", "", "start");
+
+	font_small->setSize(7);
+	font_bold->setBold();
+
+	format_bold->setFont(font_bold);
+	format_right->setAlignH(libxl::ALIGNH_RIGHT);
+	format_right_small->setFont(font_small);
+	format_right_small->setAlignH(libxl::ALIGNH_RIGHT);
+	format_underline->setBorderBottom(libxl::BORDERSTYLE_THIN);
+
+	++__row_counter;
+	__sheet->writeStr(__row_counter, 1, multibyte_to_wide(GetSignatureTitle1()).c_str(), format_bold);
+	__sheet->writeStr(__row_counter, 6, multibyte_to_wide(GetSignatureTitle2()).c_str(), format_bold);
+	__sheet->writeStr(__row_counter, 3, L"", format_underline);
+	__sheet->writeStr(__row_counter, 4, L"", format_underline);
+	__sheet->writeStr(__row_counter, 8, L"", format_underline);
+	__sheet->writeStr(__row_counter, 9, L"", format_underline);
+	++__row_counter;
+	__sheet->writeStr(__row_counter, 4, multibyte_to_wide(GetSignatureName1()).c_str(), format_right);
+	__sheet->writeStr(__row_counter, 9, multibyte_to_wide(GetSignatureName2()).c_str(), format_right);
+	++__row_counter;
+	__sheet->writeStr(__row_counter, 4, multibyte_to_wide(GetSignatureInfo1()).c_str(), format_right_small);
+	__sheet->writeStr(__row_counter, 9, multibyte_to_wide(GetSignatureInfo2()).c_str(), format_right_small);
+
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return error_message;
 }
 

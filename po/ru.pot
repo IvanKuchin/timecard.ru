@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-03 14:45-0400\n"
+"POT-Creation-Date: 2019-04-09 06:04-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -38,6 +38,9 @@ msgstr "Нет доступа"
 msgid "Account"
 msgstr "Сч. №"
 
+msgid "Accountant"
+msgstr "Бухналтер"
+
 msgid "Agency: cost center"
 msgstr "Данные агенства: центр затрат"
 
@@ -52,6 +55,9 @@ msgstr "Данные агенства: описание центра затра�
 
 msgid "Agency: cost center title updated"
 msgstr "Данные агенства: название центра затрат изменено"
+
+msgid "Agreement"
+msgstr "Договор"
 
 msgid "April"
 msgstr "Апрель"
@@ -68,6 +74,9 @@ msgstr "Авнуста"
 msgid "Bank Identifier"
 msgstr "БИК"
 
+msgid "Basis"
+msgstr "Основание"
+
 msgid "Company not found"
 msgstr "Компания не найдена"
 
@@ -76,6 +85,9 @@ msgstr "Центр Затрат"
 
 msgid "Cost Center: number"
 msgstr "Центр Затрат: номер договора"
+
+msgid "Customer"
+msgstr "Заказчик"
 
 msgid "Data has not been initialized"
 msgstr "Ошибка инициализации данных"
@@ -92,8 +104,14 @@ msgstr "Декабрь"
 msgid "December declension"
 msgstr "Декабря"
 
+msgid "Department"
+msgstr "Отдел"
+
 msgid "Destination bank"
 msgstr "Банк получателя"
+
+msgid "Director"
+msgstr "Руководитель"
 
 msgid "Employee data"
 msgstr "Данные сотрудника"
@@ -104,6 +122,9 @@ msgstr "Февраль"
 msgid "February declension"
 msgstr "Февраля"
 
+msgid "Goods"
+msgstr "Товары"
+
 msgid "Incorrect timecard list"
 msgstr "Некорректный список таймкарт"
 
@@ -112,6 +133,9 @@ msgstr "Ф.И.О."
 
 msgid "Invoice"
 msgstr "Счёт"
+
+msgid "Items short"
+msgstr "Ед."
 
 msgid "January"
 msgstr "Январь"
@@ -152,6 +176,9 @@ msgstr "Ноябрь"
 msgid "November declension"
 msgstr "Ноября"
 
+msgid "Occupancy"
+msgstr "Должность"
+
 msgid "October"
 msgstr "Октябрь"
 
@@ -170,38 +197,20 @@ msgstr "ТЗ с таким номером уже есть"
 msgid "PSoW: number"
 msgstr "Номер ТЗ"
 
+msgid "Price"
+msgstr "Цена"
+
 msgid "Project ID"
 msgstr "Идентификационный номер проекта"
 
-msgid "Recipient"
-msgstr "Получатель"
-
-msgid "Supplier"
+msgid "Provider"
 msgstr "Поставщик"
-
-msgid "Customer"
-msgstr "Заказчик"
-
-msgid "Basis"
-msgstr "Основание"
-
-msgid "Goods"
-msgstr "Товары"
 
 msgid "Quantity short"
 msgstr "Кол-во"
 
-msgid "Items short"
-msgstr "Ед."
-
-msgid "Price"
-msgstr "Цена"
-
-msgid "Total"
-msgstr "Сумма"
-
-msgid "item short"
-msgstr "шт"
+msgid "Recipient"
+msgstr "Получатель"
 
 msgid "SQL syntax issue"
 msgstr "Ошибка БД"
@@ -233,8 +242,17 @@ msgstr "У некоторых таймкарт не хватает PSoW-конт
 msgid "Subcontractor reported time on"
 msgstr "Субконтрактор отчитался за"
 
+msgid "Sum items"
+msgstr "Всего наименований"
+
+msgid "Supplier"
+msgstr "Поставщик"
+
 msgid "TIN"
 msgstr "ИНН"
+
+msgid "Technical Requirement agreement short"
+msgstr "ТЗ"
 
 msgid "This task assigned to cost center"
 msgstr "Этой задаче назначена Центр Затрат"
@@ -248,16 +266,25 @@ msgstr "Таймкарта не найдена"
 msgid "Title"
 msgstr "Должность"
 
+msgid "Total"
+msgstr "Сумма"
+
 msgid "Total days on duty"
 msgstr "Количество дней оказания услуг"
 
 msgid "Total hours on duty"
 msgstr "Количество часов оказания услуг"
 
+msgid "Total payment"
+msgstr "Всего к оплате"
+
 msgid "Total payment in reported timecard"
 msgstr "Стоимость услуг по настоящему отчету"
 
 msgid "VAT"
+msgstr "НДС"
+
+msgid "VAT short"
 msgstr "НДС"
 
 msgid "You are not agency employee"
@@ -283,6 +310,9 @@ msgstr "Агенство не найдено"
 
 msgid "agency not found"
 msgstr "агенство не найдено"
+
+msgid "agreement declensioned"
+msgstr "договора"
 
 msgid "agreement from"
 msgstr "от"
@@ -368,6 +398,9 @@ msgstr "доп. поле"
 msgid "customer assignment outside bt travel"
 msgstr "даты командировки вне периода назначения на заказчика"
 
+msgid "date is empty"
+msgstr "дата не указана"
+
 msgid "dayrate changed"
 msgstr "dayrate изменился"
 
@@ -377,11 +410,17 @@ msgstr "не указан dayrate"
 msgid "db is not initialized"
 msgstr "ошибка БД"
 
+msgid "department"
+msgstr "отдел"
+
 msgid "description updated"
 msgstr "описание изменено"
 
 msgid "employeer not found"
 msgstr "не найден работодатель"
+
+msgid "end date"
+msgstr "дата окончания"
 
 msgid "end date changed"
 msgstr "изменилась дата окончания контракта"
@@ -431,8 +470,17 @@ msgstr "hpdf: не удалось напечатать заголовок тай
 msgid "hpdf: table top must be higher than bottom"
 msgstr "hpdf: верх таблицы должен быть выше чем нижняя часть"
 
+msgid "in scope"
+msgstr "в рамках"
+
 msgid "incorrect confirmation code"
 msgstr "некорректный код"
+
+msgid "is empty"
+msgstr "не указан"
+
+msgid "item short"
+msgstr "шт"
 
 msgid "kop."
 msgstr "коп."
@@ -452,8 +500,29 @@ msgstr "не указан адрес доставки"
 msgid "mandatory parameter missed"
 msgstr "пропущен обязательный параметр"
 
+msgid "missed PSoW number"
+msgstr "не указан номер PSoW"
+
+msgid "missed occupancy title"
+msgstr "не указана должность"
+
+msgid "missed service description"
+msgstr "не указано описание должности"
+
+msgid "must be in 20-th century"
+msgstr "должна быть после 2000 г."
+
 msgid "name is empty"
 msgstr "не указано название"
+
+msgid "no VAT"
+msgstr "НДС не облагается"
+
+msgid "number"
+msgstr "номер"
+
+msgid "number is empty"
+msgstr "не указан номер"
 
 msgid "number uploaded images must be 1"
 msgstr "выберите один фаил"
@@ -485,6 +554,9 @@ msgstr "удален"
 msgid "rur."
 msgstr "руб."
 
+msgid "sign date"
+msgstr "дата подписания"
+
 msgid "sign date changed"
 msgstr "изменилась дата подписания контракта"
 
@@ -496,6 +568,9 @@ msgstr "не указан подписант 1"
 
 msgid "signature title 2 is empty"
 msgstr "не указан подписант 2"
+
+msgid "start date"
+msgstr "дата начала"
 
 msgid "start date changed"
 msgstr "изменилась дата подписания контракта"
@@ -521,6 +596,9 @@ msgstr "не указан ИНН"
 msgid "to"
 msgstr "на"
 
+msgid "total amount"
+msgstr "на сумму"
+
 msgid "type is empty"
 msgstr "не указан тип"
 
@@ -539,6 +617,9 @@ msgstr "пользователь не существует"
 msgid "variable not found"
 msgstr "перенеменная не найдена"
 
+msgid "vat"
+msgstr "НДС"
+
 msgid "w/o"
 msgstr "без"
 
@@ -550,4 +631,3 @@ msgstr "вы не назначены на этого заказчика"
 
 msgid "zip not found"
 msgstr "индекс не найден"
-

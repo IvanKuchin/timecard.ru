@@ -1,4 +1,4 @@
-configure_file(archive.pl.in			"${ARCHIVE_PROJECT_DIR}/archive.pl" COPYONLY)
+configure_file(archive.pl			"${ARCHIVE_PROJECT_DIR}/archive.pl" COPYONLY)
 configure_file(archive.config.pl.in		"${ARCHIVE_PROJECT_DIR}/archive.config.pl")
 configure_file(archive.folders_to_backup.pl.in	"${ARCHIVE_PROJECT_DIR}/archive.folders_to_backup.pl")
 configure_file(archive.persistent_folders.pl.in	"${ARCHIVE_PROJECT_DIR}/archive.persistent_folders.pl")

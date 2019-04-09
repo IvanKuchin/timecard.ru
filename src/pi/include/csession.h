@@ -17,7 +17,6 @@ using namespace std;
 #include "localy.h"
 
 #define	SESSION_LEN	60	// --- session duration in minutes
-#define	MMDB_fname "/home/httpd/dev." + DOMAIN_NAME + "/cgi-bin/GeoLite2-City.mmdb"
 
 class CSession
 {
