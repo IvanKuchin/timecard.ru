@@ -84,6 +84,7 @@ auto	C_Invoicing_Vars::GenerateVariableSet() -> string
 			if(error_message.empty()) error_message = AssignVariableValue("KPP", gettext("KPP"), true);
 			if(error_message.empty()) error_message = AssignVariableValue("Recipient", gettext("Recipient"), true);
 			if(error_message.empty()) error_message = AssignVariableValue("Invoice", gettext("Invoice"), true);
+			if(error_message.empty()) error_message = AssignVariableValue("Act", gettext("Act"), true);
 			if(error_message.empty()) error_message = AssignVariableValue("agreement from", gettext("agreement from"), true);
 			if(error_message.empty()) error_message = AssignVariableValue("agreement declensioned", gettext("agreement declensioned"), true);
 			if(error_message.empty()) error_message = AssignVariableValue("Technical Requirement agreement short", gettext("Technical Requirement agreement short"), true);

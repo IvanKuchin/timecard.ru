@@ -89,8 +89,11 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 {
 	C_Invoicing_Vars		invoicing_vars(db, user);
 	C_Print_Timecard		timecard_printer;
+
 	C_Print_Invoice_Agency	invoice_agency;
 	C_Print_Invoice_Service	*invoice_printer = &invoice_agency;
+	C_Print_Act_Agency		act_agency;
+	C_Print_Invoice_Service	*act_printer = &act_agency;
 
 	auto					error_message = ""s;
 
@@ -217,21 +220,72 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 				isFileExists(vat_filename_xls)     || isFileExists(vat_filename_pdf)
 				);
 
-		invoice_printer->SetDB(db);
-		invoice_printer->SetVariableSet(&invoicing_vars);
-
-		invoice_printer->SetFilename(invoice_filename_xls);
-		invoice_printer->SetCostCenterID(cost_center_id);
-
-		error_message = invoice_printer->PrintInvoiceAsXLS();
 		if(error_message.empty())
 		{
+			invoice_printer->SetDB(db);
+			invoice_printer->SetVariableSet(&invoicing_vars);
 
+			invoice_printer->SetCostCenterID(cost_center_id);
+
+			if(error_message.empty()) 
+			{
+				invoice_printer->SetFilename(invoice_filename_xls);
+				error_message = invoice_printer->PrintAsXLS();
+				if(error_message.empty()) {}
+				else
+				{
+					MESSAGE_ERROR("", "", "fail to build invoice (xls format)");
+				}
+			}
+			if(error_message.empty()) 
+			{
+				invoice_printer->SetFilename(invoice_filename_pdf);
+				error_message = invoice_printer->PrintAsPDF();
+				if(error_message.empty()) {}
+				else
+				{
+					MESSAGE_ERROR("", "", "fail to build invoice (pdf format)");
+				}
+			}
 		}
 		else
 		{
-			MESSAGE_ERROR("", "", "fail to build invoice.xls");
+			MESSAGE_ERROR("", "", "due to previous error invoice (xls format) won't be printed");
 		}
+
+		if(error_message.empty())
+		{
+			act_printer->SetDB(db);
+			act_printer->SetVariableSet(&invoicing_vars);
+
+			act_printer->SetCostCenterID(cost_center_id);
+
+			if(error_message.empty()) 
+			{
+				act_printer->SetFilename(act_filename_xls);
+				error_message = act_printer->PrintAsXLS();
+				if(error_message.empty()) {}
+				else
+				{
+					MESSAGE_ERROR("", "", "fail to build act (xls format)");
+				}
+			}
+			if(error_message.empty()) 
+			{
+				act_printer->SetFilename(act_filename_pdf);
+				error_message = act_printer->PrintAsPDF();
+				if(error_message.empty()) {}
+				else
+				{
+					MESSAGE_ERROR("", "", "fail to build act (pdf format)");
+				}
+			}
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "due to previous error act (xls format) won't be printed");
+		}
+
 	}	
 	else
 	{

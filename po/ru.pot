@@ -299,6 +299,9 @@ msgstr "не указан счет"
 msgid "act number"
 msgstr "номер акта"
 
+msgid "Act"
+msgstr "Акт"
+
 msgid "agency bank id not found"
 msgstr "банк не найден"
 

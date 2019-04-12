@@ -15,6 +15,7 @@ set(EXECUTABLE_CGIs_with_PI_LIBS
 # --- Libraries
 # ---- list of independent libraries
 set(INVOICE_LIB_SRCs
+    c_pdf.cpp
     c_invoice_service.cpp
     c_invoicing_vars.cpp
     c_print_timecard.cpp

@@ -804,29 +804,6 @@ auto	C_Print_Timecard::__HPDF_MoveTableLineDown(int line_decrement) -> string
 	return error_message;
 }
 
-auto	C_Print_Timecard::__HPDF_DrawHorizontalLine() -> string
-{
-	auto	error_message = ""s;
-
-	MESSAGE_DEBUG("", "", "start");
-
-	try
-	{
-		HPDF_Page_MoveTo (__pdf_page, 0, __pdf_line);
-		HPDF_Page_LineTo (__pdf_page, 200, __pdf_line);
-		HPDF_Page_Stroke (__pdf_page);
-	}
-	catch(...)
-	{
-		MESSAGE_ERROR("", "", "hpdf: fail to draw the line");
-		error_message = gettext("hpdf: fail to draw the line");
-	}
-
-	MESSAGE_DEBUG("", "", "finish");
-
-	return error_message;
-}
-
 auto	C_Print_Timecard::__HPDF_PrintText(string text, int x) -> string
 {
 	auto	error_message = ""s;

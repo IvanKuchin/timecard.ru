@@ -1,46 +1,7 @@
 #include "c_print_invoice_service.h"
 
-static void error_handler (HPDF_STATUS error_no, HPDF_STATUS detail_no, void *user_data)
-{
-	char	buffer[512];
-
-    snprintf(buffer, sizeof(buffer) - 1, "error_no=%04X, detail_no=%d\n", (unsigned int) error_no, (int) detail_no);
-    MESSAGE_ERROR("", "", "libhpdf: " +  buffer);
-    throw std::exception (); /* throw exception on error */
-}
-
-C_Print_Invoice_Service::C_Print_Invoice_Service()
-{
-	MESSAGE_DEBUG("", "", "start");
-
-	__pdf = HPDF_New(error_handler, NULL);
-
-	if(__pdf)
-	{
-		try
-		{
-			__pdf_font_name = HPDF_LoadTTFontFromFile (__pdf, (PDF_FONT_INSTALL_DIR + "/ttf/arial.ttf").c_str(), HPDF_TRUE);
-		}
-		catch(...)
-		{
-			MESSAGE_ERROR("", "", "HPDF trown exception");
-		}
-
-	}
-	else
-	{
-		MESSAGE_ERROR("", "", "fail to initialize hpdf library");
-	}
-
-	MESSAGE_DEBUG("", "", "start");
-}
-
-auto	C_Print_Invoice_Service::Restart() -> void
-{
-	__pdf_line = -1;
-}
-
-auto	C_Print_Invoice_Service::DrawXLSBorder(int left, int top, int right, int bottom) -> string
+// --- XLS part
+auto	C_Print_Invoice_Service::__DrawXLSBorder(int left, int top, int right, int bottom) -> string
 {
 	auto	result = ""s;
 
@@ -162,7 +123,7 @@ auto	C_Print_Invoice_Service::DrawXLSBorder(int left, int top, int right, int bo
 	return result;
 }
 
-auto	C_Print_Invoice_Service::PrintXLSHeaderTable() -> string
+auto	C_Print_Invoice_Service::__PrintXLSHeaderTable() -> string
 {
 	auto	result = ""s;
 	auto	top = __row_counter;
@@ -187,19 +148,29 @@ auto	C_Print_Invoice_Service::PrintXLSHeaderTable() -> string
 	__sheet->writeStr(__row_counter, 6, multibyte_to_wide(vars->Get("Account")).c_str());
 	__sheet->writeStr(__row_counter, 7, multibyte_to_wide(GetSupplierAccount()).c_str());
 
+	++__row_counter;
+	__sheet->writeStr(__row_counter, 1, multibyte_to_wide(GetCustomerName()).c_str());
+
+	++__row_counter;
+	++__row_counter;
+	__sheet->writeStr(__row_counter, 1, multibyte_to_wide(vars->Get("Recipient")).c_str());
+
+	++__row_counter;
+	++__row_counter;
+
 	// bottom = __row_counter;
 
-	DrawXLSBorder(1, top	, 5, top + 2);											DrawXLSBorder(6, top	, 6, top	);	DrawXLSBorder(7, top	, 9, top	);
-																					DrawXLSBorder(6, top + 1, 6, top + 2);	DrawXLSBorder(7, top + 1, 9, top + 2);
-	DrawXLSBorder(1, top + 3, 3, top + 3);	DrawXLSBorder(4, top + 3, 5, top + 3);	DrawXLSBorder(6, top + 3, 6, top + 6);	DrawXLSBorder(7, top + 3, 9, top + 6);
-	DrawXLSBorder(1, top + 4, 5, top + 6);
+	__DrawXLSBorder(1, top	, 5, top + 2);											__DrawXLSBorder(6, top	, 6, top	);	__DrawXLSBorder(7, top	, 9, top	);
+																					__DrawXLSBorder(6, top + 1, 6, top + 2);	__DrawXLSBorder(7, top + 1, 9, top + 2);
+	__DrawXLSBorder(1, top + 3, 3, top + 3);	__DrawXLSBorder(4, top + 3, 5, top + 3);	__DrawXLSBorder(6, top + 3, 6, top + 6);	__DrawXLSBorder(7, top + 3, 9, top + 6);
+	__DrawXLSBorder(1, top + 4, 5, top + 6);
 
 	MESSAGE_DEBUG("", "", "finish");
 
 	return result;
 }
 
-auto	C_Print_Invoice_Service::DrawXLSRowUnderline() -> string
+auto	C_Print_Invoice_Service::__DrawXLSRowUnderline() -> string
 {
 	auto	result = ""s;
 	auto	format_underline = __book->addFormat();
@@ -224,7 +195,7 @@ auto	C_Print_Invoice_Service::DrawXLSRowUnderline() -> string
 	return result;
 }
 
-auto	C_Print_Invoice_Service::PrintInvoiceAsXLS() -> string
+auto	C_Print_Invoice_Service::PrintAsXLS() -> string
 {
 	auto	error_message = ""s;
 	auto	f_name = GetFilename(); 
@@ -316,19 +287,10 @@ auto	C_Print_Invoice_Service::PrintInvoiceAsXLS() -> string
 
 				PrintXLSHeader();
 
-				++__row_counter;
-				__sheet->writeStr(__row_counter, 1, multibyte_to_wide(GetCustomerName()).c_str());
+				__sheet->writeStr(__row_counter, 1, multibyte_to_wide(GetDocumentTitle()).c_str(), format_big);
 
 				++__row_counter;
-				++__row_counter;
-				__sheet->writeStr(__row_counter, 1, multibyte_to_wide(vars->Get("Recipient")).c_str());
-
-				++__row_counter;
-				++__row_counter;
-				__sheet->writeStr(__row_counter, 1, multibyte_to_wide(vars->Get("Invoice") + " " + vars->Get("invoice_agreement")).c_str(), format_big);
-
-				++__row_counter;
-				DrawXLSRowUnderline();
+				__DrawXLSRowUnderline();
 
 				++__row_counter;
 				++__row_counter;
@@ -427,7 +389,7 @@ auto	C_Print_Invoice_Service::PrintInvoiceAsXLS() -> string
 
 				++__row_counter;
 				++__row_counter;
-				__sheet->setRow(__row_counter, LIBXL_DEFAULT_ROW_HEIGHT * 2);
+				__sheet->setRow(__row_counter, LIBXL_DEFAULT_ROW_HEIGHT * (ceil(double(vars->Get("act_footnote").length()) / 120)));
 				__sheet->setMerge(__row_counter, __row_counter, 1, 9);
 				__sheet->writeStr(__row_counter, 1, multibyte_to_wide(vars->Get("act_footnote")).c_str(), format_top_left);
 
@@ -435,7 +397,7 @@ auto	C_Print_Invoice_Service::PrintInvoiceAsXLS() -> string
 
 				++__row_counter;
 				++__row_counter;
-				DrawXLSRowUnderline();
+				__DrawXLSRowUnderline();
 
 				++__row_counter;
 				PrintXLSSignature();
@@ -464,6 +426,82 @@ auto	C_Print_Invoice_Service::PrintInvoiceAsXLS() -> string
 
 
 
+// --- PDF part
+auto	C_Print_Invoice_Service::__HPDF_DrawTitle() -> string
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return error_message;
+}
+
+auto	C_Print_Invoice_Service::__HPDF_DrawTable() -> string
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return error_message;
+}
+
+auto	C_Print_Invoice_Service::__HPDF_DrawFooter() -> string
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return error_message;
+}
+
+auto	C_Print_Invoice_Service::PrintAsPDF() -> string
+{
+	auto			error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	__c_pdf.SetFilename(GetFilename());
+	__c_pdf.SetOrientation(HPDF_PAGE_PORTRAIT);
+	if(error_message.empty())
+	{
+		if((error_message = __c_pdf.__HPDF_init()).length())			{ MESSAGE_ERROR("", "", "fail to initialize hpdf library"); }
+	}
+	if(error_message.empty())
+	{
+		if((error_message = __c_pdf.__HPDF_SetDocProps()).length())		{ MESSAGE_ERROR("", "", "hpdf: fail to set dc props"); }
+	}
+	if(error_message.empty())
+	{
+		if((error_message = __c_pdf.__HPDF_MoveLineDown(0)).length())	{ MESSAGE_ERROR("", "", "hpdf: fail to move pointer down"); }
+	}
+	if(error_message.empty())
+	{
+		if((error_message = __HPDF_DrawTitle()).length())				{ MESSAGE_ERROR("", "", "hpdf: fail to draw timecard title"); }
+	}
+	if(error_message.empty())
+	{
+		if((error_message = __HPDF_DrawTable()).length())				{ MESSAGE_ERROR("", "", "hpdf: fail to print table"); }
+	}
+	if(error_message.empty())
+	{
+		if((error_message = __HPDF_DrawFooter()).length())				{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+	}
+	if(error_message.empty())
+	{
+		if((error_message = __c_pdf.__HPDF_SaveToFile()).length())		{ MESSAGE_ERROR("", "", "hpdf: fail to save to file"); }
+	}
+
+	MESSAGE_DEBUG("", "", "finish (error_message.length() = " + to_string(error_message.length()) + ")");
+
+	return error_message;
+}
+
 ostream& operator<<(ostream& os, const C_Print_Invoice_Service &var)
 {
 	os << "object C_Print_Invoice_Service [empty for now]";
@@ -476,33 +514,59 @@ ostream& operator<<(ostream& os, const C_Print_Invoice_Service &var)
 
 
 
-
-
-auto C_Print_Invoice_Agency::PrintXLSHeader() -> string
-{
-	auto	error_message = ""s;
-
-	MESSAGE_DEBUG("", "", "start");
-
-	PrintXLSHeaderTable();
-
-	MESSAGE_DEBUG("", "", "finish");
-
-	return error_message;
-}
-
-auto C_Print_Invoice_Agency::PrintXLSFooter() -> string
-{
-	auto	error_message = ""s;
-
-	MESSAGE_DEBUG("", "", "start");
-
-	MESSAGE_DEBUG("", "", "finish");
-
-	return error_message;
-}
+// --- C_Print_Invoice_Agency
 
 auto C_Print_Invoice_Agency::PrintXLSSignature() -> string
+{
+	auto	error_message = ""s;
+	auto	font_bold = __book->addFont();
+	auto	font_small = __book->addFont();
+	auto	format_bold = __book->addFormat();
+	auto	format_right = __book->addFormat();
+	auto	format_right_small = __book->addFormat();
+	auto	format_underline = __book->addFormat();
+
+	MESSAGE_DEBUG("", "", "start");
+
+	font_small->setSize(7);
+	font_bold->setBold();
+
+	format_bold->setFont(font_bold);
+	format_right->setAlignH(libxl::ALIGNH_RIGHT);
+	format_right_small->setFont(font_small);
+	format_right_small->setAlignH(libxl::ALIGNH_RIGHT);
+	format_underline->setBorderBottom(libxl::BORDERSTYLE_THIN);
+
+	++__row_counter;
+	__sheet->writeStr(__row_counter, 1, multibyte_to_wide(GetSignatureTitle1()).c_str(), format_bold);
+	__sheet->writeStr(__row_counter, 6, multibyte_to_wide(GetSignatureTitle2()).c_str(), format_bold);
+	__sheet->writeStr(__row_counter, 3, L"", format_underline);
+	__sheet->writeStr(__row_counter, 4, L"", format_underline);
+	__sheet->writeStr(__row_counter, 8, L"", format_underline);
+	__sheet->writeStr(__row_counter, 9, L"", format_underline);
+	++__row_counter;
+	__sheet->writeStr(__row_counter, 4, multibyte_to_wide(GetSignatureName1()).c_str(), format_right);
+	__sheet->writeStr(__row_counter, 9, multibyte_to_wide(GetSignatureName2()).c_str(), format_right);
+	++__row_counter;
+	__sheet->writeStr(__row_counter, 4, multibyte_to_wide(GetSignatureInfo1()).c_str(), format_right_small);
+	__sheet->writeStr(__row_counter, 9, multibyte_to_wide(GetSignatureInfo2()).c_str(), format_right_small);
+
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return error_message;
+}
+
+
+
+
+
+
+
+
+
+// --- C_Print_Act_Agency
+auto C_Print_Act_Agency::PrintXLSSignature() -> string
 {
 	auto	error_message = ""s;
 	auto	font_bold = __book->addFont();

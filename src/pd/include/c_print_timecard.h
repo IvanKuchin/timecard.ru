@@ -95,7 +95,6 @@ class C_Print_Timecard
 		auto		__HPDF_MoveTableLineDown(int line_increment) -> string;
 		auto		__HPDF_SaveToFile() -> string;
 		auto		__HPDF_PrintText(string text, int x) -> string;
-		auto		__HPDF_DrawHorizontalLine() -> string;
 		auto		__HPDF_DrawTimecardHorizontalLine() -> string;
 		auto		__HPDF_DrawTimecardTitle() -> string;
 		auto		__HPDF_DrawTimecardTable() -> string;
