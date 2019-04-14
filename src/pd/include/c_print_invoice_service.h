@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <locale>
+#include <algorithm>    // std::max
 
 #pragma GCC diagnostic push 
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
@@ -39,21 +40,14 @@ class C_Print_Invoice_Service
 		libxl::Book						*__book = nullptr;
 		int								__row_counter = 1;
 
-		C_PDF							__c_pdf;
-		HPDF_Doc						__pdf;
-		HPDF_Page						__pdf_page;
-		HPDF_REAL						__pdf_page_width = 0;
-		HPDF_REAL						__pdf_page_height = 0;
-		HPDF_Font						__pdf_font;
-		string							__pdf_font_name = "Helvetica";
-		HPDF_INT						__pdf_font_descent = 0;
-		HPDF_INT						__pdf_font_ascent = 0;
-		HPDF_INT						__pdf_font_height = 0;
-		HPDF_INT						__pdf_font_xheight = 0;
-		HPDF_INT						__pdf_table_line_height = 0;
-		int								__pdf_line = -1;
-		int								__pdf_table_top = -1;
-		int								__pdf_table_bottom = -1;
+		C_PDF							pdf_obj;
+
+		int								total_table_items = 0;
+
+		auto			GetSupplierCompanyDetails() -> string;
+		auto			GetCustomerCompanyDetails() -> string;
+		auto			SpellTotalItemsAndSum()							{ return vars->Get("Sum items") + " " + to_string(total_table_items) + ", " + vars->Get("total amount") + " " + GetTableTotal() + " " + vars->Get("rub."); };
+		auto			SpellPrice() -> string;
 
 	public:
 
@@ -71,20 +65,20 @@ class C_Print_Invoice_Service
 		auto			__DrawXLSBorder(int left, int top, int right, int bottom) -> string;
 		auto			__DrawXLSRowUnderline() -> string;
 		auto			__PrintXLSHeaderTable() -> string;
+		auto			__PrintXLSSignature() -> string;
 
 		auto			PrintAsPDF() -> string;
-		auto			__HPDF_init() -> string;
-		auto			__HPDF_SetDocProps() -> string;
-		auto			__HPDF_SaveToFile() -> string;
+		auto			__PrintPDFHeaderTable() -> string;
 		auto			__HPDF_DrawTitle() -> string;
 		auto			__HPDF_DrawTable() -> string;
 		auto			__HPDF_DrawFooter() -> string;
-		auto			__HPDF_MoveLineDown() -> string					{ return __HPDF_MoveLineDown(__pdf_font_height); };
-		auto			__HPDF_MoveLineDown(int line_increment) -> string;
+		auto			__HPDF_PrintSignature() -> string;
 
 		virtual auto	PrintXLSHeader() -> string						= 0;
 		virtual auto	PrintXLSFooter() -> string						= 0;
-		virtual auto	PrintXLSSignature() -> string					= 0;
+
+		virtual auto	PrintPDFHeader() -> string						= 0;
+		virtual auto	PrintPDFFooter() -> string						= 0;
 
 		virtual auto	GetDocumentTitle() -> string					= 0;
 
@@ -137,7 +131,10 @@ class C_Print_Invoice_Agency : public C_Print_Invoice_Service
 	public:
 		auto			PrintXLSHeader() -> string						{ return __PrintXLSHeaderTable(); };
 		auto			PrintXLSFooter() -> string						{ return ""s; };
-		auto			PrintXLSSignature() -> string;
+
+		auto			PrintPDFHeader() -> string						{ return __PrintPDFHeaderTable(); };
+		auto			PrintPDFFooter() -> string						{ return ""s; };
+
 		auto			GetDocumentTitle() -> string					{ return vars->Get("Invoice") + " " + vars->Get("invoice_agreement"); };
 		auto			GetSupplierName() -> string						{ return vars->Get("agency_name"); };
 		auto			GetSupplierBankName() -> string					{ return vars->Get("agency_bank_title"); };
@@ -198,7 +195,10 @@ class C_Print_Act_Agency : public C_Print_Invoice_Service
 	public:
 		auto			PrintXLSHeader() -> string						{ return ""s; };
 		auto			PrintXLSFooter() -> string						{ return ""s; };
-		auto			PrintXLSSignature() -> string;
+
+		auto			PrintPDFHeader() -> string						{ return ""s; };
+		auto			PrintPDFFooter() -> string						{ return ""s; };
+
 		auto			GetDocumentTitle() -> string					{ return vars->Get("Act") + " " + vars->Get("invoice_agreement"); };
 		auto			GetSupplierName() -> string						{ return vars->Get("agency_name"); };
 		auto			GetSupplierBankName() -> string					{ return vars->Get("agency_bank_title"); };

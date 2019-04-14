@@ -39,7 +39,7 @@ msgid "Account"
 msgstr "Сч. №"
 
 msgid "Accountant"
-msgstr "Бухналтер"
+msgstr "Бухгалтер"
 
 msgid "Agency: cost center"
 msgstr "Данные агенства: центр затрат"

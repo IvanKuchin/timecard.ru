@@ -1,5 +1,29 @@
 #include "c_print_invoice_service.h"
 
+
+auto	C_Print_Invoice_Service::GetSupplierCompanyDetails() -> string
+{
+	return GetSupplierName() + ", " + vars->Get("TIN") + " " + GetSupplierTIN() + ", " + vars->Get("KPP") + " " + GetSupplierKPP() + ", " + GetSupplierLegalZIP() + " " + GetSupplierLegalLocality() + ", " + GetSupplierLegalAddress();
+}
+
+auto	C_Print_Invoice_Service::GetCustomerCompanyDetails() -> string
+{
+	return GetCustomerName() + ", " + vars->Get("TIN") + " " + GetCustomerTIN() + ", " + vars->Get("KPP") + " " + GetCustomerKPP() + ", " + GetCustomerLegalZIP() + " " + GetCustomerLegalLocality() + ", " + GetCustomerLegalAddress();
+}
+
+auto	C_Print_Invoice_Service::SpellPrice() -> string
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	C_Price_Spelling	price(stod_noexcept(GetTableTotal()));
+	auto				result = vars->Get("Total payment") + ": " + price.Spelling();
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return result;
+}
+
+
 // --- XLS part
 auto	C_Print_Invoice_Service::__DrawXLSBorder(int left, int top, int right, int bottom) -> string
 {
@@ -170,6 +194,52 @@ auto	C_Print_Invoice_Service::__PrintXLSHeaderTable() -> string
 	return result;
 }
 
+auto C_Print_Invoice_Service::__PrintXLSSignature() -> string
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	error_message = ""s;
+	auto	font_bold = __book->addFont();
+	auto	font_small = __book->addFont();
+	auto	format_bold = __book->addFormat();
+	auto	format_right = __book->addFormat();
+	auto	format_right_small = __book->addFormat();
+	auto	format_underline = __book->addFormat();
+
+	font_small->setSize(7);
+	font_bold->setBold();
+
+	format_bold->setFont(font_bold);
+	format_right->setAlignH(libxl::ALIGNH_RIGHT);
+	format_right_small->setFont(font_small);
+	format_right_small->setAlignH(libxl::ALIGNH_RIGHT);
+	format_underline->setBorderBottom(libxl::BORDERSTYLE_THIN);
+
+	++__row_counter;
+	__sheet->writeStr(__row_counter, 1, multibyte_to_wide(GetSignatureTitle1()).c_str(), format_bold);
+	__sheet->writeStr(__row_counter, 6, multibyte_to_wide(GetSignatureTitle2()).c_str(), format_bold);
+	__sheet->writeStr(__row_counter, 3, L"", format_underline);
+	__sheet->writeStr(__row_counter, 4, L"", format_underline);
+	if(GetSignatureTitle2().length())
+	{
+		__sheet->writeStr(__row_counter, 8, L"", format_underline);
+		__sheet->writeStr(__row_counter, 9, L"", format_underline);
+	}
+	++__row_counter;
+	__sheet->writeStr(__row_counter, 4, multibyte_to_wide(GetSignatureName1()).c_str(), format_right);
+	if(GetSignatureTitle2().length())
+		__sheet->writeStr(__row_counter, 9, multibyte_to_wide(GetSignatureName2()).c_str(), format_right);
+	++__row_counter;
+	__sheet->writeStr(__row_counter, 4, multibyte_to_wide(GetSignatureInfo1()).c_str(), format_right_small);
+	if(GetSignatureTitle2().length())
+		__sheet->writeStr(__row_counter, 9, multibyte_to_wide(GetSignatureInfo2()).c_str(), format_right_small);
+
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return error_message;
+}
+
 auto	C_Print_Invoice_Service::__DrawXLSRowUnderline() -> string
 {
 	auto	result = ""s;
@@ -231,7 +301,8 @@ auto	C_Print_Invoice_Service::PrintAsXLS() -> string
 				auto			format_table_center			= __book->addFormat();
 				auto			format_top_left				= __book->addFormat();
 				auto			format_top_left_bold		= __book->addFormat();
-				auto			total_items					= 0;
+
+				total_table_items = 0;
 
 				__row_counter = 1;
 
@@ -298,8 +369,7 @@ auto	C_Print_Invoice_Service::PrintAsXLS() -> string
 				__sheet->setMerge(__row_counter, __row_counter, 3, 9);
 				__sheet->setRow(__row_counter, LIBXL_DEFAULT_ROW_HEIGHT * 2);
 				__sheet->writeStr(__row_counter, 1, multibyte_to_wide(vars->Get("Supplier")).c_str(), format_top_left);
-				// __sheet->writeStr(__row_counter, 3, multibyte_to_wide(GetCustomerName() + ", " + vars->Get("TIN") + " " + GetCustomerTIN() + ", " + vars->Get("KPP") + " " + GetCustomerKPP() + ", " + GetCustomerLegalZIP() + " " + GetCustomerLegalLocality() + ", " + GetCustomerLegalAddress()).c_str(), format_top_left);
-				__sheet->writeStr(__row_counter, 3, multibyte_to_wide(GetSupplierName() + ", " + vars->Get("TIN") + " " + GetSupplierTIN() + ", " + vars->Get("KPP") + " " + GetSupplierKPP() + ", " + GetSupplierLegalZIP() + " " + GetSupplierLegalLocality() + ", " + GetSupplierLegalAddress()).c_str(), format_top_left);
+				__sheet->writeStr(__row_counter, 3, multibyte_to_wide(GetCustomerCompanyDetails()).c_str(), format_top_left);
 
 				++__row_counter;
 				++__row_counter;
@@ -307,8 +377,7 @@ auto	C_Print_Invoice_Service::PrintAsXLS() -> string
 				__sheet->setMerge(__row_counter, __row_counter, 3, 9);
 				__sheet->setRow(__row_counter, LIBXL_DEFAULT_ROW_HEIGHT * 2);
 				__sheet->writeStr(__row_counter, 1, multibyte_to_wide(vars->Get("Customer")).c_str(), format_top_left);
-				// __sheet->writeStr(__row_counter, 3, multibyte_to_wide(GetSupplierName() + ", " + vars->Get("TIN") + " " + GetSupplierTIN() + ", " + vars->Get("KPP") + " " + GetSupplierKPP() + ", " + vars->Get("cost_center_legal_geo_zip") + " " + vars->Get("cost_center_legal_locality_title") + ", " + vars->Get("cost_center_legal_address")).c_str(), format_top_left);
-				__sheet->writeStr(__row_counter, 3, multibyte_to_wide(GetCustomerName() + ", " + vars->Get("TIN") + " " + GetCustomerTIN() + ", " + vars->Get("KPP") + " " + GetCustomerKPP() + ", " + GetCustomerLegalZIP() + " " + GetCustomerLegalLocality() + ", " + GetCustomerLegalAddress()).c_str(), format_top_left);
+				__sheet->writeStr(__row_counter, 3, multibyte_to_wide(GetCustomerCompanyDetails()).c_str(), format_top_left);
 
 				++__row_counter;
 				++__row_counter;
@@ -355,7 +424,7 @@ auto	C_Print_Invoice_Service::PrintAsXLS() -> string
 					__sheet->writeNum(__row_counter, 8, stod_noexcept(GetTableRowPrice(i)), format_table_right);
 					__sheet->writeNum(__row_counter, 9, stod_noexcept(GetTableRowTotal(i)), format_table_right);
 
-					++total_items;
+					++total_table_items;
 				}
 
 				// --- table summary
@@ -375,17 +444,12 @@ auto	C_Print_Invoice_Service::PrintAsXLS() -> string
 				++__row_counter;
 				++__row_counter;
 				__sheet->setMerge(__row_counter, __row_counter, 1, 9);
-				__sheet->writeStr(__row_counter, 1, multibyte_to_wide(vars->Get("Sum items") + " " + to_string(total_items) + ", " + vars->Get("total amount") + " " + GetTableTotal() + " " + vars->Get("rub.")).c_str());
+				__sheet->writeStr(__row_counter, 1, multibyte_to_wide(SpellTotalItemsAndSum()).c_str());
 
-				{
-					C_Price_Spelling	price(stod_noexcept(GetTableTotal()));
-
-					++__row_counter;
-
-					__sheet->setRow(__row_counter, LIBXL_DEFAULT_ROW_HEIGHT * 2);
-					__sheet->setMerge(__row_counter, __row_counter, 1, 9);
-					__sheet->writeStr(__row_counter, 1, multibyte_to_wide(vars->Get("Total payment") + ": " + price.Spelling()).c_str(), format_top_left_bold);
-				}
+				++__row_counter;
+				__sheet->setRow(__row_counter, LIBXL_DEFAULT_ROW_HEIGHT * 2);
+				__sheet->setMerge(__row_counter, __row_counter, 1, 9);
+				__sheet->writeStr(__row_counter, 1, multibyte_to_wide(SpellPrice()).c_str(), format_top_left_bold);
 
 				++__row_counter;
 				++__row_counter;
@@ -400,7 +464,7 @@ auto	C_Print_Invoice_Service::PrintAsXLS() -> string
 				__DrawXLSRowUnderline();
 
 				++__row_counter;
-				PrintXLSSignature();
+				__PrintXLSSignature();
 
 			}
 
@@ -427,11 +491,394 @@ auto	C_Print_Invoice_Service::PrintAsXLS() -> string
 
 
 // --- PDF part
+auto	C_Print_Invoice_Service::__PrintPDFHeaderTable() -> string
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	error_message = ""s;
+
+	try
+	{
+
+	}
+	catch(...)
+	{
+		error_message = "hpdf: "s + gettext("fail to print header table");
+		MESSAGE_ERROR("", "", error_message);
+	}
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return error_message;
+}
+
+auto C_Print_Invoice_Service::__HPDF_PrintSignature() -> string
+{
+
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	error_message = ""s;
+
+	try
+	{
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_MoveLineDown()).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSignatureTitle1()), 0, 20, HPDF_TALIGN_LEFT, BOLD_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSignatureTitle2()), 60, 60+20, HPDF_TALIGN_LEFT, BOLD_FONT, HPDF_TIMECARD_FONT_SIZE, true)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_MoveLineDown()).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		}
+
+		if(GetSignatureTitle1().length())
+		{
+			if(error_message.empty())
+			{
+				if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(20, 40)).length())
+					{ MESSAGE_ERROR("", "", "hpdf: fail to draw horizontal line"); }
+			}
+		}
+		if(GetSignatureTitle2().length())
+		{
+			if(error_message.empty())
+			{
+				if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(80, 100)).length())
+					{ MESSAGE_ERROR("", "", "hpdf: fail to draw horizontal line"); }
+			}
+		}
+
+		if(GetSignatureTitle1().length())
+		{
+			if(error_message.empty())
+			{
+				if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSignatureName1()), 0, 40, HPDF_TALIGN_RIGHT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
+				{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+			}
+		}
+		if(GetSignatureTitle2().length())
+		{
+			if(error_message.empty())
+			{
+				if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSignatureName2()), 60, 60+40, HPDF_TALIGN_RIGHT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
+				{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+			}
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_MoveLineDown()).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		}
+
+		if(GetSignatureTitle1().length())
+		{
+			if(error_message.empty())
+			{
+				if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSignatureInfo1()), 0, 40, HPDF_TALIGN_RIGHT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE - 2, false)).length())
+				{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+			}
+		}
+		if(GetSignatureTitle2().length())
+		{
+			if(error_message.empty())
+			{
+				if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSignatureInfo2()), 60, 60+40, HPDF_TALIGN_RIGHT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE - 2, false)).length())
+				{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+			}
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_MoveLineDown()).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		}
+	}
+	catch(...)
+	{
+		error_message = "hpdf: "s + gettext("fail to print header table");
+		MESSAGE_ERROR("", "", error_message);
+	}
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return error_message;
+}
+
 auto	C_Print_Invoice_Service::__HPDF_DrawTitle() -> string
 {
 	MESSAGE_DEBUG("", "", "start");
 
 	auto	error_message = ""s;
+
+	try
+	{
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetDocumentTitle()), 0, 100, HPDF_TALIGN_LEFT, BOLD_FONT, HPDF_TIMECARD_FONT_SIZE * 2, false)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_MoveLineDown()).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_MoveLineDown()).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(0, 100)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to draw horizontal line"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_MoveLineDown()).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("Supplier")), 0, 20, HPDF_TALIGN_LEFT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSupplierCompanyDetails()), 20, 100, HPDF_TALIGN_LEFT, BOLD_FONT, HPDF_TIMECARD_FONT_SIZE, true)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("Customer")), 0, 20, HPDF_TALIGN_LEFT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetCustomerCompanyDetails()), 20, 100, HPDF_TALIGN_LEFT, BOLD_FONT, HPDF_TIMECARD_FONT_SIZE, true)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if(vars->Get("act_basis").length())
+			{
+				if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("Basis")), 0, 20, HPDF_TALIGN_LEFT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
+					{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+				if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("act_basis")), 20, 100, HPDF_TALIGN_LEFT, BOLD_FONT, HPDF_TIMECARD_FONT_SIZE, true)).length())
+					{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+			}
+		}
+
+		if(error_message.empty())
+		{
+			pdf_obj.AddColumn(5);
+			pdf_obj.AddColumn(55);
+			pdf_obj.AddColumn(5);
+			pdf_obj.AddColumn(5);
+			pdf_obj.AddColumn(15);
+			pdf_obj.AddColumn(15);
+
+			if((error_message = pdf_obj.__HPDF_StartTable()).length())
+			{
+				MESSAGE_ERROR("", "", "fail to start table");
+			}
+		}
+
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(0, utf8_to_cp1251("N"), HPDF_TALIGN_CENTER, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
+			{ MESSAGE_ERROR("", "", "fail to write table title index line"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(1, utf8_to_cp1251(vars->Get("Goods")), HPDF_TALIGN_CENTER, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
+			{ MESSAGE_ERROR("", "", "fail to write table title description line"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(2, utf8_to_cp1251(vars->Get("Quantity short")), HPDF_TALIGN_CENTER, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
+			{ MESSAGE_ERROR("", "", "fail to write table title quantity line"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(3, utf8_to_cp1251(vars->Get("Items short")), HPDF_TALIGN_CENTER, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
+			{ MESSAGE_ERROR("", "", "fail to write table title items line"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(4, utf8_to_cp1251(vars->Get("Price")), HPDF_TALIGN_CENTER, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
+			{ MESSAGE_ERROR("", "", "fail to write table title price line"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(5, utf8_to_cp1251(vars->Get("Total")), HPDF_TALIGN_CENTER, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, true)).length())
+			{ MESSAGE_ERROR("", "", "fail to write table title total line"); }
+		}
+
+		if(error_message.empty())
+		{
+			total_table_items = 0;
+			for(auto i = 1; isTableRowExists(i); ++i)
+			{
+				auto	max_lines = max(pdf_obj.__HPDF_GetNumberOfLinesInTable(0, utf8_to_cp1251(GetTableRowIndex(i))		, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE),
+									max(pdf_obj.__HPDF_GetNumberOfLinesInTable(1, utf8_to_cp1251(GetTableRowDescription(i))	, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE),
+									max(pdf_obj.__HPDF_GetNumberOfLinesInTable(2, utf8_to_cp1251(GetTableRowQuantity(i))	, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE),
+									max(pdf_obj.__HPDF_GetNumberOfLinesInTable(3, utf8_to_cp1251(GetTableRowItem(i))		, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE),
+									max(pdf_obj.__HPDF_GetNumberOfLinesInTable(4, utf8_to_cp1251(GetTableRowPrice(i))		, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE),
+										pdf_obj.__HPDF_GetNumberOfLinesInTable(5, utf8_to_cp1251(GetTableRowTotal(i))		, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE)
+									)))));
+
+				if((error_message = pdf_obj.__HPDF_PrintTextTableCell(0, utf8_to_cp1251(GetTableRowIndex(i)), HPDF_TALIGN_CENTER, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).empty())
+				{
+					if((error_message = pdf_obj.__HPDF_PrintTextTableCell(1, utf8_to_cp1251(GetTableRowDescription(i)), HPDF_TALIGN_LEFT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).empty())
+					{
+						if((error_message = pdf_obj.__HPDF_PrintTextTableCell(2, utf8_to_cp1251(GetTableRowQuantity(i)), HPDF_TALIGN_CENTER, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).empty())
+						{
+							if((error_message = pdf_obj.__HPDF_PrintTextTableCell(3, utf8_to_cp1251(GetTableRowItem(i)), HPDF_TALIGN_CENTER, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).empty())
+							{
+								if((error_message = pdf_obj.__HPDF_PrintTextTableCell(4, utf8_to_cp1251(GetTableRowPrice(i)), HPDF_TALIGN_RIGHT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).empty())
+								{
+									if((error_message = pdf_obj.__HPDF_PrintTextTableCell(5, utf8_to_cp1251(GetTableRowTotal(i)), HPDF_TALIGN_RIGHT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).empty())
+									{
+										if((error_message = pdf_obj.__HPDF_MoveTableLineDown(max_lines)).empty())
+										{
+
+										}
+										else
+										{
+											MESSAGE_ERROR("", "", "fail to move table line down " + to_string(max_lines) + " line(s)");
+										}
+									}
+									else
+									{
+										MESSAGE_ERROR("", "", "fail to write table total (" + to_string(i) + ") line");
+									}
+								}
+								else
+								{
+									MESSAGE_ERROR("", "", "fail to write table price (" + to_string(i) + ") line");
+								}
+							}
+							else
+							{
+								MESSAGE_ERROR("", "", "fail to write table item (" + to_string(i) + ") line");
+							}
+						}
+						else
+						{
+							MESSAGE_ERROR("", "", "fail to write table quantity (" + to_string(i) + ") line");
+						}
+					}
+					else
+					{
+						MESSAGE_ERROR("", "", "fail to write table description (" + to_string(i) + ") line");
+					}
+
+				}
+				else
+				{
+					MESSAGE_ERROR("", "", "fail to write table index (" + to_string(i) + ") line");
+				}
+
+				if(error_message.length()) break;
+
+				++total_table_items;
+			}
+		}
+
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_StopTable()).length())
+			{ MESSAGE_ERROR("", "", "fail to stop table"); }
+		}
+
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("Total") + ":"), 20, 85, HPDF_TALIGN_RIGHT, BOLD_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetTableSum()), 85, 100, HPDF_TALIGN_RIGHT, BOLD_FONT, HPDF_TIMECARD_FONT_SIZE, true)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("Vat short") + ":"), 20, 85, HPDF_TALIGN_RIGHT, BOLD_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetTableVAT()), 85, 100, HPDF_TALIGN_RIGHT, BOLD_FONT, HPDF_TIMECARD_FONT_SIZE, true)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("Total payment") + ":"), 20, 85, HPDF_TALIGN_RIGHT, BOLD_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetTableTotal()), 85, 100, HPDF_TALIGN_RIGHT, BOLD_FONT, HPDF_TIMECARD_FONT_SIZE, true)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(SpellTotalItemsAndSum()), 0, 100, HPDF_TALIGN_LEFT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, true)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(SpellPrice()), 0, 100, HPDF_TALIGN_LEFT, BOLD_FONT, HPDF_TIMECARD_FONT_SIZE, true)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("act_footnote")), 0, 100, HPDF_TALIGN_LEFT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, true)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+
+
+		if(error_message.empty())
+		{
+			if((error_message = PrintPDFFooter()).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print pdf footer"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_MoveLineDown()).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(0, 100)).length())
+				{ MESSAGE_ERROR("", "", "hpdf: fail to draw horizontal line"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = __HPDF_PrintSignature()).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print pdf footer"); }
+		}
+
+
+	}
+	catch(...)
+	{
+		error_message = gettext("hpdf: fail to print title");
+		MESSAGE_ERROR("", "", error_message);
+	}
+
 
 	MESSAGE_DEBUG("", "", "finish");
 
@@ -466,19 +913,19 @@ auto	C_Print_Invoice_Service::PrintAsPDF() -> string
 
 	MESSAGE_DEBUG("", "", "start");
 
-	__c_pdf.SetFilename(GetFilename());
-	__c_pdf.SetOrientation(HPDF_PAGE_PORTRAIT);
+	pdf_obj.SetFilename(GetFilename());
+	pdf_obj.SetOrientation(HPDF_PAGE_PORTRAIT);
 	if(error_message.empty())
 	{
-		if((error_message = __c_pdf.__HPDF_init()).length())			{ MESSAGE_ERROR("", "", "fail to initialize hpdf library"); }
+		if((error_message = pdf_obj.__HPDF_init()).length())			{ MESSAGE_ERROR("", "", "fail to initialize hpdf library"); }
 	}
 	if(error_message.empty())
 	{
-		if((error_message = __c_pdf.__HPDF_SetDocProps()).length())		{ MESSAGE_ERROR("", "", "hpdf: fail to set dc props"); }
+		if((error_message = pdf_obj.__HPDF_SetDocProps()).length())		{ MESSAGE_ERROR("", "", "hpdf: fail to set dc props"); }
 	}
 	if(error_message.empty())
 	{
-		if((error_message = __c_pdf.__HPDF_MoveLineDown(0)).length())	{ MESSAGE_ERROR("", "", "hpdf: fail to move pointer down"); }
+		if((error_message = pdf_obj.__HPDF_MoveLineDown(0)).length())	{ MESSAGE_ERROR("", "", "hpdf: fail to move pointer down"); }
 	}
 	if(error_message.empty())
 	{
@@ -494,7 +941,7 @@ auto	C_Print_Invoice_Service::PrintAsPDF() -> string
 	}
 	if(error_message.empty())
 	{
-		if((error_message = __c_pdf.__HPDF_SaveToFile()).length())		{ MESSAGE_ERROR("", "", "hpdf: fail to save to file"); }
+		if((error_message = pdf_obj.__HPDF_SaveToFile()).length())		{ MESSAGE_ERROR("", "", "hpdf: fail to save to file"); }
 	}
 
 	MESSAGE_DEBUG("", "", "finish (error_message.length() = " + to_string(error_message.length()) + ")");
@@ -510,100 +957,4 @@ ostream& operator<<(ostream& os, const C_Print_Invoice_Service &var)
 }
 
 
-
-
-
-
-// --- C_Print_Invoice_Agency
-
-auto C_Print_Invoice_Agency::PrintXLSSignature() -> string
-{
-	auto	error_message = ""s;
-	auto	font_bold = __book->addFont();
-	auto	font_small = __book->addFont();
-	auto	format_bold = __book->addFormat();
-	auto	format_right = __book->addFormat();
-	auto	format_right_small = __book->addFormat();
-	auto	format_underline = __book->addFormat();
-
-	MESSAGE_DEBUG("", "", "start");
-
-	font_small->setSize(7);
-	font_bold->setBold();
-
-	format_bold->setFont(font_bold);
-	format_right->setAlignH(libxl::ALIGNH_RIGHT);
-	format_right_small->setFont(font_small);
-	format_right_small->setAlignH(libxl::ALIGNH_RIGHT);
-	format_underline->setBorderBottom(libxl::BORDERSTYLE_THIN);
-
-	++__row_counter;
-	__sheet->writeStr(__row_counter, 1, multibyte_to_wide(GetSignatureTitle1()).c_str(), format_bold);
-	__sheet->writeStr(__row_counter, 6, multibyte_to_wide(GetSignatureTitle2()).c_str(), format_bold);
-	__sheet->writeStr(__row_counter, 3, L"", format_underline);
-	__sheet->writeStr(__row_counter, 4, L"", format_underline);
-	__sheet->writeStr(__row_counter, 8, L"", format_underline);
-	__sheet->writeStr(__row_counter, 9, L"", format_underline);
-	++__row_counter;
-	__sheet->writeStr(__row_counter, 4, multibyte_to_wide(GetSignatureName1()).c_str(), format_right);
-	__sheet->writeStr(__row_counter, 9, multibyte_to_wide(GetSignatureName2()).c_str(), format_right);
-	++__row_counter;
-	__sheet->writeStr(__row_counter, 4, multibyte_to_wide(GetSignatureInfo1()).c_str(), format_right_small);
-	__sheet->writeStr(__row_counter, 9, multibyte_to_wide(GetSignatureInfo2()).c_str(), format_right_small);
-
-
-	MESSAGE_DEBUG("", "", "finish");
-
-	return error_message;
-}
-
-
-
-
-
-
-
-
-
-// --- C_Print_Act_Agency
-auto C_Print_Act_Agency::PrintXLSSignature() -> string
-{
-	auto	error_message = ""s;
-	auto	font_bold = __book->addFont();
-	auto	font_small = __book->addFont();
-	auto	format_bold = __book->addFormat();
-	auto	format_right = __book->addFormat();
-	auto	format_right_small = __book->addFormat();
-	auto	format_underline = __book->addFormat();
-
-	MESSAGE_DEBUG("", "", "start");
-
-	font_small->setSize(7);
-	font_bold->setBold();
-
-	format_bold->setFont(font_bold);
-	format_right->setAlignH(libxl::ALIGNH_RIGHT);
-	format_right_small->setFont(font_small);
-	format_right_small->setAlignH(libxl::ALIGNH_RIGHT);
-	format_underline->setBorderBottom(libxl::BORDERSTYLE_THIN);
-
-	++__row_counter;
-	__sheet->writeStr(__row_counter, 1, multibyte_to_wide(GetSignatureTitle1()).c_str(), format_bold);
-	__sheet->writeStr(__row_counter, 6, multibyte_to_wide(GetSignatureTitle2()).c_str(), format_bold);
-	__sheet->writeStr(__row_counter, 3, L"", format_underline);
-	__sheet->writeStr(__row_counter, 4, L"", format_underline);
-	__sheet->writeStr(__row_counter, 8, L"", format_underline);
-	__sheet->writeStr(__row_counter, 9, L"", format_underline);
-	++__row_counter;
-	__sheet->writeStr(__row_counter, 4, multibyte_to_wide(GetSignatureName1()).c_str(), format_right);
-	__sheet->writeStr(__row_counter, 9, multibyte_to_wide(GetSignatureName2()).c_str(), format_right);
-	++__row_counter;
-	__sheet->writeStr(__row_counter, 4, multibyte_to_wide(GetSignatureInfo1()).c_str(), format_right_small);
-	__sheet->writeStr(__row_counter, 9, multibyte_to_wide(GetSignatureInfo2()).c_str(), format_right_small);
-
-
-	MESSAGE_DEBUG("", "", "finish");
-
-	return error_message;
-}
 
