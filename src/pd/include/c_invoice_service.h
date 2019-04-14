@@ -9,6 +9,7 @@
 #include "utilities.h"
 #include "c_print_timecard.h"
 #include "c_print_invoice_service.h"
+#include "c_print_vat_service.h"
 #include "c_archive.h"
 
 using namespace std;

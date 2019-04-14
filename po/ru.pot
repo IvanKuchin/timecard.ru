@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-09 06:04-0400\n"
+"POT-Creation-Date: 2019-04-14 12:54-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -40,6 +40,9 @@ msgstr "Сч. №"
 
 msgid "Accountant"
 msgstr "Бухгалтер"
+
+msgid "Act"
+msgstr "Акт"
 
 msgid "Agency: cost center"
 msgstr "Данные агенства: центр затрат"
@@ -76,6 +79,9 @@ msgstr "БИК"
 
 msgid "Basis"
 msgstr "Основание"
+
+msgid "Buyer"
+msgstr "Покупатель"
 
 msgid "Company not found"
 msgstr "Компания не найдена"
@@ -115,6 +121,9 @@ msgstr "Руководитель"
 
 msgid "Employee data"
 msgstr "Данные сотрудника"
+
+msgid "Excise"
+msgstr "Акциза"
 
 msgid "February"
 msgstr "Февраль"
@@ -170,6 +179,12 @@ msgstr "Май"
 msgid "May declension"
 msgstr "Мая"
 
+msgid "Measure unit (code)"
+msgstr "Ед. изм. (код)"
+
+msgid "Measure unit (name)"
+msgstr "Ед. изм. (имя)"
+
 msgid "November"
 msgstr "Ноябрь"
 
@@ -215,6 +230,9 @@ msgstr "Получатель"
 msgid "SQL syntax issue"
 msgstr "Ошибка БД"
 
+msgid "Seller"
+msgstr "Продавец"
+
 msgid "September"
 msgstr "Сентябрь"
 
@@ -251,6 +269,12 @@ msgstr "Поставщик"
 msgid "TIN"
 msgstr "ИНН"
 
+msgid "Tax amount"
+msgstr "Сумма налога"
+
+msgid "Tax rate"
+msgstr "Налоговая ставка"
+
 msgid "Technical Requirement agreement short"
 msgstr "ТЗ"
 
@@ -269,6 +293,9 @@ msgstr "Должность"
 msgid "Total"
 msgstr "Сумма"
 
+msgid "Total (tax free)"
+msgstr "Сумма (без налога)"
+
 msgid "Total days on duty"
 msgstr "Количество дней оказания услуг"
 
@@ -284,6 +311,12 @@ msgstr "Стоимость услуг по настоящему отчету"
 msgid "VAT"
 msgstr "НДС"
 
+msgid "VAT comment1"
+msgstr "Валюта: наименование код Российский рубль, 643"
+
+msgid "VAT doc"
+msgstr "Счет-фактура"
+
 msgid "VAT short"
 msgstr "НДС"
 
@@ -298,9 +331,6 @@ msgstr "не указан счет"
 
 msgid "act number"
 msgstr "номер акта"
-
-msgid "Act"
-msgstr "Акт"
 
 msgid "agency bank id not found"
 msgstr "банк не найден"
@@ -352,6 +382,9 @@ msgstr "не удалось создать фаил архива"
 
 msgid "changed"
 msgstr "изменилось"
+
+msgid "col index out of range"
+msgstr "недопустимый индекс"
 
 msgid "company doesn't exists"
 msgstr "такой компании нет"
@@ -443,6 +476,9 @@ msgstr "ошибка инициализации переменных"
 msgid "fail to insert to db"
 msgstr "ошибка БД"
 
+msgid "fail to print header table"
+msgstr "не удалось напечатать таблицу"
+
 msgid "from"
 msgstr "с"
 
@@ -451,6 +487,9 @@ msgstr "hpdf: не удалось сохранить фаил"
 
 msgid "hpdf: fail to add page"
 msgstr "hpdf: не удалось добавить страницу к фаилу"
+
+msgid "hpdf: fail to draw rectangle"
+msgstr "hpdf: не удалось нарисовать фигуру"
 
 msgid "hpdf: fail to draw the line"
 msgstr "hpdf: не удалось нарисовать линию"
@@ -469,6 +508,9 @@ msgstr "hpdf: не удалось напечатать нижнюю часть �
 
 msgid "hpdf: fail to print timecard title"
 msgstr "hpdf: не удалось напечатать заголовок таймкарты"
+
+msgid "hpdf: fail to print title"
+msgstr "hpdf: не удалось напечатать текст"
 
 msgid "hpdf: table top must be higher than bottom"
 msgstr "hpdf: верх таблицы должен быть выше чем нижняя часть"
@@ -520,6 +562,9 @@ msgstr "не указано название"
 
 msgid "no VAT"
 msgstr "НДС не облагается"
+
+msgid "no excise"
+msgstr "без акциза"
 
 msgid "number"
 msgstr "номер"
@@ -577,6 +622,9 @@ msgstr "дата начала"
 
 msgid "start date changed"
 msgstr "изменилась дата подписания контракта"
+
+msgid "table is too wide"
+msgstr "таблица слишком широкая"
 
 msgid "till"
 msgstr "до"

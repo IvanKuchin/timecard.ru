@@ -182,7 +182,8 @@ auto	C_PDF::__HPDF_PrintTextTableCell(unsigned int index_col, string text, HPDF_
 			right_shift_percent = left_shift_percent + grid_widths[index_col];
 
 			// --- shrink text square, so text will be spaced from vertical table lines
-			if(left_shift_percent + 5 <= right_shift_percent)
+			// --- with narrow cells (<= 5%) don't shrink print area
+			if(left_shift_percent + 6 <= right_shift_percent)
 			{
 				left_shift_percent += 1;
 				right_shift_percent -= 1;
@@ -499,7 +500,7 @@ auto	C_PDF::__HPDF_GetPixelOffsetByPercentage(double percents) -> double
 
 auto	C_PDF::__HPDF_GetNumberOfLines(string text, double left_shift_percent, double right_shift_percent, Font_Type font_type, HPDF_REAL font_size) -> int
 {
-	MESSAGE_DEBUG("", "", "start");
+	MESSAGE_DEBUG("", "", "start (" + to_string(left_shift_percent) + " <-> " + to_string(right_shift_percent) + ", text length is " + to_string(text.length()) + ")");
 
 	HPDF_Font	current_font			= font_type == BOLD_FONT ? __pdf_font_bold : __pdf_font;
 	auto		text_width_pdf_struct	= HPDF_Font_TextWidth(current_font, (HPDF_BYTE *)(text).c_str(), text.length());
@@ -507,7 +508,13 @@ auto	C_PDF::__HPDF_GetNumberOfLines(string text, double left_shift_percent, doub
 	auto		cell_width				= __HPDF_GetPixelSizeByPercentage(abs(right_shift_percent - left_shift_percent));
 	auto		number_of_lines			= ceil(text_width / cell_width);
 
-	MESSAGE_DEBUG("", "", "finish (text height is " + to_string(number_of_lines) + " lines)");
+	if(number_of_lines)
+	{
+		// --- add 10% to calculated width due to line break may move whole word to the next line
+		number_of_lines			= ceil(text_width * 1.1 / cell_width);
+	}
+
+	MESSAGE_DEBUG("", "", "finish (text height is " + to_string(number_of_lines) + " lines = text_width(" + to_string(text_width_pdf_struct.width * font_size / 1000.0) + ") / cell_width(" + to_string(cell_width) + "))");
 
 	return number_of_lines;
 }
@@ -529,7 +536,7 @@ auto	C_PDF::__HPDF_GetNumberOfLinesInTable(unsigned int index_col, string text, 
 		}
 		right_shift_percent = left_shift_percent + grid_widths[index_col];
 
-		number_of_lines = __HPDF_GetNumberOfLines(text, left_shift_percent, right_shift_percent, font_type, font_size);
+		number_of_lines = __HPDF_GetNumberOfLines(text, left_shift_percent + 1, right_shift_percent - 1, font_type, font_size);
 	}
 	else
 	{
@@ -586,8 +593,8 @@ auto	C_PDF::__HPDF_PrintTextRect(string text, double left_shift_percent, double 
 	}
 	catch(...)
 	{
-		MESSAGE_ERROR("", "", "hpdf: fail to print timecard title");
 		error_message = gettext("hpdf: fail to print text");
+		MESSAGE_ERROR("", "", error_message);
 	}
 
 	MESSAGE_DEBUG("", "", "finish");
@@ -595,14 +602,43 @@ auto	C_PDF::__HPDF_PrintTextRect(string text, double left_shift_percent, double 
 	return error_message;	
 }
 
+auto	C_PDF::__HPDF_DrawRect(double left_shift_percent, double top_shift_line, double right_shift_percent, double bottom_shift_line) -> string
+{
+	auto	error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "start (" + to_string(left_shift_percent) + "%, " + to_string(top_shift_line) + " line, " + to_string(right_shift_percent) + "%, " + to_string(bottom_shift_line) + " line)");
+
+	try
+	{
+		auto	left_coord = __HPDF_GetPixelOffsetByPercentage(left_shift_percent);
+		auto	right_coord = __HPDF_GetPixelOffsetByPercentage(right_shift_percent);
+		auto	top_coord = __pdf_line - top_shift_line * __pdf_font_height;
+		auto	bottom_coord = __pdf_line - bottom_shift_line * __pdf_font_height - __pdf_font_height;
+
+	    HPDF_Page_SetLineWidth (__pdf_page, 1);
+		if(HPDF_Page_Rectangle(__pdf_page, left_coord, bottom_coord, right_coord - left_coord, top_coord - bottom_coord) == HPDF_OK) {}
+		else
+		{
+			error_message = gettext("hpdf: fail to draw rectangle");
+			MESSAGE_ERROR("", "", error_message);
+		}
+	    HPDF_Page_Stroke (__pdf_page);
+	}
+	catch(...)
+	{
+		error_message = gettext("hpdf: fail to draw rectangle");
+		MESSAGE_ERROR("", "", error_message);
+	}
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return error_message;	
+}
+
+
 ostream& operator<<(ostream& os, const C_PDF &var)
 {
 	os << "object C_PDF [empty for now]";
 
 	return os;
 }
-
-
-
-
-

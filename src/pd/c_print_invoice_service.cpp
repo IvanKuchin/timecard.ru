@@ -173,7 +173,7 @@ auto	C_Print_Invoice_Service::__PrintXLSHeaderTable() -> string
 	__sheet->writeStr(__row_counter, 7, multibyte_to_wide(GetSupplierAccount()).c_str());
 
 	++__row_counter;
-	__sheet->writeStr(__row_counter, 1, multibyte_to_wide(GetCustomerName()).c_str());
+	__sheet->writeStr(__row_counter, 1, multibyte_to_wide(GetSupplierName()).c_str());
 
 	++__row_counter;
 	++__row_counter;
@@ -369,7 +369,7 @@ auto	C_Print_Invoice_Service::PrintAsXLS() -> string
 				__sheet->setMerge(__row_counter, __row_counter, 3, 9);
 				__sheet->setRow(__row_counter, LIBXL_DEFAULT_ROW_HEIGHT * 2);
 				__sheet->writeStr(__row_counter, 1, multibyte_to_wide(vars->Get("Supplier")).c_str(), format_top_left);
-				__sheet->writeStr(__row_counter, 3, multibyte_to_wide(GetCustomerCompanyDetails()).c_str(), format_top_left);
+				__sheet->writeStr(__row_counter, 3, multibyte_to_wide(GetSupplierCompanyDetails()).c_str(), format_top_left);
 
 				++__row_counter;
 				++__row_counter;
@@ -499,6 +499,152 @@ auto	C_Print_Invoice_Service::__PrintPDFHeaderTable() -> string
 
 	try
 	{
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSupplierBankName()), 0 + 1, 50 - 1, HPDF_TALIGN_LEFT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("Bank Identifier")), 50 + 1, 65 - 1, HPDF_TALIGN_LEFT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSupplierBIK()), 65 + 1, 100 - 1, HPDF_TALIGN_LEFT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, true)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("Account")), 50 + 1, 65 - 1, HPDF_TALIGN_LEFT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSupplierBankAccount()), 65 + 1, 100 - 1, HPDF_TALIGN_LEFT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, true)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("Destination bank")), 0 + 1, 50 - 1, HPDF_TALIGN_LEFT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, true)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("TIN") + " " + GetSupplierTIN()), 0 + 1, 25 - 1, HPDF_TALIGN_LEFT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("KPP") + " " + GetSupplierKPP()), 25 + 1, 50 - 1, HPDF_TALIGN_LEFT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("Account")), 50 + 1, 65 - 1, HPDF_TALIGN_LEFT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSupplierAccount()), 65 + 1, 100 - 1, HPDF_TALIGN_LEFT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, true)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSupplierName()), 0 + 1, 50 - 1, HPDF_TALIGN_LEFT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, true)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_MoveLineDown()).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("Recipient")), 0 + 1, 50 - 1, HPDF_TALIGN_LEFT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+
+		// --- Bank name
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_DrawRect(0, -6, 50, -4)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to draw rectangle"); }
+		}
+		// --- BIK
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_DrawRect(50, -6, 65, -6)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to draw rectangle"); }
+		}
+		// --- BIK number
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_DrawRect(65, -6, 100, -6)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to draw rectangle"); }
+		}
+		// --- Bank acc
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_DrawRect(50, -5, 65, -4)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to draw rectangle"); }
+		}
+		// --- Bank acc number
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_DrawRect(65, -5, 100, -4)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to draw rectangle"); }
+		}
+
+		// --- Company acc
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_DrawRect(50, -3, 65, 0)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to draw rectangle"); }
+		}
+		// --- Company acc number
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_DrawRect(65, -3, 100, 0)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to draw rectangle"); }
+		}
+
+		// --- TIN
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_DrawRect(0, -3, 25, -3)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to draw rectangle"); }
+		}
+		// --- KPP
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_DrawRect(25, -3, 50, -3)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to draw rectangle"); }
+		}
+
+		// --- Company name
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_DrawRect(0, -2, 50, 0)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to draw rectangle"); }
+		}
+
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_MoveLineDown()).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_MoveLineDown()).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		}
+
+
 
 	}
 	catch(...)
@@ -615,7 +761,7 @@ auto C_Print_Invoice_Service::__HPDF_PrintSignature() -> string
 	return error_message;
 }
 
-auto	C_Print_Invoice_Service::__HPDF_DrawTitle() -> string
+auto	C_Print_Invoice_Service::__HPDF_DrawHeader() -> string
 {
 	MESSAGE_DEBUG("", "", "start");
 
@@ -623,6 +769,11 @@ auto	C_Print_Invoice_Service::__HPDF_DrawTitle() -> string
 
 	try
 	{
+		if(error_message.empty())
+		{
+			if((error_message = PrintPDFHeader()).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print header"); }
+		}
 		if(error_message.empty())
 		{
 			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetDocumentTitle()), 0, 100, HPDF_TALIGN_LEFT, BOLD_FONT, HPDF_TIMECARD_FONT_SIZE * 2, false)).length())
@@ -678,7 +829,27 @@ auto	C_Print_Invoice_Service::__HPDF_DrawTitle() -> string
 					{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 			}
 		}
+	}
+	catch(...)
+	{
+		error_message = gettext("hpdf: fail to print title");
+		MESSAGE_ERROR("", "", error_message);
+	}
 
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return error_message;
+}
+
+auto	C_Print_Invoice_Service::__HPDF_DrawTable() -> string
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	error_message = ""s;
+
+	try
+	{
 		if(error_message.empty())
 		{
 			pdf_obj.AddColumn(5);
@@ -802,6 +973,27 @@ auto	C_Print_Invoice_Service::__HPDF_DrawTitle() -> string
 			{ MESSAGE_ERROR("", "", "fail to stop table"); }
 		}
 
+	}
+	catch(...)
+	{
+		error_message = gettext("hpdf: fail to print title");
+		MESSAGE_ERROR("", "", error_message);
+	}
+
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return error_message;
+}
+
+auto	C_Print_Invoice_Service::__HPDF_DrawFooter() -> string
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	error_message = ""s;
+
+	try
+	{
 		if(error_message.empty())
 		{
 			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("Total") + ":"), 20, 85, HPDF_TALIGN_RIGHT, BOLD_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
@@ -870,8 +1062,6 @@ auto	C_Print_Invoice_Service::__HPDF_DrawTitle() -> string
 			if((error_message = __HPDF_PrintSignature()).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print pdf footer"); }
 		}
-
-
 	}
 	catch(...)
 	{
@@ -879,28 +1069,6 @@ auto	C_Print_Invoice_Service::__HPDF_DrawTitle() -> string
 		MESSAGE_ERROR("", "", error_message);
 	}
 
-
-	MESSAGE_DEBUG("", "", "finish");
-
-	return error_message;
-}
-
-auto	C_Print_Invoice_Service::__HPDF_DrawTable() -> string
-{
-	MESSAGE_DEBUG("", "", "start");
-
-	auto	error_message = ""s;
-
-	MESSAGE_DEBUG("", "", "finish");
-
-	return error_message;
-}
-
-auto	C_Print_Invoice_Service::__HPDF_DrawFooter() -> string
-{
-	MESSAGE_DEBUG("", "", "start");
-
-	auto	error_message = ""s;
 
 	MESSAGE_DEBUG("", "", "finish");
 
@@ -929,7 +1097,7 @@ auto	C_Print_Invoice_Service::PrintAsPDF() -> string
 	}
 	if(error_message.empty())
 	{
-		if((error_message = __HPDF_DrawTitle()).length())				{ MESSAGE_ERROR("", "", "hpdf: fail to draw timecard title"); }
+		if((error_message = __HPDF_DrawHeader()).length())				{ MESSAGE_ERROR("", "", "hpdf: fail to draw timecard title"); }
 	}
 	if(error_message.empty())
 	{

@@ -94,6 +94,8 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 	C_Print_Invoice_Service	*invoice_printer = &invoice_agency;
 	C_Print_Act_Agency		act_agency;
 	C_Print_Invoice_Service	*act_printer = &act_agency;
+	C_Print_VAT_Agency		vat_service;
+	C_Print_VAT_Service		*vat_printer = &vat_service;
 
 	auto					error_message = ""s;
 
@@ -274,6 +276,39 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 			{
 				act_printer->SetFilename(act_filename_pdf);
 				error_message = act_printer->PrintAsPDF();
+				if(error_message.empty()) {}
+				else
+				{
+					MESSAGE_ERROR("", "", "fail to build act (pdf format)");
+				}
+			}
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "due to previous error act (xls format) won't be printed");
+		}
+
+		if(error_message.empty())
+		{
+			vat_printer->SetDB(db);
+			vat_printer->SetVariableSet(&invoicing_vars);
+
+			vat_printer->SetCostCenterID(cost_center_id);
+
+			if(error_message.empty()) 
+			{
+				vat_printer->SetFilename(vat_filename_xls);
+				error_message = vat_printer->PrintAsXLS();
+				if(error_message.empty()) {}
+				else
+				{
+					MESSAGE_ERROR("", "", "fail to build act (xls format)");
+				}
+			}
+			if(error_message.empty()) 
+			{
+				vat_printer->SetFilename(vat_filename_pdf);
+				error_message = vat_printer->PrintAsPDF();
 				if(error_message.empty()) {}
 				else
 				{

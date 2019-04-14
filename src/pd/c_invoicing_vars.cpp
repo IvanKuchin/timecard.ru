@@ -85,6 +85,8 @@ auto	C_Invoicing_Vars::GenerateVariableSet() -> string
 			if(error_message.empty()) error_message = AssignVariableValue("Recipient", gettext("Recipient"), true);
 			if(error_message.empty()) error_message = AssignVariableValue("Invoice", gettext("Invoice"), true);
 			if(error_message.empty()) error_message = AssignVariableValue("Act", gettext("Act"), true);
+			if(error_message.empty()) error_message = AssignVariableValue("VAT doc", gettext("VAT doc"), true);
+			if(error_message.empty()) error_message = AssignVariableValue("VAT comment1", gettext("VAT comment1"), true);
 			if(error_message.empty()) error_message = AssignVariableValue("agreement from", gettext("agreement from"), true);
 			if(error_message.empty()) error_message = AssignVariableValue("agreement declensioned", gettext("agreement declensioned"), true);
 			if(error_message.empty()) error_message = AssignVariableValue("Technical Requirement agreement short", gettext("Technical Requirement agreement short"), true);
@@ -93,11 +95,18 @@ auto	C_Invoicing_Vars::GenerateVariableSet() -> string
 			if(error_message.empty()) error_message = AssignVariableValue("in scope", gettext("in scope"), true);
 			if(error_message.empty()) error_message = AssignVariableValue("Provider", gettext("Provider"), true);
 			if(error_message.empty()) error_message = AssignVariableValue("Customer", gettext("Customer"), true);
+			if(error_message.empty()) error_message = AssignVariableValue("Seller", gettext("Seller"), true);
+			if(error_message.empty()) error_message = AssignVariableValue("Buyer", gettext("Buyer"), true);
 			if(error_message.empty()) error_message = AssignVariableValue("Supplier", gettext("Supplier"), true);
 			if(error_message.empty()) error_message = AssignVariableValue("Goods", gettext("Goods"), true);
 			if(error_message.empty()) error_message = AssignVariableValue("Basis", gettext("Basis"), true);
 			if(error_message.empty()) error_message = AssignVariableValue("Price", gettext("Price"), true);
 			if(error_message.empty()) error_message = AssignVariableValue("Total", gettext("Total"), true);
+			if(error_message.empty()) error_message = AssignVariableValue("Total (tax free)", gettext("Total (tax free)"), true);
+			if(error_message.empty()) error_message = AssignVariableValue("Excise", gettext("Excise"), true);
+			if(error_message.empty()) error_message = AssignVariableValue("no excise", gettext("no excise"), true);
+			if(error_message.empty()) error_message = AssignVariableValue("Tax rate", gettext("Tax rate"), true);
+			if(error_message.empty()) error_message = AssignVariableValue("Tax amount", gettext("Tax amount"), true);
 			if(error_message.empty()) error_message = AssignVariableValue("Quantity short", gettext("Quantity short"), true);
 			if(error_message.empty()) error_message = AssignVariableValue("Items short", gettext("Items short"), true);
 			if(error_message.empty()) error_message = AssignVariableValue("item short", gettext("item short"), true);
@@ -108,6 +117,8 @@ auto	C_Invoicing_Vars::GenerateVariableSet() -> string
 			if(error_message.empty()) error_message = AssignVariableValue("rur.", gettext("rur."), true);
 			if(error_message.empty()) error_message = AssignVariableValue("Director", gettext("Director"), true);
 			if(error_message.empty()) error_message = AssignVariableValue("Accountant", gettext("Accountant"), true);
+			if(error_message.empty()) error_message = AssignVariableValue("Measure unit (code)", gettext("Measure unit (code)"), true);
+			if(error_message.empty()) error_message = AssignVariableValue("Measure unit (name)", gettext("Measure unit (name)"), true);
 
 
 			if(error_message.empty()) error_message = AssignVariableValue("cost_center_id", cost_center_id, true);

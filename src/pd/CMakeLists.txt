@@ -20,6 +20,7 @@ set(INVOICE_LIB_SRCs
     c_invoicing_vars.cpp
     c_print_timecard.cpp
     c_print_invoice_service.cpp
+    c_print_vat_service.cpp
     c_timecard_to_print.cpp
     )
 
@@ -32,6 +33,7 @@ set(JOINT_LIBRARY_SRCs
     utilities_timecard1.cpp     # --- order is important, must follow c_bt
     utilities_timecard2.cpp
     )
+
 
 # --- MACROSes start ---
 

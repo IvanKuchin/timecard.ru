@@ -60,6 +60,7 @@ class C_PDF
 		auto			__HPDF_MoveLineDown() -> string					{ return __HPDF_MoveLineDown(__pdf_font_height); };
 		auto			__HPDF_MoveLineDown(int line_increment) -> string;
 		auto			__HPDF_PrintTextRect(string text, double left_shift_percent, double right_shift_percent, HPDF_TextAlignment align, Font_Type font_type, HPDF_REAL font_size, bool move_line_down) -> string;
+		auto			__HPDF_DrawRect(double left_shift_percent, double top_shift_line, double right_shift_percent, double bottom_shift_line) -> string;
 
 		auto			__HPDF_StartTable() -> string;
 		auto			__HPDF_GetNumberOfLinesInTable(unsigned int index_col, string text, Font_Type font_type, HPDF_REAL font_size) -> int;
