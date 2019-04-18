@@ -45,6 +45,9 @@
 #define TEMPLATE_CC_DIRECTORY						string(IMAGEROOTDIR) + string("/html/templates_costcenter/")
 #define	TEMPLATE_CC_NUMBER_OF_FOLDERS				512
 #define	TEMPLATE_CC_MAX_FILE_SIZE					2 * 1024 * 1024
+#define TEMPLATE_COMPANY_DIRECTORY					string(IMAGEROOTDIR) + string("/html/templates_company/")
+#define	TEMPLATE_COMPANY_NUMBER_OF_FOLDERS			512
+#define	TEMPLATE_COMPANY_MAX_FILE_SIZE				2 * 1024 * 1024
 
 #define	MMDB_fname									"${MAXMIND_INSTALL_DIR}/GeoLite2-City.mmdb"
 

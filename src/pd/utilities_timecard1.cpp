@@ -1130,7 +1130,13 @@ string GetCompanyListInJSONFormat(string dbQuery, CMysql *db, CUser *user, bool 
 					ostFinal << "\"owners\": ["			   	<< (include_employees ? GetUserListInJSONFormat("SELECT * FROM `users` WHERE `id`=\"" + companiesList[i].admin_userID + "\";", db, user) : "") << "],";
 					ostFinal << "\"employees\": ["			<< (include_employees ? GetAgencyEmployeesInJSONFormat(companiesList[i].id, db, user) : "") << "],";
 					ostFinal << "\"custom_fields\":[" 		<< GetCompanyCustomFieldsInJSONFormat("SELECT * FROM `company_custom_fields` WHERE `company_id`=\"" + companiesList[i].id + "\" "
-																+ (user->GetType() == "subcontractor" ? " AND (`visible_by_subcontractor`=\"Y\" OR `editable_by_subcontractor`=\"Y\") " : "")
+																+	(
+																	user 
+																		? (user->GetType() == "subcontractor")
+																	 		? " AND (`visible_by_subcontractor`=\"Y\" OR `editable_by_subcontractor`=\"Y\") " 
+																	 		: ""
+																	 	: ""
+																	 )
 																+ ";", db, user)
 																+ "],";
 					ostFinal << "\"isMine\": \""			<< (user ? companiesList[i].admin_userID == user->GetID() : false) << "\"";
