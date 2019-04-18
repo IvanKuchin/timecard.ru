@@ -10,7 +10,9 @@ size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *user
 	}
 
 	size_t				bufferLength = size * nmemb;
-	unique_ptr<char[]>	tempSmartPointer(new char[bufferLength + 1]); // "+1" must host last '\0'
+	// --- don't use first option
+	// unique_ptr<char[]>	tempSmartPointer(new char[bufferLength + 1]); // "+1" must host last '\0'	
+	unique_ptr<char[]>	tempSmartPointer = make_unique<char[]>(bufferLength + 1); // "+1" must host last '\0'	
 	char				*bufferToWrite = tempSmartPointer.get();
 
 	memcpy(bufferToWrite, contents, bufferLength);
@@ -18,101 +20,139 @@ size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *user
 
 	obj->AppendToHTMLPage(bufferToWrite);
 
-	{
-		CLog	log;
-		log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]:end");
-	}
+	MESSAGE_DEBUG("", "", "finish (size of allocated buffer is " + to_string(bufferLength) + ")");
 
 	return bufferLength;
 }
 
 CHTML::CHTML()
 {
-	{
-		CLog	log;
-		log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]:start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	// --- Repeated calls to curl_global_init and curl_global_cleanup should be avoided. They should only be called once each.
 	curl_global_init(CURL_GLOBAL_ALL);
 
-	{
-		CLog	log;
-		log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]:end");
-	}
+	MESSAGE_DEBUG("", "", "finish");
 }
 
 CHTML::CHTML(string _type_): type(_type_)
 {
-	{
-		CLog	log;
-		log.Write(DEBUG, string("CHTML::") + string(__func__) + string("(" + _type_ + ")[") + to_string(__LINE__) +  "]:start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	// --- Repeated calls to curl_global_init and curl_global_cleanup should be avoided. They should only be called once each.
 	curl_global_init(CURL_GLOBAL_ALL);
 
-	{
-		CLog	log;
-		log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]:end");
-	}
+	MESSAGE_DEBUG("", "", "finish");
 }
 
-string CHTML::ExtractContentAttribute(string prefix, string postfix)
+string CHTML::GetTagContent(string tag_name)
 {
-	string			 	result = "";
-	string::size_type	openTagPos, closeTagPos;
+	MESSAGE_DEBUG("", "", "start(" + tag_name + ")");
 
-	{
-		CLog	log;
-		log.Write(DEBUG, string("CHTML::") + string(__func__) + string("(prefix = ") + prefix + ", postfix = " + postfix + string(")[") + to_string(__LINE__) +  "]:start");
-	}
+    auto        result = ""s;
+    smatch      sm1, sm2;
 
-	openTagPos = headTag.find(prefix);
-	if(openTagPos != string::npos)
-	{
-		openTagPos += string(prefix).length();
-		closeTagPos = headTag.find(postfix, openTagPos);
-		if(closeTagPos != string::npos)
-		{
-			result = headTag.substr(openTagPos, closeTagPos - openTagPos);
-		}
-		else
-		{
-			MESSAGE_DEBUG("", "", "close part not found");
-		}
+    if(regex_search(headTag, sm1, regex("<" + tag_name + ".*>(.*)</" + tag_name + ">")) )
+    {
+        result = sm1[1];
+    }
+    else
+    {
+    	MESSAGE_DEBUG("", "", "tag <" + tag_name + "> not found");
+    }
 
-	}
-	else
-	{
-		MESSAGE_DEBUG("", "", "open part not found");
-	}
+	MESSAGE_DEBUG("", "", "finish (result length is " + to_string(result.length()) + ")");
 
-	MESSAGE_DEBUG("", "", "end (return string with len()=" + to_string(result.length()) + ")");
+    return result;
+}
 
-	return result;
+string CHTML::GetAttributeValue(string tag_name, string attr_name, string name_content, string attr_content_name)
+{
+	MESSAGE_DEBUG("", "", "start( " + tag_name + ", " + attr_name + ", " + name_content + ", " + attr_content_name + ")");
+
+    auto        result = ""s;
+    auto        tag_start = headTag.find("<" + tag_name);
+    auto        tag_close = tag_start; // --- type drivation only
+    
+
+    while(tag_start != string::npos)
+    {
+        tag_close = headTag.find(">", tag_start);
+
+        if(tag_close != string::npos)
+        {
+            auto    tag_attrs = headTag.substr(tag_start, tag_close - tag_start);
+            auto    name_start = tag_attrs.find(attr_name + "=");
+            
+            if(name_start != string::npos)
+            {
+                if(tag_attrs.find(name_content, name_start) != string::npos)
+                {
+                    auto    content_attr_start = tag_attrs.find(attr_content_name + "=");
+                    
+                    if(content_attr_start != string::npos)
+                    {
+                        auto content_start = content_attr_start + string(attr_content_name + "=").length();
+
+                        if(content_start + 1 < tag_attrs.length())
+                        {
+                            auto attr_separate_symbol = tag_attrs.at(content_start);
+                            auto content_end_pos = tag_attrs.find(attr_separate_symbol, content_start + 1);
+                            
+                            if(content_end_pos != string::npos)
+                            {
+                                result = tag_attrs.substr(content_start + 1, content_end_pos - (content_start + 2) + 1);
+                            }
+                            else
+                            {
+                            	MESSAGE_ERROR("", "", "can't find separator symbol("s + attr_separate_symbol + ")");
+                            }
+                        }
+                        else
+                        {
+                        	MESSAGE_ERROR("", "", "content start position at the end of attribule list");
+                        }
+                    }
+                    else
+                    {
+	                	MESSAGE_DEBUG("", "", attr_content_name + " not found");
+                    }
+                }
+                else
+                {
+                	MESSAGE_DEBUG("", "", name_content + " not found");
+                }
+            }
+            else
+            {
+            	MESSAGE_DEBUG("", "", attr_name + " not found");
+            }
+        }
+        else
+        {
+        	MESSAGE_DEBUG("", "", "closing brace not found");
+        }
+
+        tag_start = headTag.find("<" + tag_name, tag_close);
+    }
+
+	MESSAGE_DEBUG("", "", "finish (result length is " + to_string(result.length()) + ")");
+    
+    return result;
 }
 
 bool CHTML::ExtractTITLE()
 {
 	bool			 	result = true;
 
-	{
-		CLog	log;
-		log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]:start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
-	metaTitle = ExtractContentAttribute("<title>", "</title>");
-	if(metaTitle.length() == 0) metaTitle = ExtractContentAttribute("<meta name=\"title\" content=\"", "\"");
-	if(metaTitle.length() == 0) metaTitle = ExtractContentAttribute("<meta name='title' content=\"", "\"");
-	if(metaTitle.length() == 0) metaTitle = ExtractContentAttribute("<meta name=title content=\"", "\"");
+	metaTitle = GetTagContent("title");
+	if(metaTitle.length() == 0) metaTitle = GetAttributeValue("meta",  "name", "title",  "content");
 
-	{
-		CLog	log;
-		log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]:end (return: " + (result ? "true" : "false") + ")");
-	}
+	MESSAGE_DEBUG("", "", "finish (return: " + (result ? "true" : "false") + ")");
 
-	return result;
+	return result;	
 }
 
 bool CHTML::isEmbedVideoHostedOnYoutube()
@@ -120,34 +160,23 @@ bool CHTML::isEmbedVideoHostedOnYoutube()
 	bool			 	result = false;
 	regex				regex1("https?://www.youtube.com/(.*)");
 	regex				regex2("https?://youtu.be/(.*)");
-	{
-		CLog	log;
-		log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]:start");
-	}
+
+	MESSAGE_DEBUG("", "", "start");
 
 	result = (regex_match(embedVideoURL, regex1)) || (regex_match(embedVideoURL, regex2));
 
-	{
-		CLog	log;
-		log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]:end (return: " + (result ? "true" : "false") + ")");
-	}
+	MESSAGE_DEBUG("", "", "finish (return: " + (result ? "true" : "false") + ")");
 
 	return result;
 }
 
 bool CHTML::ExtractEmbedVideoURL()
 {
-	{
-		CLog	log;
-		log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]:start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
-	embedVideoURL = ExtractContentAttribute("<meta property=\"og:video:url\" content=\"", "\"");
+	embedVideoURL = GetAttributeValue("meta",  "property", "og:video:url", "content");
 
-	{
-		CLog	log;
-		log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]:end (return: " + (!embedVideoURL.empty() ? "true" : "false") + ")");
-	}
+	MESSAGE_DEBUG("", "", "finish (return: " + (!embedVideoURL.empty() ? "true" : "false") + ")");
 
 	return !embedVideoURL.empty();
 }
@@ -155,41 +184,30 @@ bool CHTML::ExtractEmbedVideoURL()
 bool CHTML::ExtractPreviewImage()
 {
 	bool	result;
-	{
-		CLog	log;
-		log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]:start");
-	}
 
-	metaPreviewImageURL = ExtractContentAttribute("<meta property=\"og:image\" content=\"", "\"");
+	MESSAGE_DEBUG("", "", "start");
+
+	metaPreviewImageURL = GetAttributeValue("meta", "property", "og:image", "content");
 	result = !metaPreviewImageURL.empty();
 
-	{
-		CLog	log;
-		log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]:end (return: " + (result ? "true" : "false") + ")");
-	}
+	MESSAGE_DEBUG("", "", "finish (return: " + (result ? "true" : "false") + ")");
 
-	return result;
+	return result;	
 }
 
 bool CHTML::ExtractDESCRIPTION()
 {
 	bool			 	result = true;
 
-	{
-		CLog	log;
-		log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]:start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
-	metaDescription = ExtractContentAttribute("<meta name=\"description\" content=\"", "\"");
-	if(metaDescription.length() == 0) metaDescription = ExtractContentAttribute("<meta name='description' content=\"", "\"");
-	if(metaDescription.length() == 0) metaDescription = ExtractContentAttribute("<meta name=description content=\"", "\"");
+	metaDescription = GetAttributeValue("meta", "name", "description", "content");
+	if(metaDescription.empty())
+		metaDescription = GetAttributeValue("meta", "property", "og:description", "content");
 
-	{
-		CLog	log;
-		log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]:end (return: " + (result ? "true" : "false") + ")");
-	}
+	MESSAGE_DEBUG("", "", "finish (return: " + (result ? "true" : "false") + ")");
 
-	return result;
+	return result;	
 }
 
 bool CHTML::ExtractHEAD()
@@ -197,10 +215,7 @@ bool CHTML::ExtractHEAD()
 	bool			 	result = false;
 	string::size_type	openTagPos, closeTagPos;
 
-	{
-		CLog	log;
-		log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]:start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	openTagPos = htmlPage.find("<head>");
 	if(openTagPos == string::npos) openTagPos = htmlPage.find("< head >");
@@ -222,25 +237,16 @@ bool CHTML::ExtractHEAD()
 		}
 		else
 		{
-			{
-				CLog	log;
-				log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]: close tag not found");
-			}
+			MESSAGE_DEBUG("", "", " close tag not found");
 		}
 
 	}
 	else
 	{
-		{
-			CLog	log;
-			log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]: open tag not found");
-		}
+		MESSAGE_DEBUG("", "", " open tag not found");
 	}
 
-	{
-		CLog	log;
-		log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]:end (return: " + (result ? "true" : "false") + ")");
-	}
+	MESSAGE_DEBUG("", "", "finish (return: " + (result ? "true" : "false") + ")");
 
 	return result;
 }
@@ -249,23 +255,16 @@ int CHTML::GetNumberOfFoldersByType()
 {
 	int		result = FEEDIMAGE_NUMBER_OF_FOLDERS;
 
-	{
-		CLog	log;
-		log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]:begin");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	if(type == "feed") result = FEEDIMAGE_NUMBER_OF_FOLDERS;
 	else if(type == "temp") result = TEMPIMAGE_NUMBER_OF_FOLDERS;
 	else
 	{
-		CLog	log;
-		log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]:ERROR:unknown type(" + type + ")");
+		MESSAGE_DEBUG("", "", "ERROR:unknown type(" + type + ")");
 	}
 
-	{
-		CLog	log;
-		log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]:finish (result = " + to_string(result) + ")");
-	}
+	MESSAGE_DEBUG("", "", "finish (result = " + to_string(result) + ")");
 
 	return result;
 }
@@ -274,23 +273,16 @@ string CHTML::GetDirectoryByType()
 {
 	string		result = IMAGE_FEED_DIRECTORY;
 
-	{
-		CLog	log;
-		log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]:begin");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	if(type == "feed") result = IMAGE_FEED_DIRECTORY;
 	else if(type == "temp") result = IMAGE_TEMP_DIRECTORY;
 	else
 	{
-		CLog	log;
-		log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]:ERROR:unknown type(" + type + ")");
+		MESSAGE_DEBUG("", "", "ERROR:unknown type(" + type + ")");
 	}
 
-	{
-		CLog	log;
-		log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]:finish (result = " + result + ")");
-	}
+	MESSAGE_DEBUG("", "", "finish (result = " + result + ")");
 
 	return result;
 }
@@ -301,10 +293,7 @@ tuple<string, string, string> CHTML::PickFileName()
 	int			folderID;
 	string		finalFile, tmpFile2Check, tmpImageJPG;
 
-	{
-		CLog	log;
-		log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]:begin");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	//--- check image file existing
 	do
@@ -346,10 +335,7 @@ tuple<string, string, string> CHTML::PickFileName()
         tmpImageJPG = ost.str();
 	} while(isFileExists(finalFile) || isFileExists(tmpFile2Check) || isFileExists(tmpImageJPG));
 
-	{
-		CLog	log;
-		log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]:end (return: folderID: " + to_string(folderID) + ", filePrefix:" + filePrefix + ", fileExtention:" + fileExtention + ")");
-	}
+	MESSAGE_DEBUG("", "", "finish (return: folderID: " + to_string(folderID) + ", filePrefix:" + filePrefix + ", fileExtention:" + fileExtention + ")");
 
 	return make_tuple(to_string(folderID), filePrefix, fileExtention);
 }
@@ -358,10 +344,7 @@ bool CHTML::DownloadFile(string urlPreview, FILE *f)
 {
 	bool		result = false;
 
-	{
-		CLog	log;
-		log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]: start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	curl = curl_easy_init();
 	if(curl)
@@ -404,10 +387,7 @@ bool CHTML::DownloadFile(string urlPreview, FILE *f)
 		result = false;
 	}
 
-	{
-		CLog	log;
-		log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]: end (result: " + (result ? "true" : "false"));
-	}
+	MESSAGE_DEBUG("", "", " end (result: " + (result ? "true" : "false"));
 
 	return result;
 }
@@ -416,19 +396,15 @@ bool CHTML::ParseHTMLPage()
 {
 	bool	result = true;
 
-	{
-		CLog	log;
-		log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]:start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	if(ExtractHEAD())
 	{
 /*
 		{
-			CLog	log;
-			log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]: dump head " + headTag);
+			MESSAGE_DEBUG("", "", " dump head " + headTag);
 		}
-*/
+*/		
 		if(ExtractTITLE())
 		{
 
@@ -436,8 +412,7 @@ bool CHTML::ParseHTMLPage()
 		else
 		{
 			{
-				CLog	log;
-				log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]: TITLE tag not found");
+				MESSAGE_DEBUG("", "", " TITLE tag not found");
 			}
 		}
 
@@ -448,8 +423,7 @@ bool CHTML::ParseHTMLPage()
 		else
 		{
 			{
-				CLog	log;
-				log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]: DESCRIPTION tag not found");
+				MESSAGE_DEBUG("", "", " DESCRIPTION tag not found");
 			}
 		}
 
@@ -466,13 +440,9 @@ bool CHTML::ParseHTMLPage()
 				FILE	*f;
 
 				tie(folderID, filePrefix, fileExtention) = PickFileName();
-
+	
 	    		{
-	    			CLog	log;
-	    			ostringstream	ost;
-
-	    			ost << "CHTML::" << __func__ << "[" << __LINE__ << "]: Save preview (" << metaPreviewImageURL << ") to /tmp for checking of image validity [" << "/tmp/tmp_" << filePrefix << fileExtention << "]";
-	    			log.Write(DEBUG, ost.str());
+					MESSAGE_DEBUG("", "", "Save preview (" + metaPreviewImageURL + ") to /tmp for checking of image validity [" + "/tmp/tmp_" + filePrefix + fileExtention + "]");
 	    		}
 
 	            // --- Save file to "/tmp/" for checking of image validity
@@ -486,11 +456,8 @@ bool CHTML::ParseHTMLPage()
 	            	}
 	            	else
 	            	{
+	                    MESSAGE_ERROR("CHTML", "", "fail download file (" + metaPreviewImageURL + ") with curl")
 
-		                {
-		                    CLog            log;
-		                    log.Write(ERROR, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) + "]:ERROR: downloading file with curl");
-		                }
 		                metaPreviewImageURL = "";
 		                folderID = "";
 		                filePrefix = "";
@@ -501,10 +468,8 @@ bool CHTML::ParseHTMLPage()
 	            }
 	            else
 	            {
-	                {
-	                    CLog            log;
-	                    log.Write(ERROR, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) + "]:ERROR: writing file: /tmp/tmp_" + filePrefix + fileExtention);
-	                }
+                    MESSAGE_ERROR("CHTML", "", "writing file: /tmp/tmp_" + filePrefix + fileExtention);
+
 	                metaPreviewImageURL = "";
 	                folderID = "";
 	                filePrefix = "";
@@ -514,24 +479,15 @@ bool CHTML::ParseHTMLPage()
 		}
 		else
 		{
-			{
-				CLog	log;
-				log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]: (embed video, preview image) not found");
-			}
+			MESSAGE_DEBUG("", "", " (embed video, preview image) not found");
 		}
 	}
 	else
 	{
-		{
-			CLog	log;
-			log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]: HEAD tag not found");
-		}
+		MESSAGE_DEBUG("", "", " HEAD tag not found");
 	}
 
-	{
-		CLog	log;
-		log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]:end (return: " + (result ? "true" : "false") + ")");
-	}
+	MESSAGE_DEBUG("", "", "finish (return: " + (result ? "true" : "false") + ")");
 
 	return result;
 }
@@ -540,10 +496,7 @@ bool CHTML::ParseHTMLPage()
 bool CHTML::PerformRequest(string param)
 {
 	bool		result = false;
-	{
-		CLog	log;
-		log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]:start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	url = param;
 	if(url.length())
@@ -627,20 +580,14 @@ bool CHTML::PerformRequest(string param)
 		result = false;
 	}
 
-	{
-		CLog	log;
-		log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]:end (return:" + (result ? "true" : "false") + ")");
-	}
+	MESSAGE_DEBUG("", "", "finish (return:" + (result ? "true" : "false") + ")");
 
 	return result;
 }
 
 void CHTML::ResetMetaValues()
 {
-	{
-		CLog	log;
-		log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]:start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	htmlPage = "";
 	headTag = "";
@@ -651,39 +598,15 @@ void CHTML::ResetMetaValues()
 	filePrefix = "";
 	fileExtention = "";
 
-	{
-		CLog	log;
-		log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]:end");
-	}
-}
-
-void CHTML::AppendToHTMLPage(string param)
-{
-	{
-		CLog	log;
-		log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]:start");
-	}
-
-	htmlPage += param;
-
-	{
-		CLog	log;
-		log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]:end");
-	}
+	MESSAGE_DEBUG("", "", "finish");
 }
 
 CHTML::~CHTML()
 {
-	{
-		CLog	log;
-		log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]:start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	// --- Repeated calls to curl_global_init and curl_global_cleanup should be avoided. They should only be called once each.
 	curl_global_cleanup();
 
-	{
-		CLog	log;
-		log.Write(DEBUG, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]:end");
-	}
+	MESSAGE_DEBUG("", "", "finish");
 }

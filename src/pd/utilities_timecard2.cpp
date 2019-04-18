@@ -1462,3 +1462,83 @@ auto	GetCostCenterCustomFieldsInJSONFormat(string sqlQuery, CMysql *db, CUser *u
 	return result;
 }
 
+auto	GetCompanyCustomFieldsInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
+{
+	int		affected;
+	auto	result = ""s;
+	struct ItemClass
+	{
+		string	id;
+		string	company_id;
+		string	title;
+		string	description;
+		string	type;
+		string	var_name;
+		string	value;
+		string	visible_by_subcontractor;
+		string	editable_by_subcontractor;
+		string	owner_user_id;
+		string	eventTimestamp;
+	};
+	vector<ItemClass>		itemsList;
+
+	{
+		MESSAGE_DEBUG("", "", "start");
+	}
+
+	affected = db->Query(sqlQuery);
+	if(affected)
+	{
+		for(int i = 0; i < affected; i++)
+		{
+			ItemClass	item;
+
+			item.id = db->Get(i, "id");
+			item.company_id = db->Get(i, "company_id");
+			item.title = db->Get(i, "title");
+			item.description = db->Get(i, "description");
+			item.type = db->Get(i, "type");
+			item.var_name = db->Get(i, "var_name");
+			item.value = db->Get(i, "value");
+			item.visible_by_subcontractor = db->Get(i, "visible_by_subcontractor");
+			item.editable_by_subcontractor = db->Get(i, "editable_by_subcontractor");
+			item.owner_user_id = db->Get(i, "owner_user_id");
+			item.eventTimestamp = db->Get(i, "eventTimestamp");
+
+			itemsList.push_back(item);
+		}
+
+		for (const auto& item : itemsList)
+		{
+			if(result.length()) result += ",";
+			result +=	"{";
+
+			result += "\"id\":\""							+ item.id + "\",";
+			result += "\"company_id\":\""				+ item.company_id + "\",";
+			result += "\"title\":\""						+ item.title + "\",";
+			result += "\"description\":\""					+ item.description + "\",";
+			result += "\"type\":\""							+ item.type + "\",";
+			result += "\"var_name\":\""						+ item.var_name + "\",";
+			result += "\"value\":\""						+ item.value + "\",";
+			result += "\"visible_by_subcontractor\":\""		+ item.visible_by_subcontractor + "\",";
+			result += "\"editable_by_subcontractor\":\""	+ item.editable_by_subcontractor + "\",";
+			result += "\"owner_user_id\":\""				+ item.owner_user_id + "\",";
+			result += "\"eventTimestamp\":\""				+ item.eventTimestamp + "\"";
+
+			result +=	"}";
+		}
+	}
+	else
+	{
+		{
+			MESSAGE_DEBUG("", "", "no bt items assigned");
+		}
+	}
+
+	{
+		MESSAGE_DEBUG("", "", "finish");
+	}
+
+	return result;
+}
+

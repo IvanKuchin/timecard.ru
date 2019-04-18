@@ -29,6 +29,8 @@ class CCgi
 		CSession	sessionDB;
 		int			initHeadersFlag;
 
+		string		content = "";
+
 		void		InitHeaders();
 
 		//it's temporarily
@@ -49,6 +51,8 @@ class CCgi
 
 		void	SetDB(CMysql *mysql);
 
+		void	SetVars(CVars &param) 				{ vars = param; };
+
 		bool	SetTemplateFile(string fileName);
 		bool	SetTemplate(string templ);
 
@@ -56,17 +60,19 @@ class CCgi
 		//in: string
 		//out: string
 		string	RenderLine(string rLine);
+		auto	RenderTemplate() -> string;
 
 		//Out templateFile wich content <<>> tags
 		//in: nothing
 		//out:nothing
 		void	OutTemplate();
+		auto	GetContent()						{ return content; };
 
 		//Simple out string to stdout
 		//in: nothing
 		//out:nothing
-		void	OutString(const char *str, bool endlFlag);
-		void	OutString(const string str, bool endlFlag);
+		void	OutString(const string &str, bool endlFlag);
+		void	AddToContent(const string &str, bool endlFlag);
 
 		void	OutStringEncode(const char *str);
 		string	StringEncode(string str);

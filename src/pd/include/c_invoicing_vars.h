@@ -27,12 +27,13 @@ class C_Invoicing_Vars
 		string							cost_center_id = "";
 		string							agency_company_id = "";
 
-		auto		AssignVariableValue(const string &var_name, const string &value, bool isMandatory);
-		auto		AssignVariableFromDB(const string &var_name, const string &sql_query, bool isMandatory);
 
 	public:
 					C_Invoicing_Vars();
 					C_Invoicing_Vars(CMysql *param1, CUser *param2) : db(param1), user(param2) {};
+
+		auto		AssignVariableValue(const string &var_name, const string &value, bool isMandatory) -> string;
+		auto		AssignVariableFromDB(const string &var_name, const string &sql_query, bool isMandatory) -> string;
 
 		auto		SetTimecards(const vector<C_Timecard_To_Print> &param)	{ timecard_obj_list = param; };
 		auto		SetCostCenterID(const string &param)	{ cost_center_id = param; };
@@ -44,6 +45,7 @@ class C_Invoicing_Vars
 
 		auto		Get(const string &) -> string;
 
+		auto		GetVars()								{ return vars; };
 
 };
 

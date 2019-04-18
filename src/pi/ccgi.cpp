@@ -105,29 +105,28 @@ string CCgi::GetEncoding()
 	string	result, lng;
 
 	lng = GetLanguage();
+
+	if(lng.empty())
+		return "utf-8";
 	if(lng == "ru")
 		return "utf-8";
 	if(lng == "en")
 		return "utf-8";
+
+	MESSAGE_DEBUG("", "", "unknown language (" + lng + ")");
 
 	return "utf-8";
 }
 
 string	CCgi::GetCity()
 {
-	string	result ="";
+	auto	result =""s;
 	
-	{
-		CLog logFile;
-		logFile.Write(DEBUG, "CCgi::" + string(__func__) + "[" + to_string(__LINE__) + "]: start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	result = sessionDB.DetectCity();
 
-	{
-		CLog logFile;
-		logFile.Write(DEBUG, "CCgi::" + string(__func__) + "[" + to_string(__LINE__) + "]: finish (city length is " + to_string(result.length()) + ")");
-	}
+	MESSAGE_DEBUG("", "", "finish (city length is " + to_string(result.length()) + ")");
 
 	return result;
 }
@@ -136,17 +135,11 @@ string	CCgi::GetCountry()
 {
 	string	result ="";
 
-	{
-		CLog logFile;
-		logFile.Write(DEBUG, "CCgi::" + string(__func__) + "[" + to_string(__LINE__) + "]: start");
-	}
+	MESSAGE_DEBUG("", "", "start")
 
 	result = sessionDB.DetectCountry();
 
-	{
-		CLog logFile;
-		logFile.Write(DEBUG, "CCgi::" + string(__func__) + "[" + to_string(__LINE__) + "]: finish (country length is " + to_string(result.length()) + ")");
-	}
+	MESSAGE_DEBUG("", "", "finish (country length is " + to_string(result.length()) + ")")
 
 	return result;
 }
@@ -158,31 +151,32 @@ bool CCgi::SetTemplate(string templ)
 
 bool CCgi::SetTemplateFile(string fileName)
 {
+	auto	result = true;
 
-	{
-		CLog logFile;
-		logFile.Write(DEBUG, "CCgi::" + string(__func__) + "[" + to_string(__LINE__) + "]: setting up template [", fileName, "]");
-	}
+	MESSAGE_DEBUG("", "", "start (" + fileName + ")")
 
     templateFile = fopen(fileName.c_str(), "r");
     if(!templateFile)
     {
-		CLog logFile;
-		logFile.Write(ERROR, "CCgi::" + string(__func__) + "[" + to_string(__LINE__) + "]: Template error: can't open file", fileName);
+		MESSAGE_ERROR("", "", "can't open " + fileName);
+
 		templateFile = NULL;
 
-		return FALSE;
+		result = false;
     }
 
-    return TRUE;
+	MESSAGE_DEBUG("", "", "finish (result is " + to_string(result) + ")")
+
+    return result;
 }
 
-void CCgi::OutString(const char *str, bool endlFlag = true)
+void CCgi::OutString(const string &str, bool endlFlag = true)
 {
-    if(!str) return;
+	if(str.empty()) return;
 
 	cout << str;
-    if(endlFlag) cout << endl;
+	if(endlFlag) cout << endl;
+
 /*
 	// --- debug warning too much output
     {
@@ -192,25 +186,19 @@ void CCgi::OutString(const char *str, bool endlFlag = true)
 */
 }
 
-void CCgi::OutString(const string str, bool endlFlag = true)
+void CCgi::AddToContent(const string &str, bool endlFlag = true)
 {
-    if(str.empty()) return;
+	if(str.empty()) return;
 
-	cout << str;
-    if(endlFlag) cout << endl;
-/*
-	// --- debug warning too much output
-    {
-		CLog logFile;
-		logFile.Write(DEBUG, "----- ", str);
-    }
-*/
+	content += str + (endlFlag ? "\n" : "");
+	// OutString(str, endlFlag);
 }
+
+
 
 string CCgi::StringEncode(string str)
 {
-    if(str.empty())
-	return str;
+    if(str.empty()) return str;
 
     return ReplaceHTMLTags(str);
 }
@@ -235,7 +223,7 @@ string CCgi::RenderLine(string rLine)
 	    findE = result.find(">>");
 	    if(findE == string::npos)
 	    {
-	    	MESSAGE_ERROR("CCgi", "", "error in template compilation: found '<<vars:' w/o trailing '>>'");
+	    	MESSAGE_ERROR("", "", "error in template compilation: found '<<vars:' w/o trailing '>>'");
 			break;
 	    }
 
@@ -247,7 +235,7 @@ string CCgi::RenderLine(string rLine)
 
 /*
 		// --- commented to reduce log flooding
-		MESSAGE_DEBUG("CCgi", "", rendering var length: " + result);
+		MESSAGE_DEBUG("", "", rendering var length: " + result);
 */
 	}
 
@@ -267,14 +255,11 @@ void CCgi::InitHeaders()
 		strftime(date, sizeof(date) - 2, "Last-Modified: %a, %d %b %Y %X %Z", localtime(&t));
 		OutString(date);
 
-		OutString("Status-text: powered by Ivan Kuchin");
-
-		cook = cookie.GetAll();
-		OutString(cook);
+		OutString(cookie.GetAll());
 
 		ost.str("");
-		ost << "Content-Type: text/html; charset=" << GetEncoding() << ";" << endl << endl;
-		OutString(ost.str());
+		ost << "Content-Type: text/html; charset=" + GetEncoding() + ";" << endl << endl;
+		OutString(ost.str(), false);
     }
 }
 
@@ -350,11 +335,69 @@ string CCgi::RecvLine(FILE *s)
     return result;
 }
 
+auto CCgi::RenderTemplate() -> string
+{
+	auto	result = ""s;
+
+    MESSAGE_DEBUG("", "", "start");
+
+    if(templateFile)
+    {
+	    auto fLine = RecvLine(templateFile);
+
+	    while(fLine.length() > 0)
+	    {
+
+	    	// --- vars: check must precede template: check
+	    	// --- reason behind is to have capability do constructions like this 
+	    	// --- <<template:templates/ru/pages/<<vars:user_type>>_navigation_menu.htmlt>>
+			if(fLine.find("<<vars:") != string::npos) fLine = RenderLine(fLine);
+
+			if(fLine.find("<<template:") != string::npos)
+			{
+				string::size_type	bPos;
+			    string::size_type	ePos;
+
+			    bPos = fLine.find("<<template:");
+			    ePos = fLine.find(">>");
+			    if(ePos != string::npos)
+			    {
+					string	templateName = fLine.substr(bPos + 11, ePos - bPos - 11);
+					CCgi	nextTempl(templateName.c_str(), vars);
+
+					string	before = fLine.substr(0, bPos);
+					string	after = fLine.substr(ePos + 2, fLine.length() - ePos - 2);
+
+					result += before + nextTempl.RenderTemplate() + after;
+			    }
+			    else
+			    {
+					result += fLine;
+			    }
+			}
+			else
+			{
+			    result += fLine;
+			}
+
+			fLine = RecvLine(templateFile);
+	    }
+    }
+    else
+    {
+	    MESSAGE_ERROR("", "", "template name is empty");
+    }
+
+    MESSAGE_DEBUG("", "", "finish (result length is " + to_string(result.length()) + ")");
+
+    return result;
+}
+
 void CCgi::OutTemplate()
 {
     string	fLine;
 
-    MESSAGE_DEBUG("CCgi", "", "start");
+    MESSAGE_DEBUG("", "", "start");
 
     if(templateFile)
     {
@@ -386,17 +429,21 @@ void CCgi::OutTemplate()
 					string	after = fLine.substr(ePos + 2, fLine.length() - ePos - 2);
 
 					OutString(before, WITHOUT_ENDL);
+					// AddToContent(before, WITHOUT_ENDL);
 					nextTempl.OutTemplate();
 					OutString(after, WITHOUT_ENDL);
+					// AddToContent(after, WITHOUT_ENDL);
 			    }
 			    else
 			    {
 					OutString(fLine, WITHOUT_ENDL);
+					// AddToContent(fLine, WITHOUT_ENDL);
 			    }
 			}
 			else
 			{
 			    OutString(fLine, WITHOUT_ENDL);
+			    // AddToContent(fLine, WITHOUT_ENDL);
 			}
 
 			fLine = RecvLine(templateFile);
@@ -404,10 +451,10 @@ void CCgi::OutTemplate()
     }
     else
     {
-	    MESSAGE_ERROR("CCgi", "", "template name is empty");
+	    MESSAGE_ERROR("", "", "template name is empty");
     }
 
-    MESSAGE_DEBUG("CCgi", "", "finish");
+    MESSAGE_DEBUG("", "", "finish");
 }
 
 void CCgi::RegisterVariable(string name, string value)
@@ -592,10 +639,7 @@ bool CCgi::Cookie_Expire()
 		cookie.Delete("sessid", "", "/", "");
 	}
 
-	{
-		CLog	log;
-		log.Write(DEBUG, "CCgi::" + string(__func__) + "[" + to_string(__LINE__) + "]: finish");
-	}
+	MESSAGE_DEBUG("", "", "finish");
 
 	return true;
 }
@@ -632,10 +676,7 @@ bool CCgi::Cookie_InitialAction_Expire()
 		cookie.Delete("initialactionid", "", "/", "");
 	}
 
-	{
-		CLog	log;
-		log.Write(DEBUG, "CCgi::" + string(__func__) + "[" + to_string(__LINE__) + "]: finish");
-	}
+	MESSAGE_DEBUG("", "", "finish");
 
 	return true;
 }

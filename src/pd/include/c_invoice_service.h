@@ -10,6 +10,8 @@
 #include "c_print_timecard.h"
 #include "c_print_invoice_service.h"
 #include "c_print_vat_service.h"
+#include "c_print_1c_costcenter.h"
+#include "c_print_1c_subcontractor.h"
 #include "c_archive.h"
 
 using namespace std;
@@ -29,6 +31,7 @@ class C_Invoice_Service
 		string							temp_dir = "";
 		string							temp_dir_timecards = "";
 		string							temp_dir_cost_center_invoices = "";
+		string							temp_dir_1c = "";
 		string							temp_archive_file = "";	// --- archive in temp_dir
 		string							archive_folder = "";	// --- production archive folder
 		string							archive_file = "";		// --- archive in production folder
@@ -37,10 +40,6 @@ class C_Invoice_Service
 		auto		UpdateDBWithInvoiceData(const string timecard_id, c_float amount) -> string;
 		auto		CreateTempDirectory() -> bool;
 		auto		CreateTimecardObj(string timecard_id) -> C_Timecard_To_Print;
-
-		// auto		GeneratePDF() -> string;
-		// auto		GenerateXL() -> string;
-		// auto		GenerateXLSTimecard(string timecard_id) -> string;
 
 	public:
 					C_Invoice_Service();

@@ -1,6 +1,6 @@
 #include "c_invoicing_vars.h"
 
-auto	C_Invoicing_Vars::AssignVariableFromDB(const string &var_name, const string &sql_query, bool isMandatory)
+auto	C_Invoicing_Vars::AssignVariableFromDB(const string &var_name, const string &sql_query, bool isMandatory) -> string
 {
 	auto	error_message = ""s;
 
@@ -43,7 +43,7 @@ auto	C_Invoicing_Vars::AssignVariableFromDB(const string &var_name, const string
 	return error_message;
 }
 
-auto	C_Invoicing_Vars::AssignVariableValue(const string &var_name, const string &value, bool isMandatory)
+auto	C_Invoicing_Vars::AssignVariableValue(const string &var_name, const string &value, bool isMandatory) -> string
 {
 	auto	error_message = ""s;
 
@@ -120,7 +120,6 @@ auto	C_Invoicing_Vars::GenerateVariableSet() -> string
 			if(error_message.empty()) error_message = AssignVariableValue("Measure unit (code)", gettext("Measure unit (code)"), true);
 			if(error_message.empty()) error_message = AssignVariableValue("Measure unit (name)", gettext("Measure unit (name)"), true);
 
-
 			if(error_message.empty()) error_message = AssignVariableValue("cost_center_id", cost_center_id, true);
 			if(error_message.empty())
 			{
@@ -160,13 +159,32 @@ auto	C_Invoicing_Vars::GenerateVariableSet() -> string
 				time_t 				rawtime;
 				struct tm * 		timeinfo;
 				C_Date_Spelling		date_obj;
+				char				buffer1[128];
+				char				buffer2[128];
 
 				time (&rawtime);
 				timeinfo = localtime (&rawtime);
 
+				strftime(buffer1, sizeof(buffer1), "%FT%T", timeinfo);
+				strftime(buffer2, sizeof(buffer2), "%B %Y", timeinfo);
+
 				date_obj.SetTMObj(*timeinfo);
 
-				error_message = AssignVariableValue("invoice_agreement", "№" + Get("cost_center_act_number") + " " + gettext("agreement from") + " " + date_obj.Spell(), true);
+				if(error_message.empty())
+				{
+					if((error_message = AssignVariableValue("invoice_agreement", "№" + Get("cost_center_act_number") + " " + gettext("agreement from") + " " + date_obj.Spell(), true)).length())
+						{ MESSAGE_ERROR("", "", "fail to assign variable value"); }
+				}
+				if(error_message.empty())
+				{
+					if((error_message = AssignVariableValue("Timestamp_1CFormat", buffer1, true)).length())
+						{ MESSAGE_ERROR("", "", "fail to assign variable value"); }
+				}
+				if(error_message.empty())
+				{
+					if((error_message = AssignVariableValue("comment_1C", gettext("Local service delivery") + " "s + buffer2, true)).length())
+						{ MESSAGE_ERROR("", "", "fail to assign variable value"); }
+				}
 			}
 
             if(error_message.empty()) error_message = AssignVariableFromDB("cost_center_company_id"                  , "SELECT `company_id` FROM `cost_centers` WHERE `id`=\"" + Get("cost_center_id") + "\";", true);
@@ -330,6 +348,16 @@ auto	C_Invoicing_Vars::GenerateVariableSet() -> string
 				{
 					if(error_message.empty()) error_message = AssignVariableValue(db->Get(i, "var_name"), db->Get(i, "value"), true);
 				}
+
+				if(Get("1C_template_invoice_to_cc_service").length())
+					AssignVariableValue("1C_template_invoice_to_cc_service_full_path", TEMPLATE_CC_DIRECTORY + Get("1C_template_invoice_to_cc_service"), true);
+				if(Get("1C_template_invoice_to_cc_service_table_row").length())
+					AssignVariableValue("1C_template_invoice_to_cc_service_table_row_full_path", TEMPLATE_CC_DIRECTORY + Get("1C_template_invoice_to_cc_service_table_row"), true);
+				
+				if(Get("1C_template_invoice_to_cc_bt").length())
+					AssignVariableValue("1C_template_invoice_to_cc_bt_full_path", TEMPLATE_CC_DIRECTORY + Get("1C_template_invoice_to_cc_bt"), true);
+				if(Get("1C_template_invoice_to_cc_bt_table_row").length())
+					AssignVariableValue("1C_template_invoice_to_cc_bt_table_row_full_path", TEMPLATE_CC_DIRECTORY + Get("1C_template_invoice_to_cc_bt_table_row"), true);
 			}
 
 			// --- define timecards variables
@@ -338,9 +366,9 @@ auto	C_Invoicing_Vars::GenerateVariableSet() -> string
 				auto	i = 0;
 				for(auto &timecard: timecard_obj_list)
 				{
-					c_float		price;
 					c_float		days = timecard.GetTotalHours() / c_float(8.0);
-					price = timecard.GetDayrate() * days;
+					c_float		price = timecard.GetDayrate() * days;
+					c_float		vat_amount = price * c_float(VAT_PERCENTAGE) / c_float(100);
 
 					++i;
 					if(error_message.empty()) error_message = AssignVariableValue("timecard_id_" + to_string(i), timecard.GetID(), true);
@@ -349,6 +377,8 @@ auto	C_Invoicing_Vars::GenerateVariableSet() -> string
 					if(error_message.empty()) error_message = AssignVariableValue("timecard_item_" + to_string(i), Get("item short"), true);
 					if(error_message.empty()) error_message = AssignVariableValue("timecard_price_" + to_string(i), string(price), true);
 					if(error_message.empty()) error_message = AssignVariableValue("timecard_total_" + to_string(i), string(price), true);
+					if(error_message.empty()) error_message = AssignVariableValue("timecard_vat_" + to_string(i), string(vat_amount), true);
+					if(error_message.empty()) error_message = AssignVariableValue("vat_rate_" + to_string(i), to_string(int(VAT_PERCENTAGE)), true);
 
 					if(db->Query(	
 									"SELECT `number`,`sign_date` FROM `contracts_sow` WHERE `id`=("
@@ -594,10 +624,29 @@ auto	C_Invoicing_Vars::GenerateVariableSet() -> string
 
 					timecards_sum = timecards_sum + price;
 
-					error_message = AssignVariableValue("timecard_contract_psow_" + to_string(i) + "_Department_spelling", 
+					if(error_message.empty())
+					{						
+						error_message = AssignVariableValue("timecard_contract_psow_" + to_string(i) + "_Department_spelling", 
 											Get("timecard_contract_psow_" + to_string(i) + "_Department").length()
 											? " ("s + gettext("department") + " " + Get("timecard_contract_psow_" + to_string(i) + "_Department") + ")"
 											: "", true);
+						if(error_message.length())
+						{ MESSAGE_ERROR("", "", "fail to assign variable"); }
+					}
+
+					if(error_message.empty())
+					{
+						error_message = AssignVariableValue("table_row_description_" + to_string(i),
+															Get("timecard_local_service_description_" + to_string(i)) + " " + 
+															Get("from") + " " + Get("timecard_date_start" + to_string(i)) + " " + Get("up to") + " " + Get("timecard_date_finish" + to_string(i)) + " " + 
+															Get("in scope") + " " + Get("Technical Requirement agreement short") + " " + Get("psow_agreement_" + to_string(i)) + " " + 
+															Get("timecard_contract_psow_" + to_string(i) + "_Department_spelling") + "." +
+															(Get("timecard_company_vat_spelling_" + to_string(i)).length() ? " " + Get("timecard_company_vat_spelling_" + to_string(i)) + "." : "")
+															,true);
+
+						if(error_message.length())
+						{ MESSAGE_ERROR("", "", "fail to assign variable"); }
+					}
 
 					if(error_message.length()) break;
 				}

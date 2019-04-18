@@ -2,14 +2,15 @@
 #define __CVARS__H__
 
 #include <map>
+#include <algorithm>
+#include <sstream>
 #include <string>
-
-using namespace std;
 
 #include <regex>
 #include "localy.h"
 #include "clog.h"
 
+using namespace std;
 
 class CNocaseCmp
 {
@@ -22,6 +23,9 @@ class CNocaseCmp
 
 class CVars : public map<string, string, CNocaseCmp>
 {
+			string		__index = "";
+			auto		GetUUID() -> string;
+
     public:
 					    CVars();
 
@@ -33,7 +37,10 @@ class CVars : public map<string, string, CNocaseCmp>
 		    bool 		Delete(string name);
 		    int			Count();
 
-					    ~CVars();
+		    auto		SetIndex(const	string&  param	)	{ __index = param; };
+		    auto		SetIndex(		string&& param	)	{ __index = move(param); };
+
+		    auto		GetIndex()	const					{ return __index; };
 };
 
 #endif

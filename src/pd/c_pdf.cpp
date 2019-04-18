@@ -278,8 +278,8 @@ auto	C_PDF::__HPDF_SaveToFile() -> string
 	}
 	catch(...)
 	{
-		MESSAGE_ERROR("", "", "hpdf: fail save to file");
 		error_message = gettext("hpdf: fail save to file");
+		MESSAGE_ERROR("", "", "hpdf: fail save to file (" + GetFilename() + ")");
 	}
 
 	MESSAGE_DEBUG("", "", "finish");

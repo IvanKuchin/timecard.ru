@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-14 12:54-0400\n"
+"POT-Creation-Date: 2019-04-16 12:55-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -31,6 +31,12 @@ msgid_plural "%d subcontractors"
 msgstr[0] "%d субконтрактору"
 msgstr[1] "%d субконтракторам"
 msgstr[2] "%d субконтракторам"
+
+msgid "1c filename is empty"
+msgstr "не указано имя фаила 1с"
+
+msgid "1c template not found"
+msgstr "не указан шаблон 1с"
 
 msgid "Access prohibited"
 msgstr "Нет доступа"
@@ -166,6 +172,9 @@ msgstr "Июня"
 
 msgid "KPP"
 msgstr "КПП"
+
+msgid "Local service delivery"
+msgstr "Локальные услуги"
 
 msgid "March"
 msgstr "Март"

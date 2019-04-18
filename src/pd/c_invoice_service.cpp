@@ -87,17 +87,28 @@ C_Invoice_Service::C_Invoice_Service(CMysql *param1, CUser *param2) : db(param1)
 
 auto C_Invoice_Service::GenerateDocumentArchive() -> string
 {
-	C_Invoicing_Vars		invoicing_vars(db, user);
-	C_Print_Timecard		timecard_printer;
+	C_Invoicing_Vars						invoicing_vars(db, user);
+	C_Print_Timecard						timecard_printer;
 
-	C_Print_Invoice_Agency	invoice_agency;
-	C_Print_Invoice_Service	*invoice_printer = &invoice_agency;
-	C_Print_Act_Agency		act_agency;
-	C_Print_Invoice_Service	*act_printer = &act_agency;
-	C_Print_VAT_Agency		vat_service;
-	C_Print_VAT_Service		*vat_printer = &vat_service;
+	C_Print_Invoice_Service_Agency			invoice_agency;
+	C_Print_Invoice_Service					*invoice_printer = &invoice_agency;
 
-	auto					error_message = ""s;
+	C_Print_Act_Service_Agency				act_agency;
+	C_Print_Invoice_Service					*act_printer = &act_agency;
+
+	C_Print_VAT_Service_Agency				vat_service;
+	C_Print_VAT_Service						*vat_printer = &vat_service;
+
+	C_Print_1C_CostCenter_Service			cc_1c_main_obj1;
+	C_Print_1C_CostCenter					*cc_1c_service_printer = &cc_1c_main_obj1;
+
+	C_Print_1C_Subcontractor_Payment		subc_1c_main_obj1;
+	C_Print_1C_Subcontractor				*subc_1c_payment_printer = &subc_1c_main_obj1;
+
+	C_Print_1C_Subcontractor_Payment_Order	subc_1c_main_obj2;
+	C_Print_1C_Subcontractor				*subc_1c_payment_order_printer = &subc_1c_main_obj2;
+
+	auto									error_message = ""s;
 
 	MESSAGE_DEBUG("", "", "start");
 
@@ -206,20 +217,30 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 		auto		act_filename_pdf = ""s;
 		auto		vat_filename_xls = ""s;
 		auto		vat_filename_pdf = ""s;
+		auto		cc_service_filename_1c = ""s;
+		auto		cc_bt_filename_1c = ""s;
+		auto		subc_payment_filename_1c = ""s;
+		auto		subc_payment_order_filename_1c = ""s;
 
 		do
 		{
 			++i;
-			invoice_filename_xls = temp_dir_cost_center_invoices + "invoice_" + to_string(i) + ".xls";
-			invoice_filename_pdf = temp_dir_cost_center_invoices + "invoice_" + to_string(i) + ".pdf";
-			act_filename_xls = temp_dir_cost_center_invoices + "act_" + to_string(i) + ".xls";
-			act_filename_pdf = temp_dir_cost_center_invoices + "act_" + to_string(i) + ".pdf";
-			vat_filename_xls = temp_dir_cost_center_invoices + "vat_" + to_string(i) + ".xls";
-			vat_filename_pdf = temp_dir_cost_center_invoices + "vat_" + to_string(i) + ".pdf";
+			invoice_filename_xls			= temp_dir_cost_center_invoices + "invoice_" + to_string(i) + ".xls";
+			invoice_filename_pdf			= temp_dir_cost_center_invoices + "invoice_" + to_string(i) + ".pdf";
+			act_filename_xls				= temp_dir_cost_center_invoices + "act_" + to_string(i) + ".xls";
+			act_filename_pdf				= temp_dir_cost_center_invoices + "act_" + to_string(i) + ".pdf";
+			vat_filename_xls				= temp_dir_cost_center_invoices + "vat_" + to_string(i) + ".xls";
+			vat_filename_pdf				= temp_dir_cost_center_invoices + "vat_" + to_string(i) + ".pdf";
+			cc_service_filename_1c			= temp_dir_1c + "costcenter_service_" + to_string(i) + ".xml";
+			cc_bt_filename_1c				= temp_dir_1c + "costcenter_bt_" + to_string(i) + ".xml";
+			subc_payment_filename_1c		= temp_dir_1c + "subcontractor_payment_" + to_string(i) + ".xml";
+			subc_payment_order_filename_1c	= temp_dir_1c + "subcontractor_payment_order_" + to_string(i) + ".xml";
 		} while(
-				isFileExists(invoice_filename_xls) || isFileExists(invoice_filename_pdf) ||
-				isFileExists(act_filename_xls)     || isFileExists(act_filename_pdf) ||
-				isFileExists(vat_filename_xls)     || isFileExists(vat_filename_pdf)
+				isFileExists(invoice_filename_xls)		|| isFileExists(invoice_filename_pdf) ||
+				isFileExists(act_filename_xls)			|| isFileExists(act_filename_pdf) ||
+				isFileExists(vat_filename_xls)			|| isFileExists(vat_filename_pdf) ||
+				isFileExists(cc_bt_filename_1c)			|| isFileExists(cc_service_filename_1c) ||
+				isFileExists(subc_payment_filename_1c)	|| isFileExists(subc_payment_order_filename_1c)
 				);
 
 		if(error_message.empty())
@@ -321,6 +342,69 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 			MESSAGE_ERROR("", "", "due to previous error act (xls format) won't be printed");
 		}
 
+		if(error_message.empty())
+		{
+			cc_1c_service_printer->SetDB(db);
+			cc_1c_service_printer->SetVariableSet(&invoicing_vars);
+
+			if(error_message.empty()) 
+			{
+				cc_1c_service_printer->SetFilename(cc_service_filename_1c);
+				error_message = cc_1c_service_printer->Print();
+				if(error_message.empty()) {}
+				else
+				{
+					MESSAGE_ERROR("", "", "fail to build 1c cost center service");
+				}
+			}
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "due to previous error 1c cost center service won't be printed");
+		}
+
+		if(error_message.empty())
+		{
+			subc_1c_payment_printer->SetDB(db);
+			subc_1c_payment_printer->SetVariableSet(&invoicing_vars);
+
+			if(error_message.empty()) 
+			{
+				subc_1c_payment_printer->SetFilename(cc_service_filename_1c);
+				error_message = subc_1c_payment_printer->Print();
+				if(error_message.empty()) {}
+				else
+				{
+					MESSAGE_ERROR("", "", "fail to build 1c cost center service");
+				}
+			}
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "due to previous error 1c subcontractor payments won't be printed");
+		}
+
+		if(error_message.empty())
+		{
+			subc_1c_payment_order_printer->SetDB(db);
+			subc_1c_payment_order_printer->SetVariableSet(&invoicing_vars);
+
+			if(error_message.empty()) 
+			{
+				subc_1c_payment_order_printer->SetFilename(cc_service_filename_1c);
+				error_message = subc_1c_payment_order_printer->Print();
+				if(error_message.empty()) {}
+				else
+				{
+					MESSAGE_ERROR("", "", "fail to build 1c cost center service");
+				}
+			}
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "due to previous error 1c subcontractor payment orders won't be printed");
+		}
+
 	}	
 	else
 	{
@@ -385,12 +469,20 @@ auto C_Invoice_Service::CreateTempDirectory() -> bool
 		temp_dir += "/";
 		temp_dir_timecards = temp_dir + "timecards/";
 		temp_dir_cost_center_invoices = temp_dir + "invoices/";
+		temp_dir_1c = temp_dir + "1c/";
 
 		if(CreateDir(temp_dir_timecards))
 		{
 			if(CreateDir(temp_dir_cost_center_invoices))
 			{
-				result = true;
+				if(CreateDir(temp_dir_1c))
+				{
+					result = true;
+				}
+				else
+				{
+					MESSAGE_ERROR("", "", "fail to create " + temp_dir_1c);
+				}
 			}
 			else
 			{

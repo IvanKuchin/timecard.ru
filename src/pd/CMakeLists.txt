@@ -21,6 +21,8 @@ set(INVOICE_LIB_SRCs
     c_print_timecard.cpp
     c_print_invoice_service.cpp
     c_print_vat_service.cpp
+    c_print_1c_costcenter.cpp
+    c_print_1c_subcontractor.cpp
     c_timecard_to_print.cpp
     )
 

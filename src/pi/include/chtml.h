@@ -32,13 +32,15 @@ private:
 	string							type = "feed"; // --- depends on type different /images/xxxx folders stores images
 	bool							isParsingRequired = true;
 
+	string 							GetTagContent(string tag_name);
+	string							GetAttributeValue(string tag_name, string attr_name, string name_content, string attr_content_name);
+
 	void							ResetMetaValues();
 	bool							ParseHTMLPage();
 	bool							ExtractHEAD();
 	bool							ExtractTITLE();
 	bool							ExtractDESCRIPTION();
 	bool							ExtractPreviewImage();
-	string							ExtractContentAttribute(string prefix, string postfix);
 	tuple<string, string, string>	PickFileName();
 	bool							DownloadFile(string urlPreview, FILE *f);
 	bool							ExtractEmbedVideoURL();
@@ -50,7 +52,7 @@ public:
 									CHTML();
 									CHTML(string _type_);
 
-	void							AppendToHTMLPage(string param);
+	void							AppendToHTMLPage(string param)			{ htmlPage += param; };
 	bool							PerformRequest(string param);
 
 	void							SetType(const string &tmp)				{ type = tmp; }
@@ -65,7 +67,6 @@ public:
 	string							GetPreviewImagePrefix()			const	{ return filePrefix; };
 	string							GetPreviewImageExtention()		const	{ return fileExtention; };
 	string							GetContent() 					const	{ return htmlPage; };
-
 
 	bool							isEmbedVideoHostedOnYoutube();
 	string							GetEmbedVideoURL() { return embedVideoURL; };

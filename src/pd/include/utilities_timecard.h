@@ -25,6 +25,7 @@ auto			GetSOWInJSONFormat(string sqlQuery, CMysql *, CUser *, bool include_tasks
 auto			GetCountryListInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetPSoWCustomFieldsInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetCostCenterCustomFieldsInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
+auto			GetCompanyCustomFieldsInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetPSoWInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetTimecardApprovalsInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			SubmitTimecard(string timecard_id, CMysql *, CUser *) -> bool;

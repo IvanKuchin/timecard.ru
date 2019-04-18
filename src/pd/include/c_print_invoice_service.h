@@ -126,7 +126,7 @@ class C_Print_Invoice_Service
 
 ostream&	operator<<(ostream& os, const C_Print_Invoice_Service &);
 
-class C_Print_Invoice_Agency : public C_Print_Invoice_Service
+class C_Print_Invoice_Service_Agency : public C_Print_Invoice_Service
 {
 	public:
 		auto			PrintXLSHeader() -> string						{ return __PrintXLSHeaderTable(); };
@@ -166,13 +166,7 @@ class C_Print_Invoice_Agency : public C_Print_Invoice_Service
 		auto			GetCustomerMailingAddress() -> string			{ return vars->Get("cost_center_mailing_address"); };
 
 		auto			isTableRowExists(int i) -> bool					{ return vars->Get("timecard_index_" + to_string(i)).length(); };
-		auto			GetTableRowDescription(int i) -> string			{ return 
-											vars->Get("timecard_local_service_description_" + to_string(i)) + " " + 
-											vars->Get("from") + " " + vars->Get("timecard_date_start" + to_string(i)) + " " + vars->Get("up to") + " " + vars->Get("timecard_date_finish" + to_string(i)) + " " + 
-											vars->Get("in scope") + " " + vars->Get("Technical Requirement agreement short") + " " + vars->Get("psow_agreement_" + to_string(i)) + " " + 
-											vars->Get("timecard_contract_psow_" + to_string(i) + "_Department_spelling") + "." +
-											(vars->Get("timecard_company_vat_spelling_" + to_string(i)).length() ? " " + vars->Get("timecard_company_vat_spelling_" + to_string(i)) + "." : "");
-																		};
+		auto			GetTableRowDescription(int i) -> string			{ return vars->Get("table_row_description_" + to_string(i)); };
 		auto			GetTableRowIndex(int i) -> string				{ return vars->Get("timecard_index_" + to_string(i)); };
 		auto			GetTableRowQuantity(int i) -> string			{ return vars->Get("timecard_quantity_" + to_string(i)); };
 		auto			GetTableRowItem(int i) -> string				{ return vars->Get("timecard_item_" + to_string(i)); };
@@ -190,7 +184,7 @@ class C_Print_Invoice_Agency : public C_Print_Invoice_Service
 		auto			GetSignatureInfo2() -> string					{ return vars->Get("invoice_signature_info2"); };
 };
 
-class C_Print_Act_Agency : public C_Print_Invoice_Service
+class C_Print_Act_Service_Agency : public C_Print_Invoice_Service
 {
 	public:
 		auto			PrintXLSHeader() -> string						{ return ""s; };
@@ -230,13 +224,7 @@ class C_Print_Act_Agency : public C_Print_Invoice_Service
 		auto			GetCustomerMailingAddress() -> string			{ return vars->Get("cost_center_mailing_address"); };
 
 		auto			isTableRowExists(int i) -> bool					{ return vars->Get("timecard_index_" + to_string(i)).length(); };
-		auto			GetTableRowDescription(int i) -> string			{ return 
-											vars->Get("timecard_local_service_description_" + to_string(i)) + " " + 
-											vars->Get("from") + " " + vars->Get("timecard_date_start" + to_string(i)) + " " + vars->Get("up to") + " " + vars->Get("timecard_date_finish" + to_string(i)) + " " + 
-											vars->Get("in scope") + " " + vars->Get("Technical Requirement agreement short") + " " + vars->Get("psow_agreement_" + to_string(i)) + " " + 
-											vars->Get("timecard_contract_psow_" + to_string(i) + "_Department_spelling") + "." +
-											(vars->Get("timecard_company_vat_spelling_" + to_string(i)).length() ? " " + vars->Get("timecard_company_vat_spelling_" + to_string(i)) + "." : "");
-																		};
+		auto			GetTableRowDescription(int i) -> string			{ return vars->Get("table_row_description_" + to_string(i)); };
 		auto			GetTableRowIndex(int i) -> string				{ return vars->Get("timecard_index_" + to_string(i)); };
 		auto			GetTableRowQuantity(int i) -> string			{ return vars->Get("timecard_quantity_" + to_string(i)); };
 		auto			GetTableRowItem(int i) -> string				{ return vars->Get("timecard_item_" + to_string(i)); };

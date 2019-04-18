@@ -4,21 +4,49 @@ CVars::CVars()
 {
 }
 
+auto CVars::GetUUID() -> string
+{
+    auto    base = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"s;
+    auto    result = ""s;
+
+    for_each(base.begin(), base.end(), [&result](char param) 
+                                        {
+                                            if(param == 'x')
+                                            {
+                                                stringstream ss;
+
+                                                ss << hex << rand() % 16;                                                
+                                                result += ss.str();
+                                            }
+                                            else if(param == 'y')
+                                            {
+                                                stringstream    ss;
+                                                int             my_num = ((rand() % 16) & 3) | 8;
+
+                                                ss << hex << my_num;
+                                                result += ss.str();
+                                            }
+                                            else
+                                                result += param;
+                                            
+                                        });
+
+    return result;
+}
+
 bool CVars::Redefine(string name, string value)
 {
     bool        bResult = false;
 
-    if(name.length() == 0)
+    if(name.empty())
     {
-        CLog log;
-        log.Write(ERROR, "CVars::" + string(__func__) + "(" + name + ")[" + to_string(__LINE__) + "]:ERROR: can't add variable with NULL name");
+        MESSAGE_ERROR("", "", "can't set variable with empty name");
         return bResult;
     }
 
     if(find(name) != end())
     {
-        CLog    log;
-        log.Write(DEBUG, "CVars::" + string(__func__) + "(" + name + ")[" + to_string(__LINE__) + "]: variable [" + name + "(" + value + ")] already exist with other value. Redefine it.");
+        MESSAGE_DEBUG("", "", "variable(" + name + ") exists with value(" + Get(name) + "), redefine to (" + value + ").");
 
     	Delete(name);
     }
@@ -36,8 +64,7 @@ bool CVars::Add(string name, string value)
 
     if(name.length() == 0)
     {
-    	CLog log;
-    	log.Write(ERROR, "CVars::" + string(__func__) + "(" + name + ")[" + to_string(__LINE__) + "]:ERROR:can't add variable with NULL name");
+        MESSAGE_ERROR("", "", "can't set variable with empty name");
     	return bResult;
     }
     
@@ -61,37 +88,47 @@ bool CVars::Delete(string name)
     
     try
     {
-	CVars::iterator	itr = find(name);
-	
-	if(itr != end())
-	    erase(itr);
-	bResult = true;
+    	CVars::iterator	itr = find(name);
+    	
+    	if(itr != end())
+    	    erase(itr);
+    	bResult = true;
     }
     catch(...)
     {
-	bResult = false;
+    	bResult = false;
     }
+
     return bResult;
 }
 
 string CVars::Get(string name)
 {
-    string sResult;
+    auto result = ""s;
 
-    try
+    if(name.find("new:UUID") == 0) { result = GetUUID(); }
+    else
     {
-        CVars::iterator itr = find(name);
-        if(itr == end())
-            sResult = "";
-        else
-            sResult = itr->second;
-    }
-    catch(...)
-    {
-        sResult = "";
+        if(name.find("index:") == 0)
+        {
+            name = name.substr("index:"s.length()) + GetIndex();
+        }
+        try
+        {
+            CVars::iterator itr = find(name);
+            if(itr == end())
+                result = "";
+            else
+                result = itr->second;
+        }
+        catch(...)
+        {
+            result = "";
+            MESSAGE_ERROR("", "", "exception thrown in map.find()");
+        }
     }
     
-    return sResult;
+    return result;
 }
 
 string  CVars::GetNameByRegex(regex r)
@@ -119,11 +156,10 @@ bool CVars::Set(string name, string val)
 {
     bool	result = false;
     
-    if(name.length() == 0)
+    if(name.empty())
     {
-	CLog log;
-	log.Write(ERROR, "try to delete empty variable");
-	return result;
+        MESSAGE_ERROR("", "", "can't set variable with empty name");
+        return result;
     }
     
     erase(name);
@@ -137,8 +173,4 @@ bool CVars::Set(string name, string val)
 int CVars::Count()
 {
     return size();
-}
-
-CVars::~CVars()
-{
 }
