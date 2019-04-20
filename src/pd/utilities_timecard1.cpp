@@ -5227,6 +5227,7 @@ auto	GetDBValueByAction(string action, string id, string sow_id, CMysql *db, CUs
 				if(action == "AJAX_updateCompanyDescription")		sql_query = "SELECT `description`		as `value` FROM `company` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateCompanyWebSite")			sql_query = "SELECT `webSite`			as `value` FROM `company` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateCompanyTIN")				sql_query = "SELECT `tin`				as `value` FROM `company` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateCompanyVAT")				sql_query = "SELECT `vat`				as `value` FROM `company` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateCompanyAccount")			sql_query = "SELECT `account`			as `value` FROM `company` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateCompanyOGRN")				sql_query = "SELECT `ogrn`				as `value` FROM `company` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateCompanyKPP")				sql_query = "SELECT `kpp`				as `value` FROM `company` WHERE `id`=\"" + id + "\";";
@@ -6876,6 +6877,7 @@ string	SetNewValueByAction(string action, string id, string sow_id, string new_v
 						if(action == "AJAX_updateCompanyDescription")				sql_query = "UPDATE	`company`					SET `description`					=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
 						if(action == "AJAX_updateCompanyWebSite")					sql_query = "UPDATE	`company`					SET `webSite`						=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
 						if(action == "AJAX_updateCompanyTIN")						sql_query = "UPDATE	`company`					SET `tin` 							=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateCompanyVAT")						sql_query = "UPDATE	`company`					SET `vat` 							=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
 						if(action == "AJAX_updateCompanyAccount")					sql_query = "UPDATE	`company`					SET `account`						=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
 						if(action == "AJAX_updateCompanyOGRN")						sql_query = "UPDATE	`company`					SET `ogrn` 							=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
 						if(action == "AJAX_updateCompanyKPP")						sql_query = "UPDATE	`company`					SET `kpp` 							=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
@@ -7634,6 +7636,18 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 	if(action == "AJAX_updateCompanyTIN")
 	{
 		notification_description = "Данные компании: ИНН компании " + existing_value + " изменился на " + new_value;
+		if(user->GetType() == "agency")
+			sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `agency_company_id`=\"" + id + "\";";
+		else if(user->GetType() == "subcontractor")
+			sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `subcontractor_company_id`=\"" + id + "\";";
+		else
+		{
+			MESSAGE_ERROR("", "", "there is no notification for user type(" + user->GetType() + ")")
+		}
+	}
+	if(action == "AJAX_updateCompanyVAT")
+	{
+		notification_description = "Данные компании: НДС компании изменился " + existing_value + " -> " + new_value;
 		if(user->GetType() == "agency")
 			sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `agency_company_id`=\"" + id + "\";";
 		else if(user->GetType() == "subcontractor")

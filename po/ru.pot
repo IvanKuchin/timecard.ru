@@ -572,6 +572,9 @@ msgstr "не указано название"
 msgid "no VAT"
 msgstr "НДС не облагается"
 
+msgid "noVAT"
+msgstr "БезНДС"
+
 msgid "no excise"
 msgstr "без акциза"
 

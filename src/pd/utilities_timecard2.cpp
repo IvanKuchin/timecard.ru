@@ -799,6 +799,7 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 					else if(action == "AJAX_updateCompanyDescription")			{ /* --- good to go */ }
 					else if(action == "AJAX_updateCompanyWebSite")				{ /* --- good to go */ }
 					else if(action == "AJAX_updateCompanyTIN")					{ /* --- good to go */ }
+					else if(action == "AJAX_updateCompanyVAT")					{ /* --- good to go */ }
 					else if(action == "AJAX_updateCompanyAccount")				{ /* --- good to go */ }
 					else if(action == "AJAX_updateCompanyOGRN")					{ /* --- good to go */ }
 					else if(action == "AJAX_updateCompanyKPP")					{ /* --- good to go */ }
@@ -1286,6 +1287,7 @@ string	isActionEntityBelongsToAgency(string action, string id, string agency_id,
 					(action == "AJAX_updateCompanyDescription")		||
 					(action == "AJAX_updateCompanyWebSite")			||
 					(action == "AJAX_updateCompanyTIN")				||
+					(action == "AJAX_updateCompanyVAT")				||
 					(action == "AJAX_updateCompanyAccount")			||
 					(action == "AJAX_updateCompanyOGRN")			||
 					(action == "AJAX_updateCompanyKPP")				||

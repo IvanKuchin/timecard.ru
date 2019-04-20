@@ -10,7 +10,7 @@ auto	C_Print_1C_Subcontractor::RenderTemplate() -> string
 	// --- build table for service invoice
 	if(error_message.empty())
 	{
-		if(vars->Get("1C_template_invoice_to_cc_service_table_row_full_path").length())
+		if(GetTemplateBody_Filename().length())
 		{
 			auto	table_content = ""s;
 
@@ -22,7 +22,7 @@ auto	C_Print_1C_Subcontractor::RenderTemplate() -> string
 				vars_obj.SetIndex(to_string(i));
 				render_obj.SetVars(vars_obj);
 
-				if(render_obj.SetTemplateFile(vars->Get("1C_template_invoice_to_cc_service_table_row_full_path")))
+				if(render_obj.SetTemplateFile(GetTemplateBody_Filename()))
 				{
 					table_content += render_obj.RenderTemplate();
 				}
@@ -35,7 +35,7 @@ auto	C_Print_1C_Subcontractor::RenderTemplate() -> string
 				if(error_message.length()) break;
 			}
 
-			vars->AssignVariableValue("Table_Service_Invoice_To_Subcontractor_1C", table_content, true);
+			vars->AssignVariableValue("Subcontractor_Payment_Documents_1C", table_content, true);
 		}
 		else
 		{
@@ -46,14 +46,14 @@ auto	C_Print_1C_Subcontractor::RenderTemplate() -> string
 	// --- build service invoice
 	if(error_message.empty())
 	{
-		if(vars->Get("1C_template_invoice_to_cc_service_full_path").length())
+		if(GetTemplate_Filename().length())
 		{
 			CCgi		render_obj;
 			CVars		vars_obj = vars->GetVars();
 
 			render_obj.SetVars(vars_obj);
 
-			if(render_obj.SetTemplateFile(vars->Get("1C_template_invoice_to_cc_service_full_path")))
+			if(render_obj.SetTemplateFile(GetTemplate_Filename()))
 			{
 				content = render_obj.RenderTemplate();
 			}
@@ -138,7 +138,17 @@ auto	C_Print_1C_Subcontractor_Payment_Order::Print() -> string
 
 	MESSAGE_DEBUG("", "", "start");
 
+	if(error_message.empty())
+	{
+		if((error_message = RenderTemplate()).length())
+		{ MESSAGE_ERROR("", "", "fail to render template 1c cost center service file"); }
+	}
 
+	if(error_message.empty())
+	{
+		if((error_message = SaveFile()).length())
+		{ MESSAGE_ERROR("", "", "fail to save 1c cost center service file"); }
+	}
 
 	MESSAGE_DEBUG("", "", "finish (error_message.length() = " + to_string(error_message.length()) + ")");
 

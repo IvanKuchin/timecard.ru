@@ -370,7 +370,7 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 
 			if(error_message.empty()) 
 			{
-				subc_1c_payment_printer->SetFilename(cc_service_filename_1c);
+				subc_1c_payment_printer->SetFilename(subc_payment_filename_1c);
 				error_message = subc_1c_payment_printer->Print();
 				if(error_message.empty()) {}
 				else
@@ -391,7 +391,7 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 
 			if(error_message.empty()) 
 			{
-				subc_1c_payment_order_printer->SetFilename(cc_service_filename_1c);
+				subc_1c_payment_order_printer->SetFilename(subc_payment_order_filename_1c);
 				error_message = subc_1c_payment_order_printer->Print();
 				if(error_message.empty()) {}
 				else

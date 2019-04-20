@@ -47,6 +47,8 @@ class C_Print_1C_Subcontractor
 		auto			RenderTemplate() -> string;
 
 		virtual	auto	Print() -> string								= 0;
+		virtual auto	GetTemplate_Filename() -> string				= 0;
+		virtual auto	GetTemplateBody_Filename() -> string			= 0;
 };
 
 ostream&	operator<<(ostream& os, const C_Print_1C_Subcontractor &);
@@ -55,12 +57,16 @@ class C_Print_1C_Subcontractor_Payment : public C_Print_1C_Subcontractor
 {
 	public:
 		auto			Print() -> string;
+		auto			GetTemplate_Filename() -> string				{ return vars->Get("1C_template_payment_to_subcontractor_full_path"); };
+		auto			GetTemplateBody_Filename() -> string			{ return vars->Get("1C_template_payment_to_subcontractor_body_full_path"); };
 };
 
 class C_Print_1C_Subcontractor_Payment_Order : public C_Print_1C_Subcontractor
 {
 	public:
 		auto			Print() -> string;
+		auto			GetTemplate_Filename() -> string				{ return vars->Get("1C_template_payment_order_to_subcontractor_full_path"); };
+		auto			GetTemplateBody_Filename() -> string			{ return vars->Get("1C_template_payment_order_to_subcontractor_body_full_path"); };
 };
 
 #endif

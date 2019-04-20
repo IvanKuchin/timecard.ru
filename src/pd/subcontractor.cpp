@@ -1839,6 +1839,7 @@ int main()
 		(action == "AJAX_updateCompanyDescription")				||
 		(action == "AJAX_updateCompanyWebSite")					||
 		(action == "AJAX_updateCompanyTIN")						||
+		(action == "AJAX_updateCompanyVAT")						||
 		(action == "AJAX_updateCompanyAccount")					||
 		(action == "AJAX_updateCompanyOGRN")					||
 		(action == "AJAX_updateCompanyKPP")						||
@@ -1871,6 +1872,7 @@ int main()
 						if(action == "AJAX_updateCompanyDescription")	{	id = company_id; }
 						if(action == "AJAX_updateCompanyWebSite")		{	id = company_id; }
 						if(action == "AJAX_updateCompanyTIN")			{	id = company_id; }
+						if(action == "AJAX_updateCompanyVAT")			{	id = company_id; }
 						if(action == "AJAX_updateCompanyAccount")		{	id = company_id; }
 						if(action == "AJAX_updateCompanyOGRN")			{	id = company_id; }
 						if(action == "AJAX_updateCompanyKPP")			{	id = company_id; }
