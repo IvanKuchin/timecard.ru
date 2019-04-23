@@ -1,29 +1,5 @@
 #include "c_float.h"
 
-static string GetFormattedOutput(double val, int prec)
-{
-	long			multiplier = pow(10, prec);
-	ostringstream	ost;
-
-	ost.str("");
-	ost.precision(prec);
-	ost << fixed << (round(val * multiplier)) / multiplier;
-
-	return CutTrailingZeroes(ost.str());
-}
-
-/*
-static string GetFormattedOutput(double val, int prec)
-{
-	ostringstream	result;
-
-	result.setf( ios::fixed, ios::floatfield ); // floatfield set to fixed
-	result.precision(prec);
-	result << val;
-
-	return result.str();
-}
-*/
 c_float::c_float() : c_float(0, 2) {}
 
 c_float::c_float(double param) : c_float(param, 2) {}
@@ -128,9 +104,36 @@ long c_float::GetFraction()
 
 }
 
-c_float::operator string()
+string c_float::GetFormattedOutput() const
 {
-	return GetFormattedOutput(Get(), GetPrecision());
+/*
+	long			multiplier = pow(10, precision);
+	ostringstream	ost;
+
+	ost.str("");
+	ost.precision(precision);
+	ost << fixed << (round(val * multiplier)) / multiplier;
+
+	return CutTrailingZeroes(ost.str());
+*/
+	return CutTrailingZeroes(GetPriceTag());
+}
+
+string c_float::GetPriceTag() const
+{
+	long			multiplier = pow(10, precision);
+	ostringstream	ost;
+
+	ost.str("");
+	ost.precision(precision);
+	ost << fixed << (round(val * multiplier)) / multiplier;
+
+	return ost.str();
+}
+
+c_float::operator string() const
+{
+	return GetFormattedOutput();
 }
 
 c_float	c_float::operator+(const c_float &term2)
@@ -187,21 +190,9 @@ c_float	c_float::operator/(const long int &term2)
 	return result;
 }
 
-/*
-c_float& c_float::operator=(const c_float &other)
-{
-	if(this != &other)
-	{
-		MESSAGE_DEBUG("c_float", "", "copy assignment (this.precision = " + to_string(this->precision) + ") value (other.value = " + to_string(other.val) + ")");
-		this->val = other.val;
-	}
-
-	return *this;
-}
-*/
 ostream& operator<<(ostream& os, const c_float &var)
 {
-	os << GetFormattedOutput(var.Get(), var.GetPrecision());;
+	os << string(var);
 	return os;
 }
 

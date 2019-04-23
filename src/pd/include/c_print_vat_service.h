@@ -85,6 +85,9 @@ class C_Print_VAT_Service
 		virtual auto	GetSupplierAccount() -> string					= 0;
 		virtual auto	GetSupplierBIK() -> string						= 0;
 		virtual auto	GetSupplierTIN() -> string						= 0;
+		virtual auto	GetSupplierVAT() -> string						= 0;
+		virtual auto	GetSupplierVATSpelling() -> string				= 0;
+		virtual auto	GetSupplierVATSpellingShort() -> string			= 0;
 		virtual auto	GetSupplierKPP() -> string						= 0;
 		virtual auto	GetSupplierOGRN() -> string						= 0;
 		virtual auto	GetSupplierLegalZIP() -> string					= 0;
@@ -107,6 +110,7 @@ class C_Print_VAT_Service
 		virtual	auto	GetTableRowQuantity(int i) -> string			= 0;
 		virtual	auto	GetTableRowItem(int i) -> string				= 0;
 		virtual	auto	GetTableRowPrice(int i) -> string				= 0;
+		virtual	auto	GetTableRowVAT(int i) -> string				= 0;
 		virtual	auto	GetTableRowTotal(int i) -> string				= 0;
 		virtual	auto	GetTableSum() -> string							= 0;
 		virtual	auto	GetTableVAT() -> string							= 0;
@@ -139,6 +143,9 @@ class C_Print_VAT_Service_Agency : public C_Print_VAT_Service
 		auto			GetSupplierAccount() -> string					{ return vars->Get("agency_account"); };
 		auto			GetSupplierBIK() -> string						{ return vars->Get("agency_bank_bik"); };
 		auto			GetSupplierTIN() -> string						{ return vars->Get("agency_tin"); };
+		auto			GetSupplierVAT() -> string						{ return vars->Get("agency_vat"); };
+		auto			GetSupplierVATSpelling() -> string				{ return vars->Get("agency_vat_spelling"); };
+		auto			GetSupplierVATSpellingShort() -> string			{ return vars->Get("agency_vat_spelling_short"); };
 		auto			GetSupplierKPP() -> string						{ return vars->Get("agency_kpp"); };
 		auto			GetSupplierOGRN() -> string						{ return vars->Get("agency_ogrn"); };
 		auto			GetSupplierLegalZIP() -> string					{ return vars->Get("agency_legal_geo_zip"); };
@@ -163,24 +170,17 @@ class C_Print_VAT_Service_Agency : public C_Print_VAT_Service
 		auto			GetCustomerMailingAddress() -> string			{ return vars->Get("cost_center_mailing_address"); };
 
 		auto			isTableRowExists(int i) -> bool					{ return vars->Get("timecard_index_" + to_string(i)).length(); };
-		auto			GetTableRowDescription(int i) -> string			{ return vars->Get("table_row_description_" + to_string(i)); };
-/*
-		auto			GetTableRowDescription(int i) -> string			{ return 
-											vars->Get("timecard_local_service_description_" + to_string(i)) + " " + 
-											vars->Get("from") + " " + vars->Get("timecard_date_start" + to_string(i)) + " " + vars->Get("up to") + " " + vars->Get("timecard_date_finish" + to_string(i)) + " " + 
-											vars->Get("in scope") + " " + vars->Get("Technical Requirement agreement short") + " " + vars->Get("psow_agreement_" + to_string(i)) + " " + 
-											vars->Get("timecard_contract_psow_" + to_string(i) + "_Department_spelling") + "." +
-											(vars->Get("timecard_company_vat_spelling_" + to_string(i)).length() ? " " + vars->Get("timecard_company_vat_spelling_" + to_string(i)) + "." : "");
-																		};
-*/
+		auto			GetTableRowDescription(int i) -> string			{ return vars->Get("cost_center_table_row_description_" + to_string(i)); };
+
 		auto			GetTableRowIndex(int i) -> string				{ return vars->Get("timecard_index_" + to_string(i)); };
 		auto			GetTableRowQuantity(int i) -> string			{ return vars->Get("timecard_quantity_" + to_string(i)); };
 		auto			GetTableRowItem(int i) -> string				{ return vars->Get("timecard_item_" + to_string(i)); };
-		auto			GetTableRowPrice(int i) -> string				{ return vars->Get("timecard_price_" + to_string(i)); };
-		auto			GetTableRowTotal(int i) -> string				{ return vars->Get("timecard_total_" + to_string(i)); };
-		auto			GetTableSum() -> string							{ return vars->Get("timecards_sum_amount"); };
-		auto			GetTableVAT() -> string							{ return vars->Get("vat_amount"); };
-		auto			GetTableTotal() -> string						{ return vars->Get("total_payment"); };
+		auto			GetTableRowPrice(int i) -> string				{ return vars->Get("cost_center_price_" + to_string(i)); };
+		auto			GetTableRowVAT(int i) -> string					{ return vars->Get("cost_center_vat_" + to_string(i)); };
+		auto			GetTableRowTotal(int i) -> string				{ return vars->Get("cost_center_total_" + to_string(i)); };
+		auto			GetTableSum() -> string							{ return vars->Get("cost_center_sum_amount"); };
+		auto			GetTableVAT() -> string							{ return vars->Get("cost_center_vat_amount"); };
+		auto			GetTableTotal() -> string						{ return vars->Get("cost_center_total_payment"); };
 
 		auto			GetSignatureTitle1() -> string					{ return vars->Get("Director"); };
 		auto			GetSignatureTitle2() -> string					{ return vars->Get("Accountant"); };

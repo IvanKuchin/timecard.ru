@@ -94,7 +94,8 @@ class C_Print_Timecard
 		auto		__HPDF_MoveTableLineDown() -> string			{ return __HPDF_MoveTableLineDown(__pdf_table_line_height); };
 		auto		__HPDF_MoveTableLineDown(int line_increment) -> string;
 		auto		__HPDF_SaveToFile() -> string;
-		auto		__HPDF_PrintText(string text, int x) -> string;
+		auto		__HPDF_PrintText(string text, double x, HPDF_TextAlignment) -> string;
+		auto		__HPDF_PrintText(string text, double x1, double x2, HPDF_TextAlignment) -> string;
 		auto		__HPDF_DrawTimecardHorizontalLine() -> string;
 		auto		__HPDF_DrawTimecardTitle() -> string;
 		auto		__HPDF_DrawTimecardTable() -> string;

@@ -111,7 +111,6 @@ auto	C_Print_VAT_Service::PrintAsXLS() -> string
 				auto			format_table_center			= __book->addFormat();
 				auto			format_top_left				= __book->addFormat();
 				auto			format_top_left_bold		= __book->addFormat();
-				c_float			sum_pre_tax(0), sum_tax(0), sum_post_tax(0);
 
 				total_table_items = 0;
 
@@ -201,13 +200,8 @@ auto	C_Print_VAT_Service::PrintAsXLS() -> string
 				for(auto i = 1; isTableRowExists(i); ++i)
 				{
 					auto	description = GetTableRowDescription(i);
-					c_float	price(GetTableRowPrice(i));
-					c_float	tax, total;
 
 					++__row_counter;
-
-					tax = price * c_float(VAT_PERCENTAGE) / c_float(100);
-					total = price + tax;
 
 					__sheet->writeNum(__row_counter,  0, stod_noexcept(GetTableRowIndex(i)), format_table_center);
 					__sheet->writeStr(__row_counter,  1, multibyte_to_wide(description).c_str(), format_table_left);
@@ -217,13 +211,9 @@ auto	C_Print_VAT_Service::PrintAsXLS() -> string
 					__sheet->writeStr(__row_counter,  5, L"", format_table_left);
 					__sheet->writeNum(__row_counter,  6, stod_noexcept(GetTableRowPrice(i)), format_table_right);
 					__sheet->writeStr(__row_counter,  7, multibyte_to_wide(vars->Get("no excise")).c_str(), format_table_right);
-					__sheet->writeStr(__row_counter,  8, multibyte_to_wide(to_string(VAT_PERCENTAGE) + "%").c_str(), format_table_right);
-					__sheet->writeNum(__row_counter,  9, tax.Get(), format_table_right);
-					__sheet->writeNum(__row_counter, 10, total.Get(), format_table_right);
-
-					sum_pre_tax = sum_pre_tax + c_float(GetTableRowPrice(i));
-					sum_tax = sum_tax + tax;
-					sum_post_tax = sum_post_tax + total;
+					__sheet->writeStr(__row_counter,  8, multibyte_to_wide(GetSupplierVATSpellingShort()).c_str(), format_table_right);
+					__sheet->writeNum(__row_counter,  9, stod_noexcept(GetTableRowVAT(i)), format_table_right);
+					__sheet->writeNum(__row_counter, 10, stod_noexcept(GetTableRowTotal(i)), format_table_right);
 
 					++total_table_items;
 				}
@@ -235,11 +225,11 @@ auto	C_Print_VAT_Service::PrintAsXLS() -> string
 				__sheet->writeStr(__row_counter,  3, L"", format_table_left);
 				__sheet->writeStr(__row_counter,  4, L"", format_table_left);
 				__sheet->writeStr(__row_counter,  5, L"", format_table_left);
-				__sheet->writeNum(__row_counter,  6, sum_pre_tax.Get(), format_table_right);
+				__sheet->writeNum(__row_counter,  6, stod_noexcept(GetTableSum()), format_table_right);
 				__sheet->writeStr(__row_counter,  7, L"", format_table_left);
 				__sheet->writeStr(__row_counter,  8, L"", format_table_left);
-				__sheet->writeNum(__row_counter,  9, sum_tax.Get(), format_table_right);
-				__sheet->writeNum(__row_counter, 10, sum_post_tax.Get(), format_table_right);
+				__sheet->writeNum(__row_counter,  9, stod_noexcept(GetTableVAT()), format_table_right);
+				__sheet->writeNum(__row_counter, 10, stod_noexcept(GetTableTotal()), format_table_right);
 
 				++__row_counter;
 				__PrintXLSSignature();
@@ -431,8 +421,6 @@ auto	C_Print_VAT_Service::__HPDF_DrawTable() -> string
 
 	try
 	{
-		c_float		sum_pre_tax(0), sum_tax(0), sum_post_tax(0);
-
 		if(error_message.empty())
 		{
 			pdf_obj.AddColumn(3);
@@ -519,12 +507,7 @@ auto	C_Print_VAT_Service::__HPDF_DrawTable() -> string
 			total_table_items = 0;
 			for(auto i = 1; isTableRowExists(i); ++i)
 			{
-				c_float	price(GetTableRowPrice(i));
-				c_float	tax, total;
 				auto	max_lines = pdf_obj.__HPDF_GetNumberOfLinesInTable(1, utf8_to_cp1251(GetTableRowDescription(i))	, NORMAL_FONT, __pdf_font_size);
-
-				tax = price * c_float(VAT_PERCENTAGE) / c_float(100);
-				total = price + tax;
 
 				if((error_message = pdf_obj.__HPDF_PrintTextTableCell(0, utf8_to_cp1251(GetTableRowIndex(i)), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).empty())
 				{
@@ -540,12 +523,12 @@ auto	C_Print_VAT_Service::__HPDF_DrawTable() -> string
 									{
 										if((error_message = pdf_obj.__HPDF_PrintTextTableCell(7, utf8_to_cp1251(vars->Get("no excise")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 2, false)).empty())
 										{
-											if((error_message = pdf_obj.__HPDF_PrintTextTableCell(8, utf8_to_cp1251(to_string(VAT_PERCENTAGE) + "%"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).empty())
+											if((error_message = pdf_obj.__HPDF_PrintTextTableCell(8, utf8_to_cp1251(GetSupplierVATSpellingShort()), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).empty())
 											{
 
-												if((error_message = pdf_obj.__HPDF_PrintTextTableCell(9, utf8_to_cp1251(string(tax)), HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, false)).empty())
+												if((error_message = pdf_obj.__HPDF_PrintTextTableCell(9, utf8_to_cp1251(GetTableRowVAT(i)), HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, false)).empty())
 												{
-													if((error_message = pdf_obj.__HPDF_PrintTextTableCell(10, utf8_to_cp1251(string(total)), HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, false)).empty())
+													if((error_message = pdf_obj.__HPDF_PrintTextTableCell(10, utf8_to_cp1251(GetTableRowTotal(i)), HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, false)).empty())
 													{
 														if((error_message = pdf_obj.__HPDF_MoveTableLineDown(max_lines)).empty())
 														{
@@ -612,10 +595,6 @@ auto	C_Print_VAT_Service::__HPDF_DrawTable() -> string
 					MESSAGE_ERROR("", "", "fail to write table index (" + to_string(i) + ") line");
 				}
 
-				sum_pre_tax = sum_pre_tax + c_float(GetTableRowPrice(i));
-				sum_tax = sum_tax + tax;
-				sum_post_tax = sum_post_tax + total;
-
 				if(error_message.length()) break;
 
 				++total_table_items;
@@ -629,17 +608,17 @@ auto	C_Print_VAT_Service::__HPDF_DrawTable() -> string
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(6, utf8_to_cp1251(string(sum_pre_tax)), HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(6, utf8_to_cp1251(GetTableSum()), HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, false)).length())
 			{ MESSAGE_ERROR("", "", "fail to write table footer sum_pre_tax line"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(9, utf8_to_cp1251(string(sum_tax)), HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(9, utf8_to_cp1251(GetTableVAT()), HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, false)).length())
 			{ MESSAGE_ERROR("", "", "fail to write table footer sum_tax line"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(10, utf8_to_cp1251(string(sum_post_tax)), HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, true)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(10, utf8_to_cp1251(GetTableTotal()), HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, true)).length())
 			{ MESSAGE_ERROR("", "", "fail to write table footer sum_post_tax line"); }
 		}
 

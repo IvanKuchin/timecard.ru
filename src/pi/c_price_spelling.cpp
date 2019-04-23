@@ -25,6 +25,8 @@ long C_Price_Spelling::GetFraction(double val)
 
 auto C_Price_Spelling::DeclensionIndex(long number) -> int
 {
+    MESSAGE_DEBUG("", "", "start");
+
     auto result = 0;
     
     number = number % 100;
@@ -41,39 +43,63 @@ auto C_Price_Spelling::DeclensionIndex(long number) -> int
         result = 2;
     }
     
+    MESSAGE_DEBUG("", "", "finish");
+
     return result;
 }
 
 auto C_Price_Spelling::SpellOrderOfMagnitude(int order_of_magnitude, long number) -> string
 {
+    MESSAGE_DEBUG("", "", "start");
+
     auto result = spelling_magnitude[order_of_magnitude][DeclensionIndex(number)];
     
+    MESSAGE_DEBUG("", "", "finish");
+
     return result;
 }
 
 auto C_Price_Spelling::SpellHundreds(long number) -> string
 {
+    MESSAGE_DEBUG("", "", "start");
+
+    MESSAGE_DEBUG("", "", "finish");
+
     return spelling_hundreds[number - 1];
 }
 
 auto C_Price_Spelling::SpellTenths(long number) -> string
 {
+    MESSAGE_DEBUG("", "", "start");
+
+    MESSAGE_DEBUG("", "", "finish");
+
     return spelling_tenths[number - 1];
 }
 
 auto C_Price_Spelling::Spell11_19(long number) -> string
 {
+    MESSAGE_DEBUG("", "", "start (" + to_string(number) + ")");
+
+    MESSAGE_DEBUG("", "", "finish");
+
     return spelling_11_19[number - 11];
 }
 
 auto C_Price_Spelling::SpellDigit(long number, int gender) -> string
 {
+    MESSAGE_DEBUG("", "", "start");
+
+    MESSAGE_DEBUG("", "", "finish");
+
     return spelling_digit[gender][number - 1];
 }
 
 
 auto C_Price_Spelling::SpellUpToThouthand(long number, int gender) -> string
 {
+    MESSAGE_DEBUG("", "", "start (" + to_string(number) + ", " + (gender == MALE_GENDER ? "male" : "female") + ")");
+
     auto    result = ""s;
     auto    hundreds = number / 100;
     auto    tenths = (number % 100) / 10;
@@ -83,7 +109,7 @@ auto C_Price_Spelling::SpellUpToThouthand(long number, int gender) -> string
     auto    digit_spelled = ""s;
 
     if(hundreds)                hundreds_spelled = SpellHundreds(hundreds);
-    if((tenths == 1) && digit)  tenths_spelled = Spell11_19(tenths + digit);
+    if((tenths == 1) && digit)  tenths_spelled = Spell11_19(tenths * 10 + digit);
     else
     {
         if(tenths)              tenths_spelled = SpellTenths(tenths);
@@ -106,11 +132,15 @@ auto C_Price_Spelling::SpellUpToThouthand(long number, int gender) -> string
         result += digit_spelled;
     }
 
+    MESSAGE_DEBUG("", "", "finish");
+
     return result;
 }
 
 auto C_Price_Spelling::SpellNumber(long number, int gender) -> string
 {
+    MESSAGE_DEBUG("", "", "start");
+
     auto            result = ""s;
 
     if(number <= max)
@@ -149,34 +179,51 @@ auto C_Price_Spelling::SpellNumber(long number, int gender) -> string
         MESSAGE_ERROR("", "", "number(" + to_string(number) + ") is too big for spelling");
     }
 
+    MESSAGE_DEBUG("", "", "finish");
+
     return result;
 }
  
 auto C_Price_Spelling::SpellRubles(long numbers) -> string
 {
+    MESSAGE_DEBUG("", "", "start");
+
     auto   result = ""s;
     
     result = spelling_dollars[DeclensionIndex(numbers)];
     
+    MESSAGE_DEBUG("", "", "finish");
+
     return result;
 }
  
 auto C_Price_Spelling::SpellCents(long numbers) -> string
 {
+    MESSAGE_DEBUG("", "", "start");
+
     auto   result = ""s;
 
     result = spelling_cents[DeclensionIndex(numbers)];
     
+    MESSAGE_DEBUG("", "", "finish");
+
     return result;
 }
  
 auto C_Price_Spelling::Spelling() -> string
 {
+    MESSAGE_DEBUG("", "", "start");
+
+    MESSAGE_DEBUG("", "", "start (" + to_string(price) + ")");
+
     auto result = ""s;
     auto whole = GetWhole(price);
     auto fraction = GetFraction(price);
+MESSAGE_DEBUG("", "", "milestone");
     auto spell_whole = SpellNumber(whole, MALE_GENDER);
+MESSAGE_DEBUG("", "", "milestone");
     auto spell_fraction = SpellNumber(fraction, FEMALE_GENDER);
+MESSAGE_DEBUG("", "", "milestone");
 
     if(spell_whole.length())
         result += spell_whole + " " + SpellRubles(whole);
@@ -185,6 +232,10 @@ auto C_Price_Spelling::Spelling() -> string
         if(result.length()) result += " ";
         result += spell_fraction + " " + SpellCents(fraction);
     }
+
+    MESSAGE_DEBUG("", "", "finish");
+
+    MESSAGE_DEBUG("", "", "finish");
 
     return result;
 }

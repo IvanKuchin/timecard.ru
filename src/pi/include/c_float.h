@@ -14,12 +14,13 @@ using namespace std;
 class c_float
 {
 	private:
-		double		val;
-		int			precision;
+		double		val = 0;
+		int			precision = 2;
 
 		auto		RoundWithPrecision(double num, int precision) -> double;
 		auto		RoundWithPrecision(double num) -> double;
 		auto 		FixRussianLocale(string param) -> string;
+		string		GetFormattedOutput() const;
 
 	public:
 					c_float();
@@ -37,8 +38,11 @@ class c_float
 		long		GetWhole();
 		long		GetFraction();
 
+		string		GetPriceTag() const;
+
 					operator double() 						{ return Get(); };
-					operator string();
+					operator string() const;
+
 		c_float		operator+(const c_float&);
 		c_float		operator-(const c_float&);
 		c_float		operator*(const c_float&);

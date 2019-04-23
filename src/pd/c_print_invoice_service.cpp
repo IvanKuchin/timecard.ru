@@ -422,7 +422,7 @@ auto	C_Print_Invoice_Service::PrintAsXLS() -> string
 					__sheet->writeNum(__row_counter, 6, stod_noexcept(GetTableRowQuantity(i)), format_table_right);
 					__sheet->writeStr(__row_counter, 7, multibyte_to_wide(GetTableRowItem(i)).c_str(), format_table_left);
 					__sheet->writeNum(__row_counter, 8, stod_noexcept(GetTableRowPrice(i)), format_table_right);
-					__sheet->writeNum(__row_counter, 9, stod_noexcept(GetTableRowTotal(i)), format_table_right);
+					__sheet->writeNum(__row_counter, 9, stod_noexcept(GetTableRowPrice(i)), format_table_right);
 
 					++total_table_items;
 				}
@@ -919,7 +919,7 @@ auto	C_Print_Invoice_Service::__HPDF_DrawTable() -> string
 							{
 								if((error_message = pdf_obj.__HPDF_PrintTextTableCell(4, utf8_to_cp1251(GetTableRowPrice(i)), HPDF_TALIGN_RIGHT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).empty())
 								{
-									if((error_message = pdf_obj.__HPDF_PrintTextTableCell(5, utf8_to_cp1251(GetTableRowTotal(i)), HPDF_TALIGN_RIGHT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).empty())
+									if((error_message = pdf_obj.__HPDF_PrintTextTableCell(5, utf8_to_cp1251(GetTableRowPrice(i)), HPDF_TALIGN_RIGHT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).empty())
 									{
 										if((error_message = pdf_obj.__HPDF_MoveTableLineDown(max_lines)).empty())
 										{

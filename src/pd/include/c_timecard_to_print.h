@@ -31,6 +31,7 @@ class C_Timecard_To_Print
 		string					date_finish_str = "";
 		string					agreement_number = "";
 		string					date_sign_str = "";
+		string					supplier_vat = "";
 		string					signature_title_1 = "";
 		string					signature_title_2 = "";
 		string					project_number = "";
@@ -49,6 +50,8 @@ class C_Timecard_To_Print
 		auto		SetDateStart(string &&param1) 				{ date_start_str = move(param1); };
 		auto		SetDateFinish(const string &param1)			{ date_finish_str = param1; };
 		auto		SetDateFinish(string &&param1) 				{ date_finish_str = move(param1); };
+		auto		SetSupplierVAT(const string &param1)		{ supplier_vat = param1; };
+		auto		SetSupplierVAT(string &&param1) 			{ supplier_vat = move(param1); };
 		auto		SetAgreementNumber(const string &param1)	{ agreement_number = param1; };
 		auto		SetAgreementNumber(string &&param1) 		{ agreement_number = move(param1); };
 		auto		SetDateSign(const string &param1)			{ date_sign_str = param1; };
@@ -64,10 +67,10 @@ class C_Timecard_To_Print
 		auto		SetDayrate(string param1) 					{ dayrate = param1; };
 		auto		SetTotalPayment(string param1) 				{ total_payment = param1; };
 
-
 		auto		GetID()										{ return id; };
 		auto		GetDateStart()								{ return date_start_str; };
 		auto		GetDateFinish()								{ return date_finish_str; };
+		auto		GetSupplierVAT()							{ return supplier_vat; };
 		auto		GetAgreementNumber()						{ return agreement_number; };		
 		auto		GetDateSign()								{ return date_sign_str; };
 		auto		GetSignatureTitle1()						{ return signature_title_1; };		

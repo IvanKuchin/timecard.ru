@@ -108,21 +108,21 @@ bool Test1()
 		cout << "failed on RemoveAllNonAlphabetSymbols(.`:'apo';`)=" << translation << ", test" << endl;
 	}
 
-	if(RemoveSpecialHTMLSymbols("<tag>\"value—value\"</tag>") == "&lt;tag&gt;&quot;value-value&quot;&lt;/tag&gt;") {}
+	if(RemoveSpecialHTMLSymbols("<tag>\"value—value\"</tag>") == "&lt;tag&gt;&quot;value—value&quot;&lt;/tag&gt;") {}
 	else
 	{
 		result = false;
 		cout << "failed on RemoveSpecialHTMLSymbols(<tag>\"value—value\"</tag>), test" << endl;
 	}
 
-	if((translation = RemoveSpecialHTMLSymbols("<tag>\"chanel№5\"</tag>")) == "&lt;tag&gt;&quot;chanel&#35;5&quot;&lt;/tag&gt;") {}
+	if((translation = RemoveSpecialHTMLSymbols("<tag>\"chanel№5\"</tag>")) == "&lt;tag&gt;&quot;chanel№5&quot;&lt;/tag&gt;") {}
 	else
 	{
 		result = false;
 		cout << "failed on RemoveSpecialHTMLSymbols(<tag>\"chanel№5\"</tag>)=" << translation << ", test" << endl;
 	}
 
-	if((translation = RemoveSpecialHTMLSymbols("<tag>\"chanel№5\"</tag>\\\\\\")) == "&lt;tag&gt;&quot;chanel&#35;5&quot;&lt;/tag&gt;") {}
+	if((translation = RemoveSpecialHTMLSymbols("<tag>\"chanel№5\"</tag>\\\\\\")) == "&lt;tag&gt;&quot;chanel№5&quot;&lt;/tag&gt;") {}
 	else
 	{
 		result = false;
@@ -170,7 +170,7 @@ bool Test1()
 		cout << "failed on SymbolReplace_KeepDigitsOnly(\"1234567890йцукенгшщз1234567890qwertyuiop\")=" << translation << ", test" << endl;
 	}
 
-	if((translation = RemoveSpecialSymbols("\\ 123	chanel№5	——— \\\\")) == " 123 chanelN5 --- ") {}
+	if((translation = RemoveSpecialSymbols("\\ 123	chanel№5	——— \\\\")) == " 123 chanel№5 ——— ") {}
 	else
 	{
 		result = false;

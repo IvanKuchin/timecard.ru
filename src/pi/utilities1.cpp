@@ -339,9 +339,7 @@ auto RemoveSpecialSymbols(wstring src) -> wstring
 	auto					result = src;
 	map<wstring, wstring>	map_replacement_1 = {
 		{L"\\", L""},
-		{L"\t", L" "},
-		{L"№", L"N"},
-		{L"—", L"-"}
+		{L"\t", L" "}
 	};
 
 
@@ -373,8 +371,6 @@ auto RemoveSpecialHTMLSymbols(const wstring &src) -> wstring
 		{L"\t", L" "},
 		{L"<", L"&lt;"},
 		{L">", L"&gt;"},
-		{L"№", L"&#35;"},
-		{L"—", L"-"},
 		{L"\"", L"&quot;"}
 	};
 
@@ -1180,7 +1176,7 @@ int convert_utf8_to_windows1251(const char* utf8, char* windows1251, size_t n)
 			{'|', (char)0xe2, (char)0x83, (char)0xa6}, // COMBINING DOUBLE VERTICAL STROKE OVERLAY
 			{'/', (char)0xe2, (char)0x83, (char)0xab}, // COMBINING LONG DOUBLE SOLIDUS OVERLAY
 			{'*', (char)0xe2, (char)0x83, (char)0xb0}, // COMBINING ASTERISK ABOVE
-			{'#', (char)0xe2, (char)0x84, (char)0x96}, // number sign
+			{(char)0xB9, (char)0xe2, (char)0x84, (char)0x96}, // number sign
 			{'1', (char)0xe2, (char)0x85, (char)0xa0}, // ROMAN NUMERAL ONE
 			{'2', (char)0xe2, (char)0x85, (char)0xa1}, // ROMAN NUMERAL TWO
 			{'3', (char)0xe2, (char)0x85, (char)0xa2}, // ROMAN NUMERAL THREE
@@ -1360,10 +1356,7 @@ NEXT_LETTER:
 		}
 		windows1251[j] = 0;
 
-	{
-		CLog	log;
-		log.Write(DEBUG, __func__ + string("[") + to_string(__LINE__) + string("]:") + string(": end"));
-	}
+		MESSAGE_DEBUG("", "", "finish");
 
 		return 1;
 }

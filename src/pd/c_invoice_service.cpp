@@ -41,7 +41,7 @@ static auto GetTimecardLines_By_TimecardID_And_CostCenterID(string timecard_id, 
 			"("
 				"SELECT `id` FROM `timecard_projects` WHERE `timecard_customers_id` IN"
 				"("
-					"SELECT `timecard_customers_id` FROM `cost_center_assignment` WHERE `cost_center_id`=\"" + cost_center_id + "\" "
+					"SELECT `timecard_customer_id` FROM `cost_center_assignment` WHERE `cost_center_id`=\"" + cost_center_id + "\" "
 				")"
 			")"
 		")"
@@ -273,7 +273,7 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 		}
 		else
 		{
-			MESSAGE_ERROR("", "", "due to previous error invoice (xls format) won't be printed");
+			MESSAGE_ERROR("", "", "due to previous error invoice won't be printed");
 		}
 
 		if(error_message.empty())
@@ -306,7 +306,7 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 		}
 		else
 		{
-			MESSAGE_ERROR("", "", "due to previous error act (xls format) won't be printed");
+			MESSAGE_ERROR("", "", "due to previous error act won't be printed");
 		}
 
 		if(error_message.empty())
@@ -323,7 +323,7 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 				if(error_message.empty()) {}
 				else
 				{
-					MESSAGE_ERROR("", "", "fail to build act (xls format)");
+					MESSAGE_ERROR("", "", "fail to build vat (xls format)");
 				}
 			}
 			if(error_message.empty()) 
@@ -333,13 +333,13 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 				if(error_message.empty()) {}
 				else
 				{
-					MESSAGE_ERROR("", "", "fail to build act (pdf format)");
+					MESSAGE_ERROR("", "", "fail to build vat (pdf format)");
 				}
 			}
 		}
 		else
 		{
-			MESSAGE_ERROR("", "", "due to previous error act (xls format) won't be printed");
+			MESSAGE_ERROR("", "", "due to previous error vat won't be printed");
 		}
 
 		if(error_message.empty())
@@ -375,7 +375,7 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 				if(error_message.empty()) {}
 				else
 				{
-					MESSAGE_ERROR("", "", "fail to build 1c cost center service");
+					MESSAGE_ERROR("", "", "fail to build 1c subcontractor payment");
 				}
 			}
 		}
@@ -396,7 +396,7 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 				if(error_message.empty()) {}
 				else
 				{
-					MESSAGE_ERROR("", "", "fail to build 1c cost center service");
+					MESSAGE_ERROR("", "", "fail to build 1c subcontractor payment order");
 				}
 			}
 		}
@@ -535,14 +535,15 @@ auto C_Invoice_Service::CreateTimecardObj(string timecard_id) -> C_Timecard_To_P
 								obj.SetDateSign(db->Get(0, "sign_date"));
 								obj.SetDayrate(db->Get(0, "day_rate"));
 
-								if(db->Query("SELECT `name` FROM `company` WHERE `id`=("
+								if(db->Query("SELECT `name`,`vat` FROM `company` WHERE `id`=("
 												"SELECT `agency_company_id` FROM `contracts_sow` WHERE `id`=("
 													"SELECT `contract_sow_id` FROM `contracts_psow` WHERE `id`=\"" + psow_id + "\""
 												")"
 											");"))
 								{
 									obj.SetSignatureTitle1(ConvertHTMLToText(db->Get(0, "name")));
-									
+									obj.SetSupplierVAT(ConvertHTMLToText(db->Get(0, "vat")));
+
 									if(db->Query("SELECT `title` FROM `cost_centers` WHERE `id`=\"" + cost_center_id + "\";"))
 									{
 										obj.SetSignatureTitle2(ConvertHTMLToText(db->Get(0, "title")));
@@ -565,8 +566,7 @@ auto C_Invoice_Service::CreateTimecardObj(string timecard_id) -> C_Timecard_To_P
 										MESSAGE_ERROR("", "", "CostCenter title not found for cost_center.id(" + cost_center_id + ")");
 								}
 								else
-									MESSAGE_ERROR("", "", "Agency title not found for psow.id(" + psow_id + ")");
-
+									MESSAGE_ERROR("", "", "Agency title and vat not found for psow.id(" + psow_id + ")");
 							}
 							else
 							{

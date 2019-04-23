@@ -5,7 +5,7 @@ auto	C_Print_1C_Subcontractor::RenderTemplate() -> string
 {
 	auto			error_message = ""s;
 
-	MESSAGE_DEBUG("", "", "start");
+	MESSAGE_DEBUG("", "", "start (template: " + GetTemplateBody_Filename() + ")");
 
 	// --- build table for service invoice
 	if(error_message.empty())
@@ -25,6 +25,26 @@ auto	C_Print_1C_Subcontractor::RenderTemplate() -> string
 				if(render_obj.SetTemplateFile(GetTemplateBody_Filename()))
 				{
 					table_content += render_obj.RenderTemplate();
+
+					{
+						auto	empty_var_list = render_obj.GetEmptyVarList();
+						auto	empty_var_list_str = ""s;
+
+						// --- generate error_message
+						if(empty_var_list.size())
+						{
+
+							for(auto &var_name: empty_var_list)
+							{
+								if(empty_var_list_str.length()) empty_var_list_str += ", ";
+								empty_var_list_str += var_name;
+							}
+
+							error_message = gettext("1C generation failed") + "("s + vars->Get("subcontractor_company_name_" + to_string(i)) + "). " + gettext("empty vars list") + ": "s + empty_var_list_str;
+							MESSAGE_ERROR("", "", "following variable must be defined on contract (" + vars->Get("subcontractor_company_name_" + to_string(i)) + "): " + empty_var_list_str);
+						}
+
+					}
 				}
 				else
 				{
@@ -35,7 +55,7 @@ auto	C_Print_1C_Subcontractor::RenderTemplate() -> string
 				if(error_message.length()) break;
 			}
 
-			vars->AssignVariableValue("Subcontractor_Payment_Documents_1C", table_content, true);
+			vars->AssignVariableValue("Subcontractor_Documents_1C", table_content, true);
 		}
 		else
 		{
@@ -117,13 +137,13 @@ auto	C_Print_1C_Subcontractor_Payment::Print() -> string
 	if(error_message.empty())
 	{
 		if((error_message = RenderTemplate()).length())
-		{ MESSAGE_ERROR("", "", "fail to render template 1c cost center service file"); }
+		{ MESSAGE_ERROR("", "", "fail to render template 1c subcontractor payment file"); }
 	}
 
 	if(error_message.empty())
 	{
 		if((error_message = SaveFile()).length())
-		{ MESSAGE_ERROR("", "", "fail to save 1c cost center service file"); }
+		{ MESSAGE_ERROR("", "", "fail to save 1c subcontractor payment file"); }
 	}
 
 
@@ -141,13 +161,13 @@ auto	C_Print_1C_Subcontractor_Payment_Order::Print() -> string
 	if(error_message.empty())
 	{
 		if((error_message = RenderTemplate()).length())
-		{ MESSAGE_ERROR("", "", "fail to render template 1c cost center service file"); }
+		{ MESSAGE_ERROR("", "", "fail to render template 1c subcontractor payment order file"); }
 	}
 
 	if(error_message.empty())
 	{
 		if((error_message = SaveFile()).length())
-		{ MESSAGE_ERROR("", "", "fail to save 1c cost center service file"); }
+		{ MESSAGE_ERROR("", "", "fail to save 1c subcontractor payment order file"); }
 	}
 
 	MESSAGE_DEBUG("", "", "finish (error_message.length() = " + to_string(error_message.length()) + ")");

@@ -166,15 +166,15 @@ class C_Print_Invoice_Service_Agency : public C_Print_Invoice_Service
 		auto			GetCustomerMailingAddress() -> string			{ return vars->Get("cost_center_mailing_address"); };
 
 		auto			isTableRowExists(int i) -> bool					{ return vars->Get("timecard_index_" + to_string(i)).length(); };
-		auto			GetTableRowDescription(int i) -> string			{ return vars->Get("table_row_description_" + to_string(i)); };
+		auto			GetTableRowDescription(int i) -> string			{ return vars->Get("cost_center_table_row_description_" + to_string(i)); };
 		auto			GetTableRowIndex(int i) -> string				{ return vars->Get("timecard_index_" + to_string(i)); };
 		auto			GetTableRowQuantity(int i) -> string			{ return vars->Get("timecard_quantity_" + to_string(i)); };
 		auto			GetTableRowItem(int i) -> string				{ return vars->Get("timecard_item_" + to_string(i)); };
-		auto			GetTableRowPrice(int i) -> string				{ return vars->Get("timecard_price_" + to_string(i)); };
-		auto			GetTableRowTotal(int i) -> string				{ return vars->Get("timecard_total_" + to_string(i)); };
-		auto			GetTableSum() -> string							{ return vars->Get("timecards_sum_amount"); };
-		auto			GetTableVAT() -> string							{ return vars->Get("vat_amount"); };
-		auto			GetTableTotal() -> string						{ return vars->Get("total_payment"); };
+		auto			GetTableRowPrice(int i) -> string				{ return vars->Get("cost_center_price_" + to_string(i)); };
+		auto			GetTableRowTotal(int i) -> string				{ return vars->Get("cost_center_total_" + to_string(i)); };
+		auto			GetTableSum() -> string							{ return vars->Get("cost_center_sum_amount"); };
+		auto			GetTableVAT() -> string							{ return vars->Get("cost_center_vat_amount"); };
+		auto			GetTableTotal() -> string						{ return vars->Get("cost_center_total_payment"); };
 
 		auto			GetSignatureTitle1() -> string					{ return vars->Get("Director"); };
 		auto			GetSignatureTitle2() -> string					{ return vars->Get("Accountant"); };
@@ -224,15 +224,15 @@ class C_Print_Act_Service_Agency : public C_Print_Invoice_Service
 		auto			GetCustomerMailingAddress() -> string			{ return vars->Get("cost_center_mailing_address"); };
 
 		auto			isTableRowExists(int i) -> bool					{ return vars->Get("timecard_index_" + to_string(i)).length(); };
-		auto			GetTableRowDescription(int i) -> string			{ return vars->Get("table_row_description_" + to_string(i)); };
+		auto			GetTableRowDescription(int i) -> string			{ return vars->Get("cost_center_table_row_description_" + to_string(i)); };
 		auto			GetTableRowIndex(int i) -> string				{ return vars->Get("timecard_index_" + to_string(i)); };
 		auto			GetTableRowQuantity(int i) -> string			{ return vars->Get("timecard_quantity_" + to_string(i)); };
 		auto			GetTableRowItem(int i) -> string				{ return vars->Get("timecard_item_" + to_string(i)); };
-		auto			GetTableRowPrice(int i) -> string				{ return vars->Get("timecard_price_" + to_string(i)); };
-		auto			GetTableRowTotal(int i) -> string				{ return vars->Get("timecard_total_" + to_string(i)); };
-		auto			GetTableSum() -> string							{ return vars->Get("timecards_sum_amount"); };
-		auto			GetTableVAT() -> string							{ return vars->Get("vat_amount"); };
-		auto			GetTableTotal() -> string						{ return vars->Get("total_payment"); };
+		auto			GetTableRowPrice(int i) -> string				{ return vars->Get("cost_center_price_" + to_string(i)); };
+		auto			GetTableRowTotal(int i) -> string				{ return vars->Get("cost_center_total_" + to_string(i)); };
+		auto			GetTableSum() -> string							{ return vars->Get("cost_center_sum_amount"); };
+		auto			GetTableVAT() -> string							{ return vars->Get("cost_center_vat_amount"); };
+		auto			GetTableTotal() -> string						{ return vars->Get("cost_center_total_payment"); };
 
 		auto			GetSignatureTitle1() -> string					{ return vars->Get("Provider"); };
 		auto			GetSignatureTitle2() -> string					{ return vars->Get("Customer"); };

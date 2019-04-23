@@ -22,26 +22,27 @@ using namespace std;
 class CCgi
 {
     private:
-		FILE		*templateFile;
-		CMysql		*db;
-		CVars		vars;
-		CFiles		files;
-		CSession	sessionDB;
-		int			initHeadersFlag;
+		FILE				*templateFile;
+		CMysql				*db;
+		CVars				vars;
+		CFiles				files;
+		CSession			sessionDB;
+		int					initHeadersFlag;
+		vector<string>		empty_var_list = {};
 
-		string		content = "";
+		string				content = "";
 
-		void		InitHeaders();
+		void				InitHeaders();
 
 		//it's temporarily
-		string		cookieName, cookieVal, cookieMaxAge, cookiePath, cookieDomain;
-		int			cookieSecure;
-		CCookies	cookie;
+		string				cookieName, cookieVal, cookieMaxAge, cookiePath, cookieDomain;
+		int					cookieSecure;
+		CCookies			cookie;
 
-		string		RecvLine(FILE *s);
-		string		GlobalMessageReplace(string where, string src, string dst);
+		string				RecvLine(FILE *s);
+		string				GlobalMessageReplace(string where, string src, string dst);
 
-		string		FindLanguageByIP(string ip);
+		string				FindLanguageByIP(string ip);
     public:
 				CCgi();
 				CCgi(int typeTemplate);
@@ -153,7 +154,9 @@ class CCgi
 		bool	Cookie_InitialAction_Expire();
 		bool	Cookie_InitialAction_Assign(string inviteHash);
 
-			~CCgi();
+		auto	GetEmptyVarList()		{ return empty_var_list; };
+
+				~CCgi();
 };
 
 #endif

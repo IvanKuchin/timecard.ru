@@ -214,7 +214,7 @@ void CCgi::OutStringEncode(const char *str)
 
 string CCgi::RenderLine(string rLine)
 {
-	string result = rLine;
+	auto result = rLine;
 	string::size_type findB, findE;
 
 	
@@ -227,8 +227,10 @@ string CCgi::RenderLine(string rLine)
 			break;
 	    }
 
-	    string tag = result.substr(findB + 7, findE - findB - 7);
-	    string varValue = vars.Get(tag);
+	    auto tag = result.substr(findB + 7, findE - findB - 7);
+	    auto varValue = vars.Get(tag);
+
+	    if(varValue.empty())	empty_var_list.push_back(tag);
 
 	    result.replace(findB, findE + 2 - findB, varValue);
 
@@ -369,6 +371,9 @@ auto CCgi::RenderTemplate() -> string
 					string	after = fLine.substr(ePos + 2, fLine.length() - ePos - 2);
 
 					result += before + nextTempl.RenderTemplate() + after;
+
+					// --- append child empty_var_list to current-parent empty_var_list
+					empty_var_list.insert(empty_var_list.end(), nextTempl.GetEmptyVarList().begin(), nextTempl.GetEmptyVarList().end());
 			    }
 			    else
 			    {

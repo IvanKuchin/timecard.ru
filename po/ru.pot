@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-16 12:55-0400\n"
+"POT-Creation-Date: 2019-04-20 13:16-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -31,6 +31,9 @@ msgid_plural "%d subcontractors"
 msgstr[0] "%d субконтрактору"
 msgstr[1] "%d субконтракторам"
 msgstr[2] "%d субконтракторам"
+
+msgid "1C generation failed"
+msgstr "Ошибка в выгрузке 1С"
 
 msgid "1c filename is empty"
 msgstr "не указано имя фаила 1с"
@@ -341,6 +344,9 @@ msgstr "не указан счет"
 msgid "act number"
 msgstr "номер акта"
 
+msgid "act number is empty"
+msgstr "не указан номер акта"
+
 msgid "agency bank id not found"
 msgstr "банк не найден"
 
@@ -446,6 +452,9 @@ msgstr "даты командировки вне периода назначен
 msgid "date is empty"
 msgstr "дата не указана"
 
+msgid "day rate"
+msgstr "дневная ставка"
+
 msgid "dayrate changed"
 msgstr "dayrate изменился"
 
@@ -463,6 +472,9 @@ msgstr "описание изменено"
 
 msgid "employeer not found"
 msgstr "не найден работодатель"
+
+msgid "empty vars list"
+msgstr "список не заданных переменных: "
 
 msgid "end date"
 msgstr "дата окончания"
@@ -524,6 +536,9 @@ msgstr "hpdf: не удалось напечатать текст"
 msgid "hpdf: table top must be higher than bottom"
 msgstr "hpdf: верх таблицы должен быть выше чем нижняя часть"
 
+msgid "id is empty"
+msgstr ""
+
 msgid "in scope"
 msgstr "в рамках"
 
@@ -572,11 +587,14 @@ msgstr "не указано название"
 msgid "no VAT"
 msgstr "НДС не облагается"
 
-msgid "noVAT"
-msgstr "БезНДС"
+msgid "no VAT short"
+msgstr "без НДС"
 
 msgid "no excise"
 msgstr "без акциза"
+
+msgid "noVAT"
+msgstr "БезНДС"
 
 msgid "number"
 msgstr "номер"
@@ -634,6 +652,9 @@ msgstr "дата начала"
 
 msgid "start date changed"
 msgstr "изменилась дата подписания контракта"
+
+msgid "subc company.id is empty"
+msgstr ""
 
 msgid "table is too wide"
 msgstr "таблица слишком широкая"
