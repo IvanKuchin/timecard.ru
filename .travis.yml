@@ -46,4 +46,4 @@ script:
     # --- don't fail unit tests, if folder can't be created
     # --- use libxl from source-tree
     - mkdir /usr/local/share/timecard.su || true
-    - mkdir build && cd build && cmake .. && chmod a+x ./share/dev.timecard.su/ci-scripts/mysql_provisioning && ./share/dev.timecard.su/ci-scripts/mysql_provisioning && make && ctest --output-on-failure
+    - mkdir build && cd build && cmake .. && chmod a+x ./share/dev.timecard.su/ci-scripts/mysql_provisioning && ./share/dev.timecard.su/ci-scripts/mysql_provisioning && make -j4 && ctest --output-on-failure
