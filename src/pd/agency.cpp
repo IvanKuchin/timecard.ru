@@ -3464,6 +3464,71 @@ int main(void)
 			MESSAGE_DEBUG("", action, "finish");
 		}
 
+		if(action == "AJAX_getApprovedBTList")
+		{
+			ostringstream	ostResult;
+
+			MESSAGE_DEBUG("", action, "start");
+
+			ostResult.str("");
+
+			{
+				string			template_name = "json_response.htmlt";
+				string			error_message = "";
+				string			cost_center_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("cost_center_id"));
+
+				if(user.GetType() == "agency")
+				{
+					if(isCostCenterBelongsToAgency(cost_center_id, &db, &user))
+					{
+						ostResult << "{"
+										"\"result\":\"success\","
+										"\"bt\":[" << GetBTsInJSONFormat(
+																"SELECT * FROM `bt` WHERE `status`=\"approved\" AND ("
+																	"`id` IN ("
+																		"SELECT `id` FROM `bt` WHERE `customer_id` IN ("
+																			"SELECT `timecard_customer_id` FROM `cost_center_assignment` WHERE `cost_center_id`=\"" + cost_center_id + "\""
+																		")"
+																	")"
+																") AND NOT("
+																	"`id` IN ("
+																		"SELECT `bt_id` FROM `invoice_cost_center_bt_details` WHERE `invoice_cost_center_bt_id` IN ("
+																			"SELECT `id` FROM `invoice_cost_center_bt` WHERE `cost_center_id`=\"" + cost_center_id + "\""
+																		")"
+																	")"
+																")", &db, &user, false) << "]";
+						ostResult << "}";
+					}
+					else
+					{
+						MESSAGE_ERROR("", action, "cost_center.id(" + cost_center_id + ") doesn't belongs to agency user(" + user.GetID() + ") employeed");
+						error_message = gettext("You are not authorized");
+					}
+				}
+				else
+				{
+					MESSAGE_ERROR("", action, "user(" + user.GetID() + ") is not an agency employee");
+					error_message = gettext("You are not authorized");
+				}
+
+				if(error_message.empty())
+				{
+				}
+				else
+				{
+					MESSAGE_DEBUG("", action, "failed");
+					ostResult.str("");
+					ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+				}
+
+				indexPage.RegisterVariableForce("result", ostResult.str());
+
+				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			}
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
+
 
 
 

@@ -87,7 +87,8 @@ C_Invoice_Service::C_Invoice_Service(CMysql *param1, CUser *param2) : db(param1)
 
 auto C_Invoice_Service::GenerateDocumentArchive() -> string
 {
-	C_Invoicing_Vars						invoicing_vars(db, user);
+	MESSAGE_DEBUG("", "", "start");
+
 	C_Print_Timecard						timecard_printer;
 
 	C_Print_Invoice_Service_Agency			invoice_agency;
@@ -110,7 +111,8 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 
 	auto									error_message = ""s;
 
-	MESSAGE_DEBUG("", "", "start");
+	invoicing_vars.SetDB(db);
+	invoicing_vars.SetUser(user);
 
 	if(error_message.empty())
 	{
@@ -659,11 +661,19 @@ auto C_Invoice_Service::UpdateDBWithInvoiceData(const string timecard_id, c_floa
 			// --- don't merge it with previous if()
 			if(invoice_cost_center_service_id)
 			{
-				if(db->InsertQuery( "INSERT INTO `invoice_cost_center_service_details` (`invoice_cost_center_service_id`, `timecard_id`, `amount`)"
+				// --- find appropriate timecard.id in invoicing_vars
+				auto	timecard_index = invoicing_vars.GetIndexByTimecardID(timecard_id);
+
+				if(db->InsertQuery( "INSERT INTO `invoice_cost_center_service_details` (`invoice_cost_center_service_id`, `timecard_id`, `cc_amount_pre_tax`, `cc_amount_tax`, `cc_amount_total`, `subc_amount_pre_tax`, `subc_amount_tax`, `subc_amount_total`)"
 									"VALUES (" + 
 										quoted(to_string(invoice_cost_center_service_id)) + "," +
 										quoted(timecard_id) + "," +
-										quoted(string(amount)) +
+										quoted(invoicing_vars.Get("cost_center_price_" + timecard_index).length() ? invoicing_vars.Get("cost_center_price_" + timecard_index) : "0") + "," +
+										quoted(invoicing_vars.Get("cost_center_vat_" + timecard_index).length() ? invoicing_vars.Get("cost_center_vat_" + timecard_index) : "0") + "," +
+										quoted(invoicing_vars.Get("cost_center_total_" + timecard_index).length() ? invoicing_vars.Get("cost_center_total_" + timecard_index) : "0") + "," +
+										quoted(invoicing_vars.Get("timecard_price_" + timecard_index).length() ? invoicing_vars.Get("timecard_price_" + timecard_index) : "0") + "," +
+										quoted(invoicing_vars.Get("timecard_vat_" + timecard_index).length() ? invoicing_vars.Get("timecard_vat_" + timecard_index) : "0") + "," +
+										quoted(invoicing_vars.Get("timecard_total_" + timecard_index).length() ? invoicing_vars.Get("timecard_total_" + timecard_index) : "0") +
 									");"))
 				{
 				}

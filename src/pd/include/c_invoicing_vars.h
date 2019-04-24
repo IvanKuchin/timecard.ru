@@ -29,8 +29,11 @@ class C_Invoicing_Vars
 
 
 	public:
-					C_Invoicing_Vars();
+					C_Invoicing_Vars()						{};
 					C_Invoicing_Vars(CMysql *param1, CUser *param2) : db(param1), user(param2) {};
+
+		auto		SetDB(CMysql *param)					{ db = param; };
+		auto		SetUser(CUser *param)					{ user = param; };
 
 		auto		AssignVariableValue(const string &var_name, const string &value, bool isMandatory) -> string;
 		auto		AssignVariableFromDB(const string &var_name, const string &sql_query, bool isMandatory) -> string;
@@ -47,6 +50,7 @@ class C_Invoicing_Vars
 
 		auto		GetVars()								{ return vars; };
 
+		auto		GetIndexByTimecardID(string timecard_id) -> string;
 };
 
 ostream&	operator<<(ostream& os, const C_Invoicing_Vars &);

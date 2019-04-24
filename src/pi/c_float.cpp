@@ -116,10 +116,10 @@ string c_float::GetFormattedOutput() const
 
 	return CutTrailingZeroes(ost.str());
 */
-	return CutTrailingZeroes(GetPriceTag());
+	return CutTrailingZeroes(PrintPriceTag());
 }
 
-string c_float::GetPriceTag() const
+string c_float::PrintPriceTag() const
 {
 	long			multiplier = pow(10, precision);
 	ostringstream	ost;

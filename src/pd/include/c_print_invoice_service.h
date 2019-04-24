@@ -170,11 +170,11 @@ class C_Print_Invoice_Service_Agency : public C_Print_Invoice_Service
 		auto			GetTableRowIndex(int i) -> string				{ return vars->Get("timecard_index_" + to_string(i)); };
 		auto			GetTableRowQuantity(int i) -> string			{ return vars->Get("timecard_quantity_" + to_string(i)); };
 		auto			GetTableRowItem(int i) -> string				{ return vars->Get("timecard_item_" + to_string(i)); };
-		auto			GetTableRowPrice(int i) -> string				{ return vars->Get("cost_center_price_" + to_string(i)); };
-		auto			GetTableRowTotal(int i) -> string				{ return vars->Get("cost_center_total_" + to_string(i)); };
-		auto			GetTableSum() -> string							{ return vars->Get("cost_center_sum_amount"); };
-		auto			GetTableVAT() -> string							{ return vars->Get("cost_center_vat_amount"); };
-		auto			GetTableTotal() -> string						{ return vars->Get("cost_center_total_payment"); };
+		auto			GetTableRowPrice(int i) -> string				{ return c_float(vars->Get("cost_center_price_" + to_string(i))).PrintPriceTag(); };
+		auto			GetTableRowTotal(int i) -> string				{ return c_float(vars->Get("cost_center_total_" + to_string(i))).PrintPriceTag(); };
+		auto			GetTableSum() -> string							{ return c_float(vars->Get("cost_center_sum_amount")).PrintPriceTag(); };
+		auto			GetTableVAT() -> string							{ return c_float(vars->Get("cost_center_vat_amount")).PrintPriceTag(); };
+		auto			GetTableTotal() -> string						{ return c_float(vars->Get("cost_center_total_payment")).PrintPriceTag(); };
 
 		auto			GetSignatureTitle1() -> string					{ return vars->Get("Director"); };
 		auto			GetSignatureTitle2() -> string					{ return vars->Get("Accountant"); };
@@ -228,11 +228,11 @@ class C_Print_Act_Service_Agency : public C_Print_Invoice_Service
 		auto			GetTableRowIndex(int i) -> string				{ return vars->Get("timecard_index_" + to_string(i)); };
 		auto			GetTableRowQuantity(int i) -> string			{ return vars->Get("timecard_quantity_" + to_string(i)); };
 		auto			GetTableRowItem(int i) -> string				{ return vars->Get("timecard_item_" + to_string(i)); };
-		auto			GetTableRowPrice(int i) -> string				{ return vars->Get("cost_center_price_" + to_string(i)); };
-		auto			GetTableRowTotal(int i) -> string				{ return vars->Get("cost_center_total_" + to_string(i)); };
-		auto			GetTableSum() -> string							{ return vars->Get("cost_center_sum_amount"); };
-		auto			GetTableVAT() -> string							{ return vars->Get("cost_center_vat_amount"); };
-		auto			GetTableTotal() -> string						{ return vars->Get("cost_center_total_payment"); };
+		auto			GetTableRowPrice(int i) -> string				{ return c_float(vars->Get("cost_center_price_" + to_string(i))).PrintPriceTag(); };
+		auto			GetTableRowTotal(int i) -> string				{ return c_float(vars->Get("cost_center_total_" + to_string(i))).PrintPriceTag(); };
+		auto			GetTableSum() -> string							{ return c_float(vars->Get("cost_center_sum_amount")).PrintPriceTag(); };
+		auto			GetTableVAT() -> string							{ return c_float(vars->Get("cost_center_vat_amount")).PrintPriceTag(); };
+		auto			GetTableTotal() -> string						{ return c_float(vars->Get("cost_center_total_payment")).PrintPriceTag(); };
 
 		auto			GetSignatureTitle1() -> string					{ return vars->Get("Provider"); };
 		auto			GetSignatureTitle2() -> string					{ return vars->Get("Customer"); };

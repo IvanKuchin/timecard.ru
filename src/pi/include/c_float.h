@@ -38,7 +38,7 @@ class c_float
 		long		GetWhole();
 		long		GetFraction();
 
-		string		GetPriceTag() const;
+		string		PrintPriceTag() const;
 
 					operator double() 						{ return Get(); };
 					operator string() const;

@@ -23,6 +23,7 @@ class C_Invoice_Service
 		CUser							*user = NULL;
 		vector<string>					timecard_id_list;
 		vector<C_Timecard_To_Print>		timecard_obj_list;
+		C_Invoicing_Vars				invoicing_vars;
 		string							cost_center_id = "";
 
 		long							invoice_cost_center_service_id = 0;

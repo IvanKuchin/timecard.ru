@@ -920,6 +920,26 @@ auto C_Invoicing_Vars::Get(const string &name) -> string
 }
 
 
+// --- helper funcitons
+auto C_Invoicing_Vars::GetIndexByTimecardID(string timecard_id) -> string
+{
+	auto	result = ""s;
+
+	MESSAGE_DEBUG("", "", "start (timecard_id = " + timecard_id + ")");
+
+	for(auto i = 1; Get("timecard_id_" + to_string(i)).length(); ++i)
+	{
+		if(Get("timecard_id_" + to_string(i)) == timecard_id)
+		{
+			result = to_string(i);
+			break;
+		}
+	}
+
+	MESSAGE_DEBUG("", "", "finish (index is " + result + ")");
+
+	return result;
+}
 
 
 ostream& operator<<(ostream& os, const C_Invoicing_Vars &var)
