@@ -19,5 +19,6 @@
 #include "localy.h"
 #include "c_bt.h"
 #include "c_invoice_service.h"
+#include "c_invoice_bt.h"
 
 #endif

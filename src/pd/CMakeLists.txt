@@ -17,13 +17,16 @@ set(EXECUTABLE_CGIs_with_PI_LIBS
 set(INVOICE_LIB_SRCs
     c_pdf.cpp
     c_invoice_service.cpp
+    c_invoice_bt.cpp
     c_invoicing_vars.cpp
     c_print_timecard.cpp
+    c_print_bt.cpp
     c_print_invoice_service.cpp
     c_print_vat_service.cpp
     c_print_1c_costcenter.cpp
     c_print_1c_subcontractor.cpp
     c_timecard_to_print.cpp
+    c_bt_to_print.cpp
     )
 
 set(INDEPENDENT_LIBRARIES_SRCs

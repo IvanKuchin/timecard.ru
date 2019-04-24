@@ -2734,6 +2734,133 @@ int main(void)
 			MESSAGE_DEBUG("", action, "finish");
 		}
 
+		if(action == "AJAX_submitBTsToInvoice")
+		{
+			ostringstream	ostResult;
+
+			MESSAGE_DEBUG("", action, "start");
+
+			ostResult.str("");
+
+			{
+				auto			template_name = "json_response.htmlt"s;
+				auto			error_message = ""s;
+				auto			cost_center_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("cost_center_id"));
+				auto			bt_list_param = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("bt_list"));
+				auto			bt_list = split(bt_list_param, ',');
+				auto			isListCorrect = true;
+
+				for(auto &item: bt_list)
+				{
+					if(CheckHTTPParam_Number(item).empty())
+					{
+						isListCorrect = false;
+					}
+				}
+
+				if(isListCorrect)
+				{
+					if(cost_center_id.length())
+					{
+						if(user.GetType() == "agency")
+						{
+							error_message = isAgencyEmployeeAllowedToChangeAgencyData(&db, &user);
+							if(error_message.empty())
+							{
+								if(isCostCenterBelongsToAgency(cost_center_id, &db, &user))
+								{
+									if(db.Query("SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id`=(SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user.GetID() + "\");"))
+									{
+										string		agency_id = db.Get(0, "id");
+
+										error_message = isBTsBelongToAgency(bt_list, agency_id, &db, &user);
+										if(error_message.empty())
+										{
+											error_message = isBTsHavePSOWAssigned(bt_list, cost_center_id, &db, &user);
+											if(error_message.empty())
+											{
+												C_Invoice_BT	c_invoice(&db, &user);
+
+												c_invoice.SetBTList(bt_list);
+												c_invoice.SetCostCenterID(cost_center_id);
+
+												error_message = c_invoice.GenerateDocumentArchive();
+												if(error_message.empty())
+												{
+													ostResult << "{"
+																	"\"result\":\"success\","
+																	"\"invoice_id\":\"" << c_invoice.GetInvoiceID() << "\""
+																 "}";
+												}
+												else
+												{
+													MESSAGE_DEBUG("", action, "fail to generate invoice document archive");
+												}
+
+											}
+											else
+											{
+												MESSAGE_ERROR("", action, "some bt.id's(" + bt_list_param + ") doesn't belong to agency(" + agency_id + ")");
+											}
+										}
+										else
+										{
+											MESSAGE_ERROR("", action, "user.id(" + user.GetID() + ") isn't agency employee");
+										}
+									}
+									else
+									{
+										MESSAGE_ERROR("", action, "Can't define agency.id by user.id(" + user.GetID() + ")");
+										error_message = gettext("You are not agency employee");
+									}
+								}
+								else
+								{
+									MESSAGE_ERROR("", action, "cost_center.id(" + cost_center_id + ") doesn't belongs to agency user(" + user.GetID() + ") employeed");
+									error_message = gettext("You are not agency employee");
+								}
+							}
+							else
+							{
+								MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") doesn't allowed to change agency data");
+							}
+						}
+						else
+						{
+							MESSAGE_ERROR("", action, "user(" + user.GetID() + ") is not an agency employee");
+							error_message = gettext("You are not agency employee");
+						}
+					}
+					else
+					{
+						MESSAGE_ERROR("", action, "cost_center_id id is missed");
+						error_message = gettext("mandatory parameter missed");
+					}
+				}
+				else
+				{
+					MESSAGE_ERROR("", action, "bt list(" + bt_list_param + ") is incorrect");
+					error_message = gettext("Incorrect bt list");
+				}
+
+				if(error_message.empty())
+				{
+				}
+				else
+				{
+					MESSAGE_DEBUG("", action, "failed");
+					ostResult.str("");
+					ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+				}
+
+				indexPage.RegisterVariableForce("result", ostResult.str());
+
+				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			}
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
+
 		if(action == "AJAX_getAgencyInfo")
 		{
 			ostringstream	ostResult;
@@ -3231,7 +3358,7 @@ int main(void)
 			MESSAGE_DEBUG("", action, "finish");
 		}
 
-		if(action == "AJAX_getServiceInvoiceList")
+		if((action == "AJAX_getServiceInvoiceList") || (action == "AJAX_getBTInvoiceList"))
 		{
 			ostringstream	ostResult;
 
@@ -3249,10 +3376,19 @@ int main(void)
 					if(isCostCenterBelongsToAgency(cost_center_id, &db, &user))
 					{
 						ostResult << "{"
-										"\"result\":\"success\","
-										"\"service_invoices\":[" << GetServiceInvoicesInJSONFormat(
-																"SELECT * FROM `invoice_cost_center_service` WHERE `cost_center_id`=\"" + cost_center_id + "\";"
-																, &db, &user) << "]";
+										"\"result\":\"success\",";
+						if(action == "AJAX_getBTInvoiceList")
+						{
+							ostResult <<    "\"bt_invoices\":[" << GetServiceBTInvoicesInJSONFormat(
+																		"SELECT * FROM `invoice_cost_center_bt` WHERE `cost_center_id`=\"" + cost_center_id + "\";"
+																		, &db, &user) << "]";
+						}
+						else
+						{
+							ostResult <<    "\"service_invoices\":[" << GetServiceBTInvoicesInJSONFormat(
+																	"SELECT * FROM `invoice_cost_center_service` WHERE `cost_center_id`=\"" + cost_center_id + "\";"
+																	, &db, &user) << "]";
+						}
 						ostResult << "}";
 					}
 					else
@@ -3303,11 +3439,11 @@ int main(void)
 					if(isServiceInvoiceBelongsToAgency(service_invoice_id, &db, &user))
 					{
 						ostResult << "{"
-										"\"result\":\"success\","
-										"\"timecards\":[" + GetTimecardsInJSONFormat(	"SELECT * FROM `timecards` WHERE `id` IN ("
+										"\"result\":\"success\",";
+						ostResult <<	"\"timecards\":[" + GetTimecardsInJSONFormat(	"SELECT * FROM `timecards` WHERE `id` IN ("
 																							"SELECT `timecard_id` FROM `invoice_cost_center_service_details` WHERE `invoice_cost_center_service_id`=\"" + service_invoice_id + "\""
-																						");", &db, &user) + "]"
-									"}";
+																						");", &db, &user) + "]";
+						ostResult << "}";
 					}
 					else
 					{
@@ -3338,6 +3474,60 @@ int main(void)
 
 			MESSAGE_DEBUG("", action, "finish");
 		}
+		if(action == "AJAX_getBTInvoiceDetails")
+		{
+			ostringstream	ostResult;
+
+			MESSAGE_DEBUG("", action, "start");
+
+			ostResult.str("");
+
+			{
+				auto			template_name = "json_response.htmlt"s;
+				auto			error_message = ""s;
+				auto			bt_invoice_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("bt_invoice_id"));
+
+				if(user.GetType() == "agency")
+				{
+					if(isBTInvoiceBelongsToAgency(bt_invoice_id, &db, &user))
+					{
+						ostResult << "{"
+										"\"result\":\"success\",";
+						ostResult <<	"\"bt\":[" + GetBTsInJSONFormat(	"SELECT * FROM `bt` WHERE `id` IN ("
+																							"SELECT `bt_id` FROM `invoice_cost_center_bt_details` WHERE `invoice_cost_center_bt_id`=\"" + bt_invoice_id + "\""
+																						");", &db, &user, true) + "]";
+						ostResult << "}";
+					}
+					else
+					{
+						MESSAGE_ERROR("", action, "invoice_cost_center_bt.id(" + bt_invoice_id + ") doesn't belongs to agency user.id(" + user.GetID() + ") working at");
+						error_message = gettext("You are not authorized");
+					}
+				}
+				else
+				{
+					MESSAGE_ERROR("", action, "user(" + user.GetID() + ") is not an agency employee");
+					error_message = gettext("You are not authorized");
+				}
+
+				if(error_message.empty())
+				{
+				}
+				else
+				{
+					MESSAGE_DEBUG("", action, "failed");
+					ostResult.str("");
+					ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+				}
+
+				indexPage.RegisterVariableForce("result", ostResult.str());
+
+				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			}
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
+
 
 		if(action == "AJAX_recallServiceInvoice")
 		{
@@ -3350,7 +3540,7 @@ int main(void)
 			{
 				auto			template_name = "json_response.htmlt"s;
 				auto			error_message = ""s;
-				auto			service_invoice_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("service_invoice_id"));
+				auto			service_invoice_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("invoice_id"));
 
 				if(user.GetType() == "agency")
 				{
@@ -3368,6 +3558,62 @@ int main(void)
 					else
 					{
 						MESSAGE_ERROR("", action, "invoice_cost_center_service.id(" + service_invoice_id + ") doesn't belongs to user(" + user.GetID() + ")");
+						error_message = gettext("You are not authorized") + ". "s + gettext("Only owner can recall an invoice");
+					}
+				}
+				else
+				{
+					MESSAGE_ERROR("", action, "user(" + user.GetID() + ") is not an agency employee");
+					error_message = gettext("You are not authorized");
+				}
+
+				if(error_message.empty())
+				{
+				}
+				else
+				{
+					MESSAGE_DEBUG("", action, "failed");
+					ostResult.str("");
+					ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+				}
+
+				indexPage.RegisterVariableForce("result", ostResult.str());
+
+				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			}
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
+
+		if(action == "AJAX_recallBTInvoice")
+		{
+			ostringstream	ostResult;
+
+			MESSAGE_DEBUG("", action, "start");
+
+			ostResult.str("");
+
+			{
+				auto			template_name = "json_response.htmlt"s;
+				auto			error_message = ""s;
+				auto			bt_invoice_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("invoice_id"));
+
+				if(user.GetType() == "agency")
+				{
+					if(isBTInvoiceBelongsToUser(bt_invoice_id, &db, &user))
+					{
+						if((error_message = RecallBTInvoice(bt_invoice_id, &db, &user)).empty())
+						{
+							ostResult << "{\"result\":\"success\"}";
+						}
+						else
+						{
+							MESSAGE_ERROR("", "", "can't recall bt invoice(" + bt_invoice_id + ")");
+						}
+					}
+					else
+					{
+						MESSAGE_ERROR("", action, "invoice_cost_center_bt.id(" + bt_invoice_id + ") doesn't belongs to user(" + user.GetID() + ")");
 						error_message = gettext("You are not authorized") + ". "s + gettext("Only owner can recall an invoice");
 					}
 				}
@@ -3496,7 +3742,7 @@ int main(void)
 																			"SELECT `id` FROM `invoice_cost_center_bt` WHERE `cost_center_id`=\"" + cost_center_id + "\""
 																		")"
 																	")"
-																")", &db, &user, false) << "]";
+																")", &db, &user, true) << "]";
 						ostResult << "}";
 					}
 					else

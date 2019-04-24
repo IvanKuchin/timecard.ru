@@ -1,6 +1,6 @@
 #include "utilities_timecard.h"
 
-auto	GetServiceInvoicesInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
+auto	GetServiceBTInvoicesInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
 {
 	auto	affected = 0;
 	auto	result = ""s;;
@@ -11,6 +11,7 @@ auto	GetServiceInvoicesInJSONFormat(string sqlQuery, CMysql *db, CUser *user) ->
 		string		cost_center_id;
 		string		file;
 		string		owner_user_id;
+		string		owner_company_id;
 		string		eventTimestamp;
 	};
 	vector<ItemClass>		itemsList;
@@ -29,6 +30,7 @@ auto	GetServiceInvoicesInJSONFormat(string sqlQuery, CMysql *db, CUser *user) ->
 			item.cost_center_id = db->Get(i, "cost_center_id");
 			item.file = db->Get(i, "file");
 			item.owner_user_id = db->Get(i, "owner_user_id");
+			item.owner_company_id = db->Get(i, "owner_company_id");
 			item.eventTimestamp = db->Get(i, "eventTimestamp");
 
 			itemsList.push_back(item);
@@ -43,6 +45,7 @@ auto	GetServiceInvoicesInJSONFormat(string sqlQuery, CMysql *db, CUser *user) ->
 			result += "\"cost_center_id\":\"" + item.cost_center_id + "\",";
 			result += "\"file\":\"" + item.file + "\",";
 			result += "\"owner_user_id\":\"" + item.owner_user_id + "\",";
+			result += "\"owner_company_id\":\"" + item.owner_company_id + "\",";
 			result += "\"users\":[" + user_cache.Get("SELECT * FROM `users` WHERE `id`=\"" + item.owner_user_id + "\";", db, user, GetUserListInJSONFormat) + "],";
 			result += "\"eventTimestamp\":\"" + item.eventTimestamp + "\"";
 
@@ -79,6 +82,26 @@ auto	isServiceInvoiceBelongsToUser(string service_invoice_id, CMysql *db, CUser 
 	return result;
 }
 
+auto	isBTInvoiceBelongsToUser(string bt_invoice_id, CMysql *db, CUser *user) -> bool
+{
+	auto	result = false;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(db->Query("SELECT `id` FROM `invoice_cost_center_bt` WHERE `id`=\"" + bt_invoice_id + "\" AND `owner_user_id`=\"" + user->GetID() + "\";"))
+	{
+		result = true;
+	}
+	else
+	{
+		MESSAGE_DEBUG("", "", "invoice_cost_center_service.id(" + bt_invoice_id + ") doesn't belongs to user.id(" + user->GetID() + ")");
+	}
+
+	MESSAGE_DEBUG("", "", "finish (result length is " + (result ? "true" : "false") + ")");
+
+	return result;
+}
+
 auto	RecallServiceInvoice(string service_invoice_id, CMysql *db, CUser *user) -> string
 {
 	auto	error_message = ""s;
@@ -107,7 +130,14 @@ auto	RecallServiceInvoice(string service_invoice_id, CMysql *db, CUser *user) ->
 				}
 				else
 				{
-					unlink((INVOICES_CC_DIRECTORY + file_name).c_str());
+					if(file_name.length())
+					{
+						unlink((INVOICES_CC_DIRECTORY + file_name).c_str());
+					}
+					else
+					{
+						MESSAGE_ERROR("", "", "invoice file doesn't exists");
+					}
 				}
 			}
 		}
@@ -121,6 +151,63 @@ auto	RecallServiceInvoice(string service_invoice_id, CMysql *db, CUser *user) ->
 	else
 	{
 		MESSAGE_ERROR("", "", "invoice_cost_center_service is empty");
+		error_message = gettext("unknown invoice");
+	}
+
+	MESSAGE_DEBUG("", "", "finish (error_message.length is " + to_string(error_message.length()) + ")");
+
+	return error_message;
+}
+
+auto	RecallBTInvoice(string bt_invoice_id, CMysql *db, CUser *user) -> string
+{
+	auto	error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(bt_invoice_id.length())
+	{
+		if(db->Query("SELECT `file` FROM `invoice_cost_center_bt` WHERE `id`=\"" + bt_invoice_id + "\";"))
+		{
+			auto	file_name = db->Get(0, 0);
+
+			db->Query("DELETE FROM `invoice_cost_center_bt_details` WHERE `invoice_cost_center_bt_id`=\"" + bt_invoice_id + "\";");
+			if(db->isError())
+			{
+				MESSAGE_ERROR("", "", "fail to delete from invoice_cost_center_bt_details")
+				error_message = gettext("SQL syntax issue");
+			}
+			else
+			{
+				db->Query("DELETE FROM `invoice_cost_center_bt` WHERE `id`=\"" + bt_invoice_id + "\";");
+				if(db->isError())
+				{
+					MESSAGE_ERROR("", "", "fail to delete from invoice_cost_center_bt")
+					error_message = gettext("SQL syntax issue");
+				}
+				else
+				{
+					if(file_name.length())
+					{
+						unlink((INVOICES_CC_DIRECTORY + file_name).c_str());
+					}
+					else
+					{
+						MESSAGE_ERROR("", "", "invoice file doesn't exists");
+					}
+				}
+			}
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "invoice_cost_center_bt(" + bt_invoice_id + ") not found");
+			error_message = gettext("unknown invoice");
+		}
+
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "invoice_cost_center_bt is empty");
 		error_message = gettext("unknown invoice");
 	}
 
@@ -156,6 +243,44 @@ auto isServiceInvoiceBelongsToAgency(string service_invoice_id, CMysql *db, CUse
 		else
 		{
 			MESSAGE_ERROR("", "", "service_invoice_id is empty");
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "db or user not initialized");
+	}
+	
+	MESSAGE_DEBUG("", "", "finish (result is " + to_string(result) + ")");
+
+	return result;
+}
+
+auto isBTInvoiceBelongsToAgency(string bt_invoice_id, CMysql *db, CUser *user) -> bool
+{
+	auto result = false;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(db && user)
+	{
+		if(bt_invoice_id.length())
+		{
+			if(db->Query("SELECT `id` FROM `invoice_cost_center_bt` WHERE `id`=\"" + bt_invoice_id + "\" AND `owner_company_id`=("
+							"SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id`=("
+								"SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\""
+							")"
+						");"))
+			{
+				result = true;
+			}
+			else
+			{
+				MESSAGE_DEBUG("", "", "bt_invoice_id(" + bt_invoice_id + ") doesn't belongs to company user.id(" + user->GetID() + ") employeed");
+			}
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "bt_invoice_id is empty");
 		}
 	}
 	else
@@ -289,6 +414,37 @@ string isTimecardsHavePSOWAssigned(const vector<string> &timecard_list, string c
 	return error_message;
 }
 
+string isBTsHavePSOWAssigned(const vector<string> &bt_list, string cost_center_id, CMysql *db, CUser *user)
+{
+	auto	error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+	
+	if(db)
+	{
+		for(auto &bt_id: bt_list)
+		{
+			auto	psow_id = GetPSoWIDByBTIDAndCostCenterID(bt_id, cost_center_id, db, user);
+
+			if(psow_id.empty())
+			{
+				MESSAGE_ERROR("", "", "bt.id(" + bt_id + ") have no PSoW associated");
+				error_message = gettext("Some timecards have no PSoW associated");
+				break;
+			}
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "db is NULL");
+		error_message = gettext("Data has not been initialized");
+	}
+
+	MESSAGE_DEBUG("", "", "finish (error_message.length = " + to_string(error_message.length()) + ")");
+
+	return error_message;
+}
+
 string isTimecardsBelongToAgency(const vector<string> &timecard_list, string agency_id, CMysql *db, CUser *user)
 {
 	auto	error_message = ""s;
@@ -316,6 +472,47 @@ string isTimecardsBelongToAgency(const vector<string> &timecard_list, string age
 			{
 				MESSAGE_ERROR("", "", "timecard.id(" + timecard_id + ") doesn't exists");
 				error_message = gettext("Timecard not found");
+			}
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "db is NULL");
+		error_message = gettext("Data has not been initialized");
+	}
+
+	MESSAGE_DEBUG("", "", "finish (error_message.length = " + to_string(error_message.length()) + ")");
+
+	return error_message;
+}
+
+string isBTsBelongToAgency(const vector<string> &bt_list, string agency_id, CMysql *db, CUser *user)
+{
+	auto	error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+	
+	if(db)
+	{
+		for(auto &bt_id: bt_list)
+		{
+			if(db->Query("SELECT `agency_company_id` FROM `contracts_sow` WHERE `id`=(SELECT `contract_sow_id` FROM `bt` WHERE `id`=\"" + bt_id + "\");"))
+			{
+				if(agency_id == db->Get(0, "agency_company_id"))
+				{
+
+				}
+				else
+				{
+					MESSAGE_ERROR("", "", "bt.id(" + bt_id + ") doesn't belongs to agency.id(" + agency_id + ")");
+					error_message = gettext("BT doesn't belongs to agency");
+					break;
+				}
+			}
+			else
+			{
+				MESSAGE_ERROR("", "", "bt.id(" + bt_id + ") doesn't exists");
+				error_message = gettext("BT not found");
 			}
 		}
 	}

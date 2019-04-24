@@ -1,4 +1,4 @@
-#include "c_invoice_service.h"
+#include "c_invoice_bt.h"
 
 /*
 static void error_handler  (HPDF_STATUS   error_no,
@@ -10,87 +10,17 @@ static void error_handler  (HPDF_STATUS   error_no,
 }
 */
 
+C_Invoice_BT::C_Invoice_BT() {}
 
-static auto GetTimecardLines_By_TimecardID_And_CostCenterID(string timecard_id, string cost_center_id, CMysql *db, CUser *user)
-{
-	vector<tuple<string, string, string, string>>	result;
+C_Invoice_BT::C_Invoice_BT(CMysql *param1, CUser *param2) : db(param1), user(param2) {}
 
-	MESSAGE_DEBUG("", "", "start");
-
-	if(user)
-	{
-		if(user->GetType() == "agency")
-		{
-			if(db)
-			{
-				auto affected = db->Query(
-"SELECT `timecard_customers`.`title` as `customer`, `timecard_projects`.`title` as `project`, `timecard_tasks`.`title` as `task`,  `timecard_lines`.`row` as `hours`"
-"FROM `timecard_lines` "
-"INNER JOIN `timecard_tasks` ON `timecard_tasks`.`id`=`timecard_lines`.`timecard_task_id` "
-"INNER JOIN `timecard_projects` ON `timecard_projects`.`id`=`timecard_tasks`.`timecard_projects_id` "
-"INNER JOIN `timecard_customers` ON `timecard_customers`.`id`=`timecard_projects`.`timecard_customers_id` "
-"WHERE "
-	"("
-		"`timecard_lines`.`timecard_id`=\"" + timecard_id + "\""
-	")"
-	"AND"
-	"("
-		"`timecard_lines`.`timecard_task_id` IN "
-		"("
-			"SELECT `id` FROM `timecard_tasks` WHERE `timecard_projects_id` IN"
-			"("
-				"SELECT `id` FROM `timecard_projects` WHERE `timecard_customers_id` IN"
-				"("
-					"SELECT `timecard_customer_id` FROM `cost_center_assignment` WHERE `cost_center_id`=\"" + cost_center_id + "\" "
-				")"
-			")"
-		")"
-	")"
-					);
-				if(affected)
-				{
-					for(int i = 0; i < affected; ++i)
-					{
-						auto	temp = make_tuple<string, string, string, string>(db->Get(i, "customer"), db->Get(i, "project"), db->Get(i, "task"), db->Get(i, "hours"));
-						result.push_back(temp);
-					}
-				}
-				else
-				{
-					MESSAGE_ERROR("", "", "it is expected that valid entries will be here, otherwise cost_center.id(" + cost_center_id + ") and timecard.id(" + timecard_id + ") should not appear in GUI");
-				}
-			}
-			else
-			{
-				MESSAGE_ERROR("", "", "db not initialized");
-			}
-		}
-		else
-		{
-			MESSAGE_ERROR("", "", "user.id(" + user->GetID() + ") is not an agency employee (" + user->GetType() + ")");
-		}
-	}
-	else
-	{
-		MESSAGE_ERROR("", "", "user not initialized");
-	}
-
-	MESSAGE_DEBUG("", "", "finish (result.size is " + to_string(result.size()) + ")");
-
-	return result;
-}
-
-
-C_Invoice_Service::C_Invoice_Service() {}
-
-C_Invoice_Service::C_Invoice_Service(CMysql *param1, CUser *param2) : db(param1), user(param2) {}
-
-auto C_Invoice_Service::GenerateDocumentArchive() -> string
+auto C_Invoice_BT::GenerateDocumentArchive() -> string
 {
 	MESSAGE_DEBUG("", "", "start");
 
-	C_Print_Timecard						timecard_printer;
+	C_Print_BT								bt_printer;
 
+/*
 	C_Print_Invoice_Service_Agency			invoice_agency;
 	C_Print_Invoice_Service					*invoice_printer = &invoice_agency;
 
@@ -108,7 +38,7 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 
 	C_Print_1C_Subcontractor_Payment_Order	subc_1c_main_obj2;
 	C_Print_1C_Subcontractor				*subc_1c_payment_order_printer = &subc_1c_main_obj2;
-
+*/
 	auto									error_message = ""s;
 
 	invoicing_vars.SetDB(db);
@@ -130,33 +60,33 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 	if(error_message.empty())
 	{
 		// --- create object list
-		for(auto &timecard_id: timecard_id_list)
+		for(auto &bt_id: bt_id_list)
 		{
-			auto	temp_obj = CreateTimecardObj(timecard_id);
+			auto	temp_obj = CreateBTObj(bt_id);
 
 			if((error_message = temp_obj.isValid()).empty())
 			{
-				timecard_obj_list.push_back(temp_obj);
+				bt_obj_list.push_back(temp_obj);
 			}
 			else
 			{
-				MESSAGE_ERROR("", "", "timecard_obj(" + timecard_id + ") is broken don't add it to the list");
+				MESSAGE_ERROR("", "", "bt_obj(" + bt_id + ") is broken don't add it to the list");
 				break;
 			}
 		}
 	}
 	else
 	{
-		MESSAGE_ERROR("", "", "timecard won't be built due to previous error");
+		MESSAGE_ERROR("", "", "bt won't be built due to previous error");
 	}
 
-	// --- timecard generator
+	// --- bt generator
 	if(error_message.empty())
 	{
 		auto	i = 0;
 
-		// --- print timecard to XLS / PDF
-		for(auto &timecard: timecard_obj_list)
+		// --- print bt to XLS / PDF
+		for(auto &bt: bt_obj_list)
 		{
 			auto		filename_xls = ""s;
 			auto		filename_pdf = ""s;
@@ -164,45 +94,42 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 			do
 			{
 				++i;
-				filename_xls = temp_dir_timecards + "timecard_" + to_string(i) + ".xls";
-				filename_pdf = temp_dir_timecards + "timecard_" + to_string(i) + ".pdf";
+				filename_xls = temp_dir_bt + "bt_" + to_string(i) + ".xls";
+				filename_pdf = temp_dir_bt + "bt_" + to_string(i) + ".pdf";
 			} while(isFileExists(filename_xls) || isFileExists(filename_pdf));
+			bt_printer.SetBT(bt);
 
-			timecard_printer.SetTimecard(timecard);
-
-			timecard_printer.SetFilename(filename_xls);
-			error_message = timecard_printer.PrintAsXLS();
+			bt_printer.SetFilename(filename_xls);
+			error_message = bt_printer.PrintAsXLS();
 			if(error_message.length())
 			{
-				MESSAGE_ERROR("", "", "fail to build timecard_" + to_string(i) + ".xls");
+				MESSAGE_ERROR("", "", "fail to build bt_" + to_string(i) + ".xls");
 				break;
 			}
 
-			timecard_printer.SetFilename(filename_pdf);
-			error_message = timecard_printer.PrintAsPDF();
+/*
+			bt_printer.SetFilename(filename_pdf);
+			error_message = bt_printer.PrintAsPDF();
 			if(error_message.length())
 			{
-				MESSAGE_ERROR("", "", "fail to build timecard_" + to_string(i) + ".pdf");
+				MESSAGE_ERROR("", "", "fail to build bt_" + to_string(i) + ".pdf");
 				break;
 			}
-
-			// --- we don't want to count total payment again, instead take it from printer
-			// --- this may not be a good idea
-			timecard.SetTotalPayment(timecard_printer.GetTotalPayment());
+*/
 		}
 	}
 	else
 	{
-		MESSAGE_ERROR("", "", "timecards won't be written to files due to previous error");
+		MESSAGE_ERROR("", "", "BTs won't be written to files due to previous error");
 	}
 
 	// --- generte variable for invoicing
 	if(error_message.empty())
 	{
 		invoicing_vars.SetCostCenterID(cost_center_id);
-		invoicing_vars.SetTimecards(timecard_obj_list);
+		invoicing_vars.SetBTs(bt_obj_list);
 
-		error_message = invoicing_vars.GenerateServiceVariableSet();
+		// error_message = invoicing_vars.GenerateBTVariableSet();
 	}
 	else
 	{
@@ -219,7 +146,6 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 		auto		act_filename_pdf = ""s;
 		auto		vat_filename_xls = ""s;
 		auto		vat_filename_pdf = ""s;
-		auto		cc_service_filename_1c = ""s;
 		auto		cc_bt_filename_1c = ""s;
 		auto		subc_payment_filename_1c = ""s;
 		auto		subc_payment_order_filename_1c = ""s;
@@ -233,7 +159,6 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 			act_filename_pdf				= temp_dir_cost_center_invoices + "act_" + to_string(i) + ".pdf";
 			vat_filename_xls				= temp_dir_cost_center_invoices + "vat_" + to_string(i) + ".xls";
 			vat_filename_pdf				= temp_dir_cost_center_invoices + "vat_" + to_string(i) + ".pdf";
-			cc_service_filename_1c			= temp_dir_1c + "costcenter_service_" + to_string(i) + ".xml";
 			cc_bt_filename_1c				= temp_dir_1c + "costcenter_bt_" + to_string(i) + ".xml";
 			subc_payment_filename_1c		= temp_dir_1c + "subcontractor_payment_" + to_string(i) + ".xml";
 			subc_payment_order_filename_1c	= temp_dir_1c + "subcontractor_payment_order_" + to_string(i) + ".xml";
@@ -241,10 +166,11 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 				isFileExists(invoice_filename_xls)		|| isFileExists(invoice_filename_pdf) ||
 				isFileExists(act_filename_xls)			|| isFileExists(act_filename_pdf) ||
 				isFileExists(vat_filename_xls)			|| isFileExists(vat_filename_pdf) ||
-				isFileExists(cc_bt_filename_1c)			|| isFileExists(cc_service_filename_1c) ||
+				isFileExists(cc_bt_filename_1c)			|| 
 				isFileExists(subc_payment_filename_1c)	|| isFileExists(subc_payment_order_filename_1c)
 				);
 
+/*
 		if(error_message.empty())
 		{
 			invoice_printer->SetDB(db);
@@ -385,7 +311,6 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 		{
 			MESSAGE_ERROR("", "", "due to previous error 1c subcontractor payments won't be printed");
 		}
-
 		if(error_message.empty())
 		{
 			subc_1c_payment_order_printer->SetDB(db);
@@ -406,7 +331,7 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 		{
 			MESSAGE_ERROR("", "", "due to previous error 1c subcontractor payment orders won't be printed");
 		}
-
+*/
 	}	
 	else
 	{
@@ -416,9 +341,9 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 	// --- update DB only if no errors earlier
 	if(error_message.empty())
 	{
-		for(auto &timecard: timecard_obj_list)
+		for(auto &bt: bt_obj_list)
 		{
-			if((error_message = UpdateDBWithInvoiceData(timecard.GetID(), timecard.GetTotalPayment())).length())
+			if((error_message = UpdateDBWithInvoiceData(bt.GetID())).length())
 			{
 				break;
 			}
@@ -451,7 +376,7 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 	return error_message;
 }
 
-auto C_Invoice_Service::CreateTempDirectory() -> bool
+auto C_Invoice_BT::CreateTempDirectory() -> bool
 {
 	auto result = false;
 
@@ -469,11 +394,11 @@ auto C_Invoice_Service::CreateTempDirectory() -> bool
 	if(CreateDir(temp_dir))
 	{
 		temp_dir += "/";
-		temp_dir_timecards = temp_dir + "timecards/";
+		temp_dir_bt = temp_dir + "bt/";
 		temp_dir_cost_center_invoices = temp_dir + "invoices/";
 		temp_dir_1c = temp_dir + "1c/";
 
-		if(CreateDir(temp_dir_timecards))
+		if(CreateDir(temp_dir_bt))
 		{
 			if(CreateDir(temp_dir_cost_center_invoices))
 			{
@@ -493,7 +418,7 @@ auto C_Invoice_Service::CreateTempDirectory() -> bool
 		}
 		else
 		{
-			MESSAGE_ERROR("", "", "fail to create " + temp_dir_timecards);
+			MESSAGE_ERROR("", "", "fail to create " + temp_dir_bt);
 		}
 	}
 	else
@@ -504,38 +429,38 @@ auto C_Invoice_Service::CreateTempDirectory() -> bool
 	return result;
 }
 
-auto C_Invoice_Service::CreateTimecardObj(string timecard_id) -> C_Timecard_To_Print
+auto C_Invoice_BT::CreateBTObj(string bt_id) -> C_BT_To_Print
 {
-	C_Timecard_To_Print		obj;
+	C_BT_To_Print		obj;
 
-	MESSAGE_DEBUG("", "", "start (timecard_id: " + timecard_id + ")");
+	MESSAGE_DEBUG("", "", "start (bt_id: " + bt_id + ")");
 
 	if(db)
 	{
-		if(timecard_id.length())
+		if(bt_id.length())
 		{
 			if(cost_center_id.length())
 			{
-				string	psow_id = GetPSoWIDByTimecardIDAndCostCenterID(timecard_id, cost_center_id, db, user);
+				string	psow_id = GetPSoWIDByBTIDAndCostCenterID(bt_id, cost_center_id, db, user);
 
 				if(psow_id.length())
 				{
-					// string	sow_id = GetSoWIDByTimecardID(timecard_id, db, user);
+					// string	sow_id = GetSoWIDByTimecardID(bt_id, db, user);
 					string	sow_id = "fake uncomment prev line";
 
 					if(sow_id.length())
 					{
-						if(db->Query("SELECT * FROM `timecards` WHERE `id`=\"" + timecard_id + "\";"))
+						if(db->Query("SELECT * FROM `bt` WHERE `id`=\"" + bt_id + "\";"))
 						{
-							obj.SetID(timecard_id);
-							obj.SetDateStart(db->Get(0, "period_start"));
-							obj.SetDateFinish(db->Get(0, "period_end"));
+							obj.SetID(bt_id);
+							obj.SetDateStart(db->Get(0, "date_start"));
+							obj.SetDateFinish(db->Get(0, "date_end"));
 
 							if(db->Query("SELECT * FROM `contracts_psow` WHERE `id`=\"" + psow_id + "\";"))
 							{
 								obj.SetAgreementNumber(db->Get(0, "number"));
 								obj.SetDateSign(db->Get(0, "sign_date"));
-								obj.SetDayrate(db->Get(0, "day_rate"));
+								// obj.SetDayrate(db->Get(0, "day_rate"));
 
 								if(db->Query("SELECT `name`,`vat` FROM `company` WHERE `id`=("
 												"SELECT `agency_company_id` FROM `contracts_sow` WHERE `id`=("
@@ -556,11 +481,13 @@ auto C_Invoice_Service::CreateTimecardObj(string timecard_id) -> C_Timecard_To_P
 											MESSAGE_DEBUG("", "", "optional field Department not found for psow.id(" + psow_id + ")");
 
 										{
-											auto		timecard_lines = GetTimecardLines_By_TimecardID_And_CostCenterID(timecard_id, cost_center_id, db, user);
-											
-											for(auto &timecard_line : timecard_lines)
+											if(EnrichObjWithExpenseLines(bt_id, &obj))
 											{
-												obj.AddTimecardLine(get<0>(timecard_line), get<1>(timecard_line), get<2>(timecard_line), get<3>(timecard_line));
+												// --- all good
+											}
+											else
+											{
+												MESSAGE_ERROR("", "", "fail to add expanse lines to object");
 											}
 										}
 									}
@@ -577,7 +504,7 @@ auto C_Invoice_Service::CreateTimecardObj(string timecard_id) -> C_Timecard_To_P
 						}
 						else
 						{
-							MESSAGE_ERROR("", "", "timecard_id(" + timecard_id + ") not found");
+							MESSAGE_ERROR("", "", "bt_id(" + bt_id + ") not found");
 						}
 					}
 					else
@@ -597,7 +524,7 @@ auto C_Invoice_Service::CreateTimecardObj(string timecard_id) -> C_Timecard_To_P
 		}
 		else
 		{
-			MESSAGE_ERROR("", "", "timecard_id is empty");
+			MESSAGE_ERROR("", "", "bt_id is empty");
 		}
 	}
 	else
@@ -610,7 +537,62 @@ auto C_Invoice_Service::CreateTimecardObj(string timecard_id) -> C_Timecard_To_P
 	return obj;
 }
 
-auto C_Invoice_Service::UpdateDBWithInvoiceData(const string timecard_id, c_float amount) -> string
+auto C_Invoice_BT::EnrichObjWithExpenseLines(string bt_id, C_BT_To_Print *obj) -> bool
+{
+	auto	result = false;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(user)
+	{
+		if(user->GetType() == "agency")
+		{
+			if(db)
+			{
+				auto affected = db->Query(
+"SELECT `bt_expenses`.`date` as `date`, `bt_expenses`.`price_foreign` as `price_foreign`, `bt_expenses`.`price_domestic` as `price_domestic`, `bt_expenses`.`currency_nominal` as `currency_nominal`, `bt_expenses`.`currency_value` as `currency_value`, `bt_expenses`.`currency_name` as `currency_name`, `bt_expense_templates`.`title` as `title`,  `bt_expense_templates`.`taxable` as `taxable`"
+"FROM `bt_expenses` "
+"INNER JOIN `bt_expense_templates` ON `bt_expense_templates`.`id`=`bt_expenses`.`bt_expense_template_id` "
+"WHERE "
+	"("
+		"`bt_expenses`.`bt_id`=\"" + bt_id + "\""
+	")"
+				);
+				if(affected)
+				{
+					for(int i = 0; i < affected; ++i)
+					{
+						obj->AddExpenseLine(db->Get(i, "date"), db->Get(i, "title"), db->Get(i, "price_domestic"), db->Get(i, "price_foreign"), db->Get(i, "currency_nominal"), db->Get(i, "currency_value"), db->Get(i, "currency_name"), db->Get(i, "taxable"));
+					}
+					result = true;
+				}
+				else
+				{
+					MESSAGE_ERROR("", "", "it is expected that valid entries will be here, otherwise cost_center.id(" + cost_center_id + ") and bt.id(" + bt_id + ") should not appear in GUI");
+				}
+			}
+			else
+			{
+				MESSAGE_ERROR("", "", "db not initialized");
+			}
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "user.id(" + user->GetID() + ") is not an agency employee (" + user->GetType() + ")");
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "user not initialized");
+	}
+
+	MESSAGE_DEBUG("", "", "finish (result.size is " + to_string(result) + ")");
+
+	return result;
+}
+
+
+auto C_Invoice_BT::UpdateDBWithInvoiceData(const string bt_id) -> string
 {
 	auto	error_message = ""s;
 
@@ -620,14 +602,14 @@ auto C_Invoice_Service::UpdateDBWithInvoiceData(const string timecard_id, c_floa
 	{
 		if(db)
 		{
-			if(invoice_cost_center_service_id == 0)
+			if(invoice_cost_center_bt_id == 0)
 			{
 				auto	owner_company_id = GetAgencyIDByUserID(db, user);
 				
 				if(owner_company_id.length())
 				{
 					// --- new invoice
-					invoice_cost_center_service_id = db->InsertQuery( "INSERT INTO `invoice_cost_center_service` (`cost_center_id`, `file`, `owner_company_id`, `owner_user_id`, `eventTimestamp`)"
+					invoice_cost_center_bt_id = db->InsertQuery( "INSERT INTO `invoice_cost_center_bt` (`cost_center_id`, `file`, `owner_company_id`, `owner_user_id`, `eventTimestamp`)"
 										"VALUES (" + 
 											quoted(cost_center_id) + "," +
 											quoted(archive_folder + "/" + archive_file) + "," +
@@ -635,7 +617,7 @@ auto C_Invoice_Service::UpdateDBWithInvoiceData(const string timecard_id, c_floa
 											quoted(user->GetID()) + "," +
 											"UNIX_TIMESTAMP()"
 										");");
-					if(invoice_cost_center_service_id)
+					if(invoice_cost_center_bt_id)
 					{
 						// --- everything is fine, increase act_number assigned to this cost_center
 						db->Query("UPDATE `cost_centers` SET `act_number`=`act_number`+1 WHERE `id`=\"" + cost_center_id + "\";");
@@ -659,21 +641,21 @@ auto C_Invoice_Service::UpdateDBWithInvoiceData(const string timecard_id, c_floa
 			}
 
 			// --- don't merge it with previous if()
-			if(invoice_cost_center_service_id)
+			if(invoice_cost_center_bt_id)
 			{
-				// --- find appropriate timecard.id in invoicing_vars
-				auto	timecard_index = invoicing_vars.GetIndexByTimecardID(timecard_id);
+				// --- find appropriate bt.id in invoicing_vars
+				auto	bt_index = invoicing_vars.GetIndexByTimecardID(bt_id);
 
-				if(db->InsertQuery( "INSERT INTO `invoice_cost_center_service_details` (`invoice_cost_center_service_id`, `timecard_id`, `cc_amount_pre_tax`, `cc_amount_tax`, `cc_amount_total`, `subc_amount_pre_tax`, `subc_amount_tax`, `subc_amount_total`)"
+				if(db->InsertQuery( "INSERT INTO `invoice_cost_center_bt_details` (`invoice_cost_center_bt_id`, `bt_id`, `cc_amount_pre_tax`, `cc_amount_tax`, `cc_amount_total`, `subc_amount_pre_tax`, `subc_amount_tax`, `subc_amount_total`)"
 									"VALUES (" + 
-										quoted(to_string(invoice_cost_center_service_id)) + "," +
-										quoted(timecard_id) + "," +
-										quoted(invoicing_vars.Get("cost_center_price_" + timecard_index).length() ? invoicing_vars.Get("cost_center_price_" + timecard_index) : "0") + "," +
-										quoted(invoicing_vars.Get("cost_center_vat_" + timecard_index).length() ? invoicing_vars.Get("cost_center_vat_" + timecard_index) : "0") + "," +
-										quoted(invoicing_vars.Get("cost_center_total_" + timecard_index).length() ? invoicing_vars.Get("cost_center_total_" + timecard_index) : "0") + "," +
-										quoted(invoicing_vars.Get("timecard_price_" + timecard_index).length() ? invoicing_vars.Get("timecard_price_" + timecard_index) : "0") + "," +
-										quoted(invoicing_vars.Get("timecard_vat_" + timecard_index).length() ? invoicing_vars.Get("timecard_vat_" + timecard_index) : "0") + "," +
-										quoted(invoicing_vars.Get("timecard_total_" + timecard_index).length() ? invoicing_vars.Get("timecard_total_" + timecard_index) : "0") +
+										quoted(to_string(invoice_cost_center_bt_id)) + "," +
+										quoted(bt_id) + "," +
+										quoted(invoicing_vars.Get("cost_center_price_" + bt_index).length() ? invoicing_vars.Get("cost_center_price_" + bt_index) : "0") + "," +
+										quoted(invoicing_vars.Get("cost_center_vat_" + bt_index).length() ? invoicing_vars.Get("cost_center_vat_" + bt_index) : "0") + "," +
+										quoted(invoicing_vars.Get("cost_center_total_" + bt_index).length() ? invoicing_vars.Get("cost_center_total_" + bt_index) : "0") + "," +
+										quoted(invoicing_vars.Get("bt_price_" + bt_index).length() ? invoicing_vars.Get("bt_price_" + bt_index) : "0") + "," +
+										quoted(invoicing_vars.Get("bt_vat_" + bt_index).length() ? invoicing_vars.Get("bt_vat_" + bt_index) : "0") + "," +
+										quoted(invoicing_vars.Get("bt_total_" + bt_index).length() ? invoicing_vars.Get("bt_total_" + bt_index) : "0") +
 									");"))
 				{
 				}
@@ -707,7 +689,7 @@ auto C_Invoice_Service::UpdateDBWithInvoiceData(const string timecard_id, c_floa
 	return error_message;
 }
 
-C_Invoice_Service::~C_Invoice_Service()
+C_Invoice_BT::~C_Invoice_BT()
 {
 	if(temp_dir.length())
 	{
@@ -719,9 +701,9 @@ C_Invoice_Service::~C_Invoice_Service()
 	}
 }
 
-ostream& operator<<(ostream& os, const C_Invoice_Service &var)
+ostream& operator<<(ostream& os, const C_Invoice_BT &var)
 {
-	os << "object C_Invoice_Service [empty for now]";
+	os << "object C_Invoice_BT [empty for now]";
 
 	return os;
 }

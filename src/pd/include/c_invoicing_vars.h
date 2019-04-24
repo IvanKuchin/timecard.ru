@@ -6,6 +6,7 @@
 #include <locale>
 
 #include "c_date_spelling.h"
+#include "c_bt_to_print.h"
 #include "c_timecard_to_print.h"
 #include "utilities_timecard.h"
 #include "c_cache_obj.h"
@@ -22,6 +23,7 @@ class C_Invoicing_Vars
 		CVars							vars;
 
 		vector<C_Timecard_To_Print>		timecard_obj_list;
+		vector<C_BT_To_Print>			bt_obj_list;
 
 
 		string							cost_center_id = "";
@@ -39,12 +41,13 @@ class C_Invoicing_Vars
 		auto		AssignVariableFromDB(const string &var_name, const string &sql_query, bool isMandatory) -> string;
 
 		auto		SetTimecards(const vector<C_Timecard_To_Print> &param)	{ timecard_obj_list = param; };
+		auto		SetBTs(const vector<C_BT_To_Print> &param)	{ bt_obj_list = param; };
 		auto		SetCostCenterID(const string &param)	{ cost_center_id = param; };
 		auto		SetCostCenterID(string &&param)			{ cost_center_id = move(param); };
 		auto		SetAgencyCompanyID(const string &param)	{ agency_company_id = param; };
 		auto		SetAgencyCompanyID(string &&param)		{ agency_company_id = move(param); };
 
-		auto		GenerateVariableSet() -> string;
+		auto		GenerateServiceVariableSet() -> string;
 
 		auto		Get(const string &) -> string;
 

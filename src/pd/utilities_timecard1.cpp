@@ -3865,6 +3865,7 @@ string	GetBTsInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool isExten
 	int		affected;
 	string	result;
 
+
 	struct ItemClass
 	{
 		string	id;
@@ -3910,6 +3911,7 @@ string	GetBTsInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool isExten
 			if(result.length()) result += ",";
 			result +=	"{";
 
+
 			result += "\"id\":\"" + item.id + "\",";
 			result += "\"contract_sow_id\":\"" + item.contract_sow_id + "\",";
 			result += "\"date_start\":\"" + item.date_start + "\",";
@@ -3922,6 +3924,7 @@ string	GetBTsInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool isExten
 			result += "\"approve_date\":\"" + item.approve_date + "\",";
 			if(isExtended)
 			{
+				result += "\"customers\":[" + GetCustomersInJSONFormat("SELECT * FROM `timecard_customers` WHERE `id`=\"" + item.customer_id + "\";", db, user) + "],";
 				result += "\"sow\":[" + GetSOWInJSONFormat("SELECT * FROM `contracts_sow` WHERE `id`=\"" + item.contract_sow_id + "\";", db, user, INCLUDE_TIMECARD_TASKS, INCLUDE_BT_EXPENSE_TEMPLATES) + "],";
 				result += "\"expenses\":[" + GetBTExpensesInJSONFormat("SELECT * FROM `bt_expenses` WHERE `bt_id`=\"" + item.id + "\";", db, user) + "],";
 				result += "\"approvers\":[" + GetApproversInJSONFormat("SELECT * FROM `bt_approvers` WHERE `contract_sow_id`=\"" + item.contract_sow_id + "\";", db, user, DO_NOT_INCLUDE_SOW_INFO) + "],";
@@ -3942,6 +3945,62 @@ string	GetBTsInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool isExten
 	{
 		MESSAGE_DEBUG("", "", "finish");
 	}
+
+	return result;
+}
+
+string	GetCustomersInJSONFormat(string sqlQuery, CMysql *db, CUser *user)
+{
+	int		affected;
+	string	result;
+
+
+	struct ItemClass
+	{
+		string	id;
+		string	title;
+		string	agency_company_id;
+		string	eventTimestamp;
+	};
+	vector<ItemClass>		itemsList;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	affected = db->Query(sqlQuery);
+	if(affected)
+	{
+		for(int i = 0; i < affected; i++)
+		{
+			ItemClass	item;
+
+			item.id = db->Get(i, "id");
+			item.title = db->Get(i, "title");
+			item.agency_company_id = db->Get(i, "agency_company_id");
+			item.eventTimestamp = db->Get(i, "eventTimestamp");
+
+			itemsList.push_back(item);
+		}
+
+		for (const auto& item : itemsList)
+		{
+			if(result.length()) result += ",";
+			result +=	"{";
+
+
+			result += "\"id\":\"" + item.id + "\",";
+			result += "\"title\":\"" + item.title + "\",";
+			result += "\"agency_company_id\":\"" + item.agency_company_id + "\",";
+			result += "\"eventTimestamp\":\"" + item.eventTimestamp + "\"";
+
+			result +=	"}";
+		}
+	}
+	else
+	{
+		MESSAGE_DEBUG("", "", "user (" + user->GetID() + ") timecard_customer is empty");
+	}
+
+	MESSAGE_DEBUG("", "", "finish");
 
 	return result;
 }
@@ -8466,6 +8525,51 @@ auto GetPSoWIDByTimecardIDAndCostCenterID(string timecard_id, string cost_center
 				else
 				{
 					MESSAGE_ERROR("", "", "can't define PSoW by timecard.id(" + timecard_id + ") and cost_center.id(" + cost_center_id + ")");
+				}
+			}
+			else
+			{
+				MESSAGE_ERROR("", "", "db not initialized");
+			}
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "user.id(" + user->GetID() + ") is not an agency employee (" + user->GetType() + ")");
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "user not initialized");
+	}
+
+	MESSAGE_DEBUG("", "", "finish (result is " + result + ")");
+
+	return result;
+}
+
+auto GetPSoWIDByBTIDAndCostCenterID(string bt_id, string cost_center_id, CMysql *db, CUser *user) -> string
+{
+	auto	result = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(user)
+	{
+		if(user->GetType() == "agency")
+		{
+			if(db)
+			{
+				if(db->Query(
+					"SELECT `id` FROM `contracts_psow` WHERE `cost_center_id`=\"" + cost_center_id + "\" AND `contract_sow_id`=("
+						"SELECT `contract_sow_id` FROM `bt` WHERE `id`=\"" + bt_id + "\""
+					")"
+				))
+				{
+					result = db->Get(0, "id");
+				}
+				else
+				{
+					MESSAGE_ERROR("", "", "can't define PSoW by bt.id(" + bt_id + ") and cost_center.id(" + cost_center_id + ")");
 				}
 			}
 			else

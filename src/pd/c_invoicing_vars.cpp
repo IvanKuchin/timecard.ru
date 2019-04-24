@@ -60,7 +60,7 @@ auto	C_Invoicing_Vars::AssignVariableValue(const string &var_name, const string 
 	return error_message;
 }
 
-auto	C_Invoicing_Vars::GenerateVariableSet() -> string
+auto	C_Invoicing_Vars::GenerateServiceVariableSet() -> string
 {
 	auto	error_message = ""s;
 
