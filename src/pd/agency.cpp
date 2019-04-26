@@ -1177,6 +1177,8 @@ int main(void)
 			(action == "AJAX_updatePSoWAct")					||
 			(action == "AJAX_updatePSoWPosition")				||
 			(action == "AJAX_updatePSoWDayRate")				||
+			(action == "AJAX_updatePSoWBTMarkup")				||
+			(action == "AJAX_updatePSoWBTMarkupType")			||
 			(action == "AJAX_updatePSoWSignDate")				||
 			(action == "AJAX_updatePSoWStartDate")				||
 			(action == "AJAX_updatePSoWEndDate")				||
@@ -1302,6 +1304,7 @@ int main(void)
 			(action == "AJAX_updateCompanyLegalZipID")				||
 			(action == "AJAX_updateCompanyBankID")					||
 			(action == "AJAX_updateExpenseTemplateTitle")			||
+			(action == "AJAX_updateExpenseTemplateTaxable")			||
 			(action == "AJAX_updateExpenseTemplateAgencyComment")	||
 			(action == "AJAX_updateExpenseTemplateLineTitle")		||
 			(action == "AJAX_updateExpenseTemplateLineDescription")	||	

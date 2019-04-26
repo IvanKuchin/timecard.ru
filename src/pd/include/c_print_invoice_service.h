@@ -165,11 +165,11 @@ class C_Print_Invoice_Service_Agency : public C_Print_Invoice_Service
 		auto			GetCustomerMailingLocality() -> string			{ return vars->Get("cost_center_mailing_locality_title"); };
 		auto			GetCustomerMailingAddress() -> string			{ return vars->Get("cost_center_mailing_address"); };
 
-		auto			isTableRowExists(int i) -> bool					{ return vars->Get("timecard_index_" + to_string(i)).length(); };
+		auto			isTableRowExists(int i) -> bool					{ return vars->Get("index_" + to_string(i)).length(); };
 		auto			GetTableRowDescription(int i) -> string			{ return vars->Get("cost_center_table_row_description_" + to_string(i)); };
-		auto			GetTableRowIndex(int i) -> string				{ return vars->Get("timecard_index_" + to_string(i)); };
-		auto			GetTableRowQuantity(int i) -> string			{ return vars->Get("timecard_quantity_" + to_string(i)); };
-		auto			GetTableRowItem(int i) -> string				{ return vars->Get("timecard_item_" + to_string(i)); };
+		auto			GetTableRowIndex(int i) -> string				{ return vars->Get("index_" + to_string(i)); };
+		auto			GetTableRowQuantity(int i) -> string			{ return vars->Get("quantity_" + to_string(i)); };
+		auto			GetTableRowItem(int i) -> string				{ return vars->Get("item_" + to_string(i)); };
 		auto			GetTableRowPrice(int i) -> string				{ return c_float(vars->Get("cost_center_price_" + to_string(i))).PrintPriceTag(); };
 		auto			GetTableRowTotal(int i) -> string				{ return c_float(vars->Get("cost_center_total_" + to_string(i))).PrintPriceTag(); };
 		auto			GetTableSum() -> string							{ return c_float(vars->Get("cost_center_sum_amount")).PrintPriceTag(); };
@@ -223,11 +223,11 @@ class C_Print_Act_Service_Agency : public C_Print_Invoice_Service
 		auto			GetCustomerMailingLocality() -> string			{ return vars->Get("cost_center_mailing_locality_title"); };
 		auto			GetCustomerMailingAddress() -> string			{ return vars->Get("cost_center_mailing_address"); };
 
-		auto			isTableRowExists(int i) -> bool					{ return vars->Get("timecard_index_" + to_string(i)).length(); };
+		auto			isTableRowExists(int i) -> bool					{ return vars->Get("index_" + to_string(i)).length(); };
 		auto			GetTableRowDescription(int i) -> string			{ return vars->Get("cost_center_table_row_description_" + to_string(i)); };
-		auto			GetTableRowIndex(int i) -> string				{ return vars->Get("timecard_index_" + to_string(i)); };
-		auto			GetTableRowQuantity(int i) -> string			{ return vars->Get("timecard_quantity_" + to_string(i)); };
-		auto			GetTableRowItem(int i) -> string				{ return vars->Get("timecard_item_" + to_string(i)); };
+		auto			GetTableRowIndex(int i) -> string				{ return vars->Get("index_" + to_string(i)); };
+		auto			GetTableRowQuantity(int i) -> string			{ return vars->Get("quantity_" + to_string(i)); };
+		auto			GetTableRowItem(int i) -> string				{ return vars->Get("item_" + to_string(i)); };
 		auto			GetTableRowPrice(int i) -> string				{ return c_float(vars->Get("cost_center_price_" + to_string(i))).PrintPriceTag(); };
 		auto			GetTableRowTotal(int i) -> string				{ return c_float(vars->Get("cost_center_total_" + to_string(i))).PrintPriceTag(); };
 		auto			GetTableSum() -> string							{ return c_float(vars->Get("cost_center_sum_amount")).PrintPriceTag(); };

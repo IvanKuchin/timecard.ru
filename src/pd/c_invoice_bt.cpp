@@ -18,6 +18,8 @@ auto C_Invoice_BT::GenerateDocumentArchive() -> string
 {
 	MESSAGE_DEBUG("", "", "start");
 
+	auto									error_message = ""s;
+
 	C_Print_BT								bt_printer;
 
 /*
@@ -39,10 +41,6 @@ auto C_Invoice_BT::GenerateDocumentArchive() -> string
 	C_Print_1C_Subcontractor_Payment_Order	subc_1c_main_obj2;
 	C_Print_1C_Subcontractor				*subc_1c_payment_order_printer = &subc_1c_main_obj2;
 */
-	auto									error_message = ""s;
-
-	invoicing_vars.SetDB(db);
-	invoicing_vars.SetUser(user);
 
 	if(error_message.empty())
 	{
@@ -80,6 +78,21 @@ auto C_Invoice_BT::GenerateDocumentArchive() -> string
 		MESSAGE_ERROR("", "", "bt won't be built due to previous error");
 	}
 
+	// --- generte variable for invoicing
+	if(error_message.empty())
+	{
+		invoicing_vars.SetDB(db);
+		invoicing_vars.SetUser(user);
+		invoicing_vars.SetCostCenterID(cost_center_id);
+		invoicing_vars.SetBTs(bt_obj_list);
+
+		error_message = invoicing_vars.GenerateBTVariableSet();
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "invoicing_vars won't be generated due to previous error");
+	}
+
 	// --- bt generator
 	if(error_message.empty())
 	{
@@ -98,6 +111,7 @@ auto C_Invoice_BT::GenerateDocumentArchive() -> string
 				filename_pdf = temp_dir_bt + "bt_" + to_string(i) + ".pdf";
 			} while(isFileExists(filename_xls) || isFileExists(filename_pdf));
 			bt_printer.SetBT(bt);
+			bt_printer.SetVariableSet(&invoicing_vars);
 
 			bt_printer.SetFilename(filename_xls);
 			error_message = bt_printer.PrintAsXLS();
@@ -121,19 +135,6 @@ auto C_Invoice_BT::GenerateDocumentArchive() -> string
 	else
 	{
 		MESSAGE_ERROR("", "", "BTs won't be written to files due to previous error");
-	}
-
-	// --- generte variable for invoicing
-	if(error_message.empty())
-	{
-		invoicing_vars.SetCostCenterID(cost_center_id);
-		invoicing_vars.SetBTs(bt_obj_list);
-
-		// error_message = invoicing_vars.GenerateBTVariableSet();
-	}
-	else
-	{
-		MESSAGE_ERROR("", "", "invoicing_vars won't be generated due to previous error");
 	}
 
 	// --- invoice generator
@@ -460,6 +461,8 @@ auto C_Invoice_BT::CreateBTObj(string bt_id) -> C_BT_To_Print
 							{
 								obj.SetAgreementNumber(db->Get(0, "number"));
 								obj.SetDateSign(db->Get(0, "sign_date"));
+								obj.SetMarkupType(db->Get(0, "bt_markup_type"));
+								obj.SetMarkupDB(db->Get(0, "bt_markup"));
 								// obj.SetDayrate(db->Get(0, "day_rate"));
 
 								if(db->Query("SELECT `name`,`vat` FROM `company` WHERE `id`=("

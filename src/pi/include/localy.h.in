@@ -212,6 +212,7 @@
 #define	DEFAULT_SITE_THEME							".cyborg"
 
 #define	VAT_PERCENTAGE								18
+#define	BUSINESS_TRIP_TAX_PERCENTAGE				6.38
 
 // --- actions allowed w/o session cookie
 #define	ALLOWED_NO_SESSION_ACTION					{ "getUserWall" }

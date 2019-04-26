@@ -171,6 +171,7 @@ pair<struct tm, struct tm> GetFirstAndLastDateOfLastMonth();
 pair<struct tm, struct tm> GetFirstAndLastDateOfThisMonth();
 struct tm		GetTMObject(string date);
 auto			GetSpellingFormattedDate(string date, string format) -> string;
+auto			GetSpellingFormattedDate(struct tm, string format) -> string;
 auto			operator <(const struct tm &tm_1, const struct tm &tm_2) -> bool;
 auto			operator <=(const struct tm &tm_1, const struct tm &tm_2) -> bool;
 auto			operator >(const struct tm &tm_1, const struct tm &tm_2) -> bool;

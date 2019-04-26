@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-20 13:16-0400\n"
+"POT-Creation-Date: 2019-04-25 17:20-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -83,6 +83,12 @@ msgstr "Август"
 msgid "August declension"
 msgstr "Авнуста"
 
+msgid "BT doesn't belongs to agency"
+msgstr "Командировка не относится к агенству"
+
+msgid "BT not found"
+msgstr "Командировка не найдена"
+
 msgid "Bank Identifier"
 msgstr "БИК"
 
@@ -142,6 +148,9 @@ msgstr "Февраля"
 
 msgid "Goods"
 msgstr "Товары"
+
+msgid "Incorrect bt list"
+msgstr "Некорректный список командировок"
 
 msgid "Incorrect timecard list"
 msgstr "Некорректный список таймкарт"
@@ -238,6 +247,9 @@ msgstr "Кол-во"
 
 msgid "Recipient"
 msgstr "Получатель"
+
+msgid "Remote service report over period"
+msgstr "Отчет об оказанных услугах на удаленном участке"
 
 msgid "SQL syntax issue"
 msgstr "Ошибка БД"
@@ -376,6 +388,21 @@ msgstr "Внутренняя ошибка с БИК"
 
 msgid "bik not found"
 msgstr "не указан БИК"
+
+msgid "bt date finish is empty"
+msgstr "не указана дата окончания командировки"
+
+msgid "bt date start is empty"
+msgstr "не указана дата начала командировки"
+
+msgid "bt id is empty"
+msgstr "командировка не найдена"
+
+msgid "bt markup changed"
+msgstr "изменилась наценка комндировки"
+
+msgid "bt markup type changed"
+msgstr "изменился тип нацеки у командировки"
 
 msgid "but BIK is different"
 msgstr "но отличается БИК"
@@ -537,7 +564,7 @@ msgid "hpdf: table top must be higher than bottom"
 msgstr "hpdf: верх таблицы должен быть выше чем нижняя часть"
 
 msgid "id is empty"
-msgstr ""
+msgstr "не указан идентификатор"
 
 msgid "in scope"
 msgstr "в рамках"
@@ -654,7 +681,7 @@ msgid "start date changed"
 msgstr "изменилась дата подписания контракта"
 
 msgid "subc company.id is empty"
-msgstr ""
+msgstr "не указан идентификатор компании субконтрактора"
 
 msgid "table is too wide"
 msgstr "таблица слишком широкая"

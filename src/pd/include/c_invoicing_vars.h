@@ -29,6 +29,19 @@ class C_Invoicing_Vars
 		string							cost_center_id = "";
 		string							agency_company_id = "";
 
+		auto		FillStaticDictionary() -> string;
+		auto		CostCenter_VarSet() -> string;
+		auto		Agency_VarSet() -> string;
+		auto		CurrentTimestamp_1C() -> string;
+		auto		AgreementNumberToCostCenterSpelling() -> string;
+
+		auto		SubcontractorsTotal_VarSet(string sum, string tax, string total) -> string;
+		auto		CostCenterTotal_VarSet(string sum, string tax, string total) -> string;
+
+		auto		Common_Index_VarSet(string index) -> string;
+		auto		DocumentSubmissionDate_Index_VarSet(string date_inside_month, string index) -> string;
+		auto		SoW_Index_VarSet(string sql_query, string index) -> string;
+		auto		SubcontractorVAT_Index_VarSet(string sql_query, string index) -> string;
 
 	public:
 					C_Invoicing_Vars()						{};
@@ -48,12 +61,14 @@ class C_Invoicing_Vars
 		auto		SetAgencyCompanyID(string &&param)		{ agency_company_id = move(param); };
 
 		auto		GenerateServiceVariableSet() -> string;
+		auto		GenerateBTVariableSet() -> string;
 
 		auto		Get(const string &) -> string;
 
 		auto		GetVars()								{ return vars; };
 
 		auto		GetIndexByTimecardID(string timecard_id) -> string;
+		auto		GetIndexByBTID(string bt_id) -> string;
 };
 
 ostream&	operator<<(ostream& os, const C_Invoicing_Vars &);

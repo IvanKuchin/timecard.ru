@@ -747,6 +747,8 @@ auto	isActionEntityBelongsToSoW(string action, string id, string sow_id, CMysql 
 				if(action == "AJAX_updatePSoWAct")					sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
 				if(action == "AJAX_updatePSoWPosition")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
 				if(action == "AJAX_updatePSoWDayRate")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
+				if(action == "AJAX_updatePSoWBTMarkup")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
+				if(action == "AJAX_updatePSoWBTMarkupType")			sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
 				if(action == "AJAX_updatePSoWSignDate")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
 				if(action == "AJAX_updatePSoWStartDate")			sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
 				if(action == "AJAX_updatePSoWEndDate")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
@@ -1110,7 +1112,7 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 						if(string(num) == new_value) { /* --- good to go */ }
 						else
 						{
-							MESSAGE_ERROR("", "", "input DayRate(" + new_value + ") wrongly formatted, need to be " + string(num));
+							MESSAGE_ERROR("", "", "input DayRate(" + new_value + ") wrongly formatted, needed to be " + string(num));
 						}
 					}
 					else if(action == "AJAX_deleteCostCenter")
@@ -1212,6 +1214,7 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 							MESSAGE_DEBUG("", "", "BT expense template with same title already exists");
 						}
 					}
+					else if(action == "AJAX_updateExpenseTemplateTaxable")				{ /* --- good to go */ }
 					else if(action == "AJAX_updateExpenseTemplateAgencyComment")		{ /* --- good to go */ }
 					// --- Expense line templates
 					else if(action == "AJAX_updateExpenseTemplateLineTitle")
@@ -1327,9 +1330,23 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 						}
 						else
 						{
-							MESSAGE_ERROR("", "", "input DayRate(" + new_value + ") wrongly formatted, need to be " + string(num));
+							MESSAGE_ERROR("", "", "input DayRate(" + new_value + ") wrongly formatted, needed to be " + string(num));
 						}
 					}
+					else if(action == "AJAX_updatePSoWBTMarkup")
+					{
+						c_float		num(new_value);
+
+						if(string(num) == new_value)
+						{
+							/* --- good to go */
+						}
+						else
+						{
+							MESSAGE_ERROR("", "", "input bt markup(" + new_value + ") wrongly formatted, needed to be " + string(num));
+						}
+					}
+					else if(action == "AJAX_updatePSoWBTMarkupType") { /* --- good to go */ }
 					else if(action == "AJAX_updatePSoWNumber")
 					{
 						if(db->Query("SELECT `id` FROM `contracts_psow` WHERE `number`=\"" + new_value + "\" AND `id`!=\"" + sow_id + "\" AND `cost_center_id`=(SELECT `cost_center_id` FROM `contracts_psow` WHERE `id`=\"" + sow_id + "\");"))
@@ -1451,6 +1468,7 @@ string	isActionEntityBelongsToAgency(string action, string id, string agency_id,
 				if(action == "AJAX_updateTaskTitle") 					sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `timecard_customers` WHERE `id`=(SELECT `timecard_customers_id` FROM `timecard_projects` WHERE `id`=(SELECT `timecard_projects_id` FROM `timecard_tasks` WHERE `id`=\"" + id + "\"));";
 
 				if(action == "AJAX_updateExpenseTemplateTitle")				sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `bt_expense_templates` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateExpenseTemplateTaxable")			sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `bt_expense_templates` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateExpenseTemplateAgencyComment")		sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `bt_expense_templates` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateExpenseTemplateLineTitle")			sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `bt_expense_templates` WHERE `id`=(SELECT `bt_expense_template_id` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\");";
 				if(action == "AJAX_updateExpenseTemplateLineDescription")	sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `bt_expense_templates` WHERE `id`=(SELECT `bt_expense_template_id` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\");";

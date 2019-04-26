@@ -32,7 +32,7 @@ class C_Print_1C_CostCenter
 
 		string							content = "";
 	public:
-		auto			isTableRowExists(int i) -> bool					{ return vars->Get("timecard_index_" + to_string(i)).length(); };
+		auto			isTableRowExists(int i) -> bool					{ return vars->Get("index_" + to_string(i)).length(); };
 
 		auto			SetDB(CMysql *param)							{ db = param; };
 		auto			SetFilename(const string &param1)				{ filename = param1; };

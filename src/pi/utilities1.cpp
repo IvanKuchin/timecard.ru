@@ -6112,11 +6112,37 @@ pair<struct tm, struct tm> GetFirstAndLastDateOfLastMonth()
 
 auto GetSpellingFormattedDate(string date, string format) -> string
 {
-	MESSAGE_DEBUG("", "", "start");
+/*	MESSAGE_DEBUG("", "", "start");
 
 	auto	result = ""s;
 	char	buffer[100];
 	auto	date_obj = GetTMObject(date);
+
+	if(strftime(buffer, sizeof(buffer), format.c_str(), &date_obj))
+	{
+		result = buffer;
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "strftime returns 0");
+	}
+
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return result;
+*/
+	return GetSpellingFormattedDate(GetTMObject(date), format);
+}
+
+auto GetSpellingFormattedDate(struct tm date_obj, string format) -> string
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	result = ""s;
+	char	buffer[100];
+
+	mktime(&date_obj);
 
 	if(strftime(buffer, sizeof(buffer), format.c_str(), &date_obj))
 	{

@@ -54,86 +54,25 @@ auto	C_Print_BT::GetSpelledTitle() -> string
 	auto			start_spelling_date = GetSpellingFormattedDate(bt.GetDateStart(), "%d %b %G");
 	auto			finish_spelling_date = GetSpellingFormattedDate(bt.GetDateFinish(), "%d %b %G");
 
-	return gettext("Service report over period") + " "s + gettext("from") + " " + start_spelling_date + " " + gettext("up to") + " " + finish_spelling_date;
+	return vars->Get("Remote service report over period") + " "s + vars->Get("from") + " " + start_spelling_date + " " + vars->Get("up to") + " " + finish_spelling_date;
 }
 
 auto	C_Print_BT::GetSpelledPSoW() -> string
 {
 	auto			sign_spelling_date = GetSpellingFormattedDate(bt.GetDateSign(), "%d %b %G");
 
-	return gettext("PSoW") + " №"s + bt.GetAgreementNumber() + " " + gettext("agreement from") + " " + sign_spelling_date;
+	return vars->Get("PSoW") + " №"s + bt.GetAgreementNumber() + " " + vars->Get("agreement from") + " " + sign_spelling_date;
 }
 
 auto	C_Print_BT::GetSpelledProjectID() -> string
 {
-	return bt.GetProjectNumber().length() ? gettext("Project ID") + ": "s + bt.GetProjectNumber() : "";
-}
-
-auto	C_Print_BT::GetSpelledTotalHours() -> string
-{
-	return gettext("Total hours on duty") + ": "s;
-}
-
-auto	C_Print_BT::GetSpelledTotalDays() -> string
-{
-	return gettext("Total days on duty") + ": "s;
-}
-
-auto	C_Print_BT::GetSpelledDayrate() -> string
-{
-	return gettext("Dayrate") + ": "s;
-}
-
-auto	C_Print_BT::GetSpelledTotalPayment() -> string
-{
-	return gettext("Total payment in reported timecard") + ": "s;
-}
-
-auto	C_Print_BT::GetSpelledVAT() -> string
-{
-	return gettext("VAT") + ": "s;
-}
-
-auto	C_Print_BT::GetSpelledTotalPaymentNoVAT() -> string
-{
-	return gettext("Total payment in reported timecard") + " "s + gettext("w/o") + " " + gettext("VAT") + ": ";
-}
-
-auto	C_Print_BT::GetSpelledSignature() -> string
-{
-	return gettext("Signature") + ":_________________________________"s;
-}
-
-auto	C_Print_BT::GetSpelledInitials() -> string
-{
-	return gettext("Initials") + ": ___________________________________"s;
-}
-
-auto	C_Print_BT::GetSpelledPosition() -> string
-{
-	return gettext("Title") + ": _______________________________"s;
-}
-
-auto	C_Print_BT::GetSpelledDate() -> string
-{
-	return gettext("Date") + ": ____________________________________"s;
-}
-
-auto	C_Print_BT::GetSpelledRur() -> string
-{
-	return gettext("rur.");
-}
-
-auto	C_Print_BT::GetSpelledKop() -> string
-{
-	return gettext("kop.");
+	return bt.GetProjectNumber().length() ? vars->Get("Project ID") + ": "s + bt.GetProjectNumber() : "";
 }
 
 auto	C_Print_BT::PrintAsXLS() -> string
 {
 	auto	error_message = ""s;
 	auto	f_name = GetFilename(); 
-	auto	good2go = false;
 
 	MESSAGE_DEBUG("", "", "start");
 
@@ -257,7 +196,7 @@ auto	C_Print_BT::PrintAsXLS() -> string
 				}
 
 				{
-					auto		temp = bt.GetDayrate();
+					auto		temp = bt.GetMarkup();
 
 					sheet->writeStr(row_counter, 1, spelled_dayrate.c_str());
 					sheet->setMerge(row_counter, row_counter, 3, 5);
@@ -368,7 +307,7 @@ auto	C_Print_BT::PrintAsXLS() -> string
 	return error_message;
 }
 
-
+/*
 auto	C_Print_BT::__HPDF_init() -> string
 {
 	auto	error_message = ""s;
@@ -399,10 +338,8 @@ auto	C_Print_BT::__HPDF_SetDocProps() -> string
 	{
 		HPDF_NewDoc (__pdf);;
 
-		/* set compression mode */
 		HPDF_SetCompressionMode (__pdf, HPDF_COMP_ALL);
 
-		/* set page mode to use outlines. */
 		HPDF_SetPageMode (__pdf, HPDF_PAGE_MODE_USE_OUTLINE);
 
 		__pdf_line = -1;
@@ -633,26 +570,6 @@ auto	C_Print_BT::__HPDF_MoveTableLineDown(int line_decrement) -> string
 
 auto	C_Print_BT::__HPDF_PrintText(string text, double x, HPDF_TextAlignment text_align = HPDF_TALIGN_LEFT) -> string
 {
-/*
-	auto	error_message = ""s;
-
-	MESSAGE_DEBUG("", "", "start");
-
-	try
-	{
-		HPDF_Page_BeginText (__pdf_page);
-		HPDF_Page_SetFontAndSize (__pdf_page, __pdf_font, HPDF_TIMECARD_FONT_SIZE);
-		HPDF_Page_TextRect (__pdf_page, x, __pdf_line + __pdf_font_height, __pdf_page_width - HPDF_FIELD_RIGHT, __pdf_line, (utf8_to_cp1251(text)).c_str(), text_align, NULL);
-		HPDF_Page_EndText (__pdf_page);
-	}
-	catch(...)
-	{
-		MESSAGE_ERROR("", "", "hpdf: fail to print timecard title");
-		error_message = gettext("hpdf: fail to print text");
-	}
-
-	MESSAGE_DEBUG("", "", "finish");
-*/
 	return __HPDF_PrintText(text, x, __pdf_page_width - HPDF_FIELD_RIGHT, text_align);
 }
 
@@ -969,15 +886,6 @@ auto	C_Print_BT::__HPDF_DrawTimecardTableBody() -> string
 					MESSAGE_DEBUG("", "", "hpdf: fail to move line down");
 					break;
 				}
-
-/*
-				HPDF_Page_BeginText (__pdf_page);
-				HPDF_Page_SetFontAndSize (__pdf_page, __pdf_font, HPDF_TIMECARD_FONT_SIZE);
-				auto		text_width = HPDF_Page_TextWidth(__pdf_page, utf8_to_cp1251(bt_line_description).c_str());
-				HPDF_Page_EndText (__pdf_page);
-
-				MESSAGE_DEBUG("", "", "text width: " + to_string(text_width) + ", reserved width " + to_string(__HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT)));
-*/
 
 				HPDF_Page_BeginText (__pdf_page);
 				HPDF_Page_SetFontAndSize (__pdf_page, __pdf_font, HPDF_TIMECARD_FONT_SIZE);
@@ -1296,7 +1204,7 @@ auto	C_Print_BT::PrintAsPDF() -> string
 
 	return error_message;
 }
-
+*/
 
 ostream& operator<<(ostream& os, const C_Print_BT &var)
 {

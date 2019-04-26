@@ -60,62 +60,86 @@ auto	C_Invoicing_Vars::AssignVariableValue(const string &var_name, const string 
 	return error_message;
 }
 
-auto	C_Invoicing_Vars::GenerateServiceVariableSet() -> string
+auto	C_Invoicing_Vars::FillStaticDictionary() -> string
 {
 	auto	error_message = ""s;
 
 	MESSAGE_DEBUG("", "", "start");
 
+	if(error_message.empty()) error_message = AssignVariableValue("Bank Identifier", gettext("Bank Identifier"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("Account", gettext("Account"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("Destination bank", gettext("Destination bank"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("TIN", gettext("TIN"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("KPP", gettext("KPP"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("Recipient", gettext("Recipient"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("Invoice", gettext("Invoice"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("Act", gettext("Act"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("VAT", gettext("VAT"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("VAT doc", gettext("VAT doc"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("VAT comment1", gettext("VAT comment1"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("agreement from", gettext("agreement from"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("agreement declensioned", gettext("agreement declensioned"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("Technical Requirement agreement short", gettext("Technical Requirement agreement short"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("from", gettext("from"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("up to", gettext("up to"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("in scope", gettext("in scope"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("Provider", gettext("Provider"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("Customer", gettext("Customer"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("Seller", gettext("Seller"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("Buyer", gettext("Buyer"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("Supplier", gettext("Supplier"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("Goods", gettext("Goods"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("Basis", gettext("Basis"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("Price", gettext("Price"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("Dayrate", gettext("Dayrate"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("Total", gettext("Total"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("Total (tax free)", gettext("Total (tax free)"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("Excise", gettext("Excise"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("no excise", gettext("no excise"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("Tax rate", gettext("Tax rate"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("Tax amount", gettext("Tax amount"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("Quantity short", gettext("Quantity short"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("Items short", gettext("Items short"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("item short", gettext("item short"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("VAT short", gettext("VAT short"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("Total payment", gettext("Total payment"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("Sum items", gettext("Sum items"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("total amount", gettext("total amount"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("rur.", gettext("rur."), true);
+	if(error_message.empty()) error_message = AssignVariableValue("Director", gettext("Director"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("Accountant", gettext("Accountant"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("Measure unit (code)", gettext("Measure unit (code)"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("Measure unit (name)", gettext("Measure unit (name)"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("Total hours on duty", gettext("Total hours on duty"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("Total days on duty", gettext("Total days on duty"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("Total payment in reported timecard", gettext("Total payment in reported timecard"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("w/o", gettext("w/o"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("Signature", gettext("Signature"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("Initials", gettext("Initials"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("Title", gettext("Title"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("Date", gettext("Date"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("rur.", gettext("rur."), true);
+	if(error_message.empty()) error_message = AssignVariableValue("kop.", gettext("kop."), true);
+	if(error_message.empty()) error_message = AssignVariableValue("Remote service report over period", gettext("Remote service report over period"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("PSoW", gettext("PSoW"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("Project ID", gettext("Project ID"), true);
+
+	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
+
+	return	error_message;
+}
+
+auto	C_Invoicing_Vars::CostCenter_VarSet() -> string
+{
+	auto	error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+
 	if(user)
 	{
 		if(db)
 		{
-			c_float	timecards_sum, timecards_vat;
-			c_float	cost_center_sum;
-
-			if(error_message.empty()) error_message = AssignVariableValue("Bank Identifier", gettext("Bank Identifier"), true);
-			if(error_message.empty()) error_message = AssignVariableValue("Account", gettext("Account"), true);
-			if(error_message.empty()) error_message = AssignVariableValue("Destination bank", gettext("Destination bank"), true);
-			if(error_message.empty()) error_message = AssignVariableValue("TIN", gettext("TIN"), true);
-			if(error_message.empty()) error_message = AssignVariableValue("KPP", gettext("KPP"), true);
-			if(error_message.empty()) error_message = AssignVariableValue("Recipient", gettext("Recipient"), true);
-			if(error_message.empty()) error_message = AssignVariableValue("Invoice", gettext("Invoice"), true);
-			if(error_message.empty()) error_message = AssignVariableValue("Act", gettext("Act"), true);
-			if(error_message.empty()) error_message = AssignVariableValue("VAT doc", gettext("VAT doc"), true);
-			if(error_message.empty()) error_message = AssignVariableValue("VAT comment1", gettext("VAT comment1"), true);
-			if(error_message.empty()) error_message = AssignVariableValue("agreement from", gettext("agreement from"), true);
-			if(error_message.empty()) error_message = AssignVariableValue("agreement declensioned", gettext("agreement declensioned"), true);
-			if(error_message.empty()) error_message = AssignVariableValue("Technical Requirement agreement short", gettext("Technical Requirement agreement short"), true);
-			if(error_message.empty()) error_message = AssignVariableValue("from", gettext("from"), true);
-			if(error_message.empty()) error_message = AssignVariableValue("up to", gettext("up to"), true);
-			if(error_message.empty()) error_message = AssignVariableValue("in scope", gettext("in scope"), true);
-			if(error_message.empty()) error_message = AssignVariableValue("Provider", gettext("Provider"), true);
-			if(error_message.empty()) error_message = AssignVariableValue("Customer", gettext("Customer"), true);
-			if(error_message.empty()) error_message = AssignVariableValue("Seller", gettext("Seller"), true);
-			if(error_message.empty()) error_message = AssignVariableValue("Buyer", gettext("Buyer"), true);
-			if(error_message.empty()) error_message = AssignVariableValue("Supplier", gettext("Supplier"), true);
-			if(error_message.empty()) error_message = AssignVariableValue("Goods", gettext("Goods"), true);
-			if(error_message.empty()) error_message = AssignVariableValue("Basis", gettext("Basis"), true);
-			if(error_message.empty()) error_message = AssignVariableValue("Price", gettext("Price"), true);
-			if(error_message.empty()) error_message = AssignVariableValue("Total", gettext("Total"), true);
-			if(error_message.empty()) error_message = AssignVariableValue("Total (tax free)", gettext("Total (tax free)"), true);
-			if(error_message.empty()) error_message = AssignVariableValue("Excise", gettext("Excise"), true);
-			if(error_message.empty()) error_message = AssignVariableValue("no excise", gettext("no excise"), true);
-			if(error_message.empty()) error_message = AssignVariableValue("Tax rate", gettext("Tax rate"), true);
-			if(error_message.empty()) error_message = AssignVariableValue("Tax amount", gettext("Tax amount"), true);
-			if(error_message.empty()) error_message = AssignVariableValue("Quantity short", gettext("Quantity short"), true);
-			if(error_message.empty()) error_message = AssignVariableValue("Items short", gettext("Items short"), true);
-			if(error_message.empty()) error_message = AssignVariableValue("item short", gettext("item short"), true);
-			if(error_message.empty()) error_message = AssignVariableValue("VAT short", gettext("VAT short"), true);
-			if(error_message.empty()) error_message = AssignVariableValue("Total payment", gettext("Total payment"), true);
-			if(error_message.empty()) error_message = AssignVariableValue("Sum items", gettext("Sum items"), true);
-			if(error_message.empty()) error_message = AssignVariableValue("total amount", gettext("total amount"), true);
-			if(error_message.empty()) error_message = AssignVariableValue("rur.", gettext("rur."), true);
-			if(error_message.empty()) error_message = AssignVariableValue("Director", gettext("Director"), true);
-			if(error_message.empty()) error_message = AssignVariableValue("Accountant", gettext("Accountant"), true);
-			if(error_message.empty()) error_message = AssignVariableValue("Measure unit (code)", gettext("Measure unit (code)"), true);
-			if(error_message.empty()) error_message = AssignVariableValue("Measure unit (name)", gettext("Measure unit (name)"), true);
-
 			if(error_message.empty()) error_message = AssignVariableValue("cost_center_id", cost_center_id, true);
 			if(error_message.empty())
 			{
@@ -149,64 +173,7 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet() -> string
 				error_message = AssignVariableValue("cost_center_agreement", "№" + Get("cost_center_agreement_number") + " " + gettext("agreement from") + " " + date_obj.Spell(), true);
 			}
 
-
-			// --- current timestamp
-			if(error_message.empty())
-			{
-				time_t 				rawtime;
-				struct tm * 		timeinfo;
-				C_Date_Spelling		date_obj;
-				// char				buffer[128];
-
-				time (&rawtime);
-				timeinfo = localtime (&rawtime);
-
-				// strftime(buffer, sizeof(buffer), "%FT%T", timeinfo);
-				date_obj.SetTMObj(*timeinfo);
-
-				if(error_message.empty())
-				{
-					if((error_message = AssignVariableValue("Timestamp_1CFormat", date_obj.GetFormatted("%FT%T"), true)).length())
-						{ MESSAGE_ERROR("", "", "fail to assign variable value"); }
-				}
-			}
-
-			// --- invoice number
-			if(error_message.empty())
-			{
-				time_t 				rawtime;
-				struct tm * 		timeinfo;
-				C_Date_Spelling		date_obj;
-				// char				buffer[128];
-
-				if(timecard_obj_list.size())
-				{
-					date_obj.SetTMObj(GetTMObject(timecard_obj_list[0].GetDateFinish()));
-				}
-				else
-				{
-					time (&rawtime);
-					timeinfo = localtime (&rawtime);
-
-					date_obj.SetTMObj(*timeinfo);
-				}
-
-				// strftime(buffer, sizeof(buffer), "%B %Y", timeinfo);
-
-
-				if(error_message.empty())
-				{
-					if((error_message = AssignVariableValue("invoice_agreement", "№" + Get("cost_center_act_number") + " " + gettext("agreement from") + " " + date_obj.Spell(), true)).length())
-						{ MESSAGE_ERROR("", "", "fail to assign variable value"); }
-				}
-				if(error_message.empty())
-				{
-					if((error_message = AssignVariableValue("comment_1C", gettext("Local service delivery") + " "s + date_obj.GetFormatted("%B %Y"), true)).length())
-						{ MESSAGE_ERROR("", "", "fail to assign variable value"); }
-				}
-			}
-
-            if(error_message.empty()) error_message = AssignVariableFromDB("cost_center_company_id"                  , "SELECT `company_id` FROM `cost_centers` WHERE `id`=\"" + Get("cost_center_id") + "\";", true);
+            if(error_message.empty()) error_message = AssignVariableFromDB("cost_center_company_id", "SELECT `company_id` FROM `cost_centers` WHERE `id`=\"" + Get("cost_center_id") + "\";", true);
             if(error_message.empty())
             {
                 if(vars.Get("cost_center_company_id").length())
@@ -285,7 +252,57 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet() -> string
 			if(error_message.empty()) error_message = AssignVariableFromDB("cost_center_agreement_number"		, "SELECT `number` FROM `cost_centers` WHERE `id`=\"" + vars.Get("cost_center_id") + "\";", true);
 			if(error_message.empty()) error_message = AssignVariableFromDB("cost_center_agreement_sign_date"	, "SELECT `sign_date` FROM `cost_centers` WHERE `id`=\"" + vars.Get("cost_center_id") + "\";", true);
 
-			if(error_message.empty()) error_message = AssignVariableFromDB("agency_company_id"					, "SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\";", true);
+			// --- cost center custom fields 
+			if(error_message.empty())
+			{
+				auto	affected = db->Query("SELECT * FROM `cost_center_custom_fields` WHERE `cost_center_id`=\"" + vars.Get("cost_center_id") + "\";");
+
+				for(auto i = 0; i < affected; ++i)
+				{
+					if(error_message.empty()) error_message = AssignVariableValue(db->Get(i, "var_name"), db->Get(i, "value"), true);
+				}
+
+				if(Get("1C_template_invoice_to_cc_service").length())
+					AssignVariableValue("1C_template_invoice_to_cc_service_full_path", TEMPLATE_CC_DIRECTORY + Get("1C_template_invoice_to_cc_service"), true);
+				if(Get("1C_template_invoice_to_cc_service_table_row").length())
+					AssignVariableValue("1C_template_invoice_to_cc_service_table_row_full_path", TEMPLATE_CC_DIRECTORY + Get("1C_template_invoice_to_cc_service_table_row"), true);
+				
+				if(Get("1C_template_invoice_to_cc_bt").length())
+					AssignVariableValue("1C_template_invoice_to_cc_bt_full_path", TEMPLATE_CC_DIRECTORY + Get("1C_template_invoice_to_cc_bt"), true);
+				if(Get("1C_template_invoice_to_cc_bt_table_row").length())
+					AssignVariableValue("1C_template_invoice_to_cc_bt_table_row_full_path", TEMPLATE_CC_DIRECTORY + Get("1C_template_invoice_to_cc_bt_table_row"), true);
+			}
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "db is not initialized");
+			error_message = gettext("db is not initialized");
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "user is not initialized");
+		error_message = gettext("user is not initialized");
+	}
+
+
+	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
+
+	return	error_message;
+}
+
+auto	C_Invoicing_Vars::Agency_VarSet() -> string
+{
+	auto	error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+
+	if(user)
+	{
+		if(db)
+		{
+			if(error_message.empty()) error_message = AssignVariableFromDB("agency_company_id", "SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\";", true);
 			if(error_message.empty())
 			{
 				if(vars.Get("agency_company_id").length())
@@ -361,27 +378,6 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet() -> string
 			if(error_message.empty()) error_message = AssignVariableFromDB("agency_mailing_region_title"		, "SELECT `title` FROM `geo_region` WHERE `id`=(SELECT `geo_region_id` FROM `geo_locality` WHERE `id`=(SELECT `geo_locality_id` FROM `geo_zip` WHERE `id`=\"" + Get("agency_mailing_geo_zip_id") + "\"));", true);
 			if(error_message.empty()) error_message = AssignVariableFromDB("agency_mailing_country_title"		, "SELECT `title` FROM `geo_country` WHERE `id`=(SELECT `geo_country_id` FROM `geo_region` WHERE `id`=(SELECT `geo_region_id` FROM `geo_locality` WHERE `id`=(SELECT `geo_locality_id` FROM `geo_zip` WHERE `id`=\"" + Get("agency_mailing_geo_zip_id") + "\")));", true);
 
-			// --- cost center custom fields 
-			if(error_message.empty())
-			{
-				auto	affected = db->Query("SELECT * FROM `cost_center_custom_fields` WHERE `cost_center_id`=\"" + vars.Get("cost_center_id") + "\";");
-
-				for(auto i = 0; i < affected; ++i)
-				{
-					if(error_message.empty()) error_message = AssignVariableValue(db->Get(i, "var_name"), db->Get(i, "value"), true);
-				}
-
-				if(Get("1C_template_invoice_to_cc_service").length())
-					AssignVariableValue("1C_template_invoice_to_cc_service_full_path", TEMPLATE_CC_DIRECTORY + Get("1C_template_invoice_to_cc_service"), true);
-				if(Get("1C_template_invoice_to_cc_service_table_row").length())
-					AssignVariableValue("1C_template_invoice_to_cc_service_table_row_full_path", TEMPLATE_CC_DIRECTORY + Get("1C_template_invoice_to_cc_service_table_row"), true);
-				
-				if(Get("1C_template_invoice_to_cc_bt").length())
-					AssignVariableValue("1C_template_invoice_to_cc_bt_full_path", TEMPLATE_CC_DIRECTORY + Get("1C_template_invoice_to_cc_bt"), true);
-				if(Get("1C_template_invoice_to_cc_bt_table_row").length())
-					AssignVariableValue("1C_template_invoice_to_cc_bt_table_row_full_path", TEMPLATE_CC_DIRECTORY + Get("1C_template_invoice_to_cc_bt_table_row"), true);
-			}
-
 			// --- agency company custom fields 
 			if(error_message.empty())
 			{
@@ -404,158 +400,473 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet() -> string
 				
 			}
 
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "db is not initialized");
+			error_message = gettext("db is not initialized");
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "user is not initialized");
+		error_message = gettext("user is not initialized");
+	}
+
+
+	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
+
+	return	error_message;
+}
+
+auto	C_Invoicing_Vars::SoW_Index_VarSet(string sql_query, string index) -> string
+{
+	auto	error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(user)
+	{
+		if(db)
+		{
+			if(db->Query(sql_query))
+			{
+				auto	sow_id = db->Get(0, "id");
+				auto	sow_number = db->Get(0, "number");
+				auto	sow_date = db->Get(0, "sign_date");
+				auto	act_number = db->Get(0, "act_number");
+				auto	subcontractor_company_id = db->Get(0, "subcontractor_company_id");
+				auto	subcontractor_dayrate = db->Get(0, "day_rate");
+
+				if(sow_id.length())
+				{
+					if((error_message = AssignVariableValue("sow_id_" + index, sow_id, true)).empty()) {}
+					else { MESSAGE_ERROR("", "", "fail to assign variable"); }
+				}
+				else
+				{
+					error_message = gettext("Agreement") + " "s + db->Get(0, "number") + " " + gettext("agreement from") + " " + db->Get(0, "sign_date") + " " + gettext("id is empty");
+					MESSAGE_ERROR("", "", "Agreement( " + db->Get(0, "number") + " " + gettext("agreement from") + db->Get(0, "sign_date") + " ) id is empty");
+				}
+
+				if(subcontractor_dayrate.length())
+				{
+					if((error_message = AssignVariableValue("subcontractor_dayrate_" + index, subcontractor_dayrate, true)).empty()) {}
+					else { MESSAGE_ERROR("", "", "fail to assign variable"); }
+				}
+				else
+				{
+					error_message = gettext("Agreement") + " "s + db->Get(0, "number") + " " + gettext("agreement from") + " " + db->Get(0, "sign_date") + " " + gettext("number is empty");
+					MESSAGE_ERROR("", "", "Agreement( " + db->Get(0, "number") + " " + gettext("agreement from") + db->Get(0, "sign_date") + " ) dayrate is empty");
+				}
+
+				if(sow_number.length())
+				{
+					if((error_message = AssignVariableValue("sow_number_" + index, sow_number, true)).empty()) {}
+					else { MESSAGE_ERROR("", "", "fail to assign variable"); }
+				}
+				else
+				{
+					error_message = gettext("Agreement") + " "s + db->Get(0, "number") + " " + gettext("agreement from") + " " + db->Get(0, "sign_date") + " " + gettext("number is empty");
+					MESSAGE_ERROR("", "", "Agreement( " + db->Get(0, "number") + " " + gettext("agreement from") + db->Get(0, "sign_date") + " ) number is empty");
+				}
+
+				if(sow_date.length())
+				{
+					if((error_message = AssignVariableValue("sow_sign_date_" + index, sow_date, true)).empty()) {}
+					else { MESSAGE_ERROR("", "", "fail to assign variable"); }
+				}
+				else
+				{
+					error_message = gettext("Agreement") + " "s + db->Get(0, "number") + " " + gettext("agreement from") + " " + db->Get(0, "sign_date") + " " + gettext("date is empty");
+					MESSAGE_ERROR("", "", "Agreement( " + db->Get(0, "number") + " " + gettext("agreement from") + db->Get(0, "sign_date") + " ) date is empty");
+				}
+
+				if(act_number.length())
+				{
+					if((error_message = AssignVariableValue("subcontractor_act_number_" + index, act_number, true)).empty()) {}
+					else { MESSAGE_ERROR("", "", "fail to assign variable"); }
+				}
+				else
+				{
+					error_message = gettext("Agreement") + " "s + db->Get(0, "number") + " " + gettext("agreement from") + " " + db->Get(0, "sign_date") + " " + gettext("act number is empty");
+					MESSAGE_ERROR("", "", "Agreement( " + db->Get(0, "number") + " " + gettext("agreement from") + db->Get(0, "sign_date") + " ) act number is empty");
+				}
+
+				if(subcontractor_company_id.length())
+				{
+					if((error_message = AssignVariableValue("subcontractor_company_id_" + index, subcontractor_company_id, true)).empty()) {}
+					else { MESSAGE_ERROR("", "", "fail to assign variable"); }
+				}
+				else
+				{
+					error_message = gettext("Agreement") + " "s + db->Get(0, "number") + " " + gettext("agreement from") + " " + db->Get(0, "sign_date") + " " + gettext("subc company.id is empty");
+					MESSAGE_ERROR("", "", "Agreement( " + db->Get(0, "number") + " " + gettext("agreement from") + db->Get(0, "sign_date") + " ) subc company.id is empty");
+				}
+
+				// --- scoping
+				{
+					C_Date_Spelling	date_obj;
+
+					date_obj.SetTMObj(GetTMObject(vars.Get("sow_sign_date_" + index)));
+
+					if(error_message.empty()) error_message = AssignVariableValue("sow_agreement_" + index, "№" + vars.Get("sow_number_" + index) + " " + gettext("agreement from") + " " + date_obj.Spell(), true);
+				}
+			}
+			else
+			{
+				error_message = gettext("SQL syntax issue");
+				MESSAGE_ERROR("", "", "SQL syntax issue");
+			}
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "db is not initialized");
+			error_message = gettext("db is not initialized");
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "user is not initialized");
+		error_message = gettext("user is not initialized");
+	}
+
+
+	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
+
+	return	error_message;
+}
+
+auto	C_Invoicing_Vars::SubcontractorVAT_Index_VarSet(string sql_query, string index) -> string
+{
+	auto	error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(user)
+	{
+		if(db)
+		{
+			auto	subcontractor_vat = cache.Get(sql_query, db, user, [](string sql_query, CMysql *db, CUser *)
+													{
+														return (db->Query(sql_query) ? db->Get(0, 0) : ""s);
+													});
+			if(subcontractor_vat.length())
+			{
+				error_message = AssignVariableValue("subcontractor_company_vat_" + index, subcontractor_vat, true);
+				error_message = AssignVariableValue("subcontractor_company_vat_boolean_" + index, subcontractor_vat == "Y" ? "true" : "false", true);
+				error_message = AssignVariableValue("subcontractor_company_vat_spelling_" + index, subcontractor_vat == "N" ? gettext("no VAT") : gettext("VAT") + " "s + to_string(VAT_PERCENTAGE) + "%", true);
+				error_message = AssignVariableValue("subcontractor_company_vat_spelling_1C_" + index, subcontractor_vat == "N" ? gettext("noVAT") : gettext("VAT") + to_string(VAT_PERCENTAGE), true);
+			}
+			else
+			{
+				error_message = gettext("SQL syntax issue");
+				MESSAGE_ERROR("", "", "SQL syntax issue");
+			}
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "db is not initialized");
+			error_message = gettext("db is not initialized");
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "user is not initialized");
+		error_message = gettext("user is not initialized");
+	}
+
+
+	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
+
+	return	error_message;
+}
+
+auto	C_Invoicing_Vars::Common_Index_VarSet(string index) -> string
+{
+	auto	error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(error_message.empty()) error_message = AssignVariableValue("index_" + index, index, true);
+	if(error_message.empty()) error_message = AssignVariableValue("quantity_" + index, "1", true);
+	if(error_message.empty()) error_message = AssignVariableValue("item_" + index, Get("item short"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("vat_rate_" + index, to_string(int(VAT_PERCENTAGE)), true);
+
+	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
+
+	return	error_message;
+}
+
+auto	C_Invoicing_Vars::DocumentSubmissionDate_Index_VarSet(string date_inside_month, string index) -> string
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	error_message = ""s;
+	auto	date_inside_month_obj = GetTMObject(date_inside_month);
+
+	// --- build last day of given month
+	date_inside_month_obj.tm_mon += 1;
+	date_inside_month_obj.tm_mday = -1;
+
+	if(error_message.empty()) error_message = AssignVariableValue("LastDayOfMonth_Timestamp_1CFormat_" + index, GetSpellingFormattedDate(date_inside_month, "%FT%T"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("LastDayOfMonth_Date_1CFormat_" + index, GetSpellingFormattedDate(date_inside_month, "%F"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("LastDayOfMonth_Timestamp_1CFormat", Get("LastDayOfMonth_Timestamp_1CFormat_" + index), true);
+
+
+	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
+
+	return	error_message;
+}
+
+auto	C_Invoicing_Vars::SubcontractorsTotal_VarSet(string sum, string tax, string total) -> string
+{
+	auto	error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	// --- not used anywhere
+	if(error_message.empty()) error_message = AssignVariableValue("subcontractors_sum_amount", sum, true);
+	if(error_message.empty()) error_message = AssignVariableValue("subcontractors_vat_amount", tax, true);
+	if(error_message.empty()) error_message = AssignVariableValue("subcontractors_total_payment", total, true);
+
+	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
+
+	return	error_message;
+}
+
+auto	C_Invoicing_Vars::CostCenterTotal_VarSet(string sum, string tax, string total) -> string
+{
+	auto	error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(error_message.empty()) error_message = AssignVariableValue("cost_center_sum_amount", sum, true);
+	if(error_message.empty()) error_message = AssignVariableValue("cost_center_vat_amount", tax, true);
+	if(error_message.empty()) error_message = AssignVariableValue("cost_center_total_payment", total, true);
+
+	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
+
+	return	error_message;
+}
+
+
+auto	C_Invoicing_Vars::CurrentTimestamp_1C() -> string
+{
+	auto	error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+
+	if(user)
+	{
+		if(db)
+		{
+			// --- current timestamp
+			if(error_message.empty())
+			{
+				time_t 				rawtime;
+				struct tm * 		timeinfo;
+				C_Date_Spelling		date_obj;
+				// char				buffer[128];
+
+				time (&rawtime);
+				timeinfo = localtime (&rawtime);
+
+				// strftime(buffer, sizeof(buffer), "%FT%T", timeinfo);
+				date_obj.SetTMObj(*timeinfo);
+
+				if(error_message.empty())
+				{
+					if((error_message = AssignVariableValue("Timestamp_1CFormat", date_obj.GetFormatted("%FT%T"), true)).length())
+						{ MESSAGE_ERROR("", "", "fail to assign variable value"); }
+				}
+			}
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "db is not initialized");
+			error_message = gettext("db is not initialized");
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "user is not initialized");
+		error_message = gettext("user is not initialized");
+	}
+
+
+	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
+
+	return	error_message;
+}
+
+auto	C_Invoicing_Vars::AgreementNumberToCostCenterSpelling() -> string
+{
+	auto	error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+
+	if(user)
+	{
+		if(db)
+		{
+			// --- invoice number
+			if(error_message.empty())
+			{
+				time_t 				rawtime;
+				struct tm * 		timeinfo;
+				C_Date_Spelling		date_obj;
+				// char				buffer[128];
+
+				if(timecard_obj_list.size())
+				{
+					date_obj.SetTMObj(GetTMObject(timecard_obj_list[0].GetDateFinish()));
+				}
+				else if(bt_obj_list.size())
+				{
+					date_obj.SetTMObj(GetTMObject(bt_obj_list[0].GetDateFinish()));
+				}
+				else
+				{
+					time (&rawtime);
+					timeinfo = localtime (&rawtime);
+
+					date_obj.SetTMObj(*timeinfo);
+				}
+
+				// strftime(buffer, sizeof(buffer), "%B %Y", timeinfo);
+
+
+				if(error_message.empty())
+				{
+					if((error_message = AssignVariableValue("invoice_agreement", "№" + Get("cost_center_act_number") + " " + Get("agreement from") + " " + date_obj.Spell(), true)).length())
+						{ MESSAGE_ERROR("", "", "fail to assign variable value"); }
+				}
+				if(error_message.empty())
+				{
+					if((error_message = AssignVariableValue("comment_1C", gettext("Local service delivery") + " "s + date_obj.GetFormatted("%B %Y"), true)).length())
+						{ MESSAGE_ERROR("", "", "fail to assign variable value"); }
+				}
+			}
+
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "db is not initialized");
+			error_message = gettext("db is not initialized");
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "user is not initialized");
+		error_message = gettext("user is not initialized");
+	}
+
+
+	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
+
+	return	error_message;
+}
+
+auto	C_Invoicing_Vars::GenerateServiceVariableSet() -> string
+{
+	auto	error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(user)
+	{
+		if(db)
+		{
+			c_float	subcontractors_sum, subcontractors_vat;
+			c_float	cost_center_sum;
+
+
+			if(error_message.empty())
+			{
+				if((error_message = FillStaticDictionary()).empty()) {}
+				else { MESSAGE_ERROR("", "", "fail returned from static dictionary"); }
+			}
+
+			if(error_message.empty())
+			{
+				if((error_message = CostCenter_VarSet()).empty()) {}
+				else { MESSAGE_ERROR("", "", "fail returned from cost center var set"); }
+			}
+
+			if(error_message.empty())
+			{
+				if((error_message = CurrentTimestamp_1C()).empty()) {}
+				else { MESSAGE_ERROR("", "", "fail returned from 1C current timestamp"); }
+			}
+
+			// --- cost_center number
+			if(error_message.empty())
+			{
+				C_Date_Spelling		date_obj(GetTMObject(Get("cost_center_agreement_sign_date")));
+
+				error_message = AssignVariableValue("cost_center_agreement", "№" + Get("cost_center_agreement_number") + " " + gettext("agreement from") + " " + date_obj.Spell(), true);
+			}
+
+			if(error_message.empty())
+			{
+				if((error_message = AgreementNumberToCostCenterSpelling()).empty()) {}
+				else { MESSAGE_ERROR("", "", "fail returned from AgreementNumberToCostCenterSpelling"); }
+			}
+
+			if(error_message.empty())
+			{
+				if((error_message = Agency_VarSet()).empty()) {}
+				else { MESSAGE_ERROR("", "", "fail returned from AgencyVarSet"); }
+			}
+
 			// --- define timecards variables
 			if(error_message.empty())
 			{
 				auto	i = 0;
 				for(auto &timecard: timecard_obj_list)
 				{
-					c_float		timecard_days;
+					c_float		timecard_days = timecard.GetTotalHours() / c_float(8.0);
 					c_float		timecard_price;
 					c_float		timecard_vat;
 					c_float		cost_center_price;
-					c_float		subcontractor_dayrate(0);
-
 
 					++i;
+
+					if(error_message.empty()) error_message = AssignVariableValue("timecard_id_" + to_string(i), timecard.GetID(), true);
+					if(error_message.empty())
+					{
+						if((error_message = Common_Index_VarSet(to_string(i))).empty()) {}
+						else { MESSAGE_ERROR("", "", "fail returned from Common_Index_VarSet"); }
+					}
+					if(error_message.empty())
+					{
+						if((error_message = DocumentSubmissionDate_Index_VarSet(timecard.GetDateFinish(), to_string(i))).empty()) {}
+						else { MESSAGE_ERROR("", "", "fail returned from DocumentSubmissionDate_Index_VarSet"); }
+					}
 
 					// --- subcontractor VAT
 					if(error_message.empty())
 					{
-						auto	subcontractor_vat = cache.Get(
-											"SELECT `vat` FROM `company` WHERE `id`=("
-												"SELECT `subcontractor_company_id` FROM `contracts_sow` WHERE `id`=("
-													"SELECT `contract_sow_id` FROM `timecards` WHERE `id`=\"" + timecard.GetID() + "\""
-												")"
-											");", db, user, [](string sql_query, CMysql *db, CUser *)
-																{
-																	return (db->Query(sql_query) ? db->Get(0, 0) : ""s);
-																});
-						if(subcontractor_vat.length())
-						{
-							error_message = AssignVariableValue("timecard_company_vat_" + to_string(i), subcontractor_vat, true);
-							error_message = AssignVariableValue("timecard_company_vat_boolean_" + to_string(i), subcontractor_vat == "Y" ? "true" : "false", true);
-							error_message = AssignVariableValue("timecard_company_vat_spelling_" + to_string(i), subcontractor_vat == "N" ? gettext("no VAT") : gettext("VAT") + " "s + to_string(VAT_PERCENTAGE) + "%", true);
-							error_message = AssignVariableValue("timecard_company_vat_spelling_1C_" + to_string(i), subcontractor_vat == "N" ? gettext("noVAT") : gettext("VAT") + to_string(VAT_PERCENTAGE), true);
-						}
-						else
-						{
-							error_message = "PSOW("s + Get("timecard_psow_contract_number_" + to_string(i)) + ") " + gettext("vat") + " " + gettext("is empty");
-							MESSAGE_ERROR("", "", error_message);
-						}
-
+						if((error_message = SubcontractorVAT_Index_VarSet(	"SELECT `vat` FROM `company` WHERE `id`=("
+																				"SELECT `subcontractor_company_id` FROM `contracts_sow` WHERE `id`=("
+																					"SELECT `contract_sow_id` FROM `timecards` WHERE `id`=\"" + vars.Get("timecard_id_" + to_string(i)) + "\""
+																				")"
+																			");", to_string(i))).empty()) {}
+						else { MESSAGE_ERROR("", "", "fail returned from SubcontractorVAT_Index_VarSet"); }
 					}
 
-					timecard_days = timecard.GetTotalHours() / c_float(8.0);
-
-					if(error_message.empty()) error_message = AssignVariableValue("timecard_id_" + to_string(i), timecard.GetID(), true);
-					if(error_message.empty()) error_message = AssignVariableValue("timecard_index_" + to_string(i), to_string(i), true);
-					if(error_message.empty()) error_message = AssignVariableValue("timecard_quantity_" + to_string(i), "1", true);
-					if(error_message.empty()) error_message = AssignVariableValue("timecard_item_" + to_string(i), Get("item short"), true);
-					if(error_message.empty()) error_message = AssignVariableValue("vat_rate_" + to_string(i), to_string(int(VAT_PERCENTAGE)), true);
-					if(error_message.empty()) error_message = AssignVariableValue("LastDayOfTimecard_Timestamp_1CFormat_" + to_string(i), GetSpellingFormattedDate(timecard.GetDateFinish(), "%FT%T"), true);
-					if(error_message.empty()) error_message = AssignVariableValue("LastDayOfTimecard_Date_1CFormat_" + to_string(i), GetSpellingFormattedDate(timecard.GetDateFinish(), "%F"), true);
-					if(error_message.empty()) error_message = AssignVariableValue("LastDayOfTimecard_Timestamp_1CFormat", GetSpellingFormattedDate(timecard.GetDateFinish(), "%FT%T"), true);
 
 					if(error_message.empty())
 					{
-						if(db->Query(	
-										"SELECT `id`,`number`,`sign_date`,`act_number`,`subcontractor_company_id`,`day_rate` FROM `contracts_sow` WHERE `id`=("
-											"SELECT `contract_sow_id` FROM `timecards` WHERE `id`=\"" + vars.Get("timecard_id_" + to_string(i)) + "\""
-										");"))
-						{
-							auto	sow_id = db->Get(0, "id");
-							auto	sow_number = db->Get(0, "number");
-							auto	sow_date = db->Get(0, "sign_date");
-							auto	act_number = db->Get(0, "act_number");
-							auto	subcontractor_company_id = db->Get(0, "subcontractor_company_id");
-
-							subcontractor_dayrate.Set(db->Get(0, "day_rate"));
-
-							if(sow_id.length())
-							{
-								if((error_message = AssignVariableValue("sow_id_" + to_string(i), sow_id, true)).empty()) {}
-								else { MESSAGE_ERROR("", "", "fail to assign variable"); }
-							}
-							else
-							{
-								error_message = gettext("Agreement") + " "s + db->Get(0, "number") + " " + gettext("agreement from") + " " + db->Get(0, "sign_date") + " " + gettext("id is empty");
-								MESSAGE_ERROR("", "", "Agreement( " + db->Get(0, "number") + " " + gettext("agreement from") + db->Get(0, "sign_date") + " ) id is empty");
-							}
-
-							if(subcontractor_dayrate.Get())
-							{
-								if((error_message = AssignVariableValue("timecard_subcontractor_dayrate_" + to_string(i), subcontractor_dayrate, true)).empty()) {}
-								else { MESSAGE_ERROR("", "", "fail to assign variable"); }
-							}
-							else
-							{
-								error_message = gettext("Agreement") + " "s + db->Get(0, "number") + " " + gettext("agreement from") + " " + db->Get(0, "sign_date") + " " + gettext("number is empty");
-								MESSAGE_ERROR("", "", "Agreement( " + db->Get(0, "number") + " " + gettext("agreement from") + db->Get(0, "sign_date") + " ) dayrate is empty");
-							}
-
-							if(sow_number.length())
-							{
-								if((error_message = AssignVariableValue("timecard_sow_number_" + to_string(i), sow_number, true)).empty()) {}
-								else { MESSAGE_ERROR("", "", "fail to assign variable"); }
-							}
-							else
-							{
-								error_message = gettext("Agreement") + " "s + db->Get(0, "number") + " " + gettext("agreement from") + " " + db->Get(0, "sign_date") + " " + gettext("number is empty");
-								MESSAGE_ERROR("", "", "Agreement( " + db->Get(0, "number") + " " + gettext("agreement from") + db->Get(0, "sign_date") + " ) number is empty");
-							}
-
-							if(sow_date.length())
-							{
-								if((error_message = AssignVariableValue("timecard_sow_sign_date_" + to_string(i), sow_date, true)).empty()) {}
-								else { MESSAGE_ERROR("", "", "fail to assign variable"); }
-							}
-							else
-							{
-								error_message = gettext("Agreement") + " "s + db->Get(0, "number") + " " + gettext("agreement from") + " " + db->Get(0, "sign_date") + " " + gettext("date is empty");
-								MESSAGE_ERROR("", "", "Agreement( " + db->Get(0, "number") + " " + gettext("agreement from") + db->Get(0, "sign_date") + " ) date is empty");
-							}
-
-							if(act_number.length())
-							{
-								if((error_message = AssignVariableValue("subcontractor_act_number_" + to_string(i), act_number, true)).empty()) {}
-								else { MESSAGE_ERROR("", "", "fail to assign variable"); }
-							}
-							else
-							{
-								error_message = gettext("Agreement") + " "s + db->Get(0, "number") + " " + gettext("agreement from") + " " + db->Get(0, "sign_date") + " " + gettext("act number is empty");
-								MESSAGE_ERROR("", "", "Agreement( " + db->Get(0, "number") + " " + gettext("agreement from") + db->Get(0, "sign_date") + " ) act number is empty");
-							}
-
-							if(subcontractor_company_id.length())
-							{
-								if((error_message = AssignVariableValue("subcontractor_company_id_" + to_string(i), subcontractor_company_id, true)).empty()) {}
-								else { MESSAGE_ERROR("", "", "fail to assign variable"); }
-							}
-							else
-							{
-								error_message = gettext("Agreement") + " "s + db->Get(0, "number") + " " + gettext("agreement from") + " " + db->Get(0, "sign_date") + " " + gettext("subc company.id is empty");
-								MESSAGE_ERROR("", "", "Agreement( " + db->Get(0, "number") + " " + gettext("agreement from") + db->Get(0, "sign_date") + " ) subc company.id is empty");
-							}
-
-							// --- scoping
-							{
-								C_Date_Spelling	date_obj;
-
-								date_obj.SetTMObj(GetTMObject(vars.Get("timecard_sow_sign_date_" + to_string(i))));
-
-								if(error_message.empty()) error_message = AssignVariableValue("sow_agreement_" + to_string(i), "№" + vars.Get("timecard_sow_number_" + to_string(i)) + " " + gettext("agreement from") + " " + date_obj.Spell(), true);
-							}
-						}
-						else
-						{
-							error_message = gettext("SQL syntax issue");
-							MESSAGE_ERROR("", "", "SQL syntax issue");
-						}
+						if((error_message = SoW_Index_VarSet("SELECT `id`,`number`,`sign_date`,`act_number`,`subcontractor_company_id`,`day_rate` FROM `contracts_sow` WHERE `id`=("
+																"SELECT `contract_sow_id` FROM `timecards` WHERE `id`=\"" + vars.Get("timecard_id_" + to_string(i)) + "\""
+															");", to_string(i))).empty()) {}
+						else { MESSAGE_ERROR("", "", "fail returned from SoW_Index_VarSet"); }
 					}
 
-					if(error_message.empty())
-						error_message = AssignVariableValue("timecard_sow_agreement_" + to_string(i), Get("timecard_sow_number_" + to_string(i)) + " " + gettext("agreement from") + " " + Get("timecard_sow_sign_date_" + to_string(i)), true);
 
 					if(error_message.empty())
 					{
@@ -577,8 +888,8 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet() -> string
 
 							if(service_description.length())
 							{
-								error_message = AssignVariableValue("timecard_company_position_id_" + to_string(i), company_position_id, true);
-								error_message = AssignVariableValue("timecard_local_service_description_" + to_string(i), service_description, true);
+								error_message = AssignVariableValue("subcontractor_position_id_" + to_string(i), company_position_id, true);
+								error_message = AssignVariableValue("subcontractor_position_local_service_description_" + to_string(i), service_description, true);
 							}
 							else
 							{
@@ -598,10 +909,10 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet() -> string
 						{
 							if(db->Query(	
 											"SELECT `number`,`sign_date` FROM `contracts_sow` WHERE `id`=("
-												"SELECT `contract_sow_id` FROM `timecards` WHERE `id`=\"" + vars.Get("timecard_index_" + to_string(i)) + "\""
+												"SELECT `contract_sow_id` FROM `timecards` WHERE `id`=\"" + vars.Get("index_" + to_string(i)) + "\""
 											");"))
 							{
-								error_message = gettext("Agreement") + " "s + Get("timecard_sow_agreement_" + to_string(i)) + " " + gettext("missed occupancy title");
+								error_message = gettext("Agreement") + " "s + Get("sow_agreement_" + to_string(i)) + " " + gettext("missed occupancy title");
 								MESSAGE_ERROR("", "", error_message);
 							}
 							else
@@ -633,7 +944,7 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet() -> string
 									}
 									else
 									{
-										error_message = "PSOW "s + gettext("number") + " " + gettext("is empty") + "(" + Get("timecard_sow_agreement_" + to_string(i)) + ")";
+										error_message = "PSOW "s + gettext("number") + " " + gettext("is empty") + "(" + Get("sow_agreement_" + to_string(i)) + ")";
 										MESSAGE_ERROR("", "", error_message);
 									}
 								}
@@ -712,7 +1023,7 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet() -> string
 						}
 						else
 						{
-							error_message = gettext("Agreement") + " "s + Get("timecard_sow_agreement_" + to_string(i)) + " " + gettext("missed PSoW number");
+							error_message = gettext("Agreement") + " "s + Get("sow_agreement_" + to_string(i)) + " " + gettext("missed PSoW number");
 							MESSAGE_ERROR("", "", error_message);
 						}
 					}
@@ -794,7 +1105,7 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet() -> string
 							if(error_message.empty()) error_message = AssignVariableValue("subcontractor_company_kpp_" + to_string(i), db->Get(0, "kpp"), true);
 							if(error_message.empty()) error_message = AssignVariableValue("subcontractor_company_vat_" + to_string(i), db->Get(0, "vat"), true);
 
-							timecard_price = subcontractor_dayrate * timecard_days;
+							timecard_price = c_float(Get("subcontractor_dayrate_" + to_string(i))) * timecard_days;
 							if(Get("subcontractor_company_vat_" + to_string(i)) == "Y") timecard_vat = timecard_price * c_float(VAT_PERCENTAGE) / c_float(100);
 							timecard_total_payment = timecard_price + timecard_vat;
 
@@ -842,7 +1153,7 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet() -> string
 					if(error_message.empty())
 					{
 						error_message = AssignVariableValue("cost_center_table_row_description_" + to_string(i),
-															Get("timecard_local_service_description_" + to_string(i)) + " " + 
+															Get("subcontractor_position_local_service_description_" + to_string(i)) + " " + 
 															Get("from") + " " + Get("timecard_date_start" + to_string(i)) + " " + Get("up to") + " " + Get("timecard_date_finish" + to_string(i)) + " " + 
 															Get("in scope") + " " + Get("Technical Requirement agreement short") + " " + Get("psow_agreement_" + to_string(i)) +
 															(Get("timecard_contract_psow_" + to_string(i) + "_Department_spelling").length() ? " "s + Get("timecard_contract_psow_" + to_string(i) + "_Department_spelling") : ""s) +
@@ -857,31 +1168,29 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet() -> string
 					if(error_message.empty())
 					{
 						error_message = AssignVariableValue("subcontractor_table_row_description_" + to_string(i),
-															Get("timecard_local_service_description_" + to_string(i)) + " " + 
+															Get("subcontractor_position_local_service_description_" + to_string(i)) + " " + 
 															Get("from") + " " + Get("timecard_date_start" + to_string(i)) + " " + Get("up to") + " " + Get("timecard_date_finish" + to_string(i)) + " " + 
 															Get("in scope") + " " + Get("agreement declensioned") + " " + Get("sow_agreement_" + to_string(i)) + "."
-															" " + Get("timecard_company_vat_spelling_" + to_string(i)) + "."
+															" " + Get("subcontractor_company_vat_spelling_" + to_string(i)) + "."
 															,true);
 
 						if(error_message.length())
 						{ MESSAGE_ERROR("", "", "fail to assign variable"); }
 					}
 
-					timecards_vat = timecards_vat + timecard_vat;
-					timecards_sum = timecards_sum + timecard_price;
+					subcontractors_vat = subcontractors_vat + timecard_vat;
+					subcontractors_sum = subcontractors_sum + timecard_price;
 					cost_center_sum = cost_center_sum + cost_center_price;
 
 					// --- loop closure
 					if(error_message.length()) break;
 				}
 
-// CONTINUE FROM HERE
-// --- think about VAT calculation from subcontractors to agency
 				// --- timecard calculations scoping
+				if(error_message.empty())
 				{
-					if(error_message.empty()) error_message = AssignVariableValue("timecards_sum_amount", string(timecards_sum), true);
-					if(error_message.empty()) error_message = AssignVariableValue("timecards_vat_amount", string(timecards_vat), true);
-					if(error_message.empty()) error_message = AssignVariableValue("timecards_total_payment", string(timecards_sum + timecards_vat), true);
+					if((error_message = SubcontractorsTotal_VarSet(subcontractors_sum.PrintPriceTag(), subcontractors_vat.PrintPriceTag(), (subcontractors_sum + subcontractors_vat).PrintPriceTag())).empty()) {}
+					else { MESSAGE_ERROR("", "", "fail returned from SubcontractorsTotalVarSet"); }
 				}
 
 				// --- cost_center calculations scoping
@@ -891,9 +1200,155 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet() -> string
 					if(Get("agency_vat") == "Y")
 						cost_center_vat = cost_center_sum * c_float(VAT_PERCENTAGE) / c_float(100);
 
-					if(error_message.empty()) error_message = AssignVariableValue("cost_center_sum_amount", string(cost_center_sum), true);
-					if(error_message.empty()) error_message = AssignVariableValue("cost_center_vat_amount", string(cost_center_vat), true);
-					if(error_message.empty()) error_message = AssignVariableValue("cost_center_total_payment", string(cost_center_sum + cost_center_vat), true);
+					if(error_message.empty())
+					{
+						if((error_message = CostCenterTotal_VarSet(cost_center_sum.PrintPriceTag(), cost_center_vat.PrintPriceTag(), (cost_center_sum + cost_center_vat).PrintPriceTag())).empty()) {}
+						else { MESSAGE_ERROR("", "", "fail returned from CostCenterTotalVarSet"); }
+					}
+				}
+			}
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "db is not initialized");
+			error_message = gettext("db is not initialized");
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "user is not initialized");
+		error_message = gettext("user is not initialized");
+	}
+
+	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
+
+	return	error_message;
+}
+
+auto	C_Invoicing_Vars::GenerateBTVariableSet() -> string
+{
+	auto	error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(user)
+	{
+		if(db)
+		{
+			c_float	subcontractors_sum, subcontractors_vat;
+			c_float	cost_center_sum;
+
+			if(error_message.empty())
+			{
+				if((error_message = FillStaticDictionary()).empty()) {}
+				else { MESSAGE_ERROR("", "", "fail returned from static dictionary"); }
+			}
+
+			if(error_message.empty())
+			{
+				if((error_message = CostCenter_VarSet()).empty()) {}
+				else { MESSAGE_ERROR("", "", "fail returned from cost center var set"); }
+			}
+
+			if(error_message.empty())
+			{
+				if((error_message = CurrentTimestamp_1C()).empty()) {}
+				else { MESSAGE_ERROR("", "", "fail returned from 1C current timestamp"); }
+			}
+
+			// --- cost_center number
+			if(error_message.empty())
+			{
+				C_Date_Spelling		date_obj(GetTMObject(Get("cost_center_agreement_sign_date")));
+
+				error_message = AssignVariableValue("cost_center_agreement", "№" + Get("cost_center_agreement_number") + " " + gettext("agreement from") + " " + date_obj.Spell(), true);
+			}
+
+			if(error_message.empty())
+			{
+				if((error_message = AgreementNumberToCostCenterSpelling()).empty()) {}
+				else { MESSAGE_ERROR("", "", "fail returned from AgreementNumberToCostCenterSpelling"); }
+			}
+
+			if(error_message.empty())
+			{
+				if((error_message = Agency_VarSet()).empty()) {}
+				else { MESSAGE_ERROR("", "", "fail returned from AgencyVarSet"); }
+			}
+
+			// --- define timecards variables
+			if(error_message.empty())
+			{
+				auto	i = 0;
+				for(auto &bt: bt_obj_list)
+				{
+					c_float		subcontractor_price;
+					c_float		subcontractor_vat;
+					c_float		cost_center_price;
+
+					++i;
+
+					if(error_message.empty()) error_message = AssignVariableValue("bt_id_" + to_string(i), bt.GetID(), true);
+					if(error_message.empty())
+					{
+						if((error_message = Common_Index_VarSet(to_string(i))).empty()) {}
+						else { MESSAGE_ERROR("", "", "fail returned from Common_Index_VarSet"); }
+					}
+					if(error_message.empty())
+					{
+						if((error_message = DocumentSubmissionDate_Index_VarSet(bt.GetDateFinish(), to_string(i))).empty()) {}
+						else { MESSAGE_ERROR("", "", "fail returned from DocumentSubmissionDate_Index_VarSet"); }
+					}
+
+					// --- subcontractor VAT
+					if(error_message.empty())
+					{
+						if((error_message = SubcontractorVAT_Index_VarSet(	"SELECT `vat` FROM `company` WHERE `id`=("
+																				"SELECT `subcontractor_company_id` FROM `contracts_sow` WHERE `id`=("
+																					"SELECT `contract_sow_id` FROM `bt` WHERE `id`=\"" + vars.Get("bt_id_" + to_string(i)) + "\""
+																				")"
+																			");", to_string(i))).empty()) {}
+						else { MESSAGE_ERROR("", "", "fail returned from SubcontractorVAT_Index_VarSet"); }
+					}
+
+
+	
+					if(error_message.empty())
+					{
+						if((error_message = SoW_Index_VarSet("SELECT `id`,`number`,`sign_date`,`act_number`,`subcontractor_company_id`,`day_rate` FROM `contracts_sow` WHERE `id`=("
+																"SELECT `contract_sow_id` FROM `bt` WHERE `id`=\"" + vars.Get("bt_id_" + to_string(i)) + "\""
+															");", to_string(i))).empty()) {}
+						else { MESSAGE_ERROR("", "", "fail returned from SoW_Index_VarSet"); }
+					}
+
+
+					subcontractors_vat = subcontractors_vat + subcontractor_vat;
+					subcontractors_sum = subcontractors_sum + subcontractor_price;
+					cost_center_sum = cost_center_sum + cost_center_price;
+
+					// --- loop closure
+					if(error_message.length()) break;
+				}
+
+				// --- timecard calculations scoping
+				if(error_message.empty())
+				{
+					if((error_message = SubcontractorsTotal_VarSet(subcontractors_sum.PrintPriceTag(), subcontractors_vat.PrintPriceTag(), (subcontractors_sum + subcontractors_vat).PrintPriceTag())).empty()) {}
+					else { MESSAGE_ERROR("", "", "fail returned from SubcontractorsTotalVarSet"); }
+				}
+
+				// --- cost_center calculations scoping
+				{
+					c_float	cost_center_vat(0);
+
+					if(Get("agency_vat") == "Y")
+						cost_center_vat = cost_center_sum * c_float(VAT_PERCENTAGE) / c_float(100);
+
+					if(error_message.empty())
+					{
+						if((error_message = CostCenterTotal_VarSet(cost_center_sum.PrintPriceTag(), cost_center_vat.PrintPriceTag(), (cost_center_sum + cost_center_vat).PrintPriceTag())).empty()) {}
+						else { MESSAGE_ERROR("", "", "fail returned from CostCenterTotalVarSet"); }
+					}
 				}
 			}
 		}
@@ -930,6 +1385,26 @@ auto C_Invoicing_Vars::GetIndexByTimecardID(string timecard_id) -> string
 	for(auto i = 1; Get("timecard_id_" + to_string(i)).length(); ++i)
 	{
 		if(Get("timecard_id_" + to_string(i)) == timecard_id)
+		{
+			result = to_string(i);
+			break;
+		}
+	}
+
+	MESSAGE_DEBUG("", "", "finish (index is " + result + ")");
+
+	return result;
+}
+
+auto C_Invoicing_Vars::GetIndexByBTID(string bt_id) -> string
+{
+	auto	result = ""s;
+
+	MESSAGE_DEBUG("", "", "start (bt_id = " + bt_id + ")");
+
+	for(auto i = 1; Get("bt_id_" + to_string(i)).length(); ++i)
+	{
+		if(Get("bt_id_" + to_string(i)) == bt_id)
 		{
 			result = to_string(i);
 			break;

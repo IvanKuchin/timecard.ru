@@ -17,6 +17,7 @@
 #include "hpdf.h"
 
 #include "utilities_timecard.h" 
+#include "c_invoicing_vars.h"
 #include "c_bt_to_print.h"
 #include "c_float.h"
 #include "clog.h"
@@ -29,6 +30,8 @@ class C_Print_BT
 	private:
 		// CMysql						*db = NULL;
 		// CUser						*user = NULL;
+
+		C_Invoicing_Vars				*vars;
 
 		string							filename = "";
 
@@ -64,18 +67,18 @@ class C_Print_BT
 		auto		GetSpelledTitle() -> string;
 		auto		GetSpelledPSoW() -> string;
 		auto		GetSpelledProjectID() -> string;
-		auto		GetSpelledTotalHours() -> string;
-		auto		GetSpelledTotalDays() -> string;
-		auto		GetSpelledDayrate() -> string;
-		auto		GetSpelledTotalPayment() -> string;
-		auto		GetSpelledVAT() -> string;
-		auto		GetSpelledTotalPaymentNoVAT() -> string;
-		auto		GetSpelledSignature() -> string;
-		auto		GetSpelledInitials() -> string;
-		auto		GetSpelledPosition() -> string;
-		auto		GetSpelledDate() -> string;
-		auto		GetSpelledRur() -> string;
-		auto		GetSpelledKop() -> string;
+		auto		GetSpelledTotalHours()							{ return vars->Get("Total hours on duty") + ": "s; };
+		auto		GetSpelledTotalDays()							{ return vars->Get("Total days on duty") + ": "s; };
+		auto		GetSpelledDayrate()								{ return vars->Get("Dayrate") + ": "s; };
+		auto		GetSpelledTotalPayment()						{ return vars->Get("Total payment in reported timecard") + ": "s; };
+		auto		GetSpelledVAT()									{ return vars->Get("VAT") + ": "s; };
+		auto		GetSpelledTotalPaymentNoVAT()					{ return vars->Get("Total payment in reported timecard") + " "s + vars->Get("w/o") + " " + vars->Get("VAT") + ": "; };
+		auto		GetSpelledSignature()							{ return vars->Get("Signature") + ":_________________________________"s; };
+		auto		GetSpelledInitials()							{ return vars->Get("Initials") + ": ___________________________________"s; };
+		auto		GetSpelledPosition()							{ return vars->Get("Title") + ": _______________________________"s; };
+		auto		GetSpelledDate()								{ return vars->Get("Date") + ": ____________________________________"s; };
+		auto		GetSpelledRur()									{ return vars->Get("rur."); };
+		auto		GetSpelledKop()									{ return vars->Get("kop."); };
 
 		auto		__HPDF_init() -> string;
 		auto		__HPDF_SetDocProps() -> string;
@@ -110,6 +113,7 @@ class C_Print_BT
 		auto		GetTotalPayment()								{ return total_payment; };
 
 		auto		SetBT(const C_BT_To_Print &param1) -> void;
+		auto		SetVariableSet(C_Invoicing_Vars *param)			{ vars = param; };
 
 		auto		SetFilename(const string &param1)				{ filename = param1; };
 		auto		SetFilename(string &&param1) 					{ filename = move(param1); };

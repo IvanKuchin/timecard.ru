@@ -4021,6 +4021,8 @@ auto	GetPSoWInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
 		string	end_date;
 		string	number;
 		string	day_rate;
+		string	bt_markup;
+		string	bt_markup_type;
 		string	act_number;
 		string	sign_date;
 		string	eventTimestamp;
@@ -4044,6 +4046,8 @@ auto	GetPSoWInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
 			item.end_date = db->Get(i, "end_date");
 			item.number = db->Get(i, "number");
 			item.day_rate = db->Get(i, "day_rate");
+			item.bt_markup = db->Get(i, "bt_markup");
+			item.bt_markup_type = db->Get(i, "bt_markup_type");
 			item.act_number = db->Get(i, "act_number");
 			item.sign_date = db->Get(i, "sign_date");
 			item.eventTimestamp = db->Get(i, "eventTimestamp");
@@ -4065,6 +4069,8 @@ auto	GetPSoWInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
 			result += "\"end_date\":\"" + item.end_date + "\",";
 			result += "\"number\":\"" + item.number + "\",";
 			result += "\"day_rate\":\"" + item.day_rate + "\",";
+			result += "\"bt_markup\":\"" + item.bt_markup + "\",";
+			result += "\"bt_markup_type\":\"" + item.bt_markup_type + "\",";
 			result += "\"act_number\":\"" + item.act_number + "\",";
 			result += "\"sign_date\":\"" + item.sign_date + "\",";
 			result += "\"custom_fields\":[" + GetPSoWCustomFieldsInJSONFormat("SELECT * FROM `contract_psow_custom_fields` WHERE `contract_psow_id`=\"" + item.id + "\" "
@@ -4376,6 +4382,7 @@ auto	GetBTExpenseTemplatesInJSONFormat(string sqlQuery, CMysql *db, CUser *user)
 	{
 		string	id;
 		string	title;
+		string	taxable;
 		string	agency_comment;
 		string	is_default;
 	};
@@ -4394,6 +4401,7 @@ auto	GetBTExpenseTemplatesInJSONFormat(string sqlQuery, CMysql *db, CUser *user)
 
 			item.id = db->Get(i, "id");
 			item.title = db->Get(i, "title");
+			item.taxable = db->Get(i, "taxable");
 			item.agency_comment = db->Get(i, "agency_comment");
 			item.is_default = db->Get(i, "is_default");
 
@@ -4407,6 +4415,7 @@ auto	GetBTExpenseTemplatesInJSONFormat(string sqlQuery, CMysql *db, CUser *user)
 
 			result += "\"id\":\"" + item.id + "\",";
 			result += "\"title\":\"" + item.title + "\",";
+			result += "\"taxable\":\"" + item.taxable + "\",";
 			result += "\"agency_comment\":\"" + item.agency_comment + "\",";
 			result += "\"line_templates\":[" + GetBTExpenseLineTemplatesInJSONFormat("SELECT * FROM `bt_expense_line_templates` WHERE `bt_expense_template_id`=\"" + item.id + "\";", db, user) + "],";
 			result += "\"is_default\":\"" + item.is_default + "\"";
@@ -5302,6 +5311,7 @@ auto	GetDBValueByAction(string action, string id, string sow_id, CMysql *db, CUs
 				if(action == "AJAX_updateSoWEditCapability")		sql_query = "SELECT `allowed_change_sow`			as `value` FROM `company_employees` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateSubcontractorCreateTasks")	sql_query = "SELECT `subcontractor_create_tasks`	as `value` FROM `contracts_sow` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateExpenseTemplateTitle")		sql_query = "SELECT `title`							as `value` FROM `bt_expense_templates` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateExpenseTemplateTaxable")	sql_query = "SELECT `taxable`						as `value` FROM `bt_expense_templates` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateExpenseTemplateAgencyComment") 	sql_query = "SELECT `agency_comment`		as `value` FROM `bt_expense_templates` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateExpenseTemplateLineTitle")			sql_query = "SELECT `title`					as `value` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateExpenseTemplateLineDescription")	sql_query = "SELECT `description`			as `value` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\";";
@@ -5327,6 +5337,8 @@ auto	GetDBValueByAction(string action, string id, string sow_id, CMysql *db, CUs
 				if(action == "AJAX_updatePSoWNumber")						sql_query = "SELECT `number`				as `value` FROM `contracts_psow` WHERE `id`=\"" + sow_id + "\";";
 				if(action == "AJAX_updatePSoWAct")							sql_query = "SELECT `act_number`			as `value` FROM `contracts_psow` WHERE `id`=\"" + sow_id + "\";";
 				if(action == "AJAX_updatePSoWDayRate")						sql_query = "SELECT `day_rate`				as `value` FROM `contracts_psow` WHERE `id`=\"" + sow_id + "\";";
+				if(action == "AJAX_updatePSoWBTMarkup")						sql_query = "SELECT `bt_markup`				as `value` FROM `contracts_psow` WHERE `id`=\"" + sow_id + "\";";
+				if(action == "AJAX_updatePSoWBTMarkupType")					sql_query = "SELECT `bt_markup_type`		as `value` FROM `contracts_psow` WHERE `id`=\"" + sow_id + "\";";
 				if(action == "AJAX_updatePSoWSignDate")						sql_query = "SELECT `sign_date`				as `value` FROM `contracts_psow` WHERE `id`=\"" + sow_id + "\";";
 				if(action == "AJAX_updatePSoWStartDate")					sql_query = "SELECT `start_date`			as `value` FROM `contracts_psow` WHERE `id`=\"" + sow_id + "\";";
 				if(action == "AJAX_updatePSoWEndDate")						sql_query = "SELECT `end_date`				as `value` FROM `contracts_psow` WHERE `id`=\"" + sow_id + "\";";
@@ -6924,6 +6936,7 @@ string	SetNewValueByAction(string action, string id, string sow_id, string new_v
 						if(action == "AJAX_updateProjectTitle") 					sql_query = "UPDATE `timecard_projects`			SET `title`							=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
 						if(action == "AJAX_updateTaskTitle") 						sql_query = "UPDATE `timecard_tasks`			SET `title`							=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
 						if(action == "AJAX_updateExpenseTemplateTitle")				sql_query = "UPDATE `bt_expense_templates`		SET `title`							=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateExpenseTemplateTaxable")			sql_query = "UPDATE `bt_expense_templates`		SET `taxable`						=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
 						if(action == "AJAX_updateExpenseTemplateAgencyComment")		sql_query = "UPDATE `bt_expense_templates`		SET `agency_comment`				=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
 						if(action == "AJAX_updateExpenseTemplateLineTitle")			sql_query = "UPDATE `bt_expense_line_templates`	SET `title`							=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
 						if(action == "AJAX_updateExpenseTemplateLineDescription")	sql_query = "UPDATE `bt_expense_line_templates`	SET `description`					=\"" + new_value + "\" WHERE `id`=\"" + id + "\";";
@@ -6969,7 +6982,9 @@ string	SetNewValueByAction(string action, string id, string sow_id, string new_v
 						if(action == "AJAX_updatePSoWSignDate")						sql_query = "UPDATE `contracts_psow`			SET `sign_date`		=STR_TO_DATE(\"" + new_value + "\",\"%d/%m/%Y\"),`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sow_id + "\";";
 						if(action == "AJAX_updatePSoWStartDate")					sql_query = "UPDATE `contracts_psow`			SET `start_date`	=STR_TO_DATE(\"" + new_value + "\",\"%d/%m/%Y\"),`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sow_id + "\";";
 						if(action == "AJAX_updatePSoWEndDate")						sql_query = "UPDATE `contracts_psow`			SET `end_date`		=STR_TO_DATE(\"" + new_value + "\",\"%d/%m/%Y\"),`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sow_id + "\";";
-						if(action == "AJAX_updatePSoWDayRate") {c_float	num(new_value); sql_query = "UPDATE `contracts_psow` 		SET `day_rate`		=\"" + string(num) + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sow_id + "\";"; }
+						if(action == "AJAX_updatePSoWDayRate")  {c_float num(new_value); sql_query = "UPDATE `contracts_psow` 		SET `day_rate`		=\"" + string(num) + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sow_id + "\";"; }
+						if(action == "AJAX_updatePSoWBTMarkup") {c_float num(new_value); sql_query = "UPDATE `contracts_psow` 		SET `bt_markup`		=\"" + string(num) + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sow_id + "\";"; }
+						if(action == "AJAX_updatePSoWBTMarkupType")					sql_query = "UPDATE `contracts_psow` 			SET `bt_markup_type`=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sow_id + "\";";
 
 						if(action == "AJAX_updateCostCenterCustomField")			sql_query = "UPDATE `cost_center_custom_fields` SET `value`			=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
 						if(action == "AJAX_updateCostCenterNumber")					sql_query = "UPDATE `cost_centers`				SET `number`		=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sow_id + "\";";
@@ -7964,6 +7979,16 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 		notification_description = gettext("PSoW") + " ("s + GetSpelledPSoWByID(sow_id, db) + "): " + gettext("dayrate changed") + " " + gettext("from") + " " + existing_value + " " + gettext("to") + " " + new_value;
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
+	if(action == "AJAX_updatePSoWBTMarkup")
+	{
+		notification_description = gettext("PSoW") + " ("s + GetSpelledPSoWByID(sow_id, db) + "): " + gettext("bt markup changed") + " " + gettext("from") + " " + existing_value + " " + gettext("to") + " " + new_value;
+		sql_query = ""; // --- don't notify subcontractors, only agency
+	}
+	if(action == "AJAX_updatePSoWBTMarkupType")
+	{
+		notification_description = gettext("PSoW") + " ("s + GetSpelledPSoWByID(sow_id, db) + "): " + gettext("bt markup type changed") + " " + gettext("from") + " " + existing_value + " " + gettext("to") + " " + new_value;
+		sql_query = ""; // --- don't notify subcontractors, only agency
+	}
 	if(action == "AJAX_updatePSoWSignDate")
 	{
 		notification_description = gettext("PSoW") + " ("s + GetSpelledPSoWByID(sow_id, db) + "): " + gettext("sign date changed") + " " + gettext("from") + " " + existing_value + " " + gettext("to") + " " + new_value;
@@ -8021,6 +8046,11 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 	if(action == "AJAX_updateExpenseTemplateTitle")
 	{
 		notification_description = "Данные командировки: изменилось название расхода с " + existing_value + " на " + new_value;
+		sql_query = "SELECT `sow_id` AS `contract_sow_id` FROM `bt_sow_assignment` WHERE `bt_expense_template_id`=\"" + id + "\";";
+	}
+	if(action == "AJAX_updateExpenseTemplateTaxable")
+	{
+		notification_description = "Данные командировки: изменилась налогооблагаемость расхода с " + existing_value + " на " + new_value;
 		sql_query = "SELECT `sow_id` AS `contract_sow_id` FROM `bt_sow_assignment` WHERE `bt_expense_template_id`=\"" + id + "\";";
 	}
 	if(action == "AJAX_updateExpenseTemplateAgencyComment")

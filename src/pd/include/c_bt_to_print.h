@@ -40,10 +40,21 @@ class C_BT_To_Print
 		string					signature_title_2 = "";
 		string					project_number = "";
 		string					cost_center_id = "";
-		// c_float					dayrate;
+		string					markup_type = "";
+		c_float					markup_from_db;
+		c_float					sum_taxable;
+		c_float					sum_non_taxable;
+		c_float					tax;
+		c_float					markup;
+		c_float					total_payment;
+
 		// c_float					total_payment;
 
 		vector<Expense_Line>	expense_lines = {};
+
+		auto		CalculateFinals()	-> void;
+		auto		GetMarkupValue()	-> c_float;
+
 	public:
 					C_BT_To_Print()						{};
 					// C_BT_To_Print(CMysql *, CUser *) : db(param1), user(param2) {};
@@ -68,7 +79,9 @@ class C_BT_To_Print
 		auto		SetCostCenterID(string &&param1) 			{ cost_center_id = move(param1); };
 		auto		SetProjectNumber(const string &param1)		{ project_number = param1; };
 		auto		SetProjectNumber(string &&param1) 			{ project_number = move(param1); };
-		// auto		SetDayrate(string param1) 					{ dayrate = param1; };
+		auto		SetMarkupType(const string &param1)			{ markup_type = param1; };
+		auto		SetMarkupType(string &&param1) 				{ markup_type = move(param1); };
+		auto		SetMarkupDB(c_float param1)					{ markup_from_db = param1; };
 		// auto		SetTotalPayment(string param1) 				{ total_payment = param1; };
 
 		auto		GetID()										{ return id; };
@@ -81,9 +94,17 @@ class C_BT_To_Print
 		auto		GetSignatureTitle2()						{ return signature_title_2; };		
 		auto		GetProjectNumber()							{ return project_number; };	
 		auto		GetCostCenterID()							{ return cost_center_id; };	
-		// auto		GetDayrate()								{ return dayrate; };
+		auto		GetMarkupDB()								{ return markup_from_db; };
+		auto		GetMarkupType()								{ return markup_type; };
 		// auto		GetTotalPayment()							{ return total_payment; };
 		auto		GetExpenseLines()							{ return expense_lines; }
+
+		// --- sum calculations
+		auto		GetSumTaxable()		-> c_float;
+		auto		GetSumNonTaxable()	-> c_float;
+		auto		GetSumTax()			-> c_float;
+		auto		GetMarkup()			-> c_float;
+		auto		GetTotalPayment()	-> c_float;
 
 		// auto		GetTotalHours() -> c_float;
 
