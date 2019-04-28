@@ -20,7 +20,7 @@ auto C_Invoice_BT::GenerateDocumentArchive() -> string
 
 	auto									error_message = ""s;
 
-	C_Print_BT								bt_printer;
+	C_Print_BT_To_CC						bt_printer;
 
 /*
 	C_Print_Invoice_Service_Agency			invoice_agency;
@@ -456,6 +456,7 @@ auto C_Invoice_BT::CreateBTObj(string bt_id) -> C_BT_To_Print
 							obj.SetID(bt_id);
 							obj.SetDateStart(db->Get(0, "date_start"));
 							obj.SetDateFinish(db->Get(0, "date_end"));
+							obj.SetLocation(db->Get(0, "place"));
 
 							if(db->Query("SELECT * FROM `contracts_psow` WHERE `id`=\"" + psow_id + "\";"))
 							{

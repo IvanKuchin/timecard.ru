@@ -40,6 +40,7 @@ class C_BT_To_Print
 		string					signature_title_2 = "";
 		string					project_number = "";
 		string					cost_center_id = "";
+		string					location = "";
 		string					markup_type = "";
 		c_float					markup_from_db;
 		c_float					sum_taxable;
@@ -81,6 +82,8 @@ class C_BT_To_Print
 		auto		SetProjectNumber(string &&param1) 			{ project_number = move(param1); };
 		auto		SetMarkupType(const string &param1)			{ markup_type = param1; };
 		auto		SetMarkupType(string &&param1) 				{ markup_type = move(param1); };
+		auto		SetLocation(const string &param1)			{ location = param1; };
+		auto		SetLocation(string &&param1) 				{ location = move(param1); };
 		auto		SetMarkupDB(c_float param1)					{ markup_from_db = param1; };
 		// auto		SetTotalPayment(string param1) 				{ total_payment = param1; };
 
@@ -95,8 +98,8 @@ class C_BT_To_Print
 		auto		GetProjectNumber()							{ return project_number; };	
 		auto		GetCostCenterID()							{ return cost_center_id; };	
 		auto		GetMarkupDB()								{ return markup_from_db; };
+		auto		GetLocation()								{ return location; };
 		auto		GetMarkupType()								{ return markup_type; };
-		// auto		GetTotalPayment()							{ return total_payment; };
 		auto		GetExpenseLines()							{ return expense_lines; }
 
 		// --- sum calculations

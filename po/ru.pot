@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-25 17:20-0400\n"
+"POT-Creation-Date: 2019-04-26 08:02-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -47,11 +47,20 @@ msgstr "Нет доступа"
 msgid "Account"
 msgstr "Сч. №"
 
+msgid "Sum expense"
+msgstr "Итого расходов по отчету"
+
 msgid "Accountant"
 msgstr "Бухгалтер"
 
 msgid "Act"
 msgstr "Акт"
+
+msgid "Tax"
+msgstr "Налог"
+
+msgid "Markup"
+msgstr "Наценка"
 
 msgid "Agency: cost center"
 msgstr "Данные агенства: центр затрат"
@@ -70,6 +79,12 @@ msgstr "Данные агенства: название центра затра�
 
 msgid "Agreement"
 msgstr "Договор"
+
+msgid "Taxable sum"
+msgstr "Итого (налогооблагаемая база)"
+
+msgid "Non-taxable sum"
+msgstr "Итого (налого-необлагаемая база)"
 
 msgid "April"
 msgstr "Апрель"
@@ -140,6 +155,9 @@ msgstr "Данные сотрудника"
 msgid "Excise"
 msgstr "Акциза"
 
+msgid "Expense"
+msgstr "Расход"
+
 msgid "February"
 msgstr "Февраль"
 
@@ -187,6 +205,9 @@ msgstr "КПП"
 
 msgid "Local service delivery"
 msgstr "Локальные услуги"
+
+msgid "Location"
+msgstr "Место"
 
 msgid "March"
 msgstr "Март"
@@ -245,6 +266,9 @@ msgstr "Поставщик"
 msgid "Quantity short"
 msgstr "Кол-во"
 
+msgid "Rate exchange"
+msgstr "Курс"
+
 msgid "Recipient"
 msgstr "Получатель"
 
@@ -283,6 +307,12 @@ msgstr "У некоторых таймкарт не хватает PSoW-конт
 
 msgid "Subcontractor reported time on"
 msgstr "Субконтрактор отчитался за"
+
+msgid "Sum (currency)"
+msgstr "Сумма (в валюте)"
+
+msgid "Sum (rur)"
+msgstr "Сумма (руб)"
 
 msgid "Sum items"
 msgstr "Всего наименований"
@@ -622,6 +652,9 @@ msgstr "без акциза"
 
 msgid "noVAT"
 msgstr "БезНДС"
+
+msgid "not found"
+msgstr "не найден(о)"
 
 msgid "number"
 msgstr "номер"

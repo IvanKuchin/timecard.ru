@@ -110,7 +110,7 @@ class C_Print_VAT_Service
 		virtual	auto	GetTableRowQuantity(int i) -> string			= 0;
 		virtual	auto	GetTableRowItem(int i) -> string				= 0;
 		virtual	auto	GetTableRowPrice(int i) -> string				= 0;
-		virtual	auto	GetTableRowVAT(int i) -> string				= 0;
+		virtual	auto	GetTableRowVAT(int i) -> string					= 0;
 		virtual	auto	GetTableRowTotal(int i) -> string				= 0;
 		virtual	auto	GetTableSum() -> string							= 0;
 		virtual	auto	GetTableVAT() -> string							= 0;

@@ -443,7 +443,7 @@ auto	C_Print_VAT_Service::__HPDF_DrawTable() -> string
 
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(0, utf8_to_cp1251("N"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(0, utf8_to_cp1251("№"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
 			{ MESSAGE_ERROR("", "", "fail to write table title index line"); }
 		}
 		if(error_message.empty())

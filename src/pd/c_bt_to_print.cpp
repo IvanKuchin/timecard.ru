@@ -98,11 +98,7 @@ auto	C_BT_To_Print::GetSumTaxable()		-> c_float
 
 	MESSAGE_DEBUG("", "", "start");
 
-	if(sum_taxable.Get()) {}
-	else
-	{
-		CalculateFinals();
-	}
+	if(sum_taxable.Get()) {} else { CalculateFinals(); }
 
 	result = sum_taxable;
 
@@ -117,11 +113,7 @@ auto	C_BT_To_Print::GetSumNonTaxable()	-> c_float
 
 	MESSAGE_DEBUG("", "", "start");
 
-	if(sum_non_taxable.Get()) {}
-	else
-	{
-		CalculateFinals();
-	}
+	if(sum_non_taxable.Get()) {} else { CalculateFinals(); }
 
 	result = sum_non_taxable;
 
@@ -136,11 +128,7 @@ auto	C_BT_To_Print::GetSumTax()			-> c_float
 
 	MESSAGE_DEBUG("", "", "start");
 
-	if(tax.Get()) {}
-	else
-	{
-		CalculateFinals();
-	}
+	if(tax.Get()) {} else { CalculateFinals(); }
 
 	result = tax;
 
@@ -155,11 +143,7 @@ auto	C_BT_To_Print::GetMarkup()			-> c_float
 
 	MESSAGE_DEBUG("", "", "start");
 
-	if(markup.Get()) {}
-	else
-	{
-		CalculateFinals();
-	}
+	if(markup.Get()) {} else { CalculateFinals(); }
 
 	result = markup;
 
@@ -174,11 +158,7 @@ auto	C_BT_To_Print::GetTotalPayment()	-> c_float
 
 	MESSAGE_DEBUG("", "", "start");
 
-	if(total_payment.Get()) {}
-	else
-	{
-		CalculateFinals();
-	}
+	if(total_payment.Get()) {} else { CalculateFinals(); }
 
 	result = total_payment;
 

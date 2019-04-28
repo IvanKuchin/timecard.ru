@@ -79,6 +79,7 @@ auto	C_Print_BT::PrintAsXLS() -> string
 	// locale cp1251_locale("ru_RU.UTF-8");
 	// std::locale::global(cp1251_locale);
 
+	if(vars)
 	{
 		// --- after instantiation libxl-object locale switch over to wide-byte string representation
 		// --- gettext is not working properly with multibyte strings, therefore all gettext constants
@@ -86,9 +87,11 @@ auto	C_Print_BT::PrintAsXLS() -> string
 		auto	spelled_title				= multibyte_to_wide(GetSpelledTitle());
 		auto	spelled_psow				= multibyte_to_wide(GetSpelledPSoW());
 		auto	spelled_projectid			= multibyte_to_wide(GetSpelledProjectID());
-		auto	spelled_totalhours			= multibyte_to_wide(GetSpelledTotalHours());
-		auto	spelled_totaldays			= multibyte_to_wide(GetSpelledTotalDays());
-		auto	spelled_dayrate				= multibyte_to_wide(GetSpelledDayrate());
+		auto	spelled_sum_taxable			= multibyte_to_wide(GetSpelledSumTaxable());
+		auto	spelled_sum_tax				= multibyte_to_wide(GetSpelledSumTax());
+		auto	spelled_sum_non_taxable		= multibyte_to_wide(GetSpelledSumNonTaxable());
+		auto	spelled_sum_expense			= multibyte_to_wide(GetSpelledSumExpense());
+		auto	spelled_markup				= multibyte_to_wide(GetSpelledMarkup());
 		auto	spelled_totalpayment		= multibyte_to_wide(GetSpelledTotalPayment());
 		auto	spelled_vat					= multibyte_to_wide(GetSpelledVAT());
 		auto	spelled_totalpaymentnovat	= multibyte_to_wide(GetSpelledTotalPaymentNoVAT());
@@ -98,6 +101,7 @@ auto	C_Print_BT::PrintAsXLS() -> string
 		auto	spelled_date				= multibyte_to_wide(GetSpelledDate());
 		auto	spelled_rur					= multibyte_to_wide(GetSpelledRur());
 		auto	spelled_kop					= multibyte_to_wide(GetSpelledKop());
+		auto	index						= vars->GetIndexByBTID(bt.GetID());
 
 		libxl::Book* book = xlCreateBook();
 		if(book)
@@ -107,7 +111,7 @@ auto	C_Print_BT::PrintAsXLS() -> string
 			{
 				auto			format_title = book->addFormat();
 				auto			format_weekend = book->addFormat();
-				auto			format_weekday = book->addFormat();
+				auto			format_table_number_d2 = book->addFormat();
 				auto			format_summary_over = book->addFormat();
 				auto			format_summary_right = book->addFormat();
 				auto			format_number_d2 = book->addFormat();
@@ -116,8 +120,7 @@ auto	C_Print_BT::PrintAsXLS() -> string
 				auto			start_spelling_date = multibyte_to_wide(GetSpellingFormattedDate(bt.GetDateStart(), "%d %b %G"));
 				auto			finish_spelling_date = multibyte_to_wide(GetSpellingFormattedDate(bt.GetDateFinish(), "%d %b %G"));
 				auto			bt_expenses = bt.GetExpenseLines();
-				auto			row_counter = 6;
-				auto			column_counter = 0;
+				auto			row_counter = 1;
 
 				format_title->setBorder(libxl::BORDERSTYLE_THIN);
 
@@ -126,8 +129,8 @@ auto	C_Print_BT::PrintAsXLS() -> string
 				format_weekend->setBorder(libxl::BORDERSTYLE_THIN);
 				format_weekend->setNumFormat(libxl::NUMFORMAT_GENERAL);
 
-				format_weekday->setBorder(libxl::BORDERSTYLE_THIN);
-				format_weekday->setNumFormat(libxl::NUMFORMAT_GENERAL);
+				format_table_number_d2->setBorder(libxl::BORDERSTYLE_THIN);
+				format_table_number_d2->setNumFormat(libxl::NUMFORMAT_NUMBER_D2);
 
 				font_summary_over->setColor(libxl::COLOR_DARKRED);
 				format_summary_over->setFont(font_summary_over);
@@ -146,30 +149,64 @@ auto	C_Print_BT::PrintAsXLS() -> string
 				// --- print proerties
 				sheet->setPaper(libxl::PAPER_A4);
 				sheet->setLandscape();
-				sheet->setPrintZoom(50);
+				sheet->setPrintZoom(75);
 
 				// --- set columns width
-				sheet->setCol(1, 1, 45);
-				sheet->setCol(2, 31 + 2, 5);
+				sheet->setCol(2, 2, 60);
+				sheet->setCol(3, 5, 16);
 
-				sheet->writeStr(2, 2, spelled_title.c_str());
-				sheet->writeStr(3, 1, spelled_psow.c_str());
-				sheet->writeStr(4, 1, spelled_projectid.c_str());
+				row_counter++;
+				sheet->writeStr(row_counter, 2, spelled_title.c_str());
+
+				row_counter++;
+				row_counter++;
+				sheet->writeStr(row_counter, 1, spelled_psow.c_str());
+
+				row_counter++;
+				sheet->writeStr(row_counter, 1, spelled_projectid.c_str());
+
+				if(GetSpelledLocation().length())
+				{
+					row_counter++;
+					sheet->writeStr(row_counter, 1, multibyte_to_wide(GetSpelledLocation()).c_str());
+				}
+
 
 				// --- table header
-				column_counter = 0;
 				{
-					sheet->writeBlank(5, column_counter + 2, format_title);
+					row_counter++;
+					row_counter++;
+					sheet->writeStr(row_counter, 1, multibyte_to_wide(GetTitleDate()).c_str()			, format_title);
+					sheet->writeStr(row_counter, 2, multibyte_to_wide(GetTitleExpense()).c_str()		, format_title);
+					sheet->writeStr(row_counter, 3, multibyte_to_wide(GetTitleSumRur()).c_str()			, format_title);
+					sheet->writeStr(row_counter, 4, multibyte_to_wide(GetTitleSumCurrency()).c_str()	, format_title);
+					sheet->writeStr(row_counter, 5, multibyte_to_wide(GetTitleRateExchange()).c_str()	, format_title);
 				}
 
 				// --- table body
+				row_counter++;
 				for(auto &bt_expense: bt_expenses)
 				{
+					wstring		bt_line_date = multibyte_to_wide(bt_expense.date);
 					wstring		bt_line_description = multibyte_to_wide(bt_expense.description);
-					wstring		bt_line_price_domestic = multibyte_to_wide(bt_expense.price_domestic);
+					c_float		bt_line_price_domestic(bt_expense.price_domestic);
+					c_float		bt_line_price_foreign(bt_expense.price_foreign);
+					wstring		bt_line_price_rate_exch = multibyte_to_wide(bt_expense.currency_nominal + " / " + bt_expense.currency_value);
 
-					sheet->writeStr(row_counter, 1, bt_line_description.c_str(), format_title);
-					sheet->writeStr(row_counter, 2, bt_line_price_domestic.c_str(), format_title);
+					sheet->writeStr(row_counter, 1, bt_line_date.c_str(), format_title);
+					sheet->writeStr(row_counter, 2, bt_line_description.c_str(), format_title);
+					sheet->writeNum(row_counter, 3, bt_line_price_domestic.Get(), format_table_number_d2);
+
+					if(bt_line_price_foreign.Get())
+					{
+						sheet->writeNum(row_counter, 4, bt_line_price_foreign.Get(), format_table_number_d2);
+						sheet->writeStr(row_counter, 5, bt_line_price_rate_exch.c_str(), format_title);
+					}
+					else
+					{
+						sheet->writeBlank(row_counter, 4, format_table_number_d2);
+						sheet->writeBlank(row_counter, 5, format_title);
+					}
 
 					row_counter++;
 				}
@@ -180,39 +217,59 @@ auto	C_Print_BT::PrintAsXLS() -> string
 				}
 
 				{
-					sheet->writeStr(row_counter, 1, spelled_totalhours.c_str());
-					sheet->setMerge(row_counter, row_counter, 3, 5);
-					sheet->writeNum(row_counter, 3, double(GetEffortHours()), format_number_d2);
-
-					row_counter++;
-				}
-
-				{
-					sheet->writeStr(row_counter, 1, spelled_totaldays.c_str());
-					sheet->setMerge(row_counter, row_counter, 3, 5);
-					sheet->writeNum(row_counter, 3, double(GetEffortDays()), format_number_d2);
+					sheet->writeStr(row_counter, 1, spelled_sum_non_taxable.c_str());
+					// sheet->setMerge(row_counter, row_counter, 3, 5);
+					sheet->writeNum(row_counter, 3, double(bt.GetSumNonTaxable()), format_number_d2);
 					
 					row_counter++;
 				}
 
 				{
-					auto		temp = bt.GetMarkup();
-
-					sheet->writeStr(row_counter, 1, spelled_dayrate.c_str());
-					sheet->setMerge(row_counter, row_counter, 3, 5);
-					sheet->writeNum(row_counter, 3, temp.GetWhole());
-					sheet->writeStr(row_counter, 6, spelled_rur.c_str());
-					sheet->writeNum(row_counter, 7, temp.GetFraction());
-					sheet->writeStr(row_counter, 8, spelled_kop.c_str());
+					sheet->writeStr(row_counter, 1, spelled_sum_taxable.c_str());
+					// sheet->setMerge(row_counter, row_counter, 3, 5);
+					sheet->writeNum(row_counter, 3, double(bt.GetSumTaxable()), format_number_d2);
 
 					row_counter++;
 				}
 
 				{
-					auto		temp = GetEffortCost();
+					sheet->writeStr(row_counter, 1, spelled_sum_tax.c_str());
+					// sheet->setMerge(row_counter, row_counter, 3, 5);
+					sheet->writeNum(row_counter, 3, double(bt.GetSumTax()), format_number_d2);
+
+					row_counter++;
+				}
+
+				{
+					sheet->writeStr(row_counter, 1, spelled_sum_expense.c_str());
+					// sheet->setMerge(row_counter, row_counter, 3, 5);
+					sheet->writeNum(row_counter, 3, c_float(GetBTSumExpenses(index)).Get(), format_number_d2);
+
+					row_counter++;
+				}
+
+				{
+					auto		temp = c_float(GetBTMarkup(index));
+
+					// --- if markup defined
+					if(temp.Get())
+					{
+						sheet->writeStr(row_counter, 1, spelled_markup.c_str());
+						// sheet->setMerge(row_counter, row_counter, 3, 5);
+						sheet->writeNum(row_counter, 3, temp.GetWhole());
+						sheet->writeStr(row_counter, 6, spelled_rur.c_str());
+						sheet->writeNum(row_counter, 7, temp.GetFraction());
+						sheet->writeStr(row_counter, 8, spelled_kop.c_str());
+					}
+
+					row_counter++;
+				}
+
+				{
+					auto		temp = c_float(GetBTPaymentNoVAT(index));
 
 					sheet->writeStr(row_counter, 1, spelled_totalpaymentnovat.c_str());
-					sheet->setMerge(row_counter, row_counter, 3, 5);
+					// sheet->setMerge(row_counter, row_counter, 3, 5);
 					sheet->writeNum(row_counter, 3, temp.GetWhole());
 					sheet->writeStr(row_counter, 6, spelled_rur.c_str());
 					sheet->writeNum(row_counter, 7, temp.GetFraction());
@@ -222,23 +279,23 @@ auto	C_Print_BT::PrintAsXLS() -> string
 				}
 
 				{
-					auto	vat = GetEffortCostVAT();
+					auto		temp = c_float(GetBTVAT(index));
 
 					sheet->writeStr(row_counter, 1, spelled_vat.c_str());
-					sheet->setMerge(row_counter, row_counter, 3, 5);
-					sheet->writeNum(row_counter, 3, vat.GetWhole());
+					// sheet->setMerge(row_counter, row_counter, 3, 5);
+					sheet->writeNum(row_counter, 3, temp.GetWhole());
 					sheet->writeStr(row_counter, 6, spelled_rur.c_str());
-					sheet->writeNum(row_counter, 7, vat.GetFraction());
+					sheet->writeNum(row_counter, 7, temp.GetFraction());
 					sheet->writeStr(row_counter, 8, spelled_kop.c_str());
 					
 					row_counter++;
 				}
 
 				{
-					auto	temp = GetTotalPayment();
+					auto		temp = c_float(GetBTPaymentAndVAT(index));
 
 					sheet->writeStr(row_counter, 1, spelled_totalpayment.c_str());
-					sheet->setMerge(row_counter, row_counter, 3, 5);
+					// sheet->setMerge(row_counter, row_counter, 3, 5);
 					sheet->writeNum(row_counter, 3, temp.GetWhole());
 					sheet->writeStr(row_counter, 6, spelled_rur.c_str());
 					sheet->writeNum(row_counter, 7, temp.GetFraction());
@@ -252,7 +309,7 @@ auto	C_Print_BT::PrintAsXLS() -> string
 
 				{
 					sheet->writeStr(row_counter, 1, multibyte_to_wide(bt.GetSignatureTitle1()).c_str());
-					sheet->writeStr(row_counter, 9, multibyte_to_wide(bt.GetSignatureTitle2()).c_str());
+					sheet->writeStr(row_counter, 4, multibyte_to_wide(bt.GetSignatureTitle2()).c_str());
 
 					row_counter++;
 					row_counter++;
@@ -260,7 +317,7 @@ auto	C_Print_BT::PrintAsXLS() -> string
 
 				{
 					sheet->writeStr(row_counter, 1, spelled_signature.c_str());
-					sheet->writeStr(row_counter, 9, spelled_signature.c_str());
+					sheet->writeStr(row_counter, 4, spelled_signature.c_str());
 
 					row_counter++;
 					row_counter++;
@@ -268,7 +325,7 @@ auto	C_Print_BT::PrintAsXLS() -> string
 
 				{
 					sheet->writeStr(row_counter, 1, spelled_initials.c_str());
-					sheet->writeStr(row_counter, 9, spelled_initials.c_str());
+					sheet->writeStr(row_counter, 4, spelled_initials.c_str());
 
 					row_counter++;
 					row_counter++;
@@ -276,7 +333,7 @@ auto	C_Print_BT::PrintAsXLS() -> string
 
 				{
 					sheet->writeStr(row_counter, 1, spelled_position.c_str());
-					sheet->writeStr(row_counter, 9, spelled_position.c_str());
+					sheet->writeStr(row_counter, 4, spelled_position.c_str());
 
 					row_counter++;
 					row_counter++;
@@ -284,7 +341,7 @@ auto	C_Print_BT::PrintAsXLS() -> string
 
 				{
 					sheet->writeStr(row_counter, 1, spelled_date.c_str());
-					sheet->writeStr(row_counter, 9, spelled_date.c_str());
+					sheet->writeStr(row_counter, 4, spelled_date.c_str());
 
 					row_counter++;
 					row_counter++;
@@ -300,6 +357,11 @@ auto	C_Print_BT::PrintAsXLS() -> string
 			}
 			book->release();
 		} 
+	}
+	else
+	{
+		error_message = "vars obj is null";
+		MESSAGE_ERROR("", "", error_message);
 	}
 
 	MESSAGE_DEBUG("", "", "finish (error_message.length() = " + to_string(error_message.length()) + ")");

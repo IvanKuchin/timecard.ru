@@ -27,11 +27,11 @@ using namespace std;
 class C_Print_BT
 {
 
-	private:
+	protected:
 		// CMysql						*db = NULL;
 		// CUser						*user = NULL;
 
-		C_Invoicing_Vars				*vars;
+		C_Invoicing_Vars				*vars = nullptr;
 
 		string							filename = "";
 
@@ -67,9 +67,12 @@ class C_Print_BT
 		auto		GetSpelledTitle() -> string;
 		auto		GetSpelledPSoW() -> string;
 		auto		GetSpelledProjectID() -> string;
-		auto		GetSpelledTotalHours()							{ return vars->Get("Total hours on duty") + ": "s; };
-		auto		GetSpelledTotalDays()							{ return vars->Get("Total days on duty") + ": "s; };
-		auto		GetSpelledDayrate()								{ return vars->Get("Dayrate") + ": "s; };
+		auto		GetSpelledLocation()							{ return bt.GetLocation().length() ? vars->Get("Location") + ": "s + bt.GetLocation() : ""; };
+		auto		GetSpelledSumNonTaxable()						{ return vars->Get("Non-taxable sum") + ": "s; };
+		auto		GetSpelledSumTaxable()							{ return vars->Get("Taxable sum") + ": "s; };
+		auto		GetSpelledSumTax()								{ return vars->Get("Tax") + " "s + c_float(BUSINESS_TRIP_TAX_PERCENTAGE).PrintPriceTag() + "%" + ": "s; };
+		auto		GetSpelledSumExpense()							{ return vars->Get("Sum expense") + ": "s; };
+		auto		GetSpelledMarkup()								{ return vars->Get("Markup") + ": "s; };
 		auto		GetSpelledTotalPayment()						{ return vars->Get("Total payment in reported timecard") + ": "s; };
 		auto		GetSpelledVAT()									{ return vars->Get("VAT") + ": "s; };
 		auto		GetSpelledTotalPaymentNoVAT()					{ return vars->Get("Total payment in reported timecard") + " "s + vars->Get("w/o") + " " + vars->Get("VAT") + ": "; };
@@ -79,6 +82,11 @@ class C_Print_BT
 		auto		GetSpelledDate()								{ return vars->Get("Date") + ": ____________________________________"s; };
 		auto		GetSpelledRur()									{ return vars->Get("rur."); };
 		auto		GetSpelledKop()									{ return vars->Get("kop."); };
+		auto		GetTitleDate()									{ return vars->Get("Date"); };
+		auto		GetTitleExpense()								{ return vars->Get("Expense"); };
+		auto		GetTitleSumRur()								{ return vars->Get("Sum (rur)"); };
+		auto		GetTitleSumCurrency()							{ return vars->Get("Sum (currency)"); };
+		auto		GetTitleRateExchange()							{ return vars->Get("Rate exchange"); };
 
 		auto		__HPDF_init() -> string;
 		auto		__HPDF_SetDocProps() -> string;
@@ -105,7 +113,12 @@ class C_Print_BT
 		auto		__HPDF_DrawTimecardVerticalLine(double x) -> string;
 		auto		__HPDF_PaintDay(int day_number, double red, double green, double blue, int number_of_lines = 1) -> string;
 
+		auto		GetBTSumExpenses(string index)					{ return vars->Get("timecard_price_" + index); };
 
+		virtual auto	GetBTMarkup(string index)		-> string	= 0;
+		virtual auto	GetBTPaymentNoVAT(string index) -> string	= 0;
+		virtual auto	GetBTVAT(string index) 			-> string	= 0;
+		virtual auto	GetBTPaymentAndVAT(string index)-> string	= 0;
 
 	public:
 					C_Print_BT();
@@ -123,7 +136,25 @@ class C_Print_BT
 		auto		PrintAsXLS() -> string;
 		auto		PrintAsPDF() -> string;
 
-					~C_Print_BT()								{ if(__pdf) { HPDF_Free(__pdf); }; };
+					~C_Print_BT()									{ if(__pdf) { HPDF_Free(__pdf); }; };
+};
+
+class C_Print_BT_To_CC : public C_Print_BT
+{
+	protected:
+		auto		GetBTMarkup(string index)			-> string	{ return vars->Get("cost_center_markup_" + index); };
+		auto		GetBTPaymentNoVAT(string index)		-> string	{ return vars->Get("cost_center_price_" + index); };
+		auto		GetBTVAT(string index)				-> string	{ return vars->Get("cost_center_vat_" + index); };
+		auto		GetBTPaymentAndVAT(string index)	-> string	{ return vars->Get("cost_center_total_" + index); };
+};
+
+class C_Print_BT_To_Subc : public C_Print_BT
+{
+	protected:
+		auto		GetBTMarkup(string index)			-> string	{ return "0"; };
+		auto		GetBTPaymentNoVAT(string index)		-> string	{ return vars->Get("timecard_price_" + index); };
+		auto		GetBTVAT(string index)				-> string	{ return vars->Get("timecard_vat_" + index); };
+		auto		GetBTPaymentAndVAT(string index)	-> string	{ return vars->Get("timecard_total_" + index); };
 };
 
 ostream&	operator<<(ostream& os, const C_Print_BT &);

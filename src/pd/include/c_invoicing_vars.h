@@ -32,16 +32,20 @@ class C_Invoicing_Vars
 		auto		FillStaticDictionary() -> string;
 		auto		CostCenter_VarSet() -> string;
 		auto		Agency_VarSet() -> string;
-		auto		CurrentTimestamp_1C() -> string;
-		auto		AgreementNumberToCostCenterSpelling() -> string;
+		auto		CurrentTimestamp_1C_VarSet() -> string;
+		auto		AgreementNumberToCostCenterSpelling_VarSet() -> string;
 
 		auto		SubcontractorsTotal_VarSet(string sum, string tax, string total) -> string;
-		auto		CostCenterTotal_VarSet(string sum, string tax, string total) -> string;
+		auto		CostCenterTotal_VarSet(c_float cost_center_sum) -> string;
 
 		auto		Common_Index_VarSet(string index) -> string;
 		auto		DocumentSubmissionDate_Index_VarSet(string date_inside_month, string index) -> string;
 		auto		SoW_Index_VarSet(string sql_query, string index) -> string;
-		auto		SubcontractorVAT_Index_VarSet(string sql_query, string index) -> string;
+		auto		PSoW_Index_VarSet(string sql_query, string index) -> string;
+		auto		CostCenterPayment_Index_VarSet(c_float cost_center_price, string index) -> string;
+		auto		Subcontractor_Index_VarSet(string subcontractor_company_id, string index) -> string;
+		auto		SubcontractorPayment_Index_VarSet(c_float cost_center_price, string index) -> string;
+		auto		TableRowDecsriptions_Index_VarSet(string local_remote_service_description, string index) -> string;
 
 	public:
 					C_Invoicing_Vars()						{};
