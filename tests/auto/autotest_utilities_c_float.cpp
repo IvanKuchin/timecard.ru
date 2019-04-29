@@ -63,7 +63,7 @@ bool RunTest1()
 		else
 		{
 			result = false;
-			cout << "[" << __LINE__ << "] failed on (" << item.first << " == " << item.second << ")" << endl;
+			cout << "[" << __LINE__ << "] failed on (" << num.Get() << " != " << item.second << ")" << endl;
 		}
 
 	}
@@ -129,7 +129,7 @@ bool RunTest2()
 		else
 		{
 			result = false;
-			cout << "[" << __LINE__ << "] failed on (" << item.first << " == " << item.second << ")" << endl;
+			cout << "[" << __LINE__ << "] failed on (" << num.Get() << " != " << item.second << ")" << endl;
 		}
 
 	}
@@ -189,7 +189,7 @@ bool RunTest3()
 		else
 		{
 			result = false;
-			cout << "[" << __LINE__ << "] failed on (" << item.first << " == " << item.second << ")" << endl;
+			cout << "[" << __LINE__ << "] failed on (" << num.Get() << " != " << item.second << ")" << endl;
 		}
 	}
 
@@ -271,7 +271,7 @@ bool RunTest4()
 		else
 		{
 			result = false;
-			cout << "[" << __LINE__ << "] failed on (" << item.first << " == " << item.second << ")" << endl;
+			cout << "[" << __LINE__ << "] failed on (" << num.Get() << " != " << item.second << ")" << endl;
 		}
 	}
 
@@ -318,7 +318,7 @@ auto RunTest5()
 		else
 		{
 			result = false;
-			cout << "[" << __LINE__ << "] failed on (" << item.first << " == " << item.second << ")" << endl;
+			cout << "[" << __LINE__ << "] failed on (" << num.Get() << " != " << item.second << ")" << endl;
 		}
 	}
 
@@ -351,7 +351,7 @@ auto RunTest6()
 		else
 		{
 			result = false;
-			cout << "[" << __LINE__ << "] failed on (" << get<0>(item) << " + " << get<1>(item) << " == " << get<2>(item) << ")" << endl;
+			cout << "[" << __LINE__ << "] failed on (" << get<0>(item) << " + " << get<1>(item) << " != " << (num_1 + num_2).Get() << ")" << endl;
 		}
 	}
 
@@ -383,7 +383,7 @@ auto RunTest7()
 		else
 		{
 			result = false;
-			cout << "[" << __LINE__ << "] failed on (" << get<0>(item) << " - " << get<1>(item) << " == " << get<2>(item) << ")" << endl;
+			cout << "[" << __LINE__ << "] failed on (" << get<0>(item) << " - " << get<1>(item) << " != " << (num_1 - num_2).Get() << ")" << endl;
 		}
 	}
 
