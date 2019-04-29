@@ -3778,6 +3778,99 @@ int main(void)
 			MESSAGE_DEBUG("", action, "finish");
 		}
 
+		if(action == "AJAX_getSubcontractorCompaniesAutocompleteList")
+		{
+			string			name = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("name"));
+			string			template_name = "json_response.htmlt";
+			string			error_message = "";
+			auto			autocomplete_str = ""s;
+			ostringstream	ostResult;
+
+			ostResult.str("");
+
+			if(user.GetType() == "agency")
+			{
+				if(name.length())
+				{
+					int	affected = db.Query("SELECT `id`, `name` FROM `company` WHERE `name` LIKE \"%" + name + "%\" AND `type`=\"subcontractor\" LIMIT 0, 20;");
+
+					for(int i = 0; i < affected; ++i)
+					{
+						if(i) autocomplete_str += ",";
+						autocomplete_str += "{\"id\":\"" + db.Get(i, "id") + "\","
+								             "\"label\":\"" + db.Get(i, "name") + "\"}";
+					}
+				}
+				else
+				{
+					MESSAGE_DEBUG("", "", "name is empty");
+				}
+			}
+			else
+			{
+				MESSAGE_ERROR("", action, "user(" + user.GetID() + ") is not an agency employee");
+				error_message = gettext("You are not authorized");
+			}
+
+			if(error_message.empty())
+			{
+				ostResult << "{\"result\":\"success\","
+						  << "\"autocomplete_list\":[" << autocomplete_str << "]}";
+			}
+			else
+			{
+				MESSAGE_DEBUG("", action, "failed");
+				ostResult.str("");
+				ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+			}
+
+			indexPage.RegisterVariableForce("result", ostResult.str());
+
+			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+		}
+
+		if(action == "AJAX_addSoW")
+		{
+			string			company_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("company_id"));
+			string			template_name = "json_response.htmlt";
+			string			error_message = "";
+			ostringstream	ostResult;
+
+			ostResult.str("");
+
+			if(user.GetType() == "agency")
+			{
+				error_message = isAgencyEmployeeAllowedToChangeAgencyData(&db, &user);
+				if(error_message.empty())
+				{
+				}
+				else
+				{
+					MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") doesn't allowed to change agency data");
+				}
+			}
+			else
+			{
+				MESSAGE_ERROR("", action, "user(" + user.GetID() + ") is not an agency employee");
+				error_message = gettext("You are not authorized");
+			}
+
+			if(error_message.empty())
+			{
+				ostResult << "{\"result\":\"success\"}";
+			}
+			else
+			{
+				MESSAGE_DEBUG("", action, "failed");
+				ostResult.str("");
+				ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+			}
+
+			indexPage.RegisterVariableForce("result", ostResult.str());
+
+			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+		}
+
 
 
 

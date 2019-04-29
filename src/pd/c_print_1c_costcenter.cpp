@@ -1,7 +1,7 @@
 #include "c_print_1c_costcenter.h"
 
 
-auto	C_Print_1C_CostCenter::RenderTemplate() -> string
+auto	C_Print_1C_CostCenter_Base::RenderTemplate() -> string
 {
 	auto			error_message = ""s;
 
@@ -74,7 +74,7 @@ auto	C_Print_1C_CostCenter::RenderTemplate() -> string
 	return error_message;
 }
 
-auto	C_Print_1C_CostCenter::SaveFile() -> string
+auto	C_Print_1C_CostCenter_Base::SaveFile() -> string
 {
 	auto			error_message = ""s;
 
@@ -108,7 +108,7 @@ auto	C_Print_1C_CostCenter::SaveFile() -> string
 	return error_message;
 }
 
-auto	C_Print_1C_CostCenter_Service::Print() -> string
+auto	C_Print_1C_CostCenter_Selling::Print() -> string
 {
 	auto			error_message = ""s;
 
@@ -132,22 +132,9 @@ auto	C_Print_1C_CostCenter_Service::Print() -> string
 	return error_message;
 }
 
-auto	C_Print_1C_CostCenter_BT::Print() -> string
+ostream& operator<<(ostream& os, const C_Print_1C_CostCenter_Base &var)
 {
-	auto			error_message = ""s;
-
-	MESSAGE_DEBUG("", "", "start");
-
-
-
-	MESSAGE_DEBUG("", "", "finish (error_message.length() = " + to_string(error_message.length()) + ")");
-
-	return error_message;
-}
-
-ostream& operator<<(ostream& os, const C_Print_1C_CostCenter &var)
-{
-	os << "object C_Print_1C_CostCenter [empty for now]";
+	os << "object C_Print_1C_CostCenter_Base [empty for now]";
 
 	return os;
 }

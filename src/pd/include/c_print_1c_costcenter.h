@@ -19,7 +19,7 @@
 
 using namespace std;
 
-class C_Print_1C_CostCenter
+class C_Print_1C_CostCenter_Base
 {
 	protected:
 		CMysql							*db = NULL;
@@ -49,15 +49,9 @@ class C_Print_1C_CostCenter
 		virtual	auto	Print() -> string								= 0;
 };
 
-ostream&	operator<<(ostream& os, const C_Print_1C_CostCenter &);
+ostream&	operator<<(ostream& os, const C_Print_1C_CostCenter_Base &);
 
-class C_Print_1C_CostCenter_Service : public C_Print_1C_CostCenter
-{
-	public:
-		auto			Print() -> string;
-};
-
-class C_Print_1C_CostCenter_BT : public C_Print_1C_CostCenter
+class C_Print_1C_CostCenter_Selling : public C_Print_1C_CostCenter_Base
 {
 	public:
 		auto			Print() -> string;

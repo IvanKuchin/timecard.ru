@@ -45,6 +45,7 @@ class C_Invoicing_Vars
 		auto		CostCenterPayment_Index_VarSet(c_float cost_center_price, string index) -> string;
 		auto		Subcontractor_Index_VarSet(string subcontractor_company_id, string index) -> string;
 		auto		SubcontractorPayment_Index_VarSet(c_float cost_center_price, string index) -> string;
+		auto		Workperiod_Index_VarSet(struct tm workperiod_start, struct tm workperiod_finish, string index) -> string;
 		auto		TableRowDecsriptions_Index_VarSet(string local_remote_service_description, string index) -> string;
 
 	public:

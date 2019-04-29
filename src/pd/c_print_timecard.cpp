@@ -505,14 +505,6 @@ auto	C_Print_Timecard::PrintAsXLS() -> string
 				}
 
 				{
-					sheet->writeStr(row_counter, 1, spelled_position.c_str());
-					sheet->writeStr(row_counter, 9, spelled_position.c_str());
-
-					row_counter++;
-					row_counter++;
-				}
-
-				{
 					sheet->writeStr(row_counter, 1, spelled_date.c_str());
 					sheet->writeStr(row_counter, 9, spelled_date.c_str());
 

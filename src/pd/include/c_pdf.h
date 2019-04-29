@@ -21,7 +21,7 @@ class C_PDF
 {
 	private:
 		string			filename = "";
-		vector<double>	grid_widths;
+		vector<double>	grid_widths = {};
 
 		auto			__HPDF_GetPixelSizeByPercentage(double percents) -> double;
 		auto			__HPDF_GetPixelOffsetByPercentage(double percents) -> double;

@@ -10,10 +10,10 @@
 #include "c_invoicing_vars.h"
 #include "c_bt_to_print.h"
 #include "c_print_bt.h"
-// #include "c_print_invoice_service.h"
-// #include "c_print_vat_service.h"
-// #include "c_print_1c_costcenter.h"
-// #include "c_print_1c_subcontractor.h"
+#include "c_print_invoice_docs.h"
+#include "c_print_vat.h"
+#include "c_print_1c_costcenter.h"
+#include "c_print_1c_subcontractor.h"
 #include "c_archive.h"
 
 using namespace std;

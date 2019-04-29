@@ -1,7 +1,7 @@
 #include "c_print_1c_subcontractor.h"
 
 
-auto	C_Print_1C_Subcontractor::RenderTemplate() -> string
+auto	C_Print_1C_Subcontractor_Base::RenderTemplate() -> string
 {
 	auto			error_message = ""s;
 
@@ -94,7 +94,7 @@ auto	C_Print_1C_Subcontractor::RenderTemplate() -> string
 	return error_message;
 }
 
-auto	C_Print_1C_Subcontractor::SaveFile() -> string
+auto	C_Print_1C_Subcontractor_Base::SaveFile() -> string
 {
 	auto			error_message = ""s;
 
@@ -175,9 +175,9 @@ auto	C_Print_1C_Subcontractor_Payment_Order::Print() -> string
 	return error_message;
 }
 
-ostream& operator<<(ostream& os, const C_Print_1C_Subcontractor &var)
+ostream& operator<<(ostream& os, const C_Print_1C_Subcontractor_Base &var)
 {
-	os << "object C_Print_1C_Subcontractor [empty for now]";
+	os << "object C_Print_1C_Subcontractor_Base [empty for now]";
 
 	return os;
 }

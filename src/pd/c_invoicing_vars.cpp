@@ -1027,6 +1027,49 @@ auto	C_Invoicing_Vars::CurrentTimestamp_1C_VarSet() -> string
 	return	error_message;
 }
 
+auto	C_Invoicing_Vars::Workperiod_Index_VarSet(struct tm workperiod_start, struct tm workperiod_finish, string index) -> string
+{
+	auto	error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	// --- define dates resided inside PSoW
+	C_Date_Spelling		report_period_start;
+	C_Date_Spelling		report_period_finish;
+	auto				psow_period_start = GetTMObject(Get("psow_contract_start_date_" + index));
+	auto				psow_period_finish = GetTMObject(Get("psow_contract_end_date_" + index));
+	auto				psow_sign_date = GetTMObject(Get("psow_contract_sign_date_" + index));
+
+	if(psow_period_start <= GetTMObject("2000-01-01"))
+	{
+		error_message = "PSOW("s + Get("psow_contract_number_" + index) + ") " + gettext("start date") + " " + gettext("must be in 20-th century");
+		MESSAGE_ERROR("", "", error_message);
+	}
+	else if(psow_period_finish <= GetTMObject("2000-01-01"))
+	{
+		error_message = "PSOW("s + Get("psow_contract_number_" + index) + ") " + gettext("end date") + " " + gettext("must be in 20-th century");
+		MESSAGE_ERROR("", "", error_message);
+	}
+	else if(psow_sign_date <= GetTMObject("2000-01-01"))
+	{
+		error_message = "PSOW("s + Get("psow_contract_number_" + index) + ") " + gettext("sign date") + " " + gettext("must be in 20-th century");
+		MESSAGE_ERROR("", "", error_message);
+	}
+	else
+	{
+		report_period_start	.SetTMObj(psow_period_start  > workperiod_start  ? psow_period_start  : workperiod_start);
+		report_period_finish.SetTMObj(psow_period_finish < workperiod_finish ? psow_period_finish : workperiod_finish);
+
+		error_message = AssignVariableValue("subcontractor_work_period_start" + index, report_period_start.GetFormatted("%d.%m.%Y"), true);
+		error_message = AssignVariableValue("subcontractor_work_perion_finish" + index, report_period_finish.GetFormatted("%d.%m.%Y"), true);
+	}
+
+	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
+
+	return	error_message;
+}
+
+
 auto	C_Invoicing_Vars::AgreementNumberToCostCenterSpelling_VarSet() -> string
 {
 	auto	error_message = ""s;
@@ -1195,6 +1238,9 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet() -> string
 					// --- get report start date and finish date
 					if(error_message.empty())
 					{
+						if((error_message = Workperiod_Index_VarSet(GetTMObject(timecard.GetDateStart()), GetTMObject(timecard.GetDateFinish()), to_string(i))).empty()) {}
+						else { MESSAGE_ERROR("", "", "fail returned from Workperiod_Index_VarSet"); }
+/*
 						C_Date_Spelling		report_period_start;
 						C_Date_Spelling		report_period_finish;
 						auto				timecard_period_start = GetTMObject(timecard.GetDateStart());
@@ -1226,7 +1272,7 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet() -> string
 							error_message = AssignVariableValue("subcontractor_work_period_start" + to_string(i), report_period_start.GetFormatted("%d.%m.%Y"), true);
 							error_message = AssignVariableValue("subcontractor_work_perion_finish" + to_string(i), report_period_finish.GetFormatted("%d.%m.%Y"), true);
 						}
-
+*/
 					}
 
 					// --- subcontractor company data
@@ -1382,6 +1428,13 @@ auto	C_Invoicing_Vars::GenerateBTVariableSet() -> string
 					{
 						if((error_message = Subcontractor_Index_VarSet(Get("subcontractor_company_id_" + to_string(i)), to_string(i))).empty()) {}
 						else { MESSAGE_ERROR("", "", "fail returned from Subcontractor_Index_VarSet"); }
+					}
+
+					// --- get report start date and finish date
+					if(error_message.empty())
+					{
+						if((error_message = Workperiod_Index_VarSet(GetTMObject(bt.GetDateStart()), GetTMObject(bt.GetDateFinish()), to_string(i))).empty()) {}
+						else { MESSAGE_ERROR("", "", "fail returned from Workperiod_Index_VarSet"); }
 					}
 
 					if(error_message.empty())

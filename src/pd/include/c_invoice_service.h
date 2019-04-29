@@ -8,8 +8,8 @@
 #include "clog.h"
 #include "utilities.h"
 #include "c_print_timecard.h"
-#include "c_print_invoice_service.h"
-#include "c_print_vat_service.h"
+#include "c_print_invoice_docs.h"
+#include "c_print_vat.h"
 #include "c_print_1c_costcenter.h"
 #include "c_print_1c_subcontractor.h"
 #include "c_archive.h"
@@ -38,7 +38,7 @@ class C_Invoice_Service
 		string							archive_file = "";		// --- archive in production folder
 
 
-		auto		UpdateDBWithInvoiceData(const string timecard_id, c_float amount) -> string;
+		auto		UpdateDBWithInvoiceData(const string timecard_id) -> string;
 		auto		CreateTempDirectory() -> bool;
 		auto		CreateTimecardObj(string timecard_id) -> C_Timecard_To_Print;
 

@@ -59,6 +59,7 @@ auto c_float::FixRussianLocale(string param) -> string
 
 double c_float::RoundWithPrecision(double num, int precision)
 {
+/*
 	double	result;
 	long	multiplier;
 
@@ -67,6 +68,8 @@ double c_float::RoundWithPrecision(double num, int precision)
 
 	// MESSAGE_DEBUG("c_float", "", to_string(num) + " -> " + to_string(result));
 	return	result;
+*/
+	return	num;
 }
 
 double c_float::RoundWithPrecision(double num)
@@ -94,9 +97,9 @@ long c_float::GetFraction()
     double	fractpart, intpart;
     long	result;
 
-    fractpart = modf (val , &intpart);
+    fractpart = modf(val , &intpart);
 
-    result = lround(fma(fractpart, 100, 0));
+    result = lround(fma(fractpart, pow(10, precision), 0));
 
     MESSAGE_DEBUG("", "", "finish (result = " + to_string(result) + ")");
 
@@ -126,7 +129,7 @@ string c_float::PrintPriceTag() const
 
 	ost.str("");
 	ost.precision(precision);
-	ost << fixed << (round(val * multiplier)) / multiplier;
+	ost << fixed << (round(val * multiplier)) / multiplier; // --- this trick will print 0.01 from 0.005
 
 	return ost.str();
 }

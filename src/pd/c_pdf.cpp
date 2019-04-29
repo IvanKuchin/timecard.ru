@@ -58,7 +58,7 @@ auto	C_PDF::AddColumn(double new_width) -> string
 	else
 	{
 		error_message = gettext("table is too wide");
-		MESSAGE_ERROR("", "", "adding " + to_string(new_width) + " to table makes it wider than 100%");
+		MESSAGE_ERROR("", "", "adding " + to_string(new_width) + " to table width(" + to_string(sum) + ") makes it wider than 100%");
 	}
 
 	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
@@ -323,13 +323,14 @@ auto	C_PDF::__HPDF_SetDocProps() -> string
 		/* set page mode to use outlines. */
 		HPDF_SetPageMode (__pdf, HPDF_PAGE_MODE_USE_OUTLINE);
 
-		__pdf_line = -1;
-	    __pdf_font		= HPDF_GetFont(__pdf, __pdf_font_name.c_str(), "CP1251");
-	    __pdf_font_bold = HPDF_GetFont(__pdf, __pdf_font_bold_name.c_str(), "CP1251");
+		grid_widths.clear();
+		__pdf_line			= -1;
+	    __pdf_font			= HPDF_GetFont(__pdf, __pdf_font_name.c_str(), "CP1251");
+	    __pdf_font_bold 	= HPDF_GetFont(__pdf, __pdf_font_bold_name.c_str(), "CP1251");
 
-	    __pdf_font_descent = HPDF_Font_GetDescent(__pdf_font) * HPDF_TIMECARD_FONT_SIZE / 1000;
-	    __pdf_font_ascent = HPDF_Font_GetAscent(__pdf_font) * HPDF_TIMECARD_FONT_SIZE / 1000;
-	    __pdf_font_xheight = HPDF_Font_GetXHeight(__pdf_font) * HPDF_TIMECARD_FONT_SIZE / 1000;
+	    __pdf_font_descent	= HPDF_Font_GetDescent(__pdf_font) * HPDF_TIMECARD_FONT_SIZE / 1000;
+	    __pdf_font_ascent	= HPDF_Font_GetAscent(__pdf_font) * HPDF_TIMECARD_FONT_SIZE / 1000;
+	    __pdf_font_xheight	= HPDF_Font_GetXHeight(__pdf_font) * HPDF_TIMECARD_FONT_SIZE / 1000;
 
 	    if(__pdf_font_descent && __pdf_font_ascent && __pdf_font_xheight)
 	    {

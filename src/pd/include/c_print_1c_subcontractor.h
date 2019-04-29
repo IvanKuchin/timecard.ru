@@ -19,7 +19,7 @@
 
 using namespace std;
 
-class C_Print_1C_Subcontractor
+class C_Print_1C_Subcontractor_Base
 {
 	protected:
 		CMysql							*db = NULL;
@@ -51,9 +51,9 @@ class C_Print_1C_Subcontractor
 		virtual auto	GetTemplateBody_Filename() -> string			= 0;
 };
 
-ostream&	operator<<(ostream& os, const C_Print_1C_Subcontractor &);
+ostream&	operator<<(ostream& os, const C_Print_1C_Subcontractor_Base &);
 
-class C_Print_1C_Subcontractor_Payment : public C_Print_1C_Subcontractor
+class C_Print_1C_Subcontractor_Payment : public C_Print_1C_Subcontractor_Base
 {
 	public:
 		auto			Print() -> string;
@@ -61,7 +61,7 @@ class C_Print_1C_Subcontractor_Payment : public C_Print_1C_Subcontractor
 		auto			GetTemplateBody_Filename() -> string			{ return vars->Get("1C_template_payment_to_subcontractor_body_full_path"); };
 };
 
-class C_Print_1C_Subcontractor_Payment_Order : public C_Print_1C_Subcontractor
+class C_Print_1C_Subcontractor_Payment_Order : public C_Print_1C_Subcontractor_Base
 {
 	public:
 		auto			Print() -> string;

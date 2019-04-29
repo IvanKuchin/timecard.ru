@@ -22,32 +22,28 @@ auto C_Invoice_BT::GenerateDocumentArchive() -> string
 
 	C_Print_BT_To_CC						bt_printer;
 
-/*
-	C_Print_Invoice_Service_Agency			invoice_agency;
-	C_Print_Invoice_Service					*invoice_printer = &invoice_agency;
+	C_Print_Invoice_Agency					__invoice_agency;
+	C_Print_Invoice_Docs_Base				*invoice_printer = &__invoice_agency;
 
-	C_Print_Act_Service_Agency				act_agency;
-	C_Print_Invoice_Service					*act_printer = &act_agency;
+	C_Print_Act_Agency						__act_agency;
+	C_Print_Invoice_Docs_Base				*act_printer = &__act_agency;
 
-	C_Print_VAT_Service_Agency				vat_service;
-	C_Print_VAT_Service						*vat_printer = &vat_service;
+	C_Print_VAT_Agency						__vat_obj;
+	C_Print_VAT_Base						*vat_printer = &__vat_obj;
 
-	C_Print_1C_CostCenter_Service			cc_1c_main_obj1;
-	C_Print_1C_CostCenter					*cc_1c_service_printer = &cc_1c_main_obj1;
+	C_Print_1C_CostCenter_Selling			__cc_1c_main_obj1;
+	C_Print_1C_CostCenter_Base				*cc_1c_selling_printer = &__cc_1c_main_obj1;
 
-	C_Print_1C_Subcontractor_Payment		subc_1c_main_obj1;
-	C_Print_1C_Subcontractor				*subc_1c_payment_printer = &subc_1c_main_obj1;
+	C_Print_1C_Subcontractor_Payment		__subc_1c_main_obj1;
+	C_Print_1C_Subcontractor_Base			*subc_1c_payment_printer = &__subc_1c_main_obj1;
 
-	C_Print_1C_Subcontractor_Payment_Order	subc_1c_main_obj2;
-	C_Print_1C_Subcontractor				*subc_1c_payment_order_printer = &subc_1c_main_obj2;
-*/
+	C_Print_1C_Subcontractor_Payment_Order	__subc_1c_main_obj2;
+	C_Print_1C_Subcontractor_Base			*subc_1c_payment_order_printer = &__subc_1c_main_obj2;
+
 
 	if(error_message.empty())
 	{
-		if(CreateTempDirectory())
-		{
-
-		}
+		if(CreateTempDirectory()) {}
 		else
 		{
 			MESSAGE_ERROR("", "", "fail to create temp directory");
@@ -78,7 +74,7 @@ auto C_Invoice_BT::GenerateDocumentArchive() -> string
 		MESSAGE_ERROR("", "", "bt won't be built due to previous error");
 	}
 
-	// --- generte variable for invoicing
+	// --- generate variable for invoicing
 	if(error_message.empty())
 	{
 		invoicing_vars.SetDB(db);
@@ -110,6 +106,7 @@ auto C_Invoice_BT::GenerateDocumentArchive() -> string
 				filename_xls = temp_dir_bt + "bt_" + to_string(i) + ".xls";
 				filename_pdf = temp_dir_bt + "bt_" + to_string(i) + ".pdf";
 			} while(isFileExists(filename_xls) || isFileExists(filename_pdf));
+
 			bt_printer.SetBT(bt);
 			bt_printer.SetVariableSet(&invoicing_vars);
 
@@ -121,7 +118,7 @@ auto C_Invoice_BT::GenerateDocumentArchive() -> string
 				break;
 			}
 
-/*
+
 			bt_printer.SetFilename(filename_pdf);
 			error_message = bt_printer.PrintAsPDF();
 			if(error_message.length())
@@ -129,7 +126,7 @@ auto C_Invoice_BT::GenerateDocumentArchive() -> string
 				MESSAGE_ERROR("", "", "fail to build bt_" + to_string(i) + ".pdf");
 				break;
 			}
-*/
+
 		}
 	}
 	else
@@ -147,7 +144,7 @@ auto C_Invoice_BT::GenerateDocumentArchive() -> string
 		auto		act_filename_pdf = ""s;
 		auto		vat_filename_xls = ""s;
 		auto		vat_filename_pdf = ""s;
-		auto		cc_bt_filename_1c = ""s;
+		auto		cc_service_filename_1c = ""s;
 		auto		subc_payment_filename_1c = ""s;
 		auto		subc_payment_order_filename_1c = ""s;
 
@@ -160,18 +157,17 @@ auto C_Invoice_BT::GenerateDocumentArchive() -> string
 			act_filename_pdf				= temp_dir_cost_center_invoices + "act_" + to_string(i) + ".pdf";
 			vat_filename_xls				= temp_dir_cost_center_invoices + "vat_" + to_string(i) + ".xls";
 			vat_filename_pdf				= temp_dir_cost_center_invoices + "vat_" + to_string(i) + ".pdf";
-			cc_bt_filename_1c				= temp_dir_1c + "costcenter_bt_" + to_string(i) + ".xml";
+			cc_service_filename_1c			= temp_dir_1c + "costcenter_bt_" + to_string(i) + ".xml";
 			subc_payment_filename_1c		= temp_dir_1c + "subcontractor_payment_" + to_string(i) + ".xml";
 			subc_payment_order_filename_1c	= temp_dir_1c + "subcontractor_payment_order_" + to_string(i) + ".xml";
 		} while(
 				isFileExists(invoice_filename_xls)		|| isFileExists(invoice_filename_pdf) ||
 				isFileExists(act_filename_xls)			|| isFileExists(act_filename_pdf) ||
 				isFileExists(vat_filename_xls)			|| isFileExists(vat_filename_pdf) ||
-				isFileExists(cc_bt_filename_1c)			|| 
+				isFileExists(cc_service_filename_1c)	|| 
 				isFileExists(subc_payment_filename_1c)	|| isFileExists(subc_payment_order_filename_1c)
 				);
 
-/*
 		if(error_message.empty())
 		{
 			invoice_printer->SetDB(db);
@@ -271,15 +267,16 @@ auto C_Invoice_BT::GenerateDocumentArchive() -> string
 			MESSAGE_ERROR("", "", "due to previous error vat won't be printed");
 		}
 
+
 		if(error_message.empty())
 		{
-			cc_1c_service_printer->SetDB(db);
-			cc_1c_service_printer->SetVariableSet(&invoicing_vars);
+			cc_1c_selling_printer->SetDB(db);
+			cc_1c_selling_printer->SetVariableSet(&invoicing_vars);
 
 			if(error_message.empty()) 
 			{
-				cc_1c_service_printer->SetFilename(cc_service_filename_1c);
-				error_message = cc_1c_service_printer->Print();
+				cc_1c_selling_printer->SetFilename(cc_service_filename_1c);
+				error_message = cc_1c_selling_printer->Print();
 				if(error_message.empty()) {}
 				else
 				{
@@ -332,7 +329,7 @@ auto C_Invoice_BT::GenerateDocumentArchive() -> string
 		{
 			MESSAGE_ERROR("", "", "due to previous error 1c subcontractor payment orders won't be printed");
 		}
-*/
+
 	}	
 	else
 	{
@@ -346,6 +343,7 @@ auto C_Invoice_BT::GenerateDocumentArchive() -> string
 		{
 			if((error_message = UpdateDBWithInvoiceData(bt.GetID())).length())
 			{
+				MESSAGE_ERROR("", "", "fail to update DB");
 				break;
 			}
 		}

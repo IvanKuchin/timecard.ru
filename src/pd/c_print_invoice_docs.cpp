@@ -1,17 +1,17 @@
-#include "c_print_invoice_service.h"
+#include "c_print_invoice_docs.h"
 
 
-auto	C_Print_Invoice_Service::GetSupplierCompanyDetails() -> string
+auto	C_Print_Invoice_Docs_Base::GetSupplierCompanyDetails() -> string
 {
 	return GetSupplierName() + ", " + vars->Get("TIN") + " " + GetSupplierTIN() + ", " + vars->Get("KPP") + " " + GetSupplierKPP() + ", " + GetSupplierLegalZIP() + " " + GetSupplierLegalLocality() + ", " + GetSupplierLegalAddress();
 }
 
-auto	C_Print_Invoice_Service::GetCustomerCompanyDetails() -> string
+auto	C_Print_Invoice_Docs_Base::GetCustomerCompanyDetails() -> string
 {
 	return GetCustomerName() + ", " + vars->Get("TIN") + " " + GetCustomerTIN() + ", " + vars->Get("KPP") + " " + GetCustomerKPP() + ", " + GetCustomerLegalZIP() + " " + GetCustomerLegalLocality() + ", " + GetCustomerLegalAddress();
 }
 
-auto	C_Print_Invoice_Service::SpellPrice() -> string
+auto	C_Print_Invoice_Docs_Base::SpellPrice() -> string
 {
 	MESSAGE_DEBUG("", "", "start");
 
@@ -25,7 +25,7 @@ auto	C_Print_Invoice_Service::SpellPrice() -> string
 
 
 // --- XLS part
-auto	C_Print_Invoice_Service::__DrawXLSBorder(int left, int top, int right, int bottom) -> string
+auto	C_Print_Invoice_Docs_Base::__XLS_DrawBorder(int left, int top, int right, int bottom) -> string
 {
 	auto	result = ""s;
 
@@ -147,7 +147,7 @@ auto	C_Print_Invoice_Service::__DrawXLSBorder(int left, int top, int right, int 
 	return result;
 }
 
-auto	C_Print_Invoice_Service::__PrintXLSHeaderTable() -> string
+auto	C_Print_Invoice_Docs_Base::__PrintXLSHeaderTable() -> string
 {
 	auto	result = ""s;
 	auto	top = __row_counter;
@@ -184,17 +184,17 @@ auto	C_Print_Invoice_Service::__PrintXLSHeaderTable() -> string
 
 	// bottom = __row_counter;
 
-	__DrawXLSBorder(1, top	, 5, top + 2);											__DrawXLSBorder(6, top	, 6, top	);	__DrawXLSBorder(7, top	, 9, top	);
-																					__DrawXLSBorder(6, top + 1, 6, top + 2);	__DrawXLSBorder(7, top + 1, 9, top + 2);
-	__DrawXLSBorder(1, top + 3, 3, top + 3);	__DrawXLSBorder(4, top + 3, 5, top + 3);	__DrawXLSBorder(6, top + 3, 6, top + 6);	__DrawXLSBorder(7, top + 3, 9, top + 6);
-	__DrawXLSBorder(1, top + 4, 5, top + 6);
+	__XLS_DrawBorder(1, top	, 5, top + 2);											__XLS_DrawBorder(6, top	, 6, top	);	__XLS_DrawBorder(7, top	, 9, top	);
+																					__XLS_DrawBorder(6, top + 1, 6, top + 2);	__XLS_DrawBorder(7, top + 1, 9, top + 2);
+	__XLS_DrawBorder(1, top + 3, 3, top + 3);	__XLS_DrawBorder(4, top + 3, 5, top + 3);	__XLS_DrawBorder(6, top + 3, 6, top + 6);	__XLS_DrawBorder(7, top + 3, 9, top + 6);
+	__XLS_DrawBorder(1, top + 4, 5, top + 6);
 
 	MESSAGE_DEBUG("", "", "finish");
 
 	return result;
 }
 
-auto C_Print_Invoice_Service::__PrintXLSSignature() -> string
+auto C_Print_Invoice_Docs_Base::__PrintXLSSignature() -> string
 {
 	MESSAGE_DEBUG("", "", "start");
 
@@ -240,7 +240,7 @@ auto C_Print_Invoice_Service::__PrintXLSSignature() -> string
 	return error_message;
 }
 
-auto	C_Print_Invoice_Service::__DrawXLSRowUnderline() -> string
+auto	C_Print_Invoice_Docs_Base::__DrawXLSRowUnderline() -> string
 {
 	auto	result = ""s;
 	auto	format_underline = __book->addFormat();
@@ -265,7 +265,7 @@ auto	C_Print_Invoice_Service::__DrawXLSRowUnderline() -> string
 	return result;
 }
 
-auto	C_Print_Invoice_Service::PrintAsXLS() -> string
+auto	C_Print_Invoice_Docs_Base::PrintAsXLS() -> string
 {
 	auto	error_message = ""s;
 	auto	f_name = GetFilename(); 
@@ -491,7 +491,7 @@ auto	C_Print_Invoice_Service::PrintAsXLS() -> string
 
 
 // --- PDF part
-auto	C_Print_Invoice_Service::__PrintPDFHeaderTable() -> string
+auto	C_Print_Invoice_Docs_Base::__PrintPDFHeaderTable() -> string
 {
 	MESSAGE_DEBUG("", "", "start");
 
@@ -658,7 +658,7 @@ auto	C_Print_Invoice_Service::__PrintPDFHeaderTable() -> string
 	return error_message;
 }
 
-auto C_Print_Invoice_Service::__HPDF_PrintSignature() -> string
+auto C_Print_Invoice_Docs_Base::__HPDF_PrintSignature() -> string
 {
 
 	MESSAGE_DEBUG("", "", "start");
@@ -761,7 +761,7 @@ auto C_Print_Invoice_Service::__HPDF_PrintSignature() -> string
 	return error_message;
 }
 
-auto	C_Print_Invoice_Service::__HPDF_DrawHeader() -> string
+auto	C_Print_Invoice_Docs_Base::__HPDF_DrawHeader() -> string
 {
 	MESSAGE_DEBUG("", "", "start");
 
@@ -842,7 +842,7 @@ auto	C_Print_Invoice_Service::__HPDF_DrawHeader() -> string
 	return error_message;
 }
 
-auto	C_Print_Invoice_Service::__HPDF_DrawTable() -> string
+auto	C_Print_Invoice_Docs_Base::__HPDF_DrawTable() -> string
 {
 	MESSAGE_DEBUG("", "", "start");
 
@@ -850,6 +850,12 @@ auto	C_Print_Invoice_Service::__HPDF_DrawTable() -> string
 
 	try
 	{
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_MoveLineDown()).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		}
+
 		if(error_message.empty())
 		{
 			pdf_obj.AddColumn(5);
@@ -986,7 +992,7 @@ auto	C_Print_Invoice_Service::__HPDF_DrawTable() -> string
 	return error_message;
 }
 
-auto	C_Print_Invoice_Service::__HPDF_DrawFooter() -> string
+auto	C_Print_Invoice_Docs_Base::__HPDF_DrawFooter() -> string
 {
 	MESSAGE_DEBUG("", "", "start");
 
@@ -1075,7 +1081,7 @@ auto	C_Print_Invoice_Service::__HPDF_DrawFooter() -> string
 	return error_message;
 }
 
-auto	C_Print_Invoice_Service::PrintAsPDF() -> string
+auto	C_Print_Invoice_Docs_Base::PrintAsPDF() -> string
 {
 	auto			error_message = ""s;
 
@@ -1117,9 +1123,9 @@ auto	C_Print_Invoice_Service::PrintAsPDF() -> string
 	return error_message;
 }
 
-ostream& operator<<(ostream& os, const C_Print_Invoice_Service &var)
+ostream& operator<<(ostream& os, const C_Print_Invoice_Docs_Base &var)
 {
-	os << "object C_Print_Invoice_Service [empty for now]";
+	os << "object C_Print_Invoice_Docs_Base [empty for now]";
 
 	return os;
 }

@@ -89,37 +89,31 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 {
 	MESSAGE_DEBUG("", "", "start");
 
-	C_Print_Timecard						timecard_printer;
-
-	C_Print_Invoice_Service_Agency			invoice_agency;
-	C_Print_Invoice_Service					*invoice_printer = &invoice_agency;
-
-	C_Print_Act_Service_Agency				act_agency;
-	C_Print_Invoice_Service					*act_printer = &act_agency;
-
-	C_Print_VAT_Service_Agency				vat_service;
-	C_Print_VAT_Service						*vat_printer = &vat_service;
-
-	C_Print_1C_CostCenter_Service			cc_1c_main_obj1;
-	C_Print_1C_CostCenter					*cc_1c_service_printer = &cc_1c_main_obj1;
-
-	C_Print_1C_Subcontractor_Payment		subc_1c_main_obj1;
-	C_Print_1C_Subcontractor				*subc_1c_payment_printer = &subc_1c_main_obj1;
-
-	C_Print_1C_Subcontractor_Payment_Order	subc_1c_main_obj2;
-	C_Print_1C_Subcontractor				*subc_1c_payment_order_printer = &subc_1c_main_obj2;
-
 	auto									error_message = ""s;
 
-	invoicing_vars.SetDB(db);
-	invoicing_vars.SetUser(user);
+	C_Print_Timecard						timecard_printer;
+
+	C_Print_Invoice_Agency					__invoice_agency;
+	C_Print_Invoice_Docs_Base				*invoice_printer = &__invoice_agency;
+
+	C_Print_Act_Agency						__act_agency;
+	C_Print_Invoice_Docs_Base				*act_printer = &__act_agency;
+
+	C_Print_VAT_Agency						__vat_obj;
+	C_Print_VAT_Base						*vat_printer = &__vat_obj;
+
+	C_Print_1C_CostCenter_Selling			__cc_1c_main_obj1;
+	C_Print_1C_CostCenter_Base				*cc_1c_selling_printer = &__cc_1c_main_obj1;
+
+	C_Print_1C_Subcontractor_Payment		__subc_1c_main_obj1;
+	C_Print_1C_Subcontractor_Base			*subc_1c_payment_printer = &__subc_1c_main_obj1;
+
+	C_Print_1C_Subcontractor_Payment_Order	__subc_1c_main_obj2;
+	C_Print_1C_Subcontractor_Base			*subc_1c_payment_order_printer = &__subc_1c_main_obj2;
 
 	if(error_message.empty())
 	{
-		if(CreateTempDirectory())
-		{
-
-		}
+		if(CreateTempDirectory()) {}
 		else
 		{
 			MESSAGE_ERROR("", "", "fail to create temp directory");
@@ -148,6 +142,21 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 	else
 	{
 		MESSAGE_ERROR("", "", "timecard won't be built due to previous error");
+	}
+
+	// --- generate variable for invoicing
+	if(error_message.empty())
+	{
+		invoicing_vars.SetDB(db);
+		invoicing_vars.SetUser(user);
+		invoicing_vars.SetCostCenterID(cost_center_id);
+		invoicing_vars.SetTimecards(timecard_obj_list);
+
+		error_message = invoicing_vars.GenerateServiceVariableSet();
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "invoicing_vars won't be generated due to previous error");
 	}
 
 	// --- timecard generator
@@ -196,19 +205,6 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 		MESSAGE_ERROR("", "", "timecards won't be written to files due to previous error");
 	}
 
-	// --- generte variable for invoicing
-	if(error_message.empty())
-	{
-		invoicing_vars.SetCostCenterID(cost_center_id);
-		invoicing_vars.SetTimecards(timecard_obj_list);
-
-		error_message = invoicing_vars.GenerateServiceVariableSet();
-	}
-	else
-	{
-		MESSAGE_ERROR("", "", "invoicing_vars won't be generated due to previous error");
-	}
-
 	// --- invoice generator
 	if(error_message.empty())
 	{
@@ -220,7 +216,6 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 		auto		vat_filename_xls = ""s;
 		auto		vat_filename_pdf = ""s;
 		auto		cc_service_filename_1c = ""s;
-		auto		cc_bt_filename_1c = ""s;
 		auto		subc_payment_filename_1c = ""s;
 		auto		subc_payment_order_filename_1c = ""s;
 
@@ -234,14 +229,13 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 			vat_filename_xls				= temp_dir_cost_center_invoices + "vat_" + to_string(i) + ".xls";
 			vat_filename_pdf				= temp_dir_cost_center_invoices + "vat_" + to_string(i) + ".pdf";
 			cc_service_filename_1c			= temp_dir_1c + "costcenter_service_" + to_string(i) + ".xml";
-			cc_bt_filename_1c				= temp_dir_1c + "costcenter_bt_" + to_string(i) + ".xml";
 			subc_payment_filename_1c		= temp_dir_1c + "subcontractor_payment_" + to_string(i) + ".xml";
 			subc_payment_order_filename_1c	= temp_dir_1c + "subcontractor_payment_order_" + to_string(i) + ".xml";
 		} while(
 				isFileExists(invoice_filename_xls)		|| isFileExists(invoice_filename_pdf) ||
 				isFileExists(act_filename_xls)			|| isFileExists(act_filename_pdf) ||
 				isFileExists(vat_filename_xls)			|| isFileExists(vat_filename_pdf) ||
-				isFileExists(cc_bt_filename_1c)			|| isFileExists(cc_service_filename_1c) ||
+				isFileExists(cc_service_filename_1c) ||
 				isFileExists(subc_payment_filename_1c)	|| isFileExists(subc_payment_order_filename_1c)
 				);
 
@@ -346,13 +340,13 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 
 		if(error_message.empty())
 		{
-			cc_1c_service_printer->SetDB(db);
-			cc_1c_service_printer->SetVariableSet(&invoicing_vars);
+			cc_1c_selling_printer->SetDB(db);
+			cc_1c_selling_printer->SetVariableSet(&invoicing_vars);
 
 			if(error_message.empty()) 
 			{
-				cc_1c_service_printer->SetFilename(cc_service_filename_1c);
-				error_message = cc_1c_service_printer->Print();
+				cc_1c_selling_printer->SetFilename(cc_service_filename_1c);
+				error_message = cc_1c_selling_printer->Print();
 				if(error_message.empty()) {}
 				else
 				{
@@ -418,8 +412,9 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 	{
 		for(auto &timecard: timecard_obj_list)
 		{
-			if((error_message = UpdateDBWithInvoiceData(timecard.GetID(), timecard.GetTotalPayment())).length())
+			if((error_message = UpdateDBWithInvoiceData(timecard.GetID())).length())
 			{
+				MESSAGE_ERROR("", "", "fail to update DB");
 				break;
 			}
 		}
@@ -610,7 +605,7 @@ auto C_Invoice_Service::CreateTimecardObj(string timecard_id) -> C_Timecard_To_P
 	return obj;
 }
 
-auto C_Invoice_Service::UpdateDBWithInvoiceData(const string timecard_id, c_float amount) -> string
+auto C_Invoice_Service::UpdateDBWithInvoiceData(const string timecard_id) -> string
 {
 	auto	error_message = ""s;
 

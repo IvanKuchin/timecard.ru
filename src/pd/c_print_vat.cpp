@@ -1,17 +1,17 @@
-#include "c_print_vat_service.h"
+#include "c_print_vat.h"
 
 
-auto	C_Print_VAT_Service::GetSupplierCompanyDetails() -> string
+auto	C_Print_VAT_Base::GetSupplierCompanyDetails() -> string
 {
 	return GetSupplierName() + ", " + vars->Get("TIN") + " " + GetSupplierTIN() + ", " + vars->Get("KPP") + " " + GetSupplierKPP() + ", " + GetSupplierLegalZIP() + " " + GetSupplierLegalLocality() + ", " + GetSupplierLegalAddress();
 }
 
-auto	C_Print_VAT_Service::GetCustomerCompanyDetails() -> string
+auto	C_Print_VAT_Base::GetCustomerCompanyDetails() -> string
 {
 	return GetCustomerName() + ", " + vars->Get("TIN") + " " + GetCustomerTIN() + ", " + vars->Get("KPP") + " " + GetCustomerKPP() + ", " + GetCustomerLegalZIP() + " " + GetCustomerLegalLocality() + ", " + GetCustomerLegalAddress();
 }
 
-auto	C_Print_VAT_Service::SpellPrice() -> string
+auto	C_Print_VAT_Base::SpellPrice() -> string
 {
 	MESSAGE_DEBUG("", "", "start");
 
@@ -25,7 +25,7 @@ auto	C_Print_VAT_Service::SpellPrice() -> string
 
 
 // --- XLS part
-auto C_Print_VAT_Service::__PrintXLSSignature() -> string
+auto C_Print_VAT_Base::__PrintXLSSignature() -> string
 {
 	MESSAGE_DEBUG("", "", "start");
 
@@ -74,7 +74,7 @@ auto C_Print_VAT_Service::__PrintXLSSignature() -> string
 	return error_message;
 }
 
-auto	C_Print_VAT_Service::PrintAsXLS() -> string
+auto	C_Print_VAT_Base::PrintAsXLS() -> string
 {
 	auto	error_message = ""s;
 	auto	f_name = GetFilename(); 
@@ -259,7 +259,7 @@ auto	C_Print_VAT_Service::PrintAsXLS() -> string
 
 
 // --- PDF part
-auto C_Print_VAT_Service::__HPDF_PrintSignature() -> string
+auto C_Print_VAT_Base::__HPDF_PrintSignature() -> string
 {
 
 	MESSAGE_DEBUG("", "", "start");
@@ -294,7 +294,7 @@ auto C_Print_VAT_Service::__HPDF_PrintSignature() -> string
 		{
 			if(error_message.empty())
 			{
-				if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(20, 40)).length())
+				if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(10, 40)).length())
 					{ MESSAGE_ERROR("", "", "hpdf: fail to draw horizontal line"); }
 			}
 		}
@@ -302,7 +302,7 @@ auto C_Print_VAT_Service::__HPDF_PrintSignature() -> string
 		{
 			if(error_message.empty())
 			{
-				if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(80, 100)).length())
+				if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(70, 100)).length())
 					{ MESSAGE_ERROR("", "", "hpdf: fail to draw horizontal line"); }
 			}
 		}
@@ -362,7 +362,7 @@ auto C_Print_VAT_Service::__HPDF_PrintSignature() -> string
 	return error_message;
 }
 
-auto	C_Print_VAT_Service::__HPDF_DrawHeader() -> string
+auto	C_Print_VAT_Base::__HPDF_DrawHeader() -> string
 {
 	MESSAGE_DEBUG("", "", "start");
 
@@ -413,7 +413,7 @@ auto	C_Print_VAT_Service::__HPDF_DrawHeader() -> string
 	return error_message;
 }
 
-auto	C_Print_VAT_Service::__HPDF_DrawTable() -> string
+auto	C_Print_VAT_Base::__HPDF_DrawTable() -> string
 {
 	MESSAGE_DEBUG("", "", "start");
 
@@ -421,6 +421,12 @@ auto	C_Print_VAT_Service::__HPDF_DrawTable() -> string
 
 	try
 	{
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_MoveLineDown()).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		}
+
 		if(error_message.empty())
 		{
 			pdf_obj.AddColumn(3);
@@ -642,7 +648,7 @@ auto	C_Print_VAT_Service::__HPDF_DrawTable() -> string
 	return error_message;
 }
 
-auto	C_Print_VAT_Service::__HPDF_DrawFooter() -> string
+auto	C_Print_VAT_Base::__HPDF_DrawFooter() -> string
 {
 	MESSAGE_DEBUG("", "", "start");
 
@@ -731,7 +737,7 @@ auto	C_Print_VAT_Service::__HPDF_DrawFooter() -> string
 	return error_message;
 }
 
-auto	C_Print_VAT_Service::PrintAsPDF() -> string
+auto	C_Print_VAT_Base::PrintAsPDF() -> string
 {
 	auto			error_message = ""s;
 
@@ -773,9 +779,9 @@ auto	C_Print_VAT_Service::PrintAsPDF() -> string
 	return error_message;
 }
 
-ostream& operator<<(ostream& os, const C_Print_VAT_Service &var)
+ostream& operator<<(ostream& os, const C_Print_VAT_Base &var)
 {
-	os << "object C_Print_VAT_Service [empty for now]";
+	os << "object C_Print_VAT_Base [empty for now]";
 
 	return os;
 }

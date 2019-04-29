@@ -14,12 +14,11 @@
 #include "libxl.h"
 #undef _UNICODE
 
-#include "hpdf.h"
-
 #include "utilities_timecard.h" 
 #include "c_invoicing_vars.h"
 #include "c_bt_to_print.h"
 #include "c_float.h"
+#include "c_pdf.h"
 #include "clog.h"
 
 using namespace std;
@@ -34,6 +33,7 @@ class C_Print_BT
 		C_Invoicing_Vars				*vars = nullptr;
 
 		string							filename = "";
+		string							index = ""; // --- bt index inside global bt list, needed to get access to specific bt.invoicing_vars
 
 		C_BT_To_Print					bt;
 
@@ -43,6 +43,12 @@ class C_Print_BT
 		c_float							effort_cost_vat = 0;
 		c_float							total_payment = 0;
 
+		libxl::Book						*__xls_book = nullptr;
+		libxl::Sheet					*__xls_sheet = nullptr;
+		int								__xls_row_counter = -1;
+
+		C_PDF							pdf_obj;
+/*
 		HPDF_Doc						__pdf;
 		HPDF_Page						__pdf_page;
 		HPDF_REAL						__pdf_page_width = 0;
@@ -57,7 +63,7 @@ class C_Print_BT
 		int								__pdf_line = -1;
 		int								__pdf_table_top = -1;
 		int								__pdf_table_bottom = -1;
-
+*/
 		auto		GetEffortHours()								{ return effort_hours; };
 		auto		GetEffortDays()									{ return effort_days; };
 		auto		GetEffortCost()									{ return effort_cost; };
@@ -76,10 +82,10 @@ class C_Print_BT
 		auto		GetSpelledTotalPayment()						{ return vars->Get("Total payment in reported timecard") + ": "s; };
 		auto		GetSpelledVAT()									{ return vars->Get("VAT") + ": "s; };
 		auto		GetSpelledTotalPaymentNoVAT()					{ return vars->Get("Total payment in reported timecard") + " "s + vars->Get("w/o") + " " + vars->Get("VAT") + ": "; };
-		auto		GetSpelledSignature()							{ return vars->Get("Signature") + ":_________________________________"s; };
-		auto		GetSpelledInitials()							{ return vars->Get("Initials") + ": ___________________________________"s; };
-		auto		GetSpelledPosition()							{ return vars->Get("Title") + ": _______________________________"s; };
-		auto		GetSpelledDate()								{ return vars->Get("Date") + ": ____________________________________"s; };
+		auto		GetSpelledSignature()							{ return vars->Get("Signature") + ":"s; };
+		auto		GetSpelledInitials()							{ return vars->Get("Initials") + ":"s; };
+		auto		GetSpelledPosition()							{ return vars->Get("Title") + ":"s; };
+		auto		GetSpelledDate()								{ return vars->Get("Date") + ":"s; };
 		auto		GetSpelledRur()									{ return vars->Get("rur."); };
 		auto		GetSpelledKop()									{ return vars->Get("kop."); };
 		auto		GetTitleDate()									{ return vars->Get("Date"); };
@@ -87,31 +93,17 @@ class C_Print_BT
 		auto		GetTitleSumRur()								{ return vars->Get("Sum (rur)"); };
 		auto		GetTitleSumCurrency()							{ return vars->Get("Sum (currency)"); };
 		auto		GetTitleRateExchange()							{ return vars->Get("Rate exchange"); };
+		auto		isTableRowExists(int i) -> bool					{ return vars->Get("index_" + to_string(i)).length(); };
 
-		auto		__HPDF_init() -> string;
-		auto		__HPDF_SetDocProps() -> string;
-		auto		__HPDF_MoveLineDown() -> string					{ return __HPDF_MoveLineDown(__pdf_font_height); };
-		auto		__HPDF_MoveLineDown(int line_increment) -> string;
-		auto		__HPDF_MoveTableLineDown() -> string			{ return __HPDF_MoveTableLineDown(__pdf_table_line_height); };
-		auto		__HPDF_MoveTableLineDown(int line_increment) -> string;
-		auto		__HPDF_SaveToFile() -> string;
-		auto		__HPDF_PrintText(string text, double x, HPDF_TextAlignment) -> string;
-		auto		__HPDF_PrintText(string text, double x1, double x2, HPDF_TextAlignment) -> string;
-		auto		__HPDF_DrawTimecardHorizontalLine() -> string;
-		auto		__HPDF_DrawTimecardTitle() -> string;
-		auto		__HPDF_DrawTimecardTable() -> string;
-		auto		__HPDF_DrawTimecardTableHeader() -> string;
-		auto		__HPDF_DrawTimecardTableBody() -> string;
-		auto		__HPDF_DrawTimecardTableFooter() -> string;
-		auto		__HPDF_DrawTimecardFooter() -> string;
-		auto		__HPDF_TableGetXOffset() -> HPDF_REAL;
-		auto		__HPDF_TableGetTitleWidth() -> HPDF_REAL;
-		auto		__HPDF_TableDaysGetXOffset() -> HPDF_REAL;
-		auto		__HPDF_StartTable() -> string;
-		auto		__HPDF_StopTable() -> string;
-		auto		__HPDF_GetTimecardTableXByPercentage(double percent) -> double;
-		auto		__HPDF_DrawTimecardVerticalLine(double x) -> string;
-		auto		__HPDF_PaintDay(int day_number, double red, double green, double blue, int number_of_lines = 1) -> string;
+		auto		__XLS_print_formatted_footer_line(string title, c_float price) -> void;
+		auto		__XLS_DrawBorder(int left, int top, int right, int bottom) -> string;
+		auto		__XLS_DrawUnderline(int left, int right) -> string;
+
+		auto		__HPDF_DrawHeader() -> string;
+		auto		__HPDF_DrawTable() -> string;
+		auto		__HPDF_DrawFooter() -> string;
+		auto		__HPDF_DrawFooter_SingleLine(string text, c_float number) -> string;
+		auto 		__HPDF_PrintSignature() -> string;
 
 		auto		GetBTSumExpenses(string index)					{ return vars->Get("timecard_price_" + index); };
 
@@ -119,9 +111,11 @@ class C_Print_BT
 		virtual auto	GetBTPaymentNoVAT(string index) -> string	= 0;
 		virtual auto	GetBTVAT(string index) 			-> string	= 0;
 		virtual auto	GetBTPaymentAndVAT(string index)-> string	= 0;
+		virtual auto	GetSignatureTitle1()			-> string	= 0;
+		virtual auto	GetSignatureTitle2()			-> string	= 0;
 
 	public:
-					C_Print_BT();
+					C_Print_BT()									{};
 					
 		auto		GetTotalPayment()								{ return total_payment; };
 
@@ -136,7 +130,7 @@ class C_Print_BT
 		auto		PrintAsXLS() -> string;
 		auto		PrintAsPDF() -> string;
 
-					~C_Print_BT()									{ if(__pdf) { HPDF_Free(__pdf); }; };
+					~C_Print_BT()									{};
 };
 
 class C_Print_BT_To_CC : public C_Print_BT
@@ -146,6 +140,8 @@ class C_Print_BT_To_CC : public C_Print_BT
 		auto		GetBTPaymentNoVAT(string index)		-> string	{ return vars->Get("cost_center_price_" + index); };
 		auto		GetBTVAT(string index)				-> string	{ return vars->Get("cost_center_vat_" + index); };
 		auto		GetBTPaymentAndVAT(string index)	-> string	{ return vars->Get("cost_center_total_" + index); };
+		auto		GetSignatureTitle1()				-> string	{ return bt.GetSignatureTitle1(); };
+		auto		GetSignatureTitle2()				-> string	{ return bt.GetSignatureTitle2(); };
 };
 
 class C_Print_BT_To_Subc : public C_Print_BT
@@ -155,6 +151,8 @@ class C_Print_BT_To_Subc : public C_Print_BT
 		auto		GetBTPaymentNoVAT(string index)		-> string	{ return vars->Get("timecard_price_" + index); };
 		auto		GetBTVAT(string index)				-> string	{ return vars->Get("timecard_vat_" + index); };
 		auto		GetBTPaymentAndVAT(string index)	-> string	{ return vars->Get("timecard_total_" + index); };
+		auto		GetSignatureTitle1()				-> string	{ return bt.GetSignatureTitle1(); };
+		auto		GetSignatureTitle2()				-> string	{ return bt.GetSignatureTitle2(); };
 };
 
 ostream&	operator<<(ostream& os, const C_Print_BT &);
