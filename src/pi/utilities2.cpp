@@ -2084,7 +2084,7 @@ string GetBankInJSONFormat(string sqlQuery, CMysql *db, CUser *user)
 			items.push_back(item);
 		}
 
-		for(unsigned int i = 0; i < items.size(); ++i)
+		for(auto i = 0u; i < items.size(); ++i)
 		{
 			if(i) ostFinal << ",";
 

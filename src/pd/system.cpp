@@ -168,7 +168,7 @@ int main()
 
 			if(user.GetLogin() == "Guest")
 			{
-				MESSAGE_DEBUG("", action, ":GetNavMenuChatStatus: re-login required");
+				MESSAGE_DEBUG("", action, "re-login required");
 				// --- session and user variable will be derived from global configuration
 			}
 			else

@@ -1863,6 +1863,7 @@ string GetUserListInJSONFormat(string dbQuery, CMysql *db, CUser *user)
 		string	userLogin;
 		string	userName;
 		string	userNameLast;
+		string	userType;
 		string	userSex;
 		string	userBirthday;
 		string	userBirthdayAccess;
@@ -1889,6 +1890,7 @@ string GetUserListInJSONFormat(string dbQuery, CMysql *db, CUser *user)
 			item.userName = db->Get(i, "name");
 			item.userNameLast = db->Get(i, "nameLast");
 			item.userSex = db->Get(i, "sex");
+			item.userType = db->Get(i, "type");
 			item.userBirthday = db->Get(i, "birthday");
 			item.userBirthdayAccess = db->Get(i, "birthdayAccess");
 			item.userAppliedVacanciesRender = db->Get(i, "appliedVacanciesRender");
@@ -1911,6 +1913,7 @@ string GetUserListInJSONFormat(string dbQuery, CMysql *db, CUser *user)
 				auto				userName = ""s;
 				auto				userNameLast = ""s;
 				auto				userSex = ""s;
+				auto				userType = ""s;
 				auto				userBirthday = ""s;
 				auto				userBirthdayAccess = ""s;
 				auto				userCurrentEmployment = ""s;
@@ -1930,6 +1933,7 @@ string GetUserListInJSONFormat(string dbQuery, CMysql *db, CUser *user)
 				userName = itemsList[i].userName;
 				userNameLast = itemsList[i].userNameLast;
 				userSex = itemsList[i].userSex;
+				userType = itemsList[i].userType;
 				userBirthday = itemsList[i].userBirthday;
 				userBirthdayAccess = itemsList[i].userBirthdayAccess;
 				userAppliedVacanciesRender = itemsList[i].userAppliedVacanciesRender;
@@ -2002,6 +2006,7 @@ string GetUserListInJSONFormat(string dbQuery, CMysql *db, CUser *user)
 						  "\"name\": \""						<< userName << "\", "
 						  "\"nameLast\": \""					<< userNameLast << "\","
 						  "\"userSex\": \""						<< userSex << "\","
+						  "\"userType\": \""					<< userType << "\","
 						  "\"birthday\": \""					<< userBirthday << "\","
 						  "\"birthdayAccess\": \""				<< userBirthdayAccess << "\","
 						  "\"appliedVacanciesRender\": \""		<< userAppliedVacanciesRender << "\","

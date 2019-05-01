@@ -206,15 +206,11 @@ int main()
 		ostringstream	ost;
 		string			strPageToGet, strFriendsOnSinglePage;
 
-		{
-			MESSAGE_DEBUG("", action, "start");
-		}
+		MESSAGE_DEBUG("", action, "start");
 
 		if(user.GetLogin() == "Guest")
 		{
-			{
-				MESSAGE_DEBUG("", action, "re-login required");
-			}
+			MESSAGE_DEBUG("", action, "re-login required");
 
 			indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
 		}
@@ -228,9 +224,7 @@ int main()
 			} // if(!indexPage.SetTemplate("my_network.htmlt"))
 		}
 
-		{
-			MESSAGE_DEBUG("", action, "finish");
-		}
+		MESSAGE_DEBUG("", action, "finish");
 	}
 
 	if(action == "AJAX_getMyTimecard")
@@ -813,16 +807,12 @@ int main()
 		};
 		vector<ItemClass>		itemsList;
 
-		{
-			MESSAGE_DEBUG("", action, "start");
-		}
+		MESSAGE_DEBUG("", action, "start");
 
 		ostResult.str("");
 		if(user.GetLogin() == "Guest")
 		{
-			{
-				MESSAGE_DEBUG("", action, "re-login required");
-			}
+			MESSAGE_DEBUG("", action, "re-login required");
 
 			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
 		}
@@ -960,7 +950,7 @@ int main()
 											{
 												if(notify_about_task_creation)
 												{
-													if(NotifySoWContractPartiesAboutChanges("AJAX_addTask", task_id, sow_id, "", item.task, &db, &user))
+													if(GeneralNotifySoWContractPartiesAboutChanges("AJAX_addTask", task_id, sow_id, "", item.task, &db, &user))
 													{
 													}
 													else
@@ -972,7 +962,7 @@ int main()
 												{
 													MESSAGE_DEBUG("", "", "no notification about task creation");
 												}
-												if(NotifySoWContractPartiesAboutChanges("AJAX_addTaskAssignment", task_assignment_id, sow_id, "", item.customer + " / " + item.project + " / " + item.task + " ( с " + sow_start_date + " по " + sow_end_date + ")", &db, &user))
+												if(GeneralNotifySoWContractPartiesAboutChanges("AJAX_addTaskAssignment", task_assignment_id, sow_id, "", item.customer + " / " + item.project + " / " + item.task + " ( с " + sow_start_date + " по " + sow_end_date + ")", &db, &user))
 												{
 												}
 												else
@@ -1897,7 +1887,7 @@ int main()
 									{
 										ostResult << "{\"result\":\"success\"}";
 
-										if(NotifySoWContractPartiesAboutChanges(action, id, "", existing_value, new_value, &db, &user))
+										if(GeneralNotifySoWContractPartiesAboutChanges(action, id, "", existing_value, new_value, &db, &user))
 										{
 										}
 										else
@@ -1972,6 +1962,81 @@ int main()
 		}
 
 		MESSAGE_DEBUG("", action, "finish");
+	}
+
+	if(action == "AJAX_agreeSoW")
+	{
+		ostringstream	ostResult;
+		auto			template_name = "json_response.htmlt"s;
+		auto			error_message = ""s;
+		auto			success_message = ""s;
+
+		MESSAGE_DEBUG("", action, "start");
+
+		ostResult.str("");
+
+		if(user.GetLogin() == "Guest")
+		{
+			error_message = "re-login required";
+			MESSAGE_DEBUG("", action, error_message);
+		}
+		else
+		{
+
+			string			sow_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("sow_id"));
+
+			if(sow_id.length())
+			{
+				auto		error_description = ""s;
+				auto		success_description = ""s;
+
+				if(isUserAssignedToSoW(user.GetID(), sow_id, &db))
+				{
+					db.Query("UPDATE `contracts_sow` SET `status`=\"signed\" WHERE `id`=\"" + sow_id + "\";");
+					if(db.isError())
+					{
+						error_message = gettext("SQL syntax issue");
+						MESSAGE_ERROR("", "", error_message);
+					}
+					
+					if(error_message.empty())
+					{
+						NotifySoWContractPartiesAboutChanges(to_string(NOTIFICATION_SUBCONTRACTOR_SIGNED_SOW), sow_id, &db, &user);
+					}
+
+				}
+				else
+				{
+					error_message = gettext("You are not authorized");
+					MESSAGE_ERROR("", action, error_message);
+				}
+			}
+			else
+			{
+				error_message = gettext("parameters incorrect");
+				MESSAGE_ERROR("", action, error_message);
+			}
+
+
+		}
+
+		if(error_message.empty())
+		{
+			ostResult << "{\"result\":\"success\"" + success_message + "}";
+		}
+		else
+		{
+			MESSAGE_DEBUG("", action, "failed");
+			ostResult.str("");
+			ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+		}
+
+		indexPage.RegisterVariableForce("result", ostResult.str());
+
+		if(!indexPage.SetTemplate(template_name))
+		{
+			MESSAGE_ERROR("", action, "can't find template " + template_name);
+		}
 	}
 
 	{

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-26 08:02-0400\n"
+"POT-Creation-Date: 2019-04-30 19:24-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -47,20 +47,14 @@ msgstr "Нет доступа"
 msgid "Account"
 msgstr "Сч. №"
 
-msgid "Sum expense"
-msgstr "Итого расходов по отчету"
+msgid "Assignment must be inside SoW"
+msgstr "Назначение должно быть в SoW"
 
 msgid "Accountant"
 msgstr "Бухгалтер"
 
 msgid "Act"
 msgstr "Акт"
-
-msgid "Tax"
-msgstr "Налог"
-
-msgid "Markup"
-msgstr "Наценка"
 
 msgid "Agency: cost center"
 msgstr "Данные агенства: центр затрат"
@@ -79,12 +73,6 @@ msgstr "Данные агенства: название центра затра�
 
 msgid "Agreement"
 msgstr "Договор"
-
-msgid "Taxable sum"
-msgstr "Итого (налогооблагаемая база)"
-
-msgid "Non-taxable sum"
-msgstr "Итого (налого-необлагаемая база)"
 
 msgid "April"
 msgstr "Апрель"
@@ -112,6 +100,9 @@ msgstr "Основание"
 
 msgid "Buyer"
 msgstr "Покупатель"
+
+msgid "Can't remove"
+msgstr "Нельзя удалить"
 
 msgid "Company not found"
 msgstr "Компания не найдена"
@@ -215,6 +206,9 @@ msgstr "Март"
 msgid "March declension"
 msgstr "Марта"
 
+msgid "Markup"
+msgstr "Наценка"
+
 msgid "May"
 msgstr "Май"
 
@@ -226,6 +220,9 @@ msgstr "Ед. изм. (код)"
 
 msgid "Measure unit (name)"
 msgstr "Ед. изм. (имя)"
+
+msgid "Non-taxable sum"
+msgstr "Итого (налого-необлагаемая база)"
 
 msgid "November"
 msgstr "Ноябрь"
@@ -314,6 +311,9 @@ msgstr "Сумма (в валюте)"
 msgid "Sum (rur)"
 msgstr "Сумма (руб)"
 
+msgid "Sum expense"
+msgstr "Итого расходов по отчету"
+
 msgid "Sum items"
 msgstr "Всего наименований"
 
@@ -323,11 +323,17 @@ msgstr "Поставщик"
 msgid "TIN"
 msgstr "ИНН"
 
+msgid "Tax"
+msgstr "Налог"
+
 msgid "Tax amount"
 msgstr "Сумма налога"
 
 msgid "Tax rate"
 msgstr "Налоговая ставка"
+
+msgid "Taxable sum"
+msgstr "Итого (налогооблагаемая база)"
 
 msgid "Technical Requirement agreement short"
 msgstr "ТЗ"
@@ -410,6 +416,9 @@ msgstr "от"
 msgid "agreement number is empty"
 msgstr "не указан номер договора"
 
+msgid "and"
+msgstr "и"
+
 msgid "bank_id is empty"
 msgstr "не указан банк"
 
@@ -433,6 +442,9 @@ msgstr "изменилась наценка комндировки"
 
 msgid "bt markup type changed"
 msgstr "изменился тип нацеки у командировки"
+
+msgid "bt-s reported"
+msgstr "командировок"
 
 msgid "but BIK is different"
 msgstr "но отличается БИК"
@@ -668,6 +680,9 @@ msgstr "выберите один фаил"
 msgid "ogrn is empty"
 msgstr "не указан ОГРН"
 
+msgid "parameters incorrect"
+msgstr "некорректные параметры"
+
 msgid "period start have to precede period end"
 msgstr "начало должно быть раньше окончания"
 
@@ -730,6 +745,9 @@ msgstr "не определена дата окончания таймкарты
 
 msgid "timecard id is empty"
 msgstr "таймкарта не найдена"
+
+msgid "timecards reported"
+msgstr "таймкарт"
 
 msgid "tin already exists"
 msgstr "компания с таким ИНН уже существует"

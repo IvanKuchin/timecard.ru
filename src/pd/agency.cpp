@@ -52,7 +52,7 @@ int main(void)
 			}
 			else
 			{
-				MESSAGE_ERROR("", "", "RegisterInitialVariables failed, throwing exception");
+				MESSAGE_ERROR("", action, "RegisterInitialVariables failed, throwing exception");
 				throw CExceptionHTML("environment variable error");
 			}
 
@@ -1107,7 +1107,7 @@ int main(void)
 									{
 										ostResult << "{\"result\":\"success\"}";
 
-										if(NotifySoWContractPartiesAboutChanges(action, id, sow_id, existing_value, new_value, &db, &user))
+										if(GeneralNotifySoWContractPartiesAboutChanges(action, id, sow_id, existing_value, new_value, &db, &user))
 										{
 										}
 										else
@@ -1218,7 +1218,7 @@ int main(void)
 									{
 										ostResult << "{\"result\":\"success\"}";
 
-										if(NotifySoWContractPartiesAboutChanges(action, id, sow_id, existing_value, new_value, &db, &user))
+										if(GeneralNotifySoWContractPartiesAboutChanges(action, id, sow_id, existing_value, new_value, &db, &user))
 										{
 										}
 										else
@@ -1372,7 +1372,7 @@ int main(void)
 											{
 												// --- good finish
 
-												if(NotifySoWContractPartiesAboutChanges(action, id, "", existing_value, new_value, &db, &user))
+												if(GeneralNotifySoWContractPartiesAboutChanges(action, id, "", existing_value, new_value, &db, &user))
 												{
 												}
 												else
@@ -1393,7 +1393,7 @@ int main(void)
 										{
 											string		existing_value = GetDBValueByAction(action, id, "", &db, &user);
 
-											if(NotifySoWContractPartiesAboutChanges(action, id, "", existing_value, new_value, &db, &user))
+											if(GeneralNotifySoWContractPartiesAboutChanges(action, id, "", existing_value, new_value, &db, &user))
 											{
 											}
 											else
@@ -1531,24 +1531,24 @@ int main(void)
 
 												if(notify_about_task_creation)
 												{
-													if(NotifySoWContractPartiesAboutChanges("AJAX_addTask", task_id, sow_id, "", task, &db, &user))
+													if(GeneralNotifySoWContractPartiesAboutChanges("AJAX_addTask", task_id, sow_id, "", task, &db, &user))
 													{
 													}
 													else
 													{
-														MESSAGE_ERROR("", "", "fail to notify SoW parties");
+														MESSAGE_ERROR("", action, "fail to notify SoW parties");
 													}
 												}
 												else
 												{
 													MESSAGE_DEBUG("", "", "no notification about task creation");
 												}
-												if(NotifySoWContractPartiesAboutChanges(action, task_assignment_id, sow_id, "", customer + " / " + project + " / " + task + " ( с " + assignment_start + " по " + assignment_end + ")", &db, &user))
+												if(GeneralNotifySoWContractPartiesAboutChanges(action, task_assignment_id, sow_id, "", customer + " / " + project + " / " + task + " ( с " + assignment_start + " по " + assignment_end + ")", &db, &user))
 												{
 												}
 												else
 												{
-													MESSAGE_ERROR("", "", "fail to notify SoW parties");
+													MESSAGE_ERROR("", action, "fail to notify SoW parties");
 												}
 											}
 											else
@@ -1656,12 +1656,12 @@ int main(void)
 
 										if(bt_expense_template_sow_assignment_id.length())
 										{
-											if(NotifySoWContractPartiesAboutChanges(action, bt_expense_template_sow_assignment_id, sow_id, "", "", &db, &user))
+											if(GeneralNotifySoWContractPartiesAboutChanges(action, bt_expense_template_sow_assignment_id, sow_id, "", "", &db, &user))
 											{
 											}
 											else
 											{
-												MESSAGE_ERROR("", "", "fail to notify SoW parties");
+												MESSAGE_ERROR("", action, "fail to notify SoW parties");
 											}
 										}
 										else
@@ -1755,12 +1755,12 @@ int main(void)
 
 								ostResult << "{\"result\":\"success\"}";
 
-								if(NotifySoWContractPartiesAboutChanges(action, task_id, "", "", task, &db, &user))
+								if(GeneralNotifySoWContractPartiesAboutChanges(action, task_id, "", "", task, &db, &user))
 								{
 								}
 								else
 								{
-									MESSAGE_ERROR("", "", "fail to notify agency");
+									MESSAGE_ERROR("", action, "fail to notify agency");
 								}
 							}
 							else
@@ -1873,12 +1873,12 @@ int main(void)
 								error_message = expense_template.SaveToDB(&db);
 								if(error_message.empty())
 								{
-									if(NotifySoWContractPartiesAboutChanges(action, expense_template.GetID(), "", "", "", &db, &user))
+									if(GeneralNotifySoWContractPartiesAboutChanges(action, expense_template.GetID(), "", "", "", &db, &user))
 									{
 									}
 									else
 									{
-										MESSAGE_ERROR("", "", "fail to notify agency");
+										MESSAGE_ERROR("", action, "fail to notify agency");
 									}
 								}
 								else
@@ -1996,12 +1996,12 @@ int main(void)
 									{
 										new_expense_tempate_line_obj = GetBTExpenseLineTemplatesInJSONFormat("SELECT * FROM `bt_expense_line_templates` WHERE `id`=\"" + expense_line_template.GetID() + "\";", &db, &user);
 
-										if(NotifySoWContractPartiesAboutChanges(action, expense_line_template.GetID(), "", "", "", &db, &user))
+										if(GeneralNotifySoWContractPartiesAboutChanges(action, expense_line_template.GetID(), "", "", "", &db, &user))
 										{
 										}
 										else
 										{
-											MESSAGE_ERROR("", "", "fail to notify agency");
+											MESSAGE_ERROR("", action, "fail to notify agency");
 										}
 									}
 									else
@@ -2082,12 +2082,12 @@ int main(void)
 
 								if(counter == "0")
 								{
-									if(NotifySoWContractPartiesAboutChanges(action, timecard_task_assignment_id, sow_id, "", "", &db, &user))
+									if(GeneralNotifySoWContractPartiesAboutChanges(action, timecard_task_assignment_id, sow_id, "", "", &db, &user))
 									{
 									}
 									else
 									{
-										MESSAGE_ERROR("", "", "fail to notify SoW parties");
+										MESSAGE_ERROR("", action, "fail to notify SoW parties");
 									}
 
 									// --- important that assignment removal come after notification
@@ -2175,12 +2175,12 @@ int main(void)
 
 								if(counter == "0")
 								{
-									if(NotifySoWContractPartiesAboutChanges(action, bt_expense_assignment_id, sow_id, "", "", &db, &user))
+									if(GeneralNotifySoWContractPartiesAboutChanges(action, bt_expense_assignment_id, sow_id, "", "", &db, &user))
 									{
 									}
 									else
 									{
-										MESSAGE_ERROR("", "", "fail to notify SoW parties");
+										MESSAGE_ERROR("", action, "fail to notify SoW parties");
 									}
 
 									// --- important that assignment removal comes after notification
@@ -2269,35 +2269,35 @@ int main(void)
 
 									tie(customer_id, project_id) = GetCustomerIDProjectIDByTaskID(task_id, &db);
 
-									if(NotifySoWContractPartiesAboutChanges("AJAX_deleteTask", task_id, "", "", "", &db, &user))
+									if(GeneralNotifySoWContractPartiesAboutChanges("AJAX_deleteTask", task_id, "", "", "", &db, &user))
 									{
 									}
 									else
 									{
-										MESSAGE_ERROR("", "", "fail to notify agency");
+										MESSAGE_ERROR("", action, "fail to notify agency");
 									}
 									db.Query("DELETE FROM `timecard_tasks` WHERE `id`=\"" + task_id + "\";");
 									ostResult << "{\"result\":\"success\"}";
 
 									if(isProjectIDValidToRemove(project_id, &db))
 									{
-										if(NotifySoWContractPartiesAboutChanges("AJAX_deleteProject", project_id, "", "", "", &db, &user))
+										if(GeneralNotifySoWContractPartiesAboutChanges("AJAX_deleteProject", project_id, "", "", "", &db, &user))
 										{
 										}
 										else
 										{
-											MESSAGE_ERROR("", "", "fail to notify agency");
+											MESSAGE_ERROR("", action, "fail to notify agency");
 										}
 										db.Query("DELETE FROM `timecard_projects` WHERE `id`=\"" + project_id + "\";");
 
 										if(isCustomerIDValidToRemove(customer_id, &db))
 										{
-											if(NotifySoWContractPartiesAboutChanges("AJAX_deleteCustomer", customer_id, "", "", "", &db, &user))
+											if(GeneralNotifySoWContractPartiesAboutChanges("AJAX_deleteCustomer", customer_id, "", "", "", &db, &user))
 											{
 											}
 											else
 											{
-												MESSAGE_ERROR("", "", "fail to notify agency");
+												MESSAGE_ERROR("", action, "fail to notify agency");
 											}
 											db.Query("DELETE FROM `timecard_customers` WHERE `id`=\"" + customer_id + "\";");
 										}
@@ -2386,12 +2386,12 @@ int main(void)
 								{
 									string		removal_sql_query = "";
 
-									if(NotifySoWContractPartiesAboutChanges("AJAX_deleteExpenseTemplate", expense_template_id, "", "", "", &db, &user))
+									if(GeneralNotifySoWContractPartiesAboutChanges("AJAX_deleteExpenseTemplate", expense_template_id, "", "", "", &db, &user))
 									{
 									}
 									else
 									{
-										MESSAGE_ERROR("", "", "fail to notify agency");
+										MESSAGE_ERROR("", action, "fail to notify agency");
 									}
 									db.Query("DELETE FROM `bt_expense_line_templates` WHERE `bt_expense_template_id`=\"" + expense_template_id + "\";");
 									db.Query("DELETE FROM `bt_sow_assignment` WHERE `bt_expense_template_id`=\"" + expense_template_id + "\";");
@@ -2473,12 +2473,12 @@ int main(void)
 								{
 									string		removal_sql_query = "";
 
-									if(NotifySoWContractPartiesAboutChanges("AJAX_deleteExpenseTemplateLine", expense_template_line_id, "", "", "", &db, &user))
+									if(GeneralNotifySoWContractPartiesAboutChanges("AJAX_deleteExpenseTemplateLine", expense_template_line_id, "", "", "", &db, &user))
 									{
 									}
 									else
 									{
-										MESSAGE_ERROR("", "", "fail to notify agency");
+										MESSAGE_ERROR("", action, "fail to notify agency");
 									}
 									
 									db.Query("DELETE FROM `bt_expense_line_templates` WHERE `id`=\"" + expense_template_line_id + "\";");
@@ -2558,12 +2558,12 @@ int main(void)
 								cost_center_id = db.InsertQuery("INSERT INTO `cost_centers` (`company_id`, `agency_company_id`, `assignee_user_id`, `eventTimestamp`) VALUES (\"" + company_id + "\", \"" + agency_id + "\", \"" + user.GetID() + "\", UNIX_TIMESTAMP());");
 								if(cost_center_id)
 								{
-									if(NotifySoWContractPartiesAboutChanges(action, to_string(cost_center_id), "", "", "", &db, &user))
+									if(GeneralNotifySoWContractPartiesAboutChanges(action, to_string(cost_center_id), "", "", "", &db, &user))
 									{
 									}
 									else
 									{
-										MESSAGE_ERROR("", "", "fail to notify agency");
+										MESSAGE_ERROR("", action, "fail to notify agency");
 									}
 								}
 							}
@@ -2942,12 +2942,12 @@ int main(void)
 								error_message = isEmployeeIDValidToRemove(employee_id, &db);
 								if(error_message.empty())
 								{
-									if(NotifySoWContractPartiesAboutChanges(action, employee_id, "", "", "", &db, &user))
+									if(GeneralNotifySoWContractPartiesAboutChanges(action, employee_id, "", "", "", &db, &user))
 									{
 									}
 									else
 									{
-										MESSAGE_ERROR("", "", "fail to notify agency");
+										MESSAGE_ERROR("", action, "fail to notify agency");
 									}
 
 									if(db.Query("SELECT `user_id` FROM `company_employees` WHERE `id`=\"" + employee_id + "\";"))
@@ -3103,7 +3103,7 @@ int main(void)
 							if(info_to_return.length()) ostResult << "," << info_to_return;
 							ostResult << "}";
 
-							if(NotifySoWContractPartiesAboutChanges(action, "fake_id", sow_id, "fake_existing_value", new_value, &db, &user))
+							if(GeneralNotifySoWContractPartiesAboutChanges(action, "fake_id", sow_id, "fake_existing_value", new_value, &db, &user))
 							{
 							}
 							else
@@ -3168,7 +3168,7 @@ int main(void)
 					if(error_message.empty())
 					{
 						// --- notify before actual removal
-						if(NotifySoWContractPartiesAboutChanges(action, id, sow_id, "fake_existing_value", "fake_new_value", &db, &user))
+						if(GeneralNotifySoWContractPartiesAboutChanges(action, id, sow_id, "fake_existing_value", "fake_new_value", &db, &user))
 						{
 						}
 						else
@@ -3555,7 +3555,7 @@ int main(void)
 						}
 						else
 						{
-							MESSAGE_ERROR("", "", "can't recall service invoice(" + service_invoice_id + ")");
+							MESSAGE_ERROR("", action, "can't recall service invoice(" + service_invoice_id + ")");
 						}
 					}
 					else
@@ -3611,7 +3611,7 @@ int main(void)
 						}
 						else
 						{
-							MESSAGE_ERROR("", "", "can't recall bt invoice(" + bt_invoice_id + ")");
+							MESSAGE_ERROR("", action, "can't recall bt invoice(" + bt_invoice_id + ")");
 						}
 					}
 					else
@@ -3831,10 +3831,12 @@ int main(void)
 
 		if(action == "AJAX_addSoW")
 		{
-			string			company_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("company_id"));
-			string			template_name = "json_response.htmlt";
-			string			error_message = "";
+			auto			subcontractor_company_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("company_id"));
+			auto			template_name = "json_response.htmlt"s;
+			auto			error_message = ""s;
+			auto			success_message = ""s;
 			ostringstream	ostResult;
+			auto			sow_id = 0l;
 
 			ostResult.str("");
 
@@ -3843,6 +3845,74 @@ int main(void)
 				error_message = isAgencyEmployeeAllowedToChangeAgencyData(&db, &user);
 				if(error_message.empty())
 				{
+					auto	position_id = GetPositionByCompanyID(subcontractor_company_id, &db, &user);
+
+					if(position_id.length())
+					{
+						auto	agency_id = GetAgencyID(&user, &db);
+
+						if(agency_id.length())
+						{
+							sow_id = db.InsertQuery("INSERT INTO `contracts_sow` ("
+																					"`subcontractor_company_id`,"
+																					"`agency_company_id`,"
+																					"`company_position_id`,"
+																					"`start_date`,"
+																					"`end_date`,"
+																					"`number`,"
+																					"`sign_date`,"
+																					"`timecard_period`,"
+																					"`subcontractor_create_tasks`,"
+																					"`day_rate`,"
+																					"`act_number`,"
+																					"`creator_user_id`,"
+																					"`eventTimestamp`"
+																				") VALUES ("
+																					"\"" + subcontractor_company_id + "\","
+																					"\"" + agency_id + "\","
+																					"\"" + position_id + "\","
+																					"NOW(),"
+																					"DATE_SUB(DATE_ADD(NOW(), INTERVAL 1 YEAR), INTERVAL 1 DAY),"
+																					"\"--------------\","
+																					"NOW(),"
+																					"\"month\","
+																					"\"N\","
+																					"\"0\","
+																					"\"0\","
+																					"\"" + user.GetID() + "\","
+																					"UNIX_TIMESTAMP()"
+																				")"
+													);
+							if(sow_id)
+							{
+								auto	subcontractor_user_id = ""s;
+								auto	temp_error_message = NotifySoWContractPartiesAboutChanges(to_string(NOTIFICATION_AGENGY_INITIATED_SOW), to_string(sow_id), &db, &user);
+
+								success_message = ",\"sow_id\":\""s + to_string(sow_id) + "\"";
+
+								// --- notifications
+								if(temp_error_message.length())
+								{
+									MESSAGE_ERROR("", action, temp_error_message);
+								}
+							}
+							else
+							{
+								error_message = gettext("SQL syntax issue");
+								MESSAGE_ERROR("", action, "fail to create sow");
+							}
+						}
+						else
+						{
+							error_message = gettext("You are not authorized");
+							MESSAGE_ERROR("", action, "fail to determine agency_id");
+						}
+					}
+					else
+					{
+						error_message = gettext("SQL syntax issue");
+						MESSAGE_ERROR("", action, "fail to determine position_id");
+					}
 				}
 				else
 				{
@@ -3857,7 +3927,7 @@ int main(void)
 
 			if(error_message.empty())
 			{
-				ostResult << "{\"result\":\"success\"}";
+				ostResult << "{\"result\":\"success\"" + success_message + "}";
 			}
 			else
 			{
@@ -3871,12 +3941,93 @@ int main(void)
 			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 		}
 
+		if(action == "AJAX_deleteSoW")
+		{
+			auto			sow_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("sow_id"));
+			auto			template_name = "json_response.htmlt"s;
+			auto			error_message = ""s;
+			auto			success_message = ""s;
+			ostringstream	ostResult;
 
+			ostResult.str("");
 
+			if(sow_id.length())
+			{
+				if(user.GetType() == "agency")
+				{
+					error_message = isAgencyEmployeeAllowedToChangeAgencyData(&db, &user);
 
+					if(error_message.empty())
+					{
+						auto	timecards_reported = 0l;
+						auto	bt_reported = 0l;
 
+						if(db.Query("SELECT count(*) FROM `bt` WHERE `contract_sow_id`=\"" + sow_id + "\";"))
+						{
+							bt_reported = stod_noexcept(db.Get(0, 0));
 
+							if(db.Query("SELECT count(*) FROM `timecards` WHERE `contract_sow_id`=\"" + sow_id + "\";"))
+							{
+								timecards_reported = stod_noexcept(db.Get(0, 0));
+							}
+						}
 
+						if(bt_reported + timecards_reported)
+						{
+							error_message = gettext("Can't remove")  + " ("s + to_string(timecards_reported) + " " + gettext("timecards reported") + " " + gettext("and") + " " + to_string(bt_reported) + " " + gettext("bt-s reported") + ").";
+						}
+						else
+						{
+// TODO: remove notifications related to SoW
+
+							db.Query("DELETE FROM `users_notification` WHERE `actionTypeId`=\"" + to_string(NOTIFICATION_AGENGY_INITIATED_SOW) + "\" AND `actionId`=\"" + sow_id + "\";");
+							db.Query("DELETE FROM `users_notification` WHERE `actionTypeId`=\"" + to_string(NOTIFICATION_SUBCONTRACTOR_SIGNED_SOW) + "\" AND `actionId`=\"" + sow_id + "\";");
+							db.Query("DELETE FROM `contract_sow_custom_fields` WHERE `contract_sow_id`=\"" + sow_id + "\";");
+							db.Query("DELETE FROM `timecard_task_assignment` WHERE `contract_sow_id`=\"" + sow_id + "\";");
+							db.Query("DELETE FROM `timecard_approvers` WHERE `contract_sow_id`=\"" + sow_id + "\";");
+							db.Query("DELETE FROM `bt_approvers` WHERE `contract_sow_id`=\"" + sow_id + "\";");
+							db.Query("DELETE FROM `bt_sow_assignment` WHERE `sow_id`=\"" + sow_id + "\";");
+
+							db.Query("DELETE FROM `contract_psow_custom_fields` WHERE `contract_psow_id`=("
+										"SELECT `id` FROM `contracts_psow` WHERE `contract_sow_id`=\"" + sow_id + "\""
+									");");
+
+							db.Query("DELETE FROM `contracts_psow` WHERE `contract_sow_id`=\"" + sow_id + "\";");
+							db.Query("DELETE FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";");
+						}
+					}
+					else
+					{
+						MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") doesn't allowed to change agency data");
+					}
+				}
+				else
+				{
+					MESSAGE_ERROR("", action, "user(" + user.GetID() + ") is not an agency employee");
+					error_message = gettext("You are not authorized");
+				}
+			}
+			else
+			{
+				error_message = gettext("parameters incorrect");
+				MESSAGE_ERROR("", action, error_message);
+			}
+
+			if(error_message.empty())
+			{
+				ostResult << "{\"result\":\"success\"" + success_message + "}";
+			}
+			else
+			{
+				MESSAGE_DEBUG("", action, "failed");
+				ostResult.str("");
+				ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+			}
+
+			indexPage.RegisterVariableForce("result", ostResult.str());
+
+			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+		}
 
 		MESSAGE_DEBUG("", "", "post-condition if(action == \"" + action + "\")");
 

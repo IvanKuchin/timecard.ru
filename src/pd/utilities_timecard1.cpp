@@ -1164,7 +1164,6 @@ string  GetUserNotificationSpecificDataByType(unsigned long typeID, unsigned lon
 
 	{
 		CLog	log;
-
 		log.Write(DEBUG, string(__func__) + "(typeID=" + to_string(typeID) + ", actionID=" + to_string(actionID) + ")[" + to_string(__LINE__) + "]: start");
 	}
 
@@ -2778,6 +2777,57 @@ string  GetUserNotificationSpecificDataByType(unsigned long typeID, unsigned lon
 		}
 	}
 
+	if(typeID == NOTIFICATION_AGENGY_INITIATED_SOW)
+	{
+		string		id = to_string(actionID);
+
+		if(id.length())
+		{
+			ostResult << "\"item\":[" << GetSOWInJSONFormat("SELECT * FROM `contracts_sow` WHERE `id`=\"" + id + "\";", db, user) << "],";
+			ostResult << "\"notificationFromCompany\":[" << GetCompanyListInJSONFormat("SELECT * FROM `company` WHERE `id`=("
+																							"SELECT `agency_company_id` FROM `contracts_sow` WHERE `id`=\"" + id + "\""
+																						");", db, NULL) << "],";
+			ostResult << "\"users\":[" << GetUserListInJSONFormat("SELECT * FROM `users` WHERE `id`=\"" + user->GetID() + "\";", db, user) << "]";
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "typeID=" + to_string(typeID) + ": sow_id is empty");
+		}
+	}
+
+	if(typeID == NOTIFICATION_SUBCONTRACTOR_SIGNED_SOW)
+	{
+		string		id = to_string(actionID);
+
+		if(id.length())
+		{
+			ostResult << "\"item\":[" << GetSOWInJSONFormat("SELECT * FROM `contracts_sow` WHERE `id`=\"" + id + "\";", db, user) << "],";
+			ostResult << "\"notificationFromCompany\":[" << GetCompanyListInJSONFormat("SELECT * FROM `company` WHERE `id`=("
+																							"SELECT `subcontractor_company_id` FROM `contracts_sow` WHERE `id`=\"" + id + "\""
+																						");", db, NULL) << "],";
+			ostResult << "\"users\":[" << GetUserListInJSONFormat("SELECT * FROM `users` WHERE `id`=\"" + user->GetID() + "\";", db, user) << "]";
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "typeID=" + to_string(typeID) + ": sow_id is empty");
+		}
+	}
+
+	if(typeID == NOTIFICATION_AGENGY_ABOUT_SUBC_REGISTRATION)
+	{
+		string		id = to_string(actionID);
+
+		if(id.length())
+		{
+			ostResult << "\"item\":[],";
+			ostResult << "\"notificationFromCompany\":[" << GetCompanyListInJSONFormat("SELECT * FROM `company` WHERE `id`=\"" + id + "\";", db, NULL) << "]";
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "typeID=" + to_string(typeID) + ": subcontractor company_id is empty");
+		}
+	}
+
 
 
 	{
@@ -4114,6 +4164,7 @@ auto	GetSOWInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include_t
 		string	subcontractor_create_tasks;
 		string	day_rate;
 		string	act_number;
+		string	status;
 		string	eventTimestamp;
 	};
 	vector<ItemClass>		itemsList;
@@ -4140,6 +4191,7 @@ auto	GetSOWInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include_t
 			item.timecard_period = db->Get(i, "timecard_period");
 			item.subcontractor_create_tasks = db->Get(i, "subcontractor_create_tasks");
 			item.act_number = db->Get(i, "act_number");
+			item.status = db->Get(i, "status");
 			item.day_rate = db->Get(i, "day_rate");
 			item.eventTimestamp = db->Get(i, "eventTimestamp");
 
@@ -4180,6 +4232,7 @@ auto	GetSOWInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include_t
 			result += "\"subcontractor_create_tasks\":\"" + item.subcontractor_create_tasks + "\",";
 			result += "\"act_number\":\"" + item.act_number + "\",";
 			result += "\"day_rate\":\"" + (user->GetType() == "agency" || user->GetType() == "subcontractor" ? item.day_rate : "") + "\",";
+			result += "\"status\":\"" + item.status + "\",";
 			result += "\"custom_fields\":[" + GetSoWCustomFieldsInJSONFormat("SELECT * FROM `contract_sow_custom_fields` WHERE `contract_sow_id`=\"" + item.id + "\" "
 						+ (user->GetType() == "subcontractor" ? " AND (`visible_by_subcontractor`=\"Y\" OR `editable_by_subcontractor`=\"Y\") " : "")
 						+ ";", db, user)
@@ -8104,7 +8157,68 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 	return make_pair(notification_description, sql_query);
 }
 
-bool NotifySoWContractPartiesAboutChanges(string action, string id, string sow_id, string existing_value, string new_value, CMysql *db, CUser *user)
+auto NotifySoWContractPartiesAboutChanges(string action_type_id, string sow_id, CMysql *db, CUser *user) -> string
+{
+	auto				error_message = "";
+
+	MESSAGE_DEBUG("", "", "start (action_type_id=" + action_type_id + ", sow_id=" + sow_id + ")");
+
+	if(sow_id.length())
+	{
+		if(action_type_id.length())
+		{
+			vector<string>		user_list;
+			auto				affected = db->Query("SELECT `user_id` FROM `company_employees` where `company_id`=("
+														"SELECT `agency_company_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\""
+													")");
+			for(int i = 0; i < affected; ++i)
+			{
+				user_list.push_back(db->Get(i, 0));
+			}
+
+			affected = db->Query("SELECT `admin_userID` FROM `company` where `id`=("
+									"SELECT `subcontractor_company_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\""
+								")");
+			for(int i = 0; i < affected; ++i)
+			{
+				user_list.push_back(db->Get(i, 0));
+			}
+
+			for(auto &user_id: user_list)
+			{
+				if(db->InsertQuery(
+									"INSERT INTO `users_notification` (`userId`, `title`, `actionTypeId`, `actionId`, `eventTimestamp`) VALUES "
+									"(\"" + user_id + "\", \"\", \"" + action_type_id + "\", \"" + sow_id + "\", UNIX_TIMESTAMP())"
+									))
+				{
+					// --- success
+				}
+				else
+				{
+					error_message = gettext("SQL syntax issue");
+					MESSAGE_ERROR("", "", "fail to insert to db");
+					break;
+				}
+			}
+		}
+		else
+		{
+			error_message = gettext("parameters incorrect");
+			MESSAGE_ERROR("", "", "action_type_id is empty");
+		}
+	}
+	else
+	{
+		error_message = gettext("parameters incorrect");
+		MESSAGE_ERROR("", "", "sow_id is empty");
+	}
+
+	MESSAGE_DEBUG("", "", "finish (error_message is " + error_message + ")");
+
+	return error_message;	
+}
+
+bool GeneralNotifySoWContractPartiesAboutChanges(string action, string id, string sow_id, string existing_value, string new_value, CMysql *db, CUser *user)
 {
 	bool	result = false;
 
@@ -8114,10 +8228,11 @@ bool NotifySoWContractPartiesAboutChanges(string action, string id, string sow_i
 	{
 		if(action.length())
 		{
-			string		actionTypeId;
-			string		notification_description = "";
-			string		sow_list_sql_query = "";
-			string		agency_list_sql_query = "";
+			// string		actionTypeId;
+			auto		notification_description	= ""s;
+			auto		sow_list_sql_query			= ""s;
+			auto		agency_list_sql_query		= ""s;
+			auto		actionTypeId				= ""s;
 
 			// --- definition sow_list affected by action
 			tie(notification_description, sow_list_sql_query) = GetNotificationDescriptionAndSoWQuery(action, id, sow_id, existing_value, new_value, db, user);
@@ -8483,7 +8598,7 @@ auto GetNumberOfSoWActiveThisMonth(CMysql *db, CUser *user) -> string
 
 			tie(period_start, period_end) = GetFirstAndLastDateOfThisMonth();
 
-			if(db->Query("SELECT COUNT(*) AS `counter` FROM `contracts_sow` WHERE `end_date`>=\"" + PrintSQLDate(period_start) + "\"  AND `start_date`<=\"" + PrintSQLDate(period_end) + "\" AND `agency_company_id`=("
+			if(db->Query("SELECT COUNT(*) AS `counter` FROM `contracts_sow` WHERE `status`=\"signed\" AND `end_date`>=\"" + PrintSQLDate(period_start) + "\"  AND `start_date`<=\"" + PrintSQLDate(period_end) + "\" AND `agency_company_id`=("
 									"SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\""
 								")"))
 			{
@@ -8514,7 +8629,7 @@ auto GetNumberOfSoWActiveLastMonth(CMysql *db, CUser *user) -> string
 
 			tie(period_start, period_end) = GetFirstAndLastDateOfLastMonth();
 
-			if(db->Query("SELECT COUNT(*) AS `counter` FROM `contracts_sow` WHERE `end_date`>=\"" + PrintSQLDate(period_start) + "\"  AND `start_date`<=\"" + PrintSQLDate(period_end) + "\" AND `agency_company_id`=("
+			if(db->Query("SELECT COUNT(*) AS `counter` FROM `contracts_sow` WHERE `status`=\"signed\" AND `end_date`>=\"" + PrintSQLDate(period_start) + "\"  AND `start_date`<=\"" + PrintSQLDate(period_end) + "\" AND `agency_company_id`=("
 									"SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\""
 								")"))
 			{

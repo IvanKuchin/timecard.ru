@@ -183,6 +183,19 @@ bool UpdateCurrencyRateExchange(CMysql *db)
 	return	result;
 }
 
+auto ExpireOldContracts(CMysql *db)
+{
+	bool	result = false;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	db->Query("UPDATE `contracts_sow` SET `status`=\"expired\" WHERE `status`<>\"expired\" AND `end_date`<CAST(NOW() AS DATE);");
+
+	MESSAGE_DEBUG("", "", "finish (result = " + to_string(result) + ")");
+
+	return	result;
+}
+
 bool RemoveOldCaptcha()
 {
 	DIR 		*dir;
@@ -339,11 +352,10 @@ int main()
 		//--- Remove temporarily media files
 		RemoveTempMedia(&db);
 
-		//--- Remove gifts reservation to give
-		// UpdateGiftsToGive(&db);
-
 		//--- Remove old captcha
 		RemoveOldCaptcha();
+
+		ExpireOldContracts(&db);
 
 		//--- update currency rate exchange
 		UpdateCurrencyRateExchange(&db);

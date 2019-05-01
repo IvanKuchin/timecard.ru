@@ -99,7 +99,8 @@ auto			isCostCenterBelongsToAgency(string cost_center_id, CMysql *, CUser *) -> 
 // string			isAgencyEmployeeAllowedToChangeAgencyData(CMysql *, CUser *);
 // string			isActionEntityBelongsToSoW(string action, string is, string sow_id, CMysql *, CUser *);
 // string			isActionEntityBelongsToAgency(string action, string id, string agency_id, CMysql *, CUser *);
-auto			NotifySoWContractPartiesAboutChanges(string action, string id, string sow_id, string existing_value, string new_value, CMysql *, CUser *) -> bool;
+auto			NotifySoWContractPartiesAboutChanges(string action_type_id, string sow_id, CMysql *db, CUser *user) -> string;
+auto			GeneralNotifySoWContractPartiesAboutChanges(string action, string id, string sow_id, string existing_value, string new_value, CMysql *, CUser *) -> bool;
 auto			GetDBValueByAction(string action, string id, string sow_id, CMysql *, CUser *) -> string;
 // string			CheckNewValueByAction(string action, string id, string sow_id, string new_value, CMysql *, CUser *);
 auto			SetNewValueByAction(string action, string id, string sow_id, string new_value, CMysql *, CUser *) -> string;
@@ -115,6 +116,7 @@ auto			GetPSoWIDByTimecardIDAndCostCenterID(string timecard_id, string cost_cent
 auto			GetSoWIDByTimecardID(string timecard_id, CMysql *, CUser *) -> string;
 auto			GetPSoWIDByBTIDAndCostCenterID(string timecard_id, string cost_center_id, CMysql *, CUser *) -> string;
 // auto			GetTimecardLines_By_TimecardID_And_CostCenterID(string timecard_id, string cost_center_id, CMysql *, CUser *);
+auto			GetPositionByCompanyID(string company_id, CMysql *, CUser *) -> string;
 
 auto			isServiceInvoiceBelongsToUser(string service_invoice_id, CMysql *, CUser *) -> bool;
 auto			RecallServiceInvoice(string service_invoice_id, CMysql *, CUser *) -> string;

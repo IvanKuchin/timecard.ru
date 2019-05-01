@@ -825,6 +825,7 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 			{
 				if(new_value.length())
 				{
+					// --- assignments can start / stop beyond SoW period, 
 					if(action == "AJAX_updatePeriodStart")
 					{
 						if(sow_id.length())
@@ -832,45 +833,78 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 							string	assignment_id = id;
 
 							// --- find existing period_start and period_end
-							if(db->Query("SELECT `period_start`, `period_end`,`timecard_tasks_id` FROM `timecard_task_assignment` WHERE `id`=\"" + assignment_id + "\";"))
+							if(error_message.empty())
 							{
-								string		task_id = db->Get(0, "timecard_tasks_id");
-								struct tm	existing_assignment_start	= GetTMObject(db->Get(0, "period_start"));
-								struct tm	existing_assignment_end		= GetTMObject(db->Get(0, "period_end"));
-								struct tm	new_assignment_start		= GetTMObject(new_value);
-
-								if(new_assignment_start <= existing_assignment_end)
+								if(db->Query("SELECT `period_start`, `period_end`,`timecard_tasks_id` FROM `timecard_task_assignment` WHERE `id`=\"" + assignment_id + "\";"))
 								{
-									if(new_assignment_start <= existing_assignment_start)
-									{
-										// --- start date can be moved earlier
-									}
-									else
-									{
-										struct tm	first_reporting_day	= GetFirstDayReportedOnAssignmentID(sow_id, task_id, db);
+									string		task_id = db->Get(0, "timecard_tasks_id");
+									struct tm	existing_assignment_start	= GetTMObject(db->Get(0, "period_start"));
+									struct tm	existing_assignment_end		= GetTMObject(db->Get(0, "period_end"));
+									struct tm	new_assignment_start		= GetTMObject(new_value);
 
-										if(new_assignment_start <= first_reporting_day)
+									if(new_assignment_start <= existing_assignment_end)
+									{
+										if(new_assignment_start <= existing_assignment_start)
 										{
 											// --- start date can be moved earlier
 										}
 										else
 										{
-											error_message = "Часы уже были заполнены на " + PrintTime(first_reporting_day, RU_DATE_FORMAT) + " дату.";
-											MESSAGE_DEBUG("", "", "assignment.id(" + assignment_id + ") has first reported day on " + PrintTime(first_reporting_day, RU_DATE_FORMAT) + ". Start can't be later than this date.");
+											struct tm	first_reporting_day	= GetFirstDayReportedOnAssignmentID(sow_id, task_id, db);
+
+											if(new_assignment_start <= first_reporting_day)
+											{
+												// --- start date can be moved earlier
+											}
+											else
+											{
+												error_message = "Часы уже были заполнены на " + PrintTime(first_reporting_day, RU_DATE_FORMAT) + " дату.";
+												MESSAGE_DEBUG("", "", "assignment.id(" + assignment_id + ") has first reported day on " + PrintTime(first_reporting_day, RU_DATE_FORMAT) + ". Start can't be later than this date.");
+											}
 										}
+									}
+									else
+									{
+										error_message = "Начало должно быть раньше окончания";
+										MESSAGE_DEBUG("", "", "timecard_task_assignment.id(" + id + ") requsted start(" + PrintTime(new_assignment_start, RU_DATE_FORMAT) + ") must be earlier than existing finish(" + PrintTime(existing_assignment_end, RU_DATE_FORMAT) + ").")
 									}
 								}
 								else
 								{
-									error_message = "Начало должно быть раньше окончания";
-									MESSAGE_DEBUG("", "", "timecard_task_assignment.id(" + id + ") requsted start(" + PrintTime(new_assignment_start, RU_DATE_FORMAT) + ") must be earlier than existing finish(" + PrintTime(existing_assignment_end, RU_DATE_FORMAT) + ").")
+									error_message = "Назначение на задачу не найдено в БД";
+									MESSAGE_ERROR("", "", "timecard_task_assignment.id(" + id + ") not found")
 								}
 							}
-							else
+
+							// --- compare new date against SoW start
+							if(error_message.empty())
 							{
-								error_message = "Назначение на задачу не найдено в БД";
-								MESSAGE_ERROR("", "", "timecard_task_assignment.id(" + id + ") not found")
+								if(db->Query("SELECT `start_date`, `end_date` FROM `contracts_sow` WHERE `id`=("
+												"SELECT `contract_sow_id` FROM `timecard_task_assignment` WHERE `id`=\"" + assignment_id + "\""
+											");"))
+								{
+									struct tm	sow_start					= GetTMObject(db->Get(0, "start_date"));
+									struct tm	sow_end						= GetTMObject(db->Get(0, "end_date"));
+									struct tm	new_assignment_date			= GetTMObject(new_value);
+
+									if((sow_start <= new_assignment_date) && (new_assignment_date <= sow_end))
+									{
+										// --- good2go
+									}
+									else
+									{
+										error_message = gettext("Assignment must be inside SoW") + " ("s + PrintTime(sow_start, RU_DATE_FORMAT) + " - " + PrintTime(sow_end, RU_DATE_FORMAT) + ")";
+										MESSAGE_DEBUG("", "", "timecard_task_assignment.id(" + id + ") requsted start(" + PrintTime(new_assignment_date, RU_DATE_FORMAT) + ")." + error_message);
+									}
+								}
+								else
+								{
+									error_message = "Назначение на задачу не найдено в БД";
+									MESSAGE_ERROR("", "", "timecard_task_assignment.id(" + id + ") not found")
+								}
 							}
+
+
 						}
 						else
 						{
@@ -885,45 +919,78 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 							string	assignment_id = id;
 
 							// --- find existing period_start and period_end
-							if(db->Query("SELECT `period_start`, `period_end`,`timecard_tasks_id` FROM `timecard_task_assignment` WHERE `id`=\"" + id + "\";"))
+							if(error_message.empty())
 							{
-								string		task_id = db->Get(0, "timecard_tasks_id");
-								struct tm	existing_assignment_start	= GetTMObject(db->Get(0, "period_start"));
-								struct tm	existing_assignment_end 	= GetTMObject(db->Get(0, "period_end"));
-								struct tm	new_assignment_end			= GetTMObject(new_value);
-
-								if(existing_assignment_start <= new_assignment_end)
+								if(db->Query("SELECT `period_start`, `period_end`,`timecard_tasks_id` FROM `timecard_task_assignment` WHERE `id`=\"" + id + "\";"))
 								{
-									if(existing_assignment_end <= new_assignment_end)
-									{
-										// --- start date can be moved earlier
-									}
-									else
-									{
-										struct tm	last_reporting_day	= GetLastDayReportedOnAssignmentID(sow_id, task_id, db);
+									string		task_id = db->Get(0, "timecard_tasks_id");
+									struct tm	existing_assignment_start	= GetTMObject(db->Get(0, "period_start"));
+									struct tm	existing_assignment_end 	= GetTMObject(db->Get(0, "period_end"));
+									struct tm	new_assignment_end			= GetTMObject(new_value);
 
-										if(last_reporting_day <= new_assignment_end)
+									if(existing_assignment_start <= new_assignment_end)
+									{
+										if(existing_assignment_end <= new_assignment_end)
 										{
 											// --- start date can be moved earlier
 										}
 										else
 										{
-											error_message = "Часы уже были заполнены на " + PrintTime(last_reporting_day, RU_DATE_FORMAT) + " дату.";
-											MESSAGE_DEBUG("", "", "assignment.id(" + assignment_id + ") has last reported day on " + PrintTime(last_reporting_day, RU_DATE_FORMAT) + ". Finish can't be earlier than this date.");
+											struct tm	last_reporting_day	= GetLastDayReportedOnAssignmentID(sow_id, task_id, db);
+
+											if(last_reporting_day <= new_assignment_end)
+											{
+												// --- start date can be moved earlier
+											}
+											else
+											{
+												error_message = "Часы уже были заполнены на " + PrintTime(last_reporting_day, RU_DATE_FORMAT) + " дату.";
+												MESSAGE_DEBUG("", "", "assignment.id(" + assignment_id + ") has last reported day on " + PrintTime(last_reporting_day, RU_DATE_FORMAT) + ". Finish can't be earlier than this date.");
+											}
 										}
+									}
+									else
+									{
+										error_message = "Окончание должно быть позднее начала";
+										MESSAGE_DEBUG("", "", "timecard_task_assignment.id(" + id + ") requsted finish(" + PrintTime(new_assignment_end, RU_DATE_FORMAT) + ") must be later than existing start(" + PrintTime(existing_assignment_start, RU_DATE_FORMAT) + ").")
 									}
 								}
 								else
 								{
-									error_message = "Окончание должно быть позднее начала";
-									MESSAGE_DEBUG("", "", "timecard_task_assignment.id(" + id + ") requsted finish(" + PrintTime(new_assignment_end, RU_DATE_FORMAT) + ") must be later than existing start(" + PrintTime(existing_assignment_start, RU_DATE_FORMAT) + ").")
+									error_message = "Назначение на задачу не найдено в БД";
+									MESSAGE_ERROR("", "", "timecard_task_assignment.id(" + id + ") not found");
 								}
 							}
-							else
+
+							// --- compare new date against SoW start
+							if(error_message.empty())
 							{
-								error_message = "Назначение на задачу не найдено в БД";
-								MESSAGE_ERROR("", "", "timecard_task_assignment.id(" + id + ") not found");
+								if(db->Query("SELECT `start_date`, `end_date` FROM `contracts_sow` WHERE `id`=("
+												"SELECT `contract_sow_id` FROM `timecard_task_assignment` WHERE `id`=\"" + assignment_id + "\""
+											");"))
+								{
+									struct tm	sow_start					= GetTMObject(db->Get(0, "start_date"));
+									struct tm	sow_end						= GetTMObject(db->Get(0, "end_date"));
+									struct tm	new_assignment_date			= GetTMObject(new_value);
+
+									if((sow_start <= new_assignment_date) && (new_assignment_date <= sow_end))
+									{
+										// --- good2go
+									}
+									else
+									{
+										error_message = gettext("Assignment must be inside SoW") + " ("s + PrintTime(sow_start, RU_DATE_FORMAT) + " - " + PrintTime(sow_end, RU_DATE_FORMAT) + ")";
+										MESSAGE_DEBUG("", "", "timecard_task_assignment.id(" + id + ") requsted start(" + PrintTime(new_assignment_date, RU_DATE_FORMAT) + ")." + error_message);
+									}
+								}
+								else
+								{
+									error_message = "Назначение на задачу не найдено в БД";
+									MESSAGE_ERROR("", "", "timecard_task_assignment.id(" + id + ") not found")
+								}
 							}
+			
+
 						}
 						else
 						{
@@ -1042,8 +1109,8 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 								}
 								else
 								{
-									error_message = gettext("SQL syntax issue");
-									MESSAGE_ERROR("", "", "issue in SQL-syntax");
+									// --- good to go
+									MESSAGE_DEBUG("", "", "No timecards subcontractor reported time on this SoW start ");
 								}
 							}
 							else
@@ -1089,8 +1156,8 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 								}
 								else
 								{
-									error_message = gettext("SQL syntax issue");
-									MESSAGE_ERROR("", "", "issue in SQL-syntax");
+									// --- good to go
+									MESSAGE_DEBUG("", "", "No timecards subcontractor reported time on this SoW start ");
 								}
 							}
 							else
@@ -1759,3 +1826,32 @@ auto	GetCompanyCustomFieldsInJSONFormat(string sqlQuery, CMysql *db, CUser *user
 	return result;
 }
 
+auto GetPositionByCompanyID(string company_id, CMysql *db, CUser *user) -> string
+{
+	auto	result = ""s;
+
+	MESSAGE_DEBUG("", "", "start (company.id = " + company_id + ")");
+
+	if(db->Query("SELECT `company_position_id` FROM `contracts_sow` WHERE `subcontractor_company_id`=\"" + company_id + "\";"))
+	{
+		result = db->Get(0, 0);
+	}
+	else if(db->Query(	"SELECT `company_position_id` FROM `contracts_sow` WHERE `agency_company_id`=("
+							"SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\""
+						") LIMIT 0,1;"))
+	{
+		result = db->Get(0, 0);
+	}
+	else if(db->Query("SELECT `id` FROM `company_position` LIMIT 0,1;"))
+	{
+		result = db->Get(0, 0);
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "fail to define company_position.id");
+	}
+
+	MESSAGE_DEBUG("", "", "finish (position.id = " + result + ")");
+
+	return result;
+}
