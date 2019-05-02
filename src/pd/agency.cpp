@@ -3978,7 +3978,21 @@ int main(void)
 						}
 						else
 						{
-// TODO: remove notifications related to SoW
+							auto	affected = db.Query("SELECT `value` FROM `contract_sow_custom_fields` WHERE `contract_sow_id`=\"" + sow_id + "\" AND `type`=\"file\";");
+
+							for(int i = 0; i < affected; ++i)
+							{
+								unlink((TEMPLATE_SOW_DIRECTORY + "/" + db.Get(i, "value")).c_str());
+							}
+
+							affected = db.Query("SELECT `value` FROM `contract_psow_custom_fields` WHERE `type`=\"file\" AND  `contract_psow_id` IN ("
+													"SELECT `id` FROM `contracts_psow` WHERE `contract_sow_id`=\"" + sow_id + "\""
+												");");
+
+							for(int i = 0; i < affected; ++i)
+							{
+								unlink((TEMPLATE_PSOW_DIRECTORY + "/" + db.Get(i, "value")).c_str());
+							}
 
 							db.Query("DELETE FROM `users_notification` WHERE `actionTypeId`=\"" + to_string(NOTIFICATION_AGENGY_INITIATED_SOW) + "\" AND `actionId`=\"" + sow_id + "\";");
 							db.Query("DELETE FROM `users_notification` WHERE `actionTypeId`=\"" + to_string(NOTIFICATION_SUBCONTRACTOR_SIGNED_SOW) + "\" AND `actionId`=\"" + sow_id + "\";");
@@ -3988,7 +4002,7 @@ int main(void)
 							db.Query("DELETE FROM `bt_approvers` WHERE `contract_sow_id`=\"" + sow_id + "\";");
 							db.Query("DELETE FROM `bt_sow_assignment` WHERE `sow_id`=\"" + sow_id + "\";");
 
-							db.Query("DELETE FROM `contract_psow_custom_fields` WHERE `contract_psow_id`=("
+							db.Query("DELETE FROM `contract_psow_custom_fields` WHERE `contract_psow_id` IN ("
 										"SELECT `id` FROM `contracts_psow` WHERE `contract_sow_id`=\"" + sow_id + "\""
 									");");
 
@@ -4028,6 +4042,173 @@ int main(void)
 
 			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 		}
+
+		if(action == "AJAX_getTemplateAgreementFiles")
+		{
+			auto			entity_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
+			auto			entity_type = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("type"));
+			auto			template_name = "json_response.htmlt"s;
+			auto			error_message = ""s;
+			auto			success_message = ""s;
+			ostringstream	ostResult;
+
+			ostResult.str("");
+
+			if(entity_id.length())
+			{
+				if((entity_type == "company") || (entity_type == "sow"))
+				{
+					if(user.GetType() == "agency")
+					{
+						if(entity_type == "sow")
+						{
+							auto	sql_query = "SELECT * FROM `contract_sow_agreement_files` WHERE `contract_sow_id`=\"" + entity_id + "\"";
+							success_message = ",\"template_agreement_files\":[" + GetTemplateSoWAgreementFiles(sql_query, &db, &user) + "]";
+						}
+						else if(entity_type == "company")
+						{
+							auto	sql_query = "SELECT * FROM `company_agreement_files` WHERE `company_id`=(SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user.GetID() + "\")";
+							success_message = ",\"template_agreement_files\":[" + GetTemplateCompanyAgreementFiles(sql_query, &db, &user) + "]";
+						}
+						else
+						{
+							error_message = gettext("parameters incorrect");
+							MESSAGE_ERROR("", action, "entity_type (" + entity_type + ") not found");
+						}
+					}
+					else
+					{
+						MESSAGE_ERROR("", action, "user(" + user.GetID() + ") is not an agency employee");
+						error_message = gettext("You are not authorized");
+					}
+				}
+				else
+				{
+					error_message = gettext("parameters incorrect");
+					MESSAGE_ERROR("", action, "entity_type (" + entity_type + ") is incorrect");
+				}
+			}
+			else
+			{
+				error_message = gettext("parameters incorrect");
+				MESSAGE_ERROR("", action, "entity_id is empty");
+			}
+
+			if(error_message.empty())
+			{
+				ostResult << "{\"result\":\"success\"" + success_message + "}";
+			}
+			else
+			{
+				MESSAGE_DEBUG("", action, "failed");
+				ostResult.str("");
+				ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+			}
+
+			indexPage.RegisterVariableForce("result", ostResult.str());
+
+			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+		}
+
+		if(action == "AJAX_addNewTemplateAgreementFile")
+		{
+			auto			entity_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
+			auto			entity_type = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("type"));
+			auto			entity_title = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("title"));
+			auto			template_name = "json_response.htmlt"s;
+			auto			error_message = ""s;
+			auto			success_message = ""s;
+			ostringstream	ostResult;
+
+			ostResult.str("");
+
+			if(entity_id.length() && entity_title.length())
+			{
+				if(entity_type == "company")
+				{
+					if((error_message = isAgencyEmployeeAllowedToChangeAgencyData(&db, &user)).empty())
+					{
+						auto	company_id = GetCompanyIDByUser(&user, &db);
+						if(company_id.length())
+						{
+							if(db.InsertQuery("INSERT INTO `company_agreement_files` (`company_id`, `title`, `owner_user_id`, `eventTimestamp`) VALUES ("
+													"\"" + company_id + "\"," 
+													"\"" + entity_title + "\"," 
+													"\"" + user.GetID() + "\"," 
+													"UNIX_TIMESTAMP()" 
+												")"))
+							{
+							}
+							else
+							{
+								error_message = gettext("SQL syntax issue");
+								MESSAGE_ERROR("", "", error_message);
+							}
+						}
+						else
+						{
+							MESSAGE_ERROR("", "", "can't define company id by user.id(" + user.GetID() + ")");
+						}
+					}
+					else
+					{
+						error_message = gettext("You are not authorized");
+						MESSAGE_ERROR("", action, "user(" + user.GetID() + ") is not allowed to change agency data");
+					}
+				}
+				else if(entity_type == "sow")
+				{
+					if((error_message = isAgencyEmployeeAllowedToChangeSoW(entity_id, &db, &user)).empty())
+					{
+						if(db.InsertQuery("INSERT INTO `contract_sow_agreement_files` (`contract_sow_id`, `title`, `owner_user_id`, `eventTimestamp`) VALUES ("
+												"\"" + entity_id + "\"," 
+												"\"" + entity_title + "\"," 
+												"\"" + user.GetID() + "\"," 
+												"UNIX_TIMESTAMP()" 
+											")"))
+						{
+						}
+						else
+						{
+							error_message = gettext("SQL syntax issue");
+							MESSAGE_ERROR("", "", error_message);
+						}
+					}
+					else
+					{
+						error_message = gettext("You are not authorized");
+						MESSAGE_ERROR("", action, "user(" + user.GetID() + ") is not allowed to change SoW(" + entity_id + ")");
+					}
+				}
+				else
+				{
+					error_message = gettext("parameters incorrect");
+					MESSAGE_ERROR("", action, "entity_type (" + entity_type + ") is incorrect");
+				}
+
+			}
+			else
+			{
+				error_message = gettext("parameters incorrect");
+				MESSAGE_ERROR("", action, "entity_id is empty");
+			}
+
+			if(error_message.empty())
+			{
+				ostResult << "{\"result\":\"success\"" + success_message + "}";
+			}
+			else
+			{
+				MESSAGE_DEBUG("", action, "failed");
+				ostResult.str("");
+				ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+			}
+
+			indexPage.RegisterVariableForce("result", ostResult.str());
+
+			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+		}
+
 
 		MESSAGE_DEBUG("", "", "post-condition if(action == \"" + action + "\")");
 

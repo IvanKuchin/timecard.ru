@@ -5484,6 +5484,8 @@ int GetSpecificData_GetNumberOfFolders(string itemType)
 	else if(itemType == "template_psow")			result = TEMPLATE_PSOW_NUMBER_OF_FOLDERS;
 	else if(itemType == "template_costcenter")		result = TEMPLATE_CC_NUMBER_OF_FOLDERS;
 	else if(itemType == "template_company")			result = TEMPLATE_COMPANY_NUMBER_OF_FOLDERS;
+	else if(itemType == "template_agreement_company") result = TEMPLATE_AGREEMENT_COMPANY_NUMBER_OF_FOLDERS;
+	else if(itemType == "template_agreement_sow")	result = TEMPLATE_AGREEMENT_SOW_NUMBER_OF_FOLDERS;
 	else
 	{
 		MESSAGE_ERROR("", "", "itemType (" + itemType + ") is unknown");
@@ -5515,6 +5517,8 @@ int GetSpecificData_GetMaxFileSize(string itemType)
 	else if(itemType == "template_psow")			result = TEMPLATE_PSOW_MAX_FILE_SIZE;
 	else if(itemType == "template_costcenter")		result = TEMPLATE_CC_MAX_FILE_SIZE;
 	else if(itemType == "template_company")			result = TEMPLATE_COMPANY_MAX_FILE_SIZE;
+	else if(itemType == "template_agreement_company") result = TEMPLATE_AGREEMENT_COMPANY_MAX_FILE_SIZE;
+	else if(itemType == "template_agreement_sow")	result = TEMPLATE_AGREEMENT_SOW_MAX_FILE_SIZE;
 	else
 	{
 		MESSAGE_ERROR("", "", "itemType (" + itemType + ") is unknown");
@@ -5600,6 +5604,8 @@ string GetSpecificData_GetBaseDirectory(string itemType)
 	else if(itemType == "template_psow")			result = TEMPLATE_PSOW_DIRECTORY;
 	else if(itemType == "template_costcenter")		result = TEMPLATE_CC_DIRECTORY;
 	else if(itemType == "template_company")			result = TEMPLATE_COMPANY_DIRECTORY;
+	else if(itemType == "template_agreement_company") result = TEMPLATE_AGREEMENT_COMPANY_DIRECTORY;
+	else if(itemType == "template_agreement_sow")	result = TEMPLATE_AGREEMENT_SOW_DIRECTORY;
 	else
 	{
 		MESSAGE_ERROR("", "", "itemType (" + itemType + ") is unknown");
@@ -5616,10 +5622,12 @@ string GetSpecificData_GetFinalFileExtenstion(string itemType)
 
 	MESSAGE_DEBUG("", "", "start");
 
-	if(itemType == "template_sow")				result = ".txt";
-	else if(itemType == "template_psow")		result = ".txt";
-	else if(itemType == "template_costcenter")	result = ".txt";
-	else if(itemType == "template_company")		result = ".txt";
+	if(itemType == "template_sow")						result = ".txt";
+	else if(itemType == "template_psow")				result = ".txt";
+	else if(itemType == "template_costcenter")			result = ".txt";
+	else if(itemType == "template_company")				result = ".txt";
+	else if(itemType == "template_agreement_company")	result = ".txt";
+	else if(itemType == "template_agreement_sow")		result = ".txt";
 	else
 	{
 		MESSAGE_DEBUG("", "", "default extension(" + result + ") taken");
@@ -5636,20 +5644,22 @@ string GetSpecificData_SelectQueryItemByID(string itemID, string itemType)
 
 	MESSAGE_DEBUG("", "", "start");
 
-	if(itemType == "certification")					result = "SELECT * FROM `certification_tracks` WHERE `id`=\"" + itemID + "\";";
-	else if(itemType == "course")					result = "SELECT * FROM `certification_tracks` WHERE `id`=\"" + itemID + "\";";
-	else if(itemType == "university")				result = "SELECT * FROM `university` WHERE `id`=\"" + itemID + "\";";
-	else if(itemType == "school")					result = "SELECT * FROM `school` WHERE `id`=\"" + itemID + "\";";
-	else if(itemType == "language")					result = "SELECT * FROM `language` WHERE `id`=\"" + itemID + "\";";
-	else if(itemType == "book")						result = "SELECT * FROM `book` WHERE `id`=\"" + itemID + "\";";
-	else if(itemType == "company")					result = "SELECT * FROM `company` WHERE `id`=\"" + itemID + "\";";
-	else if(itemType == "company_profile_logo")		result = "SELECT * FROM `company` WHERE `id`=\"" + itemID + "\";";
-	else if(itemType == "gift")						result = "SELECT * FROM `gifts` WHERE `id`=\"" + itemID + "\";";
-	else if(itemType == "event")					result = "SELECT * FROM `events` WHERE `id`=\"" + itemID + "\";";
-	else if(itemType == "template_sow")				result = "SELECT * FROM `contract_sow_custom_fields` WHERE `id`=\"" + itemID + "\" AND `type`=\"file\";";
-	else if(itemType == "template_psow")			result = "SELECT * FROM `contract_psow_custom_fields` WHERE `id`=\"" + itemID + "\" AND `type`=\"file\";";
-	else if(itemType == "template_costcenter")		result = "SELECT * FROM `cost_center_custom_fields` WHERE `id`=\"" + itemID + "\" AND `type`=\"file\";";
-	else if(itemType == "template_company")			result = "SELECT * FROM `company_custom_fields` WHERE `id`=\"" + itemID + "\" AND `type`=\"file\";";
+	if(itemType == "certification")						result = "SELECT * FROM `certification_tracks` WHERE `id`=\"" + itemID + "\";";
+	else if(itemType == "course")						result = "SELECT * FROM `certification_tracks` WHERE `id`=\"" + itemID + "\";";
+	else if(itemType == "university")					result = "SELECT * FROM `university` WHERE `id`=\"" + itemID + "\";";
+	else if(itemType == "school")						result = "SELECT * FROM `school` WHERE `id`=\"" + itemID + "\";";
+	else if(itemType == "language")						result = "SELECT * FROM `language` WHERE `id`=\"" + itemID + "\";";
+	else if(itemType == "book")							result = "SELECT * FROM `book` WHERE `id`=\"" + itemID + "\";";
+	else if(itemType == "company")						result = "SELECT * FROM `company` WHERE `id`=\"" + itemID + "\";";
+	else if(itemType == "company_profile_logo")			result = "SELECT * FROM `company` WHERE `id`=\"" + itemID + "\";";
+	else if(itemType == "gift")							result = "SELECT * FROM `gifts` WHERE `id`=\"" + itemID + "\";";
+	else if(itemType == "event")						result = "SELECT * FROM `events` WHERE `id`=\"" + itemID + "\";";
+	else if(itemType == "template_sow")					result = "SELECT * FROM `contract_sow_custom_fields` WHERE `id`=\"" + itemID + "\" AND `type`=\"file\";";
+	else if(itemType == "template_psow")				result = "SELECT * FROM `contract_psow_custom_fields` WHERE `id`=\"" + itemID + "\" AND `type`=\"file\";";
+	else if(itemType == "template_costcenter")			result = "SELECT * FROM `cost_center_custom_fields` WHERE `id`=\"" + itemID + "\" AND `type`=\"file\";";
+	else if(itemType == "template_company")				result = "SELECT * FROM `company_custom_fields` WHERE `id`=\"" + itemID + "\" AND `type`=\"file\";";
+	else if(itemType == "template_agreement_company")	result = "SELECT * FROM `company_agreement_files` WHERE `id`=\"" + itemID + "\";";
+	else if(itemType == "template_agreement_sow")		result = "SELECT * FROM `contract_sow_agreement_files` WHERE `id`=\"" + itemID + "\";";
 	else
 	{
 		MESSAGE_ERROR("", "", "itemType (" + itemType + ") is unknown");
@@ -5673,20 +5683,22 @@ string GetSpecificData_UpdateQueryItemByID(string itemID, string itemType, strin
 
 	if(logo_filename.length())
 	{
-		if(itemType == "certification")					result = "update `certification_tracks` 		set	`" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
-		else if(itemType == "course")					result = "update `certification_tracks` 		set `" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
-		else if(itemType == "university")				result = "update `university`					set	`" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
-		else if(itemType == "school")					result = "update `school`						set `" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
-		else if(itemType == "language")					result = "update `language`						set `" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
-		else if(itemType == "book")						result = "update `book`							set `" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
-		else if(itemType == "company")					result = "update `company`						set `" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
-		else if(itemType == "company_profile_logo")		result = "update `company`						set `" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
-		else if(itemType == "gift")						result = "update `gifts`						set `" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
-		else if(itemType == "event")					result = "update `events`						set `" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' where `id`=\"" + itemID + "\";";
-		else if(itemType == "template_sow")				result = "update `contract_sow_custom_fields`	set `" + logo_filename + "`='" + folderID + "/" + fileName + "', `eventTimestamp`=UNIX_TIMESTAMP() where `id`=\"" + itemID + "\";";
-		else if(itemType == "template_psow")			result = "update `contract_psow_custom_fields`	set `" + logo_filename + "`='" + folderID + "/" + fileName + "', `eventTimestamp`=UNIX_TIMESTAMP() where `id`=\"" + itemID + "\";";
-		else if(itemType == "template_costcenter")		result = "update `cost_center_custom_fields`	set `" + logo_filename + "`='" + folderID + "/" + fileName + "', `eventTimestamp`=UNIX_TIMESTAMP() where `id`=\"" + itemID + "\";";
-		else if(itemType == "template_company")			result = "update `company_custom_fields`		set `" + logo_filename + "`='" + folderID + "/" + fileName + "', `eventTimestamp`=UNIX_TIMESTAMP() where `id`=\"" + itemID + "\";";
+		if(itemType == "certification")						result = "UPDATE `certification_tracks` 		SET	`" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' WHERE `id`=\"" + itemID + "\";";
+		else if(itemType == "course")						result = "UPDATE `certification_tracks` 		SET `" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' WHERE `id`=\"" + itemID + "\";";
+		else if(itemType == "university")					result = "UPDATE `university`					SET	`" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' WHERE `id`=\"" + itemID + "\";";
+		else if(itemType == "school")						result = "UPDATE `school`						SET `" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' WHERE `id`=\"" + itemID + "\";";
+		else if(itemType == "language")						result = "UPDATE `language`						SET `" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' WHERE `id`=\"" + itemID + "\";";
+		else if(itemType == "book")							result = "UPDATE `book`							SET `" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' WHERE `id`=\"" + itemID + "\";";
+		else if(itemType == "company")						result = "UPDATE `company`						SET `" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' WHERE `id`=\"" + itemID + "\";";
+		else if(itemType == "company_profile_logo")			result = "UPDATE `company`						SET `" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' WHERE `id`=\"" + itemID + "\";";
+		else if(itemType == "gift")							result = "UPDATE `gifts`						SET `" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' WHERE `id`=\"" + itemID + "\";";
+		else if(itemType == "event")						result = "UPDATE `events`						SET `" + logo_folder + "`='" + folderID + "', `" + logo_filename + "`='" + fileName + "' WHERE `id`=\"" + itemID + "\";";
+		else if(itemType == "template_sow")					result = "UPDATE `contract_sow_custom_fields`	SET `" + logo_filename + "`='" + folderID + "/" + fileName + "', `eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + itemID + "\";";
+		else if(itemType == "template_psow")				result = "UPDATE `contract_psow_custom_fields`	SET `" + logo_filename + "`='" + folderID + "/" + fileName + "', `eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + itemID + "\";";
+		else if(itemType == "template_costcenter")			result = "UPDATE `cost_center_custom_fields`	SET `" + logo_filename + "`='" + folderID + "/" + fileName + "', `eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + itemID + "\";";
+		else if(itemType == "template_company")				result = "UPDATE `company_custom_fields`		SET `" + logo_filename + "`='" + folderID + "/" + fileName + "', `eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + itemID + "\";";
+		else if(itemType == "template_agreement_company")	result = "UPDATE `company_agreement_files`		SET `" + logo_filename + "`='" + folderID + "/" + fileName + "', `eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + itemID + "\";";
+		else if(itemType == "template_agreement_sow")		result = "UPDATE `contract_sow_agreement_files`	SET `" + logo_filename + "`='" + folderID + "/" + fileName + "', `eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + itemID + "\";";
 		else
 		{
 			MESSAGE_ERROR("", "", "itemType (" + itemType + ") is unknown");
@@ -5709,20 +5721,22 @@ string GetSpecificData_GetDBCoverPhotoFolderString(string itemType)
 
 	MESSAGE_DEBUG("", "", "start");
 
-	if(itemType == "certification")	 				result = "logo_folder";
-	else if(itemType == "course")	   				result = "logo_folder";
-	else if(itemType == "university")   			result = "logo_folder";
-	else if(itemType == "school")	   				result = "logo_folder";
-	else if(itemType == "language")	 				result = "logo_folder";
-	else if(itemType == "book")		 				result = "coverPhotoFolder";
-	else if(itemType == "company")					result = "logo_folder";
-	else if(itemType == "company_profile_logo")		result = "logo_folder";
-	else if(itemType == "gift")	  					result = "logo_folder";
-	else if(itemType == "event")	  				result = "logo_folder";
-	else if(itemType == "template_sow")				result = "";
-	else if(itemType == "template_psow")			result = "";
-	else if(itemType == "template_costcenter")		result = "";
-	else if(itemType == "template_company")			result = "";
+	if(itemType == "certification")	 					result = "logo_folder";
+	else if(itemType == "course")	   					result = "logo_folder";
+	else if(itemType == "university")   				result = "logo_folder";
+	else if(itemType == "school")	   					result = "logo_folder";
+	else if(itemType == "language")	 					result = "logo_folder";
+	else if(itemType == "book")		 					result = "coverPhotoFolder";
+	else if(itemType == "company")						result = "logo_folder";
+	else if(itemType == "company_profile_logo")			result = "logo_folder";
+	else if(itemType == "gift")	  						result = "logo_folder";
+	else if(itemType == "event")	  					result = "logo_folder";
+	else if(itemType == "template_sow")					result = "";
+	else if(itemType == "template_psow")				result = "";
+	else if(itemType == "template_costcenter")			result = "";
+	else if(itemType == "template_company")				result = "";
+	else if(itemType == "template_agreement_company")	result = "";
+	else if(itemType == "template_agreement_sow")		result = "";
 	else
 	{
 		MESSAGE_ERROR("", "", "itemType (" + itemType + ") is unknown");
@@ -5739,20 +5753,22 @@ string GetSpecificData_GetDBCoverPhotoFilenameString(string itemType)
 
 	MESSAGE_DEBUG("", "", "start");
 
-	if(itemType == "certification")					result = "logo_filename";
-	else if(itemType == "course")					result = "logo_filename";
-	else if(itemType == "university")				result = "logo_filename";
-	else if(itemType == "school")					result = "logo_filename";
-	else if(itemType == "language")					result = "logo_filename";
-	else if(itemType == "book")						result = "coverPhotoFilename";
-	else if(itemType == "company")					result = "logo_filename";
-	else if(itemType == "company_profile_logo")		result = "logo_filename";
-	else if(itemType == "gift")						result = "logo_filename";
-	else if(itemType == "event")					result = "logo_filename";
-	else if(itemType == "template_sow")				result = "value";
-	else if(itemType == "template_psow")			result = "value";
-	else if(itemType == "template_costcenter")		result = "value";
-	else if(itemType == "template_company")			result = "value";
+	if(itemType == "certification")						result = "logo_filename";
+	else if(itemType == "course")						result = "logo_filename";
+	else if(itemType == "university")					result = "logo_filename";
+	else if(itemType == "school")						result = "logo_filename";
+	else if(itemType == "language")						result = "logo_filename";
+	else if(itemType == "book")							result = "coverPhotoFilename";
+	else if(itemType == "company")						result = "logo_filename";
+	else if(itemType == "company_profile_logo")			result = "logo_filename";
+	else if(itemType == "gift")							result = "logo_filename";
+	else if(itemType == "event")						result = "logo_filename";
+	else if(itemType == "template_sow")					result = "value";
+	else if(itemType == "template_psow")				result = "value";
+	else if(itemType == "template_costcenter")			result = "value";
+	else if(itemType == "template_company")				result = "value";
+	else if(itemType == "template_agreement_company")	result = "filename";
+	else if(itemType == "template_agreement_sow")		result = "filename";
 	else
 	{
 		MESSAGE_ERROR("", "", "itemType (" + itemType + ") is unknown");
@@ -5769,10 +5785,12 @@ string GetSpecificData_GetDataTypeByItemType(const string &itemType)
 
 	MESSAGE_DEBUG("", "", "start");
 
-	if(itemType == "template_sow")			result = "template";
-	if(itemType == "template_psow")			result = "template";
-	if(itemType == "template_costcenter")	result = "template";
-	if(itemType == "template_company")		result = "template";
+	if(itemType == "template_sow")					result = "template";
+	if(itemType == "template_psow")					result = "template";
+	if(itemType == "template_costcenter")			result = "template";
+	if(itemType == "template_company")				result = "template";
+	if(itemType == "template_agreement_company")	result = "template";
+	if(itemType == "template_agreement_sow")		result = "template";
 
 	MESSAGE_DEBUG("", "", "finish (result = " + result + ")");
 
@@ -5885,6 +5903,42 @@ bool GetSpecificData_AllowedToChange(string itemID, string itemType, CMysql *db,
 			MESSAGE_DEBUG("", "", "user.type(" + user->GetType() + ") not allowerd to change company custom field");
 		}
 		
+	}
+	else if(itemType == "template_agreement_company")
+	{
+		if((user->GetType() == "agency"))
+		{
+			if(db->Query("SELECT `id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\" AND `allowed_change_sow`=\"Y\" AND `company_id`=("
+							"SELECT `company_id` FROM `company_agreement_files` WHERE `id`=\"" + itemID + "\""
+						");"))
+				result = true;
+			else
+			{
+				MESSAGE_DEBUG("", "", "user.id(" + user->GetID() + ") doesn't allowed to change company_agreement_files.id(" + itemID + ")");
+			}
+		}
+		else
+		{
+			MESSAGE_DEBUG("", "", "user.type(" + user->GetType() + ") not allowerd to change company agreement files");
+		}
+	}
+	else if(itemType == "template_agreement_sow")
+	{
+		if((user->GetType() == "agency"))
+		{
+			if(db->Query("SELECT `id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\" AND `allowed_change_sow`=\"Y\" AND `company_id`=("
+							"SELECT `company_id` FROM `contract_sow_agreement_files` WHERE `id`=\"" + itemID + "\""
+						");"))
+				result = true;
+			else
+			{
+				MESSAGE_DEBUG("", "", "user.id(" + user->GetID() + ") doesn't allowed to change contract_sow_agreement_files.id(" + itemID + ")");
+			}
+		}
+		else
+		{
+			MESSAGE_DEBUG("", "", "user.type(" + user->GetType() + ") not allowerd to change contract_sow agreement files");
+		}
 	}
 	else if(itemType == "company_profile_logo")
 	{

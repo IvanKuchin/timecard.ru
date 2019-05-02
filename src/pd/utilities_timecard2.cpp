@@ -1855,3 +1855,150 @@ auto GetPositionByCompanyID(string company_id, CMysql *db, CUser *user) -> strin
 
 	return result;
 }
+
+auto	GetTemplateSoWAgreementFiles(string sqlQuery, CMysql *db, CUser *user) -> string
+{
+	int		affected;
+	auto	result = ""s;
+	struct ItemClass
+	{
+		string	id;
+		string	contract_sow_id;
+		string	title;
+		string	filename;
+		string	owner_user_id;
+		string	eventTimestamp;
+	};
+	vector<ItemClass>		itemsList;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	affected = db->Query(sqlQuery);
+	if(affected)
+	{
+		for(int i = 0; i < affected; i++)
+		{
+			ItemClass	item;
+
+			item.id = db->Get(i, "id");
+			item.contract_sow_id = db->Get(i, "contract_sow_id");
+			item.title = db->Get(i, "title");
+			item.filename = db->Get(i, "filename");
+			item.owner_user_id = db->Get(i, "owner_user_id");
+			item.eventTimestamp = db->Get(i, "eventTimestamp");
+
+			itemsList.push_back(item);
+		}
+
+		for (const auto& item : itemsList)
+		{
+			if(result.length()) result += ",";
+			result +=	"{";
+
+			result += "\"id\":\""							+ item.id + "\",";
+			result += "\"entity_id\":\""					+ item.contract_sow_id + "\",";
+			result += "\"contract_sow_id\":\""				+ item.contract_sow_id + "\",";
+			result += "\"title\":\""						+ item.title + "\",";
+			result += "\"filename\":\""						+ item.filename + "\",";
+			result += "\"owner_user_id\":\""				+ item.owner_user_id + "\",";
+			result += "\"eventTimestamp\":\""				+ item.eventTimestamp + "\"";
+
+			result +=	"}";
+		}
+	}
+	else
+	{
+		MESSAGE_DEBUG("", "", "no bt items assigned");
+	}
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return result;
+}
+
+auto	GetTemplateCompanyAgreementFiles(string sqlQuery, CMysql *db, CUser *user) -> string
+{
+	int		affected;
+	auto	result = ""s;
+	struct ItemClass
+	{
+		string	id;
+		string	company_id;
+		string	title;
+		string	filename;
+		string	owner_user_id;
+		string	eventTimestamp;
+	};
+	vector<ItemClass>		itemsList;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	affected = db->Query(sqlQuery);
+	if(affected)
+	{
+		for(int i = 0; i < affected; i++)
+		{
+			ItemClass	item;
+
+			item.id = db->Get(i, "id");
+			item.company_id = db->Get(i, "company_id");
+			item.title = db->Get(i, "title");
+			item.filename = db->Get(i, "filename");
+			item.owner_user_id = db->Get(i, "owner_user_id");
+			item.eventTimestamp = db->Get(i, "eventTimestamp");
+
+			itemsList.push_back(item);
+		}
+
+		for (const auto& item : itemsList)
+		{
+			if(result.length()) result += ",";
+			result +=	"{";
+
+			result += "\"id\":\""							+ item.id + "\",";
+			result += "\"entity_id\":\""					+ item.company_id + "\",";
+			result += "\"company_id\":\""					+ item.company_id + "\",";
+			result += "\"title\":\""						+ item.title + "\",";
+			result += "\"filename\":\""						+ item.filename + "\",";
+			result += "\"owner_user_id\":\""				+ item.owner_user_id + "\",";
+			result += "\"eventTimestamp\":\""				+ item.eventTimestamp + "\"";
+
+			result +=	"}";
+		}
+	}
+	else
+	{
+		MESSAGE_DEBUG("", "", "no bt items assigned");
+	}
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return result;
+}
+
+auto GetCompanyIDByUser(CUser *user, CMysql *db) -> string
+{
+	auto	result = ""s;
+
+	if(db && user)
+	{
+		MESSAGE_DEBUG("", "", "start (user.id is " + user->GetID() + ")");
+
+		if(db->Query("SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\";"))
+		{
+			result = db->Get(0, 0);
+		}
+		else
+		{
+			MESSAGE_DEBUG("", "", "company not found");
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "user and db must be defined");
+	}
+
+	MESSAGE_DEBUG("", "", "finish (company.id is " + result + ")");
+
+	return result;
+}
