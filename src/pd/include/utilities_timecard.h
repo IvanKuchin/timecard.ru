@@ -106,6 +106,7 @@ auto			GeneralNotifySoWContractPartiesAboutChanges(string action, string id, str
 auto			GetDBValueByAction(string action, string id, string sow_id, CMysql *, CUser *) -> string;
 // string			CheckNewValueByAction(string action, string id, string sow_id, string new_value, CMysql *, CUser *);
 auto			SetNewValueByAction(string action, string id, string sow_id, string new_value, CMysql *, CUser *) -> string;
+auto			DeleteEntryByAction(string action, string id, CMysql *, CUser *) -> string;
 auto			ResubmitEntitiesByAction(string action, string id, string sow_id, string new_value, CMysql *, CUser *) -> string;
 auto			GetAgencyEmployeesInJSONFormat(string sql_query, CMysql *, CUser *) -> string;
 auto			GetAgencyObjectInJSONFormat(string agency_id, bool include_tasks, bool include_bt, CMysql *, CUser *) -> string;
@@ -141,7 +142,6 @@ struct tm 		GetLastDayReportedOnAssignmentID(string sow_id, string task_id, CMys
 auto			isActionEntityBelongsToSoW(string action, string id, string sow_id, CMysql *db, CUser *user) -> string;
 auto			CheckNewValueByAction(string action, string id, string sow_id, string new_value, CMysql *db, CUser *user) -> string;
 auto			isActionEntityBelongsToAgency(string action, string id, string agency_id, CMysql *db, CUser *user) -> string;
-auto			GetCompanyIDByUser(CUser *, CMysql *) -> string;
 
 
 

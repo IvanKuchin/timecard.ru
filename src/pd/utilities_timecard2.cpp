@@ -1081,6 +1081,10 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 					else if(action == "AJAX_updateSoWAct")						{ /* --- good to go */ }
 					else if(action == "AJAX_updateSoWSignDate")					{ /* --- good to go */ }
 					else if(action == "AJAX_updateSoWCustomField")				{ /* --- good to go */ }
+					else if(action == "AJAX_updateTemplateAgreement_company_Title")	{ /* --- good to go */ }
+					else if(action == "AJAX_deleteTemplateAgreement_company_Title")	{ /* --- good to go */ }
+					else if(action == "AJAX_updateTemplateAgreement_sow_Title")		{ /* --- good to go */ }
+					else if(action == "AJAX_deleteTemplateAgreement_sow_Title")		{ /* --- good to go */ }
 					else if(action == "AJAX_updateSoWStartDate")
 					{
 						if(db->Query("SELECT `end_date` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";"))
@@ -1564,6 +1568,11 @@ string	isActionEntityBelongsToAgency(string action, string id, string agency_id,
 				if(action == "AJAX_updateAgencyEditCapability")			sql_query = "SELECT `company_id` AS `agency_id` FROM `company_employees` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateSoWEditCapability")			sql_query = "SELECT `company_id` AS `agency_id` FROM `company_employees` WHERE `id`=\"" + id + "\";";
 
+				if(action == "AJAX_updateTemplateAgreement_company_Title")	sql_query = "SELECT `company_id` AS `agency_id` FROM `company_agreement_files` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_deleteTemplateAgreement_company_Title")	sql_query = "SELECT `company_id` AS `agency_id` FROM `company_agreement_files` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateTemplateAgreement_sow_Title")		sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `contracts_sow` WHERE `id`=(SELECT `contract_sow_id` FROM `contract_sow_agreement_files` WHERE `id`=\"" + id + "\");";
+				if(action == "AJAX_deleteTemplateAgreement_sow_Title")		sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `contracts_sow` WHERE `id`=(SELECT `contract_sow_id` FROM `contract_sow_agreement_files` WHERE `id`=\"" + id + "\");";
+
 				if(
 					(action == "AJAX_updateCompanyTitle")			||
 					(action == "AJAX_updateCompanyDescription")		||
@@ -1976,29 +1985,3 @@ auto	GetTemplateCompanyAgreementFiles(string sqlQuery, CMysql *db, CUser *user) 
 	return result;
 }
 
-auto GetCompanyIDByUser(CUser *user, CMysql *db) -> string
-{
-	auto	result = ""s;
-
-	if(db && user)
-	{
-		MESSAGE_DEBUG("", "", "start (user.id is " + user->GetID() + ")");
-
-		if(db->Query("SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\";"))
-		{
-			result = db->Get(0, 0);
-		}
-		else
-		{
-			MESSAGE_DEBUG("", "", "company not found");
-		}
-	}
-	else
-	{
-		MESSAGE_ERROR("", "", "user and db must be defined");
-	}
-
-	MESSAGE_DEBUG("", "", "finish (company.id is " + result + ")");
-
-	return result;
-}

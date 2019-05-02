@@ -6967,6 +6967,48 @@ string	ResubmitEntitiesByAction(string action, string id, string sow_id, string 
 	return error_message;
 }
 
+auto DeleteEntryByAction(string action, string id, CMysql *db, CUser *user) -> string
+{
+	string	error_message = "";
+
+	MESSAGE_DEBUG("", "", "start");
+
+	{
+		if(id.length())
+		{
+			if(action == "AJAX_deleteTemplateAgreement_company_Title")
+			{
+				db->Query("DELETE FROM `company_agreement_files` WHERE `id`=\"" + id + "\";");
+				if(db->isError())
+				{
+					MESSAGE_ERROR("", "", "fail to remove from table company_agreement_files");
+				}
+			}
+			else if(action == "AJAX_deleteTemplateAgreement_sow_Title")
+			{
+				db->Query("DELETE FROM `contract_sow_agreement_files` WHERE `id`=\"" + id + "\";");
+				if(db->isError())
+				{
+					MESSAGE_ERROR("", "", "fail to remove from table company_agreement_files");
+				}
+			}
+			else
+			{
+				error_message = "Неизвестное действие";
+				MESSAGE_ERROR("", "", "action is empty");
+			}
+		}
+		else
+		{
+			error_message = "Неизвестный идентификатор поля";
+			MESSAGE_ERROR("", "", "id is empty");
+		}
+	}
+
+	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
+
+	return error_message;	
+}
 
 string	SetNewValueByAction(string action, string id, string sow_id, string new_value, CMysql *db, CUser *user)
 {
@@ -7045,6 +7087,9 @@ string	SetNewValueByAction(string action, string id, string sow_id, string new_v
 						if(action == "AJAX_updateCostCenterSignDate")				sql_query = "UPDATE `cost_centers`				SET `sign_date`		=STR_TO_DATE(\"" + new_value + "\",\"%d/%m/%Y\"),`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sow_id + "\";";
 						if(action == "AJAX_updateCostCenterStartDate")				sql_query = "UPDATE `cost_centers`				SET `start_date`	=STR_TO_DATE(\"" + new_value + "\",\"%d/%m/%Y\"),`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sow_id + "\";";
 						if(action == "AJAX_updateCostCenterEndDate")				sql_query = "UPDATE `cost_centers`				SET `end_date`		=STR_TO_DATE(\"" + new_value + "\",\"%d/%m/%Y\"),`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sow_id + "\";";
+
+						if(action == "AJAX_updateTemplateAgreement_company_Title")	sql_query = "UPDATE `company_agreement_files`	SET `title`			=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateTemplateAgreement_sow_Title")		sql_query = "UPDATE `contract_sow_agreement_files` SET `title`		=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
 
 						// --- expense line template payment part
 						if(action == "AJAX_updateExpenseTemplateLinePaymentCash")

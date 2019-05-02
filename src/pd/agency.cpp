@@ -4128,7 +4128,7 @@ int main(void)
 				{
 					if((error_message = isAgencyEmployeeAllowedToChangeAgencyData(&db, &user)).empty())
 					{
-						auto	company_id = GetCompanyIDByUser(&user, &db);
+						auto	company_id = GetAgencyID(&user, &db);
 						if(company_id.length())
 						{
 							if(db.InsertQuery("INSERT INTO `company_agreement_files` (`company_id`, `title`, `owner_user_id`, `eventTimestamp`) VALUES ("
@@ -4208,6 +4208,243 @@ int main(void)
 
 			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 		}
+
+		if(
+			(action == "AJAX_updateTemplateAgreement_company_Title") ||
+			(action == "AJAX_deleteTemplateAgreement_company_Title")
+		)
+		{
+			ostringstream	ostResult;
+
+			MESSAGE_DEBUG("", action, "start");
+
+			ostResult.str("");
+			{
+				auto			template_name	= "json_response.htmlt"s;
+				auto			error_message	= ""s;
+
+				auto			id				= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
+				auto			new_value		= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("value"));
+
+				if(new_value.length())
+				{
+					error_message = isAgencyEmployeeAllowedToChangeAgencyData(&db, &user);
+					if(error_message.empty())
+					{
+						auto	agency_id = GetAgencyID(&user, &db);
+						if(agency_id.length())
+						{
+							{
+								error_message = isActionEntityBelongsToAgency(action, id, agency_id, &db, &user);
+								if(error_message.empty())
+								{
+									error_message = CheckNewValueByAction(action, id, "", new_value, &db, &user);
+									if(error_message.empty())
+									{
+										if((action.find("update") != string::npos))
+										{
+											// string		existing_value = GetDBValueByAction(action, id, "", &db, &user);
+
+											error_message = SetNewValueByAction(action, id, "", new_value, &db, &user);
+											if(error_message.empty())
+											{
+												// --- good finish
+											}
+											else
+											{
+												MESSAGE_DEBUG("", action, "unable to set new value (action/id/value = " + action + "/" + id + "/[" + FilterCP1251Symbols(new_value) + "])");
+											}
+										}
+										else if(action.find("insert") != string::npos)
+										{
+											
+										}
+										else if(action.find("delete") != string::npos)
+										{
+											error_message = DeleteEntryByAction(action, id, &db, &user);
+											if(error_message.empty())
+											{
+												// --- good finish
+											}
+											else
+											{
+												MESSAGE_DEBUG("", action, "unable to set new value (action/id/value = " + action + "/" + id + "/[" + FilterCP1251Symbols(new_value) + "])");
+											}
+										}
+										else
+										{
+											MESSAGE_ERROR("", action, "unsupported action type(" + action + ")");
+										}
+
+									}
+									else
+									{
+										MESSAGE_DEBUG("", action, "new value failed to pass validity check");
+									}
+								}
+								else
+								{
+									MESSAGE_DEBUG("", action, "action entity id(" + user.GetID() + ") doesn't belongs to agency.id(" + agency_id + ")");
+								}
+							}
+						}
+						else
+						{
+							error_message = "Агенство не найдено";
+							MESSAGE_ERROR("", action, "agency.id not found by user.id(" + user.GetID() + ") employment");
+						}
+					}
+					else
+					{
+						MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") doesn't allowed to change agency data");
+					}
+				}
+				else
+				{
+					error_message = "Поле не должно быть пустым";
+					MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") didn't set new_value");
+				}
+
+				if(error_message.empty())
+				{
+					ostResult << "{\"result\":\"success\"}";
+				}
+				else
+				{
+					MESSAGE_DEBUG("", action, "failed");
+					ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+				}
+
+				indexPage.RegisterVariableForce("result", ostResult.str());
+
+				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			}
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
+
+
+		if(
+			(action == "AJAX_updateTemplateAgreement_sow_Title") ||
+			(action == "AJAX_deleteTemplateAgreement_sow_Title")
+		)
+		{
+			ostringstream	ostResult;
+
+			MESSAGE_DEBUG("", action, "start");
+
+			ostResult.str("");
+			{
+				auto			template_name	= "json_response.htmlt"s;
+				auto			error_message	= ""s;
+
+				auto			id				= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
+				auto			new_value		= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("value"));
+				auto			sow_id			= ""s;
+
+				if(db.Query("SELECT `contract_sow_id` FROM `contract_sow_agreement_files` WHERE `id`=\"" + id + "\";"))
+				{
+					sow_id = db.Get(0, 0);
+				}
+
+				if(new_value.length())
+				{
+					error_message = isAgencyEmployeeAllowedToChangeSoW(sow_id, &db, &user);
+					if(error_message.empty())
+					{
+						auto	agency_id = GetAgencyID(&user, &db);
+						if(agency_id.length())
+						{
+
+							{
+								error_message = isActionEntityBelongsToAgency(action, id, agency_id, &db, &user);
+								if(error_message.empty())
+								{
+									error_message = CheckNewValueByAction(action, id, "", new_value, &db, &user);
+									if(error_message.empty())
+									{
+										if((action.find("update") != string::npos))
+										{
+											// string		existing_value = GetDBValueByAction(action, id, "", &db, &user);
+
+											error_message = SetNewValueByAction(action, id, "", new_value, &db, &user);
+											if(error_message.empty())
+											{
+												// --- good finish
+											}
+											else
+											{
+												MESSAGE_DEBUG("", action, "unable to set new value (action/id/value = " + action + "/" + id + "/[" + FilterCP1251Symbols(new_value) + "])");
+											}
+										}
+										else if(action.find("insert") != string::npos)
+										{
+											
+										}
+										else if(action.find("delete") != string::npos)
+										{
+											error_message = DeleteEntryByAction(action, id, &db, &user);
+											if(error_message.empty())
+											{
+												// --- good finish
+											}
+											else
+											{
+												MESSAGE_DEBUG("", action, "unable to set new value (action/id/value = " + action + "/" + id + "/[" + FilterCP1251Symbols(new_value) + "])");
+											}
+										}
+										else
+										{
+											MESSAGE_ERROR("", action, "unsupported action type(" + action + ")");
+										}
+
+									}
+									else
+									{
+										MESSAGE_DEBUG("", action, "new value failed to pass validity check");
+									}
+								}
+								else
+								{
+									MESSAGE_DEBUG("", action, "action entity id(" + user.GetID() + ") doesn't belongs to agency.id(" + agency_id + ")");
+								}
+							}
+						}
+						else
+						{
+							error_message = "Агенство не найдено";
+							MESSAGE_ERROR("", action, "agency.id not found by user.id(" + user.GetID() + ") employment");
+						}
+					}
+					else
+					{
+						MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") doesn't allowed to change agency data");
+					}
+				}
+				else
+				{
+					error_message = "Поле не должно быть пустым";
+					MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") didn't set new_value");
+				}
+
+				if(error_message.empty())
+				{
+					ostResult << "{\"result\":\"success\"}";
+				}
+				else
+				{
+					MESSAGE_DEBUG("", action, "failed");
+					ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+				}
+
+				indexPage.RegisterVariableForce("result", ostResult.str());
+
+				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			}
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
+
 
 
 		MESSAGE_DEBUG("", "", "post-condition if(action == \"" + action + "\")");
