@@ -195,7 +195,16 @@ int main()
 							if(indexPage.GetFilesHandler()->GetSize(filesCounter) > GetSpecificData_GetMaxFileSize(itemType))
 							{
 								MESSAGE_ERROR("", "", "file [" + indexPage.GetFilesHandler()->GetName(filesCounter) + "] size exceed permited maximum: " + to_string(indexPage.GetFilesHandler()->GetSize(filesCounter)) + " > " + to_string(GetSpecificData_GetMaxFileSize(itemType)));
-								throw CExceptionHTML("file size exceed", indexPage.GetFilesHandler()->GetName(filesCounter));
+
+								ostJSONResult.str("");
+								ostJSONResult << "{";
+								ostJSONResult << "\"result\": \"error\",";
+								ostJSONResult << "\"textStatus\": \"" << gettext("file size") << " " << indexPage.GetFilesHandler()->GetSize(filesCounter) / 1024 << "K " << gettext("exceeds allowed size") << " " << GetSpecificData_GetMaxFileSize(itemType) / 1024 << "K\",";
+								ostJSONResult << "\"fileName\": \"\" ,";
+								ostJSONResult << "\"jqXHR\": \"\"";
+								ostJSONResult << "}";
+
+								break;
 							}
 
 							//--- check logo file existing

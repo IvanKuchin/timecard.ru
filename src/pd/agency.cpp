@@ -1151,7 +1151,7 @@ int main(void)
 				}
 				else
 				{
-					error_message = "Поле не должно быть пустым";
+					error_message = gettext("parameters incorrect");
 					MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") didn't set new value in sow.id(" + sow_id + ")");
 				}
 
@@ -1262,7 +1262,7 @@ int main(void)
 				}
 				else
 				{
-					error_message = "Поле не должно быть пустым";
+					error_message = gettext("parameters incorrect");
 					MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") didn't set new value in sow.id(" + sow_id + ")");
 				}
 
@@ -1445,7 +1445,7 @@ int main(void)
 				}
 				else
 				{
-					error_message = "Поле не должно быть пустым";
+					error_message = gettext("parameters incorrect");
 					MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") didn't set new_value");
 				}
 
@@ -4110,7 +4110,7 @@ int main(void)
 			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 		}
 
-		if(action == "AJAX_addNewTemplateAgreementFile")
+		if(action == "AJAX_addTemplateAgreementFile")
 		{
 			auto			entity_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
 			auto			entity_type = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("type"));
@@ -4131,13 +4131,15 @@ int main(void)
 						auto	company_id = GetAgencyID(&user, &db);
 						if(company_id.length())
 						{
-							if(db.InsertQuery("INSERT INTO `company_agreement_files` (`company_id`, `title`, `owner_user_id`, `eventTimestamp`) VALUES ("
+							auto	new_id = db.InsertQuery("INSERT INTO `company_agreement_files` (`company_id`, `title`, `owner_user_id`, `eventTimestamp`) VALUES ("
 													"\"" + company_id + "\"," 
 													"\"" + entity_title + "\"," 
 													"\"" + user.GetID() + "\"," 
 													"UNIX_TIMESTAMP()" 
-												")"))
+												")");
+							if(new_id)
 							{
+								success_message = ",\"id\":\"" + to_string(new_id) + "\"";
 							}
 							else
 							{
@@ -4160,13 +4162,15 @@ int main(void)
 				{
 					if((error_message = isAgencyEmployeeAllowedToChangeSoW(entity_id, &db, &user)).empty())
 					{
-						if(db.InsertQuery("INSERT INTO `contract_sow_agreement_files` (`contract_sow_id`, `title`, `owner_user_id`, `eventTimestamp`) VALUES ("
+						auto	new_id = db.InsertQuery("INSERT INTO `contract_sow_agreement_files` (`contract_sow_id`, `title`, `owner_user_id`, `eventTimestamp`) VALUES ("
 												"\"" + entity_id + "\"," 
 												"\"" + entity_title + "\"," 
 												"\"" + user.GetID() + "\"," 
 												"UNIX_TIMESTAMP()" 
-											")"))
+											")");
+						if(new_id)
 						{
+							success_message = ",\"id\":\"" + to_string(new_id) + "\"";
 						}
 						else
 						{
@@ -4211,7 +4215,7 @@ int main(void)
 
 		if(
 			(action == "AJAX_updateTemplateAgreement_company_Title") ||
-			(action == "AJAX_deleteTemplateAgreement_company_Title")
+			(action == "AJAX_deleteTemplateAgreement_company")
 		)
 		{
 			ostringstream	ostResult;
@@ -4261,14 +4265,26 @@ int main(void)
 										}
 										else if(action.find("delete") != string::npos)
 										{
-											error_message = DeleteEntryByAction(action, id, &db, &user);
-											if(error_message.empty())
+											if(db.Query("SELECT `filename` FROM `company_agreement_files` WHERE `id`=\"" + id + "\";"))
 											{
-												// --- good finish
+												auto	filename = db.Get(0, 0);
+
+												if(filename.length()) unlink((TEMPLATE_AGREEMENT_COMPANY_DIRECTORY + "/" + filename).c_str());
+
+												error_message = DeleteEntryByAction(action, id, &db, &user);
+												if(error_message.empty())
+												{
+													// --- good finish
+												}
+												else
+												{
+													MESSAGE_DEBUG("", action, "unable to set new value (action/id/value = " + action + "/" + id + "/[" + FilterCP1251Symbols(new_value) + "])");
+												}
 											}
 											else
 											{
-												MESSAGE_DEBUG("", action, "unable to set new value (action/id/value = " + action + "/" + id + "/[" + FilterCP1251Symbols(new_value) + "])");
+												error_message = gettext("SQL syntax issue");
+												MESSAGE_ERROR("", "", "can't find contract_sow_agreement_files.id(" + id + ") in DB")
 											}
 										}
 										else
@@ -4301,7 +4317,7 @@ int main(void)
 				}
 				else
 				{
-					error_message = "Поле не должно быть пустым";
+					error_message = gettext("parameters incorrect");
 					MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") didn't set new_value");
 				}
 
@@ -4326,7 +4342,7 @@ int main(void)
 
 		if(
 			(action == "AJAX_updateTemplateAgreement_sow_Title") ||
-			(action == "AJAX_deleteTemplateAgreement_sow_Title")
+			(action == "AJAX_deleteTemplateAgreement_sow")
 		)
 		{
 			ostringstream	ostResult;
@@ -4346,6 +4362,10 @@ int main(void)
 				{
 					sow_id = db.Get(0, 0);
 				}
+				else
+				{
+					MESSAGE_ERROR("", "", "fail to determine sow.id by contract_sow_agreement_files.id(" + id + ")");
+				}
 
 				if(new_value.length())
 				{
@@ -4360,7 +4380,7 @@ int main(void)
 								error_message = isActionEntityBelongsToAgency(action, id, agency_id, &db, &user);
 								if(error_message.empty())
 								{
-									error_message = CheckNewValueByAction(action, id, "", new_value, &db, &user);
+									error_message = CheckNewValueByAction(action, id, sow_id, new_value, &db, &user);
 									if(error_message.empty())
 									{
 										if((action.find("update") != string::npos))
@@ -4383,14 +4403,26 @@ int main(void)
 										}
 										else if(action.find("delete") != string::npos)
 										{
-											error_message = DeleteEntryByAction(action, id, &db, &user);
-											if(error_message.empty())
+											if(db.Query("SELECT `filename` FROM `contract_sow_agreement_files` WHERE `id`=\"" + id + "\";"))
 											{
-												// --- good finish
+												auto	filename = db.Get(0, 0);
+
+												if(filename.length()) unlink((TEMPLATE_AGREEMENT_SOW_DIRECTORY + "/" + filename).c_str());
+
+												error_message = DeleteEntryByAction(action, id, &db, &user);
+												if(error_message.empty())
+												{
+													// --- good finish
+												}
+												else
+												{
+													MESSAGE_DEBUG("", action, "unable to set new value (action/id/value = " + action + "/" + id + "/[" + FilterCP1251Symbols(new_value) + "])");
+												}
 											}
 											else
 											{
-												MESSAGE_DEBUG("", action, "unable to set new value (action/id/value = " + action + "/" + id + "/[" + FilterCP1251Symbols(new_value) + "])");
+												error_message = gettext("SQL syntax issue");
+												MESSAGE_ERROR("", "", "can't find contract_sow_agreement_files.id(" + id + ") in DB")
 											}
 										}
 										else
@@ -4423,7 +4455,133 @@ int main(void)
 				}
 				else
 				{
-					error_message = "Поле не должно быть пустым";
+					error_message = gettext("parameters incorrect");
+					MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") didn't set new_value");
+				}
+
+				if(error_message.empty())
+				{
+					ostResult << "{\"result\":\"success\"}";
+				}
+				else
+				{
+					MESSAGE_DEBUG("", action, "failed");
+					ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+				}
+
+				indexPage.RegisterVariableForce("result", ostResult.str());
+
+				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			}
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
+
+		if(action == "AJAX_generateSoWAgreementDocuments")
+		{
+			ostringstream	ostResult;
+
+			MESSAGE_DEBUG("", action, "start");
+
+			ostResult.str("");
+			{
+				auto	template_name	= "json_response.htmlt"s;
+				auto	error_message	= ""s;
+
+				auto	sow_id			= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("sow_id"));
+
+				if(sow_id.length())
+				{
+					error_message = isAgencyEmployeeAllowedToChangeSoW(sow_id, &db, &user);
+					if(error_message.empty())
+					{
+						auto	agency_id = GetAgencyID(&user, &db);
+						if(agency_id.length())
+						{
+/*							C_Agreements_SoW	agreements(&db, &user);
+
+							if((error_message = agreements.Generate()).empty())
+							{
+// --- Notify SOW parties about new doc set has been generated
+							}
+							else
+							{
+								MESSAGE_ERROR("", action, error_message);
+							}
+*/
+						}
+						else
+						{
+							error_message = "Агенство не найдено";
+							MESSAGE_ERROR("", action, "agency.id not found by user.id(" + user.GetID() + ") employment");
+						}
+					}
+					else
+					{
+						MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") doesn't allowed to change agency data");
+					}
+				}
+				else
+				{
+					error_message = gettext("parameters incorrect");
+					MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") didn't set new_value");
+				}
+
+				if(error_message.empty())
+				{
+					ostResult << "{\"result\":\"success\"}";
+				}
+				else
+				{
+					MESSAGE_DEBUG("", action, "failed");
+					ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+				}
+
+				indexPage.RegisterVariableForce("result", ostResult.str());
+
+				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			}
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
+
+		if(action == "AJAX_deleteSoWAgreementDocuments")
+		{
+			ostringstream	ostResult;
+
+			MESSAGE_DEBUG("", action, "start");
+
+			ostResult.str("");
+			{
+				auto	template_name	= "json_response.htmlt"s;
+				auto	error_message	= ""s;
+
+				auto	sow_id			= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("sow_id"));
+
+				if(sow_id.length())
+				{
+					error_message = isAgencyEmployeeAllowedToChangeSoW(sow_id, &db, &user);
+					if(error_message.empty())
+					{
+						auto	agency_id = GetAgencyID(&user, &db);
+						if(agency_id.length())
+						{
+// --- DELETE AGREEMENT DOC SET
+						}
+						else
+						{
+							error_message = "Агенство не найдено";
+							MESSAGE_ERROR("", action, "agency.id not found by user.id(" + user.GetID() + ") employment");
+						}
+					}
+					else
+					{
+						MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") doesn't allowed to change agency data");
+					}
+				}
+				else
+				{
+					error_message = gettext("parameters incorrect");
 					MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") didn't set new_value");
 				}
 

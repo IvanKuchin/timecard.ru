@@ -6976,7 +6976,7 @@ auto DeleteEntryByAction(string action, string id, CMysql *db, CUser *user) -> s
 	{
 		if(id.length())
 		{
-			if(action == "AJAX_deleteTemplateAgreement_company_Title")
+			if(action == "AJAX_deleteTemplateAgreement_company")
 			{
 				db->Query("DELETE FROM `company_agreement_files` WHERE `id`=\"" + id + "\";");
 				if(db->isError())
@@ -6984,7 +6984,7 @@ auto DeleteEntryByAction(string action, string id, CMysql *db, CUser *user) -> s
 					MESSAGE_ERROR("", "", "fail to remove from table company_agreement_files");
 				}
 			}
-			else if(action == "AJAX_deleteTemplateAgreement_sow_Title")
+			else if(action == "AJAX_deleteTemplateAgreement_sow")
 			{
 				db->Query("DELETE FROM `contract_sow_agreement_files` WHERE `id`=\"" + id + "\";");
 				if(db->isError())

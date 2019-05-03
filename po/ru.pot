@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-30 19:24-0400\n"
+"POT-Creation-Date: 2019-05-03 18:14-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -47,9 +47,6 @@ msgstr "Нет доступа"
 msgid "Account"
 msgstr "Сч. №"
 
-msgid "Assignment must be inside SoW"
-msgstr "Назначение должно быть в SoW"
-
 msgid "Accountant"
 msgstr "Бухгалтер"
 
@@ -79,6 +76,9 @@ msgstr "Апрель"
 
 msgid "April declension"
 msgstr "Апреля"
+
+msgid "Assignment must be inside SoW"
+msgstr "Назначение должно быть в SoW"
 
 msgid "August"
 msgstr "Август"
@@ -416,6 +416,9 @@ msgstr "от"
 msgid "agreement number is empty"
 msgstr "не указан номер договора"
 
+msgid "already exists"
+msgstr "уже существует"
+
 msgid "and"
 msgstr "и"
 
@@ -551,6 +554,9 @@ msgstr "дата окончания"
 msgid "end date changed"
 msgstr "изменилась дата окончания контракта"
 
+msgid "exceeds allowed size"
+msgstr "превышает допустимый размер"
+
 msgid "fail to craft timecard obj"
 msgstr "ошибка создания объекта timecard"
 
@@ -568,6 +574,9 @@ msgstr "ошибка БД"
 
 msgid "fail to print header table"
 msgstr "не удалось напечатать таблицу"
+
+msgid "file size"
+msgstr "размер фаила"
 
 msgid "from"
 msgstr "с"

@@ -1,19 +1,5 @@
 #include "c_invoice_bt.h"
 
-/*
-static void error_handler  (HPDF_STATUS   error_no,
-                HPDF_STATUS   detail_no,
-                void         *user_data)
-{
-    printf ("ERROR: error_no=%04X, detail_no=%u\n", (HPDF_UINT)error_no,
-                (HPDF_UINT)detail_no);
-}
-*/
-
-C_Invoice_BT::C_Invoice_BT() {}
-
-C_Invoice_BT::C_Invoice_BT(CMysql *param1, CUser *param2) : db(param1), user(param2) {}
-
 auto C_Invoice_BT::GenerateDocumentArchive() -> string
 {
 	MESSAGE_DEBUG("", "", "start");

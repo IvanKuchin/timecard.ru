@@ -32,6 +32,8 @@
 #define IMAGE_TEMP_DIRECTORY						string(IMAGE_DIRECTORY) + string("temp")
 #define IMAGE_EXPENSELINES_DIRECTORY				string(IMAGE_DIRECTORY) + string("expense_lines")
 
+#define AGREEMENTS_SOW_DIRECTORY					string(IMAGEROOTDIR) + string("/html/agreements_sow/")
+#define	AGREEMENTS_SOW_NUMBER_OF_FOLDERS			2048
 #define INVOICES_SUBC_DIRECTORY						string(IMAGEROOTDIR) + string("/html/invoices_subc/")
 #define	INVOICES_SUBC_NUMBER_OF_FOLDERS				2048
 #define INVOICES_CC_DIRECTORY						string(IMAGEROOTDIR) + string("/html/invoices_cc/")

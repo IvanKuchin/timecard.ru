@@ -46,8 +46,8 @@ class C_Invoice_BT
 		auto 		EnrichObjWithExpenseLines(string bt_id, C_BT_To_Print *obj) -> bool;
 
 	public:
-					C_Invoice_BT();
-					C_Invoice_BT(CMysql *, CUser *);
+					C_Invoice_BT()									{};
+					C_Invoice_BT(CMysql *param1, CUser *param2) : db(param1), user(param2) {};
 
 		auto		SetBTList(const vector<string> &param1)			{ bt_id_list = param1; };
 
