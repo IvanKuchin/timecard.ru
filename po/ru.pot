@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-03 18:14-0400\n"
+"POT-Creation-Date: 2019-05-04 01:21-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -239,6 +239,9 @@ msgstr "Октябрь"
 msgid "October declension"
 msgstr "Октября"
 
+msgid "Only english alphabet allowed and -_."
+msgstr "Допустимы только буквы английского алфавита и -_."
+
 msgid "Only owner can recall an invoice"
 msgstr "Только владелец может отозвать счет"
 
@@ -413,6 +416,9 @@ msgstr "договора"
 msgid "agreement from"
 msgstr "от"
 
+msgid "agreement generation failed"
+msgstr "Не удалось сегенерировать набор документов"
+
 msgid "agreement number is empty"
 msgstr "не указан номер договора"
 
@@ -574,6 +580,9 @@ msgstr "ошибка БД"
 
 msgid "fail to print header table"
 msgstr "не удалось напечатать таблицу"
+
+msgid "fail to produce object set"
+msgstr "не удалось собрать внутреннюю структуру"
 
 msgid "file size"
 msgstr "размер фаила"
@@ -742,6 +751,9 @@ msgstr "не указан идентификатор компании субко
 
 msgid "table is too wide"
 msgstr "таблица слишком широкая"
+
+msgid "template not found"
+msgstr "шаблон не найден"
 
 msgid "till"
 msgstr "до"

@@ -4124,72 +4124,85 @@ int main(void)
 
 			if(entity_id.length() && entity_title.length())
 			{
-				if(entity_type == "company")
-				{
-					if((error_message = isAgencyEmployeeAllowedToChangeAgencyData(&db, &user)).empty())
+					if(entity_type == "company")
 					{
-						auto	company_id = GetAgencyID(&user, &db);
-						if(company_id.length())
+						if((error_message = isAgencyEmployeeAllowedToChangeAgencyData(&db, &user)).empty())
 						{
-							auto	new_id = db.InsertQuery("INSERT INTO `company_agreement_files` (`company_id`, `title`, `owner_user_id`, `eventTimestamp`) VALUES ("
-													"\"" + company_id + "\"," 
-													"\"" + entity_title + "\"," 
-													"\"" + user.GetID() + "\"," 
-													"UNIX_TIMESTAMP()" 
-												")");
-							if(new_id)
+							auto	company_id = GetAgencyID(&user, &db);
+							if(company_id.length())
 							{
-								success_message = ",\"id\":\"" + to_string(new_id) + "\"";
+								if((error_message = CheckAgreementSoWTitle(entity_title, "", &db, &user)).empty())
+								{
+									auto	new_id = db.InsertQuery("INSERT INTO `company_agreement_files` (`company_id`, `title`, `owner_user_id`, `eventTimestamp`) VALUES ("
+															"\"" + company_id + "\"," 
+															"\"" + entity_title + "\"," 
+															"\"" + user.GetID() + "\"," 
+															"UNIX_TIMESTAMP()" 
+														")");
+									if(new_id)
+									{
+										success_message = ",\"id\":\"" + to_string(new_id) + "\"";
+									}
+									else
+									{
+										error_message = gettext("SQL syntax issue");
+										MESSAGE_ERROR("", "", error_message);
+									}
+								}
+								else
+								{
+									MESSAGE_DEBUG("", "", "error returned from CheckAgreementSoWTitle");
+								}
 							}
 							else
 							{
-								error_message = gettext("SQL syntax issue");
-								MESSAGE_ERROR("", "", error_message);
+								MESSAGE_ERROR("", "", "can't define company id by user.id(" + user.GetID() + ")");
 							}
 						}
 						else
 						{
-							MESSAGE_ERROR("", "", "can't define company id by user.id(" + user.GetID() + ")");
+							error_message = gettext("You are not authorized");
+							MESSAGE_ERROR("", action, "user(" + user.GetID() + ") is not allowed to change agency data");
 						}
 					}
-					else
+					else if(entity_type == "sow")
 					{
-						error_message = gettext("You are not authorized");
-						MESSAGE_ERROR("", action, "user(" + user.GetID() + ") is not allowed to change agency data");
-					}
-				}
-				else if(entity_type == "sow")
-				{
-					if((error_message = isAgencyEmployeeAllowedToChangeSoW(entity_id, &db, &user)).empty())
-					{
-						auto	new_id = db.InsertQuery("INSERT INTO `contract_sow_agreement_files` (`contract_sow_id`, `title`, `owner_user_id`, `eventTimestamp`) VALUES ("
-												"\"" + entity_id + "\"," 
-												"\"" + entity_title + "\"," 
-												"\"" + user.GetID() + "\"," 
-												"UNIX_TIMESTAMP()" 
-											")");
-						if(new_id)
+						if((error_message = isAgencyEmployeeAllowedToChangeSoW(entity_id, &db, &user)).empty())
 						{
-							success_message = ",\"id\":\"" + to_string(new_id) + "\"";
+							if((error_message = CheckAgreementSoWTitle(entity_title, entity_id, &db, &user)).empty())
+							{
+								auto	new_id = db.InsertQuery("INSERT INTO `contract_sow_agreement_files` (`contract_sow_id`, `title`, `owner_user_id`, `eventTimestamp`) VALUES ("
+														"\"" + entity_id + "\"," 
+														"\"" + entity_title + "\"," 
+														"\"" + user.GetID() + "\"," 
+														"UNIX_TIMESTAMP()" 
+													")");
+								if(new_id)
+								{
+									success_message = ",\"id\":\"" + to_string(new_id) + "\"";
+								}
+								else
+								{
+									error_message = gettext("SQL syntax issue");
+									MESSAGE_ERROR("", "", error_message);
+								}
+							}
+							else
+							{
+								MESSAGE_DEBUG("", "", "error returned from CheckAgreementSoWTitle");
+							}
 						}
 						else
 						{
-							error_message = gettext("SQL syntax issue");
-							MESSAGE_ERROR("", "", error_message);
+							error_message = gettext("You are not authorized");
+							MESSAGE_ERROR("", action, "user(" + user.GetID() + ") is not allowed to change SoW(" + entity_id + ")");
 						}
 					}
 					else
 					{
-						error_message = gettext("You are not authorized");
-						MESSAGE_ERROR("", action, "user(" + user.GetID() + ") is not allowed to change SoW(" + entity_id + ")");
+						error_message = gettext("parameters incorrect");
+						MESSAGE_ERROR("", action, "entity_type (" + entity_type + ") is incorrect");
 					}
-				}
-				else
-				{
-					error_message = gettext("parameters incorrect");
-					MESSAGE_ERROR("", action, "entity_type (" + entity_type + ") is incorrect");
-				}
-
 			}
 			else
 			{
@@ -4498,9 +4511,11 @@ int main(void)
 						auto	agency_id = GetAgencyID(&user, &db);
 						if(agency_id.length())
 						{
-/*							C_Agreements_SoW	agreements(&db, &user);
+							C_Agreements_SoW_Factory	agreements(&db, &user);
 
-							if((error_message = agreements.Generate()).empty())
+							agreements.SetSoWID(sow_id);
+
+							if((error_message = agreements.GenerateDocumentArchive()).empty())
 							{
 // --- Notify SOW parties about new doc set has been generated
 							}
@@ -4508,7 +4523,7 @@ int main(void)
 							{
 								MESSAGE_ERROR("", action, error_message);
 							}
-*/
+
 						}
 						else
 						{

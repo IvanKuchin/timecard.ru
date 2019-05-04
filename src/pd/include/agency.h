@@ -20,5 +20,6 @@
 #include "c_bt.h"
 #include "c_invoice_service.h"
 #include "c_invoice_bt.h"
+#include "c_agreements_sow_factory.h"
 
 #endif

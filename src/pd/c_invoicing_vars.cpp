@@ -1496,6 +1496,59 @@ auto	C_Invoicing_Vars::GenerateBTVariableSet() -> string
 	return	error_message;
 }
 
+auto	C_Invoicing_Vars::GenerateSoWVariableSet() -> string
+{
+	auto	error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(user)
+	{
+		if(db)
+		{
+			if(error_message.empty())
+			{
+				if((error_message = FillStaticDictionary()).empty()) {}
+				else { MESSAGE_ERROR("", "", "fail returned from static dictionary"); }
+			}
+
+			if(error_message.empty())
+			{
+				if((error_message = Agency_VarSet()).empty()) {}
+				else { MESSAGE_ERROR("", "", "fail returned from AgencyVarSet"); }
+			}
+
+			if(error_message.empty())
+			{
+				if((error_message = SoW_Index_VarSet("SELECT `id`,`number`,`sign_date`,`act_number`,`subcontractor_company_id`,`day_rate` FROM `contracts_sow` WHERE `id`=\"" + GetSoWID() + "\";", "")).empty()) {}
+				else { MESSAGE_ERROR("", "", "fail returned from SoW_Index_VarSet"); }
+			}
+
+			// --- subcontractor company data
+			if(error_message.empty())
+			{
+				if((error_message = Subcontractor_Index_VarSet(Get("subcontractor_company_id_"), "")).empty()) {}
+				else { MESSAGE_ERROR("", "", "fail returned from Subcontractor_Index_VarSet"); }
+			}
+
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "db is not initialized");
+			error_message = gettext("db is not initialized");
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "user is not initialized");
+		error_message = gettext("user is not initialized");
+	}
+
+	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
+
+	return	error_message;
+}
+
 auto C_Invoicing_Vars::Get(const string &name) -> string
 {
 	return vars.Get(name);

@@ -9,6 +9,7 @@
 #include "utilities.h"
 #include "c_invoicing_vars.h"
 #include "c_agreements_sow_object.h"
+#include "c_template2pdf_printer.h"
 #include "c_archive.h"
 
 using namespace std;
@@ -32,8 +33,9 @@ class C_Agreements_SoW_Factory
 		string							archive_file = "";		// --- archive in production folder
 
 
-		auto		UpdateDBWithAgreementData(const string bt_id) -> string;
+		// auto		UpdateDBWithAgreementData(const string bt_id) -> string;
 		auto		CreateTempDirectory() -> bool;
+		auto		ProduceObjectVector() -> string;
 
 	public:
 					C_Agreements_SoW_Factory()									{};

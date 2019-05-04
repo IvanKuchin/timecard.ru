@@ -90,6 +90,7 @@ find_package(OpenSSL REQUIRED)
 find_package(CURL REQUIRED)
 find_package(LibWebSockets REQUIRED)
 find_package(Libhpdf REQUIRED)
+find_package(Libwkhtmltopdf REQUIRED)
 find_package(Libarchive REQUIRED)
 find_package(Libxl REQUIRED)
 
@@ -126,6 +127,7 @@ set(PROJECT_PI_INCLUDE_DIRECTORIES
     ${HPDF_INCLUDE_DIR}
     ${ARCHIVE_INCLUDE_DIR}
     ${XL_INCLUDE_DIR}
+    ${WKHTMLTOPDF_INCLUDE_DIR}
     )
 
 set(PROJECT_EXTERNAL_LIBS
@@ -139,6 +141,7 @@ set(PROJECT_EXTERNAL_LIBS
     ${HPDF_LIBRARY}
     ${ARCHIVE_LIBRARY}
     ${XL_LIBRARY}
+    ${WKHTMLTOPDF_LIBRARY}
     )
 
 # --- does this system provide the exp function ?

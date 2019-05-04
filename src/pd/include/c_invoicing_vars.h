@@ -28,6 +28,7 @@ class C_Invoicing_Vars
 
 		string							cost_center_id = "";
 		string							agency_company_id = "";
+		string							__sow_id = "";
 
 		auto		FillStaticDictionary() -> string;
 		auto		CostCenter_VarSet() -> string;
@@ -64,9 +65,14 @@ class C_Invoicing_Vars
 		auto		SetCostCenterID(string &&param)			{ cost_center_id = move(param); };
 		auto		SetAgencyCompanyID(const string &param)	{ agency_company_id = param; };
 		auto		SetAgencyCompanyID(string &&param)		{ agency_company_id = move(param); };
+		auto		SetSoWID(const string &param)			{ __sow_id = param; };
+		auto		SetSoWID(string &&param)				{ __sow_id = move(param); };
+
+		auto		GetSoWID()								{ return __sow_id; }
 
 		auto		GenerateServiceVariableSet() -> string;
 		auto		GenerateBTVariableSet() -> string;
+		auto		GenerateSoWVariableSet() -> string;
 
 		auto		Get(const string &) -> string;
 

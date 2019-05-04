@@ -1085,18 +1085,24 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 					else if(action == "AJAX_deleteTemplateAgreement_sow")		{ /* --- good to go */ }
 					else if(action == "AJAX_updateTemplateAgreement_company_Title")
 					{
-						if(db->Query("SELECT `id` FROM `company_agreement_files` WHERE `title`=\"" + new_value + "\" AND `company_id`=(SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\");"))
+						// if(db->Query("SELECT `id` FROM `company_agreement_files` WHERE `title`=\"" + new_value + "\" AND `company_id`=(SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\");"))
 						{
-							error_message = gettext("already exists");
-							MESSAGE_DEBUG("", "", "company_agreement_files already exists .id(" + db->Get(0, 0) + ")");
+							if((error_message = CheckAgreementSoWTitle(new_value, sow_id, db, user)).empty()) {}
+							else
+							{
+								MESSAGE_DEBUG("", "", "error returned from CheckAgreementSoWTitle");
+							}
 						}
 					}
 					else if(action == "AJAX_updateTemplateAgreement_sow_Title")
 					{
-						if(db->Query("SELECT `id` FROM `contract_sow_agreement_files` WHERE `title`=\"" + new_value + "\" AND `contract_sow_id`=\"" + sow_id + "\";"))
+						// if(db->Query("SELECT `id` FROM `contract_sow_agreement_files` WHERE `title`=\"" + new_value + "\" AND `contract_sow_id`=\"" + sow_id + "\";"))
 						{
-							error_message = gettext("already exists");
-							MESSAGE_DEBUG("", "", "contract_sow_agreement_files already exists .id(" + db->Get(0, 0) + ")");
+							if((error_message = CheckAgreementSoWTitle(new_value, sow_id, db, user)).empty()) {}
+							else
+							{
+								MESSAGE_DEBUG("", "", "error returned from CheckAgreementSoWTitle");
+							}
 						}
 					}
 					else if(action == "AJAX_updateSoWStartDate")
@@ -1999,3 +2005,41 @@ auto	GetTemplateCompanyAgreementFiles(string sqlQuery, CMysql *db, CUser *user) 
 	return result;
 }
 
+auto	CheckAgreementSoWTitle(string title, string sow_id, CMysql *db, CUser *user) -> string
+{
+	auto	error_message = ""s;
+	auto	sql_query = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(sow_id.length())
+	{
+		sql_query = "SELECT `id` FROM `contract_sow_agreement_files` WHERE `title`=\"" + title + "\" AND `contract_sow_id`=\"" + sow_id + "\";";
+	}
+	else
+	{
+		sql_query = "SELECT `id` FROM `company_agreement_files` WHERE `title`=\"" + title + "\" AND `company_id`=(SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\");";
+	}
+
+	if(db->Query(sql_query) == 0)
+	{
+		if(title.find_first_not_of("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890 _.-") == string::npos)
+		{
+			// --- good2go
+		}
+		else
+		{
+			error_message = gettext("Only english alphabet allowed and -_.");
+			MESSAGE_DEBUG("", "", error_message);
+		}
+	}
+	else
+	{
+		error_message = gettext("already exists");
+		MESSAGE_DEBUG("", "", "agreement_title already exists with id(" + db->Get(0, 0) + ")");		
+	}
+
+	MESSAGE_DEBUG("", "", "finish (error_message: " + error_message + ")");
+
+	return error_message;
+}

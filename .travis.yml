@@ -39,6 +39,7 @@ addons:
     - libcurl4-openssl-dev
     - libhpdf-dev
     - libarchive-dev
+    - libwkhtmltox
     - pkg-config
 
 script:

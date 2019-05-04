@@ -1,10 +1,22 @@
 #include "c_agreements_sow_factory.h"
-/*
+
 auto C_Agreements_SoW_Factory::GenerateDocumentArchive() -> string
 {
 	MESSAGE_DEBUG("", "", "start");
 
 	auto									error_message = ""s;
+
+	if(db == nullptr)
+	{
+		error_message = gettext("SQL syntax issue");
+		MESSAGE_ERROR("", "", "db not initialized");
+	}
+
+	if(sow_id.empty())
+	{
+		error_message = gettext("Data has not been initialized");
+		MESSAGE_ERROR("", "", "sow_id not initialized");
+	}
 
 	if(error_message.empty())
 	{
@@ -16,11 +28,22 @@ auto C_Agreements_SoW_Factory::GenerateDocumentArchive() -> string
 		}
 	}
 
+	if(error_message.empty())
+	{
+		if((ProduceObjectVector()).empty()) {}
+		else
+		{
+			error_message = (gettext("fail to produce object set"));
+			MESSAGE_ERROR("", "", error_message);
+		}
+	}
+
 	// --- generate variable for invoicing
 	if(error_message.empty())
 	{
 		invoicing_vars.SetDB(db);
 		invoicing_vars.SetUser(user);
+		invoicing_vars.SetSoWID(sow_id);
 
 		error_message = invoicing_vars.GenerateSoWVariableSet();
 	}
@@ -32,36 +55,52 @@ auto C_Agreements_SoW_Factory::GenerateDocumentArchive() -> string
 	// --- agreements sow generator
 	if(error_message.empty())
 	{
-		auto	i = 0;
+		C_Template2PDF_Printer	template2pdf_printer;
+
+		template2pdf_printer.SetDB(db);
+		template2pdf_printer.SetVariableSet(&invoicing_vars);
 
 		// --- print bt to XLS / PDF
 		for(auto &agreement: agreement_list)
 		{
-			auto		filename = ""s;
-
-			do
+			if(agreement.GetFilename().length())
 			{
-				filename = temp_dir + agreement + (i ? "_" + to_string(i) : "") + ".pdf";
-				++i;
-			} while(isFileExists(filename));
+				auto		output_filename = ""s;
+				auto		i = 0;
 
-			template2pdf_printer.SetBT(bt);
-			template2pdf_printer.SetVariableSet(&invoicing_vars);
+				do
+				{
+					output_filename = temp_dir + agreement.GetTitle() + (i ? "_" + to_string(i) : "") + ".pdf";
+					++i;
+				} while(isFileExists(output_filename));
 
-			template2pdf_printer.SetFilename(filename);
-			error_message = template2pdf_printer.PrintAsAPDF();
-			if(error_message.length())
+				template2pdf_printer.SetTemplate(agreement.GetFilename());
+				template2pdf_printer.SetFilename(output_filename);
+
+				if((error_message = template2pdf_printer.RenderTemplate()).length())
+				{
+					MESSAGE_ERROR("", "", "fail to render template " + agreement.GetFilename());
+				}
+
+				if((error_message = template2pdf_printer.ConvertHTML2PDF()).length())
+				{
+					MESSAGE_ERROR("", "", "fail to conert html to pdf (" + agreement.GetFilename() + ")");
+				}
+
+				if(error_message.length()) break;
+			}
+			else
 			{
-				MESSAGE_ERROR("", "", "fail to build bt_" + to_string(i) + ".pdf");
-				break;
+				MESSAGE_DEBUG("", "", "skip agreement due to empty template");
 			}
 		}
 	}
 	else
 	{
-		MESSAGE_ERROR("", "", "BTs won't be written to files due to previous error");
+		MESSAGE_ERROR("", "", "Agreements won't be written to files due to previous error");
 	}
 
+/*
 	// --- update DB only if no errors earlier
 	if(error_message.empty())
 	{
@@ -78,7 +117,7 @@ auto C_Agreements_SoW_Factory::GenerateDocumentArchive() -> string
 	{
 		MESSAGE_ERROR("", "", "db won't be updated due to previous error");
 	}
-
+*/
 	if(error_message.empty())
 	{
 		// --- important to keep it scoped
@@ -119,6 +158,7 @@ auto C_Agreements_SoW_Factory::CreateTempDirectory() -> bool
 	if(CreateDir(temp_dir))
 	{
 		temp_dir += "/";
+		result = true;
 	}
 	else
 	{
@@ -127,7 +167,7 @@ auto C_Agreements_SoW_Factory::CreateTempDirectory() -> bool
 
 	return result;
 }
-
+/*
 auto C_Agreements_SoW_Factory::UpdateDBWithInvoiceData(const string bt_id) -> string
 {
 	auto	error_message = ""s;
@@ -225,11 +265,53 @@ auto C_Agreements_SoW_Factory::UpdateDBWithInvoiceData(const string bt_id) -> st
 	return error_message;
 }
 */
+
+auto C_Agreements_SoW_Factory::ProduceObjectVector() -> string
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	error_message = ""s;
+	auto	affected = db->Query("SELECT * FROM `contract_sow_agreement_files` WHERE `contract_sow_id`=\"" + sow_id + "\";");
+
+	for(int i = 0; i < affected; ++i)
+	{
+		C_Agreements_SoW_Object	temp;
+
+		temp.SetSoWID(sow_id);
+		temp.SetID(db->Get(i, "id"));
+		temp.SetTitle(db->Get(i, "title"));
+		if(db->Get(i, "filename").length())
+			temp.SetFilename(TEMPLATE_AGREEMENT_SOW_DIRECTORY + "/" + db->Get(i, "filename"));
+
+		agreement_list.push_back(temp);
+	}
+
+	affected = db->Query("SELECT * FROM `company_agreement_files` WHERE `company_id`=(SELECT `agency_company_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\");");
+
+	for(int i = 0; i < affected; ++i)
+	{
+		C_Agreements_SoW_Object	temp;
+
+		temp.SetSoWID(sow_id);
+		temp.SetID(db->Get(i, "id"));
+		temp.SetTitle(db->Get(i, "title"));
+		if(db->Get(i, "filename").length())
+			temp.SetFilename(TEMPLATE_AGREEMENT_COMPANY_DIRECTORY + "/" + db->Get(i, "filename"));
+
+		agreement_list.push_back(temp);
+	}
+
+
+	MESSAGE_DEBUG("", "", "finish (error_message: " + error_message + ")");
+
+	return error_message;
+}
+
 C_Agreements_SoW_Factory::~C_Agreements_SoW_Factory()
 {
 	if(temp_dir.length())
 	{
-		RmDirRecursive(temp_dir.c_str());
+		// RmDirRecursive(temp_dir.c_str());
 	}
 	else
 	{

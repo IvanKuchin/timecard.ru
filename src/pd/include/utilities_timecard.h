@@ -29,7 +29,7 @@ auto			GetPSoWCustomFieldsInJSONFormat(string sqlQuery, CMysql *, CUser *) -> st
 auto			GetCostCenterCustomFieldsInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetCompanyCustomFieldsInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetPSoWInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
-auto			GetCustomersInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string;
+auto			GetCustomersInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetTimecardApprovalsInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			SubmitTimecard(string timecard_id, CMysql *, CUser *) -> bool;
 auto			SubmitBT(string bt_id, CMysql *, CUser *) -> bool;
@@ -101,7 +101,7 @@ auto			isCostCenterBelongsToAgency(string cost_center_id, CMysql *, CUser *) -> 
 // string			isAgencyEmployeeAllowedToChangeAgencyData(CMysql *, CUser *);
 // string			isActionEntityBelongsToSoW(string action, string is, string sow_id, CMysql *, CUser *);
 // string			isActionEntityBelongsToAgency(string action, string id, string agency_id, CMysql *, CUser *);
-auto			NotifySoWContractPartiesAboutChanges(string action_type_id, string sow_id, CMysql *db, CUser *user) -> string;
+auto			NotifySoWContractPartiesAboutChanges(string action_type_id, string sow_id, CMysql *, CUser *) -> string;
 auto			GeneralNotifySoWContractPartiesAboutChanges(string action, string id, string sow_id, string existing_value, string new_value, CMysql *, CUser *) -> bool;
 auto			GetDBValueByAction(string action, string id, string sow_id, CMysql *, CUser *) -> string;
 // string			CheckNewValueByAction(string action, string id, string sow_id, string new_value, CMysql *, CUser *);
@@ -130,19 +130,20 @@ auto			isBTInvoiceBelongsToAgency(string service_invoice_id, CMysql *, CUser *) 
 auto			GetAgencyIDByUserID(CMysql *, CUser *) -> string;
 auto			CreatePSoWfromTimecardCustomerIDAndCostCenterID(string timecard_customer_id, string cost_center_id, CMysql *, CUser *) -> bool;
 
-auto			isTimecardsHavePSOWAssigned(const vector<string> &timecard_list, string cost_center_id, CMysql *db, CUser *user) -> string;
-auto			isTimecardsBelongToAgency(const vector<string> &timecard_list, string agency_id, CMysql *db, CUser *user) -> string;
-auto			isBTsHavePSOWAssigned(const vector<string> &timecard_list, string cost_center_id, CMysql *db, CUser *user) -> string;
-auto			isBTsBelongToAgency(const vector<string> &timecard_list, string agency_id, CMysql *db, CUser *user) -> string;
-auto			isAgencyEmployeeAllowedToChangeSoW(string sow_id, CMysql *db, CUser *user) -> string;
-auto			isAgencyEmployeeAllowedToChangePSoW(string sow_id, CMysql *db, CUser *user) -> string;
-auto			isAgencyEmployeeAllowedToChangeAgencyData(CMysql *db, CUser *user) -> string;
-struct tm 		GetFirstDayReportedOnAssignmentID(string sow_id, string task_id, CMysql *db);
-struct tm 		GetLastDayReportedOnAssignmentID(string sow_id, string task_id, CMysql *db);
-auto			isActionEntityBelongsToSoW(string action, string id, string sow_id, CMysql *db, CUser *user) -> string;
-auto			CheckNewValueByAction(string action, string id, string sow_id, string new_value, CMysql *db, CUser *user) -> string;
-auto			isActionEntityBelongsToAgency(string action, string id, string agency_id, CMysql *db, CUser *user) -> string;
+auto			isTimecardsHavePSOWAssigned(const vector<string> &timecard_list, string cost_center_id, CMysql *, CUser *) -> string;
+auto			isTimecardsBelongToAgency(const vector<string> &timecard_list, string agency_id, CMysql *, CUser *) -> string;
+auto			isBTsHavePSOWAssigned(const vector<string> &timecard_list, string cost_center_id, CMysql *, CUser *) -> string;
+auto			isBTsBelongToAgency(const vector<string> &timecard_list, string agency_id, CMysql *, CUser *) -> string;
+auto			isAgencyEmployeeAllowedToChangeSoW(string sow_id, CMysql *, CUser *) -> string;
+auto			isAgencyEmployeeAllowedToChangePSoW(string sow_id, CMysql *, CUser *) -> string;
+auto			isAgencyEmployeeAllowedToChangeAgencyData(CMysql *, CUser *) -> string;
+struct tm 		GetFirstDayReportedOnAssignmentID(string sow_id, string task_id, CMysql *);
+struct tm 		GetLastDayReportedOnAssignmentID(string sow_id, string task_id, CMysql *);
+auto			isActionEntityBelongsToSoW(string action, string id, string sow_id, CMysql *, CUser *) -> string;
+auto			CheckNewValueByAction(string action, string id, string sow_id, string new_value, CMysql *, CUser *) -> string;
+auto			isActionEntityBelongsToAgency(string action, string id, string agency_id, CMysql *, CUser *) -> string;
 
+auto			CheckAgreementSoWTitle(string title, string sow_id, CMysql *, CUser *) -> string;
 
 
 #endif
