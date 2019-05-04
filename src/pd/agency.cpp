@@ -3994,6 +3994,27 @@ int main(void)
 								unlink((TEMPLATE_PSOW_DIRECTORY + "/" + db.Get(i, "value")).c_str());
 							}
 
+
+							affected = db.Query("SELECT `filename` FROM `contract_sow_agreement_files` WHERE `contract_sow_id`=\"" + sow_id + "\";");
+							for(int i = 0; i < affected; ++i)
+							{
+								unlink((TEMPLATE_AGREEMENT_SOW_DIRECTORY + "/" + db.Get(i, 0)).c_str());
+							}
+
+							affected = db.Query("SELECT `agreement_filename` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";");
+							if(affected)
+							{
+								if(db.Get(0, 0).length())
+								{
+									unlink((AGREEMENTS_SOW_DIRECTORY + "/" + db.Get(0, 0)).c_str());
+								}
+								else
+								{
+									MESSAGE_DEBUG("", "", "no agreements assigned to SoW. nothing to delete.");
+								}
+							}
+
+							db.Query("DELETE FROM `users_notification` WHERE `actionTypeId`=\"" + to_string(NOTIFICATION_AGENGY_GENERATED_AGREEMENTS) + "\" AND `actionId`=\"" + sow_id + "\";");
 							db.Query("DELETE FROM `users_notification` WHERE `actionTypeId`=\"" + to_string(NOTIFICATION_AGENGY_INITIATED_SOW) + "\" AND `actionId`=\"" + sow_id + "\";");
 							db.Query("DELETE FROM `users_notification` WHERE `actionTypeId`=\"" + to_string(NOTIFICATION_SUBCONTRACTOR_SIGNED_SOW) + "\" AND `actionId`=\"" + sow_id + "\";");
 							db.Query("DELETE FROM `contract_sow_custom_fields` WHERE `contract_sow_id`=\"" + sow_id + "\";");
@@ -4512,18 +4533,40 @@ int main(void)
 						auto	agency_id = GetAgencyID(&user, &db);
 						if(agency_id.length())
 						{
-							C_Agreements_SoW_Factory	agreements(&db, &user);
-
-							agreements.SetSoWID(sow_id);
-
-							if((error_message = agreements.GenerateDocumentArchive()).empty())
+							if(db.Query("SELECT `status` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";"))	
 							{
-// --- Notify SOW parties about new doc set has been generated
-								success_message = ",\"filename\":\"" + agreements.GetShortFilename() + "\"";
+								if(db.Get(0, 0) == "negotiating")
+								{
+									C_Agreements_SoW_Factory	agreements(&db, &user);
+
+									agreements.SetSoWID(sow_id);
+
+									if((error_message = agreements.GenerateDocumentArchive()).empty())
+									{
+										success_message = ",\"filename\":\"" + agreements.GetShortFilename() + "\"";
+
+										{
+											auto	temp_error_message = NotifySoWContractPartiesAboutChanges(to_string(NOTIFICATION_AGENGY_GENERATED_AGREEMENTS), sow_id, &db, &user);
+
+											if(temp_error_message.length()) MESSAGE_ERROR("", action, temp_error_message);
+										}
+
+									}
+									else
+									{
+										MESSAGE_ERROR("", action, error_message);
+									}
+								}
+								else
+								{
+									error_message = gettext("Agreement already signed");
+									MESSAGE_ERROR("", "", error_message + ". Workflow should not be here.");
+								}
 							}
 							else
 							{
-								MESSAGE_ERROR("", action, error_message);
+								error_message = gettext("SQL syntax issue");
+								MESSAGE_ERROR("", "", error_message + ". Workflow should not be here.");
 							}
 
 						}
@@ -4583,7 +4626,44 @@ int main(void)
 						auto	agency_id = GetAgencyID(&user, &db);
 						if(agency_id.length())
 						{
-// --- DELETE AGREEMENT DOC SET
+							if(db.Query("SELECT `status` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";"))	
+							{
+								if(db.Get(0, 0) == "negotiating")
+								{
+									auto	affected = db.Query("SELECT `agreement_filename` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";");
+
+									if(affected)
+									{
+										if(db.Get(0, 0).length())
+										{
+											unlink((AGREEMENTS_SOW_DIRECTORY + "/" + db.Get(0, 0)).c_str());
+										}
+										else
+										{
+											MESSAGE_DEBUG("", "", "no agreements assigned to SoW. nothing to delete.");
+										}
+									}
+									else
+									{
+										MESSAGE_ERROR("", "", "sow_id(" + sow_id + ") not found. Workflow must not be here. Investigate reason.");
+									}
+
+									db.Query("DELETE FROM `users_notification` WHERE `actionTypeId`=\"" + to_string(NOTIFICATION_AGENGY_GENERATED_AGREEMENTS) + "\" AND `actionId`=\"" + sow_id + "\";");
+									db.Query("UPDATE `contracts_sow` SET `agreement_filename`=\"\" WHERE `id`=\"" + sow_id + "\";");
+								}
+								else
+								{
+									error_message = gettext("Agreement already signed");
+									MESSAGE_ERROR("", "", error_message + ". Workflow should not be here.");
+								}
+							}
+							else
+							{
+								error_message = gettext("SQL syntax issue");
+								MESSAGE_ERROR("", "", error_message + ". Workflow should not be here.");
+							}
+
+
 						}
 						else
 						{

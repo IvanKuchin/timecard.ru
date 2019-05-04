@@ -2828,6 +2828,24 @@ string  GetUserNotificationSpecificDataByType(unsigned long typeID, unsigned lon
 		}
 	}
 
+	if(typeID == NOTIFICATION_AGENGY_GENERATED_AGREEMENTS)
+	{
+		string		id = to_string(actionID);
+
+		if(id.length())
+		{
+			ostResult << "\"item\":[" << GetSOWInJSONFormat("SELECT * FROM `contracts_sow` WHERE `id`=\"" + id + "\";", db, user) << "],";
+			ostResult << "\"notificationFromCompany\":[" << GetCompanyListInJSONFormat("SELECT * FROM `company` WHERE `id`=("
+																							"SELECT `agency_company_id` FROM `contracts_sow` WHERE `id`=\"" + id + "\""
+																						");", db, NULL) << "],";
+			ostResult << "\"users\":[" << GetUserListInJSONFormat("SELECT * FROM `users` WHERE `id`=\"" + user->GetID() + "\";", db, user) << "]";
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "typeID=" + to_string(typeID) + ": sow_id is empty");
+		}
+	}
+
 
 
 	{
@@ -4165,6 +4183,7 @@ auto	GetSOWInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include_t
 		string	day_rate;
 		string	act_number;
 		string	status;
+		string	agreement_filename;
 		string	eventTimestamp;
 	};
 	vector<ItemClass>		itemsList;
@@ -4192,6 +4211,7 @@ auto	GetSOWInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include_t
 			item.subcontractor_create_tasks = db->Get(i, "subcontractor_create_tasks");
 			item.act_number = db->Get(i, "act_number");
 			item.status = db->Get(i, "status");
+			item.agreement_filename = db->Get(i, "agreement_filename");
 			item.day_rate = db->Get(i, "day_rate");
 			item.eventTimestamp = db->Get(i, "eventTimestamp");
 
@@ -4233,6 +4253,7 @@ auto	GetSOWInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include_t
 			result += "\"act_number\":\"" + item.act_number + "\",";
 			result += "\"day_rate\":\"" + (user->GetType() == "agency" || user->GetType() == "subcontractor" ? item.day_rate : "") + "\",";
 			result += "\"status\":\"" + item.status + "\",";
+			result += "\"agreement_filename\":\"" + item.agreement_filename + "\",";
 			result += "\"custom_fields\":[" + GetSoWCustomFieldsInJSONFormat("SELECT * FROM `contract_sow_custom_fields` WHERE `contract_sow_id`=\"" + item.id + "\" "
 						+ (user->GetType() == "subcontractor" ? " AND (`visible_by_subcontractor`=\"Y\" OR `editable_by_subcontractor`=\"Y\") " : "")
 						+ ";", db, user)
