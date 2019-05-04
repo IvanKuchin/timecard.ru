@@ -11,6 +11,14 @@ dist: xenial
 #  - sudo apt-get install -y libavutil-dev libavcodec-dev libavformat-dev
 ##  - sudo apt-get install -y --no-install-recommends --no-install-suggests graphicsmagick-libmagick-dev-compat libgraphicsmagick++1-dev libwebp-dev libmaxminddb-dev libmysqlclient-dev libssl-dev libcurl4-openssl-dev pkg-config
 
+#
+# wkhtmltox installation
+#
+before_install:
+  - wget https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.trusty_amd64.deb
+  - sudo dpkg -i  wkhtmltox_0.12.5-1.trusty_amd64.deb 
+  - sudo apt -f install
+
 services:
   - mysql
 
@@ -39,7 +47,6 @@ addons:
     - libcurl4-openssl-dev
     - libhpdf-dev
     - libarchive-dev
-    - wkhtmltox
     - pkg-config
 
 script:
