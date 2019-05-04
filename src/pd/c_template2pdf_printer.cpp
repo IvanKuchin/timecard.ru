@@ -101,6 +101,9 @@ auto	C_Template2PDF_Printer::ConvertHTML2PDF() -> string
 
 				/* We will no longer be needing wkhtmltopdf funcionality */
 				wkhtmltopdf_deinit();
+
+				// --- remove template file
+				unlink((GetFilename() + ".html").c_str());
 			}
 		}
 		else

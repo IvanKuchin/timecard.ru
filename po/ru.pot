@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-04 01:21-0400\n"
+"POT-Creation-Date: 2019-05-04 10:04-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -623,6 +623,9 @@ msgstr "hpdf: не удалось напечатать текст"
 msgid "hpdf: table top must be higher than bottom"
 msgstr "hpdf: верх таблицы должен быть выше чем нижняя часть"
 
+msgid "html to pdf conversation failed"
+msgstr "не удалось конвертировать HTML -> PDF"
+
 msgid "id is empty"
 msgstr "не указан идентификатор"
 
@@ -754,6 +757,9 @@ msgstr "таблица слишком широкая"
 
 msgid "template not found"
 msgstr "шаблон не найден"
+
+msgid "temporary file doesn't exists"
+msgstr "временный фаил не найден"
 
 msgid "till"
 msgstr "до"

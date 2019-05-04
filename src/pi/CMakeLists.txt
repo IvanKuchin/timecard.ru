@@ -90,7 +90,7 @@ find_package(OpenSSL REQUIRED)
 find_package(CURL REQUIRED)
 find_package(LibWebSockets REQUIRED)
 find_package(Libhpdf REQUIRED)
-find_package(Libwkhtmltopdf REQUIRED)
+find_package(Libwkhtmltox REQUIRED)
 find_package(Libarchive REQUIRED)
 find_package(Libxl REQUIRED)
 

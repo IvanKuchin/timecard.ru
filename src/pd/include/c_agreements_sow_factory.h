@@ -33,7 +33,8 @@ class C_Agreements_SoW_Factory
 		string							archive_file = "";		// --- archive in production folder
 
 
-		// auto		UpdateDBWithAgreementData(const string bt_id) -> string;
+		auto		RemoveExistingAgreementFile() -> string;
+		auto		UpdateDBWithAgreementFile() -> string;
 		auto		CreateTempDirectory() -> bool;
 		auto		ProduceObjectVector() -> string;
 
@@ -45,6 +46,7 @@ class C_Agreements_SoW_Factory
 		auto		SetSoWID(string &&param1) 						{ sow_id = move(param1); };
 
 		auto		GenerateDocumentArchive() -> string;
+		auto		GetShortFilename()								{ return archive_folder + "/" + archive_file; };
 
 					~C_Agreements_SoW_Factory();
 };

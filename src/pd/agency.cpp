@@ -4500,6 +4500,7 @@ int main(void)
 			{
 				auto	template_name	= "json_response.htmlt"s;
 				auto	error_message	= ""s;
+				auto	success_message	= ""s;
 
 				auto	sow_id			= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("sow_id"));
 
@@ -4518,6 +4519,7 @@ int main(void)
 							if((error_message = agreements.GenerateDocumentArchive()).empty())
 							{
 // --- Notify SOW parties about new doc set has been generated
+								success_message = ",\"filename\":\"" + agreements.GetShortFilename() + "\"";
 							}
 							else
 							{
@@ -4544,7 +4546,7 @@ int main(void)
 
 				if(error_message.empty())
 				{
-					ostResult << "{\"result\":\"success\"}";
+					ostResult << "{\"result\":\"success\"" + success_message + "}";
 				}
 				else
 				{

@@ -48,8 +48,8 @@ addons:
     - libhpdf-dev
     - libarchive-dev
     - pkg-config
-    - xfonts-75dpi
-    - xfonts-base
+    - xfonts-75dpi	# wkhtmltox dependency
+    - xfonts-base	# wkhtmltox dependency
 
 script:
     # --- libxl will be installed to /usr/local/share/...

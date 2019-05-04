@@ -2,9 +2,9 @@
 
 auto C_Agreements_SoW_Factory::GenerateDocumentArchive() -> string
 {
-	MESSAGE_DEBUG("", "", "start");
+	auto		error_message = ""s;
 
-	auto									error_message = ""s;
+	MESSAGE_DEBUG("", "", "start");
 
 	if(db == nullptr)
 	{
@@ -100,24 +100,31 @@ auto C_Agreements_SoW_Factory::GenerateDocumentArchive() -> string
 		MESSAGE_ERROR("", "", "Agreements won't be written to files due to previous error");
 	}
 
-/*
+	if(error_message.empty())
+	{
+		if((error_message = RemoveExistingAgreementFile()).length())
+		{
+			MESSAGE_ERROR("", "", "fail to update DB");
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "old file won't be removed due to previous error");
+	}
+
 	// --- update DB only if no errors earlier
 	if(error_message.empty())
 	{
-		for(auto &bt: bt_obj_list)
+		if((error_message = UpdateDBWithAgreementFile()).length())
 		{
-			if((error_message = UpdateDBWithInvoiceData(bt.GetID())).length())
-			{
-				MESSAGE_ERROR("", "", "fail to update DB");
-				break;
-			}
+			MESSAGE_ERROR("", "", "fail to update DB");
 		}
 	}
 	else
 	{
 		MESSAGE_ERROR("", "", "db won't be updated due to previous error");
 	}
-*/
+
 	if(error_message.empty())
 	{
 		// --- important to keep it scoped
@@ -125,7 +132,7 @@ auto C_Agreements_SoW_Factory::GenerateDocumentArchive() -> string
 		{
 			c_archive	ar;
 
-			ar.SetFilename(AGREEMENTS_SOW_DIRECTORY + archive_folder + "/" + archive_file);
+			ar.SetFilename(AGREEMENTS_SOW_DIRECTORY + GetShortFilename());
 			ar.SetFolderToArchive(temp_dir);
 			ar.Archive();
 		}
@@ -167,84 +174,29 @@ auto C_Agreements_SoW_Factory::CreateTempDirectory() -> bool
 
 	return result;
 }
-/*
-auto C_Agreements_SoW_Factory::UpdateDBWithInvoiceData(const string bt_id) -> string
+
+auto C_Agreements_SoW_Factory::UpdateDBWithAgreementFile() -> string
 {
 	auto	error_message = ""s;
 
 	MESSAGE_DEBUG("", "", "start");
 
-	if(user)
+	if(sow_id.length())
 	{
 		if(db)
 		{
-			if(invoice_cost_center_bt_id == 0)
+			if(GetShortFilename().length())
 			{
-				auto	owner_company_id = GetAgencyIDByUserID(db, user);
-				
-				if(owner_company_id.length())
+				db->Query("UPDATE `contracts_sow` SET `agreement_filename`=\"" + GetShortFilename() + "\", `eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sow_id + "\";");
+				if(db->isError())
 				{
-					// --- new invoice
-					invoice_cost_center_bt_id = db->InsertQuery( "INSERT INTO `invoice_cost_center_bt` (`cost_center_id`, `file`, `owner_company_id`, `owner_user_id`, `eventTimestamp`)"
-										"VALUES (" + 
-											quoted(cost_center_id) + "," +
-											quoted(archive_folder + "/" + archive_file) + "," +
-											quoted(owner_company_id) + "," +
-											quoted(user->GetID()) + "," +
-											"UNIX_TIMESTAMP()"
-										");");
-					if(invoice_cost_center_bt_id)
-					{
-						// --- everything is fine, increase act_number assigned to this cost_center
-						db->Query("UPDATE `cost_centers` SET `act_number`=`act_number`+1 WHERE `id`=\"" + cost_center_id + "\";");
-						if(db->isError())
-						{
-							MESSAGE_ERROR("", "", "fail to increase act_number in cost_center table");
-						}
-					}
-					else
-					{
-						MESSAGE_ERROR("", "", "fail to insert to db");
-						error_message = gettext("fail to insert to db");
-					}
-				}
-				else
-				{
-					MESSAGE_ERROR("", "", "agency not found where user.id(" + user->GetID() + ") working at");
-					error_message = gettext("employeer not found");
-				}
-
-			}
-
-			// --- don't merge it with previous if()
-			if(invoice_cost_center_bt_id)
-			{
-				// --- find appropriate bt.id in invoicing_vars
-				auto	bt_index = invoicing_vars.GetIndexByTimecardID(bt_id);
-
-				if(db->InsertQuery( "INSERT INTO `invoice_cost_center_bt_details` (`invoice_cost_center_bt_id`, `bt_id`, `cc_amount_pre_tax`, `cc_amount_tax`, `cc_amount_total`, `subc_amount_pre_tax`, `subc_amount_tax`, `subc_amount_total`)"
-									"VALUES (" + 
-										quoted(to_string(invoice_cost_center_bt_id)) + "," +
-										quoted(bt_id) + "," +
-										quoted(invoicing_vars.Get("cost_center_price_" + bt_index).length() ? invoicing_vars.Get("cost_center_price_" + bt_index) : "0") + "," +
-										quoted(invoicing_vars.Get("cost_center_vat_" + bt_index).length() ? invoicing_vars.Get("cost_center_vat_" + bt_index) : "0") + "," +
-										quoted(invoicing_vars.Get("cost_center_total_" + bt_index).length() ? invoicing_vars.Get("cost_center_total_" + bt_index) : "0") + "," +
-										quoted(invoicing_vars.Get("bt_price_" + bt_index).length() ? invoicing_vars.Get("bt_price_" + bt_index) : "0") + "," +
-										quoted(invoicing_vars.Get("bt_vat_" + bt_index).length() ? invoicing_vars.Get("bt_vat_" + bt_index) : "0") + "," +
-										quoted(invoicing_vars.Get("bt_total_" + bt_index).length() ? invoicing_vars.Get("bt_total_" + bt_index) : "0") +
-									");"))
-				{
-				}
-				else
-				{
-					MESSAGE_ERROR("", "", "fail to insert to db");
-					error_message = gettext("fail to insert to db");
+					MESSAGE_ERROR("", "", "fail to update filename in contracts_sow table");
 				}
 			}
 			else
 			{
-				MESSAGE_ERROR("", "", "invoice id is empty. Most probably insert to invoice_cost_center_service failed");
-				error_message = gettext("fail to insert to db");
+				error_message = gettext("Data has not been initialized");
+				MESSAGE_ERROR("", "", "archive filename is empty");
 			}
 		}
 		else
@@ -255,8 +207,8 @@ auto C_Agreements_SoW_Factory::UpdateDBWithInvoiceData(const string bt_id) -> st
 	}
 	else
 	{
-		MESSAGE_ERROR("", "", "user is not initialized");
-		error_message = gettext("user is not initialized");
+		error_message = gettext("Data has not been initialized");
+		MESSAGE_ERROR("", "", "sow_id is not initialized");
 	}
 
 
@@ -264,7 +216,55 @@ auto C_Agreements_SoW_Factory::UpdateDBWithInvoiceData(const string bt_id) -> st
 
 	return error_message;
 }
-*/
+
+auto C_Agreements_SoW_Factory::RemoveExistingAgreementFile() -> string
+{
+	auto	error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(db)
+	{
+		if(GetShortFilename().length())
+		{
+			if(db->Query("SELECT `agreement_filename` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";"))
+			{
+				auto	existing_filename = db->Get(0, 0);
+
+				if(existing_filename.length())
+				{
+					MESSAGE_DEBUG("", "", "removing: " + AGREEMENTS_SOW_DIRECTORY + existing_filename);
+					unlink((AGREEMENTS_SOW_DIRECTORY + existing_filename).c_str());
+				}
+				else
+				{
+					MESSAGE_DEBUG("", "", "filename is empty. nothing to remove");
+				}
+			}
+			else
+			{
+				error_message = gettext("SQL syntax issue");
+				MESSAGE_DEBUG("", "", "SoW doesn't exists in DB. This is unacceptable at this stage. Investigate the reason.");
+			}
+		}
+		else
+		{
+			error_message = gettext("Data has not been initialized");
+			MESSAGE_ERROR("", "", "archive filename is empty");
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "db is not initialized");
+		error_message = gettext("db is not initialized");
+	}
+
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return error_message;
+}
+
 
 auto C_Agreements_SoW_Factory::ProduceObjectVector() -> string
 {
@@ -311,7 +311,7 @@ C_Agreements_SoW_Factory::~C_Agreements_SoW_Factory()
 {
 	if(temp_dir.length())
 	{
-		// RmDirRecursive(temp_dir.c_str());
+		RmDirRecursive(temp_dir.c_str());
 	}
 	else
 	{
