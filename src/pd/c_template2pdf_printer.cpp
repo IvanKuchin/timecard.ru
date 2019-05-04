@@ -31,7 +31,7 @@ auto	C_Template2PDF_Printer::ConvertHTML2PDF() -> string
 
 	if(GetTemplate().length())
 	{
-		if(isFileExists(GetFilename() + ".tmp"))
+		if(isFileExists(GetFilename() + ".html"))
 		{
 			if(isFileExists(GetFilename()))
 			{
@@ -40,7 +40,67 @@ auto	C_Template2PDF_Printer::ConvertHTML2PDF() -> string
 			}
 			else
 			{
+				wkhtmltopdf_global_settings * gs;
+				wkhtmltopdf_object_settings * os;
+				wkhtmltopdf_converter 		* c;
 
+				/* Init wkhtmltopdf in graphics less mode */
+				wkhtmltopdf_init(false);
+
+				/*
+				 * Create a global settings object used to store options that are not
+				 * related to input objects, note that control of this object is parsed to
+				 * the converter later, which is then responsible for freeing it
+				 */
+				gs = wkhtmltopdf_create_global_settings();
+				/* We want the result to be storred in the file called test.pdf */
+				wkhtmltopdf_set_global_setting(gs, "out", GetFilename().c_str());
+
+				// wkhtmltopdf_set_global_setting(gs, "load.cookieJar", "myjar.jar");
+				/*
+				 * Create a input object settings object that is used to store settings
+				 * related to a input object, note again that control of this object is parsed to
+				 * the converter later, which is then responsible for freeing it
+				 */
+				os = wkhtmltopdf_create_object_settings();
+				/* We want to convert to convert the qstring documentation page */
+				// wkhtmltopdf_set_object_setting(os, "page", ("file://" + GetFilename() + ".html").c_str());
+				wkhtmltopdf_set_object_setting(os, "page", (GetFilename() + ".html").c_str());
+
+				/* Create the actual converter object used to convert the pages */
+				c = wkhtmltopdf_create_converter(gs);
+
+				/* Call the progress_changed function when progress changes */
+				wkhtmltopdf_set_progress_changed_callback(c, wkhtmltox_progress_changed);
+
+				/* Call the phase _changed function when the phase changes */
+				wkhtmltopdf_set_phase_changed_callback(c, wkhtmltox_phase_changed);
+
+				/* Call the error function when an error occurs */
+				wkhtmltopdf_set_error_callback(c, wkhtmltox_error);
+
+				/* Call the warning function when a warning is issued */
+				wkhtmltopdf_set_warning_callback(c, wkhtmltox_warning);
+
+				/*
+				 * Add the the settings object describing the qstring documentation page
+				 * to the list of pages to convert. Objects are converted in the order in which
+				 * they are added
+				 */
+				wkhtmltopdf_add_object(c, os, NULL);
+
+				/* Perform the actual conversion */
+				if (!wkhtmltopdf_convert(c))
+				{
+					error_message = gettext("html to pdf conversation failed");
+					MESSAGE_ERROR("", "", error_message);
+				}
+
+				/* Destroy the converter object since we are done with it */
+				wkhtmltopdf_destroy_converter(c);
+
+				/* We will no longer be needing wkhtmltopdf funcionality */
+				wkhtmltopdf_deinit();
 			}
 		}
 		else
@@ -129,7 +189,7 @@ auto	C_Template2PDF_Printer::SaveTemporaryFile() -> string
 		if(GetFilename().length())
 		{
 			ofstream ofs;
-			ofs.open (GetFilename() + ".tmp", std::ofstream::out | std::ofstream::app);
+			ofs.open (GetFilename() + ".html", std::ofstream::out | std::ofstream::app);
 
 			ofs << content;
 

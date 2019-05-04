@@ -84,7 +84,7 @@ auto C_Agreements_SoW_Factory::GenerateDocumentArchive() -> string
 
 				if((error_message = template2pdf_printer.ConvertHTML2PDF()).length())
 				{
-					MESSAGE_ERROR("", "", "fail to conert html to pdf (" + agreement.GetFilename() + ")");
+					MESSAGE_ERROR("", "", "fail to convert html to pdf (" + agreement.GetFilename() + ")");
 				}
 
 				if(error_message.length()) break;
