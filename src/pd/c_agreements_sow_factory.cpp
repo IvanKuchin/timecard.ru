@@ -56,6 +56,7 @@ auto C_Agreements_SoW_Factory::GenerateDocumentArchive() -> string
 	if(error_message.empty())
 	{
 		C_Template2PDF_Printer	template2pdf_printer;
+		wkhtmltox_wrapper		wrapper;
 
 		template2pdf_printer.SetDB(db);
 		template2pdf_printer.SetVariableSet(&invoicing_vars);
@@ -82,10 +83,9 @@ auto C_Agreements_SoW_Factory::GenerateDocumentArchive() -> string
 					MESSAGE_ERROR("", "", "fail to render template " + agreement.GetFilename());
 				}
 
-				if((error_message = template2pdf_printer.ConvertHTML2PDF()).length())
-				{
-					MESSAGE_ERROR("", "", "fail to convert html to pdf (" + agreement.GetFilename() + ")");
-				}
+				wrapper.SetSrc(output_filename + ".html");
+				wrapper.SetDst(output_filename);
+				wrapper.Convert();
 
 				if(error_message.length()) break;
 			}

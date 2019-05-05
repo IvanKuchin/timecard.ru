@@ -30,6 +30,7 @@ set(INVOICE_LIB_SRCs
     c_timecard_to_print.cpp
     c_bt_to_print.cpp
     c_template2pdf_printer.cpp
+    wkhtmltox_wrapper.cpp
     )
 
 set(INDEPENDENT_LIBRARIES_SRCs

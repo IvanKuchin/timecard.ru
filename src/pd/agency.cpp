@@ -1527,11 +1527,25 @@ int main(void)
 
 											if(task_assignment_id.length())
 											{
-												ostResult << "{\"result\":\"success\"}";
-
-												if(notify_about_task_creation)
+												if(CreatePSoWfromTimecardTaskIDAndSoWID(task_id, sow_id, &db, &user))
 												{
-													if(GeneralNotifySoWContractPartiesAboutChanges("AJAX_addTask", task_id, sow_id, "", task, &db, &user))
+													ostResult << "{\"result\":\"success\"}";
+
+													if(notify_about_task_creation)
+													{
+														if(GeneralNotifySoWContractPartiesAboutChanges("AJAX_addTask", task_id, sow_id, "", task, &db, &user))
+														{
+														}
+														else
+														{
+															MESSAGE_ERROR("", action, "fail to notify SoW parties");
+														}
+													}
+													else
+													{
+														MESSAGE_DEBUG("", "", "no notification about task creation");
+													}
+													if(GeneralNotifySoWContractPartiesAboutChanges(action, task_assignment_id, sow_id, "", customer + " / " + project + " / " + task + " ( с " + assignment_start + " по " + assignment_end + ")", &db, &user))
 													{
 													}
 													else
@@ -1541,26 +1555,20 @@ int main(void)
 												}
 												else
 												{
-													MESSAGE_DEBUG("", "", "no notification about task creation");
-												}
-												if(GeneralNotifySoWContractPartiesAboutChanges(action, task_assignment_id, sow_id, "", customer + " / " + project + " / " + task + " ( с " + assignment_start + " по " + assignment_end + ")", &db, &user))
-												{
-												}
-												else
-												{
-													MESSAGE_ERROR("", action, "fail to notify SoW parties");
+													error_message = gettext("unable to create psow");
+													MESSAGE_DEBUG("", action, "fail to create psow from sow.id(" + sow_id + ") and task.id(" + task_id + ")");
 												}
 											}
 											else
 											{
+												error_message = "Не удалось создать назначение";
 												MESSAGE_DEBUG("", action, "fail to create assignment sow.id(" + sow_id + ") task.id(" + task_id + ")");
-												error_message = "Неудалось создать назначение";
 											}
 										}
 										else
 										{
-											MESSAGE_DEBUG("", action, "assignment Customer/Project/Task already exists for this sow.id(" + sow_id + ")");
 											error_message = "Такое назначение уже существует";
+											MESSAGE_DEBUG("", action, "assignment Customer/Project/Task already exists for this sow.id(" + sow_id + ")");
 										}
 										
 									}
@@ -1667,7 +1675,7 @@ int main(void)
 										else
 										{
 											MESSAGE_DEBUG("", action, "fail to create assignment sow.id(" + sow_id + ") new_bt_expense_template.id(" + new_bt_expense_template_id + ")");
-											error_message = "Неудалось создать назначение";
+											error_message = "Не удалось создать назначение";
 											break;
 										}
 									}
@@ -4017,6 +4025,7 @@ int main(void)
 							db.Query("DELETE FROM `users_notification` WHERE `actionTypeId`=\"" + to_string(NOTIFICATION_AGENGY_GENERATED_AGREEMENTS) + "\" AND `actionId`=\"" + sow_id + "\";");
 							db.Query("DELETE FROM `users_notification` WHERE `actionTypeId`=\"" + to_string(NOTIFICATION_AGENGY_INITIATED_SOW) + "\" AND `actionId`=\"" + sow_id + "\";");
 							db.Query("DELETE FROM `users_notification` WHERE `actionTypeId`=\"" + to_string(NOTIFICATION_SUBCONTRACTOR_SIGNED_SOW) + "\" AND `actionId`=\"" + sow_id + "\";");
+							db.Query("DELETE FROM `contract_sow_agreement_files` WHERE `contract_sow_id`=\"" + sow_id + "\";");
 							db.Query("DELETE FROM `contract_sow_custom_fields` WHERE `contract_sow_id`=\"" + sow_id + "\";");
 							db.Query("DELETE FROM `timecard_task_assignment` WHERE `contract_sow_id`=\"" + sow_id + "\";");
 							db.Query("DELETE FROM `timecard_approvers` WHERE `contract_sow_id`=\"" + sow_id + "\";");

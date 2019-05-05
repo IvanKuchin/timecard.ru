@@ -11,6 +11,7 @@
 #include "c_agreements_sow_object.h"
 #include "c_template2pdf_printer.h"
 #include "c_archive.h"
+#include "wkhtmltox_wrapper.h"
 
 using namespace std;
 
@@ -39,7 +40,7 @@ class C_Agreements_SoW_Factory
 		auto		ProduceObjectVector() -> string;
 
 	public:
-					C_Agreements_SoW_Factory()									{};
+					C_Agreements_SoW_Factory()						{};
 					C_Agreements_SoW_Factory(CMysql *param1, CUser *param2) : db(param1), user(param2) {};
 
 		auto		SetSoWID(const string &param1)					{ sow_id = param1; };

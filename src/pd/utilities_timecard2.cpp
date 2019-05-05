@@ -322,7 +322,7 @@ auto GetAgencyIDByUserID(CMysql *db, CUser *user) -> string
 	return result;
 }
 
-auto			CreatePSoWfromTimecardCustomerIDAndCostCenterID(string timecard_customer_id, string cost_center_id, CMysql *db, CUser *user) -> bool
+auto	CreatePSoWfromTimecardCustomerIDAndCostCenterID(string timecard_customer_id, string cost_center_id, CMysql *db, CUser *user) -> bool
 {
 	auto result = false;
 
@@ -382,6 +382,131 @@ auto			CreatePSoWfromTimecardCustomerIDAndCostCenterID(string timecard_customer_
 	return result;
 }
 
+auto	CreatePSoWfromTimecardTaskIDAndSoWID(string timecard_task_id, string sow_id, CMysql *db, CUser *user) -> bool
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	customer_id_project_id = GetCustomerIDProjectIDByTaskID(timecard_task_id, db);
+	auto	result = false;
+
+	if(customer_id_project_id.first.length())
+	{
+		result = CreatePSoWfromTimecardCustomerIDAndSoWID(customer_id_project_id.first, sow_id, db, user);
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "cant find project.id by task.id(" + timecard_task_id + ")");
+	}
+
+	MESSAGE_DEBUG("", "", "finish (result is " + to_string(result) + ")");
+
+
+	return result;
+}
+
+auto	CreatePSoWfromTimecardCustomerIDAndSoWID(string timecard_customer_id, string sow_id, CMysql *db, CUser *user) -> bool
+{
+	auto result = false;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(db && user)
+	{
+		auto	cost_center_id = GetCostCenterIDByCustomerID(timecard_customer_id, db);
+
+		if(cost_center_id.length())
+		{
+			// --- if psow already exists
+			if(db->Query("SELECT `id` FROM `contracts_psow` WHERE `contract_sow_id`=\"" + sow_id + "\" AND `cost_center_id`=\"" + cost_center_id + "\";"))
+			{
+				MESSAGE_DEBUG("", "", "psow.id(" + db->Get(0, 0) + ") already exists with sow.id(" + sow_id + ") and cost_center_id(" + cost_center_id + ") assigned");
+				result = true;
+			}
+			else
+			{
+				auto	company_position_id = GetPositionIDFromSoW(sow_id, db);
+
+				if(company_position_id.length())
+				{
+					auto	new_psow_id = db->InsertQuery("INSERT INTO `contracts_psow` (`contract_sow_id`, `cost_center_id`, `company_position_id`, `start_date`, `end_date`, `sign_date`, `eventTimestamp`) VALUES ("
+															+ quoted(sow_id) + ","
+															+ quoted(cost_center_id) + ","
+															+ quoted(company_position_id) + ","
+															+ "NOW(),"
+															+ "DATE_SUB(DATE_ADD(NOW(), INTERVAL 1 YEAR), INTERVAL 1 DAY),"
+															+ "NOW(),"
+															+ "UNIX_TIMESTAMP()"
+															+ ")");
+					if(new_psow_id)
+					{
+						result = true;
+					}
+					else
+					{
+						MESSAGE_ERROR("", "", "fail to insert to contract_psow table");
+					}
+				}
+				else
+				{
+					MESSAGE_ERROR("", "", "company_position_id not found.");
+				}
+			}
+		}
+		else
+		{
+			MESSAGE_DEBUG("", "", "cost_center_id not found.");
+		}
+
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "db or user not initialized");
+	}
+
+	MESSAGE_DEBUG("", "", "finish (result is " + to_string(result) + ")");
+
+	return result;
+}
+
+auto GetCostCenterIDByCustomerID(string customer_id, CMysql *db) -> string
+{
+	auto cost_center_id = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(db->Query("SELECT `cost_center_id` FROM `cost_center_assignment` WHERE `timecard_customer_id`=\"" + customer_id + "\";"))
+	{
+		cost_center_id = db->Get(0, 0);
+	}
+	else
+	{
+		MESSAGE_DEBUG("", "", "cost_center.id by timecard_customer_id(" + customer_id + ") not found");
+	}
+
+	MESSAGE_DEBUG("", "", "finish (cost_center_id: " + cost_center_id + ")");
+
+	return cost_center_id;
+}
+
+auto GetPositionIDFromSoW(string sow_id, CMysql *db) -> string
+{
+	auto position_id = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(db->Query("SELECT `company_position_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";"))
+	{
+		position_id = db->Get(0, 0);
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "sow.id(" + sow_id + ") not found");
+	}
+
+	MESSAGE_DEBUG("", "", "finish (position_id: " + position_id + ")");
+
+	return position_id;
+}
 
 string isTimecardsHavePSOWAssigned(const vector<string> &timecard_list, string cost_center_id, CMysql *db, CUser *user)
 {

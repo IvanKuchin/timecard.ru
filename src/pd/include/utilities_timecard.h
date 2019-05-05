@@ -128,7 +128,11 @@ auto			RecallBTInvoice(string service_invoice_id, CMysql *, CUser *) -> string;
 auto			isServiceInvoiceBelongsToAgency(string service_invoice_id, CMysql *, CUser *) -> bool;
 auto			isBTInvoiceBelongsToAgency(string service_invoice_id, CMysql *, CUser *) -> bool;
 auto			GetAgencyIDByUserID(CMysql *, CUser *) -> string;
+auto 			GetCostCenterIDByCustomerID(string customer_id, CMysql *) -> string;
+auto 			GetPositionIDFromSoW(string sow_id, CMysql *) -> string;
 auto			CreatePSoWfromTimecardCustomerIDAndCostCenterID(string timecard_customer_id, string cost_center_id, CMysql *, CUser *) -> bool;
+auto			CreatePSoWfromTimecardTaskIDAndSoWID(string timecard_task_id, string sow_id, CMysql *, CUser *) -> bool;
+auto			CreatePSoWfromTimecardCustomerIDAndSoWID(string timecard_customer_id, string sow_id, CMysql *, CUser *) -> bool;
 
 auto			isTimecardsHavePSOWAssigned(const vector<string> &timecard_list, string cost_center_id, CMysql *, CUser *) -> string;
 auto			isTimecardsBelongToAgency(const vector<string> &timecard_list, string agency_id, CMysql *, CUser *) -> string;

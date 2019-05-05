@@ -44,10 +44,6 @@ class C_Template2PDF_Printer
 
 
 		auto			RenderTemplate() -> string;
-		auto			ConvertHTML2PDF() -> string;
-
-		auto			Print() -> string;
-		auto			GetTemplate_Filename() -> string;
 };
 
 ostream&	operator<<(ostream& os, const C_Template2PDF_Printer &);

@@ -798,6 +798,46 @@ auto	C_Invoicing_Vars::SubcontractorPayment_Index_VarSet(c_float subcontractor_p
 	return	error_message;
 }
 
+auto	C_Invoicing_Vars::SubcontractorAddress_Index_VarSet(string index) -> string
+{
+	auto	error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(user)
+	{
+		if(db)
+		{
+			if(error_message.empty()) error_message = AssignVariableFromDB("subcontractor_legal_geo_zip_"			+ index , "SELECT `zip` FROM `geo_zip` WHERE `id`=\"" + Get("subcontractor_legal_geo_zip_id_" + index) + "\";", true);
+			if(error_message.empty()) error_message = AssignVariableFromDB("subcontractor_legal_locality_title_"	+ index , "SELECT `title` FROM `geo_locality` WHERE `id`=(SELECT `geo_locality_id` FROM `geo_zip` WHERE `id`=\"" + Get("subcontractor_legal_geo_zip_id_" + index) + "\");", true);
+			if(error_message.empty()) error_message = AssignVariableFromDB("subcontractor_legal_region_title_"		+ index , "SELECT `title` FROM `geo_region` WHERE `id`=(SELECT `geo_region_id` FROM `geo_locality` WHERE `id`=(SELECT `geo_locality_id` FROM `geo_zip` WHERE `id`=\"" + Get("subcontractor_legal_geo_zip_id_" + index) + "\"));", true);
+			if(error_message.empty()) error_message = AssignVariableFromDB("subcontractor_legal_country_title_"		+ index , "SELECT `title` FROM `geo_country` WHERE `id`=(SELECT `geo_country_id` FROM `geo_region` WHERE `id`=(SELECT `geo_region_id` FROM `geo_locality` WHERE `id`=(SELECT `geo_locality_id` FROM `geo_zip` WHERE `id`=\"" + Get("subcontractor_legal_geo_zip_id_" + index) + "\")));", true);
+			if(error_message.empty()) error_message = AssignVariableFromDB("subcontractor_mailing_geo_zip_"			+ index , "SELECT `zip` FROM `geo_zip` WHERE `id`=\"" + Get("subcontractor_mailing_geo_zip_id_" + index) + "\";", true);
+			if(error_message.empty()) error_message = AssignVariableFromDB("subcontractor_mailing_locality_title_"	+ index , "SELECT `title` FROM `geo_locality` WHERE `id`=(SELECT `geo_locality_id` FROM `geo_zip` WHERE `id`=\"" + Get("subcontractor_mailing_geo_zip_id_" + index) + "\");", true);
+			if(error_message.empty()) error_message = AssignVariableFromDB("subcontractor_mailing_region_title_"	+ index , "SELECT `title` FROM `geo_region` WHERE `id`=(SELECT `geo_region_id` FROM `geo_locality` WHERE `id`=(SELECT `geo_locality_id` FROM `geo_zip` WHERE `id`=\"" + Get("subcontractor_mailing_geo_zip_id_" + index) + "\"));", true);
+			if(error_message.empty()) error_message = AssignVariableFromDB("subcontractor_mailing_country_title_"	+ index , "SELECT `title` FROM `geo_country` WHERE `id`=(SELECT `geo_country_id` FROM `geo_region` WHERE `id`=(SELECT `geo_region_id` FROM `geo_locality` WHERE `id`=(SELECT `geo_locality_id` FROM `geo_zip` WHERE `id`=\"" + Get("subcontractor_mailing_geo_zip_id_" + index) + "\")));", true);
+
+			if(error_message.empty()) error_message = AssignVariableFromDB("subcontractor_user_name_"				+ index , "SELECT `name` FROM `users` WHERE `id`=(SELECT `admin_userID` FROM `company` WHERE `id`=\"" + Get("subcontractor_company_id_" + index) + "\");", true);
+			if(error_message.empty()) error_message = AssignVariableFromDB("subcontractor_user_name_last_"			+ index , "SELECT `nameLast` FROM `users` WHERE `id`=(SELECT `admin_userID` FROM `company` WHERE `id`=\"" + Get("subcontractor_company_id_" + index) + "\");", true);
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "db is not initialized");
+			error_message = gettext("db is not initialized");
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "user is not initialized");
+		error_message = gettext("user is not initialized");
+	}
+
+
+	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
+
+	return	error_message;
+}
+
 auto	C_Invoicing_Vars::Subcontractor_Index_VarSet(string subcontractor_company_id, string index) -> string
 {
 	auto	error_message = ""s;
@@ -823,6 +863,11 @@ auto	C_Invoicing_Vars::Subcontractor_Index_VarSet(string subcontractor_company_i
 				if(error_message.empty()) error_message = AssignVariableValue("subcontractor_company_vat_boolean_" + index, subcontractor_vat == "Y" ? "true" : "false", true);
 				if(error_message.empty()) error_message = AssignVariableValue("subcontractor_company_vat_spelling_" + index, subcontractor_vat == "N" ? gettext("no VAT") : gettext("VAT") + " "s + to_string(VAT_PERCENTAGE) + "%", true);
 				if(error_message.empty()) error_message = AssignVariableValue("subcontractor_company_vat_spelling_1C_" + index, subcontractor_vat == "N" ? gettext("noVAT") : gettext("VAT") + to_string(VAT_PERCENTAGE), true);
+
+				if(error_message.empty()) error_message = AssignVariableValue("subcontractor_mailing_geo_zip_id_" + index, db->Get(0, "mailing_geo_zip_id"), true);
+				if(error_message.empty()) error_message = AssignVariableValue("subcontractor_legal_geo_zip_id_" + index, db->Get(0, "legal_geo_zip_id"), true);
+				if(error_message.empty()) error_message = AssignVariableValue("subcontractor_mailing_address_" + index, db->Get(0, "mailing_address"), true);
+				if(error_message.empty()) error_message = AssignVariableValue("subcontractor_legal_address_" + index, db->Get(0, "legal_address"), true);
 			}
 			else
 			{
@@ -1528,6 +1573,11 @@ auto	C_Invoicing_Vars::GenerateSoWVariableSet() -> string
 			if(error_message.empty())
 			{
 				if((error_message = Subcontractor_Index_VarSet(Get("subcontractor_company_id_"), "")).empty()) {}
+				else { MESSAGE_ERROR("", "", "fail returned from Subcontractor_Index_VarSet"); }
+			}
+			if(error_message.empty())
+			{
+				if((error_message = SubcontractorAddress_Index_VarSet("")).empty()) {}
 				else { MESSAGE_ERROR("", "", "fail returned from Subcontractor_Index_VarSet"); }
 			}
 
