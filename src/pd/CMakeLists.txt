@@ -1,8 +1,10 @@
-set(EXECUTABLE_CGIs_with_PD_PI_LIBS
-    index.cgi
+set(EXECUTABLE_CGIs_with_INVOICE_PD_PI_LIBS
     approver.cgi
     agency.cgi
     subcontractor.cgi
+    )
+set(EXECUTABLE_CGIs_with_PD_PI_LIBS
+    index.cgi
     ajax_anyrole_1.cgi
     admin.cgi
     system.cgi
@@ -18,7 +20,8 @@ set(INVOICE_LIB_SRCs
     c_pdf.cpp
     c_agreements_sow_factory.cpp
     c_agreements_sow_object.cpp
-    c_invoice_service.cpp
+    c_invoice_service_agency_to_cc.cpp
+    c_invoice_service_subc_to_agency.cpp
     c_invoice_bt.cpp
     c_invoicing_vars.cpp
     c_print_timecard.cpp
@@ -31,15 +34,17 @@ set(INVOICE_LIB_SRCs
     c_bt_to_print.cpp
     c_template2pdf_printer.cpp
     wkhtmltox_wrapper.cpp
+    utilities_submit.cpp
+
+    c_bt.cpp
     )
 
 set(INDEPENDENT_LIBRARIES_SRCs
     )
 
 set(JOINT_LIBRARY_SRCs
-    c_bt.cpp
     c_company.cpp
-    utilities_timecard1.cpp     # --- order is important, must follow c_bt
+    utilities_timecard1.cpp
     utilities_timecard2.cpp
     )
 
@@ -82,7 +87,7 @@ set_pd_lib_properties(__joint_pd "${JOINT_LIBRARY_SRCs}" "${PROJECT_ALL_INCLUDE_
 
 # ---- invoice lib
 set_pd_lib_properties(__invoice "${INVOICE_LIB_SRCs}" "${PROJECT_ALL_INCLUDE_DIRECTORIES}" "${project_link_libraries}")
-list(REMOVE_ITEM    PROJECT_PD_LIBS     __invoice)  # --- remove it from PD_LIBS to speed-up linking process
+#list(REMOVE_ITEM    PROJECT_PD_LIBS     __invoice)  # --- remove it from PD_LIBS to speed-up linking process
 
 # --- MSVC grouping
 source_group("Headers Private"  FILES ${HDR_PRIVATE})
@@ -93,8 +98,14 @@ source_group("Resources"        FILES ${RESOURCES})
 # --- Link part (2 parts: custom build, normal build)
 # ---- 1) Custom build speeding up linking process by linking only required libraries (.o)
 
-__add_executable_4libs(agency.cgi "${PROJECT_ALL_INCLUDE_DIRECTORIES}" "__invoice" "${PROJECT_PD_LIBS}" "${PROJECT_PI_LIBS}" "${PROJECT_EXTERNAL_LIBS}")
-list(REMOVE_ITEM EXECUTABLE_CGIs_with_PD_PI_LIBS agency.cgi)
+#__add_executable_4libs(agency.cgi "${PROJECT_ALL_INCLUDE_DIRECTORIES}" "__invoice" "${PROJECT_PD_LIBS}" "${PROJECT_PI_LIBS}" "${PROJECT_EXTERNAL_LIBS}")
+#list(REMOVE_ITEM EXECUTABLE_CGIs_with_PD_PI_LIBS agency.cgi)
+
+#__add_executable_4libs(subcontractor.cgi "${PROJECT_ALL_INCLUDE_DIRECTORIES}" "__invoice" "${PROJECT_PD_LIBS}" "${PROJECT_PI_LIBS}" "${PROJECT_EXTERNAL_LIBS}")
+#list(REMOVE_ITEM EXECUTABLE_CGIs_with_PD_PI_LIBS subcontractor.cgi)
+
+#__add_executable_4libs(approver.cgi "${PROJECT_ALL_INCLUDE_DIRECTORIES}" "__invoice" "${PROJECT_PD_LIBS}" "${PROJECT_PI_LIBS}" "${PROJECT_EXTERNAL_LIBS}")
+#list(REMOVE_ITEM EXECUTABLE_CGIs_with_PD_PI_LIBS approver.cgi)
 
 # ---- 2) Normal build link with _all_ libraries (.o), therefore change in any .src trigger re-link for all executables
 foreach(EXECUTABLE_CGI ${EXECUTABLE_CGIs_with_PI_LIBS})
@@ -102,6 +113,9 @@ foreach(EXECUTABLE_CGI ${EXECUTABLE_CGIs_with_PI_LIBS})
 endforeach()
 foreach(EXECUTABLE_CGI ${EXECUTABLE_CGIs_with_PD_PI_LIBS})
     __add_executable_3libs(${EXECUTABLE_CGI} "${PROJECT_ALL_INCLUDE_DIRECTORIES}" "${PROJECT_PD_LIBS}" "${PROJECT_PI_LIBS}" "${PROJECT_EXTERNAL_LIBS}")
+endforeach()
+foreach(EXECUTABLE_CGI ${EXECUTABLE_CGIs_with_INVOICE_PD_PI_LIBS})
+    __add_executable_4libs(${EXECUTABLE_CGI} "${PROJECT_ALL_INCLUDE_DIRECTORIES}" __invoice "${PROJECT_PD_LIBS}" "${PROJECT_PI_LIBS}" "${PROJECT_EXTERNAL_LIBS}")
 endforeach()
 
 
@@ -115,11 +129,13 @@ endforeach()
 # --- actual linker options are -Wl,-rpath,/path/to/dynamic/library
 # --- https://gitlab.kitware.com/cmake/community/wikis/doc/cmake/RPATH-handling
 # set         (CMAKE_INSTALL_RPATH    ${XL_LIBRARY_DIR})
-set_target_properties(agency.cgi    PROPERTIES
-                                    BUILD_WITH_INSTALL_RPATH TRUE
-                                    INSTALL_RPATH_USE_LINK_PATH TRUE
-                                    INSTALL_RPATH "${XL_LIBRARY_DIR}"
-                                    )
+foreach(EXECUTABLE_CGI ${EXECUTABLE_CGIs_with_INVOICE_PD_PI_LIBS})
+    set_target_properties(${EXECUTABLE_CGI}     PROPERTIES
+                                                BUILD_WITH_INSTALL_RPATH TRUE
+                                                INSTALL_RPATH_USE_LINK_PATH TRUE
+                                                INSTALL_RPATH "${XL_LIBRARY_DIR}"
+                                                )
+endforeach()
 message(STATUS  "configure libxl RPATH to ${XL_LIBRARY_DIR}}")
 
 # --- Install part

@@ -9,7 +9,8 @@ using namespace std;
 #include "clog.h"
 #include "cmysql.h"
 #include "cvars.h"
-#include "utilities.h"
+#include "cuser.h"
+// #include "utilities.h"
 
 class c_cache_obj
 {

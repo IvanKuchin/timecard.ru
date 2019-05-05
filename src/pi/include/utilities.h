@@ -24,6 +24,8 @@
 #include "cexception.h"
 #include "clog.h"
 #include "localy.h"
+// --- IMPORTANT !!!
+// --- do NOT add any header file with potentialy recursive indludes
 
 using namespace std;
 

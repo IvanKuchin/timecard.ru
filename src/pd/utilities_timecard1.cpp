@@ -5496,50 +5496,6 @@ string GetTimecardLineID(string timecard_id, string task_id, CMysql *db)
 	return result;
 }
 /*
-vector<string> GetTimecardApprovals(string timecard_id, CMysql *db, CUser *user)
-{
-	vector<string>		result;
-
-	MESSAGE_DEBUG("", "", "start");
-
-	int		affected = db->Query(
-				"SELECT `id` FROM `timecard_approvers` WHERE "
-					"`contract_sow_id` IN (SELECT `contract_sow_id` FROM `timecards` WHERE `id`=\"" + timecard_id + "\")"
-				";");
-
-	// --- get timecard approvals
-	for(int i = 0; i < affected; ++i)
-	{
-		result.push_back(db->Get(i, "id"));
-	}
-
-	MESSAGE_DEBUG("", "", "finish");
-
-	return result;
-}
-
-vector<string> GetTimecardApprovers(string timecard_id, CMysql *db, CUser *user)
-{
-	vector<string>		result;
-
-	MESSAGE_DEBUG("", "", "start");
-
-	int		affected = db->Query(
-				"SELECT `id` FROM `timecard_approvers` WHERE "
-					"`contract_sow_id` IN (SELECT `contract_sow_id` FROM `timecards` WHERE `id`=\"" + timecard_id + "\")"
-				";");
-
-	// --- get timecard approvers
-	for(int i = 0; i < affected; ++i)
-	{
-		result.push_back(db->Get(i, "id"));
-	}
-
-	MESSAGE_DEBUG("", "", "finish");
-
-	return result;
-}
-*/
 bool SubmitTimecard(string timecard_id, CMysql *db, CUser *user)
 {
 	bool 	result = false;
@@ -5612,15 +5568,30 @@ bool SubmitTimecard(string timecard_id, CMysql *db, CUser *user)
 
 		if(all_approvers_confirm)
 		{
-			db->Query("UPDATE `timecards` SET `status`=\"approved\", `approve_date`=UNIX_TIMESTAMP() WHERE `id`=\"" + timecard_id + "\";");
-			if(db->isError())
+			auto	error_message = ""s;
+
+			C_Invoice_Service_Subc_To_Agency	c_invoice(&db, &user);
+
+			c_invoice.SetTimecardList({timecard_id});
+
+			if((error_message = c_invoice.GenerateDocumentArchive()).empty())
 			{
-				MESSAGE_ERROR("", "", "fail to update timecards table with timecard_id(" + timecard_id + ")");
+				db->Query("UPDATE `timecards` SET `status`=\"approved\", `approve_date`=UNIX_TIMESTAMP() WHERE `id`=\"" + timecard_id + "\";");
+				if(db->isError())
+				{
+					MESSAGE_ERROR("", "", "fail to update timecards table with timecard_id(" + timecard_id + ")");
+				}
+				else
+				{
+					result = true;
+				}
 			}
 			else
 			{
-				result = true;
+				error_message = gettext("fail to generate documents set");
+				MESSAGE_ERROR("", "", error_message);
 			}
+
 		}
 		else
 		{
@@ -5638,7 +5609,7 @@ bool SubmitTimecard(string timecard_id, CMysql *db, CUser *user)
 
 	return result;
 }
-
+*/
 string GetNumberOfTimecardsInPendingState(CMysql *db, CUser *user)
 {
 	struct PendingTimecardClass
@@ -5970,6 +5941,7 @@ string	GetCurrencyRatesInJSONFormat(string sqlQuery, CMysql *db, CUser *user)
 }
 
 
+/*
 bool	SubmitBT(string bt_id, CMysql *db, CUser *user)
 {
 	bool 	result = false;
@@ -6068,7 +6040,7 @@ bool	SubmitBT(string bt_id, CMysql *db, CUser *user)
 
 	return result;
 }
-
+*/
 string isCBCurrencyRate(string date, string currency_name, string currency_nominal, string currency_value, CMysql *db)
 {
 	string	result = "N";
@@ -6882,7 +6854,7 @@ string	GetInfoToReturnByAction(string action, string id, string sow_id, string n
 
 	return result;
 }
-
+/*
 string	ResubmitEntitiesByAction(string action, string id, string sow_id, string new_value, CMysql *db, CUser *user)
 {
 	string	error_message = "";
@@ -6987,7 +6959,7 @@ string	ResubmitEntitiesByAction(string action, string id, string sow_id, string 
 
 	return error_message;
 }
-
+*/
 auto DeleteEntryByAction(string action, string id, CMysql *db, CUser *user) -> string
 {
 	string	error_message = "";

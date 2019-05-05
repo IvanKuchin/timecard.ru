@@ -4,6 +4,8 @@
 #include "utilities.h"
 #include "c_float.h"
 #include "c_cache_obj.h"
+// --- IMPORTANT !!!
+// --- do NOT add any header file with potentialy recursive indludes
 
 // --- timecard functions
 auto	 		CheckHTTPParam_Timeentry(const string &srcText) -> string;
@@ -31,8 +33,8 @@ auto			GetCompanyCustomFieldsInJSONFormat(string sqlQuery, CMysql *, CUser *) ->
 auto			GetPSoWInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetCustomersInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetTimecardApprovalsInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
-auto			SubmitTimecard(string timecard_id, CMysql *, CUser *) -> bool;
-auto			SubmitBT(string bt_id, CMysql *, CUser *) -> bool;
+// auto			SubmitTimecard(string timecard_id, CMysql *, CUser *) -> bool;
+// auto			SubmitBT(string bt_id, CMysql *, CUser *) -> bool;
 auto			GetNumberOfTimecardsInPendingState(CMysql *, CUser *) -> string;
 auto			GetNumberOfBTInPendingState(CMysql *, CUser *) -> string;
 auto 			SummarizeTimereports(string timereport1, string timereport2) -> string;
@@ -97,17 +99,12 @@ auto			GetCurrencyRatesInJSONFormat(string sqlQuery, CMysql *, CUser *) -> strin
 auto 			isUserAllowedAccessToBT(string bt_id, CMysql *, CUser *) -> string;
 auto			isCostCenterBelongsToAgency(string cost_center_id, CMysql *, CUser *) -> bool;
 
-// string			isAgencyEmployeeAllowedToChangeSoW(string sow_id, CMysql *, CUser *);
-// string			isAgencyEmployeeAllowedToChangeAgencyData(CMysql *, CUser *);
-// string			isActionEntityBelongsToSoW(string action, string is, string sow_id, CMysql *, CUser *);
-// string			isActionEntityBelongsToAgency(string action, string id, string agency_id, CMysql *, CUser *);
 auto			NotifySoWContractPartiesAboutChanges(string action_type_id, string sow_id, CMysql *, CUser *) -> string;
 auto			GeneralNotifySoWContractPartiesAboutChanges(string action, string id, string sow_id, string existing_value, string new_value, CMysql *, CUser *) -> bool;
 auto			GetDBValueByAction(string action, string id, string sow_id, CMysql *, CUser *) -> string;
-// string			CheckNewValueByAction(string action, string id, string sow_id, string new_value, CMysql *, CUser *);
 auto			SetNewValueByAction(string action, string id, string sow_id, string new_value, CMysql *, CUser *) -> string;
 auto			DeleteEntryByAction(string action, string id, CMysql *, CUser *) -> string;
-auto			ResubmitEntitiesByAction(string action, string id, string sow_id, string new_value, CMysql *, CUser *) -> string;
+// auto			ResubmitEntitiesByAction(string action, string id, string sow_id, string new_value, CMysql *, CUser *) -> string;
 auto			GetAgencyEmployeesInJSONFormat(string sql_query, CMysql *, CUser *) -> string;
 auto			GetAgencyObjectInJSONFormat(string agency_id, bool include_tasks, bool include_bt, CMysql *, CUser *) -> string;
 auto			GetInfoToReturnByAction(string action, string id, string sow_id, string new_value, CMysql *, CUser *) -> string;
@@ -118,7 +115,6 @@ auto 			GetNumberOfSoWActiveLastMonth(CMysql *, CUser *) -> string;
 auto			GetPSoWIDByTimecardIDAndCostCenterID(string timecard_id, string cost_center_id, CMysql *, CUser *) -> string;
 auto			GetSoWIDByTimecardID(string timecard_id, CMysql *, CUser *) -> string;
 auto			GetPSoWIDByBTIDAndCostCenterID(string timecard_id, string cost_center_id, CMysql *, CUser *) -> string;
-// auto			GetTimecardLines_By_TimecardID_And_CostCenterID(string timecard_id, string cost_center_id, CMysql *, CUser *);
 auto			GetPositionByCompanyID(string company_id, CMysql *, CUser *) -> string;
 
 auto			isServiceInvoiceBelongsToUser(string service_invoice_id, CMysql *, CUser *) -> bool;

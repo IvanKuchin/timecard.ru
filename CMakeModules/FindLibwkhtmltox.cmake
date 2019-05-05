@@ -5,13 +5,13 @@
 # HPDF_INCLUDE_DIR, where to find hpdf.h
 #
 
-message(STATUS "looking for libwkhtmltopdf-dev")
+message(STATUS "looking for libwkhtmltox")
 
-set( WKHTMLTOPDF_FOUND OFF )
+set( WKHTMLTOX_FOUND OFF )
 
-find_path( WKHTMLTOPDF_INCLUDE_DIR wkhtmltox/pdf.h
+find_path( WKHTMLTOX_INCLUDE_DIR wkhtmltox/pdf.h
   HINTS
-  $ENV{WKHTMLTOPDFDIR}
+  $ENV{WKHTMLTOXDIR}
   PATH_SUFFIXES include 
   PATHS
   ~/Library/Frameworks
@@ -25,12 +25,12 @@ find_path( WKHTMLTOPDF_INCLUDE_DIR wkhtmltox/pdf.h
   /mingw/include
 )
 
-# message( "WKHTMLTOPDF_INCLUDE_DIR is ${WKHTMLTOPDF_INCLUDE_DIR}" )
+# message( "WKHTMLTOX_INCLUDE_DIR is ${WKHTMLTOX_INCLUDE_DIR}" )
 
-find_library( WKHTMLTOPDF_LIBRARY
+find_library( WKHTMLTOX_LIBRARY
   NAMES wkhtmltox
   HINTS
-  $ENV{WKHTMLTOPDFDIR}
+  $ENV{WKHTMLTOXDIR}
   PATH_SUFFIXES lib64 lib bin
   PATHS
   /usr/local/lib
@@ -43,17 +43,17 @@ find_library( WKHTMLTOPDF_LIBRARY
   /mingw
 )
 
-# message( "WKHTMLTOPDF_LIBRARY is ${WKHTMLTOPDF_LIBRARY}" )
+# message( "WKHTMLTOX_LIBRARY is ${WKHTMLTOX_LIBRARY}" )
 
-if(WKHTMLTOPDF_INCLUDE_DIR)
-    if(WKHTMLTOPDF_LIBRARY)
-	set( WKHTMLTOPDF_FOUND "YES" )
+if(WKHTMLTOX_INCLUDE_DIR)
+    if(WKHTMLTOX_LIBRARY)
+	set( WKHTMLTOX_FOUND "YES" )
     endif()
 endif()
 
 
-if(WKHTMLTOPDF_FOUND)
-    message(STATUS "looking for libwkhtmltopdf-dev - done")
+if(WKHTMLTOX_FOUND)
+    message(STATUS "looking for libwkhtmltox - done")
 else()
-    message(FATAL_ERROR "ERROR: libwkhtmltopdf-dev not installed")
+    message(FATAL_ERROR "ERROR: libwkhtmltox not installed")
 endif()

@@ -1,4 +1,4 @@
-#include "c_invoice_service.h"
+#include "c_invoice_service_agency_to_cc.h"
 
 /*
 static void error_handler  (HPDF_STATUS   error_no,
@@ -81,11 +81,11 @@ static auto GetTimecardLines_By_TimecardID_And_CostCenterID(string timecard_id, 
 }
 
 
-C_Invoice_Service::C_Invoice_Service() {}
+C_Invoice_Service_Agency_To_CC::C_Invoice_Service_Agency_To_CC() {}
 
-C_Invoice_Service::C_Invoice_Service(CMysql *param1, CUser *param2) : db(param1), user(param2) {}
+C_Invoice_Service_Agency_To_CC::C_Invoice_Service_Agency_To_CC(CMysql *param1, CUser *param2) : db(param1), user(param2) {}
 
-auto C_Invoice_Service::GenerateDocumentArchive() -> string
+auto C_Invoice_Service_Agency_To_CC::GenerateDocumentArchive() -> string
 {
 	MESSAGE_DEBUG("", "", "start");
 
@@ -446,7 +446,7 @@ auto C_Invoice_Service::GenerateDocumentArchive() -> string
 	return error_message;
 }
 
-auto C_Invoice_Service::CreateTempDirectory() -> bool
+auto C_Invoice_Service_Agency_To_CC::CreateTempDirectory() -> bool
 {
 	auto result = false;
 
@@ -499,7 +499,7 @@ auto C_Invoice_Service::CreateTempDirectory() -> bool
 	return result;
 }
 
-auto C_Invoice_Service::CreateTimecardObj(string timecard_id) -> C_Timecard_To_Print
+auto C_Invoice_Service_Agency_To_CC::CreateTimecardObj(string timecard_id) -> C_Timecard_To_Print
 {
 	C_Timecard_To_Print		obj;
 
@@ -541,9 +541,11 @@ auto C_Invoice_Service::CreateTimecardObj(string timecard_id) -> C_Timecard_To_P
 									obj.SetSignatureTitle1(ConvertHTMLToText(db->Get(0, "name")));
 									obj.SetSupplierVAT(ConvertHTMLToText(db->Get(0, "vat")));
 
-									if(db->Query("SELECT `title` FROM `cost_centers` WHERE `id`=\"" + cost_center_id + "\";"))
+									if(db->Query("SELECT `name` FROM `company` WHERE `id`=("
+													"SELECT `company_id` FROM `cost_centers` WHERE `id`=\"" + cost_center_id + "\""
+												");"))
 									{
-										obj.SetSignatureTitle2(ConvertHTMLToText(db->Get(0, "title")));
+										obj.SetSignatureTitle2(ConvertHTMLToText(db->Get(0, 0)));
 										
 										if(db->Query("SELECT `value` FROM `contract_psow_custom_fields` WHERE `var_name`=\"Department\" AND `contract_psow_id`=\"" + psow_id + "\" AND `type`=\"input\";"))
 											obj.SetProjectNumber(db->Get(0, "value"));
@@ -605,7 +607,7 @@ auto C_Invoice_Service::CreateTimecardObj(string timecard_id) -> C_Timecard_To_P
 	return obj;
 }
 
-auto C_Invoice_Service::UpdateDBWithInvoiceData(const string timecard_id) -> string
+auto C_Invoice_Service_Agency_To_CC::UpdateDBWithInvoiceData(const string timecard_id) -> string
 {
 	auto	error_message = ""s;
 
@@ -702,7 +704,7 @@ auto C_Invoice_Service::UpdateDBWithInvoiceData(const string timecard_id) -> str
 	return error_message;
 }
 
-C_Invoice_Service::~C_Invoice_Service()
+C_Invoice_Service_Agency_To_CC::~C_Invoice_Service_Agency_To_CC()
 {
 	if(temp_dir.length())
 	{
@@ -714,9 +716,9 @@ C_Invoice_Service::~C_Invoice_Service()
 	}
 }
 
-ostream& operator<<(ostream& os, const C_Invoice_Service &var)
+ostream& operator<<(ostream& os, const C_Invoice_Service_Agency_To_CC &var)
 {
-	os << "object C_Invoice_Service [empty for now]";
+	os << "object C_Invoice_Service_Agency_To_CC [empty for now]";
 
 	return os;
 }

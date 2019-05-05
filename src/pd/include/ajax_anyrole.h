@@ -18,7 +18,6 @@
 #include "utilities_common.h"
 #include "localy.h"
 #include "c_bt.h"
-#include "c_invoice_service.h"
 #include "c_company.h"
 
 #endif

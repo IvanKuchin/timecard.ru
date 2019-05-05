@@ -7,7 +7,6 @@
 #include <vector>
 
 #include "clog.h"
-#include "localy.h"
 
 using namespace std;
 

@@ -2664,7 +2664,7 @@ int main(void)
 											error_message = isTimecardsHavePSOWAssigned(timecard_list, cost_center_id, &db, &user);
 											if(error_message.empty())
 											{
-												C_Invoice_Service	c_invoice(&db, &user);
+												C_Invoice_Service_Agency_To_CC	c_invoice(&db, &user);
 
 												c_invoice.SetTimecardList(timecard_list);
 												c_invoice.SetCostCenterID(cost_center_id);

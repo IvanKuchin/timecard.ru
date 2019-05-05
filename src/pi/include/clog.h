@@ -2,14 +2,8 @@
 #define __CLOG__H__
 
 #include <unistd.h>
-#include <sys/types.h>
-#include <sys/ipc.h>
-#include <sys/sem.h>
 #include <sys/file.h>
 #include <errno.h>
-#include <time.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <iostream>
 #include <sstream>
@@ -18,7 +12,6 @@
 using namespace std;
 
 #include "localy.h"
-// #include "clock.h"
 
 #define DEBUG		0
 #define	WARNING		1
@@ -190,11 +183,6 @@ class CLog
 	{
 	}
 
-    private:
-	key_t	key;
-	int	hSem;
-	struct	sembuf sop_lock[2];
-	struct	sembuf sop_unlock[1];
 };
 
 #endif 

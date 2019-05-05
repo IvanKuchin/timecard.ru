@@ -18,7 +18,8 @@
 #include "utilities_common.h"
 #include "localy.h"
 #include "c_bt.h"
-#include "c_invoice_service.h"
+#include "c_invoice_service_agency_to_cc.h"
+#include "c_invoice_service_subc_to_agency.h"
 #include "c_invoice_bt.h"
 #include "c_agreements_sow_factory.h"
 

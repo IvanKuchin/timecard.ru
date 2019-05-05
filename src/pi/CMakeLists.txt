@@ -8,7 +8,6 @@ set(EXECUTABLE_CGIs
 # --- Libraries
 # ---- big joint librabry
 set(JOINT_LIBRARY_SRCs
-    c_date_spelling.cpp
     cuser.cpp
     cactivator.cpp
     ccgi.cpp
@@ -25,17 +24,18 @@ set(JOINT_LIBRARY_SRCs
     cstatistics.cpp
     cvideoconverter.cpp
     c_float.cpp
-    c_archive.cpp
     c_smsc.cpp
     utilities1.cpp
     utilities2.cpp
     utilities_common.cpp
     c_cache_obj.cpp
-    c_price_spelling.cpp
     )
 
 # ---- list of independent libraries
 set(INDEPENDENT_LIBRARIES_SRC
+    c_date_spelling.cpp
+    c_price_spelling.cpp
+    c_archive.cpp
     )
 
 # --- MACROSes start ---
@@ -127,7 +127,7 @@ set(PROJECT_PI_INCLUDE_DIRECTORIES
     ${HPDF_INCLUDE_DIR}
     ${ARCHIVE_INCLUDE_DIR}
     ${XL_INCLUDE_DIR}
-    ${WKHTMLTOPDF_INCLUDE_DIR}
+    ${WKHTMLTOX_INCLUDE_DIR}
     )
 
 set(PROJECT_EXTERNAL_LIBS
@@ -141,7 +141,7 @@ set(PROJECT_EXTERNAL_LIBS
     ${HPDF_LIBRARY}
     ${ARCHIVE_LIBRARY}
     ${XL_LIBRARY}
-    ${WKHTMLTOPDF_LIBRARY}
+    ${WKHTMLTOX_LIBRARY}
     )
 
 # --- does this system provide the exp function ?

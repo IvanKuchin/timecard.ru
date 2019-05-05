@@ -10,7 +10,9 @@ set(PI_TESTS
     autotest_utilities_db_basic.cpp
     autotest_utilities_c_float.cpp
     )
-
+set(INVOICE_PD_PI_TESTS
+    autotest_c_bt_expense_template.cpp
+    )
 # --- MACROSes start ---
 
 # --- MACROSes finish ---
@@ -22,15 +24,18 @@ GET_DIRECTORY_PROPERTY  (PROJECT_EXTERNAL_LIBS          DIRECTORY ${PROJECT_SOUR
 GET_DIRECTORY_PROPERTY  (PROJECT_PD_INCLUDE_DIRECTORIES DIRECTORY ${PROJECT_SOURCE_DIR}/src/pd/ DEFINITION PROJECT_PD_INCLUDE_DIRECTORIES)
 GET_DIRECTORY_PROPERTY  (PROJECT_PD_LIBS                DIRECTORY ${PROJECT_SOURCE_DIR}/src/pd/ DEFINITION PROJECT_PD_LIBS)
 
+set(PROJECT_PD_LIBS __invoice ${PROJECT_PD_LIBS})
+
 set(PROJECT_ALL_INCLUDE_DIRECTORIES ${PROJECT_PI_INCLUDE_DIRECTORIES} ${PROJECT_PD_INCLUDE_DIRECTORIES})
 
 set(CTEST_BINARY_DIRECTORY ${PROJECT_BINARY_DIR}/tests)
 
 file(GLOB ALL_TESTS "autotest_*.cpp")
 
+set(LINK_DESTINATIONS ${ALL_TESTS})
+
 # --- Link part (2 parts: custom build, normal build)
 # ---- 1) Custom build speeding up linking process by linking only required libraries (.o)
-set(LINK_DESTINATIONS ${ALL_TESTS})
 foreach(file ${PI_TESTS})
     string(REGEX REPLACE "(^.*/|\\.[^.]*$)" "" file_without_ext ${file})
 
@@ -38,11 +43,19 @@ foreach(file ${PI_TESTS})
     list(REMOVE_ITEM LINK_DESTINATIONS ${PROJECT_SOURCE_DIR}/tests/auto/${file})
 endforeach()
 
-# ---- 2) Normal build link with _all_ libraries (.o), therefore change in any .src trigger re-link for all executables
+# ---- 2) Custom build speeding up linking process by linking only required libraries (.o)
+foreach(file ${INVOICE_PD_PI_TESTS})
+    string(REGEX REPLACE "(^.*/|\\.[^.]*$)" "" file_without_ext ${file})
+
+    __add_executable_4libs("${file_without_ext}" "${PROJECT_PI_INCLUDE_DIRECTORIES}" __invoice "${PROJECT_PD_LIBS}" "${PROJECT_PI_LIBS}" "${PROJECT_EXTERNAL_LIBS}")
+    list(REMOVE_ITEM LINK_DESTINATIONS ${PROJECT_SOURCE_DIR}/tests/auto/${file})
+endforeach()
+
+# ---- 3) Normal build link with _all_ libraries (.o), therefore change in any .src trigger re-link for all executables
 foreach(file ${LINK_DESTINATIONS})
     string(REGEX REPLACE "(^.*/|\\.[^.]*$)" "" file_without_ext ${file})
 
-    __add_executable_3libs("${file_without_ext}" "${PROJECT_ALL_INCLUDE_DIRECTORIES}" "${PROJECT_PD_LIBS}" "${PROJECT_PI_LIBS}" "${PROJECT_EXTERNAL_LIBS}")
+    __add_executable_3libs("${file_without_ext}" "${PROJECT_ALL_INCLUDE_DIRECTORIES}"  "${PROJECT_PD_LIBS}" "${PROJECT_PI_LIBS}" "${PROJECT_EXTERNAL_LIBS}")
 endforeach()
 
 # --- Add tests

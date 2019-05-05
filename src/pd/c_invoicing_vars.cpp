@@ -1285,39 +1285,6 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet() -> string
 					{
 						if((error_message = Workperiod_Index_VarSet(GetTMObject(timecard.GetDateStart()), GetTMObject(timecard.GetDateFinish()), to_string(i))).empty()) {}
 						else { MESSAGE_ERROR("", "", "fail returned from Workperiod_Index_VarSet"); }
-/*
-						C_Date_Spelling		report_period_start;
-						C_Date_Spelling		report_period_finish;
-						auto				timecard_period_start = GetTMObject(timecard.GetDateStart());
-						auto				timecard_period_finish = GetTMObject(timecard.GetDateFinish());
-						auto				psow_period_start = GetTMObject(Get("psow_contract_start_date_" + to_string(i)));
-						auto				psow_period_finish = GetTMObject(Get("psow_contract_end_date_" + to_string(i)));
-						auto				psow_sign_date = GetTMObject(Get("psow_contract_sign_date_" + to_string(i)));
-
-						if(psow_period_start <= GetTMObject("2000-01-01"))
-						{
-							error_message = "PSOW("s + Get("psow_contract_number_" + to_string(i)) + ") " + gettext("start date") + " " + gettext("must be in 20-th century");
-							MESSAGE_ERROR("", "", error_message);
-						}
-						else if(psow_period_finish <= GetTMObject("2000-01-01"))
-						{
-							error_message = "PSOW("s + Get("psow_contract_number_" + to_string(i)) + ") " + gettext("end date") + " " + gettext("must be in 20-th century");
-							MESSAGE_ERROR("", "", error_message);
-						}
-						else if(psow_sign_date <= GetTMObject("2000-01-01"))
-						{
-							error_message = "PSOW("s + Get("psow_contract_number_" + to_string(i)) + ") " + gettext("sign date") + " " + gettext("must be in 20-th century");
-							MESSAGE_ERROR("", "", error_message);
-						}
-						else
-						{
-							report_period_start	.SetTMObj(psow_period_start  > timecard_period_start  ? psow_period_start  : timecard_period_start);
-							report_period_finish.SetTMObj(psow_period_finish < timecard_period_finish ? psow_period_finish : timecard_period_finish);
-
-							error_message = AssignVariableValue("subcontractor_work_period_start" + to_string(i), report_period_start.GetFormatted("%d.%m.%Y"), true);
-							error_message = AssignVariableValue("subcontractor_work_perion_finish" + to_string(i), report_period_finish.GetFormatted("%d.%m.%Y"), true);
-						}
-*/
 					}
 
 					// --- subcontractor company data
