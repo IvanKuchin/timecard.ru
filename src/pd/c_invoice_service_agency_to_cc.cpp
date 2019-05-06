@@ -152,7 +152,7 @@ auto C_Invoice_Service_Agency_To_CC::GenerateDocumentArchive() -> string
 		invoicing_vars.SetCostCenterID(cost_center_id);
 		invoicing_vars.SetTimecards(timecard_obj_list);
 
-		error_message = invoicing_vars.GenerateServiceVariableSet();
+		error_message = invoicing_vars.GenerateServiceVariableSet_AgencyToCC();
 	}
 	else
 	{

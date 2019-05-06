@@ -68,7 +68,7 @@ auto C_Invoice_BT::GenerateDocumentArchive() -> string
 		invoicing_vars.SetCostCenterID(cost_center_id);
 		invoicing_vars.SetBTs(bt_obj_list);
 
-		error_message = invoicing_vars.GenerateBTVariableSet();
+		error_message = invoicing_vars.GenerateBTVariableSet_AgencyToCC();
 	}
 	else
 	{

@@ -19,9 +19,11 @@ class C_Date_Spelling
 							C_Date_Spelling() {};
 							C_Date_Spelling(struct tm param) : date_struct(param) {};
 
-		auto				SetTMObj(struct tm param) { date_struct = param; };
+		auto				SetTMObj(struct tm param)	{ date_struct = param; };
+		auto				GetTMObj() 					{ return date_struct; };
 
 		auto				Spell() -> string;
+		auto				SpellMonth(int) -> string;
 		auto 				GetFormatted(string format) -> string;
 };
 

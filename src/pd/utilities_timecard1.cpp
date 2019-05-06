@@ -3862,6 +3862,7 @@ string	GetTimecardsInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool i
 		string				status;
 		string				submit_date;
 		string				approve_date;
+		string				invoice_filename;
 		string				eventTimestamp;
 	};
 	vector<ItemClass>		itemsList;
@@ -3883,6 +3884,7 @@ string	GetTimecardsInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool i
 			item.period_end = db->Get(i, "period_end");
 			item.submit_date = db->Get(i, "submit_date");
 			item.approve_date = db->Get(i, "approve_date");
+			item.invoice_filename = db->Get(i, "invoice_filename");
 			item.status = db->Get(i, "status");
 			item.eventTimestamp = db->Get(i, "eventTimestamp");
 
@@ -3901,6 +3903,7 @@ string	GetTimecardsInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool i
 			result += "\"period_end\":\"" + item.period_end + "\",";
 			result += "\"submit_date\":\"" + item.submit_date + "\",";
 			result += "\"approve_date\":\"" + item.approve_date + "\",";
+			result += "\"invoice_filename\":\"" + item.invoice_filename + "\",";
 			result += "\"status\":\"" + item.status + "\",";
 			result += "\"lines\":[" + GetTimecardLinesInJSONFormat("SELECT * FROM `timecard_lines` WHERE `timecard_id`=\"" + item.id + "\";", db, user) + "],";
 			if(isExtended)
@@ -3946,6 +3949,7 @@ string	GetBTsInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool isExten
 		string	status;
 		string	submit_date;
 		string	approve_date;
+		string	invoice_filename;
 		string	eventTimestamp;
 	};
 	vector<ItemClass>		itemsList;
@@ -3969,6 +3973,7 @@ string	GetBTsInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool isExten
 			item.status = db->Get(i, "status");
 			item.submit_date = db->Get(i, "submit_date");
 			item.approve_date = db->Get(i, "approve_date");
+			item.invoice_filename = db->Get(i, "invoice_filename");
 			item.eventTimestamp = db->Get(i, "eventTimestamp");
 
 			itemsList.push_back(item);
@@ -3990,6 +3995,7 @@ string	GetBTsInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool isExten
 			result += "\"status\":\"" + item.status + "\",";
 			result += "\"submit_date\":\"" + item.submit_date + "\",";
 			result += "\"approve_date\":\"" + item.approve_date + "\",";
+			result += "\"invoice_filename\":\"" + item.invoice_filename + "\",";
 			if(isExtended)
 			{
 				result += "\"customers\":[" + GetCustomersInJSONFormat("SELECT * FROM `timecard_customers` WHERE `id`=\"" + item.customer_id + "\";", db, user) + "],";

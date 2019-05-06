@@ -8,8 +8,6 @@ static auto GetTimecardLines_By_TimecardID(string timecard_id, CMysql *db, CUser
 
 	if(user)
 	{
-		if(user->GetType() == "agency")
-		{
 			if(db)
 			{
 				auto affected = db->Query(
@@ -40,11 +38,6 @@ static auto GetTimecardLines_By_TimecardID(string timecard_id, CMysql *db, CUser
 			{
 				MESSAGE_ERROR("", "", "db not initialized");
 			}
-		}
-		else
-		{
-			MESSAGE_ERROR("", "", "user.id(" + user->GetID() + ") is not an agency employee (" + user->GetType() + ")");
-		}
 	}
 	else
 	{
@@ -68,10 +61,8 @@ auto C_Invoice_Service_Subc_To_Agency::GenerateDocumentArchive() -> string
 	auto									error_message = ""s;
 
 	C_Print_Timecard						timecard_printer;
-/*
-	C_Print_Invoice_Agency					__invoice_agency;
-	C_Print_Invoice_Docs_Base				*invoice_printer = &__invoice_agency;
 
+/*
 	C_Print_Act_Agency						__act_agency;
 	C_Print_Invoice_Docs_Base				*act_printer = &__act_agency;
 
@@ -118,7 +109,7 @@ auto C_Invoice_Service_Subc_To_Agency::GenerateDocumentArchive() -> string
 		invoicing_vars.SetUser(user);
 		invoicing_vars.SetTimecards(timecard_obj_list);
 
-		error_message = invoicing_vars.GenerateServiceVariableSet();
+		error_message = invoicing_vars.GenerateServiceVariableSet_SubcToAgency();
 	}
 	else
 	{
@@ -174,7 +165,6 @@ auto C_Invoice_Service_Subc_To_Agency::GenerateDocumentArchive() -> string
 	// --- invoice generator
 	if(error_message.empty())
 	{
-	/*
 		auto		i = 0;
 		auto		invoice_filename_xls = ""s;
 		auto		invoice_filename_pdf = ""s;
@@ -200,10 +190,11 @@ auto C_Invoice_Service_Subc_To_Agency::GenerateDocumentArchive() -> string
 
 		if(error_message.empty())
 		{
+			C_Print_Invoice_Subc					__invoice_agency;
+			C_Print_Invoice_Docs_Base				*invoice_printer = &__invoice_agency;
+	
 			invoice_printer->SetDB(db);
 			invoice_printer->SetVariableSet(&invoicing_vars);
-
-			invoice_printer->SetCostCenterID(cost_center_id);
 
 			if(error_message.empty()) 
 			{
@@ -231,6 +222,7 @@ auto C_Invoice_Service_Subc_To_Agency::GenerateDocumentArchive() -> string
 			MESSAGE_ERROR("", "", "due to previous error invoice won't be printed");
 		}
 
+	/*
 		if(error_message.empty())
 		{
 			act_printer->SetDB(db);
@@ -405,6 +397,7 @@ auto C_Invoice_Service_Subc_To_Agency::CreateTimecardObj(string timecard_id) -> 
 							auto	sow_id = db->Get(0, "contract_sow_id");
 
 							obj.SetID(timecard_id);
+							obj.SetSoWID(sow_id);
 							obj.SetDateStart(db->Get(0, "period_start"));
 							obj.SetDateFinish(db->Get(0, "period_end"));
 
@@ -481,6 +474,25 @@ auto C_Invoice_Service_Subc_To_Agency::UpdateDBWithInvoiceData(const string time
 	{
 		if(db)
 		{
+			if(db->Query("SELECT `invoice_filename` FROM `timecards` WHERE `id`=\"" + timecard_id + "\";"))
+			{
+				auto	curr_fname = db->Get(0, 0);
+
+				if(curr_fname.length())
+				{
+					MESSAGE_DEBUG("", "", "removeing existing invoice(" + curr_fname + ")");
+					unlink((INVOICES_SUBC_DIRECTORY + curr_fname).c_str());
+				}
+				else
+				{
+					MESSAGE_DEBUG("", "", "existing invoice is empty, nothing to remove");
+				}
+			}
+			else
+			{
+				MESSAGE_ERROR("", "", "timecard.id(" + timecard_id + ") not found");
+			}
+
 			db->Query("UPDATE `timecards` SET `invoice_filename`=\"" + archive_folder + "/" + archive_file + "\" WHERE `id`=\"" + timecard_id + "\";");
 		}
 		else

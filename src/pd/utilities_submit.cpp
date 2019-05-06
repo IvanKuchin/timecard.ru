@@ -194,7 +194,17 @@ bool SubmitTimecard(string timecard_id, CMysql *db, CUser *user)
 				}
 				else
 				{
-					result = true;
+					db->Query	("UPDATE `contracts_sow` SET `act_number`=`act_number`+1 WHERE `id`=("
+									"SELECT `contract_sow_id` FROM `timecards` WHERE `id`=\"" + timecard_id + "\""
+								");");
+					if(db->isError())
+					{
+						MESSAGE_ERROR("", "", "fail to contracts_sow table by timecard_id(" + timecard_id + ")");
+					}
+					else
+					{
+						result = true;
+					}
 				}
 			}
 			else

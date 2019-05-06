@@ -32,15 +32,15 @@ class C_Invoicing_Vars
 
 		auto		FillStaticDictionary() -> string;
 		auto		CostCenter_VarSet() -> string;
-		auto		Agency_VarSet() -> string;
+		auto		Agency_VarSet(string) -> string;
 		auto		CurrentTimestamp_1C_VarSet() -> string;
-		auto		AgreementNumberToCostCenterSpelling_VarSet() -> string;
+		auto		AgreementNumberSpelling_VarSet(string agreement_number) -> string;
 
 		auto		SubcontractorsTotal_VarSet(string sum, string tax, string total) -> string;
 		auto		CostCenterTotal_VarSet(c_float cost_center_sum) -> string;
 
 		auto		Common_Index_VarSet(string index) -> string;
-		auto		DocumentSubmissionDate_Index_VarSet(string date_inside_month, string index) -> string;
+		auto		DocumentSubmissionDate_1C_Index_VarSet(string date_inside_month, string index) -> string;
 		auto		SoW_Index_VarSet(string sql_query, string index) -> string;
 		auto		PSoW_Index_VarSet(string sql_query, string index) -> string;
 		auto		CostCenterPayment_Index_VarSet(c_float cost_center_price, string index) -> string;
@@ -48,7 +48,11 @@ class C_Invoicing_Vars
 		auto		SubcontractorAddress_Index_VarSet(string index) -> string;
 		auto		SubcontractorPayment_Index_VarSet(c_float cost_center_price, string index) -> string;
 		auto		Workperiod_Index_VarSet(struct tm workperiod_start, struct tm workperiod_finish, string index) -> string;
+		auto		Workperiod_vs_PSoWperiod_Index_VarSet(struct tm workperiod_start, struct tm workperiod_finish, string index) -> string;
 		auto		TableRowDecsriptions_Index_VarSet(string local_remote_service_description, string index) -> string;
+
+		auto		ShortenWorkPeriodSpelling(struct tm workperiod_start, struct tm workperiod_finish, string index) -> string;
+
 
 	public:
 					C_Invoicing_Vars()						{};
@@ -71,8 +75,9 @@ class C_Invoicing_Vars
 
 		auto		GetSoWID()								{ return __sow_id; }
 
-		auto		GenerateServiceVariableSet() -> string;
-		auto		GenerateBTVariableSet() -> string;
+		auto		GenerateServiceVariableSet_AgencyToCC() -> string;
+		auto		GenerateServiceVariableSet_SubcToAgency() -> string;
+		auto		GenerateBTVariableSet_AgencyToCC() -> string;
 		auto		GenerateSoWVariableSet() -> string;
 
 		auto		Get(const string &) -> string;

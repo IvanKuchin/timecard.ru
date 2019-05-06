@@ -56,6 +56,11 @@ auto C_Date_Spelling::Spell() -> string
 	return result;
 }
 
+auto C_Date_Spelling::SpellMonth(int month_num) -> string
+{
+	return gettext(GetMonthInEnglish(month_num).c_str());
+}
+
 auto C_Date_Spelling::GetFormatted(string format) -> string
 {
 	char	buffer[256];
