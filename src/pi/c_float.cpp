@@ -1,38 +1,5 @@
 #include "c_float.h"
 
-c_float::c_float() : c_float(0, 2) {}
-
-c_float::c_float(double param) : c_float(param, 2) {}
-
-c_float::c_float(double param,  int prec_param) : precision(prec_param) 
-{
-	val = RoundWithPrecision(param, precision);
-}
-
-c_float::c_float(string param) : c_float(param, 2) {}
-
-c_float::c_float(string param, int prec_param) : precision(prec_param)
-{
-// TODO: remove after building c_float tests
-/*
-	if(param.empty()) val = 0;
-	else
-	{
-		try
-		{
-			val = stod(FixRussianLocale(param));
-		}
-		catch(...)
-		{
-			MESSAGE_ERROR("c_float", "", "can't convert " + param + " to double");
-			val = 0;
-		}
-
-	}
-*/
-	Set(param);
-}
-
 void c_float::Set(string param)
 {
 	if(param.empty()) Set(0);
@@ -72,57 +39,36 @@ double c_float::RoundWithPrecision(double num, int precision)
 	return	num;
 }
 
-double c_float::RoundWithPrecision(double num)
+long c_float::GetWhole() const
 {
-	return	RoundWithPrecision(num, precision);
+	double	intpart;
+	long	result;
+
+	modf (val , &intpart);
+
+	result = lround(intpart);
+
+	MESSAGE_DEBUG("", "", "finish (result = " + to_string(result) + ")");
+
+	return result;
 }
 
-long c_float::GetWhole()
+long c_float::GetFraction() const
 {
-    double	intpart;
-    long	result;
+	double	fractpart, intpart;
+	long	result;
 
-    modf (val , &intpart);
+	fractpart = modf(val , &intpart);
 
-    result = lround(intpart);
+	result = lround(fma(fractpart, pow(10, precision), 0));
 
-    MESSAGE_DEBUG("", "", "finish (result = " + to_string(result) + ")");
+	MESSAGE_DEBUG("", "", "finish (result = " + to_string(result) + ")");
 
-    return result;
-
-}
-
-long c_float::GetFraction()
-{
-    double	fractpart, intpart;
-    long	result;
-
-    fractpart = modf(val , &intpart);
-
-    result = lround(fma(fractpart, pow(10, precision), 0));
-
-    MESSAGE_DEBUG("", "", "finish (result = " + to_string(result) + ")");
-
-    return result;
+	return result;
 
 }
 
-string c_float::GetFormattedOutput() const
-{
-/*
-	long			multiplier = pow(10, precision);
-	ostringstream	ost;
-
-	ost.str("");
-	ost.precision(precision);
-	ost << fixed << (round(val * multiplier)) / multiplier;
-
-	return CutTrailingZeroes(ost.str());
-*/
-	return CutTrailingZeroes(PrintPriceTag());
-}
-
-string c_float::PrintPriceTag() const
+string c_float::GetStringValue() const
 {
 	long			multiplier = pow(10, precision);
 	ostringstream	ost;
@@ -131,7 +77,40 @@ string c_float::PrintPriceTag() const
 	ost.precision(precision);
 	ost << fixed << (round(val * multiplier)) / multiplier; // --- this trick will print 0.01 from 0.005
 
-	return ost.str();
+	return ost.str();	
+}
+
+string c_float::GetFormattedOutput() const
+{
+	return CutTrailingZeroes(GetStringValue());
+}
+
+string c_float::PrintPriceTag() const
+{
+	auto	result = GetStringValue();
+
+
+	// --- having spaces between thouthands will trigger problems with invoice/act/vat price representation in Excel
+	// --- for example: 12 000.55 will be presented as 12 in Excel
+	{
+		auto	frac_separator = result.find_first_not_of("0123456789");
+
+		if(frac_separator == string::npos)
+		{
+			MESSAGE_ERROR("", "", "fail to find fraction seprator in price_tag(" + result + ")");
+		}
+		else
+		{
+			// --- insert _spaces_ between thousands
+			while(frac_separator > 3)
+			{
+				frac_separator -= 3;
+				result.insert(frac_separator, " ");
+			}
+		}
+	}	
+
+	return result;
 }
 
 c_float::operator string() const

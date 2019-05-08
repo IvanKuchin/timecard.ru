@@ -1,5 +1,5 @@
-#ifndef __C_INVOICE_BT__H__
-#define __C_INVOICE_BT__H__
+#ifndef __C_INVOICE_BT_AGENCY_TO_CC__H__
+#define __C_INVOICE_BT_AGENCY_TO_CC__H__
 
 #include <string>
 
@@ -18,9 +18,8 @@
 
 using namespace std;
 
-class C_Invoice_BT
-{
-	private:
+class C_Invoice_BT_Agency_To_CC
+{	private:
 		CMysql							*db = NULL;
 		CUser							*user = NULL;
 		vector<string>					bt_id_list;
@@ -46,8 +45,8 @@ class C_Invoice_BT
 		auto 		EnrichObjWithExpenseLines(string bt_id, C_BT_To_Print *obj) -> bool;
 
 	public:
-					C_Invoice_BT()									{};
-					C_Invoice_BT(CMysql *param1, CUser *param2) : db(param1), user(param2) {};
+					C_Invoice_BT_Agency_To_CC()									{};
+					C_Invoice_BT_Agency_To_CC(CMysql *param1, CUser *param2) : db(param1), user(param2) {};
 
 		auto		SetBTList(const vector<string> &param1)			{ bt_id_list = param1; };
 
@@ -58,9 +57,9 @@ class C_Invoice_BT
 
 		auto		GenerateDocumentArchive() -> string;
 
-					~C_Invoice_BT();
+					~C_Invoice_BT_Agency_To_CC();
 };
 
-ostream&	operator<<(ostream& os, const C_Invoice_BT &);
+ostream&	operator<<(ostream& os, const C_Invoice_BT_Agency_To_CC &);
 
 #endif

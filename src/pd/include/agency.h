@@ -20,7 +20,8 @@
 #include "c_bt.h"
 #include "c_invoice_service_agency_to_cc.h"
 #include "c_invoice_service_subc_to_agency.h"
-#include "c_invoice_bt.h"
+#include "c_invoice_bt_agency_to_cc.h"
+#include "c_invoice_bt_subc_to_agency.h"
 #include "c_agreements_sow_factory.h"
 
 #endif

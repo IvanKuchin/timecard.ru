@@ -6,6 +6,7 @@
 #include "clog.h"
 #include "cuser.h"
 #include "c_invoice_service_subc_to_agency.h"
+#include "c_invoice_bt_subc_to_agency.h"
 
 auto			SubmitTimecard(string timecard_id, CMysql *, CUser *) -> bool;
 auto			SubmitBT(string bt_id, CMysql *, CUser *) -> bool;

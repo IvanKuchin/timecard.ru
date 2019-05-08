@@ -717,10 +717,12 @@ string	C_Expense::CheckValidity(CMysql *db) const
 		result = "не указан номинал валюты";
 		MESSAGE_DEBUG("C_Expense", "", "currency nominal is 0 in expense (id/random: " + GetID() + "/" + GetRandom() + "");
 	}
-	else if(GetPriceForeign() && (GetPriceDomestic() != (GetPriceForeign() * GetCurrencyValue() / GetCurrencyNominal())))
+	else if(GetPriceForeign() && (string(GetPriceDomestic()) != string(GetPriceForeign() * GetCurrencyValue() / GetCurrencyNominal())))
+								// --- compare string to get rounded value in both cases
+								// --- otherwise calculated value will be having more precision than PriceDomestic
 	{
 		result = "сумма в рублях не соответствует сумме в валюте";
-		MESSAGE_DEBUG("C_Expense", "", "price in rub.(" + string(GetPriceDomestic()) + ") not equal to foregn price(cost = price / nominal / value is " + string(GetPriceForeign() * GetCurrencyValue() / GetCurrencyNominal()) + " = " + string(GetPriceForeign()) + " / " + to_string(GetCurrencyNominal()) + " / " + string(GetCurrencyValue()) + ") in expense (id/random: " + GetID() + "/" + GetRandom() + ")");
+		MESSAGE_DEBUG("C_Expense", "", "price in rub.(" + string(GetPriceDomestic()) + ") not equal to foregn price(cost = price / nominal * value is " + string(GetPriceForeign() * GetCurrencyValue() / GetCurrencyNominal()) + " == " + string(GetPriceForeign()) + " / " + to_string(GetCurrencyNominal()) + " / " + string(GetCurrencyValue()) + ") in expense (id/random: " + GetID() + "/" + GetRandom() + ")");
 	}
 	else
 	{

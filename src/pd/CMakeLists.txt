@@ -22,7 +22,8 @@ set(INVOICE_LIB_SRCs
     c_agreements_sow_object.cpp
     c_invoice_service_agency_to_cc.cpp
     c_invoice_service_subc_to_agency.cpp
-    c_invoice_bt.cpp
+    c_invoice_bt_agency_to_cc.cpp
+    c_invoice_bt_subc_to_agency.cpp
     c_invoicing_vars.cpp
     c_print_timecard.cpp
     c_print_bt.cpp

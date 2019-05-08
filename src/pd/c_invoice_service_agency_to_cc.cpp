@@ -1,16 +1,5 @@
 #include "c_invoice_service_agency_to_cc.h"
 
-/*
-static void error_handler  (HPDF_STATUS   error_no,
-                HPDF_STATUS   detail_no,
-                void         *user_data)
-{
-    printf ("ERROR: error_no=%04X, detail_no=%u\n", (HPDF_UINT)error_no,
-                (HPDF_UINT)detail_no);
-}
-*/
-
-
 static auto GetTimecardLines_By_TimecardID_And_CostCenterID(string timecard_id, string cost_center_id, CMysql *db, CUser *user)
 {
 	vector<tuple<string, string, string, string>>	result;

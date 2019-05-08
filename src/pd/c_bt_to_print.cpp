@@ -30,7 +30,7 @@ auto C_BT_To_Print::isValid() -> string
 	MESSAGE_DEBUG("", "", "start");
 
 	if(GetID().empty())						{ MESSAGE_ERROR("", "", "bt.id is empty"); 					error_message = gettext("bt id is empty"); }
-	else if(GetMarkupType().empty()) 		{ MESSAGE_ERROR("", "", "bt markup type is empty"); 			error_message = gettext("bt date start is empty"); }
+	// else if(GetMarkupType().empty()) 		{ MESSAGE_ERROR("", "", "bt markup type is empty"); 			error_message = gettext("bt date start is empty"); }
 	else if(GetDateStart().empty()) 		{ MESSAGE_ERROR("", "", "bt date start is empty"); 			error_message = gettext("bt date start is empty"); }
 	else if(GetDateFinish().empty()) 		{ MESSAGE_ERROR("", "", "bt date finish is empty"); 		error_message = gettext("bt date finish is empty"); }
 	else if(GetAgreementNumber().empty()) 	{ MESSAGE_ERROR("", "", "agreement number is empty"); 		error_message = gettext("agreement number is empty"); }

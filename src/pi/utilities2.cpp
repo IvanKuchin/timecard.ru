@@ -2180,6 +2180,7 @@ auto	stod_noexcept(const string &num) -> double
 	auto	decimal_point = (localeconv()->decimal_point ? localeconv()->decimal_point[0] : ',');
 	auto	lc_original = ""s;
 	auto	lc_en = "en_US.utf8"s;
+	auto	space_pos = string::npos;	// --- type casting
 
 	if(decimal_point != '.')
 	{
@@ -2191,7 +2192,21 @@ auto	stod_noexcept(const string &num) -> double
 
 	try
 	{
-		result = stod(num);
+		if((space_pos = num.find(' ')) != string::npos)
+		{
+			auto	temp = num;
+			// --- remove any spaces
+			do
+			{
+				temp.erase(space_pos, 1);
+			} while((space_pos = temp.find(' ', space_pos)) != string::npos);
+
+			result = stod(temp);
+		}
+		else
+		{
+			result = stod(num);
+		}
 	}
 	catch(...)
 	{

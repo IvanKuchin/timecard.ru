@@ -183,8 +183,7 @@ bool SubmitTimecard(string timecard_id, CMysql *db, CUser *user)
 			
 			c_invoice.SetTimecardList({timecard_id});
 			error_message = c_invoice.GenerateDocumentArchive();
-/*
-*/
+
 			if(error_message.empty())
 			{
 				db->Query("UPDATE `timecards` SET `status`=\"approved\", `approve_date`=UNIX_TIMESTAMP() WHERE `id`=\"" + timecard_id + "\";");
@@ -199,7 +198,7 @@ bool SubmitTimecard(string timecard_id, CMysql *db, CUser *user)
 								");");
 					if(db->isError())
 					{
-						MESSAGE_ERROR("", "", "fail to contracts_sow table by timecard_id(" + timecard_id + ")");
+						MESSAGE_ERROR("", "", "fail to update contracts_sow table by timecard_id(" + timecard_id + ")");
 					}
 					else
 					{
@@ -303,14 +302,46 @@ bool	SubmitBT(string bt_id, CMysql *db, CUser *user)
 
 		if(all_approvers_confirm)
 		{
-			db->Query("UPDATE `bt` SET `status`=\"approved\", `approve_date`=UNIX_TIMESTAMP() WHERE `id`=\"" + bt_id + "\";");
-			if(db->isError())
+			auto	error_message = ""s;
+			C_Invoice_BT_Subc_To_Agency	c_invoice(db, user);
+
+			c_invoice.SetBTList({bt_id});
+
+			error_message = c_invoice.GenerateDocumentArchive();
+			if(error_message.empty())
 			{
-				MESSAGE_ERROR("", "", "fail to update bt table with bt_id(" + bt_id + ")");
+				db->Query("UPDATE `bt` SET `status`=\"approved\", `approve_date`=UNIX_TIMESTAMP() WHERE `id`=\"" + bt_id + "\";");
+				if(db->isError())
+				{
+					MESSAGE_ERROR("", "", "fail to update bt table with bt_id(" + bt_id + ")");
+				}
+				else
+				{
+					db->Query	("UPDATE `contracts_sow` SET `act_number`=`act_number`+1 WHERE `id`=("
+									"SELECT `contract_sow_id` FROM `bt` WHERE `id`=\"" + bt_id + "\""
+								");");
+					if(db->isError())
+					{
+						MESSAGE_ERROR("", "", "fail to update contracts_sow table by bt_id(" + bt_id + ")");
+					}
+					else
+					{
+						result = true;
+					}
+				}
+
+				if(db->isError())
+				{
+					MESSAGE_ERROR("", "", "fail to update bt table with bt_id(" + bt_id + ")");
+				}
+				else
+				{
+					result = true;
+				}
 			}
 			else
 			{
-				result = true;
+				MESSAGE_DEBUG("", "", "fail to generate invoice document archive");
 			}
 		}
 		else

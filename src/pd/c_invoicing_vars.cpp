@@ -782,7 +782,7 @@ auto	C_Invoicing_Vars::SubcontractorPayment_Index_VarSet(c_float subcontractor_p
 	c_float		subcontractor_vat;
 	c_float		subcontractor_total_payment;
 
-	MESSAGE_DEBUG("", "", "start");
+	MESSAGE_DEBUG("", "", "start (subcontractor_price: " + string(subcontractor_price) + ")");
 
 	if(Get("subcontractor_company_vat_" + index) == "Y") subcontractor_vat = subcontractor_price * c_float(VAT_PERCENTAGE) / c_float(100);
 	subcontractor_total_payment = subcontractor_price + subcontractor_vat;
@@ -790,7 +790,6 @@ auto	C_Invoicing_Vars::SubcontractorPayment_Index_VarSet(c_float subcontractor_p
 	if(error_message.empty()) error_message = AssignVariableValue("timecard_price_" + index, subcontractor_price        .PrintPriceTag(), true);
 	if(error_message.empty()) error_message = AssignVariableValue("timecard_vat_"   + index, subcontractor_vat          .PrintPriceTag(), true);
 	if(error_message.empty()) error_message = AssignVariableValue("timecard_total_" + index, subcontractor_total_payment.PrintPriceTag(), true);
-
 
 	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
 
@@ -861,6 +860,7 @@ auto	C_Invoicing_Vars::Subcontractor_Index_VarSet(string subcontractor_company_i
 				if(error_message.empty()) error_message = AssignVariableValue("subcontractor_company_vat_" + index, subcontractor_vat, true);
 				if(error_message.empty()) error_message = AssignVariableValue("subcontractor_company_vat_boolean_" + index, subcontractor_vat == "Y" ? "true" : "false", true);
 				if(error_message.empty()) error_message = AssignVariableValue("subcontractor_company_vat_spelling_" + index, subcontractor_vat == "N" ? gettext("no VAT") : gettext("VAT") + " "s + to_string(VAT_PERCENTAGE) + "%", true);
+				if(error_message.empty()) error_message = AssignVariableValue("subcontractor_company_vat_spelling_short_" + index, subcontractor_vat == "N" ? gettext("no VAT short") : gettext("VAT") + " "s + to_string(VAT_PERCENTAGE) + "%", true);
 				if(error_message.empty()) error_message = AssignVariableValue("subcontractor_company_vat_spelling_1C_" + index, subcontractor_vat == "N" ? gettext("noVAT") : gettext("VAT") + to_string(VAT_PERCENTAGE), true);
 
 				if(error_message.empty()) error_message = AssignVariableValue("subcontractor_mailing_geo_zip_id_" + index, db->Get(0, "mailing_geo_zip_id"), true);
@@ -920,9 +920,9 @@ auto	C_Invoicing_Vars::TableRowDecsriptions_Index_VarSet(string local_remote_ser
 		auto	temp = 	local_remote_service_description + " ";
 
 		if(Get("subcontractor_work_period_short_spelling_" + index).length())
-			temp +=		Get("subcontractor_work_period_short_spelling_" + index) + " ";
+			temp +=		gettext("za") + " "s + Get("subcontractor_work_period_short_spelling_" + index) + " ";
 		else
-			temp +=		Get("from") + " " + Get("subcontractor_work_period_start" + index) + " " + Get("up to") + " " + Get("subcontractor_work_perion_finish" + index) + " ";
+			temp +=		Get("from") + " " + Get("subcontractor_work_period_start" + index) + " " + Get("up to") + " " + Get("subcontractor_work_period_finish" + index) + " ";
 
 		temp +=			Get("in scope") + " " + Get("Technical Requirement agreement short") + " " + Get("psow_agreement_" + index) +
 						Get("psow_contract_" + index + "_Department_spelling") +
@@ -940,9 +940,9 @@ auto	C_Invoicing_Vars::TableRowDecsriptions_Index_VarSet(string local_remote_ser
 		auto	temp =	local_remote_service_description + " ";
 
 		if(Get("subcontractor_work_period_short_spelling_" + index).length())
-			temp +=		Get("subcontractor_work_period_short_spelling_" + index) + " ";
+			temp +=		gettext("za") + " "s + Get("subcontractor_work_period_short_spelling_" + index) + " ";
 		else
-			temp +=		Get("from") + " " + Get("subcontractor_work_period_start" + index) + " " + Get("up to") + " " + Get("subcontractor_work_perion_finish" + index) + " ";
+			temp +=		Get("from") + " " + Get("subcontractor_work_period_start" + index) + " " + Get("up to") + " " + Get("subcontractor_work_period_finish" + index) + " ";
 
 		temp +=			Get("in scope") + " " + Get("agreement declensioned") + " " + Get("sow_agreement_" + index) + "."
 						" " + Get("subcontractor_company_vat_spelling_" + index) + ".";
@@ -1183,7 +1183,7 @@ auto	C_Invoicing_Vars::Workperiod_Index_VarSet(struct tm workperiod_start, struc
 	}
 
 	error_message = AssignVariableValue("subcontractor_work_period_start" + index, report_period_start.GetFormatted("%d.%m.%Y"), true);
-	error_message = AssignVariableValue("subcontractor_work_perion_finish" + index, report_period_finish.GetFormatted("%d.%m.%Y"), true);
+	error_message = AssignVariableValue("subcontractor_work_period_finish" + index, report_period_finish.GetFormatted("%d.%m.%Y"), true);
 
 	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
 
@@ -1384,7 +1384,7 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet_AgencyToCC() -> string
 					if(error_message.empty())
 					{
 						if((error_message = TableRowDecsriptions_Index_VarSet(Get("subcontractor_position_local_service_description_" + to_string(i)), to_string(i))).empty()) {}
-						else { MESSAGE_ERROR("", "", "fail returned from SubcontractorPayment_Index_VarSet"); }
+						else { MESSAGE_ERROR("", "", "fail returned from TableRowDecsriptions_Index_VarSet"); }
 					}
 
 					subcontractors_vat = subcontractors_vat + c_float(Get("timecard_vat_" + to_string(i)));
@@ -1507,7 +1507,7 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet_SubcToAgency() -> string
 					if(error_message.empty())
 					{
 						if((error_message = Workperiod_Index_VarSet(GetTMObject(timecard.GetDateStart()), GetTMObject(timecard.GetDateFinish()), to_string(i))).empty()) {}
-						else { MESSAGE_ERROR("", "", "fail returned from Workperiod_vs_PSoWperiod_Index_VarSet"); }
+						else { MESSAGE_ERROR("", "", "fail returned from Workperiod_Index_VarSet"); }
 					}
 
 					// --- subcontractor company data
@@ -1710,6 +1710,144 @@ auto	C_Invoicing_Vars::GenerateBTVariableSet_AgencyToCC() -> string
 				{
 					if((error_message = CostCenterTotal_VarSet(cost_center_sum)).empty()) {}
 					else { MESSAGE_ERROR("", "", "fail returned from CostCenterTotalVarSet"); }
+				}
+			}
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "db is not initialized");
+			error_message = gettext("db is not initialized");
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "user is not initialized");
+		error_message = gettext("user is not initialized");
+	}
+
+	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
+
+	return	error_message;
+}
+
+auto	C_Invoicing_Vars::GenerateBTVariableSet_SubcToAgency() -> string
+{
+	auto	error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(user)
+	{
+		if(db)
+		{
+			c_float	subcontractors_sum, subcontractors_vat;
+
+			if(error_message.empty())
+			{
+				if((error_message = FillStaticDictionary()).empty()) {}
+				else { MESSAGE_ERROR("", "", "fail returned from static dictionary"); }
+			}
+
+			if(error_message.empty())
+			{
+				if(bt_obj_list.size())
+				{
+					if(error_message.empty()) error_message = AssignVariableFromDB("agency_company_id", "SELECT `agency_company_id` FROM `contracts_sow` WHERE `id`=\"" + bt_obj_list[0].GetSoWID() + "\";", true);
+				}
+				else
+				{
+					error_message = gettext("no bt found");
+					MESSAGE_ERROR("", "", "bt_obj_list is empty.");
+				}
+
+
+				if((error_message = Agency_VarSet(Get("agency_company_id"))).empty()) {}
+				else { MESSAGE_ERROR("", "", "fail returned from AgencyVarSet"); }
+			}
+
+			if(error_message.empty())
+			{
+				if(bt_obj_list.size())
+				{
+					if(error_message.empty()) error_message = AssignVariableFromDB("sow_act_number", "SELECT `act_number` FROM `contracts_sow` WHERE `id`=\"" + bt_obj_list[0].GetSoWID() + "\";", true);
+				}
+				else
+				{
+					error_message = gettext("no bt found");
+					MESSAGE_ERROR("", "", "bt_obj_list is empty.");
+				}
+
+				if((error_message = AgreementNumberSpelling_VarSet(Get("sow_act_number"))).empty()) {}
+				else { MESSAGE_ERROR("", "", "fail returned from AgreementNumberSpelling_VarSet"); }
+			}
+
+			// --- define timecards variables
+			if(error_message.empty())
+			{
+				auto	i = 0;
+				for(auto &bt: bt_obj_list)
+				{
+					++i;
+
+					if(error_message.empty()) error_message = AssignVariableValue("bt_id_" + to_string(i), bt.GetID(), true);
+					if(error_message.empty())
+					{
+						if((error_message = Common_Index_VarSet(to_string(i))).empty()) {}
+						else { MESSAGE_ERROR("", "", "fail returned from Common_Index_VarSet"); }
+					}
+
+					if(error_message.empty())
+					{
+						if((error_message = SoW_Index_VarSet("SELECT `id`,`number`,`sign_date`,`act_number`,`subcontractor_company_id`,`day_rate` FROM `contracts_sow` WHERE `id`=("
+																"SELECT `contract_sow_id` FROM `bt` WHERE `id`=\"" + vars.Get("bt_id_" + to_string(i)) + "\""
+															");", to_string(i))).empty()) {}
+						else { MESSAGE_ERROR("", "", "fail returned from SoW_Index_VarSet"); }
+					}
+
+					// --- get report start date and finish date
+					if(error_message.empty())
+					{
+						if((error_message = Workperiod_Index_VarSet(GetTMObject(bt.GetDateStart()), GetTMObject(bt.GetDateFinish()), to_string(i))).empty()) {}
+						else { MESSAGE_ERROR("", "", "fail returned from Workperiod_Index_VarSet"); }
+					}
+
+					if(error_message.empty())
+					{
+						if((error_message = Subcontractor_Index_VarSet(Get("subcontractor_company_id_" + to_string(i)), to_string(i))).empty()) {}
+						else { MESSAGE_ERROR("", "", "fail returned from Subcontractor_Index_VarSet"); }
+					}
+					if(error_message.empty())
+					{
+						if((error_message = SubcontractorAddress_Index_VarSet("1")).empty()) {}
+						else { MESSAGE_ERROR("", "", "fail returned from Subcontractor_Index_VarSet"); }
+					}
+
+					// --- subcontractor payment
+					if(error_message.empty())
+					{
+						if((error_message = SubcontractorPayment_Index_VarSet(bt.GetSumTaxable() + bt.GetSumTax() + bt.GetSumNonTaxable(), to_string(i))).empty()) {}
+						else { MESSAGE_ERROR("", "", "fail returned from SubcontractorPayment_Index_VarSet"); }
+					}
+
+					// --- table row description
+					if(error_message.empty())
+					{
+						if((error_message = TableRowDecsriptions_Index_VarSet(Get("subcontractor_position_remote_service_description_" + to_string(i)), to_string(i))).empty()) {}
+						else { MESSAGE_ERROR("", "", "fail returned from TableRowDecsriptions_Index_VarSet"); }
+					}
+
+					subcontractors_vat = subcontractors_vat + c_float(Get("timecard_vat_" + to_string(i)));
+					subcontractors_sum = subcontractors_sum + c_float(Get("timecard_price_" + to_string(i)));;
+
+					// --- loop closure
+					if(error_message.length()) break;
+				}
+
+				// --- timecard calculations scoping
+				if(error_message.empty())
+				{
+					if((error_message = SubcontractorsTotal_VarSet(subcontractors_sum.PrintPriceTag(), subcontractors_vat.PrintPriceTag(), (subcontractors_sum + subcontractors_vat).PrintPriceTag())).empty()) {}
+					else { MESSAGE_ERROR("", "", "fail returned from SubcontractorsTotalVarSet"); }
 				}
 			}
 		}

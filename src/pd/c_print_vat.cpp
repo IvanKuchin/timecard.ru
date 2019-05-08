@@ -515,6 +515,7 @@ auto	C_Print_VAT_Base::__HPDF_DrawTable() -> string
 			{
 				auto	max_lines = pdf_obj.__HPDF_GetNumberOfLinesInTable(1, utf8_to_cp1251(GetTableRowDescription(i))	, NORMAL_FONT, __pdf_font_size);
 
+
 				if((error_message = pdf_obj.__HPDF_PrintTextTableCell(0, utf8_to_cp1251(GetTableRowIndex(i)), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).empty())
 				{
 					if((error_message = pdf_obj.__HPDF_PrintTextTableCell(1, utf8_to_cp1251(GetTableRowDescription(i)), HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).empty())

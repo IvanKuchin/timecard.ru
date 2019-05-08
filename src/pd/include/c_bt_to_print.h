@@ -31,6 +31,7 @@ class C_BT_To_Print
 		// CUser					*user = NULL;
 
 		string					id = "";
+		string					sow_id = "";
 		string					date_start_str = "";
 		string					date_finish_str = "";
 		string					agreement_number = "";
@@ -62,6 +63,8 @@ class C_BT_To_Print
 
 		auto		SetID(const string &param1)					{ id = param1; };
 		auto		SetID(string &&param1) 						{ id = move(param1); };
+		auto		SetSoWID(const string &param1)				{ sow_id = param1; };
+		auto		SetSoWID(string &&param1) 					{ sow_id = move(param1); };
 		auto		SetDateStart(const string &param1)			{ date_start_str = param1; };
 		auto		SetDateStart(string &&param1) 				{ date_start_str = move(param1); };
 		auto		SetDateFinish(const string &param1)			{ date_finish_str = param1; };
@@ -88,6 +91,7 @@ class C_BT_To_Print
 		// auto		SetTotalPayment(string param1) 				{ total_payment = param1; };
 
 		auto		GetID()										{ return id; };
+		auto		GetSoWID()									{ return sow_id; };
 		auto		GetDateStart()								{ return date_start_str; };
 		auto		GetDateFinish()								{ return date_finish_str; };
 		auto		GetSupplierVAT()							{ return supplier_vat; };

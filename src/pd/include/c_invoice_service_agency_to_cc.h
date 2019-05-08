@@ -51,7 +51,7 @@ class C_Invoice_Service_Agency_To_CC
 		auto		SetCostCenterID(const string &param1)			{ cost_center_id = param1; };
 		auto		SetCostCenterID(string &&param1) 				{ cost_center_id = move(param1); };
 
-		auto		GetInvoiceID()									{ return invoice_cost_center_service_id; };
+		auto		GetInvoiceID()	const							{ return invoice_cost_center_service_id; };
 
 		auto		GenerateDocumentArchive() -> string;
 

@@ -78,6 +78,7 @@ class C_Invoicing_Vars
 		auto		GenerateServiceVariableSet_AgencyToCC() -> string;
 		auto		GenerateServiceVariableSet_SubcToAgency() -> string;
 		auto		GenerateBTVariableSet_AgencyToCC() -> string;
+		auto		GenerateBTVariableSet_SubcToAgency() -> string;
 		auto		GenerateSoWVariableSet() -> string;
 
 		auto		Get(const string &) -> string;

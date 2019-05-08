@@ -314,9 +314,7 @@ string RemoveQuotas(string src)
 	auto				result = src;
 	string::size_type	pos = 0;
 
-	{
-		MESSAGE_DEBUG("", "", "start (src = " + src + ")");
-	}
+	MESSAGE_DEBUG("", "", "start (src = " + src + ")");
 
 	while((pos = result.find("\"", pos)) != string::npos)
 	{
@@ -324,9 +322,7 @@ string RemoveQuotas(string src)
 		pos += 2;
 	}
 
-	{
-		MESSAGE_DEBUG("", "", "finish (result = " + result + ")");
-	}
+	MESSAGE_DEBUG("", "", "finish (result = " + result + ")");
 
 	return result;
 }

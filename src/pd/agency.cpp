@@ -2790,7 +2790,7 @@ int main(void)
 											error_message = isBTsHavePSOWAssigned(bt_list, cost_center_id, &db, &user);
 											if(error_message.empty())
 											{
-												C_Invoice_BT	c_invoice(&db, &user);
+												C_Invoice_BT_Agency_To_CC	c_invoice(&db, &user);
 
 												c_invoice.SetBTList(bt_list);
 												c_invoice.SetCostCenterID(cost_center_id);

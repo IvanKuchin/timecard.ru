@@ -53,6 +53,9 @@ msgstr "Бухгалтер"
 msgid "Act"
 msgstr "Акт"
 
+msgid "za"
+msgstr "за"
+
 msgid "Agency: cost center"
 msgstr "Данные агенства: центр затрат"
 
@@ -298,6 +301,9 @@ msgstr "Подпись"
 
 msgid "SoW"
 msgstr "Договор"
+
+msgid "sow declension"
+msgstr "договора"
 
 msgid "SoW number already exists"
 msgstr "Договор с таким номером уже есть"

@@ -11,6 +11,8 @@
 
 using namespace std;
 
+// extern auto			CutTrailingZeroes(string number) -> string;
+
 class c_float
 {
 	private:
@@ -18,16 +20,17 @@ class c_float
 		int			precision = 2;
 
 		auto		RoundWithPrecision(double num, int precision) -> double;
-		auto		RoundWithPrecision(double num) -> double;
+		auto		RoundWithPrecision(double num)			{ return RoundWithPrecision(num, precision); };
 		auto 		FixRussianLocale(string param) -> string;
+		string		GetStringValue() const;
 		string		GetFormattedOutput() const;
 
 	public:
-					c_float();
-					c_float(string param);
-					c_float(string param, int prec_param);
-					c_float(double param);
-					c_float(double param,  int prec_param);
+					c_float() : c_float(0, 2)				{};
+					c_float(string param): c_float(param, 2){};
+					c_float(double param): c_float(param, 2){};
+					c_float(string param, int prec_param)  : precision(prec_param) { Set(param); };
+					c_float(double param, int prec_param)  : precision(prec_param) { val = RoundWithPrecision(param, precision); };
 
 		void		Set(double param) 						{ val = RoundWithPrecision(param, precision); };
 		void		Set(string param);
@@ -35,8 +38,8 @@ class c_float
 		double		Get()	const 							{ return val; };
 		double		GetPrecision()	const					{ return precision; };
 
-		long		GetWhole();
-		long		GetFraction();
+		long		GetWhole()		const;
+		long		GetFraction()	const;
 
 		string		PrintPriceTag() const;
 

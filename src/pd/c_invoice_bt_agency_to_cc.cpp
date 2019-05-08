@@ -1,6 +1,6 @@
-#include "c_invoice_bt.h"
+#include "c_invoice_bt_agency_to_cc.h"
 
-auto C_Invoice_BT::GenerateDocumentArchive() -> string
+auto C_Invoice_BT_Agency_To_CC::GenerateDocumentArchive() -> string
 {
 	MESSAGE_DEBUG("", "", "start");
 
@@ -361,7 +361,7 @@ auto C_Invoice_BT::GenerateDocumentArchive() -> string
 	return error_message;
 }
 
-auto C_Invoice_BT::CreateTempDirectory() -> bool
+auto C_Invoice_BT_Agency_To_CC::CreateTempDirectory() -> bool
 {
 	auto result = false;
 
@@ -414,7 +414,7 @@ auto C_Invoice_BT::CreateTempDirectory() -> bool
 	return result;
 }
 
-auto C_Invoice_BT::CreateBTObj(string bt_id) -> C_BT_To_Print
+auto C_Invoice_BT_Agency_To_CC::CreateBTObj(string bt_id) -> C_BT_To_Print
 {
 	C_BT_To_Print		obj;
 
@@ -525,7 +525,7 @@ auto C_Invoice_BT::CreateBTObj(string bt_id) -> C_BT_To_Print
 	return obj;
 }
 
-auto C_Invoice_BT::EnrichObjWithExpenseLines(string bt_id, C_BT_To_Print *obj) -> bool
+auto C_Invoice_BT_Agency_To_CC::EnrichObjWithExpenseLines(string bt_id, C_BT_To_Print *obj) -> bool
 {
 	auto	result = false;
 
@@ -580,7 +580,7 @@ auto C_Invoice_BT::EnrichObjWithExpenseLines(string bt_id, C_BT_To_Print *obj) -
 }
 
 
-auto C_Invoice_BT::UpdateDBWithInvoiceData(const string bt_id) -> string
+auto C_Invoice_BT_Agency_To_CC::UpdateDBWithInvoiceData(const string bt_id) -> string
 {
 	auto	error_message = ""s;
 
@@ -677,7 +677,7 @@ auto C_Invoice_BT::UpdateDBWithInvoiceData(const string bt_id) -> string
 	return error_message;
 }
 
-C_Invoice_BT::~C_Invoice_BT()
+C_Invoice_BT_Agency_To_CC::~C_Invoice_BT_Agency_To_CC()
 {
 	if(temp_dir.length())
 	{
@@ -689,9 +689,9 @@ C_Invoice_BT::~C_Invoice_BT()
 	}
 }
 
-ostream& operator<<(ostream& os, const C_Invoice_BT &var)
+ostream& operator<<(ostream& os, const C_Invoice_BT_Agency_To_CC &var)
 {
-	os << "object C_Invoice_BT [empty for now]";
+	os << "object C_Invoice_BT_Agency_To_CC [empty for now]";
 
 	return os;
 }

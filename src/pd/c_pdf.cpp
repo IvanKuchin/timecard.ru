@@ -151,7 +151,7 @@ auto	C_PDF::__HPDF_PrintTextTableCell(unsigned int index_col, string text, HPDF_
 {
 	auto	error_message = ""s;
 
-	MESSAGE_DEBUG("", "", "start");
+	MESSAGE_DEBUG("", "", "start (column: " + to_string(index_col) + ", text.length(" + to_string(text.length()) + "))");
 
 	if(index_col <= grid_widths.size())
 	{
