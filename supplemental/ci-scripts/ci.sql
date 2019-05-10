@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 5.7.24, for Linux (x86_64)
 --
--- Host: localhost    Database: timecard.su
+-- Host: localhost    Database: timecard.ru
 -- ------------------------------------------------------
 -- Server version	5.7.24-0ubuntu0.16.04.1
 

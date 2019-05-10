@@ -8,7 +8,7 @@ endif()
 
 cmake_minimum_required(VERSION 3.5)
 
-project("timecard.su" CXX)
+project("timecard.ru" CXX)
 set(My_VERSION_MAJOR 0)
 set(My_VERSION_MINOR 1)
 

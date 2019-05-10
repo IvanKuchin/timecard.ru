@@ -1,4 +1,4 @@
 #!/bin/bash
 
-xgettext -d timecard.su -j --no-location -o ./ru.pot -s ../src/pi/*.cpp
-xgettext -d timecard.su -j --no-location -o ./ru.pot -s ../src/pd/*.cpp
+xgettext -d timecard.ru -j --no-location -o ./ru.pot -s ../src/pi/*.cpp
+xgettext -d timecard.ru -j --no-location -o ./ru.pot -s ../src/pd/*.cpp

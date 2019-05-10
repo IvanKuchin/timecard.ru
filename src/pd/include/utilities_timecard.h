@@ -144,6 +144,6 @@ auto			CheckNewValueByAction(string action, string id, string sow_id, string new
 auto			isActionEntityBelongsToAgency(string action, string id, string agency_id, CMysql *, CUser *) -> string;
 
 auto			CheckAgreementSoWTitle(string title, string sow_id, CMysql *, CUser *) -> string;
-
+auto			isDemoDomain() -> bool;
 
 #endif

@@ -7,6 +7,7 @@
 #include <dirent.h>
 #include <regex>
 
+#include "cactivator.h"
 #include "chtml.h"
 #include "ccgi.h"
 #include "cmysql.h"

@@ -1,5 +1,4 @@
 #include "cron_daily.h"
-#include "cactivator.h"
 
 bool CleanupActivators(CMysql *db)
 {

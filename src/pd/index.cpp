@@ -4718,6 +4718,7 @@ int main()
 				string		randomValue = GetRandom(4);
 				string 		captchaFile = GenerateImage(randomValue);
 				int 		affected;
+				auto		template_name = "login.htmlt"s;
 
 				sessid = indexPage.GetCookie("sessid");
 
@@ -4769,9 +4770,11 @@ int main()
 				indexPage.RegisterVariableForce("securityFile", captchaFile);
 
 
-				if(!indexPage.SetTemplate("login.htmlt"))
+				if(isDemoDomain()) template_name = "login_demo.htmlt";
+
+				if(!indexPage.SetTemplate(template_name))
 				{
-					MESSAGE_ERROR("", action, "template file login.htmlt was missing");
+					MESSAGE_ERROR("", action, "template file " + template_name + " was missing");
 					throw CException("Template file was missing");
 				}
 			}
@@ -6672,7 +6675,7 @@ int main()
 				throw CExceptionHTML("user not activated");
 			}
 		}
-
+/*
 		if(action == "showmain")
 		{
 			if(user.GetLogin() == "Guest")
@@ -6691,7 +6694,7 @@ int main()
 				indexPage.Redirect("/" + GetDefaultActionFromUserType(&user, &db) + "?rand=" + GetRandom(10));
 			}
 		}
-
+*/
 		if(action == "forget")
 		{
 			string		login;

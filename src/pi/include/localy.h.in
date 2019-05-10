@@ -221,7 +221,7 @@
 #define	NOTIFICATION_AGENGY_GENERATED_AGREEMENTS	109
 
 // --- miscelaneous definitions
-#define	DEFAULT_SITE_THEME							".cyborg"
+#define	DEFAULT_SITE_THEME							".regular"
 
 #define	VAT_PERCENTAGE								18
 #define	BUSINESS_TRIP_TAX_PERCENTAGE				6.38
