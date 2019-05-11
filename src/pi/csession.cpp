@@ -121,11 +121,13 @@ string CSession::DetectItem(string MMDB_itemName) {
 	string		item = "";
 
 #ifndef MAXMIND_DISABLE
+    MESSAGE_DEBUG("", "", "start (detectItem " + MMDB_itemName + " by IP)");
+
 	if(MMDB_usage)
 	{
         MMDB_entry_data_s       MMDB_entryDataS;
 
-		if(MMDB_get_value(&MMDB_result.entry, &MMDB_entryDataS, MMDB_itemName.c_str(), "names", "ru", NULL) == MMDB_SUCCESS)
+		if(MMDB_get_value(&MMDB_result.entry, &MMDB_entryDataS, MMDB_itemName.c_str(), "names", "en", NULL) == MMDB_SUCCESS)
 		{
 			if(MMDB_entryDataS.has_data && (MMDB_entryDataS.type == MMDB_DATA_TYPE_UTF8_STRING))
 			{
@@ -153,21 +155,18 @@ string CSession::DetectItem(string MMDB_itemName) {
 		}
 	}
 
+    MESSAGE_DEBUG("", "", "finish (" + item + ")");
 #endif
 	return	item;
 }
 
 auto CSession::DetectCountry() -> string
 {
-    MESSAGE_DEBUG("", "", "attempt to detect country by IP");
-
 	return DetectItem("country");
 }
 
 auto CSession::DetectCity() -> string
 {
-    MESSAGE_DEBUG("", "", "attempt to detect city by IP");
-
 	return DetectItem("city");
 }
 
