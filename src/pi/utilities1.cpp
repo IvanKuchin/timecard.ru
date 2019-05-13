@@ -1865,6 +1865,10 @@ string GetUserListInJSONFormat(string dbQuery, CMysql *db, CUser *user)
 		string	userBirthdayAccess;
 		string	userAppliedVacanciesRender;
 		string	userCurrentCityID;
+		string	passport_series;
+		string	passport_number;
+		string	passport_issue_date;
+		string	passport_issue_authority;
 		string	userLastOnline;
 		string	userLastOnlineSecondSinceY2k;
 	};
@@ -1891,6 +1895,10 @@ string GetUserListInJSONFormat(string dbQuery, CMysql *db, CUser *user)
 			item.userBirthdayAccess = db->Get(i, "birthdayAccess");
 			item.userAppliedVacanciesRender = db->Get(i, "appliedVacanciesRender");
 			item.userCurrentCityID = db->Get(i, "geo_locality_id");
+			item.passport_series = db->Get(i, "passport_series");
+			item.passport_number = db->Get(i, "passport_number");
+			item.passport_issue_date = db->Get(i, "passport_issue_date");
+			item.passport_issue_authority = db->Get(i, "passport_issue_authority");
 			item.userLastOnline = db->Get(i, "last_online");
 			item.userLastOnlineSecondSinceY2k = db->Get(i, "last_onlineSecondsSinceY2k");
 
@@ -2017,6 +2025,10 @@ string GetUserListInJSONFormat(string dbQuery, CMysql *db, CUser *user)
 						  // "\"languages\": ["		 			<< GetLanguageListInJSONFormat("SELECT * FROM `language` WHERE `id` in (SELECT `language_id` FROM `users_language` WHERE `user_id`=\"" + userID + "\");", db) << "], "
 						  // "\"skills\": ["		 				<< GetSkillListInJSONFormat("SELECT * FROM `skill` WHERE `id` in (SELECT `skill_id` FROM `users_skill` WHERE `user_id`=\"" + userID + "\");", db) << "], "
 						  // "\"subscriptions\":[" 				<< (user && (user->GetID() == userID) ? GetUserSubscriptionsInJSONFormat("SELECT * FROM `users_subscriptions` WHERE `user_id`=\"" + userID + "\";", db) : "") << "],"
+						  "\"passport_series\": \""				<< ((user && (userID == user->GetID())) ? itemsList[i].passport_series : "") << "\","
+						  "\"passport_number\": \""				<< ((user && (userID == user->GetID())) ? itemsList[i].passport_number : "") << "\","
+						  "\"passport_issue_date\": \""			<< ((user && (userID == user->GetID())) ? itemsList[i].passport_issue_date : "") << "\","
+						  "\"passport_issue_authority\": \""	<< ((user && (userID == user->GetID())) ? itemsList[i].passport_issue_authority : "") << "\","
 						  "\"isMe\": \""						<< ((user && (userID == user->GetID())) ? "yes" : "no") << "\" "
 						"}";
 			} // --- if user is not dupicated

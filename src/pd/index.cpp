@@ -5815,6 +5815,10 @@ int main()
 			auto			site_theme_id = ""s;
 			auto			geo_locality_id = ""s;
 			auto			city = ""s;
+			auto			passport_series = ""s;
+			auto			passport_number = ""s;
+			auto			passport_issue_date = ""s;
+			auto			passport_issue_authority = ""s;
 			auto			appliedVacanciesRender = ""s;
 
 
@@ -5845,6 +5849,10 @@ int main()
 						"`users`.`email`					as `users_email`, "
 						"`users`.`sex`						as `users_sex`, "
 						"`users`.`birthday`					as `users_birthday`, "
+						"`users`.`passport_series`			as `users_passport_series`, "
+						"`users`.`passport_number`			as `users_passport_number`, "
+						"`users`.`passport_issue_date`		as `users_passport_issue_date`, "
+						"`users`.`passport_issue_authority`	as `users_passport_issue_authority`, "
 						"`users`.`birthdayAccess`			as `users_birthdayAccess`, "
 						"`users`.`site_theme_id`			as `users_site_theme_id`, "
 						"`users`.`appliedVacanciesRender`	as `users_appliedVacanciesRender`, "
@@ -5870,6 +5878,10 @@ int main()
 				sex = db.Get(0, "users_sex");
 				isBlocked = db.Get(0, "users_isblocked");
 				birthday = db.Get(0, "users_birthday");
+				passport_series = db.Get(0, "users_passport_series");
+				passport_number = db.Get(0, "users_passport_number");
+				passport_issue_date = db.Get(0, "users_passport_issue_date");
+				passport_issue_authority = db.Get(0, "users_passport_issue_authority");
 				birthdayAccess = db.Get(0, "users_birthdayAccess");
 				appliedVacanciesRender = db.Get(0, "users_appliedVacanciesRender");
 				site_theme_id = db.Get(0, "users_site_theme_id");
@@ -5909,6 +5921,10 @@ int main()
 					<< "\"appliedVacanciesRender\": \"" << appliedVacanciesRender << "\","
 					<< "\"site_theme_id\": \"" << site_theme_id << "\","
 					<< "\"birthday\": \"" << birthday << "\","
+					<< "\"passport_series\": \"" << (user.GetID() == userID ? passport_series : "") << "\","
+					<< "\"passport_number\": \"" << (user.GetID() == userID ? passport_number : "") << "\","
+					<< "\"passport_issue_date\": \"" << (user.GetID() == userID ? passport_issue_date : "") << "\","
+					<< "\"passport_issue_authority\": \"" << (user.GetID() == userID ? passport_issue_authority : "") << "\","
 					<< "\"birthdayAccess\": \"" << birthdayAccess << "\","
 					<< "\"themes\": [" << GetSiteThemesInJSONFormat("SELECT * FROM `site_themes`", &db, &user) << "]"
 					<< "}";
