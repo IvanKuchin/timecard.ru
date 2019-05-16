@@ -654,12 +654,12 @@ auto C_Invoice_Service_Agency_To_CC::UpdateDBWithInvoiceData(const string timeca
 									"VALUES (" + 
 										quoted(to_string(invoice_cost_center_service_id)) + "," +
 										quoted(timecard_id) + "," +
-										quoted(invoicing_vars.Get("cost_center_price_" + timecard_index).length() ? invoicing_vars.Get("cost_center_price_" + timecard_index) : "0") + "," +
-										quoted(invoicing_vars.Get("cost_center_vat_" + timecard_index).length() ? invoicing_vars.Get("cost_center_vat_" + timecard_index) : "0") + "," +
-										quoted(invoicing_vars.Get("cost_center_total_" + timecard_index).length() ? invoicing_vars.Get("cost_center_total_" + timecard_index) : "0") + "," +
-										quoted(invoicing_vars.Get("timecard_price_" + timecard_index).length() ? invoicing_vars.Get("timecard_price_" + timecard_index) : "0") + "," +
-										quoted(invoicing_vars.Get("timecard_vat_" + timecard_index).length() ? invoicing_vars.Get("timecard_vat_" + timecard_index) : "0") + "," +
-										quoted(invoicing_vars.Get("timecard_total_" + timecard_index).length() ? invoicing_vars.Get("timecard_total_" + timecard_index) : "0") +
+										quoted(invoicing_vars.Get("cost_center_price_" + timecard_index).length()	? invoicing_vars.Get("cost_center_price_" + timecard_index) : "0") + "," +
+										quoted(invoicing_vars.Get("cost_center_vat_" + timecard_index).length()		? invoicing_vars.Get("cost_center_vat_" + timecard_index) : "0") + "," +
+										quoted(invoicing_vars.Get("cost_center_total_" + timecard_index).length()	? invoicing_vars.Get("cost_center_total_" + timecard_index) : "0") + "," +
+										quoted(invoicing_vars.Get("timecard_price_" + timecard_index).length()		? invoicing_vars.Get("timecard_price_" + timecard_index) : "0") + "," +
+										quoted(invoicing_vars.Get("timecard_vat_" + timecard_index).length()		? invoicing_vars.Get("timecard_vat_" + timecard_index) : "0") + "," +
+										quoted(invoicing_vars.Get("timecard_total_" + timecard_index).length()		? invoicing_vars.Get("timecard_total_" + timecard_index) : "0") +
 									");"))
 				{
 				}

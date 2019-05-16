@@ -20,6 +20,7 @@ auto			GetTimecardProjectsInJSONFormat(string sqlQuery, CMysql *, CUser *) -> st
 auto			GetTimecardTasksInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetTimecardTaskAssignmentInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetBTExpenseAssignmentInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
+auto			GetBTExpenseLinesInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetTimecardsInJSONFormat(string sqlQuery, CMysql *, CUser *, bool isExtended = false) -> string;
 auto			GetServiceBTInvoicesInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetSoWCustomFieldsInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
@@ -100,6 +101,7 @@ auto 			isUserAllowedAccessToBT(string bt_id, CMysql *, CUser *) -> string;
 auto			isCostCenterBelongsToAgency(string cost_center_id, CMysql *, CUser *) -> bool;
 
 auto			NotifySoWContractPartiesAboutChanges(string action_type_id, string sow_id, CMysql *, CUser *) -> string;
+auto			NotifyAgencyAboutChanges(string agency_id, string action_type_id, string action_id, CMysql *, CUser *) -> string;
 auto			GeneralNotifySoWContractPartiesAboutChanges(string action, string id, string sow_id, string existing_value, string new_value, CMysql *, CUser *) -> bool;
 auto			GetDBValueByAction(string action, string id, string sow_id, CMysql *, CUser *) -> string;
 auto			SetNewValueByAction(string action, string id, string sow_id, string new_value, CMysql *, CUser *) -> string;

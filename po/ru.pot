@@ -35,6 +35,9 @@ msgstr[2] "%d субконтракторам"
 msgid "1C generation failed"
 msgstr "Ошибка в выгрузке 1С"
 
+msgid "first name and last name are mandatory"
+msgstr "имя и фамилия обязательны"
+
 msgid "1c filename is empty"
 msgstr "не указано имя фаила 1с"
 

@@ -89,8 +89,8 @@ string c_float::PrintPriceTag() const
 {
 	auto	result = GetStringValue();
 
-
-	// --- having spaces between thouthands will trigger problems with invoice/act/vat price representation in Excel
+	// --- having spaces between thouthands may trigger problems with invoice/act/vat price representation in Excel
+	// --- or DB update (UPDATE xxx=123 456.56) will fail sql-query
 	// --- for example: 12 000.55 will be presented as 12 in Excel
 	{
 		auto	frac_separator = result.find_first_not_of("0123456789");
@@ -102,11 +102,13 @@ string c_float::PrintPriceTag() const
 		else
 		{
 			// --- insert _spaces_ between thousands
+/*
 			while(frac_separator > 3)
 			{
 				frac_separator -= 3;
 				result.insert(frac_separator, " ");
 			}
+*/
 		}
 	}	
 

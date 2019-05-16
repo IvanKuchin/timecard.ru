@@ -150,6 +150,61 @@ int main(void)
 
 			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 		}
+		if(action == "AJAX_isCompanyExists")
+		{
+			auto			id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
+			auto			tin = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("tin"));
+			auto			company_type = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("company_type"));
+			auto			template_name = "json_response.htmlt"s;
+			auto			error_message = ""s;
+			auto			success_message = ""s;
+			ostringstream	ostResult;
+
+			ostResult.str("");
+
+			if(id.length())
+			{
+				if(db.Query("SELECT `id` FROM `company` WHERE `id`=\"" + id + "\""s + (company_type.length() ? " AND `type`=\"" + company_type + "\"" : "") + ";"))
+				{
+					success_message = ",\"isExists\":\"yes\"";
+				}
+				else
+				{
+					success_message = ",\"isExists\":\"no\"";
+				}
+			}
+			else if(tin.length())
+			{
+				if(db.Query("SELECT `id` FROM `company` WHERE `tin`=\"" + tin + "\""s + (company_type.length() ? " AND `type`=\"" + company_type + "\"" : "") + ";"))
+				{
+					success_message = ",\"isExists\":\"yes\"";
+				}
+				else
+				{
+					success_message = ",\"isExists\":\"no\"";
+				}					
+			}
+			else
+			{
+				error_message = "Некорректный номер kompanii";
+				MESSAGE_DEBUG("", "", "fail to get company.id(" + id + ")");
+			}
+
+			if(error_message.empty())
+			{
+				ostResult << "{\"result\":\"success\"" + success_message + "}";
+			}
+			else
+			{
+				MESSAGE_DEBUG("", action, "failed");
+				ostResult.str("");
+				ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+			}
+
+			indexPage.RegisterVariableForce("result", ostResult.str());
+
+			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+		}
 
 		if(action == "AJAX_getGeoRegionName")
 		{
@@ -437,6 +492,58 @@ int main(void)
 			{
 				error_message = "Некорректные параметры";
 				MESSAGE_DEBUG("", "", "mandatory parameter missed");
+			}
+
+			if(error_message.empty())
+			{
+			}
+			else
+			{
+				MESSAGE_DEBUG("", action, "failed");
+				ostResult.str("");
+				ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+			}
+
+			indexPage.RegisterVariableForce("result", ostResult.str());
+
+			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+		}
+
+		if(action == "AJAX_getAgencyAutocompleteList")
+		{
+			string			name = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("name"));
+			string			template_name = "json_response.htmlt";
+			string			error_message = "";
+			ostringstream	ostResult;
+
+			ostResult.str("");
+
+			if(name.length())
+			{
+				int	affected = db.Query("SELECT `id`, `name` FROM `company` WHERE `name` LIKE \"%" + name + "%\" LIMIT 0, 20;");
+				if(affected)
+				{
+					ostResult << "{\"result\":\"success\","
+							  << "\"autocomplete_list\":[";
+					for(int i = 0; i < affected; ++i)
+					{
+						if(i) ostResult << ",";
+						ostResult << "{\"id\":\"" << db.Get(i, "id") << "\","
+								  << "\"label\":\"" << db.Get(i, "name") << "\"}";
+					}
+					ostResult << "]}";
+				}
+				else
+				{
+					error_message = gettext("agency id not found");
+					MESSAGE_DEBUG("", "", error_message);
+				}	
+					
+			}
+			else
+			{
+				error_message = gettext("agency id not found");
+				MESSAGE_DEBUG("", "", error_message);
 			}
 
 			if(error_message.empty())

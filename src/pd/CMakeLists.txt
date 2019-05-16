@@ -4,6 +4,7 @@ set(EXECUTABLE_CGIs_with_INVOICE_PD_PI_LIBS
     subcontractor.cgi
     )
 set(EXECUTABLE_CGIs_with_PD_PI_LIBS
+    initial_wizard.cgi
     index.cgi
     ajax_anyrole_1.cgi
     admin.cgi
@@ -146,6 +147,7 @@ install(TARGETS approver.cgi		DESTINATION		${CGIDIR})
 install(TARGETS agency.cgi			DESTINATION		${CGIDIR})
 install(TARGETS subcontractor.cgi	DESTINATION		${CGIDIR})
 install(TARGETS ajax_anyrole_1.cgi	DESTINATION		${CGIDIR})
+install(TARGETS initial_wizard.cgi  DESTINATION     ${CGIDIR})
 install(TARGETS system.cgi          DESTINATION     ${CGIDIR})
 
 install(TARGETS admin.cgi           DESTINATION     ${CGIADMINDIR})
