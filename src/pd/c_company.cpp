@@ -124,6 +124,7 @@ auto	C_Company::InsertToDB() -> string
 													"`mailing_geo_zip_id`,"
 													"`mailing_address`,"
 													"`tin`,"
+													"`vat`,"
 													"`bank_id`,"
 													"`account`,"
 													"`kpp`,"
@@ -142,6 +143,7 @@ auto	C_Company::InsertToDB() -> string
 													quoted(GetMailingGeoZipID()) + "," +
 													quoted(GetMailing_address()) + "," +
 													quoted(GetTIN()) + "," +
+													quoted(GetVAT()) + "," +
 													quoted(GetBankID()) + "," +
 													quoted(GetAccount()) + "," +
 													quoted(GetKPP()) + "," +

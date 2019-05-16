@@ -26,6 +26,7 @@ class C_Company
 		string		mailing_geo_zip		= "";
 		string		mailing_address		= "";
 		string		tin					= "";
+		string		vat					= "";
 		string		bik					= "";
 		string		bank_id				= "";
 		string		account				= "";
@@ -63,6 +64,8 @@ class C_Company
 		void		SetMailing_address		(string &&param)		{ mailing_address = move(param); };
 		void		SetTIN					(const string &param)	{ tin = param; };
 		void		SetTIN					(string &&param)		{ tin = move(param); };
+		void		SetVAT					(const string &param)	{ vat = param; };
+		void		SetVAT					(string &&param)		{ vat = move(param); };
 		void		SetBIK					(const string &param)	{ bik = param; };
 		void		SetBIK					(string &&param)		{ bik = move(param); };
 		void		SetBankID				(const string &param)	{ bank_id = param; };
@@ -98,6 +101,7 @@ class C_Company
 		auto		GetMailingGeoZip		()						{ return mailing_geo_zip; };
 		auto		GetMailing_address		()						{ return mailing_address; };
 		auto		GetTIN					()						{ return tin; };
+		auto		GetVAT					()						{ return vat; };
 		auto		GetBIK					()						{ return bik; };
 		auto		GetBankID				()						{ return bank_id; };
 		auto		GetAccount				()						{ return account; };

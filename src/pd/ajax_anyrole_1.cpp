@@ -520,7 +520,7 @@ int main(void)
 
 			if(name.length())
 			{
-				int	affected = db.Query("SELECT `id`, `name` FROM `company` WHERE `name` LIKE \"%" + name + "%\" LIMIT 0, 20;");
+				int	affected = db.Query("SELECT `id`, `name` FROM `company` WHERE `name` LIKE \"%" + name + "%\" AND `type`=\"agency\" LIMIT 0, 20;");
 				if(affected)
 				{
 					ostResult << "{\"result\":\"success\","
@@ -848,6 +848,7 @@ int main(void)
 			company.SetBIK				(CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("bank_bik")));
 			company.SetAccount			(CheckHTTPParam_Text  (indexPage.GetVarsHandler()->Get("company_account")));
 			company.SetTIN				(CheckHTTPParam_Text  (indexPage.GetVarsHandler()->Get("company_tin")));
+			company.SetVAT				(CheckHTTPParam_Text  (indexPage.GetVarsHandler()->Get("company_vat")));
 			company.SetOGRN				(CheckHTTPParam_Text  (indexPage.GetVarsHandler()->Get("company_ogrn")));
 			company.SetKPP				(CheckHTTPParam_Text  (indexPage.GetVarsHandler()->Get("company_kpp")));
 
@@ -855,6 +856,18 @@ int main(void)
 			{
 				if((error_message = company.InsertToDB()).empty())
 				{
+					if(company.GetType() == "agency")
+					{
+						auto	company_employee_id = db.InsertQuery(
+																"INSERT INTO `company_employees` (`user_id`, `company_id`, `allowed_change_agency_data`,`allowed_change_sow`,`eventTimestamp`) "
+																"VALUES "
+																" (\"" + user.GetID() + "\", \"" + company.GetID() + "\", \"Y\", \"Y\", UNIX_TIMESTAMP())"
+															);
+						if(company_employee_id == 0)
+						{
+							MESSAGE_ERROR("", action, "fail to insert to company_employee table");
+						}
+					}
 				}
 				else
 				{
