@@ -287,6 +287,9 @@ msgstr "Отчет об оказанных услугах на удаленно�
 msgid "SQL syntax issue"
 msgstr "Ошибка БД"
 
+msgid "fail to find company position title"
+msgstr "должность не найдена"
+
 msgid "Seller"
 msgstr "Продавец"
 
@@ -670,6 +673,9 @@ msgstr "не указан адрес доставки"
 
 msgid "mandatory parameter missed"
 msgstr "пропущен обязательный параметр"
+
+msgid "user employed in another agency"
+msgstr "сотрудник уже работает в другом агенстве"
 
 msgid "missed PSoW number"
 msgstr "не указан номер PSoW"

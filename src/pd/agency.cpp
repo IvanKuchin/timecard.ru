@@ -3060,12 +3060,171 @@ int main(void)
 			}
 			else
 			{
-				error_message = "Некорректные параметры";
-				MESSAGE_DEBUG("", "", "mandatory parameter missed");
+				error_message = gettext("mandatory parameter missed");
+				MESSAGE_DEBUG("", action, error_message);
 			}
 
 			if(error_message.empty())
 			{
+			}
+			else
+			{
+				MESSAGE_DEBUG("", action, "failed");
+				ostResult.str("");
+				ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+			}
+
+			indexPage.RegisterVariableForce("result", ostResult.str());
+
+			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+		}
+
+		if(action == "AJAX_getUnemployeedAgentAutocompleteList")
+		{
+			auto			name = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("name"));
+			auto			template_name = "json_response.htmlt"s;
+			auto			error_message = ""s;
+			auto			success_message = ""s;
+			ostringstream	ostResult;
+
+			ostResult.str("");
+
+			if(name.length())
+			{
+				error_message = isAgencyEmployeeAllowedToChangeAgencyData(&db, &user);
+				if(error_message.empty())
+				{
+					int	affected = db.Query("SELECT `id`, `name`, `nameLast` FROM `users` WHERE (`type`=\"agency\") AND ((`name` LIKE \"%" + name + "%\") OR (`nameLast` LIKE \"%" + name + "%\"))  AND NOT(EXISTS(SELECT * FROM `company_employees` WHERE `user_id`=`users`.`id`)) LIMIT 0, 20;");
+
+					if(affected)
+					{
+						success_message = ",\"autocomplete_list\":[";
+						for(int i = 0; i < affected; ++i)
+						{
+							if(i) success_message += ",";
+							success_message += "{\"id\":\"" + db.Get(i, "id") + "\","
+									  + "\"label\":\"" + db.Get(i, "name") + " " + db.Get(i, "nameLast") + "\"}";
+						}
+						success_message += "]";
+					}
+					else
+					{
+						success_message = ",\"autocomplete_list\":[]";
+						MESSAGE_DEBUG("", "", "no users found");
+					}	
+				}
+				else
+				{
+					MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") doesn't allowed to change agency data");
+				}
+			}
+			else
+			{
+				MESSAGE_DEBUG("", action, "parameter is empty");
+			}
+
+			if(error_message.empty())
+			{
+				ostResult << "{\"result\":\"success\"" + success_message + "}";
+			}
+			else
+			{
+				MESSAGE_DEBUG("", action, "failed");
+				ostResult.str("");
+				ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+			}
+
+			indexPage.RegisterVariableForce("result", ostResult.str());
+
+			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+		}
+
+		if(action == "AJAX_addNewEmployee")
+		{
+			auto			user_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("user_id"));
+			auto			title = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("title"));
+			auto			template_name = "json_response.htmlt"s;
+			auto			error_message = ""s;
+			auto			success_message = ""s;
+			ostringstream	ostResult;
+
+			ostResult.str("");
+
+			if(user_id.length() && title.length())
+			{
+				error_message = isAgencyEmployeeAllowedToChangeAgencyData(&db, &user);
+				if(error_message.empty())
+				{
+					auto agency_id = GetAgencyID(&user, &db);
+					if(agency_id.length())
+					{
+						if(db.Query("SELECT `id` FROM `users` WHERE `id`=\"" + user_id + "\" AND `type`=\"agency\";"))
+						{
+							if(db.Query("SELECT `id` FROM `company_employees` WHERE `user_id`=\"" + user_id + "\";"))
+							{
+								error_message = gettext("user employed in another agency");
+								MESSAGE_ERROR("", action, error_message);
+							}
+							else
+							{
+								auto title_id = GetCompanyPositionIDByTitle(title, &db);
+
+								if(title_id.length())
+								{
+									if(db.InsertQuery("INSERT INTO `company_employees` ("
+																		"`user_id`,"
+																		"`company_id`,"
+																		"`position_id`,"
+																		"`eventTimestamp`"
+																	") VALUES ("
+																		+ quoted(user_id) + ","
+																		+ quoted(agency_id) + ","
+																		+ quoted(title_id) + ","
+																		+ "UNIX_TIMESTAMP()"
+																		")"))
+									{
+									}
+									else
+									{
+										error_message = gettext("SQL syntax issue");
+										MESSAGE_ERROR("", action, error_message);
+									}
+								}
+								else
+								{
+									error_message = gettext("fail to find company position title");
+									MESSAGE_ERROR("", action, error_message);
+								}
+							}	
+						}
+						else
+						{
+							error_message = gettext("user is not initialized");
+							MESSAGE_ERROR("", action, error_message);
+						}	
+					}
+					else
+					{
+						error_message = gettext("agency not found");
+						MESSAGE_ERROR("", action, error_message);
+					}
+
+				}
+				else
+				{
+					error_message = gettext("You are not authorized");
+					MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") doesn't allowed to change agency data");
+				}
+			}
+			else
+			{
+				error_message = gettext("mandatory parameter missed");
+				MESSAGE_DEBUG("", action, error_message);
+			}
+
+			if(error_message.empty())
+			{
+				ostResult << "{\"result\":\"success\"" + success_message + "}";
 			}
 			else
 			{
@@ -3136,8 +3295,8 @@ int main(void)
 			}
 			else
 			{
-				error_message = "Некорректные параметры";
-				MESSAGE_DEBUG("", "", "mandatory parameter missed");
+				error_message = gettext("mandatory parameter missed");
+				MESSAGE_DEBUG("", action, error_message);
 			}
 
 			if(error_message.empty())
@@ -3218,8 +3377,8 @@ int main(void)
 			}
 			else
 			{
-				error_message = "Некорректные параметры";
-				MESSAGE_DEBUG("", "", "mandatory parameter missed");
+				error_message = gettext("mandatory parameter missed");
+				MESSAGE_DEBUG("", action, error_message);
 			}
 
 			if(error_message.empty())

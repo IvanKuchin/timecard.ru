@@ -459,9 +459,10 @@ int main(void)
 
 		if(action == "AJAX_getPositionAutocompleteList")
 		{
-			string			position = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("position"));
-			string			template_name = "json_response.htmlt";
-			string			error_message = "";
+			auto			position = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("position"));
+			auto			template_name = "json_response.htmlt"s;
+			auto			error_message = ""s;
+			auto			success_message = ""s;
 			ostringstream	ostResult;
 
 			ostResult.str("");
@@ -471,15 +472,14 @@ int main(void)
 				int	affected = db.Query("SELECT `id`, `title` FROM `company_position` WHERE `title` LIKE \"%" + position + "%\" LIMIT 0, 20;");
 				if(affected)
 				{
-					ostResult << "{\"result\":\"success\","
-							  << "\"autocomplete_list\":[";
+					success_message = ",\"autocomplete_list\":[";
 					for(int i = 0; i < affected; ++i)
 					{
-						if(i) ostResult << ",";
-						ostResult << "{\"id\":\"" << db.Get(i, "id") << "\","
-								  << "\"label\":\"" << db.Get(i, "title") << "\"}";
+						if(i) success_message += ",";
+						success_message += "{\"id\":\"" + db.Get(i, "id") + "\","
+								  + "\"label\":\"" + db.Get(i, "title") + "\"}";
 					}
-					ostResult << "]}";
+					success_message += "]";
 				}
 				else
 				{
@@ -490,16 +490,17 @@ int main(void)
 			}
 			else
 			{
-				error_message = "Некорректные параметры";
 				MESSAGE_DEBUG("", "", "mandatory parameter missed");
 			}
 
 			if(error_message.empty())
 			{
+				ostResult << "{\"result\":\"success\"" + success_message + "}";
 			}
 			else
 			{
 				MESSAGE_DEBUG("", action, "failed");
+
 				ostResult.str("");
 				ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
 			}
