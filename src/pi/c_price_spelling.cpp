@@ -61,19 +61,11 @@ auto C_Price_Spelling::SpellOrderOfMagnitude(int order_of_magnitude, long number
 
 auto C_Price_Spelling::SpellHundreds(long number) -> string
 {
-    MESSAGE_DEBUG("", "", "start");
-
-    MESSAGE_DEBUG("", "", "finish");
-
     return spelling_hundreds[number - 1];
 }
 
 auto C_Price_Spelling::SpellTenths(long number) -> string
 {
-    MESSAGE_DEBUG("", "", "start");
-
-    MESSAGE_DEBUG("", "", "finish");
-
     return spelling_tenths[number - 1];
 }
 
@@ -88,10 +80,6 @@ auto C_Price_Spelling::Spell11_19(long number) -> string
 
 auto C_Price_Spelling::SpellDigit(long number, int gender) -> string
 {
-    MESSAGE_DEBUG("", "", "start");
-
-    MESSAGE_DEBUG("", "", "finish");
-
     return spelling_digit[gender][number - 1];
 }
 
@@ -219,11 +207,8 @@ auto C_Price_Spelling::Spelling() -> string
     auto result = ""s;
     auto whole = GetWhole(price);
     auto fraction = GetFraction(price);
-MESSAGE_DEBUG("", "", "milestone");
     auto spell_whole = SpellNumber(whole, MALE_GENDER);
-MESSAGE_DEBUG("", "", "milestone");
     auto spell_fraction = SpellNumber(fraction, FEMALE_GENDER);
-MESSAGE_DEBUG("", "", "milestone");
 
     if(spell_whole.length())
         result += spell_whole + " " + SpellRubles(whole);
@@ -232,8 +217,6 @@ MESSAGE_DEBUG("", "", "milestone");
         if(result.length()) result += " ";
         result += spell_fraction + " " + SpellCents(fraction);
     }
-
-    MESSAGE_DEBUG("", "", "finish");
 
     MESSAGE_DEBUG("", "", "finish");
 

@@ -442,6 +442,8 @@ auto	C_Invoicing_Vars::SoW_Index_VarSet(string sql_query, string index) -> strin
 				auto	sow_id = db->Get(0, "id");
 				auto	sow_number = db->Get(0, "number");
 				auto	sow_date = db->Get(0, "sign_date");
+				auto	sow_start_date = db->Get(0, "start_date");
+				auto	sow_end_date = db->Get(0, "end_date");
 				auto	act_number = db->Get(0, "act_number");
 				auto	subcontractor_company_id = db->Get(0, "subcontractor_company_id");
 				auto	subcontractor_dayrate = db->Get(0, "day_rate");
@@ -464,7 +466,7 @@ auto	C_Invoicing_Vars::SoW_Index_VarSet(string sql_query, string index) -> strin
 				}
 				else
 				{
-					error_message = gettext("Agreement") + " "s + db->Get(0, "number") + " " + gettext("agreement from") + " " + db->Get(0, "sign_date") + " " + gettext("number is empty");
+					error_message = gettext("Agreement") + " "s + db->Get(0, "number") + " " + gettext("agreement from") + " " + db->Get(0, "sign_date") + " " + gettext("dayrate is empty");
 					MESSAGE_ERROR("", "", "Agreement( " + db->Get(0, "number") + " " + gettext("agreement from") + db->Get(0, "sign_date") + " ) dayrate is empty");
 				}
 
@@ -476,7 +478,7 @@ auto	C_Invoicing_Vars::SoW_Index_VarSet(string sql_query, string index) -> strin
 				else
 				{
 					error_message = gettext("Agreement") + " "s + db->Get(0, "number") + " " + gettext("agreement from") + " " + db->Get(0, "sign_date") + " " + gettext("number is empty");
-					MESSAGE_ERROR("", "", "Agreement( " + db->Get(0, "number") + " " + gettext("agreement from") + db->Get(0, "sign_date") + " ) number is empty");
+					MESSAGE_ERROR("", "", error_message);
 				}
 
 				if(sow_date.length())
@@ -487,7 +489,29 @@ auto	C_Invoicing_Vars::SoW_Index_VarSet(string sql_query, string index) -> strin
 				else
 				{
 					error_message = gettext("Agreement") + " "s + db->Get(0, "number") + " " + gettext("agreement from") + " " + db->Get(0, "sign_date") + " " + gettext("date is empty");
-					MESSAGE_ERROR("", "", "Agreement( " + db->Get(0, "number") + " " + gettext("agreement from") + db->Get(0, "sign_date") + " ) date is empty");
+					MESSAGE_ERROR("", "", error_message);
+				}
+
+				if(sow_start_date.length())
+				{
+					if((error_message = AssignVariableValue("sow_start_date_" + index, sow_start_date, true)).empty()) {}
+					else { MESSAGE_ERROR("", "", "fail to assign variable"); }
+				}
+				else
+				{
+					error_message = gettext("Agreement") + " "s + db->Get(0, "number") + " " + gettext("agreement from") + " " + db->Get(0, "sign_date") + " " + gettext("start date is empty");
+					MESSAGE_ERROR("", "", error_message);
+				}
+
+				if(sow_end_date.length())
+				{
+					if((error_message = AssignVariableValue("sow_end_date_" + index, sow_end_date, true)).empty()) {}
+					else { MESSAGE_ERROR("", "", "fail to assign variable"); }
+				}
+				else
+				{
+					error_message = gettext("Agreement") + " "s + db->Get(0, "number") + " " + gettext("agreement from") + " " + db->Get(0, "sign_date") + " " + gettext("end date is empty");
+					MESSAGE_ERROR("", "", error_message);
 				}
 
 				if(act_number.length())
@@ -498,7 +522,7 @@ auto	C_Invoicing_Vars::SoW_Index_VarSet(string sql_query, string index) -> strin
 				else
 				{
 					error_message = gettext("Agreement") + " "s + db->Get(0, "number") + " " + gettext("agreement from") + " " + db->Get(0, "sign_date") + " " + gettext("act number is empty");
-					MESSAGE_ERROR("", "", "Agreement( " + db->Get(0, "number") + " " + gettext("agreement from") + db->Get(0, "sign_date") + " ) act number is empty");
+					MESSAGE_ERROR("", "", error_message);
 				}
 
 				if(subcontractor_company_id.length())
@@ -509,7 +533,7 @@ auto	C_Invoicing_Vars::SoW_Index_VarSet(string sql_query, string index) -> strin
 				else
 				{
 					error_message = gettext("Agreement") + " "s + db->Get(0, "number") + " " + gettext("agreement from") + " " + db->Get(0, "sign_date") + " " + gettext("subc company.id is empty");
-					MESSAGE_ERROR("", "", "Agreement( " + db->Get(0, "number") + " " + gettext("agreement from") + db->Get(0, "sign_date") + " ) subc company.id is empty");
+					MESSAGE_ERROR("", "", error_message);
 				}
 
 				// --- scoping
@@ -518,7 +542,30 @@ auto	C_Invoicing_Vars::SoW_Index_VarSet(string sql_query, string index) -> strin
 
 					date_obj.SetTMObj(GetTMObject(vars.Get("sow_sign_date_" + index)));
 
+					if(error_message.empty()) error_message = AssignVariableValue("sow_sign_date_spelling_" + index, date_obj.Spell(), true);
 					if(error_message.empty()) error_message = AssignVariableValue("sow_agreement_" + index, "№" + vars.Get("sow_number_" + index) + " " + gettext("agreement from") + " " + date_obj.Spell(), true);
+				}
+				{
+					C_Date_Spelling	date_obj;
+
+					date_obj.SetTMObj(GetTMObject(vars.Get("sow_start_date_" + index)));
+
+					if(error_message.empty()) error_message = AssignVariableValue("sow_start_date_spelling_" + index, date_obj.Spell(), true);
+				}
+				{
+					C_Date_Spelling	date_obj;
+
+					date_obj.SetTMObj(GetTMObject(vars.Get("sow_end_date_" + index)));
+
+					if(error_message.empty()) error_message = AssignVariableValue("sow_end_date_spelling_" + index, date_obj.Spell(), true);
+				}
+				// --- calculate contract duration in days
+				{
+					auto	start_sow		= GetTMObject(vars.Get("sow_start_date_" + index));
+					auto	end_sow			= GetTMObject(vars.Get("sow_end_date_" + index));
+					int		number_of_days	= (mktime(&end_sow) - mktime(&start_sow)) / (3600 * 24) + 1;
+
+					if(error_message.empty()) error_message = AssignVariableValue("sow_duration_in_days_" + index, to_string(number_of_days), true);
 				}
 			}
 			else
@@ -1338,7 +1385,7 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet_AgencyToCC() -> string
 
 					if(error_message.empty())
 					{
-						if((error_message = SoW_Index_VarSet("SELECT `id`,`number`,`sign_date`,`act_number`,`subcontractor_company_id`,`day_rate` FROM `contracts_sow` WHERE `id`=("
+						if((error_message = SoW_Index_VarSet("SELECT * FROM `contracts_sow` WHERE `id`=("
 																"SELECT `contract_sow_id` FROM `timecards` WHERE `id`=\"" + vars.Get("timecard_id_" + to_string(i)) + "\""
 															");", to_string(i))).empty()) {}
 						else { MESSAGE_ERROR("", "", "fail returned from SoW_Index_VarSet"); }
@@ -1497,7 +1544,7 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet_SubcToAgency() -> string
 
 					if(error_message.empty())
 					{
-						if((error_message = SoW_Index_VarSet("SELECT `id`,`number`,`sign_date`,`act_number`,`subcontractor_company_id`,`day_rate` FROM `contracts_sow` WHERE `id`=("
+						if((error_message = SoW_Index_VarSet("SELECT * FROM `contracts_sow` WHERE `id`=("
 																"SELECT `contract_sow_id` FROM `timecards` WHERE `id`=\"" + vars.Get("timecard_id_" + to_string(i)) + "\""
 															");", to_string(i))).empty()) {}
 						else { MESSAGE_ERROR("", "", "fail returned from SoW_Index_VarSet"); }
@@ -1644,7 +1691,7 @@ auto	C_Invoicing_Vars::GenerateBTVariableSet_AgencyToCC() -> string
 
 					if(error_message.empty())
 					{
-						if((error_message = SoW_Index_VarSet("SELECT `id`,`number`,`sign_date`,`act_number`,`subcontractor_company_id`,`day_rate` FROM `contracts_sow` WHERE `id`=("
+						if((error_message = SoW_Index_VarSet("SELECT * FROM `contracts_sow` WHERE `id`=("
 																"SELECT `contract_sow_id` FROM `bt` WHERE `id`=\"" + vars.Get("bt_id_" + to_string(i)) + "\""
 															");", to_string(i))).empty()) {}
 						else { MESSAGE_ERROR("", "", "fail returned from SoW_Index_VarSet"); }
@@ -1798,7 +1845,7 @@ auto	C_Invoicing_Vars::GenerateBTVariableSet_SubcToAgency() -> string
 
 					if(error_message.empty())
 					{
-						if((error_message = SoW_Index_VarSet("SELECT `id`,`number`,`sign_date`,`act_number`,`subcontractor_company_id`,`day_rate` FROM `contracts_sow` WHERE `id`=("
+						if((error_message = SoW_Index_VarSet("SELECT * FROM `contracts_sow` WHERE `id`=("
 																"SELECT `contract_sow_id` FROM `bt` WHERE `id`=\"" + vars.Get("bt_id_" + to_string(i)) + "\""
 															");", to_string(i))).empty()) {}
 						else { MESSAGE_ERROR("", "", "fail returned from SoW_Index_VarSet"); }
@@ -1894,7 +1941,7 @@ auto	C_Invoicing_Vars::GenerateSoWVariableSet() -> string
 
 			if(error_message.empty())
 			{
-				if((error_message = SoW_Index_VarSet("SELECT `id`,`number`,`sign_date`,`act_number`,`subcontractor_company_id`,`day_rate` FROM `contracts_sow` WHERE `id`=\"" + GetSoWID() + "\";", "")).empty()) {}
+				if((error_message = SoW_Index_VarSet("SELECT * FROM `contracts_sow` WHERE `id`=\"" + GetSoWID() + "\";", "")).empty()) {}
 				else { MESSAGE_ERROR("", "", "fail returned from SoW_Index_VarSet"); }
 			}
 

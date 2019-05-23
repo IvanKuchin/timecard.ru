@@ -59,6 +59,8 @@ auto	wkhtmltox_wrapper::Convert() -> string
 			 */
 			os = wkhtmltopdf_create_object_settings();
 			/* We want to convert to convert the qstring documentation page */
+			wkhtmltopdf_set_object_setting(os, "footer.center", "[page] of [topage]");
+			wkhtmltopdf_set_object_setting(os, "footer.fontSize", "8");
 			wkhtmltopdf_set_object_setting(os, "page", GetSrc().c_str());
 
 			/* Create the actual converter object used to convert the pages */

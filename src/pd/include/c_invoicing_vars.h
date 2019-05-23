@@ -6,6 +6,7 @@
 #include <locale>
 
 #include "c_date_spelling.h"
+#include "c_price_spelling.h"
 #include "c_bt_to_print.h"
 #include "c_timecard_to_print.h"
 #include "utilities_timecard.h"
