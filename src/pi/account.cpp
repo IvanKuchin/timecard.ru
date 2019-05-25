@@ -706,7 +706,6 @@ int main()
 				}
 				if(error_message.empty())
 				{
-					ostResult << "{\"result\":\"success\"}";
 				}
 				else
 				{
@@ -721,6 +720,7 @@ int main()
 
 			if(error_message.empty())
 			{
+				ostResult << "{\"result\":\"success\"}";
 			}
 			else
 			{
@@ -758,7 +758,6 @@ int main()
 				}
 				if(error_message.empty())
 				{
-					ostResult << "{\"result\":\"success\"}";
 				}
 				else
 				{
@@ -773,6 +772,59 @@ int main()
 
 			if(error_message.empty())
 			{
+				ostResult << "{\"result\":\"success\"}";
+			}
+			else
+			{
+				MESSAGE_DEBUG("", action, "failed");
+				ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+			}
+
+			indexPage.RegisterVariableForce("result", ostResult.str());
+
+			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+		}
+
+		MESSAGE_DEBUG("", action, "finish");
+	}
+
+	if(action == "AJAX_updateForeignPassportNumber")
+	{
+		ostringstream	ostResult;
+
+		MESSAGE_DEBUG("", action, "start");
+
+		ostResult.str("");
+		{
+			string			template_name = "json_response.htmlt";
+			string			error_message = "";
+			string			new_value = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("value"));
+
+			if(new_value.length())
+			{
+				db.Query("UPDATE `users` SET `foreign_passport_number`=\"" + new_value + "\" WHERE `id`=\"" + user.GetID() + "\";");
+				if(db.isError())
+				{
+					error_message = gettext("SQL syntax issue");
+					MESSAGE_ERROR("", "", error_message);
+				}
+				if(error_message.empty())
+				{
+				}
+				else
+				{
+					MESSAGE_DEBUG("", action, "unable to set new value (action/value = " + action + "/" + new_value + ")");
+				}
+			}
+			else
+			{
+				error_message = "Поле не должно быть пустым";
+				MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") didn't set new_value");
+			}
+
+			if(error_message.empty())
+			{
+				ostResult << "{\"result\":\"success\"}";
 			}
 			else
 			{
@@ -810,7 +862,6 @@ int main()
 				}
 				if(error_message.empty())
 				{
-					ostResult << "{\"result\":\"success\"}";
 				}
 				else
 				{
@@ -825,6 +876,7 @@ int main()
 
 			if(error_message.empty())
 			{
+				ostResult << "{\"result\":\"success\"}";
 			}
 			else
 			{
@@ -839,6 +891,59 @@ int main()
 
 		MESSAGE_DEBUG("", action, "finish");
 	}
+
+	if(action == "AJAX_updateForeignPassportExpirationDate")
+	{
+		ostringstream	ostResult;
+
+		MESSAGE_DEBUG("", action, "start");
+
+		ostResult.str("");
+		{
+			string			template_name = "json_response.htmlt";
+			string			error_message = "";
+			string			new_value = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("value"));
+
+			if(new_value.length())
+			{
+				db.Query("UPDATE `users` SET `foreign_passport_expiration_date`=STR_TO_DATE(\"" + new_value + "\",\"%d/%m/%Y\") WHERE `id`=\"" + user.GetID() + "\";");
+				if(db.isError())
+				{
+					error_message = gettext("SQL syntax issue");
+					MESSAGE_ERROR("", "", error_message);
+				}
+				if(error_message.empty())
+				{
+				}
+				else
+				{
+					MESSAGE_DEBUG("", action, "unable to set new value (action/value = " + action + "/" + new_value + ")");
+				}
+			}
+			else
+			{
+				error_message = "Поле не должно быть пустым";
+				MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") didn't set new_value");
+			}
+
+			if(error_message.empty())
+			{
+				ostResult << "{\"result\":\"success\"}";
+			}
+			else
+			{
+				MESSAGE_DEBUG("", action, "failed");
+				ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+			}
+
+			indexPage.RegisterVariableForce("result", ostResult.str());
+
+			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+		}
+
+		MESSAGE_DEBUG("", action, "finish");
+	}
+
 	if(action == "AJAX_updatePassportIssueAuthority")
 	{
 		ostringstream	ostResult;
@@ -861,7 +966,6 @@ int main()
 				}
 				if(error_message.empty())
 				{
-					ostResult << "{\"result\":\"success\"}";
 				}
 				else
 				{
@@ -876,6 +980,7 @@ int main()
 
 			if(error_message.empty())
 			{
+				ostResult << "{\"result\":\"success\"}";
 			}
 			else
 			{
@@ -890,6 +995,7 @@ int main()
 
 		MESSAGE_DEBUG("", action, "finish");
 	}
+
 	if(action == "AJAX_updateBirthday")
 	{
 		ostringstream	ostResult;
@@ -912,7 +1018,6 @@ int main()
 				}
 				if(error_message.empty())
 				{
-					ostResult << "{\"result\":\"success\"}";
 				}
 				else
 				{
@@ -927,6 +1032,319 @@ int main()
 
 			if(error_message.empty())
 			{
+				ostResult << "{\"result\":\"success\"}";
+			}
+			else
+			{
+				MESSAGE_DEBUG("", action, "failed");
+				ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+			}
+
+			indexPage.RegisterVariableForce("result", ostResult.str());
+
+			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+		}
+
+		MESSAGE_DEBUG("", action, "finish");
+	}
+
+	if(action == "AJAX_updateFirstName_En")
+	{
+		ostringstream	ostResult;
+
+		MESSAGE_DEBUG("", action, "start");
+
+		ostResult.str("");
+		{
+			string			template_name = "json_response.htmlt";
+			string			error_message = "";
+			string			new_value = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("value"));
+
+			if(new_value.length())
+			{
+				db.Query("UPDATE `users` SET `first_name_en`=\"" + new_value + "\" WHERE `id`=\"" + user.GetID() + "\";");
+				if(db.isError())
+				{
+					error_message = gettext("SQL syntax issue");
+					MESSAGE_ERROR("", "", error_message);
+				}
+				if(error_message.empty())
+				{
+				}
+				else
+				{
+					MESSAGE_DEBUG("", action, "unable to set new value (action/value = " + action + "/" + new_value + ")");
+				}
+			}
+			else
+			{
+				error_message = "Поле не должно быть пустым";
+				MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") didn't set new_value");
+			}
+
+			if(error_message.empty())
+			{
+				ostResult << "{\"result\":\"success\"}";
+			}
+			else
+			{
+				MESSAGE_DEBUG("", action, "failed");
+				ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+			}
+
+			indexPage.RegisterVariableForce("result", ostResult.str());
+
+			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+		}
+
+		MESSAGE_DEBUG("", action, "finish");
+	}
+
+	if(action == "AJAX_updateLastName_En")
+	{
+		ostringstream	ostResult;
+
+		MESSAGE_DEBUG("", action, "start");
+
+		ostResult.str("");
+		{
+			string			template_name = "json_response.htmlt";
+			string			error_message = "";
+			string			new_value = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("value"));
+
+			if(new_value.length())
+			{
+				db.Query("UPDATE `users` SET `last_name_en`=\"" + new_value + "\" WHERE `id`=\"" + user.GetID() + "\";");
+				if(db.isError())
+				{
+					error_message = gettext("SQL syntax issue");
+					MESSAGE_ERROR("", "", error_message);
+				}
+				if(error_message.empty())
+				{
+				}
+				else
+				{
+					MESSAGE_DEBUG("", action, "unable to set new value (action/value = " + action + "/" + new_value + ")");
+				}
+			}
+			else
+			{
+				error_message = "Поле не должно быть пустым";
+				MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") didn't set new_value");
+			}
+
+			if(error_message.empty())
+			{
+				ostResult << "{\"result\":\"success\"}";
+			}
+			else
+			{
+				MESSAGE_DEBUG("", action, "failed");
+				ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+			}
+
+			indexPage.RegisterVariableForce("result", ostResult.str());
+
+			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+		}
+
+		MESSAGE_DEBUG("", action, "finish");
+	}
+
+	if(action == "AJAX_updateMiddleName_En")
+	{
+		ostringstream	ostResult;
+
+		MESSAGE_DEBUG("", action, "start");
+
+		ostResult.str("");
+		{
+			string			template_name = "json_response.htmlt";
+			string			error_message = "";
+			string			new_value = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("value"));
+
+			if(new_value.length())
+			{
+				db.Query("UPDATE `users` SET `middle_name_en`=\"" + new_value + "\" WHERE `id`=\"" + user.GetID() + "\";");
+				if(db.isError())
+				{
+					error_message = gettext("SQL syntax issue");
+					MESSAGE_ERROR("", "", error_message);
+				}
+				if(error_message.empty())
+				{
+				}
+				else
+				{
+					MESSAGE_DEBUG("", action, "unable to set new value (action/value = " + action + "/" + new_value + ")");
+				}
+			}
+			else
+			{
+				error_message = "Поле не должно быть пустым";
+				MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") didn't set new_value");
+			}
+
+			if(error_message.empty())
+			{
+				ostResult << "{\"result\":\"success\"}";
+			}
+			else
+			{
+				MESSAGE_DEBUG("", action, "failed");
+				ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+			}
+
+			indexPage.RegisterVariableForce("result", ostResult.str());
+
+			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+		}
+
+		MESSAGE_DEBUG("", action, "finish");
+	}
+
+	if(action == "AJAX_updateFirstName_Ru")
+	{
+		ostringstream	ostResult;
+
+		MESSAGE_DEBUG("", action, "start");
+
+		ostResult.str("");
+		{
+			string			template_name = "json_response.htmlt";
+			string			error_message = "";
+			string			new_value = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("value"));
+
+			if(new_value.length())
+			{
+				db.Query("UPDATE `users` SET `name`=\"" + new_value + "\" WHERE `id`=\"" + user.GetID() + "\";");
+				if(db.isError())
+				{
+					error_message = gettext("SQL syntax issue");
+					MESSAGE_ERROR("", "", error_message);
+				}
+				if(error_message.empty())
+				{
+				}
+				else
+				{
+					MESSAGE_DEBUG("", action, "unable to set new value (action/value = " + action + "/" + new_value + ")");
+				}
+			}
+			else
+			{
+				error_message = "Поле не должно быть пустым";
+				MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") didn't set new_value");
+			}
+
+			if(error_message.empty())
+			{
+				ostResult << "{\"result\":\"success\"}";
+			}
+			else
+			{
+				MESSAGE_DEBUG("", action, "failed");
+				ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+			}
+
+			indexPage.RegisterVariableForce("result", ostResult.str());
+
+			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+		}
+
+		MESSAGE_DEBUG("", action, "finish");
+	}
+
+	if(action == "AJAX_updateLastName_Ru")
+	{
+		ostringstream	ostResult;
+
+		MESSAGE_DEBUG("", action, "start");
+
+		ostResult.str("");
+		{
+			string			template_name = "json_response.htmlt";
+			string			error_message = "";
+			string			new_value = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("value"));
+
+			if(new_value.length())
+			{
+				db.Query("UPDATE `users` SET `nameLast`=\"" + new_value + "\" WHERE `id`=\"" + user.GetID() + "\";");
+				if(db.isError())
+				{
+					error_message = gettext("SQL syntax issue");
+					MESSAGE_ERROR("", "", error_message);
+				}
+				if(error_message.empty())
+				{
+				}
+				else
+				{
+					MESSAGE_DEBUG("", action, "unable to set new value (action/value = " + action + "/" + new_value + ")");
+				}
+			}
+			else
+			{
+				error_message = "Поле не должно быть пустым";
+				MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") didn't set new_value");
+			}
+
+			if(error_message.empty())
+			{
+				ostResult << "{\"result\":\"success\"}";
+			}
+			else
+			{
+				MESSAGE_DEBUG("", action, "failed");
+				ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+			}
+
+			indexPage.RegisterVariableForce("result", ostResult.str());
+
+			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+		}
+
+		MESSAGE_DEBUG("", action, "finish");
+	}
+
+	if(action == "AJAX_updateMiddleName_Ru")
+	{
+		ostringstream	ostResult;
+
+		MESSAGE_DEBUG("", action, "start");
+
+		ostResult.str("");
+		{
+			string			template_name = "json_response.htmlt";
+			string			error_message = "";
+			string			new_value = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("value"));
+
+			if(new_value.length())
+			{
+				db.Query("UPDATE `users` SET `nameMiddle`=\"" + new_value + "\" WHERE `id`=\"" + user.GetID() + "\";");
+				if(db.isError())
+				{
+					error_message = gettext("SQL syntax issue");
+					MESSAGE_ERROR("", "", error_message);
+				}
+				if(error_message.empty())
+				{
+				}
+				else
+				{
+					MESSAGE_DEBUG("", action, "unable to set new value (action/value = " + action + "/" + new_value + ")");
+				}
+			}
+			else
+			{
+				error_message = "Поле не должно быть пустым";
+				MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") didn't set new_value");
+			}
+
+			if(error_message.empty())
+			{
+				ostResult << "{\"result\":\"success\"}";
 			}
 			else
 			{

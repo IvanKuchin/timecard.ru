@@ -5793,149 +5793,18 @@ int main()
 */
 		if(action == "JSON_getUserProfile")
 		{
-			ostringstream	ost, ostResult;
-			int				affected;
-			auto			userID = ""s;
-			auto			name = ""s;
-			auto			nameLast = ""s;
-			auto			age = ""s;
-			auto			sex = ""s;
-			auto			birthday = ""s;
-			auto			birthdayAccess = ""s;
-			auto			cv = ""s;
-			auto			pass = ""s;
-			auto			address = ""s;
-			auto			phone = ""s;
-			auto			country_code = ""s;
-			auto			email = ""s;
-			auto			isBlocked = ""s;
-			auto			avatarFileName = ""s;
-			auto			avatarFolderName = ""s;
-			auto			current_company = ""s;
-			auto			site_theme_id = ""s;
-			auto			geo_locality_id = ""s;
-			auto			city = ""s;
-			auto			passport_series = ""s;
-			auto			passport_number = ""s;
-			auto			passport_issue_date = ""s;
-			auto			passport_issue_authority = ""s;
-			auto			appliedVacanciesRender = ""s;
+			MESSAGE_DEBUG("", action, "start");
 
-
-/*
-			if(user.GetLogin() == "Guest")
-			{
-				MESSAGE_DEBUG("", action, "re-login required");
-
-				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
-			}
-*/
-			userID = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
+			ostringstream	ostResult;
+			auto			userID = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
 
 			if(userID.empty()) userID = user.GetID();
 
 			ostResult.str("");
-			ost.str("");
-			ost << "SELECT "
-						"`users`.`id` 						as `users_id`, "
-						"`users`.`name` 					as `users_name`, "
-						"`users`.`nameLast`					as `users_nameLast`, "
-						"`users`.`geo_locality_id`			as `users_geo_locality_id`, "
-						"`users`.`cv` 						as `users_cv`, "
-						"`users_passwd`.`passwd` 			as `users_passwd_passwd`, "
-						"`users`.`address`					as `users_address`, "
-						"`users`.`country_code`				as `users_country_code`, "
-						"`users`.`phone`					as `users_phone`, "
-						"`users`.`email`					as `users_email`, "
-						"`users`.`sex`						as `users_sex`, "
-						"`users`.`birthday`					as `users_birthday`, "
-						"`users`.`passport_series`			as `users_passport_series`, "
-						"`users`.`passport_number`			as `users_passport_number`, "
-						"`users`.`passport_issue_date`		as `users_passport_issue_date`, "
-						"`users`.`passport_issue_authority`	as `users_passport_issue_authority`, "
-						"`users`.`birthdayAccess`			as `users_birthdayAccess`, "
-						"`users`.`site_theme_id`			as `users_site_theme_id`, "
-						"`users`.`appliedVacanciesRender`	as `users_appliedVacanciesRender`, "
-						"`users`.`isblocked`				as `users_isblocked` "
-					"FROM `users` "
-					"INNER JOIN `users_passwd` ON `users_passwd`.`userID`=`users`.`id` "
-					"WHERE `users`.`id`='" << userID << "' AND `users_passwd`.`isActive`='true';";
-			affected = db.Query(ost.str());
-			if(affected)
-			{
-				map<string, string>		skillMap;
-
-				name = db.Get(0, "users_name");
-				nameLast = db.Get(0, "users_nameLast");
-				cv = db.Get(0, "users_cv");
-				if(cv == "") cv = "Напишите несколько слов о себе";
-				geo_locality_id = db.Get(0, "users_geo_locality_id");
-				pass = db.Get(0, "users_passwd_passwd");
-				address = db.Get(0, "users_address");
-				country_code = db.Get(0, "users_country_code");
-				phone = db.Get(0, "users_phone");
-				email = db.Get(0, "users_email");
-				sex = db.Get(0, "users_sex");
-				isBlocked = db.Get(0, "users_isblocked");
-				birthday = db.Get(0, "users_birthday");
-				passport_series = db.Get(0, "users_passport_series");
-				passport_number = db.Get(0, "users_passport_number");
-				passport_issue_date = db.Get(0, "users_passport_issue_date");
-				passport_issue_authority = db.Get(0, "users_passport_issue_authority");
-				birthdayAccess = db.Get(0, "users_birthdayAccess");
-				appliedVacanciesRender = db.Get(0, "users_appliedVacanciesRender");
-				site_theme_id = db.Get(0, "users_site_theme_id");
-
-				if((userID != user.GetID()) && (birthdayAccess == "private"))
-					birthday = "";
-
-				if(geo_locality_id.length() && db.Query("SELECT `title` FROM `geo_locality` WHERE `id`=\"" + geo_locality_id + "\";"))
-					city = db.Get(0, "title");
-
-				if(user.GetID() == userID)
-				{
-					// --- don't hide anything
-				}
-				else
-				{
-					if(phone.length() > 2)
-						phone = MaskSymbols(phone, 0, phone.length() - 2);
-					if(email.length() > 10)
-						email = MaskSymbols(email, 4, email.length() - 5);
-				}
-
-				ostResult << "{"
-					<< "\"result\": \"success\","
-					<< "\"userID\": \"" << userID << "\","
-					<< "\"name\": \"" << name << "\","
-					<< "\"email\": \"" << email << "\","
-					<< "\"nameLast\": \"" << nameLast << "\","
-					<< "\"cv\": \"" << cv << "\","
-					<< "\"geo_locality_id\": \"" << geo_locality_id << "\","
-					<< "\"city\": \"" << city << "\","
-					<< "\"address\": \"" << address << "\","
-					<< "\"country_code\": \"" << country_code << "\","
-					<< "\"phone\": \"" << phone << "\","
-					<< "\"isBlocked\": \"" << isBlocked << "\","
-					<< "\"sex\": \"" << sex << "\","
-					<< "\"appliedVacanciesRender\": \"" << appliedVacanciesRender << "\","
-					<< "\"site_theme_id\": \"" << site_theme_id << "\","
-					<< "\"birthday\": \"" << birthday << "\","
-					<< "\"passport_series\": \"" << (user.GetID() == userID ? passport_series : "") << "\","
-					<< "\"passport_number\": \"" << (user.GetID() == userID ? passport_number : "") << "\","
-					<< "\"passport_issue_date\": \"" << (user.GetID() == userID ? passport_issue_date : "") << "\","
-					<< "\"passport_issue_authority\": \"" << (user.GetID() == userID ? passport_issue_authority : "") << "\","
-					<< "\"birthdayAccess\": \"" << birthdayAccess << "\","
-					<< "\"themes\": [" << GetSiteThemesInJSONFormat("SELECT * FROM `site_themes`", &db, &user) << "]"
-					<< "}";
-			}
-			else
-			{
-				MESSAGE_ERROR("", action, "can't find user.id(" + userID + ") with active password");
-
-				ostResult.str("");
-				ostResult << "{\"result\":\"error\", \"description\":\"user not found\"}";
-			}
+			ostResult	<< "{"
+						<< "\"result\": \"success\","
+						<< "\"users\":[" << GetUserListInJSONFormat("SELECT * FROM `users` WHERE `id`=\"" + userID + "\";", &db, &user) << "]"
+						<< "}";
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
 
@@ -5943,27 +5812,21 @@ int main()
 			{
 				MESSAGE_ERROR("", action, "template file json_response.htmlt was missing");
 				throw CException("Template file json_response.htmlt was missing");
-			}  // if(!indexPage.SetTemplate("JSON_getUserProfile.htmlt"))
-		} 	// if(action == "JSON_getUserProfile")
+			}
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
 
 		if(action == "AJAX_newsFeedMarkImageToRemove")
 		{
 			ostringstream	ostFinal;
 			string			imageIDMarkToRemove;
 
-			{
-				
-				MESSAGE_DEBUG("", action, "start");
-			}
+			MESSAGE_DEBUG("", action, "start");
 
 			if(user.GetLogin() == "Guest")
 			{
-				ostringstream	ost;
-
-				{
-					
-					MESSAGE_DEBUG("", action, "re-login required");
-				}
+				MESSAGE_DEBUG("", action, "re-login required");
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
 			}
@@ -6117,10 +5980,7 @@ int main()
 				throw CException("Template file was missing");
 			}
 
-			{
-				
-				MESSAGE_DEBUG("", action, "finish");
-			}
+			MESSAGE_DEBUG("", action, "finish");
 		}
 
 

@@ -1859,6 +1859,13 @@ string GetUserListInJSONFormat(string dbQuery, CMysql *db, CUser *user)
 		string	userLogin;
 		string	userName;
 		string	userNameLast;
+		string	userNameMiddle;
+		string	first_name_en;
+		string	last_name_en;
+		string	middle_name_en;
+		string	country_code;
+		string	phone;
+		string	email;
 		string	userType;
 		string	userSex;
 		string	userBirthday;
@@ -1869,6 +1876,10 @@ string GetUserListInJSONFormat(string dbQuery, CMysql *db, CUser *user)
 		string	passport_number;
 		string	passport_issue_date;
 		string	passport_issue_authority;
+		string	foreign_passport_number;
+		string	foreign_passport_expiration_date;
+		string	citizenship_code;
+		string	site_theme_id;
 		string	userLastOnline;
 		string	userLastOnlineSecondSinceY2k;
 	};
@@ -1876,31 +1887,41 @@ string GetUserListInJSONFormat(string dbQuery, CMysql *db, CUser *user)
 	int						itemsCount;
 
 
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	if((itemsCount = db->Query(dbQuery)) > 0)
 	{
 		for(int i = 0; i < itemsCount; ++i)
 		{
 			ItemClass	item;
-			item.userID = db->Get(i, "id");
-			item.userLogin = db->Get(i, "login");
-			item.userName = db->Get(i, "name");
-			item.userNameLast = db->Get(i, "nameLast");
-			item.userSex = db->Get(i, "sex");
-			item.userType = db->Get(i, "type");
-			item.userBirthday = db->Get(i, "birthday");
-			item.userBirthdayAccess = db->Get(i, "birthdayAccess");
-			item.userAppliedVacanciesRender = db->Get(i, "appliedVacanciesRender");
-			item.userCurrentCityID = db->Get(i, "geo_locality_id");
-			item.passport_series = db->Get(i, "passport_series");
-			item.passport_number = db->Get(i, "passport_number");
-			item.passport_issue_date = db->Get(i, "passport_issue_date");
-			item.passport_issue_authority = db->Get(i, "passport_issue_authority");
-			item.userLastOnline = db->Get(i, "last_online");
-			item.userLastOnlineSecondSinceY2k = db->Get(i, "last_onlineSecondsSinceY2k");
+			item.userID							= db->Get(i, "id");
+			item.userLogin						= db->Get(i, "login");
+			item.userName						= db->Get(i, "name");
+			item.userNameLast					= db->Get(i, "nameLast");
+			item.userNameMiddle					= db->Get(i, "nameMiddle");
+			item.country_code					= db->Get(i, "country_code");
+			item.phone							= db->Get(i, "phone");
+			item.email							= db->Get(i, "email");
+			item.userSex						= db->Get(i, "sex");
+			item.userType						= db->Get(i, "type");
+			item.userBirthday					= db->Get(i, "birthday");
+			item.userBirthdayAccess				= db->Get(i, "birthdayAccess");
+			item.userAppliedVacanciesRender		= db->Get(i, "appliedVacanciesRender");
+			item.userCurrentCityID				= db->Get(i, "geo_locality_id");
+			item.site_theme_id					= db->Get(i, "site_theme_id");
+			item.passport_series				= db->Get(i, "passport_series");
+			item.passport_number				= db->Get(i, "passport_number");
+			item.passport_issue_date			= db->Get(i, "passport_issue_date");
+			item.passport_issue_authority		= db->Get(i, "passport_issue_authority");
+			item.citizenship_code				= db->Get(i, "citizenship_code");
+			item.first_name_en					= db->Get(i, "first_name_en");
+			item.last_name_en					= db->Get(i, "last_name_en");
+			item.middle_name_en					= db->Get(i, "middle_name_en");
+			item.foreign_passport_number		= db->Get(i, "foreign_passport_number");
+			item.foreign_passport_expiration_date = db->Get(i, "foreign_passport_expiration_date");
+			item.userLastOnline					= db->Get(i, "last_online");
+			item.userLastOnlineSecondSinceY2k	= db->Get(i, "last_onlineSecondsSinceY2k");
+			item.site_theme_id					= db->Get(i, "site_theme_id");
 
 			itemsList.push_back(item);
 		}
@@ -1909,43 +1930,19 @@ string GetUserListInJSONFormat(string dbQuery, CMysql *db, CUser *user)
 		ost.str("");
 		for(int i = 0; i < itemsCount; i++)
 		{
-
+			// --- if user_list have duplicates(1, 2, 1), avoid duplications
 			if(setOfUserID.find(stol(itemsList[i].userID)) == setOfUserID.end())
 			{
-				auto				userID = ""s;
-				auto				userLogin = ""s;
-				auto				userName = ""s;
-				auto				userNameLast = ""s;
-				auto				userSex = ""s;
-				auto				userType = ""s;
-				auto				userBirthday = ""s;
-				auto				userBirthdayAccess = ""s;
-				auto				userCurrentEmployment = ""s;
-				auto				userCurrentCityID = ""s;
-				auto				userCurrentCity = ""s;
-				auto				avatarPath = ""s;
-				auto				userAppliedVacanciesRender = ""s;
-				auto				userLastOnline = ""s;
-				auto				numberUreadMessages = ""s;
-				auto				userLastOnlineSecondSinceY2k = ""s;
-				auto				userFriendship = ""s;
+				auto				userID					= itemsList[i].userID;
+				auto				userBirthday			= itemsList[i].userBirthday;
+				auto				userCurrentCityID		= itemsList[i].userCurrentCityID;
+				auto				userCurrentCity			= ""s;
+				auto				avatarPath				= ""s;
+				auto				userLastOnline			= itemsList[i].userLastOnline;
+				auto				userLastOnlineSecondSinceY2k = itemsList[i].userLastOnlineSecondSinceY2k;
 				ostringstream		ost1;
-				// auto				affected1 = 0;
 
-				userID = itemsList[i].userID;
-				userLogin = itemsList[i].userLogin;
-				userName = itemsList[i].userName;
-				userNameLast = itemsList[i].userNameLast;
-				userSex = itemsList[i].userSex;
-				userType = itemsList[i].userType;
-				userBirthday = itemsList[i].userBirthday;
-				userBirthdayAccess = itemsList[i].userBirthdayAccess;
-				userAppliedVacanciesRender = itemsList[i].userAppliedVacanciesRender;
-				userCurrentCityID = itemsList[i].userCurrentCityID;
-				userLastOnline = itemsList[i].userLastOnline;
-				userLastOnlineSecondSinceY2k = itemsList[i].userLastOnlineSecondSinceY2k;
-
-				setOfUserID.insert(atol(userID.c_str()));
+				setOfUserID.insert(stol(userID));
 
 /*
 				// --- Defining title and company of user
@@ -1990,12 +1987,12 @@ string GetUserListInJSONFormat(string dbQuery, CMysql *db, CUser *user)
 					avatarPath = ost1.str();
 				}
 
+/*
 				// --- Get friendship status
 				userFriendship = "empty";
 				if(user && db->Query("select * from `users_friends` where `userid`='" + user->GetID() + "' and `friendID`='" + userID + "';"))
 					userFriendship = db->Get(0, "state");
 
-/*
 				if(db->Query("select COUNT(*) as `number_unread_messages` from `chat_messages` where `fromType`='fromUser' and `fromID`='" + userID + "' and (`messageStatus`='unread' or `messageStatus`='sent' or `messageStatus`='delivered');"))
 					numberUreadMessages = db->Get(0, "number_unread_messages");
 */
@@ -2004,32 +2001,52 @@ string GetUserListInJSONFormat(string dbQuery, CMysql *db, CUser *user)
 
 				if(ost.str().length()) ost << ", ";
 
-				if(userBirthdayAccess == "private") userBirthday = "";
+				if(user && (userID == user->GetID()))
+				{
+					// --- user have to be able to see his own bday
+				}
+				else
+				{
+					if(itemsList[i].userBirthdayAccess == "private") userBirthday = "";
+				}
 
-				ost << "{ \"id\": \""							<< userID << "\", "
-						  "\"name\": \""						<< userName << "\", "
-						  "\"nameLast\": \""					<< userNameLast << "\","
-						  "\"userSex\": \""						<< userSex << "\","
-						  "\"userType\": \""					<< userType << "\","
-						  "\"birthday\": \""					<< userBirthday << "\","
-						  "\"birthdayAccess\": \""				<< userBirthdayAccess << "\","
-						  "\"appliedVacanciesRender\": \""		<< userAppliedVacanciesRender << "\","
-						  "\"last_online\": \""					<< userLastOnline << "\","
-						  "\"last_online_diff\": \""			<< to_string(GetTimeDifferenceFromNow(userLastOnline)) << "\","
-						  "\"last_onlineSecondsSinceY2k\": \""  << userLastOnlineSecondSinceY2k << "\","
-						  "\"userFriendship\": \""				<< userFriendship << "\","
-						  "\"avatar\": \""						<< avatarPath << "\","
-						  // "\"currentEmployment\": "				<< userCurrentEmployment << ", "
-						  "\"currentCity\": \""					<< userCurrentCity << "\", "
-						  "\"numberUnreadMessages\": \""		<< numberUreadMessages << "\", "
-						  // "\"languages\": ["		 			<< GetLanguageListInJSONFormat("SELECT * FROM `language` WHERE `id` in (SELECT `language_id` FROM `users_language` WHERE `user_id`=\"" + userID + "\");", db) << "], "
-						  // "\"skills\": ["		 				<< GetSkillListInJSONFormat("SELECT * FROM `skill` WHERE `id` in (SELECT `skill_id` FROM `users_skill` WHERE `user_id`=\"" + userID + "\");", db) << "], "
-						  // "\"subscriptions\":[" 				<< (user && (user->GetID() == userID) ? GetUserSubscriptionsInJSONFormat("SELECT * FROM `users_subscriptions` WHERE `user_id`=\"" + userID + "\";", db) : "") << "],"
-						  "\"passport_series\": \""				<< ((user && (userID == user->GetID())) ? itemsList[i].passport_series : "") << "\","
-						  "\"passport_number\": \""				<< ((user && (userID == user->GetID())) ? itemsList[i].passport_number : "") << "\","
-						  "\"passport_issue_date\": \""			<< ((user && (userID == user->GetID())) ? itemsList[i].passport_issue_date : "") << "\","
-						  "\"passport_issue_authority\": \""	<< ((user && (userID == user->GetID())) ? itemsList[i].passport_issue_authority : "") << "\","
-						  "\"isMe\": \""						<< ((user && (userID == user->GetID())) ? "yes" : "no") << "\" "
+				ost << "{"
+						"\"id\": \""							<< itemsList[i].userID << "\", "
+						"\"name\": \""							<< itemsList[i].userName << "\", "
+						"\"nameLast\": \""						<< itemsList[i].userNameLast << "\","
+						"\"nameMiddle\": \""					<< itemsList[i].userNameMiddle << "\","
+						"\"userSex\": \""						<< itemsList[i].userSex << "\","
+						"\"userType\": \""						<< itemsList[i].userType << "\","
+						"\"birthday\": \""						<< userBirthday << "\","
+						"\"birthdayAccess\": \""				<< itemsList[i].userBirthdayAccess << "\","
+						"\"last_online\": \""					<< itemsList[i].userLastOnline << "\","
+						"\"last_online_diff\": \""				<< to_string(GetTimeDifferenceFromNow(userLastOnline)) << "\","
+						"\"last_onlineSecondsSinceY2k\": \""	<< userLastOnlineSecondSinceY2k << "\","
+						"\"avatar\": \""						<< avatarPath << "\","
+						"\"site_theme_id\": \""					<< itemsList[i].site_theme_id << "\","
+						"\"themes\": ["							<< GetSiteThemesInJSONFormat("SELECT * FROM `site_themes`", db, user) << "],"
+						// "\"numberUnreadMessages\": \""			<< numberUreadMessages << "\", "
+						// "\"appliedVacanciesRender\": \""		<< userAppliedVacanciesRender << "\","
+						// "\"userFriendship\": \""				<< userFriendship << "\","
+						// "\"currentCity\": \""					<< userCurrentCity << "\", "
+						// "\"currentEmployment\": "				<< userCurrentEmployment << ", "
+						// "\"languages\": ["		 				<< GetLanguageListInJSONFormat("SELECT * FROM `language` WHERE `id` in (SELECT `language_id` FROM `users_language` WHERE `user_id`=\"" + userID + "\");", db) << "], "
+						// "\"skills\": ["		 					<< GetSkillListInJSONFormat("SELECT * FROM `skill` WHERE `id` in (SELECT `skill_id` FROM `users_skill` WHERE `user_id`=\"" + userID + "\");", db) << "], "
+						// "\"subscriptions\":[" 					<< (user && (user->GetID() == userID) ? GetUserSubscriptionsInJSONFormat("SELECT * FROM `users_subscriptions` WHERE `user_id`=\"" + userID + "\";", db) : "") << "],"
+						"\"country_code\": \""					<< ((user && (userID == user->GetID())) ? itemsList[i].country_code : "") << "\","
+						"\"phone\": \""							<< ((user && (userID == user->GetID())) ? itemsList[i].phone : "") << "\","
+						"\"email\": \""							<< ((user && (userID == user->GetID())) ? itemsList[i].email : "") << "\","
+						"\"passport_series\": \""				<< ((user && (userID == user->GetID())) ? itemsList[i].passport_series : "") << "\","
+						"\"passport_number\": \""				<< ((user && (userID == user->GetID())) ? itemsList[i].passport_number : "") << "\","
+						"\"passport_issue_date\": \""			<< ((user && (userID == user->GetID())) ? itemsList[i].passport_issue_date : "") << "\","
+						"\"passport_issue_authority\": \""		<< ((user && (userID == user->GetID())) ? itemsList[i].passport_issue_authority : "") << "\","
+						"\"first_name_en\": \""					<< ((user && (userID == user->GetID())) ? itemsList[i].first_name_en : "") << "\","
+						"\"last_name_en\": \""					<< ((user && (userID == user->GetID())) ? itemsList[i].last_name_en : "") << "\","
+						"\"middle_name_en\": \""				<< ((user && (userID == user->GetID())) ? itemsList[i].middle_name_en : "") << "\","
+						"\"foreign_passport_number\": \""		<< ((user && (userID == user->GetID())) ? itemsList[i].foreign_passport_number : "") << "\","
+						"\"foreign_passport_expiration_date\": \"" << ((user && (userID == user->GetID())) ? itemsList[i].foreign_passport_expiration_date : "") << "\","
+						"\"citizenship_code\": \""				<< ((user && (userID == user->GetID())) ? itemsList[i].citizenship_code : "") << "\","
+						"\"isMe\": \""							<< ((user && (userID == user->GetID())) ? "yes" : "no") << "\""
 						"}";
 			} // --- if user is not dupicated
 		} // --- for loop through user list
