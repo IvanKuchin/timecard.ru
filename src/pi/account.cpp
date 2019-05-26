@@ -1360,6 +1360,134 @@ int main()
 		MESSAGE_DEBUG("", action, "finish");
 	}
 
+	if(action == "AJAX_addAviaBonusNumber")
+	{
+		ostringstream	ostResult;
+
+		MESSAGE_DEBUG("", action, "start");
+
+		ostResult.str("");
+		{
+			string			template_name = "json_response.htmlt";
+			string			error_message = "";
+			auto			program_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("program_id"));
+			auto			number = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("number"));
+
+			if(program_id.length() && number.length())
+			{
+				if(db.Query("SELECT `id` FROM `user_bonuses_avia` WHERE `user_id`=\"" + user.GetID() + "\" AND `airline_id`=\"" + program_id + "\";"))
+				{
+					error_message = gettext("already exists");
+					MESSAGE_DEBUG("", action, error_message);
+				}
+				else
+				{
+					auto new_id = db.InsertQuery("INSERT INTO `user_bonuses_avia` (`user_id`, `airline_id`, `number`, `eventTimestamp`) VALUES "
+													"("
+														"\"" + user.GetID() + "\","
+														"\"" + program_id + "\","
+														"\"" + number + "\","
+														"UNIX_TIMESTAMP()"
+													");");
+					if(new_id)
+					{
+					}
+					else
+					{
+						error_message = gettext("SQL syntax issue");
+						MESSAGE_ERROR("", "", error_message);
+					}
+				}
+			}
+			else
+			{
+				error_message = gettext("mandatory parameter missed");
+				MESSAGE_DEBUG("", action, error_message);
+			}
+
+			if(error_message.empty())
+			{
+				ostResult << "{\"result\":\"success\"}";
+			}
+			else
+			{
+				MESSAGE_DEBUG("", action, "failed");
+				ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+			}
+
+			indexPage.RegisterVariableForce("result", ostResult.str());
+
+			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+		}
+
+		MESSAGE_DEBUG("", action, "finish");
+	}
+
+	if(action == "AJAX_addRailroadBonusNumber")
+	{
+		ostringstream	ostResult;
+
+		MESSAGE_DEBUG("", action, "start");
+
+		ostResult.str("");
+		{
+			string			template_name = "json_response.htmlt";
+			string			error_message = "";
+			auto			program_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("program_id"));
+			auto			number = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("number"));
+
+			if(program_id.length() && number.length())
+			{
+				if(db.Query("SELECT `id` FROM `user_bonuses_railroads` WHERE `user_id`=\"" + user.GetID() + "\" AND `railroad_id`=\"" + program_id + "\";"))
+				{
+					error_message = gettext("already exists");
+					MESSAGE_DEBUG("", action, error_message);
+				}
+				else
+				{
+					auto new_id = db.InsertQuery("INSERT INTO `user_bonuses_railroads` (`user_id`, `railroad_id`, `number`, `eventTimestamp`) VALUES "
+													"("
+														"\"" + user.GetID() + "\","
+														"\"" + program_id + "\","
+														"\"" + number + "\","
+														"UNIX_TIMESTAMP()"
+													");");
+					if(new_id)
+					{
+					}
+					else
+					{
+						error_message = gettext("SQL syntax issue");
+						MESSAGE_ERROR("", "", error_message);
+					}
+				}
+			}
+			else
+			{
+				error_message = gettext("mandatory parameter missed");
+				MESSAGE_DEBUG("", action, error_message);
+			}
+
+			if(error_message.empty())
+			{
+				ostResult << "{\"result\":\"success\"}";
+			}
+			else
+			{
+				MESSAGE_DEBUG("", action, "failed");
+				ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+			}
+
+			indexPage.RegisterVariableForce("result", ostResult.str());
+
+			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+		}
+
+		MESSAGE_DEBUG("", action, "finish");
+	}
+
+
+
 	MESSAGE_DEBUG("", action, "finish condition")
 
 	indexPage.OutTemplate();

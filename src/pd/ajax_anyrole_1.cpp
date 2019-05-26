@@ -562,6 +562,58 @@ int main(void)
 			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 		}
 
+		if(action == "AJAX_getAviaBonusAutocompleteList")
+		{
+			string			name = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("name"));
+			string			template_name = "json_response.htmlt";
+			string			error_message = "";
+			ostringstream	ostResult;
+
+			ostResult.str("");
+
+			if(name.length())
+			{
+				int	affected = db.Query("SELECT * FROM `airlines` WHERE `code` LIKE \"%" + name + "%\" OR `description_rus` LIKE \"%" + name + "%\" OR `description_eng` LIKE \"%" + name + "%\" LIMIT 0, 20;");
+				if(affected)
+				{
+					ostResult << "{\"result\":\"success\","
+							  << "\"autocomplete_list\":[";
+					for(int i = 0; i < affected; ++i)
+					{
+						if(i) ostResult << ",";
+						ostResult << "{\"id\":\"" << db.Get(i, "id") << "\","
+								  << "\"label\":\"" << db.Get(i, "description_rus") << " / " << db.Get(i, "description_eng") << " / " << db.Get(i, "code") << "\"}";
+					}
+					ostResult << "]}";
+				}
+				else
+				{
+					error_message = gettext("agency id not found");
+					MESSAGE_DEBUG("", "", error_message);
+				}	
+					
+			}
+			else
+			{
+				error_message = gettext("agency id not found");
+				MESSAGE_DEBUG("", "", error_message);
+			}
+
+			if(error_message.empty())
+			{
+			}
+			else
+			{
+				MESSAGE_DEBUG("", action, "failed");
+				ostResult.str("");
+				ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+			}
+
+			indexPage.RegisterVariableForce("result", ostResult.str());
+
+			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+		}
+
 		if(action == "AJAX_submitNewGeoZip")
 		{
 			string			country = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("country"));
