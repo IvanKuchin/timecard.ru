@@ -2046,6 +2046,9 @@ string GetUserListInJSONFormat(string dbQuery, CMysql *db, CUser *user)
 						"\"foreign_passport_number\": \""		<< ((user && (userID == user->GetID())) ? itemsList[i].foreign_passport_number : "") << "\","
 						"\"foreign_passport_expiration_date\": \"" << ((user && (userID == user->GetID())) ? itemsList[i].foreign_passport_expiration_date : "") << "\","
 						"\"citizenship_code\": \""				<< ((user && (userID == user->GetID())) ? itemsList[i].citizenship_code : "") << "\","
+						"\"bonuses_airlines\": ["				<< ((user && (userID == user->GetID())) ? GetUserBonusesAirlinesInJSONFormat("SELECT * FROM `user_bonuses_avia` WHERE `user_id`=\"" + itemsList[i].userID + "\";", db, user) : "") << "],"
+						"\"bonuses_railroads\": ["				<< ((user && (userID == user->GetID())) ? GetUserBonusesRailroadsInJSONFormat("SELECT * FROM `user_bonuses_railroads` WHERE `user_id`=\"" + itemsList[i].userID + "\";", db, user) : "") << "],"
+						"\"bonuses_hotel_chains\": ["			<< ((user && (userID == user->GetID())) ? GetUserBonusesHotelchainsInJSONFormat("SELECT * FROM `user_bonuses_hotels` WHERE `user_id`=\"" + itemsList[i].userID + "\";", db, user) : "") << "],"
 						"\"isMe\": \""							<< ((user && (userID == user->GetID())) ? "yes" : "no") << "\""
 						"}";
 			} // --- if user is not dupicated

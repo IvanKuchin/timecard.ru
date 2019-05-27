@@ -2256,3 +2256,291 @@ auto CutTrailingZeroes(string number) -> string
     
     return number;
 }
+
+auto      		GetUserBonusesAirlinesInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
+{
+	struct ItemClass
+	{
+		string	id;
+		string	user_id;
+		string	program_id;
+		string	number;
+		string	eventTimestamp;
+	};
+	vector<ItemClass>		itemsList;
+	int						affected;
+	auto					result = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(user)
+	{
+		if(db)
+		{
+			affected = db->Query(sqlQuery);
+			if(affected)
+			{
+				for(int i = 0; i < affected; i++)
+				{
+					ItemClass	item;
+
+					item.id							= db->Get(i, "id");
+					item.user_id		 			= db->Get(i, "user_id");
+					item.program_id					= db->Get(i, "airline_id");
+					item.number						= db->Get(i, "number");
+					item.eventTimestamp				= db->Get(i, "eventTimestamp");
+
+					itemsList.push_back(item);
+				}
+
+				for (const auto& item : itemsList)
+				{
+					if(result.length()) result += ",";
+					result +=	"{";
+
+					result += "\"id\":\""						+ item.id + "\",";
+					result += "\"user_id\":\""					+ item.user_id + "\",";
+					result += "\"program_id\":\""				+ item.program_id + "\",";
+					result += "\"number\":\""					+ item.number + "\",";
+					result += "\"programs\":["					+ GetBonuseProgramsInJSONFormat("SELECT * FROM `airlines` WHERE `id`=\"" + item.program_id + "\";", db, user) + "],";
+					result += "\"eventTimestamp\":\""			+ item.eventTimestamp + "\"";
+
+					result +=	"}";
+				}
+			}
+			else
+			{
+				MESSAGE_DEBUG("", "", "user.id(" + user->GetID() + ") doesn't participate in airline bonus programs");
+			}
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "db not initialized");
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "user not initialized");
+	}
+
+
+	MESSAGE_DEBUG("", "", "finish (result length = " + to_string(result.length()) + ")");
+
+	return result;
+}
+
+auto GetUserBonusesRailroadsInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
+{
+	struct ItemClass
+	{
+		string	id;
+		string	user_id;
+		string	program_id;
+		string	number;
+		string	eventTimestamp;
+	};
+	vector<ItemClass>		itemsList;
+	int						affected;
+	auto					result = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(user)
+	{
+		if(db)
+		{
+			affected = db->Query(sqlQuery);
+			if(affected)
+			{
+				for(int i = 0; i < affected; i++)
+				{
+					ItemClass	item;
+
+					item.id							= db->Get(i, "id");
+					item.user_id		 			= db->Get(i, "user_id");
+					item.program_id					= db->Get(i, "railroad_id");
+					item.number						= db->Get(i, "number");
+					item.eventTimestamp				= db->Get(i, "eventTimestamp");
+
+					itemsList.push_back(item);
+				}
+
+				for (const auto& item : itemsList)
+				{
+					if(result.length()) result += ",";
+					result +=	"{";
+
+					result += "\"id\":\""						+ item.id + "\",";
+					result += "\"user_id\":\""					+ item.user_id + "\",";
+					result += "\"program_id\":\""				+ item.program_id + "\",";
+					result += "\"number\":\""					+ item.number + "\",";
+					result += "\"programs\":["					+ GetBonuseProgramsInJSONFormat("SELECT * FROM `railroads` WHERE `id`=\"" + item.program_id + "\";", db, user) + "],";
+					result += "\"eventTimestamp\":\""			+ item.eventTimestamp + "\"";
+
+					result +=	"}";
+				}
+			}
+			else
+			{
+				MESSAGE_DEBUG("", "", "user.id(" + user->GetID() + ") doesn't participate in railroads bonus programs");
+			}
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "db not initialized");
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "user not initialized");
+	}
+
+
+	MESSAGE_DEBUG("", "", "finish (result length = " + to_string(result.length()) + ")");
+
+	return result;
+}
+
+auto GetUserBonusesHotelchainsInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
+{
+	struct ItemClass
+	{
+		string	id;
+		string	user_id;
+		string	program_id;
+		string	number;
+		string	eventTimestamp;
+	};
+	vector<ItemClass>		itemsList;
+	int						affected;
+	auto					result = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(user)
+	{
+		if(db)
+		{
+			affected = db->Query(sqlQuery);
+			if(affected)
+			{
+				for(int i = 0; i < affected; i++)
+				{
+					ItemClass	item;
+
+					item.id							= db->Get(i, "id");
+					item.user_id		 			= db->Get(i, "user_id");
+					item.program_id					= db->Get(i, "hotel_chain_id");
+					item.number						= db->Get(i, "number");
+					item.eventTimestamp				= db->Get(i, "eventTimestamp");
+
+					itemsList.push_back(item);
+				}
+
+				for (const auto& item : itemsList)
+				{
+					if(result.length()) result += ",";
+					result +=	"{";
+
+					result += "\"id\":\""						+ item.id + "\",";
+					result += "\"user_id\":\""					+ item.user_id + "\",";
+					result += "\"program_id\":\""				+ item.program_id + "\",";
+					result += "\"number\":\""					+ item.number + "\",";
+					result += "\"programs\":["					+ GetBonuseProgramsInJSONFormat("SELECT * FROM `hotel_chains` WHERE `id`=\"" + item.program_id + "\";", db, user) + "],";
+					result += "\"eventTimestamp\":\""			+ item.eventTimestamp + "\"";
+
+					result +=	"}";
+				}
+			}
+			else
+			{
+				MESSAGE_DEBUG("", "", "user.id(" + user->GetID() + ") doesn't participate in hotel chain bonus programs");
+			}
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "db not initialized");
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "user not initialized");
+	}
+
+
+	MESSAGE_DEBUG("", "", "finish (result length = " + to_string(result.length()) + ")");
+
+	return result;
+}
+
+auto  GetBonuseProgramsInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
+{
+	struct ItemClass
+	{
+		string	id;
+		string	code;
+		string	description_rus;
+		string	description_eng;
+		string	country;
+	};
+	vector<ItemClass>		itemsList;
+	int						affected;
+	auto					result = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(user)
+	{
+		if(db)
+		{
+			affected = db->Query(sqlQuery);
+			if(affected)
+			{
+				for(int i = 0; i < affected; i++)
+				{
+					ItemClass	item;
+
+					item.id							= db->Get(i, "id");
+					item.code		 				= db->Get(i, "code");
+					item.description_rus			= db->Get(i, "description_rus");
+					item.description_eng			= db->Get(i, "description_eng");
+					item.country					= db->Get(i, "country");
+
+					itemsList.push_back(item);
+				}
+
+				for (const auto& item : itemsList)
+				{
+					if(result.length()) result += ",";
+					result +=	"{";
+
+					result += "\"id\":\""				+ item.id + "\",";
+					result += "\"code\":\""				+ item.code + "\",";
+					result += "\"description_rus\":\""	+ item.description_rus + "\",";
+					result += "\"description_eng\":\""	+ item.description_eng + "\",";
+					result += "\"country\":\""			+ item.country + "\"";
+
+					result +=	"}";
+				}
+			}
+			else
+			{
+				MESSAGE_ERROR("", "", "bonus programs not found");
+			}
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "db not initialized");
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "user not initialized");
+	}
+
+
+	MESSAGE_DEBUG("", "", "finish (result length = " + to_string(result.length()) + ")");
+
+	return result;
+}
+
