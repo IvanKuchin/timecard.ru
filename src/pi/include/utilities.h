@@ -207,6 +207,7 @@ auto 			GetSpecificData_GetDataTypeByItemType(const string &itemType) -> string;
 auto 			GetSpecificData_AllowedToChange(string itemID, string itemType, CMysql *, CUser *) -> bool;
 auto			SaveImageFileFromHandler(string f_name, string f_type, CFiles *files) -> string;
 auto 			isCBCurrencyRate(string date, string currency_name, string currency_nominal, string currency_value, CMysql *) -> string;
+auto			DateInPast(string date_to_check) -> bool;
 
 // --- UTF8 encoding/decoding
 auto         	convert_utf8_to_windows1251(const char* utf8, char* windows1251, size_t n) -> int;

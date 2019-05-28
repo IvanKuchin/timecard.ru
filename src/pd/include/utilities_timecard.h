@@ -59,6 +59,8 @@ auto 			CreateBTExpenseTemplateAssignmentToSoW(string new_bt_expense_template_id
 auto			GetCostCentersInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetCostCentersAssignmentInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetApproversInJSONFormat(string sqlQuery, CMysql *, CUser *, bool include_sow) -> string;
+auto			GetAbsenceListInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
+auto			GetAbsenceTypesInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetSpelledTimecardCustomerByID(string id, CMysql *) -> string;
 auto			GetSpelledTimecardProjectByID(string id, CMysql *) -> string;
 auto			GetSpelledTimecardTaskByID(string id, CMysql *) -> string;
@@ -144,6 +146,8 @@ struct tm 		GetLastDayReportedOnAssignmentID(string sow_id, string task_id, CMys
 auto			isActionEntityBelongsToSoW(string action, string id, string sow_id, CMysql *, CUser *) -> string;
 auto			CheckNewValueByAction(string action, string id, string sow_id, string new_value, CMysql *, CUser *) -> string;
 auto			isActionEntityBelongsToAgency(string action, string id, string agency_id, CMysql *, CUser *) -> string;
+
+auto			GetAbsenceOverlap(string company_id, string start_date, string end_date, CMysql *, CUser *, string exclude_id = "") -> string;
 
 auto			CheckAgreementSoWTitle(string title, string sow_id, CMysql *, CUser *) -> string;
 auto			isDemoDomain() -> bool;

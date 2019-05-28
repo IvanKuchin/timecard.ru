@@ -2894,6 +2894,35 @@ string  GetUserNotificationSpecificDataByType(unsigned long typeID, unsigned lon
 		}
 	}
 
+	if(typeID == NOTIFICATION_SUBC_BUILT_ABSENCE_REQUEST)
+	{
+		string		id = to_string(actionID);
+
+		if(id.length())
+		{
+			ostResult << "\"item\":[" << GetAbsenceListInJSONFormat("SELECT * FROM `absence` WHERE `id`=" + quoted(id) + ";", db, user) << "],";
+			ostResult << "\"notificationFromCompany\":[" << GetCompanyListInJSONFormat("SELECT * FROM `company` WHERE `id`=(SELECT `company_id` FROM `absence` WHERE `id`=" + quoted(id) + ");", db, NULL) << "]";
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "typeID=" + to_string(typeID) + ": subcontractor company_id is empty");
+		}
+	}
+	if(typeID == NOTIFICATION_SUBC_CHANGED_ABSENCE_REQUEST)
+	{
+		string		id = to_string(actionID);
+
+		if(id.length())
+		{
+			ostResult << "\"item\":[" << GetAbsenceListInJSONFormat("SELECT * FROM `absence` WHERE `id`=" + quoted(id) + ";", db, user) << "],";
+			ostResult << "\"notificationFromCompany\":[" << GetCompanyListInJSONFormat("SELECT * FROM `company` WHERE `id`=(SELECT `company_id` FROM `absence` WHERE `id`=" + quoted(id) + ");", db, NULL) << "]";
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "typeID=" + to_string(typeID) + ": subcontractor company_id is empty");
+		}
+	}
+
 
 
 	{

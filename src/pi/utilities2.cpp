@@ -2544,3 +2544,23 @@ auto  GetBonuseProgramsInJSONFormat(string sqlQuery, CMysql *db, CUser *user) ->
 	return result;
 }
 
+auto DateInPast(string date_to_check) -> bool
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	result = false;
+	auto	date_to_check_obj = GetTMObject(date_to_check);
+
+	time_t	rawtime;
+	struct	tm *timeinfo_temp, timeinfo_now;
+
+	time(&rawtime);
+	timeinfo_temp = localtime (&rawtime);
+	timeinfo_now = *timeinfo_temp;
+
+	if(date_to_check_obj < timeinfo_now) result = true;
+
+	MESSAGE_DEBUG("", "", "finish (result is " + to_string(result) + ")");
+
+	return result;
+}

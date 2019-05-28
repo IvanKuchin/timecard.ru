@@ -48,6 +48,7 @@ set(JOINT_LIBRARY_SRCs
     c_company.cpp
     utilities_timecard1.cpp
     utilities_timecard2.cpp
+    utilities_timecard3.cpp
     )
 
 

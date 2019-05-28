@@ -2039,6 +2039,474 @@ int main()
 		}
 	}
 
+	if(action == "AJAX_getAbsenceList")
+	{
+		ostringstream	ostResult;
+		auto			template_name = "json_response.htmlt"s;
+		auto			error_message = ""s;
+		auto			success_message = ""s;
+
+		MESSAGE_DEBUG("", action, "start");
+
+		ostResult.str("");
+
+		if(user.GetLogin() == "Guest")
+		{
+			error_message = "re-login required";
+			MESSAGE_DEBUG("", action, error_message);
+		}
+		else
+		{
+			success_message = ",\"absences\":[" + 
+			GetAbsenceListInJSONFormat("SELECT * FROM `absence` WHERE `company_id`=("
+											"SELECT `id` FROM `company` WHERE `admin_userID`=\"" + user.GetID() + "\" AND `type`=\"subcontractor\""
+										");", &db, &user)
+								+ "]";
+		}
+
+		if(error_message.empty())
+		{
+			ostResult << "{\"result\":\"success\"" + success_message + "}";
+		}
+		else
+		{
+			MESSAGE_DEBUG("", action, "failed");
+			ostResult.str("");
+			ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+		}
+
+		indexPage.RegisterVariableForce("result", ostResult.str());
+
+		if(!indexPage.SetTemplate(template_name))
+		{
+			MESSAGE_ERROR("", action, "can't find template " + template_name);
+		}
+	}
+
+	if(action == "AJAX_submitNewAbsence")
+	{
+		ostringstream	ostResult;
+		auto			template_name = "json_response.htmlt"s;
+		auto			error_message = ""s;
+		auto			success_message = ""s;
+
+		MESSAGE_DEBUG("", action, "start");
+
+		ostResult.str("");
+
+		if(user.GetLogin() == "Guest")
+		{
+			error_message = "re-login required";
+			MESSAGE_DEBUG("", action, error_message);
+		}
+		else
+		{
+			auto	type_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("type_id"));
+			auto	comment = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("comment"));
+			auto	start_date = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("start_date"));
+			auto	end_date = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("end_date"));
+
+
+			if(type_id.length() && start_date.length() && end_date.length())
+			{
+				if(DateInPast(start_date) || DateInPast(end_date))
+				{
+					error_message = gettext("can't create absence in the past");
+					MESSAGE_DEBUG("", action, error_message);
+				}
+				else
+				{
+					if(GetTMObject(start_date) <= GetTMObject(end_date))
+					{
+						auto	company_id = GetCompanyID(&user, &db);
+
+						if(company_id.length())
+						{
+							auto overlap_period = GetAbsenceOverlap(company_id, start_date, end_date, &db, &user);
+
+							if(overlap_period.empty())
+							{
+								auto	new_id = db.InsertQuery("INSERT INTO `absence` ("
+																	"`company_id`,"
+																	"`absence_type_id`,"
+																	"`start_date`,"
+																	"`end_date`,"
+																	"`comment`,"
+																	"`request_date`"
+																") VALUES ("
+																	+ quoted(company_id) + ","
+																	+ quoted(type_id) + ","
+																	"STR_TO_DATE(\"" + start_date + "\", '%d/%m/%Y'),"
+																	"STR_TO_DATE(\"" + end_date + "\", '%d/%m/%Y'),"
+																	+ quoted(comment) + ","
+																	"NOW()"
+																")");
+								if(new_id)
+								{
+									success_message = ",\"absences\":[" + 
+									GetAbsenceListInJSONFormat("SELECT * FROM `absence` WHERE `company_id`=("
+																	"SELECT `id` FROM `company` WHERE `admin_userID`=\"" + user.GetID() + "\" AND `type`=\"subcontractor\""
+																");", &db, &user)
+														+ "]";
+
+									// --- notify all agencies about absence
+									{
+										vector<string>	agency_list = {};
+										auto			affected = db.Query("SELECT DISTINCT( `agency_company_id`) FROM `contracts_sow` WHERE `subcontractor_company_id`=" + quoted(company_id) + ";");
+										for(auto i = 0; i < affected; ++i)
+											agency_list.push_back(db.Get(i, 0));
+
+										for(auto &agency_company_id : agency_list)
+										{
+											auto	temp_error_message = NotifyAgencyAboutChanges(agency_company_id, to_string(NOTIFICATION_SUBC_BUILT_ABSENCE_REQUEST), to_string(new_id), &db, &user);
+
+											if(temp_error_message.length()) MESSAGE_ERROR("", action, "fail to notify agency company.id(" + agency_company_id + ")")
+										}
+									}
+
+								}
+								else
+								{
+									error_message = gettext("SQL syntax issue");
+									MESSAGE_ERROR("", action, error_message);
+								}
+							}
+							else
+							{
+								error_message = gettext("absence overlaps") + " "s + gettext("with") + " " + overlap_period;
+								MESSAGE_DEBUG("", action, error_message);
+							}
+						}
+						else
+						{
+							error_message = gettext("company not found");
+							MESSAGE_ERROR("", action, error_message);
+						}
+					}
+					else
+					{
+						error_message = gettext("period start have to precede period end");
+						MESSAGE_ERROR("", action, error_message);
+					}					
+				}
+			}
+			else
+			{
+				error_message = gettext("mandatory parameter missed");
+				MESSAGE_ERROR("", action, error_message)
+			}
+		}
+
+		if(error_message.empty())
+		{
+			ostResult << "{\"result\":\"success\"" + success_message + "}";
+		}
+		else
+		{
+			MESSAGE_DEBUG("", action, "failed");
+			ostResult.str("");
+			ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+		}
+
+		indexPage.RegisterVariableForce("result", ostResult.str());
+
+		if(!indexPage.SetTemplate(template_name))
+		{
+			MESSAGE_ERROR("", action, "can't find template " + template_name);
+		}
+	}
+
+	if(	(action == "AJAX_updateAbsenceStartDate") || (action == "AJAX_updateAbsenceEndDate"))
+	{
+		ostringstream	ostResult;
+		auto			template_name = "json_response.htmlt"s;
+		auto			error_message = ""s;
+		auto			success_message = ""s;
+
+		MESSAGE_DEBUG("", action, "start");
+
+		ostResult.str("");
+
+		if(user.GetLogin() == "Guest")
+		{
+			error_message = "re-login required";
+			MESSAGE_DEBUG("", action, error_message);
+		}
+		else
+		{
+			auto	id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
+			auto	value = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("value"));
+
+			if(id.length() && value.length())
+			{
+				auto	company_id = GetCompanyID(&user, &db);
+
+				if(company_id.length())
+				{
+
+					if(db.Query("SELECT DATE_FORMAT(`start_date`, \"%d/%m/%Y\") as \"start_date\", DATE_FORMAT(`end_date`, \"%d/%m/%Y\") as \"end_date\" FROM `absence` WHERE `id`=\"" + id + "\" and `company_id`=" + quoted(company_id) + ";"))
+					{
+						auto	start_date = db.Get(0, "start_date");
+						auto	end_date = db.Get(0, "end_date");
+
+						if(DateInPast(value) || DateInPast(start_date) || DateInPast(end_date))
+						{
+							error_message = gettext("can't change dates in past");
+							MESSAGE_DEBUG("", action, error_message);
+						}
+						else
+						{
+							if(action == "AJAX_updateAbsenceStartDate")	start_date = value;
+							if(action == "AJAX_updateAbsenceEndDate")	end_date = value;
+
+							if(GetTMObject(start_date) <= GetTMObject(end_date))
+							{
+									auto overlap_period = GetAbsenceOverlap(company_id, start_date, end_date, &db, &user, id);
+
+									if(overlap_period.empty())
+									{
+										db.Query("UPDATE `absence` SET `start_date`=STR_TO_DATE(\"" + start_date + "\", '%d/%m/%Y'), `end_date`=STR_TO_DATE(\"" + end_date + "\", '%d/%m/%Y') WHERE `id`=" + quoted(id) + ";");
+
+										if(db.isError())
+										{
+											error_message = gettext("SQL syntax issue");
+											MESSAGE_ERROR("", action, error_message);
+										}
+										else
+										{
+											// --- success
+
+											// --- notify all agencies about absence
+											{
+												vector<string>	agency_list = {};
+												auto			affected = db.Query("SELECT DISTINCT( `agency_company_id`) FROM `contracts_sow` WHERE `subcontractor_company_id`=" + quoted(company_id) + ";");
+												for(auto i = 0; i < affected; ++i)
+													agency_list.push_back(db.Get(i, 0));
+
+												for(auto &agency_company_id : agency_list)
+												{
+													auto	temp_error_message = NotifyAgencyAboutChanges(agency_company_id, to_string(NOTIFICATION_SUBC_CHANGED_ABSENCE_REQUEST), id, &db, &user);
+
+													if(temp_error_message.length()) MESSAGE_ERROR("", action, "fail to notify agency company.id(" + agency_company_id + ")")
+												}
+											}
+										}
+									}
+									else
+									{
+										error_message = gettext("absence overlaps") + " "s + gettext("with") + " " + overlap_period;
+										MESSAGE_DEBUG("", action, error_message);
+									}
+							}
+							else
+							{
+								error_message = gettext("period start have to precede period end");
+								MESSAGE_ERROR("", action, error_message);
+							}
+						}
+					}
+					else
+					{
+						error_message = gettext("absence not found");
+						MESSAGE_ERROR("", action, error_message);
+					}
+				}
+				else
+				{
+					error_message = gettext("company not found");
+					MESSAGE_ERROR("", action, error_message);
+				}
+			}
+			else
+			{
+				error_message = gettext("mandatory parameter missed");
+				MESSAGE_ERROR("", action, error_message)
+			}
+		}
+
+		if(error_message.empty())
+		{
+			ostResult << "{\"result\":\"success\"" + success_message + "}";
+		}
+		else
+		{
+			MESSAGE_DEBUG("", action, "failed");
+			ostResult.str("");
+			ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+		}
+
+		indexPage.RegisterVariableForce("result", ostResult.str());
+
+		if(!indexPage.SetTemplate(template_name))
+		{
+			MESSAGE_ERROR("", action, "can't find template " + template_name);
+		}
+	}
+
+	if(action == "AJAX_updateAbsenceComment")
+	{
+		ostringstream	ostResult;
+		auto			template_name = "json_response.htmlt"s;
+		auto			error_message = ""s;
+		auto			success_message = ""s;
+
+		MESSAGE_DEBUG("", action, "start");
+
+		ostResult.str("");
+
+		if(user.GetLogin() == "Guest")
+		{
+			error_message = "re-login required";
+			MESSAGE_DEBUG("", action, error_message);
+		}
+		else
+		{
+			auto	id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
+			auto	value = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("value"));
+
+			if(id.length() && value.length())
+			{
+				auto	company_id = GetCompanyID(&user, &db);
+
+				if(company_id.length())
+				{
+
+					db.Query("UPDATE `absence` SET `comment`=" + quoted(value) + " WHERE `id`=" + quoted(id) + " AND `company_id`=" + quoted(company_id) + ";");
+
+					if(db.isError())
+					{
+						error_message = gettext("SQL syntax issue");
+						MESSAGE_ERROR("", action, error_message);
+					}
+					else
+					{
+						// --- success
+					}
+
+				}
+				else
+				{
+					error_message = gettext("company not found");
+					MESSAGE_ERROR("", action, error_message);
+				}
+			}
+			else
+			{
+				error_message = gettext("mandatory parameter missed");
+				MESSAGE_ERROR("", action, error_message)
+			}
+		}
+
+		if(error_message.empty())
+		{
+			ostResult << "{\"result\":\"success\"" + success_message + "}";
+		}
+		else
+		{
+			MESSAGE_DEBUG("", action, "failed");
+			ostResult.str("");
+			ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+		}
+
+		indexPage.RegisterVariableForce("result", ostResult.str());
+
+		if(!indexPage.SetTemplate(template_name))
+		{
+			MESSAGE_ERROR("", action, "can't find template " + template_name);
+		}
+	}
+
+	if(action == "AJAX_deleteAbsence")
+	{
+		ostringstream	ostResult;
+		auto			template_name = "json_response.htmlt"s;
+		auto			error_message = ""s;
+		auto			success_message = ""s;
+
+		MESSAGE_DEBUG("", action, "start");
+
+		ostResult.str("");
+
+		if(user.GetLogin() == "Guest")
+		{
+			error_message = "re-login required";
+			MESSAGE_DEBUG("", action, error_message);
+		}
+		else
+		{
+			auto	id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
+
+			if(id.length())
+			{
+				auto	company_id = GetCompanyID(&user, &db);
+
+				if(company_id.length())
+				{
+					if(db.Query("SELECT * FROM `absence` WHERE `id`=" + quoted(id) + " AND `company_id`=" + quoted(company_id) + ";"))
+					{
+						auto	start_date = db.Get(0, "start_date");
+						auto	end_date = db.Get(0, "end_date");
+
+						if(DateInPast(start_date) || DateInPast(end_date))
+						{
+							error_message = gettext("can't remove absence in the past");
+							MESSAGE_DEBUG("", action, error_message);
+						}
+						else
+						{
+							db.Query("DELETE FROM `users_notification` WHERE `actionTypeId` IN (112, 113) AND `actionId`=" + quoted(id) + ";");
+							db.Query("DELETE FROM `absence` WHERE `id`=" + quoted(id) + " AND `company_id`=" + quoted(company_id) + ";");
+
+							if(db.isError())
+							{
+								error_message = gettext("SQL syntax issue");
+								MESSAGE_ERROR("", action, error_message);
+							}
+							else
+							{
+								// --- success
+							}
+						}
+					}
+					else
+					{
+						error_message = gettext("you are no authorized");
+						MESSAGE_ERROR("", action, error_message);
+					}
+
+				}
+				else
+				{
+					error_message = gettext("company not found");
+					MESSAGE_ERROR("", action, error_message);
+				}
+			}
+			else
+			{
+				error_message = gettext("mandatory parameter missed");
+				MESSAGE_ERROR("", action, error_message)
+			}
+		}
+
+		if(error_message.empty())
+		{
+			ostResult << "{\"result\":\"success\"" + success_message + "}";
+		}
+		else
+		{
+			MESSAGE_DEBUG("", action, "failed");
+			ostResult.str("");
+			ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+		}
+
+		indexPage.RegisterVariableForce("result", ostResult.str());
+
+		if(!indexPage.SetTemplate(template_name))
+		{
+			MESSAGE_ERROR("", action, "can't find template " + template_name);
+		}
+	}
+
 	{
 		MESSAGE_DEBUG("", "", "post-condition if(action == \"" + action + "\")");
 	}

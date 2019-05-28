@@ -98,6 +98,15 @@ msgstr "Авнуста"
 msgid "BT doesn't belongs to agency"
 msgstr "Командировка не относится к агенству"
 
+msgid "can't change dates in past"
+msgstr "нельзя менять даты в прошлом"
+
+msgid "can't create absence in the past"
+msgstr "нельзя создавать отпуск в прошлом"
+
+msgid "can't remove absence in the past"
+msgstr "нельзя удаляить отпуск в прошлом"
+
 msgid "BT not found"
 msgstr "Командировка не найдена"
 
@@ -112,6 +121,9 @@ msgstr "Покупатель"
 
 msgid "Can't remove"
 msgstr "Нельзя удалить"
+
+msgid "absence overlaps"
+msgstr "отсутствие перекрывается"
 
 msgid "Company not found"
 msgstr "Компания не найдена"
@@ -603,6 +615,9 @@ msgid "file size"
 msgstr "размер фаила"
 
 msgid "from"
+msgstr "с"
+
+msgid "with"
 msgstr "с"
 
 msgid "hpdf: fail save to file"

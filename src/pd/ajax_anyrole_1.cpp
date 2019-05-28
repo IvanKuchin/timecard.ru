@@ -948,6 +948,34 @@ int main(void)
 			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 		}
 
+		if(action == "AJAX_getAbsenceTypesList")
+		{
+			string			template_name = "json_response.htmlt";
+			string			error_message = "";
+			ostringstream	ostResult;
+
+			ostResult.str("");
+
+			ostResult	<< "{\"result\":\"success\","
+						<< "\"absence_types\":["
+						<< GetAbsenceTypesInJSONFormat("SELECT * FROM `absence_types`;", &db, &user)
+						<< "]}";
+
+			if(error_message.empty())
+			{
+			}
+			else
+			{
+				MESSAGE_DEBUG("", action, "failed");
+				ostResult.str("");
+				ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+			}
+
+			indexPage.RegisterVariableForce("result", ostResult.str());
+
+			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+		}
+
 
 
 		{
