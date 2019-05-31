@@ -2557,6 +2557,10 @@ auto DateInPast(string date_to_check) -> bool
 	time(&rawtime);
 	timeinfo_temp = localtime (&rawtime);
 	timeinfo_now = *timeinfo_temp;
+	
+	timeinfo_now.tm_sec	= 0;   // seconds of minutes from 0 to 61
+	timeinfo_now.tm_min	= 0;   // minutes of hour from 0 to 59
+	timeinfo_now.tm_hour = 0;  // hours of day from 0 to 24
 
 	if(date_to_check_obj < timeinfo_now) result = true;
 
