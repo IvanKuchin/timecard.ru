@@ -1829,6 +1829,9 @@ int main()
 		(action == "AJAX_updateCompanyDescription")				||
 		(action == "AJAX_updateCompanyWebSite")					||
 		(action == "AJAX_updateCompanyTIN")						||
+		(action == "AJAX_updateCompanyActNumber")				||
+		(action == "AJAX_updateCompanyActNumberPrefix")			||
+		(action == "AJAX_updateCompanyActNumberPostfix")		||
 		(action == "AJAX_updateCompanyVAT")						||
 		(action == "AJAX_updateCompanyAccount")					||
 		(action == "AJAX_updateCompanyOGRN")					||
@@ -1852,7 +1855,11 @@ int main()
 			string			id				= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
 			string			new_value		= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("value"));
 
-			if(new_value.length())
+			if(
+				new_value.length() 									||
+				(action == "AJAX_updateCompanyActNumberPrefix")		||	// --- ActNumberPrefix could be empty
+				(action == "AJAX_updateCompanyActNumberPostfix")		 // --- ActNumberPostfix could be empty
+			)
 			{
 				{
 					auto	company_id = GetCompanyID(&user, &db);
@@ -1861,6 +1868,9 @@ int main()
 						if(action == "AJAX_updateCompanyTitle") 		{	id = company_id; }
 						if(action == "AJAX_updateCompanyDescription")	{	id = company_id; }
 						if(action == "AJAX_updateCompanyWebSite")		{	id = company_id; }
+						if(action == "AJAX_updateCompanyActNumber")		{	id = company_id; }
+						if(action == "AJAX_updateCompanyActNumberPrefix"){	id = company_id; }
+						if(action == "AJAX_updateCompanyActNumberPostfix"){	id = company_id; }
 						if(action == "AJAX_updateCompanyTIN")			{	id = company_id; }
 						if(action == "AJAX_updateCompanyVAT")			{	id = company_id; }
 						if(action == "AJAX_updateCompanyAccount")		{	id = company_id; }

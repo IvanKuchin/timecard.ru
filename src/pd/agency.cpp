@@ -1290,6 +1290,9 @@ int main(void)
 			(action == "AJAX_updateCompanyTitle")					||
 			(action == "AJAX_updateCompanyDescription")				||
 			(action == "AJAX_updateCompanyWebSite")					||
+			(action == "AJAX_updateCompanyActNumber")				||
+			(action == "AJAX_updateCompanyActNumberPrefix")			||
+			(action == "AJAX_updateCompanyActNumberPostfix")		||
 			(action == "AJAX_updateCompanyTIN")						||
 			(action == "AJAX_updateCompanyVAT")						||
 			(action == "AJAX_updateCompanyAccount")					||
@@ -1333,7 +1336,11 @@ int main(void)
 				string			id				= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
 				string			new_value		= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("value"));
 
-				if(new_value.length())
+				if(
+					new_value.length() 									||
+					(action == "AJAX_updateCompanyActNumberPrefix")		||	// --- ActNumberPrefix could be empty
+					(action == "AJAX_updateCompanyActNumberPostfix")		 // --- ActNumberPostfix could be empty
+				)
 				{
 					error_message = isAgencyEmployeeAllowedToChangeAgencyData(&db, &user);
 					if(error_message.empty())
@@ -1344,6 +1351,9 @@ int main(void)
 							if(action == "AJAX_updateCompanyTitle") 		{					if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
 							if(action == "AJAX_updateCompanyDescription")	{					if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
 							if(action == "AJAX_updateCompanyWebSite")		{					if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
+							if(action == "AJAX_updateCompanyActNumber")		{					if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
+							if(action == "AJAX_updateCompanyActNumberPrefix")	{				if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
+							if(action == "AJAX_updateCompanyActNumberPostfix")	{				if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
 							if(action == "AJAX_updateCompanyTIN")			{					if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
 							if(action == "AJAX_updateCompanyVAT")			{					if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
 							if(action == "AJAX_updateCompanyAccount")		{					if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }

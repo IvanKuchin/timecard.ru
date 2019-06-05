@@ -948,7 +948,11 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 		{
 			if(action.length())
 			{
-				if(new_value.length())
+				if(
+					new_value.length()									||
+					(action == "AJAX_updateCompanyActNumberPrefix")		||	// --- ActNumberPrefix could be empty
+					(action == "AJAX_updateCompanyActNumberPostfix")		 // --- ActNumberPostfix could be empty
+				)
 				{
 					// --- assignments can start / stop beyond SoW period, 
 					if(action == "AJAX_updatePeriodStart")
@@ -1191,6 +1195,9 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 					else if(action == "AJAX_updateCompanyWebSite")				{ /* --- good to go */ }
 					else if(action == "AJAX_updateCompanyTIN")					{ /* --- good to go */ }
 					else if(action == "AJAX_updateCompanyVAT")					{ /* --- good to go */ }
+					else if(action == "AJAX_updateCompanyActNumber")			{ /* --- good to go */ }
+					else if(action == "AJAX_updateCompanyActNumberPrefix")		{ /* --- good to go */ }
+					else if(action == "AJAX_updateCompanyActNumberPostfix")		{ /* --- good to go */ }
 					else if(action == "AJAX_updateCompanyAccount")				{ /* --- good to go */ }
 					else if(action == "AJAX_updateCompanyOGRN")					{ /* --- good to go */ }
 					else if(action == "AJAX_updateCompanyKPP")					{ /* --- good to go */ }
@@ -1724,6 +1731,9 @@ string	isActionEntityBelongsToAgency(string action, string id, string agency_id,
 					(action == "AJAX_updateCompanyWebSite")			||
 					(action == "AJAX_updateCompanyTIN")				||
 					(action == "AJAX_updateCompanyVAT")				||
+					(action == "AJAX_updateCompanyActNumber")		||
+					(action == "AJAX_updateCompanyActNumberPrefix")	||
+					(action == "AJAX_updateCompanyActNumberPostfix")||
 					(action == "AJAX_updateCompanyAccount")			||
 					(action == "AJAX_updateCompanyOGRN")			||
 					(action == "AJAX_updateCompanyKPP")				||
@@ -2207,6 +2217,9 @@ auto	GetDBValueByAction(string action, string id, string sow_id, CMysql *db, CUs
 				if(action == "AJAX_updateCompanyDescription")		sql_query = "SELECT `description`		as `value` FROM `company` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateCompanyWebSite")			sql_query = "SELECT `webSite`			as `value` FROM `company` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateCompanyTIN")				sql_query = "SELECT `tin`				as `value` FROM `company` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateCompanyActNumber")			sql_query = "SELECT `act_number`		as `value` FROM `company` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateCompanyActNumberPrefix")	sql_query = "SELECT `act_number_prefix`	as `value` FROM `company` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateCompanyActNumberPostfix")	sql_query = "SELECT `act_number_postfix` as `value` FROM `company` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateCompanyVAT")				sql_query = "SELECT `vat`				as `value` FROM `company` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateCompanyAccount")			sql_query = "SELECT `account`			as `value` FROM `company` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateCompanyOGRN")				sql_query = "SELECT `ogrn`				as `value` FROM `company` WHERE `id`=\"" + id + "\";";
@@ -3852,7 +3865,11 @@ string	SetNewValueByAction(string action, string id, string sow_id, string new_v
 		{
 			if(action.length())
 			{
-				if(new_value.length())
+				if(
+					new_value.length()									||
+					(action == "AJAX_updateCompanyActNumberPrefix")		||	// --- ActNumberPrefix could be empty
+					(action == "AJAX_updateCompanyActNumberPostfix")		 // --- ActNumberPostfix could be empty
+				)
 				{
 					if(error_message.empty())
 					{
@@ -3875,6 +3892,9 @@ string	SetNewValueByAction(string action, string id, string sow_id, string new_v
 						if(action == "AJAX_updateCompanyDescription")				sql_query = "UPDATE	`company`					SET `description`					=\"" + new_value + "\",`lastActivity`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
 						if(action == "AJAX_updateCompanyWebSite")					sql_query = "UPDATE	`company`					SET `webSite`						=\"" + new_value + "\",`lastActivity`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
 						if(action == "AJAX_updateCompanyTIN")						sql_query = "UPDATE	`company`					SET `tin` 							=\"" + new_value + "\",`lastActivity`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateCompanyActNumber")					sql_query = "UPDATE	`company`					SET `act_number`					=\"" + new_value + "\",`lastActivity`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateCompanyActNumberPrefix")			sql_query = "UPDATE	`company`					SET `act_number_prefix`				=\"" + new_value + "\",`lastActivity`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateCompanyActNumberPostfix")			sql_query = "UPDATE	`company`					SET `act_number_postfix`			=\"" + new_value + "\",`lastActivity`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
 						if(action == "AJAX_updateCompanyVAT")						sql_query = "UPDATE	`company`					SET `vat` 							=\"" + new_value + "\",`lastActivity`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
 						if(action == "AJAX_updateCompanyAccount")					sql_query = "UPDATE	`company`					SET `account`						=\"" + new_value + "\",`lastActivity`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
 						if(action == "AJAX_updateCompanyOGRN")						sql_query = "UPDATE	`company`					SET `ogrn` 							=\"" + new_value + "\",`lastActivity`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";

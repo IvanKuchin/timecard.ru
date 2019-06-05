@@ -1042,6 +1042,9 @@ string GetCompanyListInJSONFormat(string dbQuery, CMysql *db, CUser *user, bool 
 		string	ogrn;
 		string	vat;
 		string	link;
+		string	act_number_prefix;
+		string	act_number;
+		string	act_number_postfix;
 		string	foundationDate;
 		string	numberOfEmployee;
 		string	admin_userID;
@@ -1088,6 +1091,9 @@ string GetCompanyListInJSONFormat(string dbQuery, CMysql *db, CUser *user, bool 
 				company.ogrn = db->Get(i, "ogrn");
 				company.vat = db->Get(i, "vat");
 				company.link = db->Get(i, "link");
+				company.act_number_prefix	= db->Get(i, "act_number_prefix");
+				company.act_number			= db->Get(i, "act_number");
+				company.act_number_postfix	= db->Get(i, "act_number_postfix");
 				company.admin_userID = db->Get(i, "admin_userID");
 				company.foundationDate = db->Get(i, "foundationDate");
 				company.numberOfEmployee = db->Get(i, "numberOfEmployee");
@@ -1121,6 +1127,9 @@ string GetCompanyListInJSONFormat(string dbQuery, CMysql *db, CUser *user, bool 
 					ostFinal << "\"ogrn\": \""				<< companiesList[i].ogrn << "\", ";
 					ostFinal << "\"vat\": \""				<< companiesList[i].vat << "\", ";
 					ostFinal << "\"link\": \""				<< companiesList[i].link << "\", ";
+					ostFinal << "\"act_number_prefix\": \""	<< companiesList[i].act_number_prefix << "\", ";
+					ostFinal << "\"act_number\": \""		<< companiesList[i].act_number << "\", ";
+					ostFinal << "\"act_number_postfix\": \""<< companiesList[i].act_number_postfix << "\", ";
 					ostFinal << "\"foundationDate\": \""	<< companiesList[i].foundationDate << "\",";
 					ostFinal << "\"numberOfEmployee\": \""	<< companiesList[i].numberOfEmployee << "\",";
 					ostFinal << "\"webSite\": \""			<< companiesList[i].webSite << "\",";
@@ -3118,9 +3127,7 @@ string	GetTimecardCustomersInJSONFormat(string sqlQuery, CMysql *db, CUser *user
 	};
 	vector<ItemClass>		itemsList;
 
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	affected = db->Query(sqlQuery);
 	if(affected)
@@ -3154,9 +3161,7 @@ string	GetTimecardCustomersInJSONFormat(string sqlQuery, CMysql *db, CUser *user
 		}
 	}
 
-	{
-		MESSAGE_DEBUG("", "", "finish");
-	}
+	MESSAGE_DEBUG("", "", "finish");
 
 	return result;
 }
@@ -3175,9 +3180,7 @@ string	GetTimecardProjectsInJSONFormat(string sqlQuery, CMysql *db, CUser *user)
 	};
 	vector<ItemClass>		itemsList;
 
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	affected = db->Query(sqlQuery);
 	if(affected)
@@ -3213,9 +3216,7 @@ string	GetTimecardProjectsInJSONFormat(string sqlQuery, CMysql *db, CUser *user)
 		}
 	}
 
-	{
-		MESSAGE_DEBUG("", "", "finish");
-	}
+	MESSAGE_DEBUG("", "", "finish");
 
 	return result;
 }
@@ -3234,9 +3235,7 @@ string	GetTimecardTasksInJSONFormat(string sqlQuery, CMysql *db, CUser *user)
 	};
 	vector<ItemClass>		itemsList;
 
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	affected = db->Query(sqlQuery);
 	if(affected)
@@ -3272,9 +3271,7 @@ string	GetTimecardTasksInJSONFormat(string sqlQuery, CMysql *db, CUser *user)
 		}
 	}
 
-	{
-		MESSAGE_DEBUG("", "", "finish");
-	}
+	MESSAGE_DEBUG("", "", "finish");
 
 	return result;
 }
@@ -3297,9 +3294,7 @@ string	GetTimecardTaskAssignmentInJSONFormat(string sqlQuery, CMysql *db, CUser 
 	};
 	vector<ItemClass>		itemsList;
 
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	affected = db->Query(sqlQuery);
 	if(affected)
@@ -3343,9 +3338,7 @@ string	GetTimecardTaskAssignmentInJSONFormat(string sqlQuery, CMysql *db, CUser 
 		}
 	}
 
-	{
-		MESSAGE_DEBUG("", "", "finish");
-	}
+	MESSAGE_DEBUG("", "", "finish");
 
 	return result;
 }
@@ -3365,9 +3358,7 @@ string	GetBTExpenseAssignmentInJSONFormat(string sqlQuery, CMysql *db, CUser *us
 	};
 	vector<ItemClass>		itemsList;
 
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	affected = db->Query(sqlQuery);
 	if(affected)
@@ -3405,9 +3396,7 @@ string	GetBTExpenseAssignmentInJSONFormat(string sqlQuery, CMysql *db, CUser *us
 		}
 	}
 
-	{
-		MESSAGE_DEBUG("", "", "finish");
-	}
+	MESSAGE_DEBUG("", "", "finish");
 
 	return result;
 }
@@ -3425,9 +3414,7 @@ string	GetTimecardLinesInJSONFormat(string sqlQuery, CMysql *db, CUser *user)
 	};
 	vector<ItemClass>		itemsList;
 
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	affected = db->Query(sqlQuery);
 	if(affected)
@@ -3461,9 +3448,7 @@ string	GetTimecardLinesInJSONFormat(string sqlQuery, CMysql *db, CUser *user)
 		}
 	}
 
-	{
-		MESSAGE_DEBUG("", "", "finish");
-	}
+	MESSAGE_DEBUG("", "", "finish");
 
 	return result;
 }
@@ -3482,9 +3467,7 @@ string	GetSOWTimecardApproversInJSONFormat(string sqlQuery, CMysql *db, CUser *u
 	string					result;
 	vector<ItemClass>		itemsList;
 
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	affected = db->Query(sqlQuery);
 	if(affected)
@@ -3522,9 +3505,7 @@ string	GetSOWTimecardApproversInJSONFormat(string sqlQuery, CMysql *db, CUser *u
 		}
 	}
 
-	{
-		MESSAGE_DEBUG("", "", "finish");
-	}
+	MESSAGE_DEBUG("", "", "finish");
 
 	return result;
 }
@@ -3545,9 +3526,7 @@ string	GetTimecardApprovalsInJSONFormat(string sqlQuery, CMysql *db, CUser *user
 	string					result;
 	vector<ItemClass>		itemsList;
 
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	affected = db->Query(sqlQuery);
 	if(affected)
@@ -3588,9 +3567,7 @@ string	GetTimecardApprovalsInJSONFormat(string sqlQuery, CMysql *db, CUser *user
 		}
 	}
 
-	{
-		MESSAGE_DEBUG("", "", "finish");
-	}
+	MESSAGE_DEBUG("", "", "finish");
 
 	return result;
 }
@@ -3650,9 +3627,7 @@ string	GetBTApprovalsInJSONFormat(string sqlQuery, CMysql *db, CUser *user)
 		MESSAGE_DEBUG("", "", "user.id(" + user->GetID() + ") there are no bt approvals");
 	}
 
-	{
-		MESSAGE_DEBUG("", "", "finish");
-	}
+	MESSAGE_DEBUG("", "", "finish");
 
 	return result;
 }
@@ -3673,9 +3648,7 @@ string	GetTimecardApproversInJSONFormat(string sqlQuery, CMysql *db, CUser *user
 	string					result;
 	vector<ItemClass>		itemsList;
 
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	affected = db->Query(sqlQuery);
 	if(affected)
@@ -3716,9 +3689,7 @@ string	GetTimecardApproversInJSONFormat(string sqlQuery, CMysql *db, CUser *user
 		MESSAGE_DEBUG("", "", "approvers list is empty");
 	}
 
-	{
-		MESSAGE_DEBUG("", "", "finish");
-	}
+	MESSAGE_DEBUG("", "", "finish");
 
 	return result;
 }
@@ -3855,7 +3826,6 @@ auto	GetCostCentersInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> str
 		string	end_date;
 		string	number;
 		string	sign_date;
-		string	act_number;
 		string	agency_company_id;
 		string	assignee_user_id;
 		string	eventTimestamp;
@@ -3882,7 +3852,6 @@ auto	GetCostCentersInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> str
 			item.end_date = db->Get(i, "end_date");
 			item.number = db->Get(i, "number");
 			item.sign_date = db->Get(i, "sign_date");
-			item.act_number = db->Get(i, "act_number");
 			item.agency_company_id = db->Get(i, "agency_company_id");
 			item.assignee_user_id = db->Get(i, "assignee_user_id");
 			item.eventTimestamp = db->Get(i, "eventTimestamp");
@@ -3903,7 +3872,6 @@ auto	GetCostCentersInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> str
 			result += "\"end_date\":\"" + item.end_date + "\",";
 			result += "\"number\":\"" + item.number + "\",";
 			result += "\"sign_date\":\"" + item.sign_date + "\",";
-			result += "\"act_number\":\"" + item.act_number + "\",";
 			result += "\"agency_company_id\":\"" + item.agency_company_id + "\",";
 			result += "\"assignee_user_id\":\"" + item.assignee_user_id + "\",";
 			result += "\"custom_fields\":[" + GetCostCenterCustomFieldsInJSONFormat("SELECT * FROM `cost_center_custom_fields` WHERE `cost_center_id`=\"" + item.id + "\" "
@@ -3944,9 +3912,7 @@ string	GetTimecardsInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool i
 	};
 	vector<ItemClass>		itemsList;
 
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	affected = db->Query(sqlQuery);
 	if(affected)
@@ -4001,9 +3967,7 @@ string	GetTimecardsInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool i
 		}
 	}
 
-	{
-		MESSAGE_DEBUG("", "", "finish");
-	}
+	MESSAGE_DEBUG("", "", "finish");
 
 	return result;
 }
@@ -4093,9 +4057,7 @@ string	GetBTsInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool isExten
 		}
 	}
 
-	{
-		MESSAGE_DEBUG("", "", "finish");
-	}
+	MESSAGE_DEBUG("", "", "finish");
 
 	return result;
 }
@@ -4174,7 +4136,6 @@ auto	GetPSoWInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
 		string	day_rate;
 		string	bt_markup;
 		string	bt_markup_type;
-		string	act_number;
 		string	sign_date;
 		string	eventTimestamp;
 	};
@@ -4199,7 +4160,6 @@ auto	GetPSoWInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
 			item.day_rate = db->Get(i, "day_rate");
 			item.bt_markup = db->Get(i, "bt_markup");
 			item.bt_markup_type = db->Get(i, "bt_markup_type");
-			item.act_number = db->Get(i, "act_number");
 			item.sign_date = db->Get(i, "sign_date");
 			item.eventTimestamp = db->Get(i, "eventTimestamp");
 
@@ -4222,7 +4182,6 @@ auto	GetPSoWInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
 			result += "\"day_rate\":\"" + item.day_rate + "\",";
 			result += "\"bt_markup\":\"" + item.bt_markup + "\",";
 			result += "\"bt_markup_type\":\"" + item.bt_markup_type + "\",";
-			result += "\"act_number\":\"" + item.act_number + "\",";
 			result += "\"sign_date\":\"" + item.sign_date + "\",";
 			result += "\"custom_fields\":[" + GetPSoWCustomFieldsInJSONFormat("SELECT * FROM `contract_psow_custom_fields` WHERE `contract_psow_id`=\"" + item.id + "\" "
 						+ (user->GetType() == "subcontractor" ? " AND (`visible_by_subcontractor`=\"Y\" OR `editable_by_subcontractor`=\"Y\") " : "")
@@ -4235,14 +4194,10 @@ auto	GetPSoWInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
 	}
 	else
 	{
-		{
-			MESSAGE_DEBUG("", "", "user (" + user->GetID() + ") timecard is empty");
-		}
+		MESSAGE_DEBUG("", "", "user (" + user->GetID() + ") timecard is empty");
 	}
 
-	{
-		MESSAGE_DEBUG("", "", "finish");
-	}
+	MESSAGE_DEBUG("", "", "finish");
 
 	return result;
 }
@@ -4264,7 +4219,6 @@ auto	GetSOWInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include_t
 		string	timecard_period;
 		string	subcontractor_create_tasks;
 		string	day_rate;
-		string	act_number;
 		string	status;
 		string	agreement_filename;
 		string	eventTimestamp;
@@ -4292,7 +4246,6 @@ auto	GetSOWInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include_t
 			item.sign_date = db->Get(i, "sign_date");
 			item.timecard_period = db->Get(i, "timecard_period");
 			item.subcontractor_create_tasks = db->Get(i, "subcontractor_create_tasks");
-			item.act_number = db->Get(i, "act_number");
 			item.status = db->Get(i, "status");
 			item.agreement_filename = db->Get(i, "agreement_filename");
 			item.day_rate = db->Get(i, "day_rate");
@@ -4333,7 +4286,6 @@ auto	GetSOWInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include_t
 			result += "\"bt_approvers\":[" + GetApproversInJSONFormat("SELECT * FROM `bt_approvers` WHERE `contract_sow_id`=\"" + item.id + "\";", db, user, DO_NOT_INCLUDE_SOW_INFO) + "],";
 			result += "\"timecard_approvers\":[" + GetApproversInJSONFormat("SELECT * FROM `timecard_approvers` WHERE `contract_sow_id`=\"" + item.id + "\";", db, user, DO_NOT_INCLUDE_SOW_INFO) + "],";
 			result += "\"subcontractor_create_tasks\":\"" + item.subcontractor_create_tasks + "\",";
-			result += "\"act_number\":\"" + item.act_number + "\",";
 			result += "\"day_rate\":\"" + (user->GetType() == "agency" || user->GetType() == "subcontractor" ? item.day_rate : "") + "\",";
 			result += "\"status\":\"" + item.status + "\",";
 			result += "\"agreement_filename\":\"" + item.agreement_filename + "\",";
@@ -4364,9 +4316,7 @@ auto	GetSOWInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include_t
 		}
 	}
 
-	{
-		MESSAGE_DEBUG("", "", "finish");
-	}
+	MESSAGE_DEBUG("", "", "finish");
 
 	return result;
 }
@@ -4391,9 +4341,7 @@ auto	GetSoWCustomFieldsInJSONFormat(string sqlQuery, CMysql *db, CUser *user) ->
 	};
 	vector<ItemClass>		itemsList;
 
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	affected = db->Query(sqlQuery);
 	if(affected)
@@ -4444,9 +4392,7 @@ auto	GetSoWCustomFieldsInJSONFormat(string sqlQuery, CMysql *db, CUser *user) ->
 		}
 	}
 
-	{
-		MESSAGE_DEBUG("", "", "finish");
-	}
+	MESSAGE_DEBUG("", "", "finish");
 
 	return result;
 }
@@ -4471,9 +4417,7 @@ auto	GetPSoWCustomFieldsInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -
 	};
 	vector<ItemClass>		itemsList;
 
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	affected = db->Query(sqlQuery);
 	if(affected)
@@ -4524,9 +4468,7 @@ auto	GetPSoWCustomFieldsInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -
 		}
 	}
 
-	{
-		MESSAGE_DEBUG("", "", "finish");
-	}
+	MESSAGE_DEBUG("", "", "finish");
 
 	return result;
 }
@@ -4545,9 +4487,7 @@ auto	GetBTExpenseTemplatesInJSONFormat(string sqlQuery, CMysql *db, CUser *user)
 	};
 	vector<ItemClass>		itemsList;
 
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	affected = db->Query(sqlQuery);
 	if(affected)
@@ -4587,9 +4527,7 @@ auto	GetBTExpenseTemplatesInJSONFormat(string sqlQuery, CMysql *db, CUser *user)
 		}
 	}
 
-	{
-		MESSAGE_DEBUG("", "", "finish");
-	}
+	MESSAGE_DEBUG("", "", "finish");
 
 	return result;
 }
@@ -4611,9 +4549,7 @@ string	GetBTExpenseLineTemplatesInJSONFormat(string sqlQuery, CMysql *db, CUser 
 	};
 	vector<ItemClass>		itemsList;
 
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	affected = db->Query(sqlQuery);
 	if(affected)
@@ -4658,9 +4594,7 @@ string	GetBTExpenseLineTemplatesInJSONFormat(string sqlQuery, CMysql *db, CUser 
 		}
 	}
 
-	{
-		MESSAGE_DEBUG("", "", "finish");
-	}
+	MESSAGE_DEBUG("", "", "finish");
 
 	return result;
 }
@@ -4680,9 +4614,7 @@ string	GetBTExpenseLinesInJSONFormat(string sqlQuery, CMysql *db, CUser *user)
 	};
 	vector<ItemClass>		itemsList;
 
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	affected = db->Query(sqlQuery);
 	if(affected)
@@ -4723,9 +4655,7 @@ string	GetBTExpenseLinesInJSONFormat(string sqlQuery, CMysql *db, CUser *user)
 		}
 	}
 
-	{
-		MESSAGE_DEBUG("", "", "finish");
-	}
+	MESSAGE_DEBUG("", "", "finish");
 
 	return result;
 }
@@ -4772,9 +4702,7 @@ bool isTimecardEntryEmpty(string timereports)
 	bool	result = true;
 	vector<string>	timereport_vector;
 
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	timereport_vector = SplitTimeentry(timereports, ',');
 	for(auto &item: timereport_vector)
@@ -4799,9 +4727,7 @@ bool isUserAssignedToSoW(string user_id, string sow_id, CMysql *db)
 {
 	bool 	result = false;
 
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	if(user_id.length())
 	{
@@ -4847,9 +4773,7 @@ bool isSoWAllowedToCreateTask(string sow_id, CMysql *db)
 {
 	bool 	result = false;
 
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	if(sow_id.length())
 	{
@@ -4880,9 +4804,7 @@ string GetTaskIDFromAgency(string customer, string project, string task, string 
 {
 	string 	result = "";
 
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	if(customer.length() && (customer.find("ыберите") == string::npos))
 	{
@@ -4938,9 +4860,7 @@ string GetTaskIDFromSOW(string customer, string project, string task, string sow
 {
 	string 	result = "";
 
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	if(customer.length() && (customer.find("ыберите") == string::npos))
 	{
@@ -5034,9 +4954,7 @@ string GetTaskAssignmentID(string customer, string project, string task, string 
 {
 	string 	result = "";
 
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	if(customer.length() && (customer.find("ыберите") == string::npos))
 	{
@@ -5096,9 +5014,7 @@ string CreateTaskBelongsToAgency(string customer, string project, string task, s
 	string	project_id = "";
 	string	task_id = "";
 
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	if(customer.length() && (customer.find("ыберите") == string::npos))
 	{
@@ -5215,9 +5131,7 @@ string CreateTaskAssignment(string task_id, string sow_id, string assignment_sta
 {
 	string	result = "";
 
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	if(task_id.length() && sow_id.length() && assignment_start.length() && assignment_end.length() && db)
 	{
@@ -5290,9 +5204,7 @@ string GetTimecardID(string sow_id, string period_start, string period_end, CMys
 {
 	string 	result = "";
 
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	if(period_start.length() && period_end.length())
 	{
@@ -5341,9 +5253,7 @@ string GetTimecardStatus(string timecard_id, CMysql *db)
 {
 	string 	result = "";
 
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	if(timecard_id.length())
 	{
