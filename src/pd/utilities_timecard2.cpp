@@ -4716,6 +4716,22 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 			MESSAGE_ERROR("", "", "there is no notification for user type(" + user->GetType() + ")")
 		}
 	}
+	if(
+		action == "AJAX_updateCompanyActNumberPrefix"	||
+		action == "AJAX_updateCompanyActNumber"			||
+		action == "AJAX_updateCompanyActNumberPostfix"
+	)
+	{
+		notification_description = "Данные компании: текущий номер акта " + existing_value + " изменился на " + new_value;
+		if(user->GetType() == "agency")
+			sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `agency_company_id`=\"" + id + "\";";
+		else if(user->GetType() == "subcontractor")
+			sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `subcontractor_company_id`=\"" + id + "\";";
+		else
+		{
+			MESSAGE_ERROR("", "", "there is no notification for user type(" + user->GetType() + ")")
+		}
+	}
 	if(action == "AJAX_updateCompanyLegalAddress")
 	{
 		notification_description = "Данные компании: Юр. адрес компании " + existing_value + " изменился на " + new_value;
