@@ -119,6 +119,7 @@ int CFiles::GetSize(string name)
 			return (*iv)->GetSize();
 		}
 	}
+
 	return -1;
 }
 

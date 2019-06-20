@@ -270,5 +270,9 @@
 #define	SMSC_EXPIRATION								120
 #define	SMSC_CHARSET								"utf-8"s
 
+#define	SMARTWAY_LOGIN								"demo@smartway.today"s
+#define	SMARTWAY_PASSWORD							"1234"s
+#define	SMARTWAY_URL								"https://api.test.dev.smartway.today/v2"s
+
 #endif
 

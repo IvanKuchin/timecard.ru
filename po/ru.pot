@@ -44,6 +44,9 @@ msgstr "не указано имя фаила 1с"
 msgid "1c template not found"
 msgstr "не указан шаблон 1с"
 
+msgid "service is not reachable"
+msgstr "сервисе недоступен"
+
 msgid "Access prohibited"
 msgstr "Нет доступа"
 
@@ -86,6 +89,9 @@ msgstr "Апрель"
 msgid "April declension"
 msgstr "Апреля"
 
+msgid "file not found"
+msgstr "фаил не найден"
+
 msgid "Assignment must be inside SoW"
 msgstr "Назначение должно быть в SoW"
 
@@ -93,7 +99,7 @@ msgid "August"
 msgstr "Август"
 
 msgid "August declension"
-msgstr "Авнуста"
+msgstr "Августа"
 
 msgid "BT doesn't belongs to agency"
 msgstr "Командировка не относится к агенству"
@@ -436,6 +442,9 @@ msgstr "Агенство не найдено"
 
 msgid "agency not found"
 msgstr "агенство не найдено"
+
+msgid "airline not found"
+msgstr "авиалинии не найдены"
 
 msgid "agreement declensioned"
 msgstr "договора"

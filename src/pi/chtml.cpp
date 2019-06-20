@@ -1,6 +1,6 @@
 #include "chtml.h"
 
-size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
+static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
 {
 	CHTML	*obj = (CHTML *)userp;
 
@@ -496,6 +496,7 @@ bool CHTML::ParseHTMLPage()
 bool CHTML::PerformRequest(string param)
 {
 	bool		result = false;
+
 	MESSAGE_DEBUG("", "", "start");
 
 	url = param;
@@ -522,7 +523,28 @@ bool CHTML::PerformRequest(string param)
 			 field, so we provide one */
 			curl_easy_setopt(curl, CURLOPT_USERAGENT, "libcurl-agent/1.0");
 
+			// --- low security
+			curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, FALSE);
+
+			if(isPostJSON())
+			{
+				MESSAGE_DEBUG("", "", "post json: " + GetPostJSON())
+
+				curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
+			    __slist_headers = curl_slist_append(__slist_headers, "Accept: application/json");
+			    __slist_headers = curl_slist_append(__slist_headers, "Content-Type: text/plain;charset=UTF-8");
+				curl_easy_setopt(curl, CURLOPT_HTTPHEADER, __slist_headers);
+				curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, GetPostJSON().length());
+				curl_easy_setopt(curl, CURLOPT_COPYPOSTFIELDS, GetPostJSON().c_str());
+			}
+
 			curlRes = curl_easy_perform(curl);
+
+			if(isPostJSON())
+			{
+				curl_slist_free_all(__slist_headers);
+			}
+
 			if(curlRes == CURLE_OK)
 			{
 				// --- can't move it behind ParseHTMLPage, beacause ParseHTMLPage also calls culr_easy_cleanup
@@ -537,10 +559,7 @@ bool CHTML::PerformRequest(string param)
 					}
 					else
 					{
-						{
-							CLog	log;
-							log.Write(ERROR, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]:ERROR: page parsing fail");
-						}
+						MESSAGE_ERROR("", "", "page parsing fail");
 						result = false;
 					}
 				}
@@ -552,10 +571,8 @@ bool CHTML::PerformRequest(string param)
 			}
 			else
 			{
-				{
-					CLog	log;
-					log.Write(ERROR, string("CHTML::") + string(__func__) + string("[") + to_string(__LINE__) +  "]:ERROR: curl_easy_perform() returned error (" + curl_easy_strerror(curlRes) + ")");
-				}
+				MESSAGE_ERROR("", "", "curl_easy_perform() returned error (" + curl_easy_strerror(curlRes) + ")");
+
 				result = false;
 
 				curl_easy_cleanup(curl);

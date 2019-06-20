@@ -567,6 +567,7 @@ int main(void)
 			string			name = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("name"));
 			string			template_name = "json_response.htmlt";
 			string			error_message = "";
+			string			success_message = "";
 			ostringstream	ostResult;
 
 			ostResult.str("");
@@ -576,31 +577,30 @@ int main(void)
 				int	affected = db.Query("SELECT * FROM `airlines` WHERE `code` LIKE \"%" + name + "%\" OR `description_rus` LIKE \"%" + name + "%\" OR `description_eng` LIKE \"%" + name + "%\" LIMIT 0, 20;");
 				if(affected)
 				{
-					ostResult << "{\"result\":\"success\","
-							  << "\"autocomplete_list\":[";
+					success_message = ",\"autocomplete_list\":[";
 					for(int i = 0; i < affected; ++i)
 					{
-						if(i) ostResult << ",";
-						ostResult << "{\"id\":\"" << db.Get(i, "id") << "\","
-								  << "\"label\":\"" << db.Get(i, "description_rus") << " / " << db.Get(i, "description_eng") << " / " << db.Get(i, "code") << "\"}";
+						if(i) success_message += ",";
+						success_message += "{\"id\":\"" + db.Get(i, "id") + "\","
+								  + "\"label\":\"" + db.Get(i, "description_rus") + " / " + db.Get(i, "description_eng") + " / " + db.Get(i, "code") + "\"}";
 					}
-					ostResult << "]}";
+					success_message += "]";
 				}
 				else
 				{
-					error_message = gettext("agency id not found");
+					error_message = gettext("airline not found");
 					MESSAGE_DEBUG("", "", error_message);
 				}	
 					
 			}
 			else
 			{
-				error_message = gettext("agency id not found");
 				MESSAGE_DEBUG("", "", error_message);
 			}
 
 			if(error_message.empty())
 			{
+					ostResult << "{\"result\":\"success\""  << success_message << "}";
 			}
 			else
 			{

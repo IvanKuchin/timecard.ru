@@ -33,44 +33,7 @@ static auto GetCompanyID(CUser *user, CMysql *db)
 
 	return result;
 }
-/*
-static string isUserAllowedAccessToCompany(string company_id, CMysql *db, CUser *user)
-{
-	string	error_message = "";
 
-	MESSAGE_DEBUG("", "", "start");
-
-	if(company_id.length())
-	{
-		if(user->GetType() == "subcontractor")
-		{
-			if(db->Query("SELECT `id` FROM `company` WHERE `id`=\"" + company_id + "\" AND `admin_userID`=\"" + user->GetID() + "\");"))
-			{
-				// --- everything is good
-			}
-			else
-			{
-				MESSAGE_DEBUG("", "", "user(" + user->GetID() + ") have not rights to change company.id(" + company_id + ") data");
-				error_message = "Вы не можете менять данные kompanii";
-			}
-		}
-		else
-		{
-			MESSAGE_ERROR("", "", "user(" + user->GetID() + ") must be a subcontractor(" + user->GetType() + ")");
-			error_message = "Информация доступна только для subcontractor";
-		}
-	}
-	else
-	{
-		error_message = "Неизвестный номер kompanii";
-		MESSAGE_ERROR("", "", "company_id is empty");
-	}
-
-	MESSAGE_DEBUG("", "", "finish (result length is " + to_string(error_message.length()) + ")");
-
-	return error_message;
-}
-*/
 static auto	GetTimecardsSOWTaskAssignement_Reusable_InJSONFormat(string date, CMysql *db, CUser *user)
 {
 	auto		result = ""s;
@@ -172,9 +135,8 @@ int main()
 
 
 	action = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("action"));
-	{
-		MESSAGE_DEBUG("", "", " action = " + action);
-	}
+
+	MESSAGE_DEBUG("", "", " action = " + action);
 
 	// --- generate common parts
 	{
@@ -194,12 +156,11 @@ int main()
 
 		//------- Generate session
 		action = GenerateSession(action, &indexPage, &db, &user);
+		action = LogoutIfGuest(action, &indexPage, &db, &user);
 	}
 // ------------ end generate common parts
 
-	{
-		MESSAGE_DEBUG("", "", "pre-condition if(action == \"" + action + "\")");
-	}
+	MESSAGE_DEBUG("", "", "pre-condition if(action == \"" + action + "\")");
 
 	if((action.length() > 10) && (action.compare(action.length() - 9, 9, "_template") == 0))
 	{
@@ -208,14 +169,14 @@ int main()
 
 		MESSAGE_DEBUG("", action, "start");
 
-		if(user.GetLogin() == "Guest")
+/*		if(user.GetLogin() == "Guest")
 		{
 			MESSAGE_DEBUG("", action, "re-login required");
 
 			indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
 		}
 		else
-		{
+*/		{
 			string		template_name = action.substr(0, action.length() - 9) + ".htmlt";
 
 			if(!indexPage.SetTemplate(template_name))
@@ -232,21 +193,17 @@ int main()
 		string			strPageToGet, strFriendsOnSinglePage;
 		ostringstream	ostResult;
 
-		{
-			MESSAGE_DEBUG("", action, "start");
-		}
+		MESSAGE_DEBUG("", action, "start");
 
 		ostResult.str("");
-		if(user.GetLogin() == "Guest")
+/*		if(user.GetLogin() == "Guest")
 		{
-			{
-				MESSAGE_DEBUG("", action, "re-login required");
-			}
+			MESSAGE_DEBUG("", action, "re-login required");
 
 			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
 		}
 		else
-		{
+*/		{
 			string			template_name = "json_response.htmlt";
 			string			period_start_date, period_start_month, period_start_year;
 			string			period_length;
@@ -296,36 +253,6 @@ int main()
 									<< "\"status\":\"success\","
 									<< temp
 									<< "}";
-/*
-					ostResult << "{"
-									"\"status\":\"success\","
-									"\"timecards\":[" << GetTimecardsInJSONFormat(
-											"SELECT * FROM `timecards` WHERE "
-												"`contract_sow_id` IN (SELECT `id` FROM `contracts_sow` WHERE `subcontractor_company_id` IN (" + companies_list + ")) "
-												"AND "
-												"`period_start`<=\"" + period_start_year + "-" + period_start_month + "-" + period_start_date + "\" "
-												"AND "
-												"`period_end`>=\"" + period_start_year + "-" + period_start_month + "-" + period_start_date + "\""
-											";", &db, &user) << "],"
-									"\"sow\":[" << GetSOWInJSONFormat(
-											"SELECT * FROM `contracts_sow` WHERE "
-												"`subcontractor_company_id` IN (" + companies_list + ") "
-												"AND "
-												"`start_date`<=\"" + period_start_year + "-" + period_start_month + "-" + period_start_date + "\" "
-												"AND "
-												"`end_date`>=\"" + period_start_year + "-" + period_start_month + "-" + period_start_date + "\""
-											";", &db, &user) << "],"
-									"\"task_assignments\":[" << GetTimecardTaskAssignmentInJSONFormat(
-											"SELECT * FROM `timecard_task_assignment` WHERE "
-												"`contract_sow_id` IN (SELECT `id` FROM `contracts_sow` WHERE "
-																			"`subcontractor_company_id` IN (" + companies_list + ") "
-																			"AND "
-																			"`start_date`<=\"" + period_start_year + "-" + period_start_month + "-" + period_start_date + "\" "
-																			"AND "
-																			"`end_date`>=\"" + period_start_year + "-" + period_start_month + "-" + period_start_date + "\""
-																		");", &db, &user) << "]"
-								"}";
-*/
 					}
 
 				}
@@ -362,21 +289,17 @@ int main()
 		string			strPageToGet, strFriendsOnSinglePage;
 		ostringstream	ostResult;
 
-		{
-			MESSAGE_DEBUG("", action, "start");
-		}
+		MESSAGE_DEBUG("", action, "start");
 
 		ostResult.str("");
-		if(user.GetLogin() == "Guest")
+/*		if(user.GetLogin() == "Guest")
 		{
-			{
-				MESSAGE_DEBUG("", action, "re-login required");
-			}
+			MESSAGE_DEBUG("", action, "re-login required");
 
 			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
 		}
 		else
-		{
+*/		{
 			string			template_name = "json_response.htmlt";
 			int				affected = db.Query("SELECT `id` FROM `company` WHERE `admin_userID`=\"" + user.GetID() + "\";");
 			bool			include_bt = indexPage.GetVarsHandler()->Get("include_bt") == "true";
@@ -437,21 +360,17 @@ int main()
 		string			strPageToGet, strFriendsOnSinglePage;
 		ostringstream	ostResult;
 
-		{
-			MESSAGE_DEBUG("", action, "start");
-		}
+		MESSAGE_DEBUG("", action, "start");
 
 		ostResult.str("");
-		if(user.GetLogin() == "Guest")
+/*		if(user.GetLogin() == "Guest")
 		{
-			{
-				MESSAGE_DEBUG("", action, "re-login required");
-			}
+			MESSAGE_DEBUG("", action, "re-login required");
 
 			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
 		}
 		else
-		{
+*/		{
 			string			template_name = "json_response.htmlt";
 			string			date = indexPage.GetVarsHandler()->Get("date");
 			string			error_message = "";
@@ -497,21 +416,17 @@ int main()
 		string			strPageToGet, strFriendsOnSinglePage;
 		ostringstream	ostResult;
 
-		{
-			MESSAGE_DEBUG("", action, "start");
-		}
+		MESSAGE_DEBUG("", action, "start");
 
 		ostResult.str("");
-		if(user.GetLogin() == "Guest")
+/*		if(user.GetLogin() == "Guest")
 		{
-			{
-				MESSAGE_DEBUG("", action, "re-login required");
-			}
+			MESSAGE_DEBUG("", action, "re-login required");
 
 			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
 		}
 		else
-		{
+*/		{
 			string			template_name = "json_response.htmlt";
 			int				affected = db.Query("SELECT `id` FROM `company` WHERE `admin_userID`=\"" + user.GetID() + "\";");
 
@@ -564,21 +479,17 @@ int main()
 		string			strPageToGet, strFriendsOnSinglePage;
 		ostringstream	ostResult;
 
-		{
-			MESSAGE_DEBUG("", action, "start");
-		}
+		MESSAGE_DEBUG("", action, "start");
 
 		ostResult.str("");
-		if(user.GetLogin() == "Guest")
+/*		if(user.GetLogin() == "Guest")
 		{
-			{
-				MESSAGE_DEBUG("", action, "re-login required");
-			}
+			MESSAGE_DEBUG("", action, "re-login required");
 
 			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
 		}
 		else
-		{
+*/		{
 			string			template_name = "json_response.htmlt";
 
 			string			bt_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("bt_id"));
@@ -592,35 +503,6 @@ int main()
 									"\"status\":\"success\","
 									"\"bt\":[" << GetBTsInJSONFormat("SELECT * FROM `bt` WHERE ""(`id`=\"" + bt_id + "\");", &db, &user, INCLUDE_ADDITIONAL_INFO) << "]"
 								"}";
-/*
-					int				affected = db.Query("SELECT `id` FROM `company` WHERE `admin_userID`=\"" + user.GetID() + "\";");
-
-					if(affected)
-					{
-						string		companies_list= "";
-
-						for(int i = 0; i < affected; ++i)
-						{
-							if(companies_list.length()) companies_list += ",";
-							companies_list += db.Get(i, "id");
-						}
-
-						ostResult << "{"
-										"\"status\":\"success\","
-										"\"bt\":[" << GetBTsInJSONFormat(
-												"SELECT * FROM `bt` WHERE "
-													"(`id`=\"" + bt_id + "\") "
-													"AND "
-													"(`contract_sow_id` IN ( SELECT `id` FROM `contracts_sow` WHERE `subcontractor_company_id` IN (" + companies_list + ")))"
-												";", &db, &user, INCLUDE_ADDITIONAL_INFO) << "]"
-									"}";
-					}
-					else
-					{
-						MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't owns company");
-						ostResult << "{\"status\":\"error\",\"description\":\"Вы не создали компанию\"}";
-					}
-*/
 				}
 				else
 				{
@@ -653,21 +535,17 @@ int main()
 		string			strPageToGet, strFriendsOnSinglePage;
 		ostringstream	ostResult;
 
-		{
-			MESSAGE_DEBUG("", action, "start");
-		}
+		MESSAGE_DEBUG("", action, "start");
 
 		ostResult.str("");
-		if(user.GetLogin() == "Guest")
+/*		if(user.GetLogin() == "Guest")
 		{
-			{
-				MESSAGE_DEBUG("", action, "re-login required");
-			}
+			MESSAGE_DEBUG("", action, "re-login required");
 
 			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
 		}
 		else
-		{
+*/		{
 			string			template_name = "json_response.htmlt";
 			int				affected = db.Query("SELECT `id` FROM `company` WHERE `admin_userID`=\"" + user.GetID() + "\";");
 
@@ -718,21 +596,17 @@ int main()
 		string			strPageToGet, strFriendsOnSinglePage;
 		ostringstream	ostResult;
 
-		{
-			MESSAGE_DEBUG("", action, "start");
-		}
+		MESSAGE_DEBUG("", action, "start");
 
 		ostResult.str("");
-		if(user.GetLogin() == "Guest")
+/*		if(user.GetLogin() == "Guest")
 		{
-			{
-				MESSAGE_DEBUG("", action, "re-login required");
-			}
+			MESSAGE_DEBUG("", action, "re-login required");
 
 			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
 		}
 		else
-		{
+*/		{
 			string			template_name = "json_response.htmlt";
 			int				affected = 0;
 			string			timecard_id = "";
@@ -810,14 +684,14 @@ int main()
 		MESSAGE_DEBUG("", action, "start");
 
 		ostResult.str("");
-		if(user.GetLogin() == "Guest")
+/*		if(user.GetLogin() == "Guest")
 		{
 			MESSAGE_DEBUG("", action, "re-login required");
 
 			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
 		}
 		else
-		{
+*/		{
 			string			template_name = "json_response.htmlt";
 
 			string			requested_status = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("status"));
@@ -1161,21 +1035,17 @@ int main()
 		string			strPageToGet, strFriendsOnSinglePage;
 		ostringstream	ostResult;
 
-		{
-			MESSAGE_DEBUG("", action, "start");
-		}
+		MESSAGE_DEBUG("", action, "start");
 
 		ostResult.str("");
-		if(user.GetLogin() == "Guest")
+/*		if(user.GetLogin() == "Guest")
 		{
-			{
-				MESSAGE_DEBUG("", action, "re-login required");
-			}
+			MESSAGE_DEBUG("", action, "re-login required");
 
 			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
 		}
 		else
-		{
+*/		{
 			string		template_name = "json_response.htmlt";
 			string		sow_id;
 			string		lookForKey;
@@ -1234,21 +1104,17 @@ int main()
 		string			strPageToGet, strFriendsOnSinglePage;
 		ostringstream	ostResult;
 
-		{
-			MESSAGE_DEBUG("", action, "start");
-		}
+		MESSAGE_DEBUG("", action, "start");
 
 		ostResult.str("");
-		if(user.GetLogin() == "Guest")
+/*		if(user.GetLogin() == "Guest")
 		{
-			{
-				MESSAGE_DEBUG("", action, "re-login required");
-			}
+			MESSAGE_DEBUG("", action, "re-login required");
 
 			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
 		}
 		else
-		{
+*/		{
 			string		template_name = "json_response.htmlt";
 			int			affected = db.Query("SELECT `id` FROM `company` WHERE `admin_userID`=\"" + user.GetID() + "\";");
 
@@ -1309,21 +1175,17 @@ int main()
 		string			strPageToGet, strFriendsOnSinglePage;
 		ostringstream	ostResult;
 
-		{
-			MESSAGE_DEBUG("", action, "start");
-		}
+		MESSAGE_DEBUG("", action, "start");
 
 		ostResult.str("");
-		if(user.GetLogin() == "Guest")
+/*		if(user.GetLogin() == "Guest")
 		{
-			{
-				MESSAGE_DEBUG("", action, "re-login required");
-			}
+			MESSAGE_DEBUG("", action, "re-login required");
 
 			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
 		}
 		else
-		{
+*/		{
 			string					template_name = "json_response.htmlt";
 			string					error_message = "";
 			CVars					*http_params = indexPage.GetVarsHandler();
@@ -1406,13 +1268,23 @@ int main()
 							if(dom_type == "image")
 							{
 								string		path_to_file = "";
-								int			file_size = indexPage.GetFilesHandler()->GetSize("expense_item_doc_main_field_" + expense_line_random + ".jpg");
+								auto		file_size = 0;
+								auto		file_ext = ""s;
+
+								for(auto &temp: {".jpg", ".pdf"})
+								{
+									if((file_size = indexPage.GetFilesHandler()->GetSize("expense_item_doc_main_field_" + expense_line_random + temp)) > 0)
+									{
+										file_ext = temp;
+										break;
+									}
+								}
 
 								if(file_size > 0)
 								{
-									// --- take care of an image file
-									MESSAGE_DEBUG("", action, "expense_item_doc_main_field_" + expense_line_random + ".jpg file size is " + to_string(file_size));
-									path_to_file = SaveImageFileFromHandler("expense_item_doc_main_field_" + expense_line_random + ".jpg", "expense_line", indexPage.GetFilesHandler());
+									// --- take care of an image/pdf file
+									MESSAGE_DEBUG("", action, "expense_item_doc_main_field_" + expense_line_random + file_ext + " file size is " + to_string(file_size));
+									path_to_file = SaveFileFromHandler("expense_item_doc_main_field_" + expense_line_random + file_ext, "expense_line", indexPage.GetFilesHandler(), file_ext);
 									expense_line.SetValue(path_to_file);
 
 									if(path_to_file.length())
@@ -1422,7 +1294,7 @@ int main()
 								}
 								else
 								{
-									MESSAGE_DEBUG("", action, "file to expense_line(random = " + expense_line_random + ") not uploaded");
+									MESSAGE_DEBUG("", "", "file for line item(" + expense_line_random + ") already uploaded to server");
 								}
 							}
 
@@ -1518,21 +1390,17 @@ int main()
 		string			strPageToGet, strFriendsOnSinglePage;
 		ostringstream	ostResult;
 
-		{
-			MESSAGE_DEBUG("", action, "start");
-		}
+		MESSAGE_DEBUG("", action, "start");
 
 		ostResult.str("");
-		if(user.GetLogin() == "Guest")
+/*		if(user.GetLogin() == "Guest")
 		{
-			{
-				MESSAGE_DEBUG("", action, "re-login required");
-			}
+			MESSAGE_DEBUG("", action, "re-login required");
 
 			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
 		}
 		else
-		{
+*/		{
 			string					template_name = "json_response.htmlt";
 			string 					expense_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("bt_expense_id"));
 			string					error_message = "";
@@ -1650,21 +1518,17 @@ int main()
 		string			strPageToGet, strFriendsOnSinglePage;
 		ostringstream	ostResult;
 
-		{
-			MESSAGE_DEBUG("", action, "start");
-		}
+		MESSAGE_DEBUG("", action, "start");
 
 		ostResult.str("");
-		if(user.GetLogin() == "Guest")
+/*		if(user.GetLogin() == "Guest")
 		{
-			{
-				MESSAGE_DEBUG("", action, "re-login required");
-			}
+			MESSAGE_DEBUG("", action, "re-login required");
 
 			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
 		}
 		else
-		{
+*/		{
 			string					template_name = "json_response.htmlt";
 			string 					bt_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("bt_id"));
 			string					error_message = "";
@@ -1985,13 +1849,13 @@ int main()
 
 		ostResult.str("");
 
-		if(user.GetLogin() == "Guest")
+/*		if(user.GetLogin() == "Guest")
 		{
 			error_message = "re-login required";
 			MESSAGE_DEBUG("", action, error_message);
 		}
 		else
-		{
+*/		{
 
 			string			sow_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("sow_id"));
 
@@ -2060,13 +1924,13 @@ int main()
 
 		ostResult.str("");
 
-		if(user.GetLogin() == "Guest")
+/*		if(user.GetLogin() == "Guest")
 		{
 			error_message = "re-login required";
 			MESSAGE_DEBUG("", action, error_message);
 		}
 		else
-		{
+*/		{
 			success_message = ",\"absences\":[" + 
 			GetAbsenceListInJSONFormat("SELECT * FROM `absence` WHERE `company_id`=("
 											"SELECT `id` FROM `company` WHERE `admin_userID`=\"" + user.GetID() + "\" AND `type`=\"subcontractor\""
@@ -2104,13 +1968,13 @@ int main()
 
 		ostResult.str("");
 
-		if(user.GetLogin() == "Guest")
+/*		if(user.GetLogin() == "Guest")
 		{
 			error_message = "re-login required";
 			MESSAGE_DEBUG("", action, error_message);
 		}
 		else
-		{
+*/		{
 			auto	type_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("type_id"));
 			auto	comment = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("comment"));
 			auto	start_date = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("start_date"));
@@ -2237,13 +2101,13 @@ int main()
 
 		ostResult.str("");
 
-		if(user.GetLogin() == "Guest")
+/*		if(user.GetLogin() == "Guest")
 		{
 			error_message = "re-login required";
 			MESSAGE_DEBUG("", action, error_message);
 		}
 		else
-		{
+*/		{
 			auto	id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
 			auto	value = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("value"));
 
@@ -2364,13 +2228,13 @@ int main()
 
 		ostResult.str("");
 
-		if(user.GetLogin() == "Guest")
+/*		if(user.GetLogin() == "Guest")
 		{
 			error_message = "re-login required";
 			MESSAGE_DEBUG("", action, error_message);
 		}
 		else
-		{
+*/		{
 			auto	id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
 			auto	value = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("value"));
 
@@ -2437,13 +2301,13 @@ int main()
 
 		ostResult.str("");
 
-		if(user.GetLogin() == "Guest")
+/*		if(user.GetLogin() == "Guest")
 		{
 			error_message = "re-login required";
 			MESSAGE_DEBUG("", action, error_message);
 		}
 		else
-		{
+*/		{
 			auto	id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
 
 			if(id.length())
@@ -2516,6 +2380,51 @@ int main()
 			MESSAGE_ERROR("", action, "can't find template " + template_name);
 		}
 	}
+
+	if(action == "AJAX_enrollSmartway")
+	{
+		ostringstream	ostResult;
+		auto			template_name = "json_response.htmlt"s;
+		auto			error_message = ""s;
+		auto			success_message = ""s;
+
+		MESSAGE_DEBUG("", action, "start");
+
+		ostResult.str("");
+
+		{
+			C_Smartway		smartway;
+			auto			result = smartway.ping();
+
+			if(result.length())
+			{
+
+			}
+			else
+			{
+				error_message = gettext("service is not reachable");
+			}
+		}
+
+		if(error_message.empty())
+		{
+			ostResult << "{\"result\":\"success\"" + success_message + "}";
+		}
+		else
+		{
+			MESSAGE_DEBUG("", action, "failed");
+			ostResult.str("");
+			ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+		}
+
+		indexPage.RegisterVariableForce("result", ostResult.str());
+
+		if(!indexPage.SetTemplate(template_name))
+		{
+			MESSAGE_ERROR("", action, "can't find template " + template_name);
+		}
+	}
+
 
 	{
 		MESSAGE_DEBUG("", "", "post-condition if(action == \"" + action + "\")");

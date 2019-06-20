@@ -34,6 +34,7 @@ set(INVOICE_LIB_SRCs
     c_print_1c_subcontractor.cpp
     c_timecard_to_print.cpp
     c_bt_to_print.cpp
+    c_smartway.cpp
     c_template2pdf_printer.cpp
     wkhtmltox_wrapper.cpp
     utilities_submit.cpp

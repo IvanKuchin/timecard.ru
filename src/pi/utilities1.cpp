@@ -5403,7 +5403,7 @@ bool CheckImageFileInTempFolder(string src, string dst, string f_type)
 	return result;
 }
 
-string	SaveImageFileFromHandler(string f_name, string f_type, CFiles *files)
+string	SaveFileFromHandler(string f_name, string f_type, CFiles *files, string file_extension)
 {
 	string		result = "";
 
@@ -5432,11 +5432,14 @@ string	SaveImageFileFromHandler(string f_name, string f_type, CFiles *files)
 					if((foundPos = f_name.rfind(".")) != string::npos) 
 						fileExtention = f_name.substr(foundPos, f_name.length() - foundPos);
 					else
+					{
+						MESSAGE_ERROR("", "", "fileExtension MUST be predefined, if workflow gets here then filename doesn't contains extension which is wrong. Require to check subcontractor.cpp:AJAX_sumitBT part");
 						fileExtention = ".jpg";
+					}
 
 					originalFilename = "/tmp/tmp_" + filePrefix + fileExtention;
-					preFinalFilename = "/tmp/" + filePrefix + ".jpg";
-					finalFilename = GetSpecificData_GetBaseDirectory(f_type) + "/" + to_string(folderID) + "/" + filePrefix + ".jpg";
+					preFinalFilename = "/tmp/" + filePrefix + fileExtention;
+					finalFilename = GetSpecificData_GetBaseDirectory(f_type) + "/" + to_string(folderID) + "/" + filePrefix + fileExtention;
 				} while(isFileExists(finalFilename) || isFileExists(originalFilename) || isFileExists(preFinalFilename));
 
 				MESSAGE_DEBUG("", "", "Save file to /tmp for checking of image validity [" + originalFilename + "]");
@@ -5445,12 +5448,30 @@ string	SaveImageFileFromHandler(string f_name, string f_type, CFiles *files)
 				f = fopen(originalFilename.c_str(), "w");
 				if(f)
 				{
+					auto	good2go = true;
 
 					fwrite(files->Get(f_name), files->GetSize(f_name), 1, f);
 					fclose(f);
 
+					if(file_extension == ".jpg")
+					{
+						if(CheckImageFileInTempFolder(originalFilename, preFinalFilename, f_type)) {}
+						else
+						{
+							MESSAGE_ERROR("", "", "file(" + originalFilename + ") can't be saved as image file");
+						}
+					}
+					else if(file_extension == ".pdf")
+					{
+						CopyFile(originalFilename, preFinalFilename);
+					}
+					else
+					{
+						good2go = false;
+					}
+
 					// --- file written to temporary directory to original f_name
-					if(CheckImageFileInTempFolder(originalFilename, preFinalFilename, f_type))
+					if(good2go)
 					{
 						unlink(originalFilename.c_str());
 
@@ -5458,11 +5479,11 @@ string	SaveImageFileFromHandler(string f_name, string f_type, CFiles *files)
 
 						unlink(preFinalFilename.c_str());
 
-						result = to_string(folderID) + "/" + filePrefix + ".jpg";
+						result = to_string(folderID) + "/" + filePrefix + fileExtention;
 					}
 					else
 					{
-						MESSAGE_ERROR("", "", "file(" + originalFilename + ") is not an image");
+						MESSAGE_ERROR("", "", "file(" + originalFilename + ") neither image, nor pdf");
 						unlink(originalFilename.c_str());
 					}
 				}

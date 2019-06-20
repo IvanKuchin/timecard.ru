@@ -14,6 +14,7 @@
 #include "cmail.h"
 #include "cstatistics.h"
 #include "c_bt.h"
+#include "c_smartway.h"
 #include "utilities.h"
 #include "utilities_common.h"
 #include "localy.h"

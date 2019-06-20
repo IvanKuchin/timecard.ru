@@ -392,6 +392,26 @@ void CUser::Email(string messageID)
 	mail.Send(GetLogin(), messageID, GetVars(), GetDB());
 }
 
+bool CUser::FillObjectFromDB()
+{
+	SetID(db->Get(0, "id"));
+	SetLogin(db->Get(0, "login"));
+	SetEmail(db->Get(0, "email"));
+	SetSiteThemeID(db->Get(0, "site_theme_id"));
+	SetLng(db->Get(0, "lng"));
+	SetIP(db->Get(0, "ip"));
+	SetType(db->Get(0, "type"));
+	SetCV(db->Get(0, "cv"));
+	SetName(db->Get(0, "name"));
+	SetNameLast(db->Get(0, "nameLast"));
+	SetSmartwayEnrolled(db->Get(0, "smartway_enrolled"));
+	SetSmartwayEmployeeID(db->Get(0, "smartway_employee_id"));
+	if(LoadAvatar()) {}
+	else { MESSAGE_DEBUG("CUser", "", "no avatar for user.id(" + GetID() + ")"); }
+
+	return  true;
+}
+
 bool CUser::GetFromDBbyLogin(string log)
 {
 	ostringstream		ost;
@@ -406,22 +426,8 @@ bool CUser::GetFromDBbyLogin(string log)
 		result = false;
 	}
 	else{
-		SetID(db->Get(0, "id"));
-		SetLogin(db->Get(0, "login"));
-		SetPasswd(db->Get(0, "passwd"));
-		SetEmail(db->Get(0, "email"));
-		SetSiteThemeID(db->Get(0, "site_theme_id"));
-		SetLng(db->Get(0, "lng"));
-		SetIP(db->Get(0, "ip"));
-		SetType(db->Get(0, "type"));
-		// SetPartnerID(db->Get(0, "partnerid"));
-		SetCV(db->Get(0, "cv"));
-		SetName(db->Get(0, "name"));
-		SetNameLast(db->Get(0, "nameLast"));
-		if(LoadAvatar()) {}
-		else { MESSAGE_DEBUG("CUser", "", "no avatar for user.id(" + GetID() + ")"); }
-
-		result = true;
+		if(FillObjectFromDB()) result = true;
+		else MESSAGE_ERROR("", "", "fail to fill up user object");
 	}
 
 	return result;
@@ -441,21 +447,8 @@ bool CUser::GetFromDBbyID(string id)
 		result =  false;
 	}
 	else {
-		SetID(db->Get(0, "id"));
-		SetLogin(db->Get(0, "login"));
-		SetPasswd(db->Get(0, "passwd"));
-		SetEmail(db->Get(0, "email"));
-		SetSiteThemeID(db->Get(0, "site_theme_id"));
-		SetLng(db->Get(0, "lng"));
-		SetIP(db->Get(0, "ip"));
-		SetType(db->Get(0, "type"));
-		SetCV(db->Get(0, "cv"));
-		SetName(db->Get(0, "name"));
-		SetNameLast(db->Get(0, "nameLast"));
-		if(LoadAvatar()) {}
-		else { MESSAGE_DEBUG("CUser", "", "no avatar for user.id(" + GetID() + ")"); }
-
-		result = true;
+		if(FillObjectFromDB()) result = true;
+		else MESSAGE_ERROR("", "", "fail to fill up user object");
 	}
 
 	return result;
@@ -484,19 +477,8 @@ bool CUser::GetFromDBbyEmailNoPassword(string email)
 	}
 	else
 	{
-		SetID(db->Get(0, "id"));
-		SetLogin(db->Get(0, "login"));
-		SetEmail(db->Get(0, "email"));
-		SetSiteThemeID(db->Get(0, "site_theme_id"));
-		SetLng(db->Get(0, "lng"));
-		SetIP(db->Get(0, "ip"));
-		SetType(db->Get(0, "type"));
-		SetCV(db->Get(0, "cv"));
-		SetName(db->Get(0, "name"));
-		SetNameLast(db->Get(0, "nameLast"));
-		if(LoadAvatar()) {}
-		else { MESSAGE_DEBUG("CUser", "", "no avatar for user.id(" + GetID() + ")"); }
-		result = true;
+		if(FillObjectFromDB()) result = true;
+		else MESSAGE_ERROR("", "", "fail to fill up user object");
 	}
 
 	MESSAGE_DEBUG("CUser", "", "finish (return " + (result ? string("true") : string("false")) + ")");
@@ -533,7 +515,7 @@ bool CUser::GetFromDBbyEmail(string email)
 	}
 	else
 	{
-		MESSAGE_DEBUG("CUser", "", "user not found in GetFromDBbyEmailNoPassword(" + email + ")")
+		MESSAGE_DEBUG("CUser", "", "user not found (" + email + ")")
 	}
 
 	MESSAGE_DEBUG("CUser", "", "finish (" + (result ? string("true") : string("false")) + ")");

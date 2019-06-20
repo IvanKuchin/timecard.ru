@@ -183,6 +183,7 @@ auto GenerateSession(string action, CCgi *indexPage, CMysql *db, CUser *user) ->
 							indexPage->RegisterVariableForce("myLastName", user->GetNameLast());
 							indexPage->RegisterVariableForce("myUserAvatar", user->GetAvatar());
 							indexPage->RegisterVariableForce("user_type", user->GetType());
+							indexPage->RegisterVariableForce("smartway_enrolled", user->GetSmartwayEnrolled());
 
 							// --- specific actions to AJAX-requests
 							if((action.find("AJAX_") != string::npos) || (action.find("JSON_") != string::npos))

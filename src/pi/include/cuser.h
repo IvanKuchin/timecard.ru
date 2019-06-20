@@ -15,6 +15,8 @@ class CUser
 {
 	private:
 		string		id, login, passwd, passwdConfirm, email, lng, ip, agreement, type, partnerID, phone, cv, name, nameLast, lastOnline;
+		string		smartway_enrolled = "";
+		string		smartway_employee_id = "";
 		string		avatar = "empty";
 		string		site_theme_id = "";
 		string		site_theme = "";
@@ -23,6 +25,7 @@ class CUser
 		CVars		*vars;
 
 		bool		LoadAvatar();
+		bool		FillObjectFromDB();
 	public:
 					CUser();
 					CUser(string log, string pas, string pasConfirm, string em, string l, string i, string agr, string t, string pID, string ph);
@@ -63,6 +66,8 @@ class CUser
 		string		GetCV			()	const					{ return cv; }
 		string		GetAvatar		()	const					{ return avatar; }
 		string		GetLastOnline	()	const					{ return lastOnline; }
+		string		GetSmartwayEnrolled	()	const				{ return smartway_enrolled; }
+		string		GetSmartwayEmployeeID()	const				{ return smartway_employee_id; }
 
 		void		SetLng			(const string &p);
 		void		SetID			(const string &p) 			{ id = p; };
@@ -81,6 +86,8 @@ class CUser
 		void		SetCV			(const string &p) 			{ cv = p; };
 		void		SetAvatar		(const string &p) 			{ avatar = p; };
 		void		SetLastOnline	(const string &p) 			{ lastOnline = p; };
+		void		SetSmartwayEnrolled	(const string &p) 		{ smartway_enrolled = p; };
+		void		SetSmartwayEmployeeID(const string &p) 		{ smartway_employee_id = p; };
 
 		void		SetID			(string &&p) 	noexcept	{ id = move(p); };
 		void		SetLogin		(string &&p) 	noexcept	{ login = move(p); };
@@ -98,6 +105,8 @@ class CUser
 		void		SetCV			(string &&p) 	noexcept	{ cv = move(p); };
 		void		SetAvatar		(string &&p) 	noexcept	{ avatar = move(p); };
 		void		SetLastOnline	(string &&p) 	noexcept	{ lastOnline = move(p); };
+		void		SetSmartwayEnrolled	(string &&p) noexcept	{ smartway_enrolled = move(p); };
+		void		SetSmartwayEmployeeID(string &&p) noexcept	{ smartway_employee_id = move(p); };
 
 		void		Create();
 		void		Block(string reason);
