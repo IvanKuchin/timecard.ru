@@ -47,6 +47,7 @@ addons:
     - libcurl4-openssl-dev
     - libhpdf-dev
     - libarchive-dev
+    - rapidjson-dev
     - pkg-config
     - xfonts-75dpi	# wkhtmltox dependency
     - xfonts-base	# wkhtmltox dependency

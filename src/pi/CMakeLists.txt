@@ -93,6 +93,7 @@ find_package(Libhpdf REQUIRED)
 find_package(Libwkhtmltox REQUIRED)
 find_package(Libarchive REQUIRED)
 find_package(Libxl REQUIRED)
+find_package(Rapidjson-dev REQUIRED)
 
 if(IMAGEMAGICK_DISABLE)
     message("Magick++ turned off")
