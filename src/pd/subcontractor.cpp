@@ -2393,16 +2393,24 @@ int main()
 		ostResult.str("");
 
 		{
-			C_Smartway		smartway;
-			auto			result = smartway.ping();
+			C_Smartway		smartway(&db, &user);
 
-			if(result.length())
+			// error_message = smartway.ping();
+			if(error_message.empty())
 			{
-
+				error_message = smartway.employees_create(user.GetID());
+				if(error_message.empty())
+				{
+					db.Query("UPDATE `users` SET `smartway_employee_id`=" + quoted(smartway.GetEmployeeID()) + " WHERE `id`=" + quoted(user.GetID()) + ";");
+				}
+				else
+				{
+					MESSAGE_ERROR("", "", "fail to save employee");
+				}
 			}
 			else
 			{
-				error_message = gettext("service is not reachable");
+				MESSAGE_ERROR("", "", "fail to reach server");
 			}
 		}
 

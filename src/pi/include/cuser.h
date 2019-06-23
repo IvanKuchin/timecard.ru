@@ -66,7 +66,7 @@ class CUser
 		string		GetCV			()	const					{ return cv; }
 		string		GetAvatar		()	const					{ return avatar; }
 		string		GetLastOnline	()	const					{ return lastOnline; }
-		string		GetSmartwayEnrolled	()	const				{ return smartway_enrolled; }
+		string		GetSmartwayEnrolled	()	const				{ return smartway_employee_id.length() ? "true" : "false"; }
 		string		GetSmartwayEmployeeID()	const				{ return smartway_employee_id; }
 
 		void		SetLng			(const string &p);
@@ -86,7 +86,6 @@ class CUser
 		void		SetCV			(const string &p) 			{ cv = p; };
 		void		SetAvatar		(const string &p) 			{ avatar = p; };
 		void		SetLastOnline	(const string &p) 			{ lastOnline = p; };
-		void		SetSmartwayEnrolled	(const string &p) 		{ smartway_enrolled = p; };
 		void		SetSmartwayEmployeeID(const string &p) 		{ smartway_employee_id = p; };
 
 		void		SetID			(string &&p) 	noexcept	{ id = move(p); };

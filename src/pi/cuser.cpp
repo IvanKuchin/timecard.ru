@@ -404,7 +404,6 @@ bool CUser::FillObjectFromDB()
 	SetCV(db->Get(0, "cv"));
 	SetName(db->Get(0, "name"));
 	SetNameLast(db->Get(0, "nameLast"));
-	SetSmartwayEnrolled(db->Get(0, "smartway_enrolled"));
 	SetSmartwayEmployeeID(db->Get(0, "smartway_employee_id"));
 	if(LoadAvatar()) {}
 	else { MESSAGE_DEBUG("CUser", "", "no avatar for user.id(" + GetID() + ")"); }
