@@ -2,6 +2,7 @@
 #define __C_SMARTWAY__H__
 
 #include <rapidjson/document.h>
+#include <rapidjson/prettywriter.h>
 
 #include "chtml.h"
 #include "clog.h"
@@ -10,6 +11,13 @@
 
 using namespace std;
 using namespace rapidjson;
+
+struct C_Flight_Route
+{
+		string			from;
+		string			to;
+		string			date;
+};
 
 class C_Smartway
 {
@@ -41,6 +49,8 @@ private:
 		string			ParseResponse();
 		string			ParseResponse_Ping();
 		string			ParseResponse_EmployeesSave();
+		string			ParseResponse_AirportAutocomplete();
+		string			ParseResponse_AirlineSearch();
 
 		void			SetEmployeeID(string p) { employee_id = p; };
 
@@ -53,6 +63,11 @@ public:
 		string			ping();
 		string			employees_create(string userID);
 		string			employees_save(string userID);
+		string			airline_search(const vector<C_Flight_Route> &, string cabin_class = "Econom", bool direct = false, string baggage = "all", unsigned int travelers = 1);
+
+		string			airport_autocomplete(string query);
+		string			GetAirportAutocompleteJSON() const;
+		string			GetFlightsJSON() const;
 
 		string			GetEmployeeID()	{ return employee_id; };
 };

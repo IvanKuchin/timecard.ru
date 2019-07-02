@@ -25,6 +25,38 @@ find_path( ARCHIVE_INCLUDE_DIR rapidjson/rapidjson.h
   /mingw/include
 )
 
+find_path( ARCHIVE_INCLUDE_DIR rapidjson/document.h
+  HINTS
+  $ENV{ARCHIVEDIR}
+  PATH_SUFFIXES include 
+  PATHS
+  ~/Library/Frameworks
+  /Library/Frameworks
+  /usr/local/include
+  /usr/include
+  /sw/include
+  /opt/local/include
+  /opt/csw/include 
+  /opt/include
+  /mingw/include
+)
+
+find_path( ARCHIVE_INCLUDE_DIR rapidjson/prettywriter.h
+  HINTS
+  $ENV{ARCHIVEDIR}
+  PATH_SUFFIXES include 
+  PATHS
+  ~/Library/Frameworks
+  /Library/Frameworks
+  /usr/local/include
+  /usr/include
+  /sw/include
+  /opt/local/include
+  /opt/csw/include 
+  /opt/include
+  /mingw/include
+)
+
 #message( "ARCHIVE_INCLUDE_DIR is ${ARCHIVE_INCLUDE_DIR}" )
 
 if(ARCHIVE_INCLUDE_DIR)

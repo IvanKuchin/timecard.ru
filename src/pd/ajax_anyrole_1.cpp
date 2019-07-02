@@ -595,7 +595,7 @@ int main(void)
 			}
 			else
 			{
-				MESSAGE_DEBUG("", "", error_message);
+				MESSAGE_DEBUG("", "", "name is empty");
 			}
 
 			if(error_message.empty())
@@ -610,6 +610,72 @@ int main(void)
 			}
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
+
+			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+		}
+
+		if(action == "AJAX_getSmartwayAirportAutocompleteList")
+		{
+			string			query = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("term"));
+			string			template_name = "json_response.htmlt";
+			string			error_message = "";
+			string			success_message = "";
+			ostringstream	ostResult;
+
+			ostResult.str("");
+
+			if(query.length())
+			{
+				C_Smartway		smartway(&db, &user);
+
+				error_message = smartway.airport_autocomplete(query);
+				if(error_message.empty())
+				{
+					success_message = smartway.GetAirportAutocompleteJSON();
+				}
+				else
+				{
+					MESSAGE_ERROR("", "", "fail to save employee");
+				}
+
+			}
+			else
+			{
+				MESSAGE_DEBUG("", "", "query is empty");
+			}
+
+			indexPage.RegisterVariableForce("result", "[" + success_message + "]");
+
+			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+		}
+
+		if(action == "AJAX_getAirportAutocompleteList")
+		{
+			string			query = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("term"));
+			string			template_name = "json_response.htmlt";
+			string			error_message = "";
+			string			success_message = "";
+			ostringstream	ostResult;
+
+			ostResult.str("");
+
+			if(query.length())
+			{
+				int	affected = db.Query("SELECT * FROM `airports` WHERE (`city_name` LIKE \"%" + query + "%\") OR (`airport_code` LIKE \"%" + query + "%\") OR (`airport_name` LIKE \"%" + query + "%\") OR ((`country_name` LIKE \"%" + query + "%\")) LIMIT 0, 20;");
+
+				for(int i = 0; i < affected; ++i)
+				{
+					if(i) success_message += ",";
+					success_message += "{\"id\":\"" + db.Get(i, "airport_code") + "\","
+							  + "\"label\":\"" + db.Get(i, "airport_name") + " (" + db.Get(i, "city_name") + " / " + db.Get(i, "country_name") + ")\"}";
+				}
+			}
+			else
+			{
+				MESSAGE_DEBUG("", "", "query is empty");
+			}
+
+			indexPage.RegisterVariableForce("result", "[" + success_message + "]");
 
 			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 		}

@@ -21,7 +21,7 @@ string	C_Smartway::GetPostJSON()
 		  "\"method\": \"" + GetMethod() + "\","
 		  "\"params\": "
 		  	"{" + GetAuthJSON() + ","
-		    "\"query\": {" + GetQuery() + "}"
+		    "\"query\": " + GetQuery() + ""
 		  "}"
 		"}";
 	}
@@ -94,7 +94,7 @@ string C_Smartway::ParseResponse_EmployeesSave()
 
 		if(json_obj["result"].IsArray())
 		{
-			auto result_id = 0;
+			auto result_id = ""s;
 			auto result_success = false;
 
 			// --- continue from here
@@ -102,36 +102,135 @@ string C_Smartway::ParseResponse_EmployeesSave()
 			{
 				if(json_obj["result"][0].HasMember("success"))
 				{
-					result_id = json_obj["result"][0]["id"].GetInt();
-					result_success = json_obj["result"][0]["success"].GetBool();
-
-					if(result_success)
+					if(json_obj["result"][0]["id"].IsString())
 					{
-						SetEmployeeID(to_string(result_id));
+						result_id = json_obj["result"][0]["id"].GetString();
+						if(json_obj["result"][0]["success"].IsBool())
+						{
+							result_success = json_obj["result"][0]["success"].GetBool();
+
+							if(result_success)
+							{
+								SetEmployeeID(result_id);
+							}
+							else
+							{
+								error_message = "Smartway "s + "response.success "s + gettext("is not true");
+								MESSAGE_ERROR("", "", error_message);
+							}
+						}
+						else
+						{
+							error_message = "Smartway "s + "response.success "s + gettext("is not a boolean");
+							MESSAGE_ERROR("", "", error_message)
+						}
 					}
 					else
 					{
-						MESSAGE_ERROR("", "", "smartway response result is false");
+						error_message = "Smartway "s + "response.id "s + gettext("is not a string");
+						MESSAGE_ERROR("", "", error_message)
 					}
-
 				}
 				else
 				{
-					error_message = gettext("smartway response failed to parse");
+					error_message = "Smartway "s + gettext("response failed to parse");
 					MESSAGE_ERROR("", "", error_message + "(member 'id' is missed)")
 				}
 			}
 			else
 			{
-				error_message = gettext("smartway response failed to parse");
+				error_message = "Smartway "s + gettext("response failed to parse");
 				MESSAGE_ERROR("", "", error_message + "(member 'id' is missed)")
 			}
 		}
 		else
 		{
-			error_message = gettext("result is not an array");
+			error_message = "Smartway "s + gettext("result is not an array");
 			MESSAGE_ERROR("", "", error_message);
 		}
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return error_message;
+}
+
+string C_Smartway::ParseResponse_AirlineSearch()
+{
+	auto		error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(json_obj["result"].IsObject())
+	{
+
+	}
+	else
+	{
+		error_message = "Smartway "s + gettext("result is not an array");
+		MESSAGE_ERROR("", "", error_message);
+	}
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return error_message;
+}
+
+string C_Smartway::ParseResponse_AirportAutocomplete()
+{
+	auto		error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(json_obj["result"].IsArray())
+	{
+		auto result_id = ""s;
+
+		for(auto i = 0u; i < json_obj["result"].Size(); ++i)
+		{
+			// --- continue from here
+			if(json_obj["result"][i].HasMember("code"))
+			{
+				if(json_obj["result"][i].HasMember("country"))
+				{
+					if(json_obj["result"][i]["country"].HasMember("name_eng"))
+					{
+						if(json_obj["result"][i].HasMember("name_eng"))
+						{
+						}
+						else
+						{
+							error_message = "Smartway "s + "response.id "s + gettext("response failed to parse");
+							MESSAGE_ERROR("", "", error_message + "(member 'name_eng' is missed)")
+							break;
+						}
+					}
+					else
+					{
+						error_message = "Smartway "s + "response.id "s + gettext("response failed to parse");
+						MESSAGE_ERROR("", "", error_message + "(member 'name_eng' is missed)")
+						break;
+					}
+				}
+				else
+				{
+					error_message = "Smartway "s + gettext("response failed to parse");
+					MESSAGE_ERROR("", "", error_message + "(member 'country' is missed)");
+					break;
+				}
+			}
+			else
+			{
+				error_message = "Smartway "s + gettext("response failed to parse");
+				MESSAGE_ERROR("", "", error_message + "(member 'code' is missed)");
+				break;
+			}
+		}
+	}
+	else
+	{
+		error_message = "Smartway "s + gettext("result is not an array");
+		MESSAGE_ERROR("", "", error_message);
+	}
 
 	MESSAGE_DEBUG("", "", "finish");
 
@@ -157,6 +256,14 @@ string C_Smartway::ParseResponse()
 			else if(GetMethod() == "employees.save")
 			{
 				if((error_message = ParseResponse_EmployeesSave()).length()) MESSAGE_ERROR("", "", "fail to parse employees.save response");
+			}
+			else if(GetMethod() == "airline.airport_autocomplete")
+			{
+				if((error_message = ParseResponse_AirportAutocomplete()).length()) MESSAGE_ERROR("", "", "fail to parse airline.airport_autocomplete response");
+			}
+			else if(GetMethod() == "airline.search")
+			{
+				if((error_message = ParseResponse_AirlineSearch()).length()) MESSAGE_ERROR("", "", "fail to parse airline.airport_autocomplete response");
 			}
 			else
 			{
@@ -245,8 +352,8 @@ string C_Smartway::BuildEmployeesSaveQuery(string user_id)
 		{
 			if(db->Query("SELECT * FROM `users` WHERE `id`=\"" + user_id + "\";"))			
 			{
-				auto	employee_id			= (db->Get(0, "smartway_employee_id").length() ? quoted(db->Get(0, "smartway_employee_id")) : "null"s);
-				auto	is_phone_confirmed	= db->Get(0, "smartway_employee_id");
+				auto	employee_id			= user_id;
+				auto	is_phone_confirmed	= db->Get(0, "is_phone_confirmed");
 				auto	phone				= "+" + db->Get(0, "country_code") + db->Get(0, "phone");
 				auto	surname				= db->Get(0, "nameLast");
 				auto	name				= db->Get(0, "name");
@@ -268,6 +375,8 @@ string C_Smartway::BuildEmployeesSaveQuery(string user_id)
 				if(db->Query("SELECT * FROM `company` WHERE `admin_userID`=\"" + user_id + "\" and `type`=\"subcontractor\";"))			
 				{
 					auto	company_tin = db->Get(0, "tin");
+
+					company_tin = "0000000000";					
 
 					// --- validity check
 					if(is_phone_confirmed == "N")
@@ -354,7 +463,7 @@ string C_Smartway::BuildEmployeesSaveQuery(string user_id)
 					result = 
 						      "\"employees\": ["
 						        "{"
-						          "\"id\": " + employee_id + ","
+						          "\"id\": " + quoted(employee_id) + ","
 						          "\"mobile_phone\": " + quoted(phone) + ","
 						          "\"surname\": " + quoted(surname) + ","
 						          "\"name\": " + quoted(name) + ","
@@ -409,7 +518,7 @@ string C_Smartway::BuildEmployeesSaveQuery(string user_id)
 
 	if(error_message.empty())
 	{
-		SetQuery(result);
+		SetQuery("{" + result + "}");
 	}
 
 	MESSAGE_DEBUG("", "", "finish (" + (error_message.empty() ? "success" : "fail") + ")");
@@ -482,7 +591,7 @@ string C_Smartway::ping()
 	MESSAGE_DEBUG("", "", "start");
 
 	SetMethod("ping");
-	SetQuery("");
+	SetQuery("{}");
 
 	if((error_message = SendRequestToServer()).empty())
 	{
@@ -505,3 +614,171 @@ string C_Smartway::ping()
 	return error_message;
 }
 
+string C_Smartway::airport_autocomplete(string query)
+{
+	auto	error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	SetMethod("airline.airport_autocomplete");
+	SetQuery(quoted(query));
+
+	if((error_message = SendRequestToServer()).empty())
+	{
+		if((error_message = ParseResponse()).empty())
+		{
+
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", error_message);
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", error_message);
+	}
+
+	MESSAGE_DEBUG("", "", "finish (" + (error_message.empty() ? "success" : "fail") + ")");
+
+	return error_message;
+}
+
+string C_Smartway::GetAirportAutocompleteJSON() const
+{
+	auto	result = ""s;
+	auto	error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	for(SizeType i = 0; i < json_obj["result"].Size(); ++i)
+	{
+		// --- continue from here
+		if(json_obj["result"][i].HasMember("code") && json_obj["result"][i]["code"].IsString())
+		{
+				if(json_obj["result"][i].HasMember("country") && json_obj["result"][i]["country"].IsObject())
+				{
+						if(json_obj["result"][i]["country"].HasMember("name_eng") && json_obj["result"][i]["country"]["name_eng"].IsString())
+						{
+							if(json_obj["result"][i].HasMember("name_eng") && json_obj["result"][i]["name_eng"].IsString())
+							{
+								if(result.length()) result += ",";
+								result = result + "{"
+												 + "\"id\":\"" + json_obj["result"][i]["code"].GetString() + "\","
+												 + "\"label\":\"" + json_obj["result"][i]["name_eng"].GetString() + " (" + json_obj["result"][i]["country"]["name_eng"].GetString() + ")\"" +
+											"}";
+							}
+							else
+							{
+								error_message = "Smartway "s + "response.id "s + gettext("response failed to parse");
+								MESSAGE_ERROR("", "", error_message + "(member 'name_eng' is missed or not a string)")
+								break;
+							}
+						}
+						else
+						{
+							error_message = "Smartway "s + "response.id "s + gettext("response failed to parse");
+							MESSAGE_ERROR("", "", error_message + "(member 'name_eng' is missed or not a string)")
+							break;
+						}
+				}
+				else
+				{
+					error_message = "Smartway "s + gettext("response failed to parse");
+					MESSAGE_ERROR("", "", error_message + "(member 'country' is missed or not a string)");
+					break;
+				}
+		}
+		else
+		{
+			error_message = "Smartway "s + gettext("response failed to parse");
+			MESSAGE_ERROR("", "", error_message + "(member 'code' is missed or not a string)");
+			break;
+		}
+	}
+
+	MESSAGE_DEBUG("", "", "finish (" + (result.length() ? "success" : "fail") + ")");
+
+	return result;
+}
+
+string C_Smartway::GetFlightsJSON() const
+{
+	auto	result = ""s;
+	auto	error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+
+	if(json_obj.HasMember("result") && json_obj["result"].IsObject())
+	{
+		StringBuffer			sb;
+		Writer<StringBuffer>	writer(sb);
+
+		json_obj["result"].Accept(writer);
+
+		result = sb.GetString();
+	}
+	else
+	{
+		error_message = "Smartway "s + "response.id "s + gettext("response failed to parse");
+		MESSAGE_ERROR("", "", error_message + "(result is missed or doesn't exists)");
+	}
+
+	MESSAGE_DEBUG("", "", "finish (" + (result.length() ? "success" : "fail") + ")");
+
+	return result;
+}
+
+string	C_Smartway::airline_search(const vector<C_Flight_Route> &flight_routes, string cabin_class, bool direct, string baggage, unsigned int travelers)
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	error_message = ""s;
+
+	auto	temp_query = 
+	"{"
+      "\"class\": " + quoted(cabin_class) + ","
+      "\"direct\": " + (direct ? "true" : "false") + ","
+      "\"baggage\": " + quoted(baggage) + ","
+      "\"travelers\": " + to_string(travelers) + ","
+      "\"routes\": [";
+
+	for(auto i = 0u; i < flight_routes.size(); ++i)
+	{
+		if(i) temp_query += ",";
+		temp_query +=
+        "{"
+			"\"departure\": " + quoted(flight_routes[i].from) + ","
+			"\"arrival\": " + quoted(flight_routes[i].to) + ","
+			"\"date\": " + quoted(GetSpellingFormattedDate(flight_routes[i].date, "%F")) + ""
+        "}";
+	}
+
+	temp_query +=
+      "]"
+    "}";
+
+	SetMethod("airline.search");
+	SetQuery(temp_query);
+
+	if((error_message = SendRequestToServer()).empty())
+	{
+		if((error_message = ParseResponse()).empty())
+		{
+
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", error_message);
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", error_message);
+	}
+
+	MESSAGE_DEBUG("", "", "finish (" + (error_message.empty() ? "success" : "fail") + ")");
+
+	return error_message;
+}

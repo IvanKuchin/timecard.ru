@@ -19,5 +19,6 @@
 #include "localy.h"
 #include "c_bt.h"
 #include "c_company.h"
+#include "c_smartway.h"
 
 #endif

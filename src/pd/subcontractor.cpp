@@ -2433,6 +2433,79 @@ int main()
 		}
 	}
 
+	if(action == "AJAX_findFlights")
+	{
+		MESSAGE_DEBUG("", action, "start");
+
+		ostringstream			ostResult;
+		auto					template_name = "json_response.htmlt"s;
+		auto					error_message = ""s;
+		auto					success_message = ""s;
+		vector<C_Flight_Route>	flight_routes;
+		auto					idx = 0;
+
+		while(CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("from_" + to_string(idx))).length())
+		{
+			C_Flight_Route	temp;
+			
+			temp.from = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("from_" + to_string(idx)));
+			temp.to = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("to_" + to_string(idx)));
+			temp.date = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("date_takeoff_" + to_string(idx)));
+
+			++idx;
+			
+			flight_routes.push_back(temp);
+		}
+
+		ostResult.str("");
+
+		if(flight_routes.size())
+		{
+			C_Smartway		smartway(&db, &user);
+
+			// error_message = smartway.ping();
+			if(error_message.empty())
+			{
+				error_message = smartway.airline_search(flight_routes);
+				if(error_message.empty())
+				{
+					success_message = ",\"flights\":[" + smartway.GetFlightsJSON() + "]";
+				}
+				else
+				{
+					MESSAGE_ERROR("", "", "fail to search flights");
+				}
+			}
+			else
+			{
+				MESSAGE_ERROR("", "", "fail to reach server");
+			}
+		}
+		else
+		{
+			error_message = gettext("mandatory parameter missed");
+			MESSAGE_ERROR("", action, error_message);
+		}
+
+		if(error_message.empty())
+		{
+			ostResult << "{\"result\":\"success\"" + success_message + "}";
+		}
+		else
+		{
+			MESSAGE_DEBUG("", action, "failed");
+			ostResult.str("");
+			ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+		}
+
+		indexPage.RegisterVariableForce("result", ostResult.str());
+
+		if(!indexPage.SetTemplate(template_name))
+		{
+			MESSAGE_ERROR("", action, "can't find template " + template_name);
+		}
+	}
+
 
 	{
 		MESSAGE_DEBUG("", "", "post-condition if(action == \"" + action + "\")");
