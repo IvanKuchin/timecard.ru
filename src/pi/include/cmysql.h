@@ -31,8 +31,8 @@ class CMysqlSkel
 						CMysqlSkel( void ): db(NULL), fieldsInfo(NULL), numRows(0), numFields(0) {};
 		void			CloseDB( void );
 		int				InitDB(const char *dbName, const char *user, const char *pass );
-		MYSQL_RES*		QueryDB(string query );
-		unsigned long	InsertQueryDB(string query );
+		MYSQL_RES*		QueryDB(const string &query );
+		unsigned long	InsertQueryDB(const string &query );
 		char*			ResultValue( MYSQL_RES *result, unsigned int row, const char *name );
 		char*			ResultValue( MYSQL_RES *result, unsigned int row, int fi );
 		int				ResultRows( MYSQL_RES *result );
@@ -50,8 +50,8 @@ class CMysql : public CMysqlSkel
 						CMysql(const char *dbname, const char *login, const char *pass);
 
 		int				Connect(const char *dbname, const char *login, const char *pass);
-		int				Query(string query);
-		unsigned long	InsertQuery(string query);
+		int				Query(const string &query);
+		unsigned long	InsertQuery(const string &query);
 		string			Get(int rows, const string &field);
 		string			Get(int rows, const char *field);
 		string			Get(int rows, int col);

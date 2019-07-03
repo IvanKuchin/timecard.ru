@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-04 18:31-0400\n"
+"POT-Creation-Date: 2019-07-03 17:19-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -35,17 +35,11 @@ msgstr[2] "%d субконтракторам"
 msgid "1C generation failed"
 msgstr "Ошибка в выгрузке 1С"
 
-msgid "first name and last name are mandatory"
-msgstr "имя и фамилия обязательны"
-
 msgid "1c filename is empty"
 msgstr "не указано имя фаила 1с"
 
 msgid "1c template not found"
 msgstr "не указан шаблон 1с"
-
-msgid "service is not reachable"
-msgstr "сервисе недоступен"
 
 msgid "Access prohibited"
 msgstr "Нет доступа"
@@ -58,9 +52,6 @@ msgstr "Бухгалтер"
 
 msgid "Act"
 msgstr "Акт"
-
-msgid "za"
-msgstr "за"
 
 msgid "Agency: cost center"
 msgstr "Данные агенства: центр затрат"
@@ -89,9 +80,6 @@ msgstr "Апрель"
 msgid "April declension"
 msgstr "Апреля"
 
-msgid "file not found"
-msgstr "фаил не найден"
-
 msgid "Assignment must be inside SoW"
 msgstr "Назначение должно быть в SoW"
 
@@ -103,15 +91,6 @@ msgstr "Августа"
 
 msgid "BT doesn't belongs to agency"
 msgstr "Командировка не относится к агенству"
-
-msgid "can't change dates in past"
-msgstr "нельзя менять даты в прошлом"
-
-msgid "can't create absence in the past"
-msgstr "нельзя создавать отпуск в прошлом"
-
-msgid "can't remove absence in the past"
-msgstr "нельзя удаляить отпуск в прошлом"
 
 msgid "BT not found"
 msgstr "Командировка не найдена"
@@ -128,9 +107,6 @@ msgstr "Покупатель"
 msgid "Can't remove"
 msgstr "Нельзя удалить"
 
-msgid "absence overlaps"
-msgstr "отсутствие перекрывается"
-
 msgid "Company not found"
 msgstr "Компания не найдена"
 
@@ -142,6 +118,9 @@ msgstr "Центр Затрат: номер договора"
 
 msgid "Customer"
 msgstr "Заказчик"
+
+msgid "DB is not initialized"
+msgstr "Ошибка инициализации БД"
 
 msgid "Data has not been initialized"
 msgstr "Ошибка инициализации данных"
@@ -302,11 +281,11 @@ msgstr "Получатель"
 msgid "Remote service report over period"
 msgstr "Отчет об оказанных услугах на удаленном участке"
 
-msgid "SQL syntax issue"
+msgid "SQL syntax error"
 msgstr "Ошибка БД"
 
-msgid "fail to find company position title"
-msgstr "должность не найдена"
+msgid "SQL syntax issue"
+msgstr "Ошибка БД"
 
 msgid "Seller"
 msgstr "Продавец"
@@ -325,9 +304,6 @@ msgstr "Подпись"
 
 msgid "SoW"
 msgstr "Договор"
-
-msgid "sow declension"
-msgstr "договора"
 
 msgid "SoW number already exists"
 msgstr "Договор с таким номером уже есть"
@@ -422,6 +398,12 @@ msgstr "Вы не сотрудник агенства"
 msgid "You are not authorized"
 msgstr "У Вас нет доступа"
 
+msgid "absence not found"
+msgstr "Заявка на отсутствие не найдена"
+
+msgid "absence overlaps"
+msgstr "отсутствие перекрывается"
+
 msgid "account is empty"
 msgstr "не указан счет"
 
@@ -443,9 +425,6 @@ msgstr "Агенство не найдено"
 msgid "agency not found"
 msgstr "агенство не найдено"
 
-msgid "airline not found"
-msgstr "авиалинии не найдены"
-
 msgid "agreement declensioned"
 msgstr "договора"
 
@@ -457,6 +436,9 @@ msgstr "Не удалось сегенерировать набор докуме
 
 msgid "agreement number is empty"
 msgstr "не указан номер договора"
+
+msgid "airline not found"
+msgstr "авиалинии не найдены"
 
 msgid "already exists"
 msgstr "уже существует"
@@ -472,6 +454,9 @@ msgstr "Внутренняя ошибка с БИК"
 
 msgid "bik not found"
 msgstr "не указан БИК"
+
+msgid "birthday is empty"
+msgstr "Не указана дата рождения"
 
 msgid "bt date finish is empty"
 msgstr "не указана дата окончания командировки"
@@ -503,20 +488,38 @@ msgstr "но отличается ОГРН"
 msgid "but account is different"
 msgstr "но отличается корр счет"
 
+msgid "can't change dates in past"
+msgstr "нельзя менять даты в прошлом"
+
 msgid "can't close archive"
 msgstr "не удалось закрыть фаил архива"
+
+msgid "can't create absence in the past"
+msgstr "нельзя создавать отпуск в прошлом"
 
 msgid "can't create archive"
 msgstr "не удалось создать фаил архива"
 
+msgid "can't remove absence in the past"
+msgstr "нельзя удаляить отпуск в прошлом"
+
 msgid "changed"
 msgstr "изменилось"
+
+msgid "citizenship code is empty"
+msgstr "не указано гражданство"
 
 msgid "col index out of range"
 msgstr "недопустимый индекс"
 
 msgid "company doesn't exists"
 msgstr "такой компании нет"
+
+msgid "company not found"
+msgstr "компания не найдена"
+
+msgid "company tin is empty"
+msgstr "не указан ИНН компании"
 
 msgid "cost center already exists"
 msgstr "такой центр затрат уже есть"
@@ -572,6 +575,9 @@ msgstr "дневная ставка"
 msgid "dayrate changed"
 msgstr "dayrate изменился"
 
+msgid "dayrate is empty"
+msgstr "не указан dayrate"
+
 msgid "dayrate not set"
 msgstr "не указан dayrate"
 
@@ -583,6 +589,9 @@ msgstr "отдел"
 
 msgid "description updated"
 msgstr "описание изменено"
+
+msgid "email is empty"
+msgstr "не указан email"
 
 msgid "employeer not found"
 msgstr "не найден работодатель"
@@ -596,6 +605,9 @@ msgstr "дата окончания"
 msgid "end date changed"
 msgstr "изменилась дата окончания контракта"
 
+msgid "end date is empty"
+msgstr "не указана дата окончания"
+
 msgid "exceeds allowed size"
 msgstr "превышает допустимый размер"
 
@@ -604,6 +616,12 @@ msgstr "ошибка создания объекта timecard"
 
 msgid "fail to create temp directory"
 msgstr "невозможно создать временное хранилище"
+
+msgid "fail to find company position title"
+msgstr "должность не найдена"
+
+msgid "fail to generate documents set"
+msgstr "не удалось сгенерировать набор документов"
 
 msgid "fail to initialize hpdf library"
 msgstr "ошибка инициализации библиотеки libharu"
@@ -620,13 +638,31 @@ msgstr "не удалось напечатать таблицу"
 msgid "fail to produce object set"
 msgstr "не удалось собрать внутреннюю структуру"
 
+msgid "file not found"
+msgstr "фаил не найден"
+
 msgid "file size"
 msgstr "размер фаила"
 
-msgid "from"
-msgstr "с"
+msgid "first name and last name are mandatory"
+msgstr "имя и фамилия обязательны"
 
-msgid "with"
+msgid "foreign last name is empty"
+msgstr "не указана фамилия как в загран паспорте"
+
+msgid "foreign name is empty"
+msgstr "не указано имя как в загран паспорте"
+
+msgid "foreign passport due date is empty"
+msgstr "не указана дата окончания действия загран паспорте"
+
+msgid "foreign passport number is empty"
+msgstr "не указан номер загран паспорта"
+
+msgid "foreign passport type is empty"
+msgstr "не указан тип загран паспорта"
+
+msgid "from"
 msgstr "с"
 
 msgid "hpdf: fail save to file"
@@ -677,14 +713,29 @@ msgstr "некорректный код"
 msgid "is empty"
 msgstr "не указан"
 
+msgid "is not a boolean"
+msgstr "is not a boolean"
+
+msgid "is not a string"
+msgstr "не строка"
+
+msgid "is not true"
+msgstr "is not true"
+
 msgid "item short"
 msgstr "шт"
+
+msgid "json_obj reponse error"
+msgstr "ошибка объекта JSON"
 
 msgid "kop."
 msgstr "коп."
 
 msgid "kpp is empty"
 msgstr "не указан КПП"
+
+msgid "last name is empty"
+msgstr "не указана фамилия"
 
 msgid "legal_address is empty"
 msgstr "не указан юр. адрес"
@@ -697,9 +748,6 @@ msgstr "не указан адрес доставки"
 
 msgid "mandatory parameter missed"
 msgstr "пропущен обязательный параметр"
-
-msgid "user employed in another agency"
-msgstr "сотрудник уже работает в другом агенстве"
 
 msgid "missed PSoW number"
 msgstr "не указан номер PSoW"
@@ -722,8 +770,14 @@ msgstr "НДС не облагается"
 msgid "no VAT short"
 msgstr "без НДС"
 
+msgid "no bt found"
+msgstr "не найдена командировка"
+
 msgid "no excise"
 msgstr "без акциза"
+
+msgid "no timecard found"
+msgstr "не найдена таймкарта"
 
 msgid "noVAT"
 msgstr "БезНДС"
@@ -749,6 +803,9 @@ msgstr "некорректные параметры"
 msgid "period start have to precede period end"
 msgstr "начало должно быть раньше окончания"
 
+msgid "phone is not confirmed"
+msgstr "телефон не подтвержден"
+
 msgid "phone number is incorrect"
 msgstr "некорректный номер телефона"
 
@@ -767,8 +824,38 @@ msgstr "Нельзя удалить"
 msgid "removed"
 msgstr "удален"
 
+msgid "response failed to parse"
+msgstr "ошибка ответа сервера"
+
+msgid "result is not a string"
+msgstr "result is not a string"
+
+msgid "result is not an array"
+msgstr "result is not an array"
+
+msgid "result is not null"
+msgstr "result is not null"
+
+msgid "root item is not an object"
+msgstr "ошибка ответа сервера"
+
+msgid "ru passport due date is empty"
+msgstr "не указана дата выдачи паспорта"
+
+msgid "ru passport number is empty"
+msgstr "не указан номер паспорта"
+
+msgid "ru passport type is empty"
+msgstr "не указана тип паспорта"
+
 msgid "rur."
 msgstr "руб."
+
+msgid "service is not reachable"
+msgstr "сервисе недоступен"
+
+msgid "sex is empty"
+msgstr "не указан пол"
 
 msgid "sign date"
 msgstr "дата подписания"
@@ -785,14 +872,23 @@ msgstr "не указан подписант 1"
 msgid "signature title 2 is empty"
 msgstr "не указан подписант 2"
 
+msgid "sow declension"
+msgstr "договора"
+
 msgid "start date"
 msgstr "дата начала"
 
 msgid "start date changed"
 msgstr "изменилась дата подписания контракта"
 
+msgid "start date is empty"
+msgstr "не указана дата начала"
+
 msgid "subc company.id is empty"
 msgstr "не указан идентификатор компании субконтрактора"
+
+msgid "subcontractor_company_id is unknown"
+msgstr "не указан идентификатор компании"
 
 msgid "table is too wide"
 msgstr "таблица слишком широкая"
@@ -802,6 +898,9 @@ msgstr "шаблон не найден"
 
 msgid "temporary file doesn't exists"
 msgstr "временный фаил не найден"
+
+msgid "this booking already exists"
+msgstr "этот букинг уже существует"
 
 msgid "till"
 msgstr "до"
@@ -839,14 +938,26 @@ msgstr "не удалось создать PSoW"
 msgid "unknown invoice"
 msgstr "Неизвестный счет"
 
+msgid "unknown smartway method"
+msgstr "неизвестный Smartway метод"
+
 msgid "up to"
 msgstr "по"
 
 msgid "updated"
 msgstr "изменен"
 
+msgid "user already enrolled"
+msgstr "пользователь уже дал согласие"
+
+msgid "user employed in another agency"
+msgstr "сотрудник уже работает в другом агенстве"
+
 msgid "user is not initialized"
 msgstr "пользователь не существует"
+
+msgid "user not found"
+msgstr "пользователь не найден"
 
 msgid "variable not found"
 msgstr "перенеменная не найдена"
@@ -857,11 +968,20 @@ msgstr "НДС"
 msgid "w/o"
 msgstr "без"
 
+msgid "with"
+msgstr "с"
+
 msgid "wrong format"
 msgstr "некорректный формат"
 
+msgid "you are no authorized"
+msgstr "у Вас недостаточно прав"
+
 msgid "you are not assigned to customer"
 msgstr "вы не назначены на этого заказчика"
+
+msgid "za"
+msgstr "за"
 
 msgid "zip not found"
 msgstr "индекс не найден"

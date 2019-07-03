@@ -2506,6 +2506,86 @@ int main()
 		}
 	}
 
+	if(action == "AJAX_purchaseAirTicket")
+	{
+		MESSAGE_DEBUG("", action, "start");
+
+		ostringstream			ostResult;
+		auto					template_name = "json_response.htmlt"s;
+		auto					error_message = ""s;
+		auto					success_message = ""s;
+		auto					passport_type = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("passport_type"));
+		auto					search_id = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("search_id"));
+		auto					trip_id = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("trip_id"));
+		auto					fare_id = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("fare_id"));
+
+		ostResult.str("");
+
+		if(search_id.length() && trip_id.length() && fare_id.length())
+		{
+			if(db.Query("SELECT `id` FROM `user_tickets_avia` WHERE `user_id`=\"" + user.GetID() + "\" AND `search_id`=\"" + search_id + "\" AND `trip_id`=\"" + trip_id + "\" AND `fare_id`=\"" + fare_id + "\";") == 0)
+			{
+				C_Smartway		smartway(&db, &user);
+
+				error_message = smartway.airline_book(user.GetID(), passport_type, search_id, trip_id, fare_id);
+				if(error_message.empty())
+				{
+					auto	id = db.InsertQuery("INSERT INTO `user_tickets_avia` "s
+												"(`user_id`, `search_id`, `trip_id`, `fare_id`, `purchase_datetime`, `result_trip_id`, `eventTimestamp`) "
+												"VALUES "
+												"("	+
+													"\"" + user.GetID() + "\", "
+													"\"" + search_id + "\", "
+													"\"" + trip_id + "\", "
+													"\"" + fare_id + "\", "
+													"NOW(), "
+													"\"" + smartway.GetAirlineBookingResultID() + "\", "
+													"UNIX_TIMESTAMP());");
+
+					if(id)
+					{
+
+					}
+					else
+					{
+						MESSAGE_ERROR("", "", "VERY IMPORTANT: fail to insert to DB, check Smartway web-site, ticket could be purchased");
+					}
+				}
+				else
+				{
+					MESSAGE_ERROR("", "", "fail to search flights");
+				}
+			}
+			else
+			{
+				error_message = gettext("this booking already exists");
+				MESSAGE_DEBUG("", "", error_message);
+			}
+		}
+		else
+		{
+			error_message = gettext("mandatory parameter missed");
+			MESSAGE_ERROR("", action, error_message);
+		}
+
+		if(error_message.empty())
+		{
+			ostResult << "{\"result\":\"success\"" + success_message + "}";
+		}
+		else
+		{
+			MESSAGE_DEBUG("", action, "failed");
+			ostResult.str("");
+			ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+		}
+
+		indexPage.RegisterVariableForce("result", ostResult.str());
+
+		if(!indexPage.SetTemplate(template_name))
+		{
+			MESSAGE_ERROR("", action, "can't find template " + template_name);
+		}
+	}
 
 	{
 		MESSAGE_DEBUG("", "", "post-condition if(action == \"" + action + "\")");
