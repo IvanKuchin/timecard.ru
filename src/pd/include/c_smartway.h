@@ -87,6 +87,9 @@ class C_Smartway
 		string			json_response = "";
 		string			employee_id = "";
 		string			airline_booking_result_id = "";
+		string			airline_result_status = "";
+		string			airline_result_error = "";
+		string			airline_result_trip_id = "";
 
 		C_Smartway_Employees	employees;
 		rapidjson::Document		json_obj;
@@ -112,6 +115,7 @@ class C_Smartway
 		string			ParseResponse_AirportAutocomplete();
 		string			ParseResponse_AirlineSearch();
 		string			ParseResponse_AirlineBook();
+		string			ParseResponse_AirlineResult();
 
 		void			SetEmployeeID(string p) { employee_id = p; };
 
@@ -126,11 +130,15 @@ class C_Smartway
 		string			employees_save(string userID);
 		string			airline_search(const vector<C_Flight_Route> &, string cabin_class = "Econom", bool direct = false, string baggage = "all", unsigned int travelers = 1);
 		string			airline_book(const string &user_id, const string &passport_type, const string &search_id, const string &trip_id, const string &fare_id);
+		string			airline_result(const string &id);
 
 		string			airport_autocomplete(string query);
 		string			GetAirportAutocompleteJSON() const;
 		string			GetFlightsJSON() const;
 		string			GetAirlineBookingResultID() const	{ return airline_booking_result_id; };
+		string			GetAirlineResultTripID() const		{ return airline_result_trip_id; };
+		string			GetAirlineResultStatus() const		{ return airline_result_status; };
+		string			GetAirlineResultError() const		{ return airline_result_error; };
 
 		string			GetEmployeeID()	{ return employee_id; };
 };

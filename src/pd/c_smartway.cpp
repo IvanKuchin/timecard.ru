@@ -500,6 +500,66 @@ string C_Smartway::ParseResponse_AirlineSearch()
 	return error_message;
 }
 
+string C_Smartway::ParseResponse_AirlineResult()
+{
+	auto		error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(json_obj["result"].IsObject())
+	{
+		if(json_obj["result"]["status"].IsString())
+		{
+			airline_result_status = json_obj["result"]["status"].GetString();
+
+			if(GetAirlineResultStatus() == "done")
+			{
+				if(json_obj["result"]["trip_id"].IsNumber())
+				{
+					airline_result_trip_id = to_string(json_obj["result"]["trip_id"].GetInt());
+				}
+				else
+				{
+					error_message = "Smartway trip_id "s + gettext("is not a number");
+					MESSAGE_ERROR("", "", error_message);
+				}
+			}
+			else if(GetAirlineResultStatus() == "failed")
+			{
+				if(json_obj["result"]["error"].IsString())
+				{
+					airline_result_error = json_obj["result"]["error"].GetString();
+				}
+				else
+				{
+					error_message = "Smartway error "s + gettext("is not a string");
+					MESSAGE_ERROR("", "", error_message);
+				}
+			}
+			else
+			{
+				error_message = "Smartway "s + gettext("unknown method");
+				MESSAGE_ERROR("", "", error_message);
+			}
+
+		}
+		else
+		{
+			error_message = "Smartway status "s + gettext("is not a string");
+			MESSAGE_ERROR("", "", error_message);
+		}
+	}
+	else
+	{
+		error_message = "Smartway "s + gettext("result is not a string");
+		MESSAGE_ERROR("", "", error_message);
+	}
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return error_message;
+}
+
 string C_Smartway::ParseResponse_AirlineBook()
 {
 	auto		error_message = ""s;
@@ -615,6 +675,10 @@ string C_Smartway::ParseResponse()
 			{
 				if((error_message = ParseResponse_AirlineBook()).length()) MESSAGE_ERROR("", "", "fail to parse airline.book response");
 			}
+			else if(GetMethod() == "airline.result")
+			{
+				if((error_message = ParseResponse_AirlineResult()).length()) MESSAGE_ERROR("", "", "fail to parse airline.book response");
+			}
 			else
 			{
 				error_message = gettext("unknown smartway method");
@@ -695,175 +759,7 @@ string C_Smartway::BuildEmployeesSaveQuery(string user_id)
 	auto	json = ""s;
 
 	MESSAGE_DEBUG("", "", "start");
-/*
-	if(user_id.length())
-	{
-		if(db)
-		{
-			if(db->Query("SELECT * FROM `users` WHERE `id`=\"" + user_id + "\";"))			
-			{
-				auto	employee_id			= user_id;
-				auto	is_phone_confirmed	= db->Get(0, "is_phone_confirmed");
-				auto	phone				= "+" + db->Get(0, "country_code") + db->Get(0, "phone");
-				auto	surname				= db->Get(0, "nameLast");
-				auto	name				= db->Get(0, "name");
-				auto	patronymic			= db->Get(0, "nameMiddle");
-				auto	surname_eng			= db->Get(0, "last_name_en");
-				auto	name_eng			= db->Get(0, "first_name_en");
-				auto	patronymic_eng		= db->Get(0, "middle_name_en");
-				auto	email				= db->Get(0, "email");
-				auto	citizenship_code	= db->Get(0, "citizenship_code");
-				auto	birthday			= db->Get(0, "birthday");
-				auto	sex					= db->Get(0, "sex");
-				auto	ru_passport_number	= db->Get(0, "passport_series") + " " + db->Get(0, "passport_number");
-				auto	ru_passport_due_date= "null"s;
-				auto	ru_passport_type	= "domestic_passport"s;
-				auto	for_passport_number	= db->Get(0, "foreign_passport_number");
-				auto	for_passport_due_date= db->Get(0, "foreign_passport_expiration_date");
-				auto	for_passport_type	= "foreign_passport"s;
 
-				if(db->Query("SELECT * FROM `company` WHERE `admin_userID`=\"" + user_id + "\" and `type`=\"subcontractor\";"))			
-				{
-					auto	company_tin = db->Get(0, "tin");
-
-					// --- validity check
-					if(is_phone_confirmed == "N")
-					{
-						error_message = gettext("phone is not confirmed");
-						MESSAGE_ERROR("", "", error_message);
-					}
-					else if(surname.empty())
-					{
-						error_message = gettext("last name is empty");
-						MESSAGE_ERROR("", "", error_message);
-					}
-					else if(name.empty())
-					{
-						error_message = gettext("name is empty");
-						MESSAGE_ERROR("", "", error_message);
-					}
-					else if(surname_eng.empty())
-					{
-						error_message = gettext("foreign last name is empty");
-						MESSAGE_ERROR("", "", error_message);
-					}
-					else if(name_eng.empty())
-					{
-						error_message = gettext("foreign name is empty");
-						MESSAGE_ERROR("", "", error_message);
-					}
-					else if(email.empty())
-					{
-						error_message = gettext("email is empty");
-						MESSAGE_ERROR("", "", error_message);
-					}
-					else if(citizenship_code.empty())
-					{
-						error_message = gettext("citizenship code is empty");
-						MESSAGE_ERROR("", "", error_message);
-					}
-					else if(birthday.empty())
-					{
-						error_message = gettext("birthday is empty");
-						MESSAGE_ERROR("", "", error_message);
-					}
-					else if(sex.empty())
-					{
-						error_message = gettext("sex is empty");
-						MESSAGE_ERROR("", "", error_message);
-					}
-					else if(ru_passport_number.empty())
-					{
-						error_message = gettext("ru passport number is empty");
-						MESSAGE_ERROR("", "", error_message);
-					}
-					else if(ru_passport_type.empty())
-					{
-						error_message = gettext("ru passport type is empty");
-						MESSAGE_ERROR("", "", error_message);
-					}
-					else if(ru_passport_due_date.empty())
-					{
-						error_message = gettext("ru passport due date is empty");
-						MESSAGE_ERROR("", "", error_message);
-					}
-					else if(for_passport_number.empty())
-					{
-						error_message = gettext("foreign passport number is empty");
-						MESSAGE_ERROR("", "", error_message);
-					}
-					else if(for_passport_type.empty())
-					{
-						error_message = gettext("foreign passport type is empty");
-						MESSAGE_ERROR("", "", error_message);
-					}
-					else if(for_passport_due_date.empty())
-					{
-						error_message = gettext("foreign passport due date is empty");
-						MESSAGE_ERROR("", "", error_message);
-					}
-					else if(company_tin.empty())
-					{
-						error_message = gettext("company tin is empty");
-						MESSAGE_ERROR("", "", error_message);
-					}
-
-					result = 
-						      "\"employees\": ["
-						        "{"
-						          "\"id\": " + quoted(employee_id) + ","
-						          "\"mobile_phone\": " + quoted(phone) + ","
-						          "\"surname\": " + quoted(surname) + ","
-						          "\"name\": " + quoted(name) + ","
-						          "\"patronymic\": " + quoted(patronymic) + ","
-						          "\"surname_eng\": " + quoted(surname_eng) + ","
-						          "\"name_eng\": " + quoted(name_eng) + ","
-						          "\"patronymic_eng\": " + quoted(patronymic_eng) + ","
-						          "\"email\": " + quoted(email) + ","
-						          "\"citizenship_code\": " + quoted(citizenship_code) + ","
-						          "\"birthday\": " + quoted(birthday) + ","
-						          "\"sex\": " + quoted(sex) + ","
-						          "\"bonuses\": [],"
-						          "\"documents\": ["
-						            "{"
-						              "\"number\": " + quoted(ru_passport_number) + ","
-						              "\"due_date\": " + quoted(ru_passport_due_date) + ","
-						              "\"type\": " + quoted(ru_passport_type) + ""
-						            "},"
-						            "{"
-						              "\"number\": " + quoted(for_passport_number) + ","
-						              "\"due_date\": " + quoted(for_passport_due_date) + ","
-						              "\"type\": " + quoted(for_passport_type) + ""
-						            "}"
-						          "],"
-						          "\"companies_inn\": [" + quoted(company_tin) + "]"
-						        "}"
-						      "]";
-				}
-				else
-				{
-					error_message = gettext("company not found");
-					MESSAGE_ERROR("", "", error_message);
-				}
-			}
-			else
-			{
-				error_message = gettext("user not found");
-				MESSAGE_ERROR("", "", error_message);
-			}
-		}
-		else
-		{
-			error_message = gettext("DB is not initialized");
-			MESSAGE_ERROR("", "", error_message);
-		}
-	}
-	else
-	{
-		error_message = gettext("mandatory parameter missed");
-		MESSAGE_ERROR("", "", error_message);
-	}
-*/
 	employees.SetMethod("employees.save");
 	json = employees.GetEmployeesJSON("SELECT * FROM `users` WHERE `id`=\"" + user_id + "\" AND `type`=\"subcontractor\";");
 
@@ -1165,7 +1061,36 @@ string	C_Smartway::airline_book(const string &user_id, const string &passport_ty
 	{
 		if((error_message = ParseResponse()).empty())
 		{
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", error_message);
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", error_message);
+	}
 
+	MESSAGE_DEBUG("", "", "finish (" + (error_message.empty() ? "success" : "fail") + ")");
+
+	return error_message;
+}
+
+string	C_Smartway::airline_result(const string &id)
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	error_message = ""s;
+	auto	temp_query = ""s;
+
+	SetMethod("airline.result");
+	SetQuery("\"" + id + "\"");
+
+	if((error_message = SendRequestToServer()).empty())
+	{
+		if((error_message = ParseResponse()).empty())
+		{
 		}
 		else
 		{

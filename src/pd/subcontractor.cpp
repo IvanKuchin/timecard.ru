@@ -2544,7 +2544,45 @@ int main()
 
 					if(id)
 					{
-
+						error_message = smartway.airline_result(smartway.GetAirlineBookingResultID());
+						if(error_message.empty())
+						{
+							db.Query("UPDATE `user_tickets_avia` SET `status`=\"" + smartway.GetAirlineResultStatus() + "\" WHERE `id`=\"" + to_string(id) + "\";");
+							if(db.isError())
+							{
+								error_message = gettext("SQL syntax error");
+								MESSAGE_DEBUG("", "", error_message);
+							}
+							else
+							{
+								if(smartway.GetAirlineResultStatus() == "done")
+								{
+									if(trip_id == smartway.GetAirlineResultTripID())
+									{
+										// --- good result
+									}
+									else
+									{
+										error_message = "Smartway "s + gettext("trip_id failure");
+										MESSAGE_ERROR("", action, error_message);
+									}
+								}
+								else if(smartway.GetAirlineResultStatus() == "failed")
+								{
+									error_message = smartway.GetAirlineResultError();
+									MESSAGE_DEBUG("", "", error_message);
+								}
+								else
+								{
+									error_message = "Smartway "s + gettext("unknown method");
+									MESSAGE_DEBUG("", "", error_message);
+								}
+							}
+						}
+						else
+						{
+							MESSAGE_ERROR("", "", "fail to get booking status");
+						}
 					}
 					else
 					{

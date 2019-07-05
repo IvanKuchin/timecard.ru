@@ -528,7 +528,7 @@ bool CHTML::PerformRequest(string param)
 
 			if(isPostJSON())
 			{
-				MESSAGE_DEBUG("", "", "post json: " + GetPostJSON())
+				MESSAGE_DEBUG("", "", "post json: " + GetPostJSON());
 
 				curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "POST");
 			    __slist_headers = curl_slist_append(__slist_headers, "Accept: application/json");
@@ -543,6 +543,7 @@ bool CHTML::PerformRequest(string param)
 			if(isPostJSON())
 			{
 				curl_slist_free_all(__slist_headers);
+				__slist_headers = nullptr;
 			}
 
 			if(curlRes == CURLE_OK)
