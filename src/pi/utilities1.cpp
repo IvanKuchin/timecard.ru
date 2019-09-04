@@ -580,15 +580,13 @@ auto CheckHTTPParam_Number(const string &srcText) -> string
 
 string CheckHTTPParam_Float(const string &srcText)
 {
-	string	result = "";
+	auto	result = ""s;
 
-	{
-		MESSAGE_DEBUG("", "", "start param(" + srcText + ")");
-	}
+	MESSAGE_DEBUG("", "", "start param(" + srcText + ")");
 
 	if(srcText.length())
 	{
-		regex	r("^[0-9]+\\.?[0-9]+$");
+		regex	r("^[0-9]+(\\.[0-9]+)?$");
 
 		if(regex_match(srcText, r))
 		{
@@ -600,9 +598,7 @@ string CheckHTTPParam_Float(const string &srcText)
 		}
 	}
 
-	{
-		MESSAGE_DEBUG("", "", "finish ( result length = " + to_string(result.length()) + ")");
-	}
+	MESSAGE_DEBUG("", "", "finish ( result length = " + to_string(result.length()) + ")");
 
 	return	result;
 }
@@ -716,10 +712,15 @@ string	GetDefaultActionFromUserType(CUser *user, CMysql *db)
 
 	MESSAGE_DEBUG("", "", "start");
 
-	if(user->GetType() == "subcontractor") result = LOGGEDIN_SUBCONTRACTOR_DEFAULT_ACTION;
-	if(user->GetType() == "agency") result = LOGGEDIN_AGENCY_DEFAULT_ACTION;
-	if(user->GetType() == "approver") result = LOGGEDIN_APPROVER_DEFAULT_ACTION;
-	if(user->GetType() == "no role") result = LOGGEDIN_NOROLE_DEFAULT_ACTION;
+	if(user->GetType() == "guest") result = GUEST_USER_DEFAULT_ACTION;
+	else if(user->GetType() == "subcontractor") result = LOGGEDIN_SUBCONTRACTOR_DEFAULT_ACTION;
+	else if(user->GetType() == "agency") result = LOGGEDIN_AGENCY_DEFAULT_ACTION;
+	else if(user->GetType() == "approver") result = LOGGEDIN_APPROVER_DEFAULT_ACTION;
+	else if(user->GetType() == "no role") result = LOGGEDIN_NOROLE_DEFAULT_ACTION;
+	else
+	{
+		MESSAGE_ERROR("", "", "unknown user type (" + user->GetType() + ")");
+	}
 
 	MESSAGE_DEBUG("", "", "finish (result = " + result + ")");
 

@@ -128,10 +128,19 @@ const char *CMysqlSkel::GetErrorMessage(void)
 
 int CMysqlSkel::FieldsIndex(const char *fieldName )
 {
-    for(auto i = 0; i < numFields; i++ )
+    for(auto i = 0u; i < numFields; i++ )
     	if( strcmp( fieldName, fieldsInfo[i].name ) == 0 )
             return(i);
     return(-1);
+}
+
+auto CMysqlSkel::GetColName(unsigned int idx) -> string
+{
+    auto    result = ""s;
+
+    if(idx < numFields) result = fieldsInfo[idx].name;
+
+    return result;
 }
 
 void CMysqlSkel::FreeResultSet()

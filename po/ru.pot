@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-07-03 17:19-0400\n"
+"POT-Creation-Date: 2019-08-28 17:35-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -53,6 +53,12 @@ msgstr "Бухгалтер"
 msgid "Act"
 msgstr "Акт"
 
+msgid "Agency: bt allowance"
+msgstr "Данные агенства: надбавка"
+
+msgid "Agency: bt approver"
+msgstr "Данные агенства: порядок согласований командировок"
+
 msgid "Agency: cost center"
 msgstr "Данные агенства: центр затрат"
 
@@ -67,6 +73,9 @@ msgstr "Данные агенства: описание центра затра�
 
 msgid "Agency: cost center title updated"
 msgstr "Данные агенства: название центра затрат изменено"
+
+msgid "Agency: holiday calendar"
+msgstr "Данные агенства: производственный календарь"
 
 msgid "Agreement"
 msgstr "Договор"
@@ -413,6 +422,9 @@ msgstr "номер акта"
 msgid "act number is empty"
 msgstr "не указан номер акта"
 
+msgid "added"
+msgstr "добавлено"
+
 msgid "agency bank id not found"
 msgstr "банк не найден"
 
@@ -445,6 +457,9 @@ msgstr "уже существует"
 
 msgid "and"
 msgstr "и"
+
+msgid "approver doesn't assigned to SoW"
+msgstr "согласователь не назначен договору"
 
 msgid "bank_id is empty"
 msgstr "не указан банк"
@@ -509,6 +524,9 @@ msgstr "изменилось"
 msgid "citizenship code is empty"
 msgstr "не указано гражданство"
 
+msgid "code"
+msgstr "код"
+
 msgid "col index out of range"
 msgstr "недопустимый индекс"
 
@@ -560,11 +578,17 @@ msgstr "центр затрат не найден"
 msgid "country list is empty"
 msgstr "Список стран пустой"
 
+msgid "country not found"
+msgstr "страна не найдена"
+
 msgid "custom field"
 msgstr "доп. поле"
 
 msgid "customer assignment outside bt travel"
 msgstr "даты командировки вне периода назначения на заказчика"
+
+msgid "customer not found"
+msgstr "заказчик не найден"
 
 msgid "date is empty"
 msgstr "дата не указана"
@@ -716,11 +740,20 @@ msgstr "не указан"
 msgid "is not a boolean"
 msgstr "is not a boolean"
 
+msgid "is not a number"
+msgstr "не число"
+
 msgid "is not a string"
 msgstr "не строка"
 
+msgid "is not an air reservation"
+msgstr "не бронь перелета"
+
+msgid "is not an array"
+msgstr "не является массивом"
+
 msgid "is not true"
-msgstr "is not true"
+msgstr "не 'истина'"
 
 msgid "item short"
 msgstr "шт"
@@ -748,6 +781,12 @@ msgstr "не указан адрес доставки"
 
 msgid "mandatory parameter missed"
 msgstr "пропущен обязательный параметр"
+
+msgid "member has missed"
+msgstr "нет атрибута"
+
+msgid "message"
+msgstr "сообщение"
 
 msgid "missed PSoW number"
 msgstr "не указан номер PSoW"
@@ -827,11 +866,17 @@ msgstr "удален"
 msgid "response failed to parse"
 msgstr "ошибка ответа сервера"
 
+msgid "result is not a object"
+msgstr "результат не обьект"
+
 msgid "result is not a string"
 msgstr "result is not a string"
 
 msgid "result is not an array"
 msgstr "result is not an array"
+
+msgid "result is not an object"
+msgstr "результат не обьект"
 
 msgid "result is not null"
 msgstr "result is not null"
@@ -893,6 +938,9 @@ msgstr "не указан идентификатор компании"
 msgid "table is too wide"
 msgstr "таблица слишком широкая"
 
+msgid "task not assigned to a cost center"
+msgstr "заказчик не назначен никакому центру затрат"
+
 msgid "template not found"
 msgstr "шаблон не найден"
 
@@ -901,6 +949,12 @@ msgstr "временный фаил не найден"
 
 msgid "this booking already exists"
 msgstr "этот букинг уже существует"
+
+msgid "this limit already exists"
+msgstr "такое ограничение уже есть"
+
+msgid "tickets purchased"
+msgstr "билет куплен"
 
 msgid "till"
 msgstr "до"
@@ -929,6 +983,9 @@ msgstr "на"
 msgid "total amount"
 msgstr "на сумму"
 
+msgid "trip_id failure"
+msgstr "идентификатор поездки не найден"
+
 msgid "type is empty"
 msgstr "не указан тип"
 
@@ -938,14 +995,23 @@ msgstr "не удалось создать PSoW"
 msgid "unknown invoice"
 msgstr "Неизвестный счет"
 
+msgid "unknown method"
+msgstr "неизвестный метод"
+
 msgid "unknown smartway method"
 msgstr "неизвестный Smartway метод"
+
+msgid "unsupported action"
+msgstr "неизвестное действие"
 
 msgid "up to"
 msgstr "по"
 
 msgid "updated"
 msgstr "изменен"
+
+msgid "updated(female)"
+msgstr "изменена"
 
 msgid "user already enrolled"
 msgstr "пользователь уже дал согласие"
@@ -964,6 +1030,9 @@ msgstr "перенеменная не найдена"
 
 msgid "vat"
 msgstr "НДС"
+
+msgid "voucher content is empty"
+msgstr "содержимое ваучера пустое"
 
 msgid "w/o"
 msgstr "без"

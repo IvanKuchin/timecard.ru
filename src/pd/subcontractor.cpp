@@ -46,15 +46,20 @@ static auto	GetTimecardsSOWTaskAssignement_Reusable_InJSONFormat(string date, CM
 		{
 			if(db)
 			{
-				result =
-						"\"timecards\":[" + GetTimecardsInJSONFormat(
-								"SELECT * FROM `timecards` WHERE "
-									"`contract_sow_id` IN (SELECT `id` FROM `contracts_sow` WHERE `subcontractor_company_id` IN (SELECT `id` FROM `company` WHERE `admin_userID` = \"" + user->GetID() + "\")) "
+				auto	timecard_query = 
+								"FROM `timecards` WHERE "
+									"`contract_sow_id` IN ("
+										"SELECT `id` FROM `contracts_sow` WHERE `subcontractor_company_id` IN ("
+											"SELECT `id` FROM `company` WHERE `admin_userID` = \"" + user->GetID() + "\""
+										")"
+									") "
 									"AND "
 									"`period_start`<=\"" + date + "\" "
 									"AND "
-									"`period_end`>=\"" + date + "\""
-								";", db, user) + "],"
+									"`period_end`>=\"" + date + "\" ";
+
+				result =
+						"\"timecards\":[" + GetTimecardsInJSONFormat("SELECT * " + timecard_query + ";", db, user) + "],"
 						"\"sow\":[" + GetSOWInJSONFormat(
 								"SELECT * FROM `contracts_sow` WHERE "
 									"`subcontractor_company_id` IN (SELECT `id` FROM `company` WHERE `admin_userID` = \"" + user->GetID() + "\") "
@@ -71,7 +76,19 @@ static auto	GetTimecardsSOWTaskAssignement_Reusable_InJSONFormat(string date, CM
 																"`start_date`<=\"" + date + "\" "
 																"AND "
 																"`end_date`>=\"" + date + "\""
-															");", db, user) + "]";
+															");", db, user) + "],"
+						"\"holiday_calendar\":[" + GetHolidayCalendarInJSONFormat(
+								"SELECT * FROM `holiday_calendar` WHERE "
+									"`date`>=(SELECT DISTINCT(`period_start`) " + timecard_query + ") "
+									"AND "
+									"`date`<=(SELECT DISTINCT(`period_end`) " + timecard_query + ") "
+									"AND "
+									"`agency_company_id` IN ("
+										"SELECT `agency_company_id` FROM `contracts_sow` WHERE `subcontractor_company_id` IN ("
+											"SELECT `id` FROM `company` WHERE `admin_userID` = \"" + user->GetID() + "\""
+										")"
+									")"
+								";", db, user) + "]";
 			}
 			else
 			{
@@ -182,7 +199,7 @@ int main()
 			if(!indexPage.SetTemplate(template_name))
 			{
 				MESSAGE_ERROR("", action, "can't find template " + template_name);
-			} // if(!indexPage.SetTemplate("my_network.htmlt"))
+			}
 		}
 
 		MESSAGE_DEBUG("", action, "finish");
@@ -275,7 +292,7 @@ int main()
 			if(!indexPage.SetTemplate(template_name))
 			{
 				MESSAGE_ERROR("", action, "can't find template " + template_name);
-			} // if(!indexPage.SetTemplate("my_network.htmlt"))
+			}
 		}
 
 
@@ -346,7 +363,7 @@ int main()
 			if(!indexPage.SetTemplate(template_name))
 			{
 				MESSAGE_ERROR("", action, "can't find template " + template_name);
-			} // if(!indexPage.SetTemplate("my_network.htmlt"))
+			}
 		}
 
 
@@ -401,7 +418,7 @@ int main()
 			if(!indexPage.SetTemplate(template_name))
 			{
 				MESSAGE_ERROR("", action, "can't find template " + template_name);
-			} // if(!indexPage.SetTemplate("my_network.htmlt"))
+			}
 		}
 
 
@@ -412,21 +429,62 @@ int main()
 
 	if(action == "AJAX_getBTList")
 	{
+		ostringstream	ostResult;
+		auto			template_name = "json_response.htmlt"s;
+		auto			affected = db.Query("SELECT `id` FROM `company` WHERE `admin_userID`=\"" + user.GetID() + "\";");
 
-		string			strPageToGet, strFriendsOnSinglePage;
+		MESSAGE_DEBUG("", action, "start");
+
+		ostResult.str("");
+
+		if(affected)
+		{
+			auto		companies_list= ""s;
+
+			for(auto i = 0; i < affected; ++i)
+			{
+				if(companies_list.length()) companies_list += ",";
+				companies_list += db.Get(i, 0);
+			}
+
+			ostResult << "{"
+							"\"status\":\"success\","
+							"\"sow\":[" << GetSOWInJSONFormat(
+									"SELECT * FROM `contracts_sow` WHERE "
+										"`subcontractor_company_id` IN (" + companies_list + ") "
+									";", &db, &user) << "],"
+							"\"bt\":[" << GetBTsInJSONFormat(
+									"SELECT * FROM `bt` WHERE "
+										"`contract_sow_id` IN ( SELECT `id` FROM `contracts_sow` WHERE `subcontractor_company_id` IN (" + companies_list + "))"
+									";", &db, &user, false) << "]"
+						"}";
+		}
+		else
+		{
+			MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't owns company");
+			ostResult << "{\"status\":\"error\",\"description\":\"Вы не создали компанию\"}";
+		}
+
+		indexPage.RegisterVariableForce("result", ostResult.str());
+
+		if(!indexPage.SetTemplate(template_name))
+		{
+			MESSAGE_ERROR("", action, "can't find template " + template_name);
+		}
+
+		MESSAGE_DEBUG("", action, "finish");
+	}
+
+	if(action == "AJAX_getTravelList")
+	{
+
 		ostringstream	ostResult;
 
 		MESSAGE_DEBUG("", action, "start");
 
 		ostResult.str("");
-/*		if(user.GetLogin() == "Guest")
-		{
-			MESSAGE_DEBUG("", action, "re-login required");
 
-			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
-		}
-		else
-*/		{
+		{
 			string			template_name = "json_response.htmlt";
 			int				affected = db.Query("SELECT `id` FROM `company` WHERE `admin_userID`=\"" + user.GetID() + "\";");
 
@@ -446,10 +504,12 @@ int main()
 										"SELECT * FROM `contracts_sow` WHERE "
 											"`subcontractor_company_id` IN (" + companies_list + ") "
 										";", &db, &user) << "],"
-								"\"bt\":[" << GetBTsInJSONFormat(
-										"SELECT * FROM `bt` WHERE "
-											"`contract_sow_id` IN ( SELECT `id` FROM `contracts_sow` WHERE `subcontractor_company_id` IN (" + companies_list + "))"
-										";", &db, &user, false) << "]"
+								"\"airline_bookings\":[" << GetAirlineBookingsInJSONFormat(
+										"SELECT * FROM `airline_bookings` WHERE "
+											"`contract_sow_id` IN ( SELECT `id` FROM `contracts_sow` WHERE `subcontractor_company_id` IN (" + companies_list + ")) "
+											"AND "
+											"`status`=\"done\""
+										";", &db, &user) << "]"
 							"}";
 			}
 			else
@@ -463,7 +523,7 @@ int main()
 			if(!indexPage.SetTemplate(template_name))
 			{
 				MESSAGE_ERROR("", action, "can't find template " + template_name);
-			} // if(!indexPage.SetTemplate("my_network.htmlt"))
+			}
 		}
 
 
@@ -521,7 +581,7 @@ int main()
 			if(!indexPage.SetTemplate(template_name))
 			{
 				MESSAGE_ERROR("", action, "can't find template " + template_name);
-			} // if(!indexPage.SetTemplate("my_network.htmlt"))
+			}
 		}
 
 
@@ -538,14 +598,8 @@ int main()
 		MESSAGE_DEBUG("", action, "start");
 
 		ostResult.str("");
-/*		if(user.GetLogin() == "Guest")
-		{
-			MESSAGE_DEBUG("", action, "re-login required");
 
-			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
-		}
-		else
-*/		{
+		{
 			string			template_name = "json_response.htmlt";
 			int				affected = db.Query("SELECT `id` FROM `company` WHERE `admin_userID`=\"" + user.GetID() + "\";");
 
@@ -556,7 +610,7 @@ int main()
 				for(int i = 0; i < affected; ++i)
 				{
 					if(companies_list.length()) companies_list += ",";
-					companies_list += db.Get(i, "id");
+					companies_list += db.Get(i, 0);
 				}
 
 				ostResult << "{"
@@ -582,7 +636,7 @@ int main()
 			if(!indexPage.SetTemplate(template_name))
 			{
 				MESSAGE_ERROR("", action, "can't find template " + template_name);
-			} // if(!indexPage.SetTemplate("my_network.htmlt"))
+			}
 		}
 
 
@@ -659,7 +713,7 @@ int main()
 			if(!indexPage.SetTemplate(template_name))
 			{
 				MESSAGE_ERROR("", action, "can't find template " + template_name);
-			} // if(!indexPage.SetTemplate("my_network.htmlt"))
+			}
 		}
 
 
@@ -749,7 +803,7 @@ int main()
 									{
 										if((item.task == task) && (item.project == project) && (item.customer == customer))
 										{
-											MESSAGE_DEBUG("", action, "http post parameter duplicate found (" + customer + " / " + project + " / " + task + ")");
+											MESSAGE_DEBUG("", action, "http post parameter duplicate found (" + customer + TIMECARD_ENTRY_TITLE_SEPARATOR + project + TIMECARD_ENTRY_TITLE_SEPARATOR + task + ")");
 											isDuplicate = true;
 
 											item.timereports = SummarizeTimereports(item.timereports, timereports);
@@ -796,7 +850,7 @@ int main()
 
 								if(task_id.empty())
 								{
-									MESSAGE_DEBUG("", action, "task (" + item.customer + " / " + item.project + " / " + item.task + ") doesn't assigned to SoW (" + sow_id + ")");
+									MESSAGE_DEBUG("", action, "task (" + item.customer + TIMECARD_ENTRY_TITLE_SEPARATOR + item.project + TIMECARD_ENTRY_TITLE_SEPARATOR + item.task + ") doesn't assigned to SoW (" + sow_id + ")");
 
 									if(isSoWAllowedToCreateTask(sow_id, &db))
 									{
@@ -836,7 +890,7 @@ int main()
 												{
 													MESSAGE_DEBUG("", "", "no notification about task creation");
 												}
-												if(GeneralNotifySoWContractPartiesAboutChanges("AJAX_addTaskAssignment", task_assignment_id, sow_id, "", item.customer + " / " + item.project + " / " + item.task + " ( с " + sow_start_date + " по " + sow_end_date + ")", &db, &user))
+												if(GeneralNotifySoWContractPartiesAboutChanges("AJAX_addTaskAssignment", task_assignment_id, sow_id, "", item.customer + TIMECARD_ENTRY_TITLE_SEPARATOR + item.project + TIMECARD_ENTRY_TITLE_SEPARATOR + item.task + " ( с " + sow_start_date + " по " + sow_end_date + ")", &db, &user))
 												{
 												}
 												else
@@ -950,12 +1004,11 @@ int main()
 									db.Query("UPDATE `timecards` SET `status`=\"submit\", `submit_date`=UNIX_TIMESTAMP() WHERE `id`=\"" + timecard_id + "\";");
 									if(!db.isError())
 									{
-										// --- auto_approve
+/*										// --- auto_approve
 										// --- UNIX_TIMESTAMP() + 1 needed to make visibility that approve been done after submission
 										db.Query("INSERT INTO `timecard_approvals` (`timecard_id`, `approver_id`, `decision`, `comment`, `eventTimestamp`) "
 														"SELECT \"" + timecard_id + "\", `id`, \"approved\", \"auto-approve\",UNIX_TIMESTAMP()+1 FROM `timecard_approvers` WHERE `contract_sow_id`=\"" + sow_id + "\" AND `auto_approve`=\"Y\"");
-
-
+*/
 										if(SubmitTimecard(timecard_id, &db, &user))
 										{
 											success_description = GetTimecardsSOWTaskAssignement_Reusable_InJSONFormat(current_period_start_year + "-" + current_period_start_month + "-" + current_period_start_date, &db, &user);
@@ -965,6 +1018,20 @@ int main()
 											error_description = "ошибка отправки таймкарты";
 											MESSAGE_ERROR("", action, "fail to submit timecard_id(" + timecard_id + ")");
 										}
+
+/*
+										C_TC_BT_Submit	submit_obj(&db, &user);
+
+										if((error_message = submit_obj.Submit("timecard", timecard_id)).empty())
+										{
+											success_description = GetTimecardsSOWTaskAssignement_Reusable_InJSONFormat(current_period_start_year + "-" + current_period_start_month + "-" + current_period_start_date, &db, &user);
+										}
+										else
+										{
+											error_description = "ошибка отправки таймкарты";
+											MESSAGE_ERROR("", action, "fail to submit timecard_id(" + timecard_id + ")");
+										}
+*/
 									}
 									else
 									{
@@ -1021,7 +1088,7 @@ int main()
 			if(!indexPage.SetTemplate(template_name))
 			{
 				MESSAGE_ERROR("", action, "can't find template " + template_name);
-			} // if(!indexPage.SetTemplate("my_network.htmlt"))
+			}
 		}
 
 
@@ -1170,6 +1237,49 @@ int main()
 		}
 	}
 
+	if(action == "AJAX_getDashboardPendingPayment")
+	{
+		MESSAGE_DEBUG("", action, "start");
+
+		auto		template_name = "json_response.htmlt"s;
+		auto		error_message = ""s;
+		auto		success_message = ""s;
+		auto		affected = db.Query("SELECT `id` FROM `company` WHERE `admin_userID`=\"" + user.GetID() + "\";");
+
+		if(affected)
+		{
+			string		company_id= db.Get(0, 0);
+			bool		successFlag = true;
+			string		pending_timecards = "";
+
+			if(successFlag)
+			{
+				auto sow_sql =	"SELECT `id` FROM `contracts_sow` WHERE `subcontractor_company_id`=("
+									"SELECT `id` FROM `company` WHERE `admin_userID`=" + quoted(user.GetID()) + 
+								")";
+
+				success_message = 
+								"\"number_of_payment_pending_timecards\":" + GetNumberOfTimecardsInPaymentPendingState(sow_sql, &db, &user) + ","
+								"\"number_of_payment_pending_bt\":" + GetNumberOfBTInPaymentPendingState(sow_sql, &db, &user) + ""
+							;
+			}
+			else
+			{
+				error_message = "Ошибка построения панели управления";
+				MESSAGE_ERROR("", action, error_message);
+			}
+		}
+		else
+		{
+			error_message = gettext("you are not authorized");
+			MESSAGE_ERROR("", action, error_message);
+		}
+
+		AJAX_ResponseTemplate(&indexPage, success_message, error_message);
+
+		MESSAGE_DEBUG("", action, "finish");
+	}
+
 	if(action == "AJAX_submitBT")
 	{
 		string			strPageToGet, strFriendsOnSinglePage;
@@ -1255,7 +1365,7 @@ int main()
 					{
 						string		dom_type = 			CheckHTTPParam_Text	(http_params->Get("expense_item_doc_dom_type_" + expense_line_random));
 
-						if((dom_type == "image") || (dom_type == "input"))
+						if((dom_type == "image") || (dom_type == "input") || (dom_type == "allowance"))
 						{
 							expense_line.SetRandom					(expense_line_random);
 							expense_line.SetParentRandom			(parent_random);
@@ -1264,6 +1374,8 @@ int main()
 							expense_line.SetComment					(CheckHTTPParam_Text	(http_params->Get("expense_item_doc_comment_" + expense_line_random)));
 
 							if(dom_type == "input")
+								expense_line.SetValue				(CheckHTTPParam_Text	(http_params->Get("expense_item_doc_main_field_" + expense_line_random)));
+							if(dom_type == "allowance")
 								expense_line.SetValue				(CheckHTTPParam_Text	(http_params->Get("expense_item_doc_main_field_" + expense_line_random)));
 							if(dom_type == "image")
 							{
@@ -2443,42 +2555,52 @@ int main()
 		auto					success_message = ""s;
 		vector<C_Flight_Route>	flight_routes;
 		auto					idx = 0;
+		auto					sow_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("sow_id"));
 
-		while(CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("from_" + to_string(idx))).length())
+		if(sow_id.length())
 		{
-			C_Flight_Route	temp;
-			
-			temp.from = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("from_" + to_string(idx)));
-			temp.to = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("to_" + to_string(idx)));
-			temp.date = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("date_takeoff_" + to_string(idx)));
-
-			++idx;
-			
-			flight_routes.push_back(temp);
-		}
-
-		ostResult.str("");
-
-		if(flight_routes.size())
-		{
-			C_Smartway		smartway(&db, &user);
-
-			// error_message = smartway.ping();
-			if(error_message.empty())
+			while(CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("from_" + to_string(idx))).length())
 			{
-				error_message = smartway.airline_search(flight_routes);
+				C_Flight_Route	temp;
+				
+				temp.from = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("from_" + to_string(idx)));
+				temp.to = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("to_" + to_string(idx)));
+				temp.date = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("date_takeoff_" + to_string(idx)));
+
+				++idx;
+				
+				flight_routes.push_back(temp);
+			}
+
+			ostResult.str("");
+
+			if(flight_routes.size())
+			{
+				C_Smartway		smartway(&db, &user);
+
+				// error_message = smartway.ping();
 				if(error_message.empty())
 				{
-					success_message = ",\"flights\":[" + smartway.GetFlightsJSON() + "]";
+					smartway.SetSoW(sow_id); // --- requires to apply filter
+					error_message = smartway.airline_search(flight_routes);
+					if(error_message.empty())
+					{
+						success_message = ",\"flights\":[" + smartway.GetFlightsJSON() + "]";
+					}
+					else
+					{
+						MESSAGE_ERROR("", "", "fail to search flights");
+					}
 				}
 				else
 				{
-					MESSAGE_ERROR("", "", "fail to search flights");
+					MESSAGE_ERROR("", "", "fail to reach server");
 				}
 			}
 			else
 			{
-				MESSAGE_ERROR("", "", "fail to reach server");
+				error_message = gettext("mandatory parameter missed");
+				MESSAGE_ERROR("", action, error_message);
 			}
 		}
 		else
@@ -2513,91 +2635,142 @@ int main()
 		ostringstream			ostResult;
 		auto					template_name = "json_response.htmlt"s;
 		auto					error_message = ""s;
-		auto					success_message = ""s;
-		auto					passport_type = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("passport_type"));
-		auto					search_id = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("search_id"));
-		auto					trip_id = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("trip_id"));
-		auto					fare_id = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("fare_id"));
+		auto					success_message	= ""s;
+		auto					passport_type	= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("passport_type"));
+		auto					search_id		= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("search_id"));
+		auto					trip_id			= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("trip_id"));
+		auto					fare_id			= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("fare_id"));
+		auto					sow_id			= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("sow_id"));
 
 		ostResult.str("");
 
-		if(search_id.length() && trip_id.length() && fare_id.length())
+		if(search_id.length() && trip_id.length() && fare_id.length() && sow_id.length())
 		{
-			if(db.Query("SELECT `id` FROM `user_tickets_avia` WHERE `user_id`=\"" + user.GetID() + "\" AND `search_id`=\"" + search_id + "\" AND `trip_id`=\"" + trip_id + "\" AND `fare_id`=\"" + fare_id + "\";") == 0)
+			if(isUserAssignedToSoW(user.GetID(), sow_id, &db))
 			{
-				C_Smartway		smartway(&db, &user);
-
-				error_message = smartway.airline_book(user.GetID(), passport_type, search_id, trip_id, fare_id);
-				if(error_message.empty())
+				if(db.Query("SELECT `id` FROM `airline_bookings` WHERE `contract_sow_id`=\"" + sow_id + "\" AND `search_id`=\"" + search_id + "\" AND `search_trip_id`=\"" + trip_id + "\" AND `search_fare_id`=\"" + fare_id + "\" AND `status`=\"done\";") == 0)
 				{
-					auto	id = db.InsertQuery("INSERT INTO `user_tickets_avia` "s
-												"(`user_id`, `search_id`, `trip_id`, `fare_id`, `purchase_datetime`, `result_trip_id`, `eventTimestamp`) "
-												"VALUES "
-												"("	+
-													"\"" + user.GetID() + "\", "
-													"\"" + search_id + "\", "
-													"\"" + trip_id + "\", "
-													"\"" + fare_id + "\", "
-													"NOW(), "
-													"\"" + smartway.GetAirlineBookingResultID() + "\", "
-													"UNIX_TIMESTAMP());");
+					C_Smartway		smartway(&db, &user);
 
-					if(id)
+					smartway.SetSoW(sow_id);
+					error_message = smartway.airline_book(passport_type, search_id, trip_id, fare_id);
+					if(error_message.empty())
 					{
-						error_message = smartway.airline_result(smartway.GetAirlineBookingResultID());
-						if(error_message.empty())
+						auto	id = db.InsertQuery("INSERT INTO `airline_bookings` "s
+													"(`contract_sow_id`, `search_id`, `search_trip_id`, `search_fare_id`,`passport_type`, `eventTimestamp`) "
+													"VALUES "
+													"("	+
+														"\"" + sow_id + "\", "
+														"\"" + search_id + "\", "
+														"\"" + trip_id + "\", "
+														"\"" + fare_id + "\", "
+														"\"" + passport_type + "\", "
+														"UNIX_TIMESTAMP());");
+
+						if(id)
 						{
-							db.Query("UPDATE `user_tickets_avia` SET `status`=\"" + smartway.GetAirlineResultStatus() + "\" WHERE `id`=\"" + to_string(id) + "\";");
-							if(db.isError())
+							do
 							{
-								error_message = gettext("SQL syntax error");
-								MESSAGE_DEBUG("", "", error_message);
-							}
-							else
-							{
-								if(smartway.GetAirlineResultStatus() == "done")
+								error_message = smartway.airline_result(smartway.GetAirlineBookingResultID());
+								if(error_message.empty())
 								{
-									if(trip_id == smartway.GetAirlineResultTripID())
+									db.Query("UPDATE `airline_bookings` SET `status`=\"" + smartway.GetAirlineResultStatus() + "\" WHERE `id`=\"" + to_string(id) + "\";");
+									if(db.isError())
 									{
-										// --- good result
+										error_message = gettext("SQL syntax error");
+										MESSAGE_DEBUG("", "", error_message);
 									}
 									else
 									{
-										error_message = "Smartway "s + gettext("trip_id failure");
-										MESSAGE_ERROR("", action, error_message);
+										if(smartway.GetAirlineResultStatus() == "done")
+										{
+											db.Query("UPDATE `airline_bookings` SET `trip_id`=\"" + smartway.GetAirlineResultTripID() + "\" WHERE `id`=\"" + to_string(id) + "\";");
+											if(db.isError())
+											{
+												error_message = gettext("SQL syntax error");
+												MESSAGE_DEBUG("", "", error_message);
+											}
+											else
+											{
+											}
+										}
+										else if(smartway.GetAirlineResultStatus() == "pending")
+										{
+										}
+										else if(smartway.GetAirlineResultStatus() == "failed")
+										{
+											error_message = smartway.GetAirlineResultError();
+											MESSAGE_DEBUG("", "", error_message);
+										}
+										else
+										{
+											error_message = "Smartway "s + gettext("unknown method");
+											MESSAGE_DEBUG("", "", error_message);
+										}
 									}
-								}
-								else if(smartway.GetAirlineResultStatus() == "failed")
-								{
-									error_message = smartway.GetAirlineResultError();
-									MESSAGE_DEBUG("", "", error_message);
 								}
 								else
 								{
-									error_message = "Smartway "s + gettext("unknown method");
-									MESSAGE_DEBUG("", "", error_message);
+									MESSAGE_ERROR("", "", "fail to get booking status");
+								}
+
+							} while(error_message.empty() && (smartway.GetAirlineResultStatus() == "pending"));
+
+							if(error_message.empty())
+							{
+								error_message = smartway.trip_item_voucher(smartway.GetAirlineResultTripID());
+								if(error_message.empty())
+								{
+									db.Query("UPDATE `airline_bookings` SET "
+																				"`voucher_filename`=\"" + smartway.GetVoucherFile() + "\", "
+																				"`destination`=\"" + smartway.GetPurchasedServiceDestination() + "\", "
+																				"`checkin`=\"" + smartway.GetPurchasedServiceCheckin() + "\", "
+																				"`checkout`=\"" + smartway.GetPurchasedServiceCheckout() + "\", "
+																				"`book_date`=\"" + smartway.GetPurchasedServiceBookDate() + "\", "
+																				"`amount`=\"" + smartway.GetPurchasedServiceAmount() + "\" "
+																				"WHERE `id`=\"" + to_string(id) + "\";");
+									if(db.isError())
+									{
+										error_message = gettext("SQL syntax error");
+										MESSAGE_DEBUG("", "", error_message);
+									}
+									else
+									{
+										// --- good result
+									}
+								}
+								else
+								{
+									MESSAGE_ERROR("", action, error_message);
 								}
 							}
+							else
+							{
+								MESSAGE_ERROR("", action, error_message);
+							}
+
 						}
 						else
 						{
-							MESSAGE_ERROR("", "", "fail to get booking status");
+							error_message = gettext("SQL syntax error");
+							MESSAGE_ERROR("", "", "VERY IMPORTANT: fail to insert to DB, check Smartway web-site, ticket could be purchased");
 						}
 					}
 					else
 					{
-						MESSAGE_ERROR("", "", "VERY IMPORTANT: fail to insert to DB, check Smartway web-site, ticket could be purchased");
+						MESSAGE_ERROR("", "", "fail to purchase air ticket (" + error_message + ")");
 					}
 				}
 				else
 				{
-					MESSAGE_ERROR("", "", "fail to search flights");
+					error_message = gettext("this booking already exists");
+					MESSAGE_DEBUG("", "", error_message);
 				}
 			}
 			else
 			{
-				error_message = gettext("this booking already exists");
-				MESSAGE_DEBUG("", "", error_message);
+				error_message = gettext("You are not authorized");
+				MESSAGE_ERROR("", action, "SoW(" + sow_id + ") is not assigned to the user(" + user.GetID() + ") company");
 			}
 		}
 		else
@@ -2625,9 +2798,72 @@ int main()
 		}
 	}
 
+	if(action == "AJAX_getVoucher")
 	{
-		MESSAGE_DEBUG("", "", "post-condition if(action == \"" + action + "\")");
+		MESSAGE_DEBUG("", action, "start");
+
+		auto			voucher_id = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("voucher_id"));
+		ostringstream	ostResult;
+		auto			template_name = "json_response.htmlt"s;
+		auto			error_message = ""s;
+		auto			success_message = ""s;
+
+
+		if(voucher_id.length())
+		{
+			C_Smartway		smartway(&db, &user);
+			error_message = smartway.trip_item_voucher(voucher_id);
+		}
+		else
+		{
+			error_message = gettext("mandatory parameter missed");
+			MESSAGE_ERROR("", action, error_message);
+		}
+
+		if(error_message.empty())
+		{
+			ostResult << "{\"result\":\"success\"" + success_message + "}";
+		}
+		else
+		{
+			MESSAGE_DEBUG("", action, "failed");
+			ostResult.str("");
+			ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+		}
+
+		indexPage.RegisterVariableForce("result", ostResult.str());
+
+		if(!indexPage.SetTemplate(template_name))
+		{
+			MESSAGE_ERROR("", action, "can't find template " + template_name);
+		}
 	}
+
+	if(action == "AJAX_getBTWorkerData")
+	{
+		MESSAGE_DEBUG("", action, "start");
+
+		auto			error_message = ""s;
+		auto			success_message = ""s;
+		auto			sow_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("sow_id"));
+		auto			agency_company_id = GetAgencyID(sow_id, &db);
+
+		if(agency_company_id.length())
+		{
+			success_message = "\"allowances\": ["  + GetBTAllowanceInJSONFormat("SELECT * FROM `bt_allowance` WHERE `agency_company_id`=" + quoted(agency_company_id) + ";", &db, &user) + "]";
+		}
+		else
+		{
+			error_message = gettext("agency not found");
+			MESSAGE_ERROR("", action, error_message);
+		}
+
+		AJAX_ResponseTemplate(&indexPage, success_message, error_message);
+
+		MESSAGE_DEBUG("", action, "finish");
+	}
+
+	MESSAGE_DEBUG("", "", "post-condition if(action == \"" + action + "\")");
 
 	indexPage.OutTemplate();
 

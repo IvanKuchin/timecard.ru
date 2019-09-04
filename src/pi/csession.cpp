@@ -126,8 +126,9 @@ string CSession::DetectItem(string MMDB_itemName) {
 	if(MMDB_usage)
 	{
         MMDB_entry_data_s       MMDB_entryDataS;
+        auto					error_code = MMDB_get_value(&MMDB_result.entry, &MMDB_entryDataS, MMDB_itemName.c_str(), "names", "en", NULL);
 
-		if(MMDB_get_value(&MMDB_result.entry, &MMDB_entryDataS, MMDB_itemName.c_str(), "names", "en", NULL) == MMDB_SUCCESS)
+		if(error_code == MMDB_SUCCESS)
 		{
 			if(MMDB_entryDataS.has_data && (MMDB_entryDataS.type == MMDB_DATA_TYPE_UTF8_STRING))
 			{
@@ -151,7 +152,22 @@ string CSession::DetectItem(string MMDB_itemName) {
 		}
 		else
 		{
-			MESSAGE_ERROR("", "", "MMDB_get_value returned error");
+			if((error_code == 9) && (MMDB_itemName == "city"))
+			{
+				auto remote_addr = getenv("REMOTE_ADDR") ? getenv("REMOTE_ADDR") : ""s;
+
+				MESSAGE_DEBUG("", "", "MMDB_get_value(" + MMDB_itemName + ") returned error code: " + to_string(error_code) + " city name not found in MMDB (use mmdblookup --ip " + remote_addr + " --file " + MMDB_fname + " to confirm that city name missed). Here is the MMDB library error message (" + MMDB_strerror(error_code) + ")");
+			}
+			else if((error_code == 9) && (MMDB_itemName == "country"))
+			{
+				auto remote_addr = getenv("REMOTE_ADDR") ? getenv("REMOTE_ADDR") : ""s;
+
+				MESSAGE_DEBUG("", "", "MMDB_get_value(" + MMDB_itemName + ") returned error code: " + to_string(error_code) + " country name not found in MMDB (use mmdblookup --ip " + remote_addr + " --file " + MMDB_fname + " to confirm that country name missed). Here is the MMDB library error message (" + MMDB_strerror(error_code) + ")");
+			}
+			else
+			{
+				MESSAGE_ERROR("", "", "MMDB_get_value(" + MMDB_itemName + ") returned error code: " + to_string(error_code) + " (" + MMDB_strerror(error_code) + ")");
+			}
 		}
 	}
 
@@ -172,6 +188,24 @@ auto CSession::DetectCity() -> string
 
 bool CSession::Save(string u, string i, string l)
 {
+	if(!db)
+	{
+		MESSAGE_ERROR("", "", "ERROR: connect to database in CSession module");
+
+		throw CExceptionHTML("error db");
+	}
+
+	if(db->Query("SELECT `id` FROM `users` WHERE `login`=" + quoted(u) + ";"))
+	{
+		SetUserID(db->Get(0, 0));
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", " user ID must be set");
+
+		throw CExceptionHTML("session error");
+	}
+
 	SetUser(u);
 	SetIP(i);
 	SetLng(l);
@@ -182,7 +216,7 @@ bool CSession::Save(string u, string i, string l)
 
 bool CSession::Save()
 {
-	ostringstream	ost;
+	auto	result = false;
 
 	if(!db)
 	{
@@ -190,39 +224,41 @@ bool CSession::Save()
 
 		throw CExceptionHTML("error db");
 	}
-
-	if(GetUser().empty())
+	if(GetUserID().empty())
 	{
-		MESSAGE_ERROR("", "", " user name must be set in session::Save");
+		MESSAGE_ERROR("", "", " user ID must be set");
 
 		throw CExceptionHTML("session error");
 	}
 	if(GetID().empty())
 	{
-		MESSAGE_ERROR("", "", " id must be set in session::Save");
+		MESSAGE_ERROR("", "", " id must be set");
 
 		throw CExceptionHTML("session error");
 	}
 	if(GetIP().empty())
 	{
-		MESSAGE_ERROR("", "", " ip must be set in session::Save");
+		MESSAGE_ERROR("", "", " ip must be set");
 
 		throw CExceptionHTML("session error");
 	}
 	if(GetLng().empty())
 	{
-		MESSAGE_ERROR("", "", " lng must be set in session::Save");
+		MESSAGE_ERROR("", "", " lng must be set");
 
 		throw CExceptionHTML("session error");
 	}
 
-	if(db->Query("INSERT INTO `sessions` (`id`, `user`, `country_auto`, `city_auto`, `lng`, `ip`, `time`,`expire` ) VALUES ('" + GetID() + "', '" + GetUser() + "', '" + DetectCountry() + "', '" + DetectCity() + "', '" + GetLng() + "', '" + GetIP() + "', NOW(), '" + to_string(SESSION_LEN * 60) + "')") != 0) {
+	if(db->Query("INSERT INTO `sessions` (`id`, `user_id`, `country_auto`, `city_auto`, `lng`, `ip`, `time`,`expire` ) VALUES ('" + GetID() + "', '" + GetUserID() + "', '" + DetectCountry() + "', '" + DetectCity() + "', '" + GetLng() + "', '" + GetIP() + "', NOW(), '" + to_string(SESSION_LEN * 60) + "')") != 0)
+	{
 		MESSAGE_ERROR("", "", "ERROR: in insert SQL-query");
-
-		return false;
+	}
+	else
+	{
+		result = true;
 	}
 
-	return true;
+	return result;
 }
 
 
@@ -233,9 +269,7 @@ bool CSession::Load(string id)
 	string			currIP;
 	bool			result = true;
 
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	if(id.find(",") != string::npos)
 	{
@@ -256,14 +290,19 @@ bool CSession::Load(string id)
 		// --- DB should not return NULL value
 		// --- all fields must have "not null"-attribute
 		SetID(id);
-		SetUser(db->Get(0, "user"));
 		SetIP(db->Get(0, "ip"));
 		SetLng(db->Get(0, "lng"));
 		SetExpire(stoi(db->Get(0, "expire")));
+		SetUserID(db->Get(0, "user_id"));
 
+		if(db->Query("SELECT `login` FROM `users` WHERE `id`=" + quoted(GetUserID()) + ";"))
+			SetUser(db->Get(0, 0));
+		else
 		{
-			MESSAGE_DEBUG("", "", "session loaded for user [" + GetUser() + "]");
+			MESSAGE_ERROR("", "", "user id not found");
 		}
+
+		MESSAGE_DEBUG("", "", "session loaded for user [" + GetUser() + "]");
 	}
 	else
 	{
@@ -273,9 +312,7 @@ bool CSession::Load(string id)
 	}
 
 
-	{
-		MESSAGE_DEBUG("", "", "result (" + to_string(result) + ")");
-	}
+	MESSAGE_DEBUG("", "", "result (" + to_string(result) + ")");
 
 	return result;
 }
@@ -398,7 +435,7 @@ bool CSession::isExist(string id)
 		throw CExceptionHTML("activator error");
 	}
 
-	db->Query("delete from `sessions` where `time`<=(NOW()-interval `expire` second) and `expire`>'0'");
+	db->Query("DELETE FROM `sessions` WHERE `time`<=(NOW()-INTERVAL `expire` SECOND) AND `expire`>'0'");
 	if(db->Query("select * from `sessions` where `id`=\"" + id + "\";"))
 	{
 	}
@@ -438,4 +475,4 @@ CSession::~CSession()
 
 
 
-
+ 

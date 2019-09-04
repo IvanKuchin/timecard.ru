@@ -1,9 +1,11 @@
 #ifndef __UTILITIES_TIMECARD__H__
 #define __UTILITIES_TIMECARD__H__
 
+#include "c_tc_bt_submit.h"
 #include "utilities.h"
 #include "c_float.h"
 #include "c_cache_obj.h"
+
 // --- IMPORTANT !!!
 // --- do NOT add any header file with potentialy recursive indludes
 
@@ -38,6 +40,10 @@ auto			GetTimecardApprovalsInJSONFormat(string sqlQuery, CMysql *, CUser *) -> s
 // auto			SubmitBT(string bt_id, CMysql *, CUser *) -> bool;
 auto			GetNumberOfTimecardsInPendingState(CMysql *, CUser *) -> string;
 auto			GetNumberOfBTInPendingState(CMysql *, CUser *) -> string;
+auto			GetNumberOfTimecardsInPaymentPendingState(string sow_sql, CMysql *, CUser *) -> string;
+auto			GetNumberOfBTInPaymentPendingState(string sow_sql, CMysql *, CUser *) -> string;
+bool 			areThereTimecardsWithExpiredPayment(string multiplier, string sow_sql, CMysql *, CUser *);
+bool 			areThereBTWithExpiredPayment(string multiplier, string sow_sql, CMysql *, CUser *);
 auto 			SummarizeTimereports(string timereport1, string timereport2) -> string;
 vector<string> 	SplitTimeentry(const string& s, const char c = ',');
 auto			isTimecardEntryEmpty(string	timereports) -> bool;
@@ -66,7 +72,9 @@ auto			GetSpelledTimecardProjectByID(string id, CMysql *) -> string;
 auto			GetSpelledTimecardTaskByID(string id, CMysql *) -> string;
 auto			GetSpelledTimecardTaskAssignmentByID(string id, CMysql *) -> string;
 auto			GetSpelledBTExpenseTemplateLineByID(string id, CMysql *) -> string;
+auto			GetSpelledBTAllowanceByID(string id, CMysql *) -> string;
 auto			GetSpelledCostCenterByID(string id, CMysql *) -> string;
+auto			GetSpelledAirfareDirectionLimitByID(string id, CMysql *) -> string;
 auto			GetSpelledBTExpenseAssignmentByID(string id, CMysql *) -> string;
 auto			GetSpelledUserNameByID(string id, CMysql *) -> string;
 auto			GetSpelledEmployeeByID(string id, CMysql *) -> string;
@@ -97,10 +105,15 @@ auto			GetBTApprovalsInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetBTExpenseTemplatesInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetBTExpenseLineTemplatesInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetBTsInJSONFormat(string sqlQuery, CMysql *, CUser *, bool isExtended) -> string;
+auto			GetBTAllowanceInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
+auto			GetHolidayCalendarInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
+
 auto			GetBTExpensesInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
+auto			GetAirlineBookingsInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetCurrencyRatesInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto 			isUserAllowedAccessToBT(string bt_id, CMysql *, CUser *) -> string;
 auto			isCostCenterBelongsToAgency(string cost_center_id, CMysql *, CUser *) -> bool;
+auto			amIonTheApproverListForSoW(const string &db_table, const string &sow_id, CMysql *, CUser *) -> bool;
 
 auto			NotifySoWContractPartiesAboutChanges(string action_type_id, string sow_id, CMysql *, CUser *) -> string;
 auto			NotifyAgencyAboutChanges(string agency_id, string action_type_id, string action_id, CMysql *, CUser *) -> string;
@@ -129,6 +142,7 @@ auto			isServiceInvoiceBelongsToAgency(string service_invoice_id, CMysql *, CUse
 auto			isBTInvoiceBelongsToAgency(string service_invoice_id, CMysql *, CUser *) -> bool;
 auto			GetAgencyIDByUserID(CMysql *, CUser *) -> string;
 auto 			GetCostCenterIDByCustomerID(string customer_id, CMysql *) -> string;
+auto 			GetCostCenterIDByTaskID(string task_id, CMysql *) -> string;
 auto 			GetPositionIDFromSoW(string sow_id, CMysql *) -> string;
 auto			CreatePSoWfromTimecardCustomerIDAndCostCenterID(string timecard_customer_id, string cost_center_id, CMysql *, CUser *) -> bool;
 auto			CreatePSoWfromTimecardTaskIDAndSoWID(string timecard_task_id, string sow_id, CMysql *, CUser *) -> bool;
@@ -146,6 +160,10 @@ struct tm 		GetLastDayReportedOnAssignmentID(string sow_id, string task_id, CMys
 auto			isActionEntityBelongsToSoW(string action, string id, string sow_id, CMysql *, CUser *) -> string;
 auto			CheckNewValueByAction(string action, string id, string sow_id, string new_value, CMysql *, CUser *) -> string;
 auto			isActionEntityBelongsToAgency(string action, string id, string agency_id, CMysql *, CUser *) -> string;
+auto			GetAirfareLimitaionsByDirectionInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
+auto			GetAirportCountryInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
+auto			isValidToAddAirfareLimitByDirection(string from_id, string to_id, string agency_id, CMysql *, CUser *) -> string;
+
 
 auto			GetAbsenceOverlap(string company_id, string start_date, string end_date, CMysql *, CUser *, string exclude_id = "") -> string;
 

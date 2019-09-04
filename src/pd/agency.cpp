@@ -77,7 +77,7 @@ int main(void)
 				if(!indexPage.SetTemplate(template_name))
 				{
 					MESSAGE_ERROR("", action, "can't find template " + template_name);
-				} // if(!indexPage.SetTemplate("my_network.htmlt"))
+				}
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
@@ -133,16 +133,113 @@ int main(void)
 				if(!indexPage.SetTemplate(template_name))
 				{
 					MESSAGE_ERROR("", action, "can't find template " + template_name);
-				} // if(!indexPage.SetTemplate("my_network.htmlt"))
+				}
 			}
 
 
 			MESSAGE_DEBUG("", action, "finish");
 		}
 
+		if(action == "AJAX_getTimecardList")
+		{
+			ostringstream	ostResult;
+
+			MESSAGE_DEBUG("", action, "start");
+
+			ostResult.str("");
+
+			string			template_name = "json_response.htmlt";
+			int				affected = db.Query("SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user.GetID() + "\";");
+
+			if(affected)
+			{
+				string		companies_list= "";
+
+				for(int i = 0; i < affected; ++i)
+				{
+					if(companies_list.length()) companies_list += ",";
+					companies_list += db.Get(i, 0);
+				}
+
+				ostResult << "{"
+								"\"status\":\"success\","
+								"\"sow\":[" << GetSOWInJSONFormat(
+										"SELECT * FROM `contracts_sow` WHERE "
+											"`agency_company_id` IN (" + companies_list + ") "
+										";", &db, &user) << "],"
+								"\"timecards\":[" << GetTimecardsInJSONFormat(
+										"SELECT * FROM `timecards` WHERE "
+											"`contract_sow_id` IN ( SELECT `id` FROM `contracts_sow` WHERE `agency_company_id` IN (" + companies_list + "))"
+										";", &db, &user) << "]"
+							"}";
+			}
+			else
+			{
+				MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't owns company");
+				ostResult << "{\"status\":\"error\",\"description\":\"Вы не создали компанию\"}";
+			}
+
+			indexPage.RegisterVariableForce("result", ostResult.str());
+
+			if(!indexPage.SetTemplate(template_name))
+			{
+				MESSAGE_ERROR("", action, "can't find template " + template_name);
+			}
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
+
+		if(action == "AJAX_getBTList")
+		{
+			ostringstream	ostResult;
+			auto			template_name = "json_response.htmlt"s;
+			auto			affected = db.Query("SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user.GetID() + "\";");
+
+			MESSAGE_DEBUG("", action, "start");
+
+			ostResult.str("");
+
+			if(affected)
+			{
+				auto		companies_list= ""s;
+
+				for(auto i = 0; i < affected; ++i)
+				{
+					if(companies_list.length()) companies_list += ",";
+					companies_list += db.Get(i, 0);
+				}
+
+				ostResult << "{"
+								"\"status\":\"success\","
+								"\"sow\":[" << GetSOWInJSONFormat(
+										"SELECT * FROM `contracts_sow` WHERE "
+											"`agency_company_id` IN (" + companies_list + ") "
+										";", &db, &user) << "],"
+								"\"bt\":[" << GetBTsInJSONFormat(
+										"SELECT * FROM `bt` WHERE "
+											"`contract_sow_id` IN ( SELECT `id` FROM `contracts_sow` WHERE `agency_company_id` IN (" + companies_list + "))"
+										";", &db, &user, false) << "]"
+							"}";
+			}
+			else
+			{
+				MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't owns company");
+				ostResult << "{\"status\":\"error\",\"description\":\"Вы не создали компанию\"}";
+			}
+
+			indexPage.RegisterVariableForce("result", ostResult.str());
+
+			if(!indexPage.SetTemplate(template_name))
+			{
+				MESSAGE_ERROR("", action, "can't find template " + template_name);
+			}
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
+
+
 		if(action == "AJAX_getTimecardEntry")
 		{
-			string			strPageToGet, strFriendsOnSinglePage;
 			ostringstream	ostResult;
 
 			MESSAGE_DEBUG("", action, "start");
@@ -207,7 +304,7 @@ int main(void)
 				if(!indexPage.SetTemplate(template_name))
 				{
 					MESSAGE_ERROR("", action, "can't find template " + template_name);
-				} // if(!indexPage.SetTemplate("my_network.htmlt"))
+				}
 			}
 
 
@@ -233,12 +330,6 @@ int main(void)
 				if(timecard_id.length())
 				{
 					{
-						// --- REPEAT #2 
-	/*					if(db.Query("SELECT `id` FROM `timecards` WHERE "
-										"`id`=\"" + timecard_id + "\" "
-										"AND "
-										"`contract_sow_id` IN (SELECT `contract_sow_id` FROM `timecard_approvers` WHERE `approver_user_id`=\"" + user.GetID() + "\")"))
-	*/
 						// --- check ability to see this timecard
 						if(db.Query("SELECT `id` FROM `timecard_approvers` WHERE "
 										"`approver_user_id`=\"" + user.GetID() + "\" "
@@ -256,26 +347,10 @@ int main(void)
 								if(timecard_state == "submit")
 								{
 									{
-										// --- did approver approved after user submission ?
-										if(db.Query("SELECT `eventTimestamp` FROM `timecard_approvals` WHERE `approver_id`=\"" + approver_id + "\" AND `timecard_id`=\"" + timecard_id + "\" AND `eventTimestamp`>\"" + timecard_submit_date + "\";"))
+										if(db.Query("SELECT `id` FROM `timecard_approvals` WHERE `approver_id`=" + quoted(approver_id) + " AND `decision`=\"pending\" AND `timecard_id`=" + quoted(timecard_id) + ";"))
 										{
-											// --- this approver already approved this bt
-											ostResult << "{\"result\":\"error\",\"description\":\"Вы уже подтвердили\"}";
-											MESSAGE_ERROR("", action, "approver.id(" + approver_id + ") already approved timecard.id(" + timecard_id + ") at timestamp(" + db.Get(0, "eventTimestamp") + ")");
-										}
-										else
-										{
-											long int	temp;
-
-											temp = db.InsertQuery(	"INSERT INTO `timecard_approvals` SET "
-																	"`timecard_id`=\"" + timecard_id + "\","
-																	"`approver_id`=\"" + approver_id + "\","
-																	"`decision`=\"approved\","
-																	"`comment`=\"" + comment + "\","
-																	"`eventTimestamp`=UNIX_TIMESTAMP();"
-																);
-
-											if(temp)
+											db.Query("UPDATE `timecard_approvals` SET `decision`=\"approved\", `eventTimestamp`=UNIX_TIMESTAMP() WHERE  `approver_id`=" + quoted(approver_id) + " AND `decision`=\"pending\" AND `timecard_id`=" + quoted(timecard_id) + ";");
+											if(!db.isError())
 											{
 												if(SubmitTimecard(timecard_id, &db, &user))
 												{
@@ -305,6 +380,12 @@ int main(void)
 												ostResult << "{\"result\":\"error\",\"description\":\"ошибка обновления списка апруверов\"}";
 												MESSAGE_ERROR("", action, "fail to insert to timecards table with timecard_id(" + timecard_id + ")");
 											}
+										}
+										else
+										{
+											// --- this approver already approved this bt
+											ostResult << "{\"result\":\"error\",\"description\":\"Вы уже подтвердили\"}";
+											MESSAGE_ERROR("", action, "approver.id(" + approver_id + ") already approved timecard.id(" + timecard_id + ") at timestamp(" + db.Get(0, "eventTimestamp") + ")");
 										}
 										
 									}
@@ -346,7 +427,7 @@ int main(void)
 				if(!indexPage.SetTemplate(template_name))
 				{
 					MESSAGE_ERROR("", action, "can't find template " + template_name);
-				} // if(!indexPage.SetTemplate("my_network.htmlt"))
+				}
 			}
 
 
@@ -379,54 +460,48 @@ int main(void)
 					else
 					{
 						// --- check ability to see this timecard
-						if(db.Query("SELECT `id` FROM `timecards` WHERE "
-										"`id`=\"" + timecard_id + "\" "
+						if(db.Query("SELECT `id` FROM `timecard_approvers` WHERE "
+										"`approver_user_id`=\"" + user.GetID() + "\" "
 										"AND "
-										"`contract_sow_id` IN (SELECT `contract_sow_id` FROM `timecard_approvers` WHERE `approver_user_id`=\"" + user.GetID() + "\")"))
+										"`contract_sow_id`=( SELECT `contract_sow_id` FROM `timecards` WHERE `id`=\"" + timecard_id + "\")"
+										";"))
 						{
+							string		approver_id = db.Get(0, "id");
 
-							if(db.Query("SELECT `status` FROM `timecards` WHERE `id`=\"" + timecard_id + "\";"))
+							if(db.Query("SELECT `status`, `submit_date` FROM `timecards` WHERE `id`=\"" + timecard_id + "\";"))
 							{
 								string	timecard_state = db.Get(0, "status");
+								string	timecard_submit_date = db.Get(0, "submit_date");
 
 								if(timecard_state == "submit")
 								{
-
-									if(db.Query("SELECT `id` FROM `timecard_approvers` WHERE "
-													"`approver_user_id`=\"" + user.GetID() + "\" "
-													"AND "
-													"`contract_sow_id`=( SELECT `contract_sow_id` FROM `timecards` WHERE `id`=\"" + timecard_id + "\")"
-													";"))
 									{
-										string		approver_id = db.Get(0, "id");
-										long int	temp;
-
-										temp = db.InsertQuery(	"INSERT INTO `timecard_approvals` SET "
-																"`timecard_id`=\"" + timecard_id + "\","
-																"`approver_id`=\"" + approver_id + "\","
-																"`decision`=\"rejected\","
-																"`comment`=\"" + comment + "\","
-																"`eventTimestamp`=UNIX_TIMESTAMP();"
-															);
-
-										if(temp)
+										if(db.Query("SELECT `id` FROM `timecard_approvals` WHERE `approver_id`=" + quoted(approver_id) + " AND `decision`=\"pending\" AND `timecard_id`=" + quoted(timecard_id) + ";"))
 										{
-											db.Query("UPDATE `timecards` SET `status`=\"rejected\", `eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + timecard_id + "\";");
+											db.Query("UPDATE `timecard_approvals` SET `decision`=\"rejected\",`comment`=" + quoted(comment) + ", `eventTimestamp`=UNIX_TIMESTAMP() WHERE  `approver_id`=" + quoted(approver_id) + " AND `decision`=\"pending\" AND `timecard_id`=" + quoted(timecard_id) + ";");
 											if(!db.isError())
 											{
-												string	success_description = GetObjectsSOW_Reusable_InJSONFormat("timecard", "submit", &db, &user);
-
-												if(success_description.length())
+												if(SubmitTimecard(timecard_id, &db, &user))
 												{
-													ostResult	<< "{"
-																<< "\"result\":\"success\","
-																<< success_description
-																<< "}";
+													string	success_description = GetObjectsSOW_Reusable_InJSONFormat("timecard", "submit", &db, &user);
+
+													if(success_description.length())
+													{
+														ostResult	<< "{"
+																	<< "\"result\":\"success\","
+																	<< success_description
+																	<< "}";
+													}
+													else
+													{
+														ostResult << "{\"result\":\"error\",\"description\":\"ошибка БД\"}";
+														MESSAGE_ERROR("", action, "error getting info about pending timecards");
+													}
 												}
 												else
 												{
-													ostResult << "{\"result\":\"error\",\"description\":\"ошибка БД\"}";
-													MESSAGE_ERROR("", action, "error getting info about pending timecards");
+													ostResult << "{\"result\":\"error\",\"description\":\"ошибка отправки таймкарты\"}";
+													MESSAGE_ERROR("", action, "fail to submit timecard_id(" + timecard_id + ")");
 												}
 											}
 											else
@@ -437,16 +512,10 @@ int main(void)
 										}
 										else
 										{
-											ostResult << "{\"result\":\"error\",\"description\":\"ошибка обновления списка апруверов\"}";
-											MESSAGE_ERROR("", action, "fail to insert to timecards table with timecard_id(" + timecard_id + ")");
+											MESSAGE_ERROR("", action, "timecard.id(" + timecard_id + ") not in pending state on user.id(" + user.GetID() + ")");
+											ostResult << "{\"result\":\"error\",\"description\":\"Вы не должны подтверждать эту таймкарту\"}";
 										}
 									}
-									else
-									{
-										MESSAGE_ERROR("", action, "user.id(" + user.GetID() + ") not an timecard.id(" + timecard_id + ") approver");
-										ostResult << "{\"result\":\"error\",\"description\":\"Вы не должны подтверждать таймкарту у данного договора\"}";
-									}
-
 								}
 								else
 								{
@@ -479,7 +548,7 @@ int main(void)
 				if(!indexPage.SetTemplate(template_name))
 				{
 					MESSAGE_ERROR("", action, "can't find template " + template_name);
-				} // if(!indexPage.SetTemplate("my_network.htmlt"))
+				}
 			}
 
 
@@ -517,7 +586,6 @@ int main(void)
 							string	error_string = isUserAllowedAccessToBT(bt_id, &db, &user);
 							if(error_string.empty())
 							{
-
 								if(db.Query("SELECT `status` FROM `bt` WHERE `id`=\"" + bt_id + "\";"))
 								{
 									string	bt_state = db.Get(0, "status");
@@ -532,6 +600,7 @@ int main(void)
 														";"))
 										{
 											string		approver_id = db.Get(0, "id");
+/*
 											long int	temp;
 
 											temp = db.InsertQuery(	"INSERT INTO `bt_approvals` SET "
@@ -573,6 +642,47 @@ int main(void)
 												ostResult << "{\"result\":\"error\",\"description\":\"ошибка обновления списка апруверов\"}";
 												MESSAGE_ERROR("", action, "fail to insert to bt table with bt_id(" + bt_id + ")");
 											}
+*/
+											if(db.Query("SELECT `id` FROM `bt_approvals` WHERE `approver_id`=" + quoted(approver_id) + " AND `decision`=\"pending\" AND `bt_id`=" + quoted(bt_id) + ";"))
+											{
+												db.Query("UPDATE `bt_approvals` SET `decision`=\"rejected\",`comment`=" + quoted(comment) + ", `eventTimestamp`=UNIX_TIMESTAMP() WHERE  `approver_id`=" + quoted(approver_id) + " AND `decision`=\"pending\" AND `bt_id`=" + quoted(bt_id) + ";");
+												if(!db.isError())
+												{
+													if(SubmitBT(bt_id, &db, &user))
+													{
+														string	success_description = GetObjectsSOW_Reusable_InJSONFormat("bt", "submit", &db, &user);
+
+														if(success_description.length())
+														{
+															ostResult	<< "{"
+																		<< "\"result\":\"success\","
+																		<< success_description
+																		<< "}";
+														}
+														else
+														{
+															ostResult << "{\"result\":\"error\",\"description\":\"ошибка БД\"}";
+															MESSAGE_ERROR("", action, "error getting info about pending bts");
+														}
+													}
+													else
+													{
+														ostResult << "{\"result\":\"error\",\"description\":\"ошибка отправки таймкарты\"}";
+														MESSAGE_ERROR("", action, "fail to submit bt_id(" + bt_id + ")");
+													}
+												}
+												else
+												{
+													ostResult << "{\"result\":\"error\",\"description\":\"ошибка БД\"}";
+													MESSAGE_ERROR("", action, "fail to update bt_id(" + bt_id + "): " + db.GetErrorMessage());
+												}
+											}
+											else
+											{
+												MESSAGE_ERROR("", action, "bt.id(" + bt_id + ") not in pending state on user.id(" + user.GetID() + ")");
+												ostResult << "{\"result\":\"error\",\"description\":\"Вы не должны подтверждать эту таймкарту\"}";
+											}
+
 										}
 										else
 										{
@@ -618,12 +728,145 @@ int main(void)
 				if(!indexPage.SetTemplate(template_name))
 				{
 					MESSAGE_ERROR("", action, "can't find template " + template_name);
-				} // if(!indexPage.SetTemplate("my_network.htmlt"))
+				}
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
 		}
 
+
+		if(action == "AJAX_approveBT")
+		{
+			string			strPageToGet, strFriendsOnSinglePage;
+			ostringstream	ostResult;
+
+			MESSAGE_DEBUG("", action, "start");
+
+			ostResult.str("");
+			{
+				string			template_name = "json_response.htmlt";
+				string			bt_id = "";
+				string			comment = "";
+
+				bt_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("bt_id"));
+				comment = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("comment"));
+
+				if(bt_id.length())
+				{
+					if((user.GetType() == "approver") || (user.GetType() == "agency"))
+					{
+						// --- check ability to see this bt
+						string	error_string = isUserAllowedAccessToBT(bt_id, &db, &user);
+						if(error_string.empty())
+						{
+							if(db.Query("SELECT `status` FROM `bt` WHERE `id`=\"" + bt_id + "\";"))
+							{
+								string	bt_state = db.Get(0, "status");
+
+								if(bt_state == "submit")
+								{
+
+									if(db.Query("SELECT `id` FROM `bt_approvers` WHERE "
+													"`approver_user_id`=\"" + user.GetID() + "\" "
+													"AND "
+													"`contract_sow_id`=( SELECT `contract_sow_id` FROM `bt` WHERE `id`=\"" + bt_id + "\")"
+													";"))
+									{
+										string		approver_id = db.Get(0, "id");
+
+										if(db.Query("SELECT `id` FROM `bt_approvals` WHERE `approver_id`=" + quoted(approver_id) + " AND `decision`=\"pending\" AND `bt_id`=" + quoted(bt_id) + ";"))
+										{
+											db.Query("UPDATE `bt_approvals` SET `decision`=\"approved\",`comment`=" + quoted(comment) + ", `eventTimestamp`=UNIX_TIMESTAMP() WHERE  `approver_id`=" + quoted(approver_id) + " AND `decision`=\"pending\" AND `bt_id`=" + quoted(bt_id) + ";");
+											if(!db.isError())
+											{
+												if(SubmitBT(bt_id, &db, &user))
+												{
+													string	success_description = GetObjectsSOW_Reusable_InJSONFormat("bt", "submit", &db, &user);
+
+													if(success_description.length())
+													{
+														ostResult	<< "{"
+																	<< "\"result\":\"success\","
+																	<< success_description
+																	<< "}";
+													}
+													else
+													{
+														ostResult << "{\"result\":\"error\",\"description\":\"ошибка БД\"}";
+														MESSAGE_ERROR("", action, "error getting info about pending bts");
+													}
+												}
+												else
+												{
+													ostResult << "{\"result\":\"error\",\"description\":\"ошибка отправки таймкарты\"}";
+													MESSAGE_ERROR("", action, "fail to submit bt_id(" + bt_id + ")");
+												}
+											}
+											else
+											{
+												ostResult << "{\"result\":\"error\",\"description\":\"ошибка БД\"}";
+												MESSAGE_ERROR("", action, "fail to update bt_id(" + bt_id + "): " + db.GetErrorMessage());
+											}
+										}
+										else
+										{
+											MESSAGE_ERROR("", action, "bt.id(" + bt_id + ") not in pending state on user.id(" + user.GetID() + ")");
+											ostResult << "{\"result\":\"error\",\"description\":\"Вы не должны подтверждать эту таймкарту\"}";
+										}
+
+
+									}
+									else
+									{
+										MESSAGE_ERROR("", action, "user.id(" + user.GetID() + ") not an bt.id(" + bt_id + ") approver");
+										ostResult << "{\"result\":\"error\",\"description\":\"Вы не должны подтверждать таймкарту у данного договора\"}";
+									}
+
+								}
+								else
+								{
+									MESSAGE_ERROR("", action, "bt.id(" + bt_id + ") have to be in submit state to be approved/rejected, but it is in \"" + bt_state + "\" state");
+									ostResult << "{\"result\":\"error\",\"description\":\"таймкарта не требует подтверждения\"}";
+								}
+							}
+							else
+							{
+								MESSAGE_ERROR("", action, "issue get info about bt.id(" + bt_id + ") from DB");
+								ostResult << "{\"result\":\"error\",\"description\":\"Ошибка ДБ\"}";
+							}
+						}
+						else
+						{
+							MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't allow to see this bt");
+							ostResult << "{\"result\":\"error\",\"description\":\"У Вас нет доступа к этой таймкарте\"}";
+						}
+					}
+					else
+					{
+						MESSAGE_ERROR("", action, "user.id(" + user.GetID() + ") is " + user.GetType() + ", who can't approve/reject");
+						ostResult << "{\"result\":\"error\",\"description\":\"У Вас нет доступа к этой таймкарте\"}";
+					}
+				}
+				else
+				{
+					MESSAGE_ERROR("", action, "parameter bt_id is empty");
+					ostResult << "{\"result\":\"error\",\"description\":\"Некорректые параметры\"}";
+				}
+
+
+				indexPage.RegisterVariableForce("result", ostResult.str());
+
+				if(!indexPage.SetTemplate(template_name))
+				{
+					MESSAGE_ERROR("", action, "can't find template " + template_name);
+				}
+			}
+
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
+
+/*
 		if(action == "AJAX_approveBT")
 		{
 			string			strPageToGet, strFriendsOnSinglePage;
@@ -761,13 +1004,13 @@ int main(void)
 				if(!indexPage.SetTemplate(template_name))
 				{
 					MESSAGE_ERROR("", action, "can't find template " + template_name);
-				} // if(!indexPage.SetTemplate("my_network.htmlt"))
+				}
 			}
 
 
 			MESSAGE_DEBUG("", action, "finish");
 		}
-
+*/
 		if(action == "AJAX_getDashboardPendingData")
 		{
 			string			strPageToGet, strFriendsOnSinglePage;
@@ -814,6 +1057,41 @@ int main(void)
 				}
 			}
 
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
+
+		if(action == "AJAX_getDashboardPendingPayment")
+		{
+			MESSAGE_DEBUG("", action, "start");
+
+			auto		template_name = "json_response.htmlt"s;
+			auto		error_message = ""s;
+			auto		success_message = ""s;
+			auto		affected = db.Query("SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user.GetID() + "\";");
+
+			if(affected)
+			{
+				auto sow_sql =	"SELECT `id` FROM `contracts_sow` WHERE `agency_company_id`=("
+									"SELECT `company_id` FROM `company_employees` WHERE `user_id`=" + quoted(user.GetID()) + 
+								")";
+
+				success_message = 
+								"\"number_of_payment_pending_timecards\":" + GetNumberOfTimecardsInPaymentPendingState(sow_sql, &db, &user) + ","
+								"\"timecard_late_payment\":" + quoted(to_string(areThereTimecardsWithExpiredPayment("1", sow_sql, &db, &user))) + ","
+								"\"timecard_payment_will_be_late_soon\":" + quoted(to_string(areThereTimecardsWithExpiredPayment("1/2", sow_sql, &db, &user))) + ","
+								"\"number_of_payment_pending_bt\":" + GetNumberOfBTInPaymentPendingState(sow_sql, &db, &user) + ","
+								"\"bt_late_payment\":" + quoted(to_string(areThereBTWithExpiredPayment("1", sow_sql, &db, &user))) + ","
+								"\"bt_payment_will_be_late_soon\":" + quoted(to_string(areThereBTWithExpiredPayment("1/2", sow_sql, &db, &user))) + ""
+							;
+			}
+			else
+			{
+				error_message = gettext("you are not authorized");
+				MESSAGE_ERROR("", action, error_message);
+			}
+
+			AJAX_ResponseTemplate(&indexPage, success_message, error_message);
 
 			MESSAGE_DEBUG("", action, "finish");
 		}
@@ -1316,6 +1594,13 @@ int main(void)
 			(action == "AJAX_updateExpenseTemplateLinePaymentCash")	||	
 			(action == "AJAX_updateExpenseTemplateLinePaymentCard")	||	
 			(action == "AJAX_updateExpenseTemplateLineRequired")	||
+			(action == "AJAX_updateAirfareLimitationByDirection")	||
+			(action == "AJAX_updateBTAllowanceCountry")				||
+			(action == "AJAX_updateBTAllowanceAmount")				||
+			(action == "AJAX_deleteBTAllowance")					||
+			(action == "AJAX_updateHolidayCalendarDate")			||
+			(action == "AJAX_updateHolidayCalendarTitle")			||
+			(action == "AJAX_deleteHolidayCalendar")				||
 			(action == "AJAX_updateCostCenterToCustomer")			||
 			(action == "AJAX_deleteCostCenterFromCustomer")			||
 			(action == "AJAX_deleteCostCenter")						||
@@ -1476,6 +1761,108 @@ int main(void)
 
 			MESSAGE_DEBUG("", action, "finish");
 		}
+		if(
+			(action == "AJAX_updateTimecardApproverOrder")	||
+			(action == "AJAX_updateBTApproverOrder")
+			)
+		{
+			{
+				MESSAGE_DEBUG("", action, "start");
+
+				auto			error_message = ""s;
+				auto			success_message = ""s;
+
+				auto			sow_id			= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("sow_id"));
+				auto			new_value		= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("value"));
+
+				ostringstream	ostResult;
+
+				ostResult.str("");
+
+				if(new_value.length() && sow_id.length())
+				{
+					error_message = isAgencyEmployeeAllowedToChangeSoW(sow_id, &db, &user);
+					if(error_message.empty())
+					{
+						string	agency_id = GetAgencyID(&user, &db);
+						if(agency_id.length())
+						{
+							{
+								error_message = isActionEntityBelongsToAgency(action, sow_id, agency_id, &db, &user);
+								if(error_message.empty())
+								{
+									error_message = CheckNewValueByAction(action, "fake", sow_id, new_value, &db, &user);
+									if(error_message.empty())
+									{
+										if((action.find("update") != string::npos))
+										{
+											string		existing_value = GetDBValueByAction(action, sow_id, "", &db, &user);
+
+											error_message = SetNewValueByAction(action, sow_id, "", new_value, &db, &user);
+											if(error_message.empty())
+											{
+												// --- good finish
+
+												if(GeneralNotifySoWContractPartiesAboutChanges(action, sow_id, "", existing_value, new_value, &db, &user))
+												{
+
+													if(action == "AJAX_updateTimecardApproverOrder")	success_message = "\"timecard_approvers\":[" + GetApproversInJSONFormat("SELECT * FROM `timecard_approvers` WHERE `contract_sow_id`=" + quoted(sow_id) + ";", &db, &user, false) + "]";
+													else if(action == "AJAX_updateBTApproverOrder")		success_message = "\"bt_approvers\":[" + GetApproversInJSONFormat("SELECT * FROM `bt_approvers` WHERE `contract_sow_id`=" + quoted(sow_id) + ";", &db, &user, false) + "]";
+													else
+													{
+														error_message = gettext("unsupported action");
+														MESSAGE_ERROR("", action, error_message + " type(" + action + ")");
+													}
+												}
+												else
+												{
+													MESSAGE_DEBUG("", action, "fail to notify agency about changes");
+												}
+											}
+											else
+											{
+												MESSAGE_DEBUG("", action, "unable to set new value (action/id/value = " + action + "/" + sow_id + "/[" + FilterCP1251Symbols(new_value) + "])");
+											}
+										}
+										else
+										{
+											MESSAGE_ERROR("", action, "unsupported action type(" + action + ")");
+										}
+
+									}
+									else
+									{
+										MESSAGE_DEBUG("", action, "new value failed to pass validity check");
+									}
+								}
+								else
+								{
+									MESSAGE_DEBUG("", action, "action entity id(" + user.GetID() + ") doesn't belongs to agency.id(" + agency_id + ")");
+								}
+							}
+						}
+						else
+						{
+							error_message = "Агенство не найдено";
+							MESSAGE_ERROR("", action, "agency.id not found by user.id(" + user.GetID() + ") employment");
+						}
+					}
+					else
+					{
+						MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") doesn't allowed to change agency data");
+					}
+				}
+				else
+				{
+					error_message = gettext("parameters incorrect");
+					MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") didn't set new_value");
+				}
+
+				AJAX_ResponseTemplate(&indexPage, success_message, error_message);
+
+			MESSAGE_DEBUG("", action, "finish");
+			}
+		}
 
 		if(action == "AJAX_addTaskAssignment")
 		{
@@ -1502,108 +1889,120 @@ int main(void)
 					{
 						if(db.Query("SELECT `agency_company_id`,`start_date`,`end_date` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";"))
 						{
-							string agency_id				= db.Get(0, "agency_company_id");
-							struct tm sow_start				= GetTMObject(db.Get(0, "start_date"));
-							struct tm sow_end				= GetTMObject(db.Get(0, "end_date"));
-							struct tm new_assignemt_start	= GetTMObject(period_start);
-							struct tm new_assignemt_end		= GetTMObject(period_end);
+								string agency_id				= db.Get(0, "agency_company_id");
+								struct tm sow_start				= GetTMObject(db.Get(0, "start_date"));
+								struct tm sow_end				= GetTMObject(db.Get(0, "end_date"));
+								struct tm new_assignemt_start	= GetTMObject(period_start);
+								struct tm new_assignemt_end		= GetTMObject(period_end);
 
-							if(difftime(mktime(&new_assignemt_start), mktime(&sow_start)) >= 0)
-							{
-								if(difftime(mktime(&sow_end), mktime(&new_assignemt_end)) >= 0)
+								if(difftime(mktime(&new_assignemt_start), mktime(&sow_start)) >= 0)
 								{
-									if(difftime(mktime(&new_assignemt_end), mktime(&new_assignemt_start)) >= 0)
+									if(difftime(mktime(&sow_end), mktime(&new_assignemt_end)) >= 0)
 									{
-										string	task_assignment_id = GetTaskAssignmentID(customer, project, task, sow_id, &db);
-
-										if(task_assignment_id.empty())
+										if(difftime(mktime(&new_assignemt_end), mktime(&new_assignemt_start)) >= 0)
 										{
-											string	assignment_start = to_string(1900 + new_assignemt_start.tm_year) + "-" + to_string(1 + new_assignemt_start.tm_mon) + "-" + to_string(new_assignemt_start.tm_mday);
-											string	assignment_end = to_string(1900 + new_assignemt_end.tm_year) + "-" + to_string(1 + new_assignemt_end.tm_mon) + "-" + to_string(new_assignemt_end.tm_mday);
-											string	task_id = GetTaskIDFromAgency(customer, project, task, agency_id, &db);
-											bool	notify_about_task_creation = false;
+											string	task_assignment_id = GetTaskAssignmentID(customer, project, task, sow_id, &db);
 
-											if(task_id.empty())
+											if(task_assignment_id.empty())
 											{
-												task_id = CreateTaskBelongsToAgency(customer, project, task, agency_id, &db);
-												notify_about_task_creation = true;
-											}
-											else
-											{
-												MESSAGE_DEBUG("", action, "Customer/Project/Task already exists for this agency.id(" + agency_id + ")");
-											}
+												string	assignment_start = to_string(1900 + new_assignemt_start.tm_year) + "-" + to_string(1 + new_assignemt_start.tm_mon) + "-" + to_string(new_assignemt_start.tm_mday);
+												string	assignment_end = to_string(1900 + new_assignemt_end.tm_year) + "-" + to_string(1 + new_assignemt_end.tm_mon) + "-" + to_string(new_assignemt_end.tm_mday);
+												string	task_id = GetTaskIDFromAgency(customer, project, task, agency_id, &db);
+												bool	notify_about_task_creation = false;
 
-											task_assignment_id = CreateTaskAssignment(task_id, sow_id, assignment_start, assignment_end, &db, &user);
-
-											if(task_assignment_id.length())
-											{
-												if(CreatePSoWfromTimecardTaskIDAndSoWID(task_id, sow_id, &db, &user))
+												if(task_id.empty())
 												{
-													ostResult << "{\"result\":\"success\"}";
-
-													if(notify_about_task_creation)
-													{
-														if(GeneralNotifySoWContractPartiesAboutChanges("AJAX_addTask", task_id, sow_id, "", task, &db, &user))
-														{
-														}
-														else
-														{
-															MESSAGE_ERROR("", action, "fail to notify SoW parties");
-														}
-													}
-													else
-													{
-														MESSAGE_DEBUG("", "", "no notification about task creation");
-													}
-													if(GeneralNotifySoWContractPartiesAboutChanges(action, task_assignment_id, sow_id, "", customer + " / " + project + " / " + task + " ( с " + assignment_start + " по " + assignment_end + ")", &db, &user))
-													{
-													}
-													else
-													{
-														MESSAGE_ERROR("", action, "fail to notify SoW parties");
-													}
+													task_id = CreateTaskBelongsToAgency(customer, project, task, agency_id, &db);
+													notify_about_task_creation = true;
 												}
 												else
 												{
-													error_message = gettext("unable to create psow");
-													MESSAGE_DEBUG("", action, "fail to create psow from sow.id(" + sow_id + ") and task.id(" + task_id + ")");
+													MESSAGE_DEBUG("", action, "Customer/Project/Task already exists for this agency.id(" + agency_id + ")");
 												}
+
+												{
+													auto	cost_center_id = GetCostCenterIDByTaskID(task_id, &db);
+													if(cost_center_id.length())
+													{
+														task_assignment_id = CreateTaskAssignment(task_id, sow_id, assignment_start, assignment_end, &db, &user);
+
+														if(task_assignment_id.length())
+														{
+															if(CreatePSoWfromTimecardTaskIDAndSoWID(task_id, sow_id, &db, &user))
+															{
+																ostResult << "{\"result\":\"success\"}";
+
+																if(notify_about_task_creation)
+																{
+																	if(GeneralNotifySoWContractPartiesAboutChanges("AJAX_addTask", task_id, sow_id, "", task, &db, &user))
+																	{
+																	}
+																	else
+																	{
+																		MESSAGE_ERROR("", action, "fail to notify SoW parties");
+																	}
+																}
+																else
+																{
+																	MESSAGE_DEBUG("", "", "no notification about task creation");
+																}
+																if(GeneralNotifySoWContractPartiesAboutChanges(action, task_assignment_id, sow_id, "", customer + TIMECARD_ENTRY_TITLE_SEPARATOR + project + TIMECARD_ENTRY_TITLE_SEPARATOR + task + " ( с " + assignment_start + " по " + assignment_end + ")", &db, &user))
+																{
+																}
+																else
+																{
+																	MESSAGE_ERROR("", action, "fail to notify SoW parties");
+																}
+															}
+															else
+															{
+																error_message = gettext("unable to create psow");
+																MESSAGE_DEBUG("", action, "fail to create psow from sow.id(" + sow_id + ") and task.id(" + task_id + ")");
+															}
+														}
+														else
+														{
+															error_message = "Не удалось создать назначение";
+															MESSAGE_DEBUG("", action, "fail to create assignment sow.id(" + sow_id + ") task.id(" + task_id + ")");
+														}
+													}
+													else
+													{
+														error_message = gettext("task not assigned to a cost center");
+														MESSAGE_DEBUG("", action, error_message);
+													}
+												}
+
 											}
 											else
 											{
-												error_message = "Не удалось создать назначение";
-												MESSAGE_DEBUG("", action, "fail to create assignment sow.id(" + sow_id + ") task.id(" + task_id + ")");
+												error_message = "Такое назначение уже существует";
+												MESSAGE_DEBUG("", action, "assignment Customer/Project/Task already exists for this sow.id(" + sow_id + ")");
 											}
+											
 										}
 										else
 										{
-											error_message = "Такое назначение уже существует";
-											MESSAGE_DEBUG("", action, "assignment Customer/Project/Task already exists for this sow.id(" + sow_id + ")");
+											MESSAGE_DEBUG("", action, "new assignment finish(" + period_end + ")  earlier than start(" + period_start + ")");
+											error_message = "Начало назначения должно быть раньше, чем окончание";
 										}
-										
 									}
 									else
 									{
-										MESSAGE_DEBUG("", action, "new assignment finish(" + period_end + ")  earlier than start(" + period_start + ")");
-										error_message = "Начало назначения должно быть раньше, чем окончание";
+										MESSAGE_DEBUG("", action, "new assignment end " + period_end + " later than sow.id(" + sow_id + ") end");
+										error_message = "Новое назначение не должно заканчиваться позднее контракта";
 									}
 								}
 								else
 								{
-									MESSAGE_DEBUG("", action, "new assignment end " + period_end + " later than sow.id(" + sow_id + ") end");
-									error_message = "Новое назначение не должно заканчиваться позднее контракта";
+									MESSAGE_DEBUG("", action, "new assignment start " + period_start + " earlier than sow.id(" + sow_id + ") start");
+									error_message = "Новое назначение не должно начинаться раньше контракта";
 								}
-							}
-							else
-							{
-								MESSAGE_DEBUG("", action, "new assignment start " + period_start + " earlier than sow.id(" + sow_id + ") start");
-								error_message = "Новое назначение не должно начинаться раньше контракта";
-							}
 						}
 						else
 						{
+							error_message = "SoW "s + gettext("not found");
 							MESSAGE_ERROR("", action, "sow.id" + sow_id + " not found");
-							error_message = "Контракт не найден";
 						}
 					}
 					else
@@ -1943,6 +2342,101 @@ int main(void)
 
 			MESSAGE_DEBUG("", action, "finish");
 		}
+
+		if(action == "AJAX_addAirfareLimitationByDirection")
+		{
+			ostringstream	ostResult;
+
+			MESSAGE_DEBUG("", action, "start");
+
+			ostResult.str("");
+			{
+				string			template_name = "json_response.htmlt";
+				string			error_message = "";
+
+				string			from_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("from_id"));
+				string			to_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("to_id"));
+				string			limit = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("limit"));
+
+
+				if(from_id.length() && to_id.length() && limit.length())
+				{
+					error_message = isAgencyEmployeeAllowedToChangeAgencyData(&db, &user);
+					if(error_message.empty())
+					{
+						string	agency_id = GetAgencyID(&user, &db);
+
+						if(agency_id.length())
+						{
+							error_message = isValidToAddAirfareLimitByDirection(from_id, to_id, agency_id, &db, &user);
+							if(error_message.empty())
+							{
+								auto	id = db.InsertQuery("INSERT INTO `airfare_limits_by_direction` "
+															"(`from`, `to`, `limit`, `agency_company_id`, `creator_user_id`, `eventTimestamp`) "
+															"VALUES "
+															"(" + quoted(from_id) + ", "
+																+ quoted(to_id) + ", "
+																+ quoted(limit) + ", "
+																+ quoted(agency_id) + ", "
+																+ quoted(user.GetID()) + ", "
+																+ "UNIX_TIMESTAMP());");
+								if(id)
+								{
+									if(GeneralNotifySoWContractPartiesAboutChanges(action, to_string(id), "", "", limit, &db, &user))
+									{
+									}
+									else
+									{
+										MESSAGE_ERROR("", action, "fail to notify agency");
+									}
+								}
+								else
+								{
+									MESSAGE_DEBUG("", action, "fail saving bt_expense_template to DB");
+								}
+							}
+							else
+							{
+								MESSAGE_DEBUG("", action, error_message);
+							}
+						}
+						else
+						{
+							error_message = gettext("agency not found");
+							MESSAGE_ERROR("", action, "agency.id not found by user.id(" + user.GetID() + ") employment");
+						}
+					}
+					else
+					{
+						error_message = gettext("You are not authorized");
+						MESSAGE_ERROR("", action, error_message);
+					}
+				}
+				else
+				{
+					error_message = gettext("mandatory parameter missed");
+					MESSAGE_ERROR("", action, error_message);
+				}
+
+				if(error_message.empty())
+				{
+					ostResult << "{\"result\":\"success\"}";
+				}
+				else
+				{
+					MESSAGE_DEBUG("", action, "failed");
+					ostResult.str("");
+					ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+				}
+
+				indexPage.RegisterVariableForce("result", ostResult.str());
+
+				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			}
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
+
 
 		if(action == "AJAX_addExpenseTemplateLine")
 		{
@@ -2547,6 +3041,82 @@ int main(void)
 			MESSAGE_DEBUG("", action, "finish");
 		}
 
+		if(action == "AJAX_deleteAirfarelimitationByDirection")
+		{
+			ostringstream	ostResult;
+
+			MESSAGE_DEBUG("", action, "start");
+
+			ostResult.str("");
+			{
+				string			template_name = "json_response.htmlt";
+				string			error_message = "";
+
+				string			id	= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
+
+				if(id.length())
+				{
+					error_message = isAgencyEmployeeAllowedToChangeAgencyData(&db, &user);
+					if(error_message.empty())
+					{
+						string	agency_id = GetAgencyID(&user, &db);
+
+						if(agency_id.length())
+						{
+							error_message = isActionEntityBelongsToAgency(action, id, agency_id, &db, &user);
+							if(error_message.empty())
+							{
+								if(GeneralNotifySoWContractPartiesAboutChanges("AJAX_deleteAirfarelimitationByDirection", id, "", "", "", &db, &user))
+								{
+								}
+								else
+								{
+									MESSAGE_ERROR("", action, "fail to notify agency");
+								}
+								
+								db.Query("DELETE FROM `airfare_limits_by_direction` WHERE `id`=\"" + id + "\";");
+							}
+							else
+							{
+								MESSAGE_DEBUG("", action, "action entity id(" + user.GetID() + ") doesn't belongs to agency.id(" + agency_id + ")");
+							}
+						}
+						else
+						{
+							MESSAGE_ERROR("", action, "agency.id not found by user.id(" + user.GetID() + ") employment");
+							error_message = "Агенство не найдено";
+						}
+					}
+					else
+					{
+						MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") doesn't allowed to change agency data");
+					}
+				}
+				else
+				{
+					MESSAGE_ERROR("", action, "id missed");
+					error_message = "Не указан идентификатор ограничения на удаление";
+				}
+
+				if(error_message.empty())
+				{
+					ostResult << "{\"result\":\"success\"}";
+				}
+				else
+				{
+					MESSAGE_DEBUG("", action, "failed");
+					ostResult.str("");
+					ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+				}
+
+				indexPage.RegisterVariableForce("result", ostResult.str());
+
+				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			}
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
+
 		if(action == "AJAX_addCostCenter")
 		{
 			ostringstream	ostResult;
@@ -2603,8 +3173,8 @@ int main(void)
 				}
 				else
 				{
-					MESSAGE_ERROR("", action, "mandatory parameter missed");
 					error_message = gettext("mandatory parameter missed");
+					MESSAGE_ERROR("", action, error_message);
 				}
 
 				ostResult.str("");
@@ -2613,6 +3183,168 @@ int main(void)
 					ostResult	<< "{"
 								<< "\"result\":\"success\","
 								<< "\"cost_centers\":[" << GetCostCentersInJSONFormat("SELECT * FROM `cost_centers` WHERE `id`=\"" + to_string(cost_center_id) + "\";", &db, &user) << "]"
+								<< "}";
+				}
+				else
+				{
+					MESSAGE_DEBUG("", action, "failed");
+					ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+				}
+
+				indexPage.RegisterVariableForce("result", ostResult.str());
+
+				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			}
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
+
+		if(action == "AJAX_addBTAllowance")
+		{
+			ostringstream	ostResult;
+
+			MESSAGE_DEBUG("", action, "start");
+
+			ostResult.str("");
+			{
+				auto			template_name	= "json_response.htmlt"s;
+				auto			error_message	= ""s;
+
+				auto			country_id		= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("country_id"));
+				auto			amount			= CheckHTTPParam_Float(indexPage.GetVarsHandler()->Get("amount"));
+
+				if(country_id.length() && amount.length())
+				{
+					error_message = isAgencyEmployeeAllowedToChangeAgencyData(&db, &user);
+					if(error_message.empty())
+					{
+						string	agency_id = GetAgencyID(&user, &db);
+
+						if(agency_id.length())
+						{
+							error_message = CheckNewValueByAction(action, agency_id, "", country_id, &db, &user);
+							if(error_message.empty())
+							{
+								auto	bt_allowance_id = db.InsertQuery("INSERT INTO `bt_allowance` (`agency_company_id`, `geo_country_id`, `amount`, `eventTimestamp`) VALUES (\"" + agency_id + "\", \"" + country_id + "\", \"" + amount + "\", UNIX_TIMESTAMP());");
+								if(bt_allowance_id)
+								{
+									if(GeneralNotifySoWContractPartiesAboutChanges(action, to_string(bt_allowance_id), "", "", "", &db, &user))
+									{
+									}
+									else
+									{
+										MESSAGE_ERROR("", action, "fail to notify agency");
+									}
+								}
+							}
+							else
+							{
+								MESSAGE_DEBUG("", action, error_message);
+							}
+						}
+						else
+						{
+							MESSAGE_ERROR("", action, "agency.id not found by user.id(" + user.GetID() + ") employment");
+							error_message = gettext("agency not found");
+						}
+					}
+					else
+					{
+						MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") doesn't allowed to change agency data");
+					}
+				}
+				else
+				{
+					error_message = gettext("mandatory parameter missed");
+					MESSAGE_ERROR("", action, error_message);
+				}
+
+				ostResult.str("");
+				if(error_message.empty())
+				{
+					ostResult	<< "{"
+								<< "\"result\":\"success\""
+								<< "}";
+				}
+				else
+				{
+					MESSAGE_DEBUG("", action, "failed");
+					ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+				}
+
+				indexPage.RegisterVariableForce("result", ostResult.str());
+
+				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			}
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
+
+		if(action == "AJAX_addHolidayCalendar")
+		{
+			ostringstream	ostResult;
+
+			MESSAGE_DEBUG("", action, "start");
+
+			ostResult.str("");
+			{
+				auto			template_name	= "json_response.htmlt"s;
+				auto			error_message	= ""s;
+
+				auto			date		= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("date"));
+				auto			title		= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("title"));
+
+				if(date.length() && title.length())
+				{
+					error_message = isAgencyEmployeeAllowedToChangeAgencyData(&db, &user);
+					if(error_message.empty())
+					{
+						string	agency_id = GetAgencyID(&user, &db);
+
+						if(agency_id.length())
+						{
+							error_message = CheckNewValueByAction(action, agency_id, "", date, &db, &user);
+							if(error_message.empty())
+							{
+								auto	holiday_calendar_id = db.InsertQuery("INSERT INTO `holiday_calendar` (`agency_company_id`, `date`, `title`, `eventTimestamp`) VALUES (\"" + agency_id + "\", \"" + date + "\", \"" + title + "\", UNIX_TIMESTAMP());");
+								if(holiday_calendar_id)
+								{
+									if(GeneralNotifySoWContractPartiesAboutChanges(action, to_string(holiday_calendar_id), "", "", "", &db, &user))
+									{
+									}
+									else
+									{
+										MESSAGE_ERROR("", action, "fail to notify agency");
+									}
+								}
+							}
+							else
+							{
+								MESSAGE_DEBUG("", action, error_message);
+							}
+						}
+						else
+						{
+							MESSAGE_ERROR("", action, "agency.id not found by user.id(" + user.GetID() + ") employment");
+							error_message = gettext("agency not found");
+						}
+					}
+					else
+					{
+						MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") doesn't allowed to change agency data");
+					}
+				}
+				else
+				{
+					error_message = gettext("mandatory parameter missed");
+					MESSAGE_ERROR("", action, error_message);
+				}
+
+				ostResult.str("");
+				if(error_message.empty())
+				{
+					ostResult	<< "{"
+								<< "\"result\":\"success\""
 								<< "}";
 				}
 				else
@@ -3031,37 +3763,25 @@ int main(void)
 
 		if(action == "AJAX_getApproversAutocompleteList")
 		{
-			string			name = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("name"));
-			string			sow_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("sow_id"));
-			string			template_name = "json_response.htmlt";
-			string			error_message = "";
-			ostringstream	ostResult;
-
-			ostResult.str("");
+			auto			name = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("term"));
+			auto			sow_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("sow_id"));
+			auto			template_name = "json_response.htmlt"s;
+			auto			error_message = ""s;
+			auto			success_message = ""s;
 
 			if(name.length() && sow_id.length())
 			{
 				error_message = isAgencyEmployeeAllowedToChangeSoW(sow_id, &db, &user);
 				if(error_message.empty())
 				{
-					int	affected = db.Query("SELECT `id`, `name`, `nameLast` FROM `users` WHERE ((`type`=\"approver\") OR (`type`=\"agency\")) AND ((`name` LIKE \"%" + name + "%\") OR (`nameLast` LIKE \"%" + name + "%\")) LIMIT 0, 20;");
-					if(affected)
+					auto	affected = db.Query("SELECT `id`, `name`, `nameLast` FROM `users` WHERE ((`type`=\"approver\") OR (`type`=\"agency\")) AND ((`name` LIKE \"%" + name + "%\") OR (`nameLast` LIKE \"%" + name + "%\")) LIMIT 0, 20;");
+
+					for(auto i = 0; i < affected; ++i)
 					{
-						ostResult << "{\"result\":\"success\","
-								  << "\"autocomplete_list\":[";
-						for(int i = 0; i < affected; ++i)
-						{
-							if(i) ostResult << ",";
-							ostResult << "{\"id\":\"" << db.Get(i, "id") << "\","
-									  << "\"label\":\"" << db.Get(i, "name") << " " << db.Get(i, "nameLast") << "\"}";
-						}
-						ostResult << "]}";
+						if(i) success_message += ",";
+						success_message += "{\"id\":\"" + db.Get(i, "id") + "\","
+								  + "\"label\":\"" + db.Get(i, "name") + " " + db.Get(i, "nameLast") + "\"}";
 					}
-					else
-					{
-						ostResult << "{\"result\":\"success\",\"autocomplete_list\":[]}";
-						MESSAGE_DEBUG("", "", "no users found");
-					}	
 				}
 				else
 				{
@@ -3074,17 +3794,7 @@ int main(void)
 				MESSAGE_DEBUG("", action, error_message);
 			}
 
-			if(error_message.empty())
-			{
-			}
-			else
-			{
-				MESSAGE_DEBUG("", action, "failed");
-				ostResult.str("");
-				ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
-			}
-
-			indexPage.RegisterVariableForce("result", ostResult.str());
+			indexPage.RegisterVariableForce("result", "[" + success_message + "]");
 
 			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 		}
@@ -4136,6 +4846,7 @@ int main(void)
 					{
 						auto	timecards_reported = 0l;
 						auto	bt_reported = 0l;
+						auto	airtickets_purchased = 0l;
 
 						if(db.Query("SELECT count(*) FROM `bt` WHERE `contract_sow_id`=\"" + sow_id + "\";"))
 						{
@@ -4144,12 +4855,17 @@ int main(void)
 							if(db.Query("SELECT count(*) FROM `timecards` WHERE `contract_sow_id`=\"" + sow_id + "\";"))
 							{
 								timecards_reported = stod_noexcept(db.Get(0, 0));
+
+								if(db.Query("SELECT count(*) FROM `airline_bookings` WHERE `contract_sow_id`=\"" + sow_id + "\";"))
+								{
+									airtickets_purchased = stod_noexcept(db.Get(0, 0));
+								}
 							}
 						}
 
-						if(bt_reported + timecards_reported)
+						if(bt_reported + timecards_reported + airtickets_purchased)
 						{
-							error_message = gettext("Can't remove")  + " ("s + to_string(timecards_reported) + " " + gettext("timecards reported") + " " + gettext("and") + " " + to_string(bt_reported) + " " + gettext("bt-s reported") + ").";
+							error_message = gettext("Can't remove")  + " ("s + to_string(timecards_reported) + " " + gettext("timecards reported") + " " + gettext("and") + " " + to_string(bt_reported) + " " + gettext("bt-s reported") + " " + gettext("and") + " " + to_string(airtickets_purchased) + " " + gettext("tickets purchased") + ").";
 						}
 						else
 						{
@@ -4872,6 +5588,72 @@ int main(void)
 
 				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 			}
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
+
+		if(action == "AJAX_payForTheList")
+		{
+			MESSAGE_DEBUG("", action, "start");
+
+			auto			entity = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("entity"));
+			auto			list_param = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("list"));
+
+			auto			error_message = ""s;
+			auto			success_message = ""s;
+
+			auto			list = split(list_param, ',');
+
+			for(auto i = 0u; i < list.size() && error_message.empty(); ++i)
+			{
+				auto	sql_query = ""s;
+
+				if(entity == "timecard") sql_query = "SELECT `contract_sow_id` FROM `timecards` WHERE `id`=" + quoted(list[i]) + ";";
+				else if(entity == "bt") sql_query = "SELECT `contract_sow_id` FROM `bt` WHERE `id`=" + quoted(list[i]) + ";";
+				else
+				{
+					error_message = gettext("entity type is unknown");
+					MESSAGE_ERROR("", action, error_message);
+				}
+
+				if(db.Query(sql_query))
+				{
+					auto	sow_id = db.Get(0, 0);
+
+					error_message = isAgencyEmployeeAllowedToChangeSoW(sow_id, &db, &user);
+					if(error_message.empty())
+					{
+						auto	sql_query = ""s;
+
+						if(entity == "timecard") sql_query = "UPDATE `timecards` SET `payed_date`=UNIX_TIMESTAMP() WHERE `id`=" + quoted(list[i]) + ";";
+						else if(entity == "bt") sql_query = "UPDATE `bt` SET `payed_date`=UNIX_TIMESTAMP() WHERE `id`=" + quoted(list[i]) + ";";
+						else
+						{
+							error_message = gettext("entity type is unknown");
+							MESSAGE_ERROR("", action, error_message);
+						}
+
+						db.Query(sql_query);
+						if(db.isError())
+						{
+							error_message = db.GetErrorMessage();
+							MESSAGE_ERROR("", action, error_message);
+						}
+					}
+					else
+					{
+						MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") doesn't allowed to change agency data");
+					}
+				}
+				else
+				{
+					error_message = gettext("SoW not known");
+					MESSAGE_ERROR("", action, error_message);
+				}
+
+			}
+
+			AJAX_ResponseTemplate(&indexPage, success_message, error_message);
 
 			MESSAGE_DEBUG("", action, "finish");
 		}

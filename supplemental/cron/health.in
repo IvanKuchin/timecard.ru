@@ -25,4 +25,6 @@ grep "general punctuation detected" ${LOGDIR}${MAIN_DOMAIN_NAME}.log | grep `dat
 echo --------------- ${MAIN_DOMAIN_NAME} log: lost pictures in DB [setID = 0]
 echo "select \`id\` from \`feed_images\` where \`setID\`='0';" | mysql -u ${PROJECT_NAME}RO -p${PROJECT_NAME}RO ${MAIN_DOMAIN_NAME} 2>/dev/null | grep -v id
 
+echo --------------- ${MAIN_DOMAIN_NAME} log: unknonwn business trip localities [need to add those to geo_xxxxxx tables]
+echo "select \`locality\` from \`geo_locality_unknown\`;" | mysql -u ${PROJECT_NAME}RO -p${PROJECT_NAME}RO ${MAIN_DOMAIN_NAME} 2>/dev/null | grep -v id
 

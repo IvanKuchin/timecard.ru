@@ -17,9 +17,6 @@
 #include "cmail.h"
 #include "cstatistics.h"
 #include "utilities_timecard.h"
-// #include "cforum.h"
-// #include "cmenu.h"
-// #include "ccatalog.h"
 
 int main()
 {
@@ -59,7 +56,6 @@ int main()
 
 		indexPage.SetDB(&db);
 
-
 		action = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("action"));
 		action = action.substr(0, 128);
 
@@ -81,38 +77,46 @@ int main()
 				mapResult["user"] = "false";
 
 				sessidHTTP = indexPage.SessID_Get_FromHTTP();
-				if(sessidHTTP.length() < 5) {
-					{
-						MESSAGE_DEBUG("", action, "session checks: session cookie is not_exists/expired, UA must be redirected to / page.");
-					}
+				if(sessidHTTP.length() < 5) 
+				{
+					MESSAGE_DEBUG("", action, "session checks: session cookie is not_exists/expired, UA must be redirected to / page.");
 				}
 				else
 				{
-					{
-						MESSAGE_DEBUG("", action, "session checks: session cookie provided [" + sessidHTTP + "]");
-					}
-
+					MESSAGE_DEBUG("", action, "session checks: session cookie provided [" + sessidHTTP + "]");
 					if(indexPage.SessID_Load_FromDB(sessidHTTP))
 					{
-						{
-							MESSAGE_DEBUG("", action, "session checks: DB session loaded");
-						}
-
+						MESSAGE_DEBUG("", action, "session checks: DB session loaded");
 						if(indexPage.SessID_CheckConsistency())
 						{
-
+							indexPage.RegisterVariableForce("loginUser", "");
 							mapResult["session"] = "true";
 
-							indexPage.RegisterVariableForce("loginUser", "");
+							user.SetDB(&db);
+							if(user.GetFromDBbyLogin(indexPage.SessID_Get_UserFromDB()))
+							{
+								indexPage.RegisterVariableForce("loginUser", indexPage.SessID_Get_UserFromDB());
 
+								if(user.GetLogin() != "Guest")
+								{
+									// --- actions specific to registeres user
+									mapResult["user"] = "true";
+								}
+
+								MESSAGE_DEBUG("", action, "session checks: user [" + user.GetLogin() + "] logged in");
+							}
+							else
+							{
+								// --- enforce to close session
+								action = "logout";
+
+								MESSAGE_ERROR("", action, "user [" + indexPage.SessID_Get_UserFromDB() + "] not found. Change the [action = logout].");
+							}
+/*
 							if(indexPage.SessID_Get_UserFromDB() != "Guest")
 							{
-
-								user.SetDB(&db);
-
-								if(user.GetFromDBbyEmailNoPassword(indexPage.SessID_Get_UserFromDB()))
+								if(user.GetFromDBbyLogin(indexPage.SessID_Get_UserFromDB()))
 								{
-
 									indexPage.RegisterVariableForce("loginUser", indexPage.SessID_Get_UserFromDB());
 									mapResult["user"] = "true";
 
@@ -121,16 +125,16 @@ int main()
 								else
 								{
 									// --- enforce to close session
-									mapResult["user"] = "false";
 									action = "logout";
 
-									MESSAGE_ERROR("", action, "user [" + indexPage.SessID_Get_UserFromDB() + "] session exists on client device, but not in the DB. Change the [action = logout].");
+									MESSAGE_ERROR("", action, "user [" + indexPage.SessID_Get_UserFromDB() + "] not found. Change the [action = logout].");
 								}
 							}
 							else
 							{
 								MESSAGE_DEBUG("", action, "session checks: session assigned to Guest user");
 							}
+*/
 						}
 						else
 						{
@@ -173,7 +177,7 @@ int main()
 			}
 			else
 			{
-				int				numberOfFriendshipRequests;
+				auto		numberOfFriendshipRequests = 0;
 
 				result.str("");
 
@@ -184,7 +188,7 @@ int main()
 				// if(numberOfFriendshipRequests > 0)
 				// {
 					result << "[";
-					for(int i = 0; i < numberOfFriendshipRequests; i++)
+					for(auto i = 0; i < numberOfFriendshipRequests; i++)
 					{
 						if(i > 0) result << ",";
 
@@ -231,7 +235,7 @@ int main()
 		if(action == "GetUserInfo")
 		{
 			ostringstream	ost, ostFinal;
-			string			sessid, userID, userList;
+			auto			sessid = ""s, userID = ""s, userList = ""s;
 
 			MESSAGE_DEBUG("", action, "start");
 
@@ -241,7 +245,7 @@ int main()
 			}
 			else
 			{
-				userID = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("userID"));
+				userID = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("userID"));
 
 				userList = GetUserListInJSONFormat("select * from `users` where `isActivated`='Y' and `isblocked`='N' and `id` in (" + userID + ") ;", &db, &user);
 
@@ -382,13 +386,13 @@ int main()
 
 
 									user.SetDB(&db);
-									user.GetFromDBbyEmail(indexPage.SessID_Get_UserFromDB());
+									user.GetFromDBbyLogin(indexPage.SessID_Get_UserFromDB());
 									indexPage.RegisterVariableForce("loginUser", indexPage.SessID_Get_UserFromDB());
 
 									// --- copy session from persisted user to his/her new session
-									if(db.Query("SELECT `user`, `expire`, `remove_flag`, `remove_flag_timestamp` FROM `sessions` WHERE `id`=\"" + sessidPersistence + "\";"))
+									if(db.Query("SELECT * FROM `sessions` WHERE `id`=\"" + sessidPersistence + "\";"))
 									{
-										string	persistedUser = db.Get(0, "user");
+										string	persistedUserID = db.Get(0, "user_id");
 										string	persistedExpire = db.Get(0, "expire");
 										string	remove_flag = db.Get(0, "remove_flag");
 										string	remove_flag_timestamp = db.Get(0, "remove_flag_timestamp");
@@ -410,16 +414,15 @@ int main()
 										{
 											// --- following lines used to track re-use legacy sessions. 
 											// --- instead of removal, it will be "marked for removal"
-											// db.Query("DELETE FROM `sessions` WHERE `id`=\"" + sessidPersistence + "\";");
 											db.Query("UPDATE `sessions` SET `remove_flag`=\"Y\", `remove_flag_timestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sessidPersistence + "\";");
 										}
 
 										mapResult["redirect"] = "/" + GetDefaultActionFromUserType(&user, &db) + "?rand=" + GetRandom(10);
 
-										db.Query("UPDATE `sessions` SET `user`=\"" + persistedUser + "\", expire=\"" + persistedExpire + "\" WHERE `id`=\"" + sessidHTTP + "\";");
+										db.Query("UPDATE `sessions` SET `user_id`=\"" + persistedUserID + "\", expire=\"" + persistedExpire + "\" WHERE `id`=\"" + sessidHTTP + "\";");
 										if(db.isError())
 										{
-											MESSAGE_ERROR("", action, "error updating user session in DB(`sessions`)");
+											MESSAGE_ERROR("", action, "error updating user session in table `sessions`");
 										}
 										else
 										{
@@ -466,10 +469,7 @@ int main()
 			sessid = indexPage.GetCookie("sessid");
 			if(sessid.length() > 0)
 			{
-				ostringstream	ost;
-				ost.str("");
-				ost << "update sessions set `user`='Guest', `expire`='1' where `id`='" << sessid << "'";
-				db.Query(ost.str());
+				db.Query("UPDATE `sessions` set `user_id`=(SELECT `id` FROM `users` WHERE `login`=\"Guest\"), `expire`='1' where `id`=" + quoted(sessid) + ";");
 
 				if(!indexPage.Cookie_Expire())
 				{

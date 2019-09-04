@@ -450,8 +450,8 @@ auto RunTest9()
 		else
 		{
 			result = false;
-			cout << "[" << __LINE__ << "] failed on (" << get<0>(item) << " / " << get<1>(item) << " == " << get<2>(item) << ")" << endl;
-			cout << "must be failed on (" << string(num_1) << " / " << (num_2) << " = " << (op_result)  << " == " << string((num_1 / num_2)) << ", diff " << op_result - num_1 / num_2 << ")" << endl;
+			cout << "[" << __LINE__ << "] failed on (" << get<0>(item) << TIMECARD_ENTRY_TITLE_SEPARATOR << get<1>(item) << " == " << get<2>(item) << ")" << endl;
+			cout << "must be failed on (" << string(num_1) << TIMECARD_ENTRY_TITLE_SEPARATOR << (num_2) << " = " << (op_result)  << " == " << string((num_1 / num_2)) << ", diff " << op_result - num_1 / num_2 << ")" << endl;
 		}
 	}
 

@@ -19,7 +19,7 @@ class CMysqlSkel
 		MYSQL_RES		*resultSet;
 		MYSQL_FIELD		*fieldsInfo;
 		unsigned int	numRows;
-		int				numFields;
+		unsigned int	numFields;
 
 		int				FieldsIndex(const char *fieldName);
 		MYSQL_ROW		NextFetch(MYSQL_RES *result);
@@ -39,6 +39,8 @@ class CMysqlSkel
 		void			FreeResultSet();
 		bool			isError();
 		const char *	GetErrorMessage();
+		auto			GetNumberOfCols()										{ return numFields; };
+		auto			GetColName(unsigned int idx) -> string;
 
 		virtual			~CMysqlSkel() {};
 };

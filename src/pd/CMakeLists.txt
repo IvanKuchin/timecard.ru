@@ -47,6 +47,7 @@ set(INDEPENDENT_LIBRARIES_SRCs
 
 set(JOINT_LIBRARY_SRCs
     c_company.cpp
+    c_tc_bt_submit.cpp
     utilities_timecard1.cpp
     utilities_timecard2.cpp
     utilities_timecard3.cpp

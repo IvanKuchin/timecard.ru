@@ -56,6 +56,8 @@
 #define TEMPLATE_AGREEMENT_SOW_DIRECTORY			string(IMAGEROOTDIR) + string("/html/templates_agreement_sow/")
 #define	TEMPLATE_AGREEMENT_SOW_NUMBER_OF_FOLDERS	512
 #define	TEMPLATE_AGREEMENT_SOW_MAX_FILE_SIZE		2 * 1024 * 1024
+#define SMARTWAY_VOUCHERS_DIRECTORY					string(IMAGEROOTDIR) + string("/html/smartway_vouchers/")
+#define	SMARTWAY_VOUCHERS_NUMBER_OF_FOLDERS			2048
 
 #define	MMDB_fname									"${MAXMIND_INSTALL_DIR}/GeoLite2-City.mmdb"
 
@@ -265,13 +267,17 @@
 
 #define	TIMECARD_ENTRY_TITLE_SEPARATOR				" / "s
 
-#define	SMSC_LOGIN									"ivan.kuchin"s
-#define	SMSC_PASSWORD								"ivankuchinsupersecret"s
+#define	SMSC_LOGIN									"${PROJECT_NAME}"s
+#define	SMSC_PASSWORD								"${PROJECT_NAME}"s
 #define	SMSC_EXPIRATION								120
 #define	SMSC_CHARSET								"utf-8"s
 
-#define	SMARTWAY_LOGIN								"demo@smartway.today"s
-#define	SMARTWAY_PASSWORD							"1234"s
+/*
+#define	SMARTWAY_LOGIN								"${PROJECT_NAME}"s
+#define	SMARTWAY_PASSWORD							"${PROJECT_NAME}"s
+*/
+#define	SMARTWAY_LOGIN								"${PROJECT_NAME}"s
+#define	SMARTWAY_PASSWORD							"${PROJECT_NAME}"s
 #define	SMARTWAY_URL								"https://api.test.dev.smartway.today/v2"s
 
 #endif

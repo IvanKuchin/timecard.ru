@@ -317,7 +317,7 @@ auto	C_Print_BT::PrintAsXLS() -> string
 					wstring		bt_line_description = multibyte_to_wide(bt_expense.description);
 					c_float		bt_line_price_domestic(bt_expense.price_domestic);
 					c_float		bt_line_price_foreign(bt_expense.price_foreign);
-					wstring		bt_line_price_rate_exch = multibyte_to_wide(bt_expense.currency_nominal + " / " + bt_expense.currency_value);
+					wstring		bt_line_price_rate_exch = multibyte_to_wide(bt_expense.currency_nominal + TIMECARD_ENTRY_TITLE_SEPARATOR + bt_expense.currency_value);
 
 					__xls_sheet->writeStr(__xls_row_counter, 1, bt_line_date.c_str(), format_title);
 					__xls_sheet->setMerge(__xls_row_counter, __xls_row_counter, 2, 10);
@@ -613,7 +613,7 @@ auto	C_Print_BT::__HPDF_DrawTable() -> string
 					}
 					if(error_message.empty())
 					{
-						if((error_message = pdf_obj.__HPDF_PrintTextTableCell(4, utf8_to_cp1251(bt_expense.currency_nominal + " / " + bt_expense.currency_value), HPDF_TALIGN_CENTER, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
+						if((error_message = pdf_obj.__HPDF_PrintTextTableCell(4, utf8_to_cp1251(bt_expense.currency_nominal + TIMECARD_ENTRY_TITLE_SEPARATOR + bt_expense.currency_value), HPDF_TALIGN_CENTER, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
 						{ MESSAGE_ERROR("", "", "fail to write table currency_nominal"); }
 					}
 				}

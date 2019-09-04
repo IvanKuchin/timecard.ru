@@ -7,6 +7,7 @@ string	CleanUPData(CMysql *db)
 	MESSAGE_DEBUG("", "", "start");
 	
 	db->Query("DELETE FROM `captcha` WHERE `timestamp`<=(NOW()-INTERVAL " + to_string(SESSION_LEN) + " MINUTE)");
+	db->Query("DELETE FROM `sessions` WHERE `time`<=(NOW()-INTERVAL `expire` SECOND) AND `expire`>'0'");
 
 	MESSAGE_DEBUG("", "", "finish (error_message.length = " + to_string(error_message.length()) + ")");
 
@@ -43,11 +44,7 @@ int main()
 
 		//--- start of minute cron main functionality
 
-		error_message = CleanUPData(&db);
-		if(error_message.length())
-		{
-			MESSAGE_ERROR("", "", error_message);
-		}
+		if((error_message = CleanUPData(&db)).length()) MESSAGE_ERROR("", "", error_message);
 
 		//--- end of minute cron main functionality
 	}

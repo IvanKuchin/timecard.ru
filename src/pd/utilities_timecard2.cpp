@@ -22,7 +22,7 @@ auto	GetServiceBTInvoicesInJSONFormat(string sqlQuery, CMysql *db, CUser *user) 
 	affected = db->Query(sqlQuery);
 	if(affected)
 	{
-		for(int i = 0; i < affected; i++)
+		for(auto i = 0; i < affected; i++)
 		{
 			ItemClass	item;
 
@@ -481,6 +481,27 @@ auto GetCostCenterIDByCustomerID(string customer_id, CMysql *db) -> string
 	else
 	{
 		MESSAGE_DEBUG("", "", "cost_center.id by timecard_customer_id(" + customer_id + ") not found");
+	}
+
+	MESSAGE_DEBUG("", "", "finish (cost_center_id: " + cost_center_id + ")");
+
+	return cost_center_id;
+}
+
+auto GetCostCenterIDByTaskID(string task_id, CMysql *db) -> string
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	cost_center_id = ""s;
+	auto	customer_project_pair = GetCustomerIDProjectIDByTaskID(task_id, db);
+
+	if(customer_project_pair.first.length())
+	{
+		cost_center_id = GetCostCenterIDByCustomerID(customer_project_pair.first, db);
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "task_id(" + task_id + ") not found");
 	}
 
 	MESSAGE_DEBUG("", "", "finish (cost_center_id: " + cost_center_id + ")");
@@ -1215,6 +1236,73 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 					else if(action == "AJAX_updateSoWCustomField")				{ /* --- good to go */ }
 					else if(action == "AJAX_deleteTemplateAgreement_company")	{ /* --- good to go */ }
 					else if(action == "AJAX_deleteTemplateAgreement_sow")		{ /* --- good to go */ }
+					else if(action == "AJAX_updateAirfareLimitationByDirection"){ /* --- good to go */ }
+					else if(action == "AJAX_updateHolidayCalendarTitle")		{ /* --- good to go */ }
+					else if(action == "AJAX_deleteHolidayCalendar")				{ /* --- good to go */ }
+					else if(action == "AJAX_deleteBTAllowance")					{ /* --- good to go */ }
+					else if(action == "AJAX_updateBTAllowanceAmount")			{ /* --- good to go */ }
+					else if(action == "AJAX_updateBTAllowanceCountry")
+					{
+						if(db->Query("SELECT `id` FROM `geo_country` WHERE `title`=" + quoted(new_value) + ";"))
+						{
+							if(db->Query(
+								"SELECT `id` FROM `bt_allowance` WHERE "
+									"`geo_country_id`=(SELECT `id` FROM `geo_country` WHERE `title`=\"" + new_value + "\") "
+									"AND "
+									"`agency_company_id`=(SELECT `agency_company_id` FROM `bt_allowance` WHERE `id`=\"" + id + "\") "
+								";"
+								))
+							{
+								error_message = gettext("already exists");
+								MESSAGE_DEBUG("", "", error_message);
+							}
+							else
+							{
+								// --- good to go
+							}
+						}
+						else
+						{
+							error_message = gettext("country not found");
+							MESSAGE_DEBUG("", "", error_message);
+						}
+					}
+					else if(action == "AJAX_addBTAllowance")
+					{
+						if(db->Query("SELECT `id` FROM `bt_allowance` WHERE `geo_country_id`=" + quoted(new_value) + " AND `agency_company_id`=" + quoted(id) + ";"))
+						{
+							error_message = gettext("already exists");
+							MESSAGE_DEBUG("", "", error_message);
+						}
+						else
+						{
+							// --- good to go
+						}
+					}
+					else if(action == "AJAX_updateHolidayCalendarDate")
+					{
+						if(db->Query("SELECT `id` FROM `holiday_calendar` WHERE `date`=" + quoted(new_value) + " AND `agency_company_id`=(SELECT `agency_company_id` FROM `holiday_calendar` WHERE `id`=\"" + id + "\");"))
+						{
+							error_message = gettext("already exists");
+							MESSAGE_DEBUG("", "", error_message);
+						}
+						else
+						{
+							// --- good to go
+						}
+					}
+					else if(action == "AJAX_addHolidayCalendar")
+					{
+						if(db->Query("SELECT `id` FROM `holiday_calendar` WHERE `date`=" + quoted(new_value) + " AND `agency_company_id`=" + quoted(id) + ";"))
+						{
+							error_message = gettext("already exists");
+							MESSAGE_DEBUG("", "", error_message);
+						}
+						else
+						{
+							// --- good to go
+						}
+					}
 					else if(action == "AJAX_updateTemplateAgreement_company_Title")
 					{
 						// if(db->Query("SELECT `id` FROM `company_agreement_files` WHERE `title`=\"" + new_value + "\" AND `company_id`=(SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\");"))
@@ -1641,6 +1729,40 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 							MESSAGE_ERROR("", "", "issue in SQL-syntax");
 						}
 					}
+					else if(action == "AJAX_updateTimecardApproverOrder")
+					{
+						auto	user_id_list = split(new_value, ',');
+
+						for(auto &user_id : user_id_list)
+						{
+							if(db->Query("SELECT `approver_user_id` FROM `timecard_approvers` WHERE `id`=" + quoted(user_id) + " AND `contract_sow_id`=" + quoted(sow_id) + ";"))
+							{
+
+							}
+							else
+							{
+								error_message = gettext("approver doesn't assigned to SoW");
+								MESSAGE_ERROR("", "", error_message);
+							}
+						}
+					}
+					else if(action == "AJAX_updateBTApproverOrder")
+					{
+						auto	user_id_list = split(new_value, ',');
+
+						for(auto &user_id : user_id_list)
+						{
+							if(db->Query("SELECT `approver_user_id` FROM `bt_approvers` WHERE `id`=" + quoted(user_id) + " AND `contract_sow_id`=" + quoted(sow_id) + ";"))
+							{
+
+							}
+							else
+							{
+								error_message = gettext("approver doesn't assigned to SoW");
+								MESSAGE_ERROR("", "", error_message);
+							}
+						}
+					}
 
  					else
 					{
@@ -1690,6 +1812,17 @@ string	isActionEntityBelongsToAgency(string action, string id, string agency_id,
 				if(action == "AJAX_updateProjectTitle") 				sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `timecard_customers` WHERE `id`=(SELECT `timecard_customers_id` FROM `timecard_projects` WHERE `id`=\"" + id + "\");";
 				if(action == "AJAX_updateTaskTitle") 					sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `timecard_customers` WHERE `id`=(SELECT `timecard_customers_id` FROM `timecard_projects` WHERE `id`=(SELECT `timecard_projects_id` FROM `timecard_tasks` WHERE `id`=\"" + id + "\"));";
 
+				if(action == "AJAX_updateAirfareLimitationByDirection")		sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `airfare_limits_by_direction` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_deleteAirfarelimitationByDirection")		sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `airfare_limits_by_direction` WHERE `id`=\"" + id + "\";";
+
+				if(action == "AJAX_updateBTAllowanceCountry")				sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `bt_allowance` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateBTAllowanceAmount")				sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `bt_allowance` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_deleteBTAllowance")						sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `bt_allowance` WHERE `id`=\"" + id + "\";";
+
+				if(action == "AJAX_updateHolidayCalendarDate")				sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `holiday_calendar` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateHolidayCalendarTitle")				sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `holiday_calendar` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_deleteHolidayCalendar")					sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `holiday_calendar` WHERE `id`=\"" + id + "\";";
+
 				if(action == "AJAX_updateExpenseTemplateTitle")				sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `bt_expense_templates` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateExpenseTemplateTaxable")			sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `bt_expense_templates` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateExpenseTemplateAgencyComment")		sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `bt_expense_templates` WHERE `id`=\"" + id + "\";";
@@ -1724,6 +1857,9 @@ string	isActionEntityBelongsToAgency(string action, string id, string agency_id,
 				if(action == "AJAX_deleteTemplateAgreement_company")		sql_query = "SELECT `company_id` AS `agency_id` FROM `company_agreement_files` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateTemplateAgreement_sow_Title")		sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `contracts_sow` WHERE `id`=(SELECT `contract_sow_id` FROM `contract_sow_agreement_files` WHERE `id`=\"" + id + "\");";
 				if(action == "AJAX_deleteTemplateAgreement_sow")			sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `contracts_sow` WHERE `id`=(SELECT `contract_sow_id` FROM `contract_sow_agreement_files` WHERE `id`=\"" + id + "\");";
+
+				if(action == "AJAX_updateTimecardApproverOrder")			sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `contracts_sow` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateBTApproverOrder")					sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `contracts_sow` WHERE `id`=\"" + id + "\";";
 
 				if(
 					(action == "AJAX_updateCompanyTitle")			||
@@ -1814,7 +1950,7 @@ auto	GetCountryListInJSONFormat(string sqlQuery, CMysql *db, CUser *) -> string
 
 	MESSAGE_DEBUG("", "", "start");
 
-	auto affected = db->Query("SELECT * FROM `geo_country`;");
+	auto affected = db->Query(sqlQuery);
 	if(affected)
 	{
 		for(auto i = 0; i < affected; ++i)
@@ -1857,7 +1993,7 @@ auto	GetCostCenterCustomFieldsInJSONFormat(string sqlQuery, CMysql *db, CUser *u
 	affected = db->Query(sqlQuery);
 	if(affected)
 	{
-		for(int i = 0; i < affected; i++)
+		for(auto i = 0; i < affected; i++)
 		{
 			ItemClass	item;
 
@@ -1937,7 +2073,7 @@ auto	GetCompanyCustomFieldsInJSONFormat(string sqlQuery, CMysql *db, CUser *user
 	affected = db->Query(sqlQuery);
 	if(affected)
 	{
-		for(int i = 0; i < affected; i++)
+		for(auto i = 0; i < affected; i++)
 		{
 			ItemClass	item;
 
@@ -2040,7 +2176,7 @@ auto	GetTemplateSoWAgreementFiles(string sqlQuery, CMysql *db, CUser *user) -> s
 	affected = db->Query(sqlQuery);
 	if(affected)
 	{
-		for(int i = 0; i < affected; i++)
+		for(auto i = 0; i < affected; i++)
 		{
 			ItemClass	item;
 
@@ -2100,7 +2236,7 @@ auto	GetTemplateCompanyAgreementFiles(string sqlQuery, CMysql *db, CUser *user) 
 	affected = db->Query(sqlQuery);
 	if(affected)
 	{
-		for(int i = 0; i < affected; i++)
+		for(auto i = 0; i < affected; i++)
 		{
 			ItemClass	item;
 
@@ -2235,8 +2371,9 @@ auto	GetDBValueByAction(string action, string id, string sow_id, CMysql *db, CUs
 				if(action == "AJAX_updateAgencyEditCapability")		sql_query = "SELECT `allowed_change_agency_data`	as `value` FROM `company_employees` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateSoWEditCapability")		sql_query = "SELECT `allowed_change_sow`			as `value` FROM `company_employees` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateSubcontractorCreateTasks")	sql_query = "SELECT `subcontractor_create_tasks`	as `value` FROM `contracts_sow` WHERE `id`=\"" + id + "\";";
-				if(action == "AJAX_updateExpenseTemplateTitle")		sql_query = "SELECT `title`							as `value` FROM `bt_expense_templates` WHERE `id`=\"" + id + "\";";
-				if(action == "AJAX_updateExpenseTemplateTaxable")	sql_query = "SELECT `taxable`						as `value` FROM `bt_expense_templates` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateAirfareLimitationByDirection")		sql_query = "SELECT `limit`					as `value` FROM `airfare_limits_by_direction` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateExpenseTemplateTitle")				sql_query = "SELECT `title`					as `value` FROM `bt_expense_templates` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateExpenseTemplateTaxable")			sql_query = "SELECT `taxable`				as `value` FROM `bt_expense_templates` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateExpenseTemplateAgencyComment") 	sql_query = "SELECT `agency_comment`		as `value` FROM `bt_expense_templates` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateExpenseTemplateLineTitle")			sql_query = "SELECT `title`					as `value` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateExpenseTemplateLineDescription")	sql_query = "SELECT `description`			as `value` FROM `bt_expense_line_templates` WHERE `id`=\"" + id + "\";";
@@ -2275,6 +2412,18 @@ auto	GetDBValueByAction(string action, string id, string sow_id, CMysql *db, CUs
 				if(action == "AJAX_updateCostCenterStartDate")				sql_query = "SELECT `start_date`			as `value` FROM `cost_centers` WHERE `id`=\"" + sow_id + "\";";
 				if(action == "AJAX_updateCostCenterEndDate")				sql_query = "SELECT `end_date`				as `value` FROM `cost_centers` WHERE `id`=\"" + sow_id + "\";";
 				if(action == "AJAX_updateCostCenterCustomField")			sql_query = "SELECT `value`					as `value` FROM `cost_center_custom_fields` WHERE `id`=\"" + id + "\";";
+
+				if(action == "AJAX_deleteBTAllowance")						sql_query = "SELECT `title`					as `value` FROM `geo_country` WHERE `id`=(SELECT `geo_country_id` FROM `bt_allowance` WHERE `id`=\"" + id + "\");";
+				if(action == "AJAX_updateBTAllowanceCountry")				sql_query = "SELECT `title`					as `value` FROM `geo_country` WHERE `id`=(SELECT `geo_country_id` FROM `bt_allowance` WHERE `id`=\"" + id + "\");";
+				if(action == "AJAX_updateBTAllowanceAmount")				sql_query = "SELECT `amount`				as `value` FROM `bt_allowance` WHERE `id`=\"" + id + "\";";
+
+				if(action == "AJAX_updateHolidayCalendarDate")				sql_query = "SELECT `date`					as `value` FROM `holiday_calendar` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateHolidayCalendarTitle")				sql_query = "SELECT `title`					as `value` FROM `holiday_calendar` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_deleteHolidayCalendar")					sql_query = "SELECT `title`					as `value` FROM `holiday_calendar` WHERE `id`=\"" + id + "\";";
+
+				if(action == "AJAX_updateTimecardApproverOrder")			sql_query = "SELECT 'fake'					as `value`;";
+				if(action == "AJAX_updateBTApproverOrder")					sql_query = "SELECT 'fake'					as `value`;";
+
 
 				if(sql_query.length())
 				{
@@ -2347,120 +2496,6 @@ string GetTimecardLineID(string timecard_id, string task_id, CMysql *db)
 	return result;
 }
 /*
-bool SubmitTimecard(string timecard_id, CMysql *db, CUser *user)
-{
-	bool 	result = false;
-
-	MESSAGE_DEBUG("", "", "start");
-
-	if(timecard_id.length())
-	{
-		struct ApproveClass
-		{
-			string	id;
-			string	timecard_id;
-			string	approver_id;
-			string	decision;
-			string	comment;
-			string	eventTimestamp;
-		};
-		map<string, bool>			approvers;
-		vector<ApproveClass>		approves_list;
-		int							affected;
-		bool						all_approvers_confirm = true;
-
-		affected = db->Query(
-				"SELECT `id` FROM `timecard_approvers` WHERE "
-					"`contract_sow_id` IN (SELECT `contract_sow_id` FROM `timecards` WHERE `id`=\"" + timecard_id + "\")"
-				";");
-		for(int i = 0; i < affected; i++)
-		{
-			approvers[db->Get(i, "id")] = false;
-		}
-
-		affected = db->Query(
-				"SELECT * FROM `timecard_approvals` WHERE "
-					"`eventTimestamp` > (SELECT `eventTimestamp` FROM `timecards` WHERE `id`=\"" + timecard_id + "\") "
-					"AND "
-					"`timecard_id`=\"" + timecard_id + "\""
-				";");
-		for(int i = 0; i < affected; i++)
-		{
-			ApproveClass	item;
-
-			item.id = db->Get(i, "id");
-			item.timecard_id = db->Get(i, "timecard_id");
-			item.approver_id = db->Get(i, "approver_id");
-			item.decision = db->Get(i, "decision");
-			item.comment = db->Get(i, "comment");
-			item.eventTimestamp = db->Get(i, "eventTimestamp");
-
-			approves_list.push_back(item);
-
-			if(approvers.find(item.approver_id) == approvers.end())
-			{
-				MESSAGE_ERROR("", "", "approver id(" + item.approver_id + ") not found in approvers list. Check DB structure !");
-			}
-			else
-			{
-				if(item.decision == "approved")
-					approvers[item.approver_id] = true;
-				else
-				{
-					MESSAGE_ERROR("", "", "approver id(" + item.approver_id + ") did (" + item.decision + ") action on timecard(" + item.timecard_id + "). According to timecard approve workflow, this branch can be used for \"approved\" timecards only. Check timecard workflow !");
-				}
-			}
-		}
-
-		for(auto &approver: approvers)
-		{
-			if(!approver.second) { all_approvers_confirm = false; break; }
-		}
-
-		if(all_approvers_confirm)
-		{
-			auto	error_message = ""s;
-
-			C_Invoice_Service_Subc_To_Agency	c_invoice(&db, &user);
-
-			c_invoice.SetTimecardList({timecard_id});
-
-			if((error_message = c_invoice.GenerateDocumentArchive()).empty())
-			{
-				db->Query("UPDATE `timecards` SET `status`=\"approved\", `approve_date`=UNIX_TIMESTAMP() WHERE `id`=\"" + timecard_id + "\";");
-				if(db->isError())
-				{
-					MESSAGE_ERROR("", "", "fail to update timecards table with timecard_id(" + timecard_id + ")");
-				}
-				else
-				{
-					result = true;
-				}
-			}
-			else
-			{
-				error_message = gettext("fail to generate documents set");
-				MESSAGE_ERROR("", "", error_message);
-			}
-
-		}
-		else
-		{
-			result = true;
-			MESSAGE_DEBUG("", "", "not all approvers approved timecard.id(" + timecard_id + ")");
-		}
-
-	}
-	else
-	{
-		MESSAGE_ERROR("", "", "timecard_id is empty");
-	}
-
-	MESSAGE_DEBUG("", "", "finish (result = " + to_string(result) + ")");
-
-	return result;
-}
-*/
 string GetNumberOfTimecardsInPendingState(CMysql *db, CUser *user)
 {
 	struct PendingTimecardClass
@@ -2474,9 +2509,8 @@ string GetNumberOfTimecardsInPendingState(CMysql *db, CUser *user)
 	};
 	vector<PendingTimecardClass>		timecards_list;
 
-	int			affected = 0;
-	int			pending_timecards = 0;
-	string		company_id;
+	auto			affected = 0;
+	auto			pending_timecards = 0;
 
 	MESSAGE_DEBUG("", "", "start");
 
@@ -2487,13 +2521,13 @@ string GetNumberOfTimecardsInPendingState(CMysql *db, CUser *user)
 		affected = db->Query("SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\";");
 		if(affected)
 		{
-			company_id = db->Get(0, "company_id");
+			auto	company_id = db->Get(0, "company_id");
 
 			affected = db->Query("SELECT `id`, `contract_sow_id`, `submit_date` FROM `timecards` WHERE "
 										"`status`=\"submit\" "
 										"AND "
 										"`contract_sow_id` IN (SELECT `id` FROM `contracts_sow` WHERE `agency_company_id`=\"" + company_id + "\");");
-			for(int i = 0; i < affected; ++i)
+			for(auto i = 0; i < affected; ++i)
 			{
 				PendingTimecardClass	item;
 
@@ -2518,7 +2552,7 @@ string GetNumberOfTimecardsInPendingState(CMysql *db, CUser *user)
 									"`status`=\"submit\" "
 									"AND "
 									"`contract_sow_id` IN (SELECT `contract_sow_id` FROM `timecard_approvers` WHERE `approver_user_id`=\"" + user->GetID() + "\");");
-		for(int i = 0; i < affected; ++i)
+		for(auto i = 0; i < affected; ++i)
 		{
 			PendingTimecardClass	item;
 
@@ -2536,27 +2570,34 @@ string GetNumberOfTimecardsInPendingState(CMysql *db, CUser *user)
 
 	for(auto &timecard: timecards_list)
 	{
-		if(db->Query("SELECT `decision` FROM `timecard_approvals` WHERE "
-						"`timecard_id` = \"" + timecard.id + "\" "
-						"AND "
-						"`eventTimestamp` > \"" + timecard.submit_date + "\" "
-						"AND "
-						"`approver_id` IN (SELECT `id` FROM `timecard_approvers` WHERE `contract_sow_id`=\"" + timecard.contract_sow_id + "\" AND `approver_user_id`=\"" + user->GetID() + "\")"))
+		if(amIonTheApproverListForSoW("timecard_approvers", timecard.contract_sow_id, db, user))
 		{
-			string		decision = db->Get(0, "decision");
-
-			if(decision == "approved")
+			if(db->Query("SELECT `decision` FROM `timecard_approvals` WHERE "
+							"`timecard_id` = \"" + timecard.id + "\" "
+							"AND "
+							"`eventTimestamp` > \"" + timecard.submit_date + "\" "
+							"AND "
+							"`approver_id` IN (SELECT `id` FROM `timecard_approvers` WHERE `contract_sow_id`=\"" + timecard.contract_sow_id + "\" AND `approver_user_id`=\"" + user->GetID() + "\")"))
 			{
-				// --- everything ok
+				string		decision = db->Get(0, "decision");
+
+				if(decision == "approved")
+				{
+					// --- everything ok
+				}
+				else
+				{
+					MESSAGE_ERROR("", "", "check approval workflow for contract(" + timecard.contract_sow_id + ") at this time(" + timecard.submit_date + ") timcard.id(" + timecard.id + ") must have only \"approved\" approvals from user.id(" + user->GetID() + ")");
+				}
 			}
 			else
 			{
-				MESSAGE_ERROR("", "", "check approval workflow for contract(" + timecard.contract_sow_id + ") at this time(" + timecard.submit_date + ") timcard.id(" + timecard.id + ") must have only \"approved\" approvals from user.id(" + user->GetID() + ")");
+				++pending_timecards;
 			}
 		}
 		else
 		{
-			++pending_timecards;
+			MESSAGE_DEBUG("", "", "I'm not on the approver list for SoW(" + timecard.contract_sow_id + ")");
 		}
 	}
 
@@ -2564,7 +2605,163 @@ string GetNumberOfTimecardsInPendingState(CMysql *db, CUser *user)
 
 	return to_string(pending_timecards);
 }
+*/
 
+string GetNumberOfTimecardsInPaymentPendingState(string sow_sql, CMysql *db, CUser *user)
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	pending_items = "0"s;
+
+	if(db->Query("SELECT COUNT(*) FROM `timecards` WHERE "
+													"`payed_date`=\"0\" "
+													"AND "
+													"`status`=\"approved\" "
+													"AND "
+													"`contract_sow_id` IN (" + sow_sql + ");")
+		)
+	{
+		pending_items = db->Get(0,0);
+	}
+
+	MESSAGE_DEBUG("", "", "finish (number of pending_items is " + pending_items + ")");
+
+	return pending_items;
+}
+
+string GetNumberOfBTInPaymentPendingState(string sow_sql, CMysql *db, CUser *user)
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	pending_items = "0"s;
+
+	if(db->Query("SELECT COUNT(*) FROM `bt` WHERE "
+													"`payed_date`=\"0\" "
+													"AND "
+													"`status`=\"approved\" "
+													"AND "
+													"`contract_sow_id` IN (" + sow_sql + ");")
+		)
+	{
+		pending_items = db->Get(0,0);
+	}
+
+	MESSAGE_DEBUG("", "", "finish (number of pending_items is " + pending_items + ")");
+
+	return pending_items;
+}
+
+bool areThereTimecardsWithExpiredPayment(string multiplier, string sow_sql, CMysql *db, CUser *user)
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	result = false;
+
+	if(db->Query("SELECT `payment_period_service` FROM `company` WHERE `id`=("
+					"SELECT `company_id` FROM `company_employees` WHERE `user_id`=" + quoted(user->GetID()) + 
+				")"
+		";")
+		)
+	{
+		auto 	payment_period = db->Get(0, 0);
+
+		if(payment_period != "0")
+		{
+			auto affected = db->Query("SELECT COUNT(*) FROM `timecards` WHERE "
+															"`payed_date`<UNIX_TIMESTAMP() - 3600 * 24 * " + payment_period + " * " + multiplier + " "
+															"AND "
+															"`status`=\"approved\" "
+															"AND "
+															"`contract_sow_id` IN (" + sow_sql + ");");
+				
+			result = (affected > 0);
+		}
+		else
+		{
+			MESSAGE_DEBUG("", "", "payment period not set");
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "sql syntax error");
+	}
+
+	MESSAGE_DEBUG("", "", "finish (" + to_string(result) + ")");
+
+	return result;
+}
+
+bool areThereBTWithExpiredPayment(string multiplier, string sow_sql, CMysql *db, CUser *user)
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	result = false;
+
+	if(db->Query("SELECT `payment_period_bt` FROM `company` WHERE `id`=("
+					"SELECT `company_id` FROM `company_employees` WHERE `user_id`=" + quoted(user->GetID()) + 
+				")"
+		";")
+		)
+	{
+		auto 	payment_period = db->Get(0, 0);
+
+		if(payment_period != "0")
+		{
+			auto affected = db->Query("SELECT COUNT(*) FROM `bt` WHERE "
+															"`payed_date`<UNIX_TIMESTAMP() - 3600 * 24 * " + payment_period + " * " + multiplier + " "
+															"AND "
+															"`status`=\"approved\" "
+															"AND "
+															"`contract_sow_id` IN (" + sow_sql + ");");
+				
+			result = (affected > 0);
+		}
+		else
+		{
+			MESSAGE_DEBUG("", "", "payment period not set");
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "sql syntax error");
+	}
+
+	MESSAGE_DEBUG("", "", "finish (" + to_string(result) + ")");
+
+	return result;
+}
+
+string GetNumberOfTimecardsInPendingState(CMysql *db, CUser *user)
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	pending_items = db->Query("SELECT `id` FROM `timecard_approvals` WHERE "
+													"`decision`=\"pending\" "
+													"AND "
+													"`approver_id` IN (SELECT `id` FROM `timecard_approvers` WHERE `approver_user_id`=" + quoted(user->GetID()) + ")"
+													";");
+
+	MESSAGE_DEBUG("", "", "finish (number of pending_items is " + to_string(pending_items) + ")");
+
+	return to_string(pending_items);
+}
+
+string GetNumberOfBTInPendingState(CMysql *db, CUser *user)
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	pending_items = db->Query("SELECT `id` FROM `bt_approvals` WHERE "
+													"`decision`=\"pending\" "
+													"AND "
+													"`approver_id` IN (SELECT `id` FROM `bt_approvers` WHERE `approver_user_id`=" + quoted(user->GetID()) + ")"
+													";");
+
+	MESSAGE_DEBUG("", "", "finish (number of pending_items is " + to_string(pending_items) + ")");
+
+	return to_string(pending_items);
+}
+
+/*
 string GetNumberOfBTInPendingState(CMysql *db, CUser *user)
 {
 	struct PendingBTClass
@@ -2597,7 +2794,7 @@ string GetNumberOfBTInPendingState(CMysql *db, CUser *user)
 										"`status`=\"submit\" "
 										"AND "
 										"`contract_sow_id` IN (SELECT `id` FROM `contracts_sow` WHERE `agency_company_id`=\"" + company_id + "\");");
-			for(int i = 0; i < affected; ++i)
+			for(auto i = 0; i < affected; ++i)
 			{
 				PendingBTClass	item(db->Get(i, "id"), db->Get(i, "contract_sow_id"), db->Get(i, "submit_date"));
 
@@ -2621,7 +2818,7 @@ string GetNumberOfBTInPendingState(CMysql *db, CUser *user)
 									"`status`=\"submit\" "
 									"AND "
 									"`contract_sow_id` IN (SELECT `contract_sow_id` FROM `bt_approvers` WHERE `approver_user_id`=\"" + user->GetID() + "\");");
-		for(int i = 0; i < affected; ++i)
+		for(auto i = 0; i < affected; ++i)
 		{
 			PendingBTClass	item;
 
@@ -2639,27 +2836,34 @@ string GetNumberOfBTInPendingState(CMysql *db, CUser *user)
 
 	for(auto &bt: bt_list)
 	{
-		if(db->Query("SELECT `decision` FROM `bt_approvals` WHERE "
-						"`bt_id` = \"" + bt.id + "\" "
-						"AND "
-						"`eventTimestamp` > \"" + bt.submit_date + "\" "
-						"AND "
-						"`approver_id` IN (SELECT `id` FROM `bt_approvers` WHERE `contract_sow_id`=\"" + bt.contract_sow_id + "\" AND `approver_user_id`=\"" + user->GetID() + "\")"))
+		if(amIonTheApproverListForSoW("bt_approvers", bt.contract_sow_id, db, user))
 		{
-			string		decision = db->Get(0, "decision");
-
-			if(decision == "approved")
+			if(db->Query("SELECT `decision` FROM `bt_approvals` WHERE "
+							"`bt_id` = \"" + bt.id + "\" "
+							"AND "
+							"`eventTimestamp` > \"" + bt.submit_date + "\" "
+							"AND "
+							"`approver_id` IN (SELECT `id` FROM `bt_approvers` WHERE `contract_sow_id`=\"" + bt.contract_sow_id + "\" AND `approver_user_id`=\"" + user->GetID() + "\")"))
 			{
-				// --- everything ok
+				string		decision = db->Get(0, "decision");
+
+				if(decision == "approved")
+				{
+					// --- everything ok
+				}
+				else
+				{
+					MESSAGE_ERROR("", "", "check approval workflow for contract(" + bt.contract_sow_id + ") at this time(" + bt.submit_date + ") timcard.id(" + bt.id + ") must have only \"approved\" approvals from user.id(" + user->GetID() + ")");
+				}
 			}
 			else
 			{
-				MESSAGE_ERROR("", "", "check approval workflow for contract(" + bt.contract_sow_id + ") at this time(" + bt.submit_date + ") timcard.id(" + bt.id + ") must have only \"approved\" approvals from user.id(" + user->GetID() + ")");
+				++pending_bt;
 			}
 		}
 		else
 		{
-			++pending_bt;
+			MESSAGE_DEBUG("", "", "I'm not on the approver list for SoW(" + bt.contract_sow_id + ")");
 		}
 	}
 
@@ -2667,7 +2871,7 @@ string GetNumberOfBTInPendingState(CMysql *db, CUser *user)
 
 	return to_string(pending_bt);
 }
-
+*/
 string	GetObjectsSOW_Reusable_InJSONFormat(string object, string filter, CMysql *db, CUser *user)
 {
 	string		result = "";
@@ -2683,12 +2887,26 @@ string	GetObjectsSOW_Reusable_InJSONFormat(string object, string filter, CMysql 
 
 				if(object == "timecard")
 				{
-					string		sql_query_where_statement = "`contract_sow_id` IN ( SELECT `contract_sow_id` FROM `timecard_approvers` WHERE `approver_user_id`=\"" + user->GetID() + "\")";
+					auto		sql_query_where_statement = ""s;
+
+					if(user->GetType() == "approver")
+						sql_query_where_statement = "`contract_sow_id` IN ( SELECT `contract_sow_id` FROM `timecard_approvers` WHERE `approver_user_id`=\"" + user->GetID() + "\")";
+					else if(user->GetType() == "agency")
+						sql_query_where_statement = "`contract_sow_id` IN ( SELECT `id` FROM `contracts_sow` WHERE `agency_company_id`=(SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\"))";
+					else
+					{
+						MESSAGE_ERROR("", "", "unknown user type");
+					}
 
 					if(filter == "submit") sql_query_where_statement += " AND `status` = \"submit\" ";
 
 					result += 
 						"\"timecards\":[" + GetTimecardsInJSONFormat("SELECT * FROM `timecards` WHERE " + sql_query_where_statement, db, user, true) + "],"
+						"\"holiday_calendar\":[" + GetHolidayCalendarInJSONFormat("SELECT * FROM `holiday_calendar` WHERE `agency_company_id` IN ("
+																						"SELECT `agency_company_id` FROM `contracts_sow` WHERE `id` IN ("
+																					    	"SELECT `contract_sow_id` FROM `timecard_approvers` WHERE `approver_user_id`=" + quoted(user->GetID()) +
+																					    ")"
+																					");", db, user) + "],"
 						"\"sow\":[" + GetSOWInJSONFormat(
 								"SELECT * FROM `contracts_sow` WHERE "
 									"`id` IN ( SELECT `contract_sow_id` FROM `timecards` WHERE " + sql_query_where_statement + ") "
@@ -2696,7 +2914,17 @@ string	GetObjectsSOW_Reusable_InJSONFormat(string object, string filter, CMysql 
 				}
 				else if(object == "bt")
 				{
-					string		sql_query_where_statement = "`contract_sow_id` IN ( SELECT `contract_sow_id` FROM `bt_approvers` WHERE `approver_user_id`=\"" + user->GetID() + "\")";
+					auto		sql_query_where_statement = ""s;
+
+					if(user->GetType() == "approver")
+						sql_query_where_statement = "`contract_sow_id` IN ( SELECT `contract_sow_id` FROM `bt_approvers` WHERE `approver_user_id`=\"" + user->GetID() + "\")";
+					else if(user->GetType() == "agency")
+						sql_query_where_statement = "`contract_sow_id` IN ( SELECT `id` FROM `contracts_sow` WHERE `agency_company_id`=(SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user->GetID() + "\"))";
+					else
+					{
+						MESSAGE_ERROR("", "", "unknown user type");
+					}
+													
 
 					if(filter == "submit") sql_query_where_statement += " AND `status` = \"submit\" ";
 
@@ -2756,7 +2984,7 @@ string	GetCurrencyRatesInJSONFormat(string sqlQuery, CMysql *db, CUser *user)
 	affected = db->Query(sqlQuery);
 	if(affected)
 	{
-		for(int i = 0; i < affected; i++)
+		for(auto i = 0; i < affected; i++)
 		{
 			ItemClass	item;
 
@@ -2819,7 +3047,7 @@ bool	SubmitBT(string bt_id, CMysql *db, CUser *user)
 				"SELECT `id` FROM `bt_approvers` WHERE "
 					"`contract_sow_id` IN (SELECT `contract_sow_id` FROM `bt` WHERE `id`=\"" + bt_id + "\")"
 				";");
-		for(int i = 0; i < affected; i++)
+		for(auto i = 0; i < affected; i++)
 		{
 			approvers[db->Get(i, "id")] = false;
 		}
@@ -2830,7 +3058,7 @@ bool	SubmitBT(string bt_id, CMysql *db, CUser *user)
 					"AND "
 					"`bt_id`=\"" + bt_id + "\""
 				";");
-		for(int i = 0; i < affected; i++)
+		for(auto i = 0; i < affected; i++)
 		{
 			ApproveClass	item;
 
@@ -2966,7 +3194,7 @@ string	GetBTExpensesInJSONFormat(string sqlQuery, CMysql *db, CUser *user)
 	affected = db->Query(sqlQuery);
 	if(affected)
 	{
-		for(int i = 0; i < affected; i++)
+		for(auto i = 0; i < affected; i++)
 		{
 			ItemClass	item;
 
@@ -3725,7 +3953,7 @@ string	ResubmitEntitiesByAction(string action, string id, string sow_id, string 
 							int	affected = db->Query("SELECT `id` FROM `timecards` WHERE `status`=\"submit\" AND `contract_sow_id`=\"" + sow_id + "\";");
 							vector<string> timecard_list;
 
-							for(int i = 0; i < affected; ++i)
+							for(auto i = 0; i < affected; ++i)
 							{
 								timecard_list.push_back(db->Get(i, "id"));
 							}
@@ -3756,7 +3984,7 @@ string	ResubmitEntitiesByAction(string action, string id, string sow_id, string 
 							int	affected = db->Query("SELECT `id` FROM `bt` WHERE `status`=\"submit\" AND `contract_sow_id`=\"" + sow_id + "\";");
 							vector<string> bt_list;
 
-							for(int i = 0; i < affected; ++i)
+							for(auto i = 0; i < affected; ++i)
 							{
 								bt_list.push_back(db->Get(i, "id"));
 							}
@@ -3878,6 +4106,7 @@ string	SetNewValueByAction(string action, string id, string sow_id, string new_v
 						if(action == "AJAX_updateCustomerTitle") 					sql_query = "UPDATE `timecard_customers`		SET `title`							=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
 						if(action == "AJAX_updateProjectTitle") 					sql_query = "UPDATE `timecard_projects`			SET `title`							=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
 						if(action == "AJAX_updateTaskTitle") 						sql_query = "UPDATE `timecard_tasks`			SET `title`							=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateAirfareLimitationByDirection")		sql_query = "UPDATE `airfare_limits_by_direction`	SET `limit`						=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
 						if(action == "AJAX_updateExpenseTemplateTitle")				sql_query = "UPDATE `bt_expense_templates`		SET `title`							=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
 						if(action == "AJAX_updateExpenseTemplateTaxable")			sql_query = "UPDATE `bt_expense_templates`		SET `taxable`						=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
 						if(action == "AJAX_updateExpenseTemplateAgencyComment")		sql_query = "UPDATE `bt_expense_templates`		SET `agency_comment`				=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
@@ -3907,8 +4136,6 @@ string	SetNewValueByAction(string action, string id, string sow_id, string new_v
 						if(action == "AJAX_updateSoWEditCapability")				sql_query = "UPDATE	`company_employees`			SET `allowed_change_sow`			=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
 						if(action == "AJAX_updateAgencyEditCapability")				sql_query = "UPDATE	`company_employees`			SET `allowed_change_agency_data`	=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
 						if(action == "AJAX_updateSubcontractorCreateTasks")			sql_query = "UPDATE	`contracts_sow`				SET `subcontractor_create_tasks`	=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sow_id + "\";";
-						if(action == "AJAX_addTimecardApproverToSoW")				sql_query = "INSERT INTO `timecard_approvers` (`approver_user_id`,`contract_sow_id`) VALUES (\"" + new_value + "\", \"" + sow_id + "\");";
-						if(action == "AJAX_addBTExpenseApproverToSoW")				sql_query = "INSERT INTO `bt_approvers` (`approver_user_id`,`contract_sow_id`) 		VALUES (\"" + new_value + "\", \"" + sow_id + "\");";
 						if(action == "AJAX_deleteCostCenterFromCustomer")			sql_query = "DELETE FROM `cost_center_assignment` WHERE `timecard_customer_id`=\"" + id + "\";";
 						if(action == "AJAX_deleteCostCenter")						sql_query = "DELETE FROM `cost_centers` WHERE `id`=\"" + id + "\";";
 						if(action == "AJAX_updateCostCenterTitle")					sql_query = "UPDATE `cost_centers`				SET `title`							=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
@@ -3941,6 +4168,46 @@ string	SetNewValueByAction(string action, string id, string sow_id, string new_v
 
 						if(action == "AJAX_updateTemplateAgreement_company_Title")	sql_query = "UPDATE `company_agreement_files`	SET `title`			=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
 						if(action == "AJAX_updateTemplateAgreement_sow_Title")		sql_query = "UPDATE `contract_sow_agreement_files` SET `title`		=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
+
+						if(action == "AJAX_updateHolidayCalendarDate")				sql_query = "UPDATE `holiday_calendar` 			SET `date`			=STR_TO_DATE(\"" + new_value + "\",\"%d/%m/%Y\"),`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateHolidayCalendarTitle")				sql_query = "UPDATE `holiday_calendar` 			SET `title`			=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_deleteHolidayCalendar")					sql_query = "DELETE FROM `holiday_calendar` WHERE `id`=\"" + id + "\";";
+
+						if(action == "AJAX_updateBTAllowanceCountry")				sql_query = "UPDATE `bt_allowance` 				SET `geo_country_id`=(SELECT `id` FROM `geo_country` WHERE `title`=\"" + new_value + "\"),`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateBTAllowanceAmount")				sql_query = "UPDATE `bt_allowance` 				SET `amount`=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_deleteBTAllowance")						sql_query = "DELETE FROM `bt_allowance` WHERE `id`=\"" + id + "\";";
+
+						// --- add approver
+						if(action == "AJAX_addTimecardApproverToSoW")
+						{
+							// --- insert 0 if everybody else have 0 order
+							// --- insert MAX+1 if approvers are ordered
+							auto	order = "0"s;
+
+							if(db->Query("SELECT MAX(`approver_order`) FROM `timecard_approvers` WHERE `contract_sow_id`=" + quoted(sow_id) + ";"))
+							{
+								order = db->Get(0, 0);
+
+								if(order == "0") {} else { order += "+1"; }
+							}
+
+							sql_query = "INSERT INTO `timecard_approvers` (`approver_user_id`,`contract_sow_id`, `approver_order`) VALUES (\"" + new_value + "\", \"" + sow_id + "\"," + order + ");";
+						}
+						if(action == "AJAX_addBTExpenseApproverToSoW")
+						{
+							// --- insert 0 if everybody else have 0 order
+							// --- insert MAX+1 if approvers are ordered
+							auto	order = "0"s;
+
+							if(db->Query("SELECT MAX(`approver_order`) FROM `bt_approvers` WHERE `contract_sow_id`=" + quoted(sow_id) + ";"))
+							{
+								order = db->Get(0, 0);
+
+								if(order == "0") {} else { order += "+1"; }
+							}
+
+							sql_query = "INSERT INTO `bt_approvers` (`approver_user_id`,`contract_sow_id`, `approver_order`) VALUES (\"" + new_value + "\", \"" + sow_id + "\", " + order + ");";
+						}
 
 						// --- expense line template payment part
 						if(action == "AJAX_updateExpenseTemplateLinePaymentCash")
@@ -4056,14 +4323,99 @@ string	SetNewValueByAction(string action, string id, string sow_id, string new_v
 
 						if(action == "AJAX_deleteTimecardApproverFromSoW")
 						{
+							auto	affected = 0;
 
 							db->Query("DELETE FROM `timecard_approvals` WHERE `approver_id`=\"" + id + "\";");
-							sql_query =  "DELETE FROM `timecard_approvers` WHERE `id`=\"" + id + "\";";
+							db->Query("DELETE FROM `timecard_approvers` WHERE `id`=\"" + id + "\";");
+
+							// --- renumber approvers
+							if((affected = db->Query("SELECT `id` FROM `timecard_approvers` WHERE `contract_sow_id`=" + quoted(sow_id) + " AND `approver_order`>0 ORDER BY `approver_order` ASC;")))
+							{
+								vector<string>	id_arr;
+								auto			i = 0;
+
+								for(i = 0; i < affected; ++i)
+								{
+									id_arr.push_back(db->Get(i, 0));
+								}
+
+								i = 1;
+								for(auto &id: id_arr)
+								{
+									db->Query("UPDATE `timecard_approvers` SET `approver_order`=" + quoted(to_string(i++)) + " WHERE `id`=" + quoted(id) + ";");
+								}
+							}
+							else
+							{
+								MESSAGE_DEBUG("", action, "no need to reorder");
+							}
+
+							sql_query = "SELECT 'fake'";
 						}
 						if(action == "AJAX_deleteBTExpenseApproverFromSoW")
 						{
+							auto	affected = 0;
+
 							db->Query("DELETE FROM `bt_approvals` WHERE `approver_id`=\"" + id + "\";");
-							sql_query =  "DELETE FROM `bt_approvers` WHERE `id`=\"" + id + "\";";
+							db->Query("DELETE FROM `bt_approvers` WHERE `id`=\"" + id + "\";");
+
+							// --- renumber approvers
+							if((affected = db->Query("SELECT `id` FROM `bt_approvers` WHERE `contract_sow_id`=" + quoted(sow_id) + " AND `approver_order`>0 ORDER BY `approver_order` ASC;")))
+							{
+								vector<string>	id_arr;
+								auto			i = 0;
+
+								for(i = 0; i < affected; ++i)
+								{
+									id_arr.push_back(db->Get(i, 0));
+								}
+
+								i = 1;
+								for(auto &id: id_arr)
+								{
+									db->Query("UPDATE `bt_approvers` SET `approver_order`=" + quoted(to_string(i++)) + " WHERE `id`=" + quoted(id) + ";");
+								}
+							}
+							else
+							{
+								MESSAGE_DEBUG("", action, "no need to reorder");
+							}
+
+							sql_query = "SELECT 'fake'";
+						}
+						if(action == "AJAX_updateTimecardApproverOrder")
+						{
+							auto	approver_id_list = split(new_value, ',');
+							auto	i = 1;
+
+							for(auto &approver_id: approver_id_list)
+							{
+								db->Query("UPDATE `timecard_approvers` SET `approver_order`=" + quoted(to_string(i++)) + " WHERE `id`=" + quoted(approver_id) + ";");
+								if(db->isError())
+								{
+									error_message = "Ошибка БД";
+									MESSAGE_ERROR("", "", "sql_query has failed (" + db->GetErrorMessage() + ")");
+								}
+							}
+
+							sql_query = "SELECT 'fake';";
+						}
+						if(action == "AJAX_updateBTApproverOrder")
+						{
+							auto	approver_id_list = split(new_value, ',');
+							auto	i = 1;
+
+							for(auto &approver_id: approver_id_list)
+							{
+								db->Query("UPDATE `bt_approvers` SET `approver_order`=" + quoted(to_string(i++)) + " WHERE `id`=" + quoted(approver_id) + ";");
+								if(db->isError())
+								{
+									error_message = "Ошибка БД";
+									MESSAGE_ERROR("", "", "sql_query has failed (" + db->GetErrorMessage() + ")");
+								}
+							}
+
+							sql_query = "SELECT 'fake';";
 						}
 
 						if(sql_query.length())
@@ -4170,7 +4522,7 @@ string	GetSpelledTimecardProjectByID(string id, CMysql *db)
 		string 	title = db->Get(0, "title");
 		string	customer_id = db->Get(0, "timecard_customers_id");
 
-		result = GetSpelledTimecardCustomerByID(customer_id, db) + " / " + title;
+		result = GetSpelledTimecardCustomerByID(customer_id, db) + TIMECARD_ENTRY_TITLE_SEPARATOR + title;
 	}
 	else
 	{
@@ -4193,7 +4545,7 @@ string	GetSpelledTimecardTaskByID(string id, CMysql *db)
 		string 	title = db->Get(0, "title");
 		string	project_id = db->Get(0, "timecard_projects_id");
 
-		result = GetSpelledTimecardProjectByID(project_id, db) + " / " + title;
+		result = GetSpelledTimecardProjectByID(project_id, db) + TIMECARD_ENTRY_TITLE_SEPARATOR + title;
 	}
 	else
 	{
@@ -4296,6 +4648,90 @@ auto	GetSpelledCostCenterByID(string id, CMysql *db) -> string
 	return result;	
 }
 
+auto	GetSpelledBTAllowanceByID(string id, CMysql *db) -> string
+{
+	auto	result = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(db->Query("SELECT `title` FROM `geo_country` WHERE `id`=(SELECT `geo_country_id` FROM `bt_allowance` WHERE `id`=\"" + id + "\");"))
+	{
+		result = db->Get(0, "title");
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "geo_country.id(" + id + ") not found");
+	}
+	
+	MESSAGE_DEBUG("", "", "finish (result is " + result + ")");
+
+	return result;	
+}
+
+auto	GetSpelledHolidayCalendarByID(string id, CMysql *db) -> string
+{
+	auto	result = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(db->Query("SELECT `title` FROM `holiday_calendar` WHERE `id`=" + quoted(id) + ";"))
+	{
+		result = db->Get(0, "title");
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "holiday_country.id(" + id + ") not found");
+	}
+	
+	MESSAGE_DEBUG("", "", "finish (result is " + result + ")");
+
+	return result;	
+}
+
+auto	GetSpelledAirfareDirectionLimitByID(string id, CMysql *db) -> string
+{
+	auto	result = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(db->Query("SELECT * FROM `airfare_limits_by_direction` WHERE `id`=\"" + id + "\";"))
+	{
+		auto	from = db->Get(0, "from");
+		auto	to = db->Get(0, "to");
+
+		if(db->Query("SELECT * FROM `airport_countries` WHERE `id`=\"" + from + "\";"))
+		{
+			auto	from_title = db->Get(0, "title");
+
+			if(db->Query("SELECT * FROM `airport_countries` WHERE `id`=\"" + to + "\";"))
+			{
+				auto	to_title = db->Get(0, "title");
+
+				result = from_title + " -> "s + to_title;
+			}
+			else
+			{
+				MESSAGE_ERROR("", "", gettext("SQL syntax error"))
+			}
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", gettext("SQL syntax error"))
+		}
+
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "airfare_limits_by_direction.id(" + id + ") not found");
+	}
+
+
+	MESSAGE_DEBUG("", "", "finish (result.length is " + to_string(result.length()) + ")");
+
+	return result;	
+}
+
+
 auto	GetSpelledBTExpenseTemplateLineByID(string id, CMysql *db) -> string
 {
 	auto	result = ""s;
@@ -4309,7 +4745,7 @@ auto	GetSpelledBTExpenseTemplateLineByID(string id, CMysql *db) -> string
 		string	dom_type = db->Get(0, "dom_type");
 		string	payment = db->Get(0, "payment");
 
-		result = title + " ("s + description + " / "s + dom_type + " / "s + payment + ")"s;
+		result = title + " ("s + description + TIMECARD_ENTRY_TITLE_SEPARATOR + dom_type + TIMECARD_ENTRY_TITLE_SEPARATOR + payment + ")"s;
 	}
 	else
 	{
@@ -4443,7 +4879,7 @@ string	GetSpelledSoWCustomFieldNameByID(string custom_field_id, CMysql *db)
 	{
 		auto	description = ""s + db->Get(0, "description");
 
-		result = string(db->Get(0, "title")) + (description.length() ? " / " + description : "");
+		result = string(db->Get(0, "title")) + (description.length() ? TIMECARD_ENTRY_TITLE_SEPARATOR + description : "");
 	}
 	else
 	{
@@ -4466,7 +4902,7 @@ string	GetSpelledPSoWCustomFieldNameByID(string custom_field_id, CMysql *db)
 	{
 		auto	description = ""s + db->Get(0, "description");
 
-		result = string(db->Get(0, "title")) + (description.length() ? " / " + description : "");
+		result = string(db->Get(0, "title")) + (description.length() ? TIMECARD_ENTRY_TITLE_SEPARATOR + description : "");
 	}
 	else
 	{
@@ -4489,7 +4925,7 @@ string	GetSpelledCostCenterCustomFieldNameByID(string custom_field_id, CMysql *d
 	{
 		auto	description = ""s + db->Get(0, "description");
 
-		result = string(db->Get(0, "title")) + (description.length() ? " / " + description : "");
+		result = string(db->Get(0, "title")) + (description.length() ? TIMECARD_ENTRY_TITLE_SEPARATOR + description : "");
 	}
 	else
 	{
@@ -4852,6 +5288,21 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 		notification_description = "Данные командировки: добавили отчетный документ " + GetSpelledBTExpenseTemplateLineByID(id, db) + " к возмещаемому расходу "  + GetSpelledBTExpenseTemplateByLineID(id, db);
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
+	if(action == "AJAX_addAirfareLimitationByDirection")
+	{
+		notification_description = "Ограничения на перелет: добавили лимит на перелет "  + GetSpelledAirfareDirectionLimitByID(id, db) + " " + new_value + " руб.";
+		sql_query = ""; // --- don't notify subcontractors, only agency
+	}
+	if(action == "AJAX_updateAirfareLimitationByDirection")
+	{
+		notification_description = "Ограничения на перелет: изменили лимит на перелет "  + GetSpelledAirfareDirectionLimitByID(id, db) + " с " + existing_value + " на " + new_value + " руб.";
+		sql_query = ""; // --- don't notify subcontractors, only agency
+	}
+	if(action == "AJAX_deleteAirfarelimitationByDirection")
+	{
+		notification_description = "Ограничения на перелет: удалили лимит на перелет "  + GetSpelledAirfareDirectionLimitByID(id, db);
+		sql_query = ""; // --- don't notify subcontractors, only agency
+	}
 	if(action == "AJAX_addCostCenter")
 	{
 		notification_description = gettext("Agency: cost center added") + " "s + GetSpelledCostCenterByID(id, db);
@@ -4882,6 +5333,58 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 		notification_description = gettext("Agency: cost center")  + " ("s + GetSpelledCostCenterByID(id, db) + ") "  + gettext("description updated") + " "s + gettext("from") + " "s + existing_value + " "s + gettext("to") + " "s + new_value;
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
+	if(action == "AJAX_updateBTAllowanceCountry")
+	{
+		notification_description = gettext("Agency: bt allowance") + " ("s + GetSpelledBTAllowanceByID(id, db) + ") " + gettext("updated(female)") + " "s + gettext("from") + " "s + existing_value + " "s + gettext("to") + " "s + new_value;
+		sql_query = ""; // --- don't notify subcontractors, only agency
+	}
+	if(action == "AJAX_updateBTAllowanceAmount")
+	{
+		notification_description = gettext("Agency: bt allowance") + " ("s + GetSpelledBTAllowanceByID(id, db) + ") " + gettext("updated(female)") + " "s + gettext("from") + " "s + existing_value + " "s + gettext("to") + " "s + new_value;
+		sql_query = ""; // --- don't notify subcontractors, only agency
+	}
+	if(action == "AJAX_deleteBTAllowance")
+	{
+		notification_description = gettext("Agency: bt allowance") + " ("s + GetSpelledBTAllowanceByID(id, db) + ") " + gettext("removed");
+		sql_query = ""; // --- don't notify subcontractors, only agency
+	}
+	if(action == "AJAX_addBTAllowance")
+	{
+		notification_description = gettext("Agency: bt allowance") + " ("s + GetSpelledBTAllowanceByID(id, db) + ") " + gettext("added");
+		sql_query = ""; // --- don't notify subcontractors, only agency
+	}
+	if(action == "AJAX_updateTimecardApproverOrder")
+	{
+		notification_description = gettext("Agency: bt approver") + " "s + gettext("updated");
+		sql_query = ""; // --- don't notify subcontractors, only agency
+	}
+	if(action == "AJAX_updateBTApproverOrder")
+	{
+		notification_description = gettext("Agency: bt approver") + " "s + gettext("updated");
+		sql_query = ""; // --- don't notify subcontractors, only agency
+	}
+	if(action == "AJAX_updateHolidayCalendarDate")
+	{
+		notification_description = gettext("Agency: holiday calendar") + " "s + gettext("updated") + " "s + gettext("from") + " "s + existing_value + " "s + gettext("to") + " "s + new_value;
+		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `agency_company_id`=(SELECT `agency_company_id` FROM `holiday_calendar` WHERE `id`=" + quoted(id) + ");";
+	}
+	if(action == "AJAX_updateHolidayCalendarTitle")
+	{
+		notification_description = gettext("Agency: holiday calendar") + " "s + gettext("updated") + " "s + gettext("from") + " "s + existing_value + " "s + gettext("to") + " "s + new_value;
+		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `agency_company_id`=(SELECT `agency_company_id` FROM `holiday_calendar` WHERE `id`=" + quoted(id) + ");";
+	}
+	if(action == "AJAX_deleteHolidayCalendar")
+	{
+		notification_description = gettext("Agency: holiday calendar") + " ("s + GetSpelledHolidayCalendarByID(id, db) + ") " + gettext("removed");
+		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `agency_company_id`=(SELECT `agency_company_id` FROM `holiday_calendar` WHERE `id`=" + quoted(id) + ");";
+	}
+	if(action == "AJAX_addHolidayCalendar")
+	{
+		notification_description = gettext("Agency: holiday calendar") + " "s + gettext("added") + " ("s + GetSpelledHolidayCalendarByID(id, db) + ") ";
+		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `agency_company_id`=(SELECT `agency_company_id` FROM `holiday_calendar` WHERE `id`=" + quoted(id) + ");";
+	}
+
+
 
 	if(action == "AJAX_updateSoWNumber")
 	{
@@ -5083,7 +5586,7 @@ auto NotifySoWContractPartiesAboutChanges(string action_type_id, string sow_id, 
 			auto				affected = db->Query("SELECT `user_id` FROM `company_employees` where `company_id`=("
 														"SELECT `agency_company_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\""
 													")");
-			for(int i = 0; i < affected; ++i)
+			for(auto i = 0; i < affected; ++i)
 			{
 				user_list.push_back(db->Get(i, 0));
 			}
@@ -5091,7 +5594,7 @@ auto NotifySoWContractPartiesAboutChanges(string action_type_id, string sow_id, 
 			affected = db->Query("SELECT `admin_userID` FROM `company` where `id`=("
 									"SELECT `subcontractor_company_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\""
 								")");
-			for(int i = 0; i < affected; ++i)
+			for(auto i = 0; i < affected; ++i)
 			{
 				user_list.push_back(db->Get(i, 0));
 			}
@@ -5142,7 +5645,7 @@ auto NotifyAgencyAboutChanges(string agency_id, string action_type_id, string ac
 		{
 			vector<string>		user_list;
 			auto				affected = db->Query("SELECT `user_id` FROM `company_employees` where `company_id`=\"" + agency_id + "\";");
-			for(int i = 0; i < affected; ++i)
+			for(auto i = 0; i < affected; ++i)
 			{
 				user_list.push_back(db->Get(i, 0));
 			}
@@ -5210,7 +5713,7 @@ bool GeneralNotifySoWContractPartiesAboutChanges(string action, string id, strin
 					// --- collect list sow to notify
 					affected = db->Query(sow_list_sql_query);
 
-					for(int i = 0; i < affected; ++i) 
+					for(auto i = 0; i < affected; ++i) 
 						sow_list.push_back(db->Get(i, "contract_sow_id"));
 
 					if(sow_list.size())
@@ -5237,7 +5740,7 @@ bool GeneralNotifySoWContractPartiesAboutChanges(string action, string id, strin
 				{
 					affected = db->Query(agency_list_sql_query);
 
-					for(int i = 0; i < affected; ++i) 
+					for(auto i = 0; i < affected; ++i) 
 						agency_list.push_back(db->Get(i, "agency_company_id"));
 
 					// --- define agency
@@ -5290,7 +5793,7 @@ bool GeneralNotifySoWContractPartiesAboutChanges(string action, string id, strin
 						{
 							// --- gather agency employee list
 							affected = db->Query("SELECT DISTINCT `user_id` FROM `company_employees` WHERE `company_id` IN (" + join(agency_list) + ");");
-							for(int i = 0; i < affected; ++i)
+							for(auto i = 0; i < affected; ++i)
 								persons_to_notify.push_back(db->Get(i, "user_id"));
 							
 							// --- gather subcontractor list
@@ -5299,7 +5802,7 @@ bool GeneralNotifySoWContractPartiesAboutChanges(string action, string id, strin
 								affected = db->Query("SELECT DISTINCT `admin_userID` FROM `company` WHERE `id` IN ("
 												"SELECT DISTINCT `subcontractor_company_id` FROM `contracts_sow` WHERE `id` IN (" + join(sow_list) + ")"
 											");");
-								for(int i = 0; i < affected; ++i)
+								for(auto i = 0; i < affected; ++i)
 									persons_to_notify.push_back(db->Get(i, "admin_userID"));
 							}
 							else
@@ -5398,7 +5901,7 @@ string GetAgencyEmployeesInJSONFormat(string company_id, CMysql *db, CUser *user
 		affected = db->Query(sql_query);
 		if(affected)
 		{
-			for(int i = 0; i < affected; ++i)
+			for(auto i = 0; i < affected; ++i)
 			{
 				if(i) result += ",";
 				result += 
@@ -5465,9 +5968,10 @@ string GetAgencyObjectInJSONFormat(string agency_id, bool include_tasks, bool in
 							"\"cost_centers\":[" + ( include_tasks ? GetCostCentersInJSONFormat("SELECT * FROM `cost_centers` WHERE `agency_company_id`=\"" + agency_id + "\";", db, user) : "") + "],"
 							"\"cost_center_assignment\":[" + ( include_tasks ? GetCostCentersAssignmentInJSONFormat("SELECT * FROM `cost_center_assignment` WHERE `timecard_customer_id` IN (SELECT `id` FROM `timecard_customers` WHERE `agency_company_id`=\"" + agency_id + "\");", db, user) : "") + "],"
 							
-							"\"bt_expense_templates\":[" + ( include_bt ? 
-																			GetBTExpenseTemplatesInJSONFormat("SELECT * FROM `bt_expense_templates` WHERE `agency_company_id`=\"" + agency_id + "\";", db, user)
-																			 : "") + "]"
+							"\"bt_expense_templates\":[" + ( include_bt ? GetBTExpenseTemplatesInJSONFormat("SELECT * FROM `bt_expense_templates` WHERE `agency_company_id`=\"" + agency_id + "\";", db, user) : "") + "],"
+							"\"airfare_limitations_by_direction\":[" + ( include_bt ? GetAirfareLimitaionsByDirectionInJSONFormat("SELECT * FROM `airfare_limits_by_direction` WHERE `agency_company_id`=\"" + agency_id + "\";", db, user) : "") + "],"
+							"\"allowances\":[" + ( include_bt ? GetBTAllowanceInJSONFormat("SELECT * FROM `bt_allowance` WHERE `agency_company_id`=" + quoted(agency_id) + ";", db, user) : "") + "],"
+							"\"holiday_calendar\":[" + ( include_tasks ? GetHolidayCalendarInJSONFormat("SELECT * FROM `holiday_calendar` WHERE `agency_company_id`=" + quoted(agency_id) + ";", db, user) : "") + "]"
 						"}";
 
 		}

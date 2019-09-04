@@ -143,144 +143,29 @@ int main()
 
 		indexPage.SetDB(&db);
 
-		action = indexPage.GetVarsHandler()->Get("action");
-		{
-			CLog	log;
-
-			log.Write(DEBUG, string(__func__) + ": action = ", action);
-		}
-
-
-
-	// ------------ generate common parts
-		{
-			ostringstream			query, ost1, ost2;
-			string				partNum;
-			map<string, string>		menuHeader;
-			map<string, string>::iterator	iterMenuHeader;
-			string				content;
-			// Menu				m;
-
-			indexPage.RegisterVariableForce("rand", GetRandom(10));
-			indexPage.RegisterVariableForce("random", GetRandom(10));
-			indexPage.RegisterVariableForce("style", "style.css");
-
-
 #ifndef IMAGEMAGICK_DISABLE
-			Magick::InitializeMagick(NULL);
+		Magick::InitializeMagick(NULL);
 #endif
-	/*
-			m.SetDB(&db);
-			m.Load();
-			GenerateAndRegisterMenuV("1", &m, &db, &indexPage);
-	*/
+			
+		action = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("action"));
+		MESSAGE_DEBUG("", "", "action taken from HTTP is " + action);
 
-	//------- Cleanup data
+		// --- generate common parts
+		{
+			// --- it has to be run before session, because session relay upon Apache environment variable
+			if(RegisterInitialVariables(&indexPage, &db, &user)) {}
+			else
 			{
-				ostringstream	ost;
-
-				ost.str("");
-				ost << "delete from captcha where `timestamp`<=(NOW()-INTERVAL " << SESSION_LEN << " MINUTE)";
-				db.Query(ost.str());
+				MESSAGE_ERROR("", "", "RegisterInitialVariables failed, throwing exception");
+				throw CExceptionHTML("environment variable error");
 			}
 
-	//------- Generate session
-			{
-				string			lng, sessidHTTP;
-				ostringstream	ost;
-
-
-				sessidHTTP = indexPage.SessID_Get_FromHTTP();
-				if(sessidHTTP.length() < 5) {
-					{
-						CLog	log;
-						log.Write(DEBUG, string(__func__) + ": session cookie is not exist, generating new session.");
-					}
-					sessidHTTP = indexPage.SessID_Create_HTTP_DB();
-					if(sessidHTTP.length() < 5) {
-						CLog	log;
-						log.Write(ERROR, string(__func__) + ": error in generating session ID");
-						throw CExceptionHTML("session can't be created");
-					}
-				} 
-				else {
-					if(indexPage.SessID_Load_FromDB(sessidHTTP)) 
-					{
-						if(indexPage.SessID_CheckConsistency()) 
-						{
-							if(indexPage.SessID_Update_HTTP_DB()) 
-							{
-								indexPage.RegisterVariableForce("loginUser", "");
-
-								if(indexPage.SessID_Get_UserFromDB() != "Guest") {
-									user.SetDB(&db);
-									user.GetFromDBbyEmail(indexPage.SessID_Get_UserFromDB());
-									indexPage.RegisterVariableForce("loginUser", indexPage.SessID_Get_UserFromDB());
-									{
-										CLog	log;
-										ostringstream	ost;
-
-										ost << string(__func__) + ": user [" << user.GetLogin() << "] logged in";
-										log.Write(DEBUG, ost.str());
-									}
-								}
-								else
-								{
-									indexPage.RegisterVariableForce("ErrorDescription", "ERROR user not signed in (Guest user)");
-
-									{
-										CLog	log;
-										log.Write(ERROR, string(__func__) + ": ERROR user not signed in (Guest user)");
-									}
-								}
-							}
-							else
-							{
-								indexPage.RegisterVariableForce("ErrorDescription", "ERROR update session in HTTP or DB failed");
-
-								{
-									CLog	log;
-									log.Write(ERROR, string(__func__) + ": ERROR update session in HTTP or DB failed");
-								}
-							}
-						}
-						else {
-							indexPage.RegisterVariableForce("ErrorDescription", "ERROR session consistency check failed");
-
-							{
-								CLog	log;
-								log.Write(ERROR, string(__func__) + ": ERROR session consistency check failed");
-							}
-						}
-					}
-					else 
-					{
-						ostringstream	ost;
-
-						{
-							CLog	log;
-							log.Write(DEBUG, string(__func__) + ": cookie session and DB session is not equal. Need to recreate session");
-						}
-
-						ost.str("");
-						ost << "/?rand=" << GetRandom(10);
-
-						if(!indexPage.Cookie_Expire()) {
-							CLog	log;
-							log.Write(ERROR, string(__func__) + ": Error in session expiration");
-						} // --- if(!indexPage.Cookie_Expire())
-						indexPage.Redirect(ost.str());
-					} // --- if(indexPage.SessID_Load_FromDB(sessidHTTP)) 
-				} // --- if(sessidHTTP.length() < 5)
-
-
-
-
-			}
-	//------- End generate session
-
+			//------- Generate session
+			action = GenerateSession(action, &indexPage, &db, &user);
 		}
-	// ------------ end generate common parts
+		// ------------ end generate common parts
+
+		MESSAGE_DEBUG("", "", "pre-condition if(action == \"" + action + "\")");
 
 
 		if((user.GetID().length()) && (user.GetName() != "Guest"))

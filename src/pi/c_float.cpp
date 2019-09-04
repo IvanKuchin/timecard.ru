@@ -159,7 +159,7 @@ c_float	c_float::operator/(const c_float &term2)
 
 	result = RoundWithPrecision(fma(Get(), 1 / term2.Get(), 0));
 
-	MESSAGE_DEBUG("c_float", "", to_string(Get()) + " / " + to_string(term2.Get()) + " = " + to_string(result.Get()));
+	MESSAGE_DEBUG("c_float", "", to_string(Get()) + TIMECARD_ENTRY_TITLE_SEPARATOR + to_string(term2.Get()) + " = " + to_string(result.Get()));
 
 	return result;
 }
@@ -169,7 +169,7 @@ c_float	c_float::operator/(const long int &term2)
 	c_float	result;
 
 	result = RoundWithPrecision(Get() / term2);
-	MESSAGE_DEBUG("c_float", "", to_string(Get()) + " / " + to_string(term2) + " = " + to_string(result.Get()));
+	MESSAGE_DEBUG("c_float", "", to_string(Get()) + TIMECARD_ENTRY_TITLE_SEPARATOR + to_string(term2) + " = " + to_string(result.Get()));
 
 	return result;
 }

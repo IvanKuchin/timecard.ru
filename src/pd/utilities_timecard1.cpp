@@ -3631,69 +3631,7 @@ string	GetBTApprovalsInJSONFormat(string sqlQuery, CMysql *db, CUser *user)
 
 	return result;
 }
-/*
-string	GetTimecardApproversInJSONFormat(string sqlQuery, CMysql *db, CUser *user)
-{
-	struct ItemClass
-	{
-		string	id;
-		string	approver_user_id;
-		string	contract_sow_id;
-		string	auto_approve;
-		string	type;
-		string	rate;
-	};
 
-	int						affected;
-	string					result;
-	vector<ItemClass>		itemsList;
-
-	MESSAGE_DEBUG("", "", "start");
-
-	affected = db->Query(sqlQuery);
-	if(affected)
-	{
-		for(int i = 0; i < affected; i++)
-		{
-			ItemClass	item;
-
-			item.id = db->Get(i, "id");
-			item.approver_user_id = db->Get(i, "approver_user_id");
-			item.contract_sow_id = db->Get(i, "contract_sow_id");
-			item.auto_approve = db->Get(i, "auto_approve");
-			item.type = db->Get(i, "type");
-			item.rate = db->Get(i, "rate");
-
-			itemsList.push_back(item);
-		}
-
-		for (const auto& item : itemsList)
-		{
-			if(result.length()) result += ",";
-			result +=	"{";
-
-			result += "\"id\":\"" + item.id + "\",";
-			result += "\"approver_user_id\":\"" + item.approver_user_id + "\",";
-			result += "\"contract_sow_id\":\"" + item.contract_sow_id + "\",";
-			result += "\"sow\":[" + GetSOWInJSONFormat("SELECT * FROM `contracts_sow` WHERE `id`=\"" + item.contract_sow_id + "\";", db, user) + "],";
-			result += "\"users\":[" + GetUserListInJSONFormat("SELECT * FROM `users` WHERE `id`=\"" + item.approver_user_id + "\";", db, user) + "],";
-			result += "\"auto_approve\":\"" + item.auto_approve + "\",";
-			result += "\"type\":\"" + item.type + "\",";
-			result += "\"rate\":\"" + item.rate + "\"";
-
-			result +=	"}";
-		}
-	}
-	else
-	{
-		MESSAGE_DEBUG("", "", "approvers list is empty");
-	}
-
-	MESSAGE_DEBUG("", "", "finish");
-
-	return result;
-}
-*/
 string	GetApproversInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include_sow)
 {
 	struct ItemClass
@@ -3701,6 +3639,7 @@ string	GetApproversInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool i
 		string	id;
 		string	approver_user_id;
 		string	contract_sow_id;
+		string	approver_order;
 		string	auto_approve;
 		string	type;
 		string	rate;
@@ -3720,11 +3659,12 @@ string	GetApproversInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool i
 			ItemClass	item;
 
 			item.id = db->Get(i, "id");
-			item.approver_user_id = db->Get(i, "approver_user_id");
-			item.contract_sow_id = db->Get(i, "contract_sow_id");
-			item.auto_approve = db->Get(i, "auto_approve");
-			item.type = db->Get(i, "type");
-			item.rate = db->Get(i, "rate");
+			item.approver_user_id	= db->Get(i, "approver_user_id");
+			item.contract_sow_id	= db->Get(i, "contract_sow_id");
+			item.approver_order		= db->Get(i, "approver_order");
+			item.auto_approve		= db->Get(i, "auto_approve");
+			item.type				= db->Get(i, "type");
+			item.rate				= db->Get(i, "rate");
 
 			itemsList.push_back(item);
 		}
@@ -3740,6 +3680,7 @@ string	GetApproversInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool i
 			if(include_sow)
 				result += "\"sow\":[" + GetSOWInJSONFormat("SELECT * FROM `contracts_sow` WHERE `id`=\"" + item.contract_sow_id + "\";", db, user) + "],";
 			result += "\"users\":[" + GetUserListInJSONFormat("SELECT * FROM `users` WHERE `id`=\"" + item.approver_user_id + "\";", db, user) + "],";
+			result += "\"approver_order\":\"" + item.approver_order + "\",";
 			result += "\"auto_approve\":\"" + item.auto_approve + "\",";
 			result += "\"type\":\"" + item.type + "\",";
 			result += "\"rate\":\"" + item.rate + "\"";
@@ -3907,6 +3848,7 @@ string	GetTimecardsInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool i
 		string				status;
 		string				submit_date;
 		string				approve_date;
+		string				payed_date;
 		string				invoice_filename;
 		string				eventTimestamp;
 	};
@@ -3927,6 +3869,7 @@ string	GetTimecardsInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool i
 			item.period_end = db->Get(i, "period_end");
 			item.submit_date = db->Get(i, "submit_date");
 			item.approve_date = db->Get(i, "approve_date");
+			item.payed_date = db->Get(i, "payed_date");
 			item.invoice_filename = db->Get(i, "invoice_filename");
 			item.status = db->Get(i, "status");
 			item.eventTimestamp = db->Get(i, "eventTimestamp");
@@ -3946,6 +3889,7 @@ string	GetTimecardsInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool i
 			result += "\"period_end\":\"" + item.period_end + "\",";
 			result += "\"submit_date\":\"" + item.submit_date + "\",";
 			result += "\"approve_date\":\"" + item.approve_date + "\",";
+			result += "\"payed_date\":\"" + item.payed_date + "\",";
 			result += "\"invoice_filename\":\"" + item.invoice_filename + "\",";
 			result += "\"status\":\"" + item.status + "\",";
 			result += "\"lines\":[" + GetTimecardLinesInJSONFormat("SELECT * FROM `timecard_lines` WHERE `timecard_id`=\"" + item.id + "\";", db, user) + "],";
@@ -3990,6 +3934,7 @@ string	GetBTsInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool isExten
 		string	status;
 		string	submit_date;
 		string	approve_date;
+		string	payed_date;
 		string	invoice_filename;
 		string	eventTimestamp;
 	};
@@ -4014,6 +3959,7 @@ string	GetBTsInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool isExten
 			item.status = db->Get(i, "status");
 			item.submit_date = db->Get(i, "submit_date");
 			item.approve_date = db->Get(i, "approve_date");
+			item.payed_date = db->Get(i, "payed_date");
 			item.invoice_filename = db->Get(i, "invoice_filename");
 			item.eventTimestamp = db->Get(i, "eventTimestamp");
 
@@ -4036,6 +3982,7 @@ string	GetBTsInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool isExten
 			result += "\"status\":\"" + item.status + "\",";
 			result += "\"submit_date\":\"" + item.submit_date + "\",";
 			result += "\"approve_date\":\"" + item.approve_date + "\",";
+			result += "\"payed_date\":\"" + item.payed_date + "\",";
 			result += "\"invoice_filename\":\"" + item.invoice_filename + "\",";
 			if(isExtended)
 			{
@@ -4575,14 +4522,22 @@ string	GetBTExpenseLineTemplatesInJSONFormat(string sqlQuery, CMysql *db, CUser 
 			if(result.length()) result += ",";
 			result +=	"{";
 
-			result += "\"id\":\"" + item.id + "\",";
-			result += "\"bt_expense_template_id\":\"" + item.bt_expense_template_id + "\",";
-			result += "\"dom_type\":\"" + item.dom_type + "\",";
-			result += "\"title\":\"" + item.title + "\",";
-			result += "\"description\":\"" + item.description + "\",";
-			result += "\"tooltip\":\"" + item.tooltip + "\",";
-			result += "\"payment\":\"" + item.payment + "\",";
-			result += "\"required\":\"" + item.required + "\"";
+			result		+= "\"id\":\"" + item.id + "\",";
+			result		+= "\"bt_expense_template_id\":\"" + item.bt_expense_template_id + "\",";
+			result		+= "\"dom_type\":\"" + item.dom_type + "\",";
+			if(item.dom_type == "allowance")
+				result	+= "\"allowances\":[" + GetBTAllowanceInJSONFormat(
+													"SELECT * FROM `bt_allowance` WHERE `agency_company_id`=("
+														"SELECT `agency_company_id` FROM `bt_expense_templates` WHERE `id`=("
+															"SELECT `bt_expense_template_id` FROM `bt_expense_line_templates` WHERE `id`=" + quoted(item.id) + 
+														")"
+													");", db, user) + "],";
+
+			result		+= "\"title\":\"" + item.title + "\",";
+			result		+= "\"description\":\"" + item.description + "\",";
+			result		+= "\"tooltip\":\"" + item.tooltip + "\",";
+			result		+= "\"payment\":\"" + item.payment + "\",";
+			result		+= "\"required\":\"" + item.required + "\"";
 
 			result +=	"}";
 		}

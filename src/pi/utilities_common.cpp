@@ -169,64 +169,31 @@ auto GenerateSession(string action, CCgi *indexPage, CMysql *db, CUser *user) ->
 					indexPage->RegisterVariableForce("loginUserID", "");
 
 					user->SetDB(db);
-					if(indexPage->SessID_Get_UserFromDB() != "Guest")
+					if(user->GetFromDBbyLogin(indexPage->SessID_Get_UserFromDB()))
 					{
-						// --- place 2change user FROM user->email to user->id
-						if(user->GetFromDBbyEmail(indexPage->SessID_Get_UserFromDB()))
+						indexPage->RegisterVariableForce("loginUser", indexPage->SessID_Get_UserFromDB());
+						indexPage->RegisterVariableForce("loginUserID", user->GetID());
+						indexPage->RegisterVariableForce("myLogin", user->GetLogin());
+						indexPage->RegisterVariableForce("myFirstName", user->GetName());
+						indexPage->RegisterVariableForce("myLastName", user->GetNameLast());
+						indexPage->RegisterVariableForce("myUserAvatar", user->GetAvatar());
+						indexPage->RegisterVariableForce("user_type", user->GetType());
+						indexPage->RegisterVariableForce("smartway_enrolled", user->GetSmartwayEnrolled());
+
+						if(user->GetLogin() != "Guest")
 						{
-							string			avatarPath = "empty";
-
-							indexPage->RegisterVariableForce("loginUser", indexPage->SessID_Get_UserFromDB());
-							indexPage->RegisterVariableForce("loginUserID", user->GetID());
-							indexPage->RegisterVariableForce("myLogin", user->GetLogin());
-							indexPage->RegisterVariableForce("myFirstName", user->GetName());
-							indexPage->RegisterVariableForce("myLastName", user->GetNameLast());
-							indexPage->RegisterVariableForce("myUserAvatar", user->GetAvatar());
-							indexPage->RegisterVariableForce("user_type", user->GetType());
-							indexPage->RegisterVariableForce("smartway_enrolled", user->GetSmartwayEnrolled());
-
-							// --- specific actions to AJAX-requests
-							if((action.find("AJAX_") != string::npos) || (action.find("JSON_") != string::npos))
-							{
-								// --- don't look for user theme if it is AJAX_ or JSON_ request
-								// --- Site theme required only if it is template request
-								// --- this will save one request to DB
-							}
-							else
-							{
-								indexPage->RegisterVariableForce("site_theme", user->GetSiteTheme());
-							}
-
-							MESSAGE_DEBUG("", action, "user (" + user->GetLogin() + ") logged in");
+							// --- actions specific to registered user
+							indexPage->RegisterVariableForce("site_theme", user->GetSiteTheme());
 						}
-						else
-						{
-							// --- enforce to close session
-							action = "logout";
 
-							MESSAGE_ERROR("", action, "session.user(" + indexPage->SessID_Get_UserFromDB() + ") not found in users.table. Session exists on client side, but not in the DB. Session belonged to unknown user must be terminated.");
-						}
+						MESSAGE_DEBUG("", action, "user (" + user->GetLogin() + ") logged in");
 					}
 					else
 					{
-						MESSAGE_DEBUG("", action, "user (" + user->GetLogin() + ") surfing");
+						// --- enforce to close session
+						action = "logout";
 
-						if(user->GetFromDBbyLogin(user->GetLogin()))
-						{
-							indexPage->RegisterVariableForce("loginUser", user->GetLogin());
-							indexPage->RegisterVariableForce("loginUserID", user->GetID());
-							indexPage->RegisterVariableForce("myLogin", user->GetLogin());
-							indexPage->RegisterVariableForce("myFirstName", user->GetName());
-							indexPage->RegisterVariableForce("myLastName", user->GetNameLast());
-							indexPage->RegisterVariableForce("user_type", user->GetType());
-						}
-						else
-						{
-							// --- enforce to close session
-							action = "logout";
-
-							MESSAGE_ERROR("", action, "session.user(" + indexPage->SessID_Get_UserFromDB() + ") not found in users.table. Session exists on client side, but not in the DB. Session belonged to unknown user must be terminated.");
-						}
+						MESSAGE_ERROR("", action, "user [" + indexPage->SessID_Get_UserFromDB() + "] not found. Change the [action = logout].");
 					}
 				}
 				else
@@ -302,4 +269,33 @@ auto 		LogoutIfGuest(string action, CCgi *indexPage, CMysql *db, CUser *user) ->
 
 	return action;
 
+}
+
+auto AJAX_ResponseTemplate(CCgi *indexPage, const string &success_message, const string &error_message) -> string
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	template_name = "json_response.htmlt"s;
+	auto	result = ""s;
+
+	if(error_message.empty())
+	{
+		result = "{\"result\":\"success\"" + (success_message.length() ? "," + success_message : "") + "}";
+	}
+	else
+	{
+		MESSAGE_DEBUG("", "", error_message);
+		result = "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+	}
+
+	indexPage->RegisterVariableForce("result", result);
+
+	if(!indexPage->SetTemplate(template_name))
+	{
+		MESSAGE_DEBUG("", "", "can't find template " + template_name);
+	}
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return ""s;
 }

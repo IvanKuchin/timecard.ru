@@ -107,12 +107,14 @@ string	ResubmitEntitiesByAction(string action, string id, string sow_id, string 
 
 bool SubmitTimecard(string timecard_id, CMysql *db, CUser *user)
 {
-	bool 	result = false;
-
 	MESSAGE_DEBUG("", "", "start");
+
+	auto 			result = false;
 
 	if(timecard_id.length())
 	{
+
+/*
 		struct ApproveClass
 		{
 			string	id;
@@ -125,7 +127,7 @@ bool SubmitTimecard(string timecard_id, CMysql *db, CUser *user)
 		map<string, bool>			approvers;
 		vector<ApproveClass>		approves_list;
 		int							affected;
-		bool						all_approvers_confirm = true;
+		bool						all_approvers_confirmed = true;
 
 		affected = db->Query(
 				"SELECT `id` FROM `timecard_approvers` WHERE "
@@ -172,10 +174,15 @@ bool SubmitTimecard(string timecard_id, CMysql *db, CUser *user)
 
 		for(auto &approver: approvers)
 		{
-			if(!approver.second) { all_approvers_confirm = false; break; }
+			if(!approver.second) { all_approvers_confirmed = false; break; }
 		}
 
-		if(all_approvers_confirm)
+		if(all_approvers_confirmed)
+*/
+		C_TC_BT_Submit	submit_obj(db, user);
+
+		submit_obj.Submit("timecard", timecard_id);
+		if(submit_obj.isCompletelyApproved())
 		{
 			auto	error_message = ""s;
 
@@ -240,6 +247,7 @@ bool	SubmitBT(string bt_id, CMysql *db, CUser *user)
 
 	if(bt_id.length())
 	{
+/*
 		struct ApproveClass
 		{
 			string	id;
@@ -252,7 +260,7 @@ bool	SubmitBT(string bt_id, CMysql *db, CUser *user)
 		map<string, bool>			approvers;
 		vector<ApproveClass>		approves_list;
 		int							affected;
-		bool						all_approvers_confirm = true;
+		bool						all_approvers_confirmed = true;
 
 		affected = db->Query(
 				"SELECT `id` FROM `bt_approvers` WHERE "
@@ -299,10 +307,15 @@ bool	SubmitBT(string bt_id, CMysql *db, CUser *user)
 
 		for(auto &approver: approvers)
 		{
-			if(!approver.second) { all_approvers_confirm = false; break; }
+			if(!approver.second) { all_approvers_confirmed = false; break; }
 		}
 
-		if(all_approvers_confirm)
+		if(all_approvers_confirmed)
+*/
+		C_TC_BT_Submit	submit_obj(db, user);
+
+		submit_obj.Submit("bt", bt_id);
+		if(submit_obj.isCompletelyApproved())
 		{
 			auto	error_message = ""s;
 			C_Invoice_BT_Subc_To_Agency	c_invoice(db, user);

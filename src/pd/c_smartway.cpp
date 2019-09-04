@@ -113,12 +113,41 @@ string C_Smartway_Employees::GetCommonPart_JSON()
 
 string C_Smartway_Employees::GetAllBonuses_JSON()
 {
-	return "\"bonuses\":[]";
+	MESSAGE_DEBUG("", "", "start"); 
+
+	auto	bonuses = ""s;
+	auto	affected = db->Query("SELECT * FROM `user_bonuses_avia_view` WHERE `user_id`=\"" + user->GetID() + "\";");
+
+	for(auto i = 0; i < affected; ++i)
+	{
+		if(bonuses.length()) bonuses += ",";
+		bonuses +=	"{"s + 
+						"\"code\":" + quoted(db->Get(i, "code")) + "," +
+						"\"number\":" + quoted(db->Get(i, "number")) + "," +
+						"\"type\":" + quoted("air"s) + "" +
+					"}";
+	}
+
+	affected = db->Query("SELECT * FROM `user_bonuses_railroad_view` WHERE `user_id`=\"" + user->GetID() + "\";");
+	for(auto i = 0; i < affected; ++i)
+	{
+		if(bonuses.length()) bonuses += ",";
+		bonuses +=	"{"s + 
+						"\"code\":" + quoted(db->Get(i, "code")) + "," +
+						"\"number\":" + quoted(db->Get(i, "number")) + "," +
+						"\"type\":" + quoted("train"s) + "" +
+					"}";
+	}
+
+
+	MESSAGE_DEBUG("", "", "finish"); 
+
+	return "\"bonuses\":[" + bonuses + "]";
 }
 
 string C_Smartway_Employees::GetCompaniesINN_JSON()
 {
-	return "\"companies_inn\": [" + quoted(company_tin) + "]";
+	return "\"companies_inn\": [" + company_tin + "]";
 }
 
 string C_Smartway_Employees::GetDocuments_JSON()
@@ -204,8 +233,6 @@ string C_Smartway_Employees::GetAirlineBonuses_JSON()
 	return result;
 }
 
-
-
 string C_Smartway_Employees::GetEmployeesJSON(const string &sql_query)
 {
 	auto	result = ""s;
@@ -218,6 +245,8 @@ string C_Smartway_Employees::GetEmployeesJSON(const string &sql_query)
 		{
 			if(db->Query(sql_query))			
 			{
+				auto	affected = 0;
+
 				employee_id			= db->Get(0, "id");
 				is_phone_confirmed	= db->Get(0, "is_phone_confirmed");
 				phone				= "+" + db->Get(0, "country_code") + db->Get(0, "phone");
@@ -238,9 +267,14 @@ string C_Smartway_Employees::GetEmployeesJSON(const string &sql_query)
 				for_passport_due_date= db->Get(0, "foreign_passport_expiration_date");
 				for_passport_type	= "foreign_passport"s;
 
-				if(db->Query("SELECT * FROM `company` WHERE `admin_userID`=\"" + employee_id + "\" and `type`=\"subcontractor\";"))
+				affected = db->Query("SELECT `tin` FROM `company` WHERE `id` IN (SELECT `agency_company_id` FROM `contracts_sow` WHERE `subcontractor_company_id`=(SELECT `id` FROM `company` WHERE `admin_userID`=" + quoted(employee_id) + "));");
+				if(affected)
 				{
-					company_tin = db->Get(0, "tin");
+					for(auto i = 0; i < affected; ++i)
+					{
+						if(company_tin.length()) company_tin += ",";
+						company_tin += quoted(db->Get(i, 0));
+					}
 
 					if(CheckValidity().empty())
 					{
@@ -479,6 +513,155 @@ string C_Smartway::ParseResponse_EmployeesSave()
 	return error_message;
 }
 
+int C_Smartway::GetDirectionLimit(const vector<C_Flight_Route> &flight_routes)
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto		error_message = ""s;
+	auto		limit = 0;
+
+	if(sow_id.length())
+	{
+		if(flight_routes.size())
+		{
+			if(db->Query(
+						"SELECT `limit` FROM `airfare_limits_by_direction` WHERE "s + 
+							"(`from`=(SELECT `airport_country_id` FROM `airports` WHERE `airport_code`=\"" + flight_routes[0].from + "\") AND `to`=(SELECT `airport_country_id` FROM `airports` WHERE `airport_code`=\"" + flight_routes[0].to + "\")) " + 
+							"OR "
+							"(`to`=(SELECT `airport_country_id` FROM `airports` WHERE `airport_code`=\"" + flight_routes[0].from + "\") AND `from`=(SELECT `airport_country_id` FROM `airports` WHERE `airport_code`=\"" + flight_routes[0].to + "\")) " + 
+							"AND "
+							"(`agency_company_id`=(SELECT `agency_company_id` FROM `contracts_sow` WHERE `id`=" + quoted(sow_id) + "))"
+				))
+			{
+				limit = stoi(db->Get(0, 0));
+			}
+			else
+			{
+				MESSAGE_DEBUG("", "", "no limitation configured on this direction");
+			}
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "flight_routes is empty");
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "sow_id is empty. Call SetSoW(xxxx) prior to GetDirectionLimit execution");
+	}
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return limit;
+}
+
+string C_Smartway::ApplyFilter_ByDirection(const vector<C_Flight_Route> &flight_routes)
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto		error_message = ""s;
+	auto		direction_limit = GetDirectionLimit(flight_routes);
+
+	if(direction_limit)
+	{
+		if(json_obj["result"].HasMember("trips") && json_obj["result"]["trips"].IsArray())
+		{
+			auto &trips = json_obj["result"]["trips"];
+
+			for (SizeType i = 0; i < trips.Size(); ++i) // Uses SizeType instead of size_t
+			{
+				auto	&trip = trips[i];
+
+				if(trip.HasMember("price") && trip["price"].IsNumber())
+				{
+					auto	trip_price = trip["price"].GetDouble();
+
+					if(trip_price > direction_limit)
+					{
+						MESSAGE_DEBUG("", "", "trip price " + to_string(trip_price) + " is over the limit(" + to_string(direction_limit) + ")");
+
+						trips.Erase(trips.Begin() + i--);
+					}
+					else
+					{
+						if(trip.HasMember("fares") && trip["fares"].IsArray())
+						{
+							auto	&fares = trip["fares"];
+							for (SizeType j = 0; j < fares.Size(); j++) // Uses SizeType instead of size_t
+							{
+								auto	&fare = fares[j];
+
+								if(fare.HasMember("price") && fare["price"].IsNumber())
+								{
+									auto	fare_price = fare["price"].GetDouble();
+
+									if(fare_price > direction_limit)
+									{
+										MESSAGE_DEBUG("", "", "fare price " + to_string(fare_price) + " is over the limit(" + to_string(direction_limit) + ")");
+										fares.Erase(fares.Begin() + j--);
+									}
+								}
+								else
+								{
+									error_message = gettext("json_obj reponse error");
+									MESSAGE_ERROR("", "", error_message + "(price is not a number or missed)");
+								}
+							}
+
+						}
+						else
+						{
+							error_message = gettext("json_obj reponse error");
+							MESSAGE_ERROR("", "", error_message + "(fares is not an array or missed)");
+						}
+					}
+				}
+				else
+				{
+					error_message = gettext("json_obj reponse error");
+					MESSAGE_ERROR("", "", error_message + "(price is not a number or missed)");
+				}
+
+
+			}
+		}
+		else
+		{
+			error_message = gettext("json_obj reponse error");
+			MESSAGE_ERROR("", "", error_message + "(trips is not an array or missed)");
+		}
+	}
+	else
+	{
+		MESSAGE_DEBUG("", "", "no direction limit");
+	}
+
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return error_message;
+}
+
+string C_Smartway::ApplyFilters(const vector<C_Flight_Route> &flight_routes)
+{
+	auto		error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if((error_message = ApplyFilter_ByDirection(flight_routes)).empty())
+	{
+
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", error_message);
+	}
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return error_message;
+}
+
 string C_Smartway::ParseResponse_AirlineSearch()
 {
 	auto		error_message = ""s;
@@ -487,7 +670,7 @@ string C_Smartway::ParseResponse_AirlineSearch()
 
 	if(json_obj["result"].IsObject())
 	{
-
+		// --- good to go
 	}
 	else
 	{
@@ -524,6 +707,10 @@ string C_Smartway::ParseResponse_AirlineResult()
 					MESSAGE_ERROR("", "", error_message);
 				}
 			}
+			else if(GetAirlineResultStatus() == "pending")
+			{
+				airline_result_trip_id = "";
+			}
 			else if(GetAirlineResultStatus() == "failed")
 			{
 				if(json_obj["result"]["error"].IsString())
@@ -546,6 +733,219 @@ string C_Smartway::ParseResponse_AirlineResult()
 		else
 		{
 			error_message = "Smartway status "s + gettext("is not a string");
+			MESSAGE_ERROR("", "", error_message);
+		}
+	}
+	else
+	{
+		error_message = "Smartway "s + gettext("result is not a object");
+		MESSAGE_ERROR("", "", error_message);
+	}
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return error_message;
+}
+
+string C_Smartway::ParseResponse_TripInfo()
+{
+	auto		error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(json_obj["result"].IsObject())
+	{
+		if(json_obj["result"].HasMember("items") && json_obj["result"]["items"].IsArray())
+		{
+			auto	&item = json_obj["result"]["items"][0];
+
+			if(item.HasMember("service_type") && item["service_type"].IsString())
+			{
+				if(item.HasMember("id") && item["id"].IsNumber())
+				{
+					if(item["service_type"].GetString() == "Air"s)
+					{
+						purchased_service_id = to_string(item["id"].GetInt());
+
+						// --- more optional fields
+						if(item.HasMember("amount") && item["amount"].IsNumber())
+						{
+							purchased_service_amount = to_string((long int)item["amount"].GetDouble());
+						}
+						else
+						{
+							error_message = "Smartway amount "s + gettext("is not a number");
+							MESSAGE_ERROR("", "", error_message);
+						}
+
+						if(item.HasMember("checkin") && item["checkin"].IsString())
+						{
+							purchased_service_checkin = item["checkin"].GetString();
+						}
+						else
+						{
+							error_message = "Smartway checkin "s + gettext("is not a string");
+							MESSAGE_ERROR("", "", error_message);
+						}
+
+						if(item.HasMember("checkout") && item["checkout"].IsString())
+						{
+							purchased_service_checkout = item["checkout"].GetString();
+						}
+						else
+						{
+							error_message = "Smartway checkout "s + gettext("is not a string");
+							MESSAGE_ERROR("", "", error_message);
+						}
+
+						if(json_obj["result"].HasMember("book_date") && json_obj["result"]["book_date"].IsString())
+						{
+							purchased_service_book_date = json_obj["result"]["book_date"].GetString();
+						}
+						else
+						{
+							error_message = "Smartway book_date "s + gettext("is not a string");
+							MESSAGE_ERROR("", "", error_message);
+						}
+
+						if(json_obj["result"].HasMember("name") && json_obj["result"]["name"].IsString())
+						{
+							purchased_service_destination = json_obj["result"]["name"].GetString();
+						}
+						else
+						{
+							error_message = "Smartway name "s + gettext("is not a string");
+							MESSAGE_ERROR("", "", error_message);
+						}
+
+
+					}
+					else
+					{
+						error_message = "Smartway service_type "s + gettext("is not an air reservation");
+						MESSAGE_ERROR("", "", error_message);
+					}
+				}
+				else
+				{
+					error_message = "Smartway id "s + gettext("is not a number");
+					MESSAGE_ERROR("", "", error_message);
+				}
+			}
+			else
+			{
+				error_message = "Smartway service_type "s + gettext("is not a string");
+				MESSAGE_ERROR("", "", error_message);
+			}
+		}
+		else
+		{
+			error_message = "Smartway items "s + gettext("is not an array");
+			MESSAGE_ERROR("", "", error_message);
+		}
+	}
+	else
+	{
+		error_message = "Smartway "s + gettext("result is not an object");
+		MESSAGE_ERROR("", "", error_message);
+	}
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return error_message;
+}
+
+string C_Smartway::SaveTempFile(const string &content, const string &extension)
+{
+	auto	result = ""s;
+	auto	fname = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	do
+	{
+		fname = GetRandom(10) + extension;
+		result = TEMP_DIRECTORY_PREFIX + fname;
+	} while(isFileExists(result));
+
+	ofstream ofs (result, std::ofstream::out);
+	ofs << content;
+	ofs.close();
+
+	MESSAGE_DEBUG("", "", "finish (result = " + result + ")");
+
+	return result;
+}
+
+string C_Smartway::SaveVoucher(const string &content, const string &extension)
+{
+	auto	fname = ""s;
+	auto	voucher_folder = ""s;
+	auto	voucher_file = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(content.length())
+	{
+		do
+		{
+			voucher_folder = to_string( (int)(rand()/(RAND_MAX + 1.0) * SMARTWAY_VOUCHERS_NUMBER_OF_FOLDERS) + 1);
+			voucher_file = GetRandom(15) + extension;
+			fname = voucher_folder + "/" + voucher_file;
+
+		} while(isFileExists(SMARTWAY_VOUCHERS_DIRECTORY + fname));
+
+		ofstream ofs (SMARTWAY_VOUCHERS_DIRECTORY + fname, std::ofstream::out);
+		ofs << content;
+		ofs.close();
+	}
+	else
+	{
+		MESSAGE_DEBUG("", "", "file content is empty");
+	}
+
+	MESSAGE_DEBUG("", "", "finish (result = " + fname + ")");
+
+	return fname;
+}
+
+string C_Smartway::ParseResponse_TripItemVoucher()
+{
+	auto		error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(json_obj["result"].IsObject())
+	{
+		if(json_obj["result"].HasMember("content"))
+		{
+			if(json_obj["result"]["content"].IsString())
+			{
+				auto	base64_encoded_string = json_obj["result"]["content"].GetString();
+				auto	base64_encoded_file = SaveTempFile(base64_encoded_string, ".enc64");
+
+				auto	base64_decoded_string = base64_decode(base64_encoded_string);
+				auto	base64_decoded_file = SaveTempFile(base64_decoded_string, ".pdf");
+
+				if(base64_decoded_string.length())
+				{
+					voucher_file = SaveVoucher(base64_decoded_string, ".pdf");
+				}
+				else
+				{
+					error_message = gettext("voucher content is empty");
+					MESSAGE_ERROR("", "", error_message);
+				}
+			}
+			else
+			{
+				error_message = "Smartway content "s + gettext("is not a string");
+				MESSAGE_ERROR("", "", error_message);
+			}
+		}
+		else
+		{
+			error_message = "Smartway content "s + gettext("member has missed");
 			MESSAGE_ERROR("", "", error_message);
 		}
 	}
@@ -679,6 +1079,14 @@ string C_Smartway::ParseResponse()
 			{
 				if((error_message = ParseResponse_AirlineResult()).length()) MESSAGE_ERROR("", "", "fail to parse airline.book response");
 			}
+			else if(GetMethod() == "trip.info")
+			{
+				if((error_message = ParseResponse_TripInfo()).length()) MESSAGE_ERROR("", "", "fail to parse trip.info response");
+			}
+			else if(GetMethod() == "trip.item_voucher")
+			{
+				if((error_message = ParseResponse_TripItemVoucher()).length()) MESSAGE_ERROR("", "", "fail to parse trip.item_voucher response");
+			}
 			else
 			{
 				error_message = gettext("unknown smartway method");
@@ -710,7 +1118,7 @@ string C_Smartway::ParseResponse()
 				MESSAGE_ERROR("", "", "response from server have no error member");
 			}
 
-			error_message = gettext(("json_obj reponse error (code: " + to_string(error_code_from_server) + ", message: " + error_message_from_server + ")").c_str());
+			error_message = gettext("json_obj reponse error") + " ("s + gettext("code") + ": " + to_string(error_code_from_server) + ", " + gettext("message") + ": " + error_message_from_server + ")";
 			MESSAGE_ERROR("", "", error_message + ", missed result member");
 		}
 	}
@@ -1018,7 +1426,14 @@ string	C_Smartway::airline_search(const vector<C_Flight_Route> &flight_routes, s
 	{
 		if((error_message = ParseResponse()).empty())
 		{
+			if((error_message = ApplyFilters(flight_routes)).empty())
+			{
 
+			}
+			else
+			{
+				MESSAGE_ERROR("", "", error_message);
+			}
 		}
 		else
 		{
@@ -1035,32 +1450,43 @@ string	C_Smartway::airline_search(const vector<C_Flight_Route> &flight_routes, s
 	return error_message;
 }
 
-string	C_Smartway::airline_book(const string &user_id, const string &passport_type, const string &search_id, const string &trip_id, const string &fare_id)
+string	C_Smartway::airline_book(const string &passport_type, const string &search_id, const string &trip_id, const string &fare_id)
 {
 	MESSAGE_DEBUG("", "", "start");
 
 	auto	error_message = ""s;
 	auto	temp_query = ""s;
 
-	employees.SetPassportType(passport_type);
-	employees.SetMethod("airline.book");
-	temp_query = 
-					"{"
-						"\"item\":{"
-							"\"search_id\": " + quoted(search_id) + ","
-							"\"trip_id\": " + quoted(trip_id) + 
-							(fare_id == "null" ? "" : ",\"fare_id\": " + quoted(fare_id) + "") +
-					    "},"
-					    "\"employees\":[" + employees.GetEmployeesJSON("SELECT * FROM `users` WHERE `id`=\"" + user_id + "\" AND `type`=\"subcontractor\";") + "]"
-					"}";
-
-	SetMethod("airline.book");
-	SetQuery(temp_query);
-
-	if((error_message = SendRequestToServer()).empty())
+	if(sow_id.length())
 	{
-		if((error_message = ParseResponse()).empty())
+		employees.SetPassportType(passport_type);
+		employees.SetMethod("airline.book");
+		temp_query = 
+						"{"
+							"\"item\":{"
+								"\"search_id\": " + quoted(search_id) + ","
+								"\"trip_id\": " + quoted(trip_id) + 
+								(fare_id == "null" ? "" : ",\"fare_id\": " + quoted(fare_id) + "") +
+						    "},"
+						    "\"employees\":[" + employees.GetEmployeesJSON("SELECT * FROM `users` WHERE `id`=("
+					    														"SELECT `admin_userID` FROM `company` WHERE `id`=("
+								    													"SELECT `subcontractor_company_id` FROM `contracts_sow` WHERE `id`=" + quoted(sow_id) + ""
+					    														")"
+					    													") AND `type`=\"subcontractor\";") + "]"
+						"}";
+
+		SetMethod("airline.book");
+		SetQuery(temp_query);
+
+		if((error_message = SendRequestToServer()).empty())
 		{
+			if((error_message = ParseResponse()).empty())
+			{
+			}
+			else
+			{
+				MESSAGE_ERROR("", "", error_message);
+			}
 		}
 		else
 		{
@@ -1069,7 +1495,8 @@ string	C_Smartway::airline_book(const string &user_id, const string &passport_ty
 	}
 	else
 	{
-		MESSAGE_ERROR("", "", error_message);
+		error_message = gettext("mandatory parameter missed");
+		MESSAGE_ERROR("", "", "sow_id is empty. Call SetSoW(xxxx) prior to GetDirectionLimit execution");
 	}
 
 	MESSAGE_DEBUG("", "", "finish (" + (error_message.empty() ? "success" : "fail") + ")");
@@ -1100,6 +1527,74 @@ string	C_Smartway::airline_result(const string &id)
 	else
 	{
 		MESSAGE_ERROR("", "", error_message);
+	}
+
+	MESSAGE_DEBUG("", "", "finish (" + (error_message.empty() ? "success" : "fail") + ")");
+
+	return error_message;
+}
+
+string	C_Smartway::trip_info(const string &trip_id)
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	error_message = ""s;
+	auto	temp_query = ""s;
+
+	SetMethod("trip.info");
+	SetQuery(trip_id);
+
+	if((error_message = SendRequestToServer()).empty())
+	{
+		if((error_message = ParseResponse()).empty())
+		{
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", error_message);
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", error_message);
+	}
+
+	MESSAGE_DEBUG("", "", "finish (" + (error_message.empty() ? "success" : "fail") + ")");
+
+	return error_message;
+}
+
+string	C_Smartway::trip_item_voucher(const string &trip_id)
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	error_message = ""s;
+	auto	temp_query = ""s;
+
+
+	if((error_message = trip_info(trip_id)).empty())
+	{
+		SetMethod("trip.item_voucher");
+		SetQuery(GetPurchasedServiceID());
+
+		if((error_message = SendRequestToServer()).empty())
+		{
+			if((error_message = ParseResponse()).empty())
+			{
+			}
+			else
+			{
+				MESSAGE_ERROR("", "", error_message);
+			}
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", error_message);
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "fail to get purchased_service_id");
 	}
 
 	MESSAGE_DEBUG("", "", "finish (" + (error_message.empty() ? "success" : "fail") + ")");

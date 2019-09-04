@@ -65,15 +65,18 @@ ltmain.sh
 config.sub
 ar-lib
 build/
-*.swp
-doc
-docs/
-etc/
-ssl/
 /build2/
 /build3/
 /cov-int/
 /.vs/
+*.swp
+
+# --- Timecard specific
+doc
+docs/
+etc/
+ssl/
 ftpsync.settings
 sql
 sublime/
+localy.h.in.original

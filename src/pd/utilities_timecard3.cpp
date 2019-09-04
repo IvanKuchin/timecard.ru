@@ -169,3 +169,330 @@ auto GetAbsenceOverlap(string company_id, string start_date, string end_date, CM
 
 	return result;
 }
+
+auto	GetAirfareLimitaionsByDirectionInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
+{
+	int		affected;
+	auto	result = ""s;
+	struct ItemClass
+	{
+		string	id;
+		string	from;
+		string	to;
+		string	limit;
+	};
+	vector<ItemClass>		itemsList;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	affected = db->Query(sqlQuery);
+	if(affected)
+	{
+		for(int i = 0; i < affected; i++)
+		{
+			ItemClass	item;
+
+			item.id = db->Get(i, "id");
+			item.from = db->Get(i, "from");
+			item.to = db->Get(i, "to");
+			item.limit = db->Get(i, "limit");
+
+			itemsList.push_back(item);
+		}
+
+		for (const auto& item : itemsList)
+		{
+			if(result.length()) result += ",";
+			result +=	"{";
+
+			result += "\"id\":\"" + item.id + "\",";
+			result += "\"from\":[" + GetAirportCountryInJSONFormat("SELECT * FROM `airport_countries` WHERE `id`=\"" + item.from + "\";", db, user) + "],";
+			result += "\"to\":[" + GetAirportCountryInJSONFormat("SELECT * FROM `airport_countries` WHERE `id`=\"" + item.to + "\";", db, user) + "],";
+			result += "\"limit\":\"" + item.limit + "\"";
+
+			result +=	"}";
+		}
+	}
+	else
+	{
+		MESSAGE_DEBUG("", "", "there are no fare limitaions by direction in DB");
+	}
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return result;
+}
+
+auto	GetAirportCountryInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
+{
+
+	int		affected;
+	auto	result = ""s;
+	struct ItemClass
+	{
+		string	id;
+		string	title;
+		string	abbrev;
+	};
+	vector<ItemClass>		itemsList;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	affected = db->Query(sqlQuery);
+	if(affected)
+	{
+		for(int i = 0; i < affected; i++)
+		{
+			ItemClass	item;
+
+			item.id = db->Get(i, "id");
+			item.title = db->Get(i, "title");
+			item.abbrev = db->Get(i, "abbrev");
+
+			itemsList.push_back(item);
+		}
+
+		for (const auto& item : itemsList)
+		{
+			if(result.length()) result += ",";
+			result +=	"{";
+
+			result += "\"id\":\"" + item.id + "\",";
+			result += "\"title\":\"" + item.title + "\",";
+			result += "\"abbrev\":\"" + item.abbrev + "\"";
+
+			result +=	"}";
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "DB returned emtpy response");
+	}
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return result;
+}
+
+
+auto isValidToAddAirfareLimitByDirection(string from_id, string to_id, string agency_id, CMysql *db, CUser *user) -> string
+{
+	auto	error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(db->Query("SELECT `id` FROM `airfare_limits_by_direction` WHERE "
+						"(`from`=" + quoted(from_id) + " AND `to`=" + quoted(to_id) + " AND `agency_company_id`=" + quoted(agency_id) + ") "
+						"OR "
+						"(`to`=" + quoted(from_id) + " AND `from`=" + quoted(to_id) + " AND `agency_company_id`=" + quoted(agency_id) + ") "
+						 ";"))
+	{
+		error_message = gettext("this limit already exists");
+		MESSAGE_DEBUG("", "", error_message);
+	}
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return error_message;
+}
+
+auto	GetAirlineBookingsInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
+{
+	int		affected;
+	string	result;
+
+
+	struct ItemClass
+	{
+		string	id;
+		string	contract_sow_id;
+		string	checkin;
+		string	checkout;
+		string	trip_id;
+		string	destination;
+		string	passport_type;
+		string	status;
+		string	amount;
+		string	book_date;
+		string	voucher_filename;
+		string	eventTimestamp;
+	};
+	vector<ItemClass>		itemsList;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	affected = db->Query(sqlQuery);
+	if(affected)
+	{
+		for(int i = 0; i < affected; i++)
+		{
+			ItemClass	item;
+
+			item.id = db->Get(i, "id");
+			item.contract_sow_id = db->Get(i, "contract_sow_id");
+			item.checkin = db->Get(i, "checkin");
+			item.checkout = db->Get(i, "checkout");
+			item.trip_id = db->Get(i, "trip_id");
+			item.destination = db->Get(i, "destination");
+			item.passport_type = db->Get(i, "passport_type");
+			item.status = db->Get(i, "status");
+			item.amount = db->Get(i, "amount");
+			item.book_date = db->Get(i, "book_date");
+			item.voucher_filename = db->Get(i, "voucher_filename");
+			item.eventTimestamp = db->Get(i, "eventTimestamp");
+
+			itemsList.push_back(item);
+		}
+
+		for (const auto& item : itemsList)
+		{
+			if(result.length()) result += ",";
+			result +=	"{";
+
+
+			result += "\"id\":\"" + item.id + "\",";
+			result += "\"contract_sow_id\":\"" + item.contract_sow_id + "\",";
+			result += "\"checkin\":\"" + item.checkin + "\",";
+			result += "\"checkout\":\"" + item.checkout + "\",";
+			result += "\"trip_id\":\"" + item.trip_id + "\",";
+			result += "\"destination\":\"" + item.destination + "\",";
+			result += "\"passport_type\":\"" + item.passport_type + "\",";
+			result += "\"status\":\"" + item.status + "\",";
+			result += "\"amount\":\"" + item.amount + "\",";
+			result += "\"book_date\":\"" + item.book_date + "\",";
+			result += "\"voucher_filename\":\"" + item.voucher_filename + "\",";
+			result += "\"eventTimestamp\":\"" + item.eventTimestamp + "\"";
+
+			result +=	"}";
+		}
+	}
+	else
+	{
+		MESSAGE_DEBUG("", "", "user (" + user->GetID() + ") timecard is empty");
+	}
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return result;
+}
+
+auto	GetBTAllowanceInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	int		affected;
+	string	result;
+
+
+	struct ItemClass
+	{
+		string	id;
+		string	agency_company_id;
+		string	geo_country_id;
+		string	amount;
+	};
+	vector<ItemClass>		itemsList;
+
+
+	affected = db->Query(sqlQuery);
+	if(affected)
+	{
+		for(int i = 0; i < affected; i++)
+		{
+			ItemClass	item;
+
+			item.id = db->Get(i, "id");
+			item.agency_company_id = db->Get(i, "agency_company_id");
+			item.geo_country_id = db->Get(i, "geo_country_id");
+			item.amount = db->Get(i, "amount");
+
+			itemsList.push_back(item);
+		}
+
+		for (const auto& item : itemsList)
+		{
+			if(result.length()) result += ",";
+			result +=	"{";
+
+
+			result += "\"id\":\"" + item.id + "\",";
+			result += "\"agency_company_id\":\"" + item.agency_company_id + "\",";
+			result += "\"countries\":[" + GetCountryListInJSONFormat("SELECT  * FROM `geo_country` WHERE `id`=" + quoted(item.geo_country_id) + ";", db, user) + "],";
+			result += "\"amount\":\"" + item.amount + "\"";
+			result +=	"}";
+		}
+	}
+	else
+	{
+		MESSAGE_DEBUG("", "", "bt_allowance is empty");
+	}
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return result;
+}
+
+auto	amIonTheApproverListForSoW(const string &db_table, const string &sow_id, CMysql *db, CUser *user) -> bool
+{
+	return db->Query("SELECT `id` FROM `" + db_table + "` WHERE `contract_sow_id`=" + quoted(sow_id) + " AND `approver_user_id`=" + quoted(user->GetID()) + ";");
+}
+
+auto	GetHolidayCalendarInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	int		affected;
+	string	result;
+
+
+	struct ItemClass
+	{
+		string	id;
+		string	agency_company_id;
+		string	date;
+		string	type;
+		string	title;
+	};
+	vector<ItemClass>		itemsList;
+
+
+	affected = db->Query(sqlQuery);
+	if(affected)
+	{
+		for(int i = 0; i < affected; i++)
+		{
+			ItemClass	item;
+
+			item.id = db->Get(i, "id");
+			item.agency_company_id = db->Get(i, "agency_company_id");
+			item.date = db->Get(i, "date");
+			item.type = db->Get(i, "type");
+			item.title = db->Get(i, "title");
+
+			itemsList.push_back(item);
+		}
+
+		for (const auto& item : itemsList)
+		{
+			if(result.length()) result += ",";
+			result +=	"{";
+
+
+			result += "\"id\":\"" + item.id + "\",";
+			result += "\"agency_company_id\":\"" + item.agency_company_id + "\",";
+			result += "\"date\":\"" + item.date + "\",";
+			result += "\"type\":\"" + item.type + "\",";
+			result += "\"title\":\"" + item.title + "\"";
+			result +=	"}";
+		}
+	}
+	else
+	{
+		MESSAGE_DEBUG("", "", "holyday_calendar is empty");
+	}
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return result;
+}
+

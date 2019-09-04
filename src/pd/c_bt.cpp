@@ -17,10 +17,10 @@ string	C_ExpenseLineTemplate::CheckValidity(CMysql *db) const
 		error_message = "Необходимо указать название";
 		MESSAGE_DEBUG("C_ExpenseLineTemplate", "", "title is required");
 	}
-	else if((dom_type != "image") && (dom_type != "input"))
+	else if((dom_type != "image") && (dom_type != "input") && (dom_type != "allowance"))
 	{
 		error_message = "Некорректный тип документа";
-		MESSAGE_ERROR("C_ExpenseLineTemplate", "", "Incorrect document type (must be either input or image)");
+		MESSAGE_ERROR("C_ExpenseLineTemplate", "", "Incorrect document type (must be either input or image or allowance)");
 	}
 	else if(payment.empty())
 	{
@@ -722,7 +722,7 @@ string	C_Expense::CheckValidity(CMysql *db) const
 								// --- otherwise calculated value will be having more precision than PriceDomestic
 	{
 		result = "сумма в рублях не соответствует сумме в валюте";
-		MESSAGE_DEBUG("C_Expense", "", "price in rub.(" + string(GetPriceDomestic()) + ") not equal to foregn price(cost = price / nominal * value is " + string(GetPriceForeign() * GetCurrencyValue() / GetCurrencyNominal()) + " == " + string(GetPriceForeign()) + " / " + to_string(GetCurrencyNominal()) + " / " + string(GetCurrencyValue()) + ") in expense (id/random: " + GetID() + "/" + GetRandom() + ")");
+		MESSAGE_DEBUG("C_Expense", "", "price in rub.(" + string(GetPriceDomestic()) + ") not equal to foregn price(cost = price / nominal * value is " + string(GetPriceForeign() * GetCurrencyValue() / GetCurrencyNominal()) + " == " + string(GetPriceForeign()) + TIMECARD_ENTRY_TITLE_SEPARATOR + to_string(GetCurrencyNominal()) + TIMECARD_ENTRY_TITLE_SEPARATOR + string(GetCurrencyValue()) + ") in expense (id/random: " + GetID() + "/" + GetRandom() + ")");
 	}
 	else
 	{
@@ -1207,6 +1207,8 @@ string	C_BT::SaveToDB()
 		// --- submit BT, if needed
 		if(error_message.empty() && (GetAction() == "submit"))
 		{
+			// --- auto approve will be done in SubmitBT function
+/*
 			if(GetID().length() && GetSowID().length())
 			{
 				// --- auto_approve
@@ -1219,7 +1221,7 @@ string	C_BT::SaveToDB()
 				// doesn't assign anything to error_message to allow process to continue
 				MESSAGE_ERROR("C_BT", "", "fail to auto_approve due to bt.id(" + GetID() + ") is empty");
 			}
-
+*/
 			if(SubmitBT(GetID(), db, GetUser()))
 			{
 			}

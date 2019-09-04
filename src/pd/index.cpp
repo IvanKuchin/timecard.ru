@@ -865,7 +865,7 @@ int main()
 			}
 		}
 
-		// --- AJAX get data for profile
+		// --- AJAX get data for profile (called from JS Worker)
 		if(action == "AJAX_getDataForProfile")
 		{
 			ostringstream	ost;
@@ -1410,7 +1410,7 @@ int main()
 
 			indexPage.RegisterVariableForce("result", result.str());
 
-			if(!indexPage.SetTemplate("ajax_getJobTitles.htmlt"))
+			if(!indexPage.SetTemplate("json_response.htmlt"))
 			{
 				MESSAGE_ERROR("", action, "template file ajax_response.htmlt was missing");
 				throw CException("Template file was missing");
@@ -4224,28 +4224,13 @@ int main()
 		// --- AJAX change user password
 		if(action == "AJAX_changeUserPassword")
 		{
-			ostringstream	ostResult;
 			string			newPassword, cleanedPassword;
+			auto			error_message = ""s;
 
 			if(user.GetLogin() == "Guest")
 			{
-				ostringstream	ost;
-
-				{
-					
-					MESSAGE_DEBUG("", action, "re-login required");
-				}
-
-				ost.str("");
-				ost << "{\"result\": \"error\", \"description\": \"session lost. Need to relogin\"}";
-
-				indexPage.RegisterVariableForce("result", ost.str());
-
-				if(!indexPage.SetTemplate("json_response.htmlt"))
-				{
-					MESSAGE_ERROR("", action, "can't find template json_response.htmlt");
-					throw CExceptionHTML("user not activated");
-				} // if(!indexPage.SetTemplate("json_response.htmlt"))
+				error_message = "re-login required";
+				MESSAGE_DEBUG("", action, error_message);
 			}
 			else
 			{
@@ -4255,94 +4240,16 @@ int main()
 
 				if(cleanedPassword != newPassword)
 				{
-					MESSAGE_DEBUG("", action, "" + action + ": password having wrong symbols change the password to a new one [" + newPassword + "] <> [" + cleanedPassword + "]");
-
-					ostResult.str("");
-					ostResult << "{";
-					ostResult << "\"result\": \"error\",";
-					ostResult << "\"description\": \"Пароль не должен содержать символов [(кавычки), (перевод строки), '<>] \"";
-					ostResult << "}";
+					error_message = "Пароль не должен содержать символов [(кавычки), (перевод строки), '<>]";
+					MESSAGE_DEBUG("", action, error_message);
 				}
 				else
 				{
-					// --- newPassword not empty
-					if(newPassword.length() > 0)
-					{
-						ostringstream	ost;
-
-						ost.str("");
-						ost << "SELECT * FROM `users_passwd` WHERE `userID`='" << user.GetID() << "' and `passwd`='" << newPassword << "';";
-						if(db.Query(ost.str()))
-						{
-
-							MESSAGE_DEBUG("", action, "" + action + ": new password is the same as earlier");
-
-							ostResult.str("");
-							ostResult << "{";
-							ostResult << "\"result\": \"error\",";
-							ostResult << "\"description\": \"Пароль не должен совпадать с одним из прошлых паролей\"";
-							ostResult << "}";
-						}
-						else
-						{
-							// --- Change password
-							ostringstream	ost;
-
-							ost.str("");
-							ost << "update `users_passwd` set `isActive`='false' WHERE `userID`='" << user.GetID() << "';";
-							db.Query(ost.str());
-
-							ost.str("");
-							ost << "insert into `users_passwd` (`userID`, `passwd`, `isActive`, `eventTimestamp`) VALUES \
-									('" << user.GetID() << "', '" << newPassword << "', 'true', NOW());";
-							if(db.InsertQuery(ost.str()))
-							{
-								ostResult.str("");
-								ostResult << "{";
-								ostResult << "\"result\": \"success\",";
-								ostResult << "\"description\": \"\"";
-								ostResult << "}";
-							}
-							else
-							{
-								MESSAGE_ERROR("", action, "insert into users_passwd");
-
-								ostResult.str("");
-								ostResult << "{";
-								ostResult << "\"result\": \"error\",";
-								ostResult << "\"description\": \"Ошибка БД\"";
-								ostResult << "}";
-							}
-							
-							MESSAGE_DEBUG("", action, "password has been changed successfully");
-						}
-					} // if(newPassword.length() > 0)
-					else
-					{
-						// --- Empty title, message and image
-						ostResult.str("");
-						ostResult << "{";
-						ostResult << "\"result\": \"error\",";
-						ostResult << "\"description\": \"can't change to empty password\"";
-						ostResult << "}";
-
-						
-						MESSAGE_DEBUG("", action, "can't change to empty password");
-					}
-
+					error_message = user.ChangePasswordTo(newPassword);
 				}
-
-
 			} // if(user.GetLogin() == "Guest")
 
-			indexPage.RegisterVariableForce("result", ostResult.str());
-
-			if(!indexPage.SetTemplate("json_response.htmlt"))
-			{
-				MESSAGE_ERROR("", action, "can't find template json_response.htmlt");
-				throw CExceptionHTML("Template file was missing");
-			}
-
+			AJAX_ResponseTemplate(&indexPage, "", error_message);
 		}
 
 
@@ -4799,7 +4706,7 @@ int main()
 			sessid = indexPage.GetCookie("sessid");
 			if(sessid.length() > 0)
 			{
-				db.Query("UPDATE `sessions` SET `user`=\"Guest\", `expire`=\"1\" WHERE `id`=\"" + sessid + "\";");
+				db.Query("UPDATE `sessions` SET `user_id`=(SELECT `id` FROM `users` WHERE `login`=\"Guest\"), `expire`=\"1\" WHERE `id`=\"" + sessid + "\";");
 
 				if(!indexPage.Cookie_Expire()) {
 					MESSAGE_ERROR("", action, "in session expiration");
@@ -4976,60 +4883,37 @@ int main()
 			}
 			else
 			{
-				string		activator_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("activator_id"));
-				string		password_hash = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("password_hash"));
+				auto		activator_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("activator_id"));
+				auto		password_hash = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("password_hash"));
 
 				if(activator_id.length())
 				{
 					if(db.Query("SELECT `user` FROM `activators` WHERE `id`=\"" + activator_id + "\" and `type`=\"password_recovery\";"))
 					{
-						string		user_email = db.Get(0, "user");
+						auto		user_email = db.Get(0, "user");
+						CUser		user(&db);
 
-						if(db.Query("SELECT `id` FROM `users` WHERE `email`=\"" + user_email + "\";"))
+						if(user.GetFromDBbyEmail(user_email))
 						{
-							string		user_id = db.Get(0, "id");
-
-							if(db.Query("SELECT `eventTimestamp` FROM `users_passwd` WHERE `userID`=\"" + user_id + "\" and `passwd`=\"" + password_hash + "\";"))
+							if((error_message = user.ChangePasswordTo(password_hash)).empty())
 							{
-								string timestamp = db.Get(0, "eventTimestamp");
+								db.Query("DELETE FROM `activators` WHERE `user`=\"" + user_email + "\" AND `type`=\"password_recovery\";");
+								if(db.isError())
+								{
+									MESSAGE_ERROR("", "", "fail to clean-up table activators with user.email(" + user_email + ") and type(password_recovery)");
+								}
 
-								error_message = "этот пароль использовался " + GetHumanReadableTimeDifferenceFromNow(timestamp) + ". Выберите другой.";
-								MESSAGE_DEBUG("", action, "user.id(" + user_id + ") not allowd to re-use old password(" + timestamp + ").");
+								redirect_url = "/login?rand=" + GetRandom(10) + "&signinInputEmail=" + user_email;
 							}
 							else
 							{
-								db.Query("UPDATE `users_passwd` SET `isActive`=\"false\" WHERE `userID`=\"" + user_id + "\";");
-								if(db.isError())
-								{
-									error_message = "Ошибка обновления пароля";
-									MESSAGE_ERROR("", action, "fail to update users_passwd table user.id(" + user_id + ")");
-								}
-								else
-								{
-									long	passwd_id = db.InsertQuery("INSERT INTO `users_passwd` SET `userID`=\"" + user_id + "\", `passwd`=\"" + password_hash + "\", `isActive`=\"true\", `eventTimestamp`=NOW();");
-
-									if(passwd_id)
-									{
-										db.Query("DELETE FROM `activators` WHERE `user`=\"" + user_email + "\" AND `type`=\"password_recovery\";");
-										if(db.isError())
-										{
-											MESSAGE_ERROR("", action, "fail to clean-up table activators with user.id(" + user_id + ") and type(password_recovery)");
-										}
-
-										redirect_url = "/login?rand=" + GetRandom(10) + "&signinInputEmail=" + user_email;
-									}
-									else
-									{
-										error_message = "Ошибка обновления пароля";
-										MESSAGE_ERROR("", action, "fail to insert new passwd to users_passwd table");
-									}
-								}
+								MESSAGE_ERROR("", action, error_message);
 							}
 						}
 						else
 						{
-							error_message = "Неизвестный пользователь";
-							MESSAGE_ERROR("", action, "user_email(" + user_email + ") not found in the users table");
+							error_message = gettext("user not found");
+							MESSAGE_ERROR("", action, error_message);
 						}
 					}
 					else
@@ -5075,112 +4959,6 @@ int main()
 			MESSAGE_DEBUG("", action, "finish");
 		}
 
-		if(action == "login_user")
-		{
-			string			login, password, lng, sessid, rememberMe;
-			CUser			user;
-			ostringstream	ost1;
-			string			error_message = "";
-			string			redirect_url = "";
-			string			result = "";
-
-			MESSAGE_DEBUG("", action, "start");
-
-			sessid = indexPage.GetCookie("sessid");
-			if(sessid.length() < 5)
-			{
-				MESSAGE_DEBUG("", action, "cookie is not enabled or session didn't created");
-				error_message = "Разрешите cookie в браузере";
-			}
-			else
-			{
-				login = indexPage.GetVarsHandler()->Get("signinInputEmail");
-				password = indexPage.GetVarsHandler()->Get("signinInputPassword");
-				rememberMe = indexPage.GetVarsHandler()->Get("signinRemember");
-				lng = indexPage.GetLanguage();
-
-				user.SetDB(&db);
-				if(!user.GetFromDBbyEmail(login))
-				{
-					MESSAGE_DEBUG("", action, "user [" + user.GetLogin() + "] not found");
-					error_message = "Имя пользователя или пароль некорректны";
-				}
-				else
-				{
-
-					if(!user.isActive())
-					{
-						MESSAGE_ERROR("", action, "user [" + user.GetLogin() + "] not activated");
-						error_message = "Пользоатель не активирован. Проверьте email и нажмите на ссылку.";
-					}
-					else
-					{
-						if((password != user.GetPasswd()) || (user.GetPasswd() == ""))
-						{
-							MESSAGE_DEBUG("", action, "password incorrect for user [" + user.GetLogin() + "]");
-							error_message = "Имя пользователя или пароль некорректны";
-						}
-						else
-						{
-							{
-								MESSAGE_DEBUG("", action, "switching session (" + sessid + ") FROM Guest to user (" + user.GetLogin() + ")");
-							}
-
-							db.Query("UPDATE `sessions` SET `user`='" + user.GetEmail() + "', `ip`=\"" + getenv("REMOTE_ADDR") + "\", `expire`=\"" + (rememberMe == "remember-me" ? "0" : to_string(SESSION_LEN * 60)) + "\" WHERE `id`=\"" + sessid + "\";");
-							if(db.isError())
-							{
-								MESSAGE_DEBUG("", action, "fail to updte DB sessions`");
-								error_message = "Ошибка БД";
-							}
-							else
-							{
-								if(rememberMe == "remember-me")
-								{
-									if(!indexPage.CookieUpdateTS("sessid", 0))
-									{
-										MESSAGE_ERROR("", action, "setting cookie to session cookie (expire after browser closed)");
-									}
-								}
-
-								indexPage.RegisterVariableForce("loginUser", user.GetLogin());
-								indexPage.RegisterVariableForce("menu_main_active", "active");
-
-								redirect_url = "/" + GetDefaultActionFromUserType(&user, &db) + "?rand=" + GetRandom(10);
-
-								{
-									MESSAGE_DEBUG("", action, "redirect to " + redirect_url);
-								}
-							}
-						} // if(password != user.GetPasswd())
-					}  // if(!user.isActive())
-				}  // if(!user.isFound())
-			} // if(sessid.length() < 5)
-
-			if(error_message.empty())
-			{
-				result = "{\"result\":\"success\",\"redirect_url\":\"" + redirect_url + "\"}";
-			}
-			else
-			{
-				result = "{\"result\":\"error\",\"description\":\"" + error_message + "\", \"redirect_url\":\"" + redirect_url + "\"}";
-			}
-
-
-			// --- scoping
-			{
-				string			template_name = "json_response.htmlt";
-				indexPage.RegisterVariableForce("result", result);
-
-				if(!indexPage.SetTemplate(template_name))
-				{
-					MESSAGE_DEBUG("", action, "can't find template " + template_name);
-				} // if(!indexPage.SetTemplate("my_network.htmlt"))
-			}
-
-			MESSAGE_DEBUG("", action, "finish");
-
-		}
-
 		if(action == "AJAX_loginUser")
 		{
 			string		login, password, lng, sessid, rememberMe;
@@ -5208,23 +4986,18 @@ int main()
 			}
 			else
 			{
-				login = indexPage.GetVarsHandler()->Get("login");
-				password = indexPage.GetVarsHandler()->Get("password");
-				rememberMe = indexPage.GetVarsHandler()->Get("remember");
-				lng = indexPage.GetLanguage();
+				login		= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("login"));
+				password	= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("password"));
+				rememberMe	= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("remember"));
+				lng			= CheckHTTPParam_Text(indexPage.GetLanguage());
 
 				user.SetDB(&db);
-				if(!user.GetFromDBbyEmail(login))
-				{
-					MESSAGE_DEBUG("", action, "user [" + user.GetLogin() + "] not found");
 
-					ostResult.str("");
-					ostResult << "{";
-					ostResult << "\"result\": \"error\",";
-					ostResult << "\"description\": \"Почта или Пароль указаны не верно.\"";
-					ostResult << "}";
-				}
-				else
+				if	(
+						((login.find("@") != string::npos) && user.GetFromDBbyEmail(login)) ||
+						((login.find_first_not_of("1234567890+()- ") == string::npos) && user.GetFromDBbyPhone(login)) || 
+						(user.GetFromDBbyLogin(login))
+					)
 				{
 
 					if(!user.isActive())
@@ -5232,10 +5005,10 @@ int main()
 						MESSAGE_ERROR("", action, "user [" + user.GetLogin() + "] not activated");
 
 						ostResult.str("");
-						ostResult << "{";
-						ostResult << "\"result\": \"error\",";
-						ostResult << "\"description\": \"пользователь неактивирован, необходима активация\"";
-						ostResult << "}";
+						ostResult << "{"
+									"\"result\": \"error\","
+									"\"description\": \"пользователь неактивирован, необходима активация\""
+									"}";
 					}
 					else
 					{
@@ -5244,11 +5017,7 @@ int main()
 							if(db.Query("SELECT * FROM `users_passwd` WHERE `userID`=\"" + user.GetID() + "\" and `passwd`=\"" + password + "\";"))
 							{
 								// --- earlier password is user for user login
-
-								{
-									
-									MESSAGE_DEBUG("", action, "old password has been used for user [" + user.GetLogin() + "] login");
-								}
+								MESSAGE_DEBUG("", action, "old password has been used for user [" + user.GetLogin() + "] login");
 
 								ostResult.str("");
 								ostResult << "{";
@@ -5259,11 +5028,7 @@ int main()
 							else
 							{
 								// --- password is wrong for user
-
-								{
-									
-									MESSAGE_DEBUG("", action, "user [" + user.GetLogin() + "] failed to login due to passwd error");
-								}
+								MESSAGE_DEBUG("", action, "user [" + user.GetLogin() + "] failed to login due to passwd error");
 
 								ostResult.str("");
 								ostResult << "{";
@@ -5275,18 +5040,14 @@ int main()
 						}
 						else
 						{
+							MESSAGE_DEBUG("", action, "" + action + ": switching session (" + sessid + ") FROM Guest to user (" + user.GetLogin() + ")");
 
-							{
-								MESSAGE_DEBUG("", action, "" + action + ": switching session (" + sessid + ") FROM Guest to user (" + user.GetLogin() + ")");
-							}
-
-							db.Query("UPDATE `sessions` SET `user`=\"" + user.GetEmail() + "\", `ip`=\"" + getenv("REMOTE_ADDR") + "\", `expire`=\"" + (rememberMe == "remember-me" ? "0" : to_string(SESSION_LEN * 60)) + "\" WHERE `id`=\"" + sessid + "\";");
+							db.Query("UPDATE `sessions` SET `user_id`=\"" + user.GetID() + "\", `ip`=\"" + getenv("REMOTE_ADDR") + "\", `expire`=\"" + (rememberMe == "remember-me" ? "0" : to_string(SESSION_LEN * 60)) + "\" WHERE `id`=\"" + sessid + "\";");
 
 							if(db.isError())
 							{
-								{
-									MESSAGE_ERROR("", action, "updating `sessions` table");
-								}
+								MESSAGE_ERROR("", action, "updating `sessions` table");
+
 								ostResult.str("");
 								ostResult << "{";
 								ostResult << "\"result\": \"error\",";
@@ -5317,7 +5078,17 @@ int main()
 							}
 						} // if(password != user.GetPasswd())
 					}  // if(!user.isActive())
-				}  // if(!user.isFound())
+				}
+				else
+				{
+					MESSAGE_DEBUG("", action, "user [" + user.GetLogin() + "] not found");
+
+					ostResult.str("");
+					ostResult << "{";
+					ostResult << "\"result\": \"error\",";
+					ostResult << "\"description\": \"Почта или Пароль указаны не верно.\"";
+					ostResult << "}";
+				}
 			} // if(sessid.length() < 5)
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
@@ -5409,7 +5180,7 @@ int main()
 								userTemporary.SetPasswd(regPassword);
 								userTemporary.SetCountry(indexPage.GetCountry());
 								userTemporary.SetCity(indexPage.GetCity());
-								userTemporary.SetType("user");
+								userTemporary.SetType("no role");
 								userTemporary.SetIP(getenv("REMOTE_ADDR"));
 								userTemporary.SetLng(indexPage.GetLanguage());
 								userTemporary.SetDB(&db);
@@ -5544,20 +5315,14 @@ int main()
 							}
 							else 
 							{
-								ostringstream	ost1;
-
-								{
-									MESSAGE_DEBUG("", action, "switching session (" + sessid + ") FROM Guest to user (" + user.GetLogin() + ")");
-								}
+								MESSAGE_DEBUG("", action, "switching session (" + sessid + ") FROM Guest to user (" + user.GetLogin() + ")");
 
 								// --- 2delete if login works till Nov 1
 								// ost1.str("");
 								// ost1 << "update `users` set `last_online`=NOW(), `ip`='" << getenv("REMOTE_ADDR") << "' WHERE `login`='" << user.GetLogin() << "';";
 								// db.Query(ost1.str());
 
-								ost1.str("");
-								ost1 << "update `sessions` set `user`='" << login << "', `ip`='" << getenv("REMOTE_ADDR") << "', `expire`=" << (rememberMe == "remember-me" ? 0 : SESSION_LEN * 60) << " WHERE `id`='" << sessid << "';";
-								db.Query(ost1.str());
+								db.Query("UPDATE `sessions` SET `user_id`='" + user.GetID() + "', `ip`='" + getenv("REMOTE_ADDR") + "', `expire`=" + to_string(rememberMe == "remember-me" ? 0 : SESSION_LEN * 60) + " WHERE `id`='" + sessid + "';");
 
 								if(rememberMe == "remember-me") 
 								{
@@ -5571,12 +5336,9 @@ int main()
 								indexPage.RegisterVariableForce("menu_main_active", "active");
 
 
-								{
-									MESSAGE_DEBUG("", action, "redirection to \"news_feed?rand=xxxxxx\"");
-								}
-								ost1.str("");
-								ost1 << "/news_feed?rand=" << GetRandom(10);
-								indexPage.Redirect(ost1.str());
+								MESSAGE_DEBUG("", action, "redirection to default action to user role");
+
+								indexPage.Redirect("/" + GetDefaultActionFromUserType(&user, &db) + "?rand=" + GetRandom(10));
 
 							}  // if(!user.isActive()) 
 						}  // if(!user.isFound()) 

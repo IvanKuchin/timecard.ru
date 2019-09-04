@@ -499,10 +499,7 @@ void CCgi::Redirect(string url)
 {
     string	result;
 
-	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]:HTML redirect to: " + url);
-	}
+	MESSAGE_DEBUG("", "", "HTML redirect to: " + url);
 
     RegisterVariableForce("redirect_url", url);
 
@@ -513,10 +510,7 @@ void CCgi::RedirectHTTP(string url)
 {
     string	result;
 
-	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]:HTTP redirect to: " + url);
-	}
+	MESSAGE_DEBUG("", "", "HTTP redirect to: " + url);
 
 	cout << "Location: " << url << std::endl;
 	cout << "Content-Type: text/html" << std::endl;

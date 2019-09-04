@@ -308,19 +308,17 @@ string CCookies::GetAll()
 
 void CCookies::RegisterCookieVariables(CVars *v)
 {
-	vector<CCookie *>::iterator	im;
-
 	MESSAGE_DEBUG("", "", " start ");
 
-	for(im = cookies.begin(); im < cookies.end(); ++im)
+	for(auto im = cookies.begin(); im != cookies.end(); ++im)
+	{
 		if((*im)->GetName().length())
 			v->Add((*im)->GetName(), (*im)->GetValue());
 		else
 		{
-			{
-				MESSAGE_ERROR("", "", "ERROR: cookie name is empty (" + (*im)->GetName() + " = " + (*im)->GetValue() + ")");
-			}
+			MESSAGE_ERROR("", "", "ERROR: cookie name is empty (" + (*im)->GetName() + " = " + (*im)->GetValue() + ")");
 		}
+	}
 
 	MESSAGE_DEBUG("", "", " finish ");
 }

@@ -457,6 +457,41 @@ int main(void)
 			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 		}
 
+		if(action == "AJAX_getLocalityAutocompleteList_2")
+		{
+			MESSAGE_DEBUG("", action, "start");
+
+			auto			locality = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("term"));
+			auto			template_name = "json_response.htmlt"s;
+			auto			error_message = ""s;
+			auto			success_message = ""s;
+
+			if(locality.length())
+			{
+				auto	affected = db.Query("SELECT * FROM `geo_locality_view` WHERE `geo_locality_title` LIKE \"%" + locality + "%\" LIMIT 0, 20;");
+
+				for(int i = 0; i < affected; ++i)
+				{
+					if(i) success_message += ",";
+					success_message += "{"
+											"\"id\":\"" + db.Get(i, "geo_locality_id") + "\","
+											"\"country_id\":\"" + db.Get(i, "geo_country_id") + "\","
+					  						"\"label\":\"" + db.Get(i, "geo_locality_title") + ", " + db.Get(i, "geo_region_title") + ", " + db.Get(i, "geo_country_title") + "\""
+				  						"}";
+				}				
+			}
+			else
+			{
+				error_message = gettext("mandatory parameter missed");
+				MESSAGE_DEBUG("", "", error_message);
+			}
+
+			indexPage.RegisterVariableForce("result", "[" + success_message + "]");
+			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
+
 		if(action == "AJAX_getPositionAutocompleteList")
 		{
 			auto			position = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("position"));
@@ -564,7 +599,7 @@ int main(void)
 
 		if(action == "AJAX_getAviaBonusAutocompleteList")
 		{
-			string			name = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("name"));
+			string			name = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("term"));
 			string			template_name = "json_response.htmlt";
 			string			error_message = "";
 			string			success_message = "";
@@ -577,14 +612,12 @@ int main(void)
 				int	affected = db.Query("SELECT * FROM `airlines` WHERE `code` LIKE \"%" + name + "%\" OR `description_rus` LIKE \"%" + name + "%\" OR `description_eng` LIKE \"%" + name + "%\" LIMIT 0, 20;");
 				if(affected)
 				{
-					success_message = ",\"autocomplete_list\":[";
 					for(int i = 0; i < affected; ++i)
 					{
 						if(i) success_message += ",";
 						success_message += "{\"id\":\"" + db.Get(i, "id") + "\","
-								  + "\"label\":\"" + db.Get(i, "description_rus") + " / " + db.Get(i, "description_eng") + " / " + db.Get(i, "code") + "\"}";
+								  + "\"label\":\"" + db.Get(i, "description_rus") + TIMECARD_ENTRY_TITLE_SEPARATOR + db.Get(i, "description_eng") + TIMECARD_ENTRY_TITLE_SEPARATOR + db.Get(i, "code") + "\"}";
 					}
-					success_message += "]";
 				}
 				else
 				{
@@ -600,13 +633,13 @@ int main(void)
 
 			if(error_message.empty())
 			{
-					ostResult << "{\"result\":\"success\""  << success_message << "}";
+					ostResult << "[" << success_message << "]";
 			}
 			else
 			{
 				MESSAGE_DEBUG("", action, "failed");
 				ostResult.str("");
-				ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+				ostResult << "[]";
 			}
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
@@ -661,13 +694,77 @@ int main(void)
 
 			if(query.length())
 			{
-				int	affected = db.Query("SELECT * FROM `airports` WHERE (`city_name` LIKE \"%" + query + "%\") OR (`airport_code` LIKE \"%" + query + "%\") OR (`airport_name` LIKE \"%" + query + "%\") OR ((`country_name` LIKE \"%" + query + "%\")) LIMIT 0, 20;");
+				int	affected = db.Query("SELECT * FROM `airports_view` WHERE (`city_name` LIKE \"%" + query + "%\") OR (`airport_code` LIKE \"%" + query + "%\") OR (`airport_name` LIKE \"%" + query + "%\") OR (`country_name` LIKE \"%" + query + "%\") LIMIT 0, 20;");
 
 				for(int i = 0; i < affected; ++i)
 				{
 					if(i) success_message += ",";
 					success_message += "{\"id\":\"" + db.Get(i, "airport_code") + "\","
-							  + "\"label\":\"" + db.Get(i, "airport_name") + " (" + db.Get(i, "city_name") + " / " + db.Get(i, "country_name") + ")\"}";
+							  + "\"label\":\"" + db.Get(i, "airport_name") + " (" + db.Get(i, "city_name") + TIMECARD_ENTRY_TITLE_SEPARATOR + db.Get(i, "country_name") + ")\"}";
+				}
+			}
+			else
+			{
+				MESSAGE_DEBUG("", "", "query is empty");
+			}
+
+			indexPage.RegisterVariableForce("result", "[" + success_message + "]");
+
+			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+		}
+
+		if(action == "AJAX_getAirportCountryAutocompleteList")
+		{
+			string			query = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("term"));
+			string			template_name = "json_response.htmlt";
+			string			error_message = "";
+			string			success_message = "";
+			ostringstream	ostResult;
+
+			ostResult.str("");
+
+			if(query.length())
+			{
+				int	affected = db.Query("SELECT * FROM `airport_countries` WHERE (`title` LIKE \"%" + query + "%\") LIMIT 0, 20;");
+
+				for(int i = 0; i < affected; ++i)
+				{
+					if(i) success_message += ",";
+					
+					success_message += "{\"id\":\"" + db.Get(i, "id") + "\","
+									  + "\"label\":\"" + db.Get(i, "title") + "\"}";
+				}
+			}
+			else
+			{
+				MESSAGE_DEBUG("", "", "query is empty");
+			}
+
+			indexPage.RegisterVariableForce("result", "[" + success_message + "]");
+
+			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+		}
+
+		if(action == "AJAX_getCountryAutocompleteList")
+		{
+			string			query = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("term"));
+			string			template_name = "json_response.htmlt";
+			string			error_message = "";
+			string			success_message = "";
+			ostringstream	ostResult;
+
+			ostResult.str("");
+
+			if(query.length())
+			{
+				int	affected = db.Query("SELECT * FROM `geo_country` WHERE (`title` LIKE \"%" + query + "%\") LIMIT 0, 20;");
+
+				for(int i = 0; i < affected; ++i)
+				{
+					if(i) success_message += ",";
+					
+					success_message += "{\"id\":\"" + db.Get(i, "id") + "\","
+									  + "\"label\":\"" + db.Get(i, "title") + "\"}";
 				}
 			}
 			else
@@ -1040,6 +1137,27 @@ int main(void)
 			indexPage.RegisterVariableForce("result", ostResult.str());
 
 			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+		}
+
+		if(action == "AJAX_submitUnknownLocality")
+		{
+			MESSAGE_DEBUG("", action, "start");
+
+			auto			success_message = ""s;
+			auto			error_message = ""s;
+
+			if(db.InsertQuery("INSERT INTO `geo_locality_unknown` SET `locality`=" + quoted(indexPage.GetVarsHandler()->Get("value")) + ", `eventTimestamp`=NOW();"))
+			{
+			}
+			else
+			{
+				error_message = gettext("SQL syntax error");
+				MESSAGE_ERROR("", action, error_message);
+			}
+
+			AJAX_ResponseTemplate(&indexPage, success_message, error_message);
+
+			MESSAGE_DEBUG("", action, "finish");
 		}
 
 
