@@ -82,6 +82,7 @@ sub RestoreFiles
 	foreach my $file (@files)
 	{
 		system("cp ".$file.".original"." ".$file);
+		unlink $file.".original";
 	}
 
 	return $result;

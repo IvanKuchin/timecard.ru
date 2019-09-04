@@ -581,7 +581,7 @@ string		C_TC_BT_Submit::Submit(const string tc_bt_type_param, const string &id_p
 		}
 		else
 		{
-			error_message = gettext("id is not defined");
+			error_message = gettext("id is empty");
 			MESSAGE_ERROR("", "", error_message);
 		}
 	}

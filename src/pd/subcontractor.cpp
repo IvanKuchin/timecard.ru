@@ -2456,7 +2456,7 @@ int main()
 					}
 					else
 					{
-						error_message = gettext("you are no authorized");
+						error_message = gettext("you are not authorized");
 						MESSAGE_ERROR("", action, error_message);
 					}
 

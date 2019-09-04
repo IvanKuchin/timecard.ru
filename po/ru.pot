@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-28 17:35-0400\n"
+"POT-Creation-Date: 2019-09-04 16:25-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -313,6 +313,9 @@ msgstr "Подпись"
 
 msgid "SoW"
 msgstr "Договор"
+
+msgid "SoW not known"
+msgstr "SoW не найден"
 
 msgid "SoW number already exists"
 msgstr "Договор с таким номером уже есть"
@@ -631,6 +634,9 @@ msgstr "изменилась дата окончания контракта"
 
 msgid "end date is empty"
 msgstr "не указана дата окончания"
+
+msgid "entity type is unknown"
+msgstr "неизвестный тип"
 
 msgid "exceeds allowed size"
 msgstr "превышает допустимый размер"
@@ -989,6 +995,9 @@ msgstr "идентификатор поездки не найден"
 msgid "type is empty"
 msgstr "не указан тип"
 
+msgid "type is not defined"
+msgstr "тип не указан"
+
 msgid "unable to create psow"
 msgstr "не удалось создать PSoW"
 
@@ -1000,6 +1009,9 @@ msgstr "неизвестный метод"
 
 msgid "unknown smartway method"
 msgstr "неизвестный Smartway метод"
+
+msgid "unknown type"
+msgstr "неизвестный тип"
 
 msgid "unsupported action"
 msgstr "неизвестное действие"
@@ -1043,11 +1055,11 @@ msgstr "с"
 msgid "wrong format"
 msgstr "некорректный формат"
 
-msgid "you are no authorized"
-msgstr "у Вас недостаточно прав"
-
 msgid "you are not assigned to customer"
 msgstr "вы не назначены на этого заказчика"
+
+msgid "you are not authorized"
+msgstr "у Вас недостаточно прав"
 
 msgid "za"
 msgstr "за"
