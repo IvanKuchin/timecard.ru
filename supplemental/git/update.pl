@@ -3,7 +3,7 @@
 use Cwd;
 use strict;
 
-my	@anonimazition = ("src/pi/include/localy.h.in");
+my	@anonimazition = ("src/pi/include/localy.h.in", "tests/selenium/login.py");
 my	$DEBUG;
 
 $|++;
@@ -82,7 +82,7 @@ sub RestoreFiles
 	foreach my $file (@files)
 	{
 		system("cp ".$file.".original"." ".$file);
-		# unlink $file.".original";
+		unlink $file.".original";
 	}
 
 	return $result;
@@ -148,7 +148,6 @@ sub HideSmthInFile
 
     while(<$inF>)
     {
-		# s/(#define\s+[\w\d]+$hidden_word\s+)"(.*)"/\1"\$\{PROJECT_NAME\}"/g;
 		s/(\s+[\w\d]+$hidden_word[\s\=]+)"(.*)"/\1"\$\{PROJECT_NAME\}"/g;
 		print $outF $_;
     }
