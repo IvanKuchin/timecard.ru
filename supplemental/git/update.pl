@@ -148,7 +148,7 @@ sub HideSmthInFile
 
     while(<$inF>)
     {
-		s/(\s+[\w\d]+$hidden_word[\s\=]+)"(.*)"/\1"\$\{PROJECT_NAME\}"/g;
+		s/([\w\d]+$hidden_word[\s\=]+)"(.*)"/\1"\$\{PROJECT_NAME\}"/g;
 		print $outF $_;
     }
 

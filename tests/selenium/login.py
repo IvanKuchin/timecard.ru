@@ -7,8 +7,8 @@ from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
 
 test_counter_global: int = 1
-TEST_LOGIN = "ivan.kuchin"
-TEST_PASSWORD = "123"
+TEST_LOGIN = "${PROJECT_NAME}"
+TEST_PASSWORD = "${PROJECT_NAME}"
 
 
 def create_incognito_window():
