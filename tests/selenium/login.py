@@ -151,13 +151,13 @@ if __name__ == "__main__":
     else:
         test_success("test_anonymous_feed")
 
-    error_message: str = test_normal_login(incognito_win, LOGIN, PASSWORD)
+    error_message: str = test_normal_login(incognito_win, TEST_LOGIN, TEST_PASSWORD)
     if len(error_message) != 0:
         test_error(error_message)
     else:
         test_success("test_normal_login")
 
-    error_message: str = test_cookieless_login(incognito_win, LOGIN, PASSWORD)
+    error_message: str = test_cookieless_login(incognito_win, TEST_LOGIN, TEST_PASSWORD)
     if len(error_message) != 0:
         test_error(error_message)
     else:
