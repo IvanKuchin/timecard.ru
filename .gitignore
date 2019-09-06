@@ -79,4 +79,4 @@ ssl/
 ftpsync.settings
 sql
 sublime/
-localy.h.in.original
+*.original
