@@ -82,7 +82,7 @@ sub RestoreFiles
 	foreach my $file (@files)
 	{
 		system("cp ".$file.".original"." ".$file);
-		unlink $file.".original";
+		# unlink $file.".original";
 	}
 
 	return $result;
@@ -148,7 +148,8 @@ sub HideSmthInFile
 
     while(<$inF>)
     {
-		s/(#define\s+[\w\d]+$hidden_word\s+)"(.*)"/\1"\$\{PROJECT_NAME\}"/g;
+		# s/(#define\s+[\w\d]+$hidden_word\s+)"(.*)"/\1"\$\{PROJECT_NAME\}"/g;
+		s/(\s+[\w\d]+$hidden_word[\s\=]+)"(.*)"/\1"\$\{PROJECT_NAME\}"/g;
 		print $outF $_;
     }
 
