@@ -433,6 +433,7 @@ if($action =~ /^--restore/)
 	# that way c-compiler can spend a lot of time in "CPU-wait" state, rather than use CPU-cycles
 	#
 	system("cd ".$folders_to_backup{SRCDIR}."/build && nice -5 make -j2");
+	system("cd ".$folders_to_backup{SRCDIR}."/build && ctest ");
 	system("cd ".$folders_to_backup{SRCDIR}."/build && make install");
 	system("cd ".$folders_to_backup{SRCDIR}."/build && make clean");
 

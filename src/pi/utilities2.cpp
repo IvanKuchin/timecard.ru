@@ -2568,3 +2568,291 @@ auto DateInPast(string date_to_check) -> bool
 
 	return result;
 }
+
+auto	GetHelpDeskTicketsInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	int		affected;
+	string	result;
+
+
+	struct ItemClass
+	{
+		string	id;
+		string	customer_user_id;
+		string	severity;
+		string	title;
+	};
+	vector<ItemClass>		itemsList;
+
+
+	affected = db->Query(sqlQuery);
+	if(affected)
+	{
+		for(int i = 0; i < affected; i++)
+		{
+			ItemClass	item;
+
+			item.id = db->Get(i, "id");
+			item.customer_user_id = db->Get(i, "customer_user_id");
+			item.title = db->Get(i, "title");
+
+			itemsList.push_back(item);
+		}
+
+		for (const auto& item : itemsList)
+		{
+			if(result.length()) result += ",";
+			result +=	"{";
+
+
+			result += "\"id\":\"" + item.id + "\",";
+			result += "\"customer_user_id\":\"" + item.customer_user_id + "\",";
+			result += "\"users\":[" + GetUserListInJSONFormat("SELECT * FROM `users` WHERE `id`=" + quoted(item.customer_user_id) + ";", db, user) + "],";
+			result += "\"title\":\"" + item.title + "\",";
+			result += "\"history\":[" + GetHelpDeskTicketHistoryInJSONFormat("SELECT * FROM `helpdesk_ticket_history` WHERE `helpdesk_ticket_id`=\"" + item.id + "\";", db, user) + "]";
+			result +=	"}";
+		}
+	}
+	else
+	{
+		MESSAGE_DEBUG("", "", "no ticket found");
+	}
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return result;
+}
+
+auto	GetHelpDeskTicketHistoryInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	int		affected;
+	string	result;
+
+
+	struct ItemClass
+	{
+		string	id;
+		string	customer_user_id;
+		string	user_id;
+		string	state;
+		string	severity;
+		string	description;
+		string	eventTimestamp;
+	};
+	vector<ItemClass>		itemsList;
+
+
+	affected = db->Query(sqlQuery);
+	if(affected)
+	{
+		for(int i = 0; i < affected; i++)
+		{
+			ItemClass	item;
+
+			item.id = db->Get(i, "id");
+			item.user_id = db->Get(i, "user_id");
+			item.state = db->Get(i, "state");
+			item.severity = db->Get(i, "severity");
+			item.description = db->Get(i, "description");
+			item.eventTimestamp = db->Get(i, "eventTimestamp");
+
+			itemsList.push_back(item);
+		}
+
+		for (const auto& item : itemsList)
+		{
+			if(result.length()) result += ",";
+			result +=	"{";
+
+
+			result += "\"id\":\"" + item.id + "\",";
+			result += "\"users\":[" + GetUserListInJSONFormat("SELECT * FROM `users` WHERE `id`=" + quoted(item.user_id) + ";", db, user) + "],";
+			result += "\"files\":[" + GetHelpDeskTicketAttachInJSONFormat("SELECT * FROM `helpdesk_ticket_attaches` WHERE `helpdesk_ticket_history_id`=" + quoted(item.id) + ";", db, user) + "],";
+			result += "\"state\":\"" + item.state + "\",";
+			result += "\"severity\":\"" + item.severity + "\",";
+			result += "\"description\":\"" + item.description + "\",";
+			result += "\"eventTimestamp\":\"" + item.eventTimestamp + "\"";
+			result +=	"}";
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "no history found for helpdesk_ticket (" + sqlQuery + ")");
+	}
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return result;
+}
+
+auto	GetHelpDeskTicketAttachInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	int		affected;
+	string	result;
+
+
+	struct ItemClass
+	{
+		string	id;
+		string	helpdesk_ticket_history_id;
+		string	filename;
+	};
+	vector<ItemClass>		itemsList;
+
+
+	affected = db->Query(sqlQuery);
+	if(affected)
+	{
+		for(int i = 0; i < affected; i++)
+		{
+			ItemClass	item;
+
+			item.id = db->Get(i, "id");
+			item.helpdesk_ticket_history_id = db->Get(i, "helpdesk_ticket_history_id");
+			item.filename = db->Get(i, "filename");
+
+			itemsList.push_back(item);
+		}
+
+		for (const auto& item : itemsList)
+		{
+			if(result.length()) result += ",";
+			result +=	"{";
+
+
+			result += "\"id\":\"" + item.id + "\",";
+			result += "\"helpdesk_ticket_history_id\":\"" + item.helpdesk_ticket_history_id + "\",";
+			result += "\"filename\":\"" + item.filename + "\"";
+			result +=	"}";
+		}
+	}
+	else
+	{
+		MESSAGE_DEBUG("", "", "no attaches to the helpdesk_ticket_history");
+	}
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return result;
+}
+
+auto CleanupFilename(string filename) -> string
+{
+	MESSAGE_DEBUG("", "", "start (" + filename + ")");
+
+	auto found = filename.find_first_not_of("."); // --- type derivation;
+
+	while((found = filename.find_first_not_of("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890_-().")) != string::npos)
+	{
+		filename.replace(found, 1, "_");
+	}
+
+	MESSAGE_DEBUG("", "", "finish (" + filename + ")");
+
+	return filename;
+}
+
+auto	isHelpdeskTicketOwner(string ticket_id, string user_id, CMysql *db, CUser *user) -> bool
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	result = false;
+
+	if(db->Query("SELECT `id` FROM `helpdesk_tickets` WHERE `id`=" + quoted(ticket_id) + " AND `customer_user_id`=" + quoted(user_id) + ";"))
+	{
+		result = true;
+	}
+	else
+	{
+		MESSAGE_DEBUG("", "", "helpdesk_ticket.id(" + ticket_id + ") not owned by user.id(" + user_id + ")");
+	}
+
+	MESSAGE_DEBUG("", "", "finish (result = " + to_string(result) + ")");
+
+	return result;
+}
+
+auto isUserAllowedToChangeTicket(string ticket_id, string user_id, CMysql *db, CUser *user) -> string
+{
+	MESSAGE_DEBUG("", "", "start (ticket_id:" + ticket_id + ", user_id:" + user_id + ")");
+
+	auto	result	 = ""s;
+
+	if((db->Query("SELECT `id` FROM `users` WHERE "
+					"(`id`=" + quoted(user_id) + " AND `type`=" + quoted(HELPDESK_USER_ROLE) + ") "
+					"OR "
+					"(" + quoted(user_id) + "=(SELECT `customer_user_id` FROM `helpdesk_tickets` WHERE `id`=" + quoted(ticket_id) + ")) "
+					"LIMIT 0,1;"))
+		)
+	{
+	}
+	else
+	{
+		result = gettext("you are not authorized");
+		MESSAGE_DEBUG("", "", "user (" + user_id + ") not allowed to change ticket")
+	}
+
+	MESSAGE_DEBUG("", "", "finish (" + result + ")");
+
+	return result;
+}
+
+auto	GetFAQInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	int		affected;
+	string	result;
+
+
+	struct ItemClass
+	{
+		string	id;
+		string	title;
+		string	description;
+	};
+	vector<ItemClass>		itemsList;
+
+
+	affected = db->Query(sqlQuery);
+	if(affected)
+	{
+		for(int i = 0; i < affected; i++)
+		{
+			ItemClass	item;
+
+			item.id = db->Get(i, "id");
+			item.title = db->Get(i, "title");
+			item.description = db->Get(i, "description");
+
+			itemsList.push_back(item);
+		}
+
+		for (const auto& item : itemsList)
+		{
+			if(result.length()) result += ",";
+			result +=	"{";
+
+
+			result += "\"id\":\"" + item.id + "\",";
+			result += "\"title\":\"" + item.title + "\",";
+			result += "\"description\":\"" + item.description + "\"";
+			result +=	"}";
+		}
+	}
+	else
+	{
+		MESSAGE_DEBUG("", "", "no attaches to the helpdesk_ticket_history");
+	}
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return result;
+}
+

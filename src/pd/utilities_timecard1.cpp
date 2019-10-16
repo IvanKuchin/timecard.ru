@@ -4979,80 +4979,62 @@ string CreateTaskBelongsToAgency(string customer, string project, string task, s
 			{
 				if(agency_id.length())
 				{
-					int affected = db->Query(
-						"SELECT `id` FROM `contracts_sow` WHERE `agency_company_id`=\"" + agency_id + "\";"
-					);
-					if(affected)
-					{
-						string	sow_list = "";
-
-						for(int i = 0; i < affected; ++i)
-						{
-							if(i) sow_list += ",";
-							sow_list += db->Get(i, "id");
-						}
-
-						// --- try to define project_id from customers and projects belong to SoW
-						if(db->Query(
-							    "SELECT `id` FROM `timecard_projects` WHERE `title`=\"" + project + "\" AND `timecard_customers_id` IN ("
-							        "SELECT `id` FROM `timecard_customers` WHERE `title`=\"" + customer + "\" AND `agency_company_id`=\"" + agency_id + "\""
-							    ")"
-						))
-						{
-							project_id = db->Get(0, "id");
-							customer_id = "fake number";
-						}
-						else
-						{
-							// --- try to define customer_id from customers belong to SoW
-							if(db->Query(
+					// --- try to define project_id from customers and projects belong to SoW
+					if(db->Query(
+						    "SELECT `id` FROM `timecard_projects` WHERE `title`=\"" + project + "\" AND `timecard_customers_id` IN ("
 						        "SELECT `id` FROM `timecard_customers` WHERE `title`=\"" + customer + "\" AND `agency_company_id`=\"" + agency_id + "\""
-							))
-							{
-								customer_id = db->Get(0, "id");
-							}
-							else
-							{
-								MESSAGE_DEBUG("", "", "neither customer nor project exists in agency portfolio");
-							}
-						}
-
-						if(customer_id.empty())
-						{
-							long int	temp = db->InsertQuery("INSERT INTO `timecard_customers` (`agency_company_id`,`title`,`eventTimestamp`) VALUES (\"" + agency_id + "\", \"" + customer + "\", UNIX_TIMESTAMP());");
-
-							if(temp) { customer_id = to_string(temp); }
-							else
-							{
-								MESSAGE_ERROR("", "", "fail to insert to db");
-							}
-						}
-
-						if(customer_id.length() && project_id.empty())
-						{
-							long int	temp = db->InsertQuery("INSERT INTO `timecard_projects` (`timecard_customers_id`,`title`,`eventTimestamp`) VALUES (\"" + customer_id + "\",\"" + project + "\", UNIX_TIMESTAMP());");
-
-							if(temp) { project_id = to_string(temp); }
-							else
-							{
-								MESSAGE_ERROR("", "", "fail to insert to db");
-							}
-						}
-
-						if(customer_id.length() && project_id.length() && task_id.empty())
-						{
-							long int	temp = db->InsertQuery("INSERT INTO `timecard_tasks` (`timecard_projects_id`,`title`,`eventTimestamp`) VALUES (\"" + project_id + "\",\"" + task + "\", UNIX_TIMESTAMP());");
-
-							if(temp) { task_id = to_string(temp); }
-							else
-							{
-								MESSAGE_ERROR("", "", "fail to insert to db");
-							}
-						}
+						    ")"
+					))
+					{
+						project_id = db->Get(0, "id");
+						customer_id = "fake number";
 					}
 					else
 					{
-						MESSAGE_ERROR("", "", "fail to define all sow's signed with the same agency.id(" + agency_id + ")");
+						// --- try to define customer_id from customers belong to SoW
+						if(db->Query(
+					        "SELECT `id` FROM `timecard_customers` WHERE `title`=\"" + customer + "\" AND `agency_company_id`=\"" + agency_id + "\""
+						))
+						{
+							customer_id = db->Get(0, "id");
+						}
+						else
+						{
+							MESSAGE_DEBUG("", "", "neither customer nor project exists in agency portfolio");
+						}
+					}
+
+					if(customer_id.empty())
+					{
+						long int	temp = db->InsertQuery("INSERT INTO `timecard_customers` (`agency_company_id`,`title`,`eventTimestamp`) VALUES (\"" + agency_id + "\", \"" + customer + "\", UNIX_TIMESTAMP());");
+
+						if(temp) { customer_id = to_string(temp); }
+						else
+						{
+							MESSAGE_ERROR("", "", "fail to insert to db");
+						}
+					}
+
+					if(customer_id.length() && project_id.empty())
+					{
+						long int	temp = db->InsertQuery("INSERT INTO `timecard_projects` (`timecard_customers_id`,`title`,`eventTimestamp`) VALUES (\"" + customer_id + "\",\"" + project + "\", UNIX_TIMESTAMP());");
+
+						if(temp) { project_id = to_string(temp); }
+						else
+						{
+							MESSAGE_ERROR("", "", "fail to insert to db");
+						}
+					}
+
+					if(customer_id.length() && project_id.length() && task_id.empty())
+					{
+						long int	temp = db->InsertQuery("INSERT INTO `timecard_tasks` (`timecard_projects_id`,`title`,`eventTimestamp`) VALUES (\"" + project_id + "\",\"" + task + "\", UNIX_TIMESTAMP());");
+
+						if(temp) { task_id = to_string(temp); }
+						else
+						{
+							MESSAGE_ERROR("", "", "fail to insert to db");
+						}
 					}
 				}
 				else

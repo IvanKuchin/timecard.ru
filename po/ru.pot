@@ -737,6 +737,9 @@ msgstr "не указан идентификатор"
 msgid "in scope"
 msgstr "в рамках"
 
+msgid "opened"
+msgstr "открыт"
+
 msgid "incorrect confirmation code"
 msgstr "некорректный код"
 

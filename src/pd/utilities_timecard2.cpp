@@ -2667,7 +2667,7 @@ bool areThereTimecardsWithExpiredPayment(string multiplier, string sow_sql, CMys
 
 		if(payment_period != "0")
 		{
-			auto affected = db->Query("SELECT COUNT(*) FROM `timecards` WHERE "
+			auto affected = db->Query("SELECT `id` FROM `timecards` WHERE "
 															"`payed_date`<UNIX_TIMESTAMP() - 3600 * 24 * " + payment_period + " * " + multiplier + " "
 															"AND "
 															"`status`=\"approved\" "
@@ -2707,7 +2707,7 @@ bool areThereBTWithExpiredPayment(string multiplier, string sow_sql, CMysql *db,
 
 		if(payment_period != "0")
 		{
-			auto affected = db->Query("SELECT COUNT(*) FROM `bt` WHERE "
+			auto affected = db->Query("SELECT `id` FROM `bt` WHERE "
 															"`payed_date`<UNIX_TIMESTAMP() - 3600 * 24 * " + payment_period + " * " + multiplier + " "
 															"AND "
 															"`status`=\"approved\" "

@@ -58,6 +58,10 @@
 #define	TEMPLATE_AGREEMENT_SOW_MAX_FILE_SIZE		2 * 1024 * 1024
 #define SMARTWAY_VOUCHERS_DIRECTORY					string(IMAGEROOTDIR) + string("/html/smartway_vouchers/")
 #define	SMARTWAY_VOUCHERS_NUMBER_OF_FOLDERS			2048
+#define HELPDESK_TICKET_ATTACHES_DIRECTORY			string(IMAGEROOTDIR) + string("/html/helpdesk_ticket_attaches/")
+#define	HELPDESK_TICKET_ATTACHES_NUMBER_OF_FOLDERS	2048
+#define	HELPDESK_TICKET_ATTACHES_MAX_FILE_SIZE		10 * 1024 * 1024
+
 
 #define	MMDB_fname									"${MAXMIND_INSTALL_DIR}/GeoLite2-City.mmdb"
 
@@ -89,10 +93,24 @@
 #define	LOGGEDIN_SUBCONTRACTOR_DEFAULT_ACTION		string("subcontractor_dashboard")
 #define	LOGGEDIN_AGENCY_DEFAULT_ACTION				string("agency_dashboard")
 #define	LOGGEDIN_APPROVER_DEFAULT_ACTION			string("approver_dashboard")
+#define	LOGGEDIN_HELPDESK_DEFAULT_ACTION			string("helpdesk_dashboard")
 #define	LOGGEDIN_NOROLE_DEFAULT_ACTION				string("initial_wizard")
 #define	GUEST_USER_DEFAULT_ACTION					string("autologin")
 #define	BREADCRUMBS_STR								" | "
 
+#define	ROBOT_USER_ID								25			// --- user id uses to assign helpdesk case after opening
+
+#define	HELPDESK_USER_ROLE							"helpdesk"s
+#define	HELPDESK_STATE_NEW							"new"s
+#define	HELPDESK_STATE_ASSIGNED						"assigned"s
+#define	HELPDESK_STATE_MONITORING					"monitoring"s
+#define	HELPDESK_STATE_SOLUTION_PROVIDED			"solution_provided"s
+#define	HELPDESK_STATE_CUSTOMER_PENDING				"customer_pending"s
+#define	HELPDESK_STATE_COMPANY_PENDING				"company_pending"s
+#define	HELPDESK_STATE_SEVERITY_CHANGED				"severity_changed"s
+#define	HELPDESK_STATE_CLOSE_PENDING				"close_pending"s
+#define	HELPDESK_STATE_CLOSED						"closed"s
+#define HELPDESK_TICKET_CLOSE_PENDING_TIMEOUT		2			// --- in days
 
 #define	SMTP_HOST									"127.0.0.1"
 #define	SMTP_PORT									25
@@ -229,7 +247,7 @@
 // --- miscelaneous definitions
 #define	DEFAULT_SITE_THEME							".regular"
 
-#define	VAT_PERCENTAGE								18
+#define	VAT_PERCENTAGE								20
 #define	BUSINESS_TRIP_TAX_PERCENTAGE				6.38
 
 // --- actions allowed w/o session cookie

@@ -488,11 +488,12 @@ auto	GetHolidayCalendarInJSONFormat(string sqlQuery, CMysql *db, CUser *user) ->
 	}
 	else
 	{
-		MESSAGE_DEBUG("", "", "holyday_calendar is empty");
+		MESSAGE_DEBUG("", "", "holiday_calendar is empty");
 	}
 
 	MESSAGE_DEBUG("", "", "finish");
 
 	return result;
 }
+
 

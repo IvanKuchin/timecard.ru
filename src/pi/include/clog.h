@@ -124,11 +124,13 @@ class CLog
 	        return;
 	    }
 
-	    time_t			binTime = time((time_t *)NULL);
+	    auto			curr_locale	= setlocale(LC_ALL, LOCALE_ENGLISH.c_str());
+
+	    time_t			binTime		= time((time_t *)NULL);
 	    // char			*time = ctime((const time_t *)&binTime);
-	    struct tm		*timeInfo = localtime(&binTime);
-	    pid_t			processID = getpid();
-	    microseconds	ms = duration_cast< microseconds >(system_clock::now().time_since_epoch());
+	    struct tm		*timeInfo	= localtime(&binTime);
+	    pid_t			processID	= getpid();
+	    microseconds	ms			= duration_cast< microseconds >(system_clock::now().time_since_epoch());
 
 	    if(timeInfo)
 	    {
@@ -156,6 +158,7 @@ class CLog
 	    fflush(fh);
 	    fclose(fh);
 
+	    setlocale(LC_ALL, curr_locale);
 //	    lock.UnLock();
 	}
 

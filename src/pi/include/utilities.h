@@ -146,6 +146,7 @@ auto        	isDirExists(const std::string& name) -> bool;
 auto        	isFileExists(const std::string& name) -> bool;
 auto			isFilenameImage(string	filename) -> bool;
 auto			isFilenameVideo(string	filename) -> bool;
+auto			CleanupFilename(string	filename) -> string;
 auto        	CopyFile(const string src, const string dst) -> void;
 auto      		GetCompanyDuplicates(CMysql *) -> string;
 auto      		GetPicturesWithEmptySet(CMysql *) -> string;
@@ -208,6 +209,16 @@ auto 			GetSpecificData_AllowedToChange(string itemID, string itemType, CMysql *
 auto			SaveFileFromHandler(string f_name, string f_type, CFiles *files, string file_extension) -> string;
 auto 			isCBCurrencyRate(string date, string currency_name, string currency_nominal, string currency_value, CMysql *) -> string;
 auto			DateInPast(string date_to_check) -> bool;
+
+// --- helpdesk
+auto			GetHelpDeskTicketsInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string;
+auto			GetHelpDeskTicketHistoryInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string;
+auto			GetHelpDeskTicketAttachInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string;
+auto			isHelpdeskTicketOwner(string ticket_id, string user_id, CMysql *db, CUser *user) -> bool;
+auto			isUserAllowedToChangeTicket(string ticket_id, string user_id, CMysql *db, CUser *user) -> string;
+
+// --- FAQ
+auto			GetFAQInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string;
 
 // --- UTF8 encoding/decoding
 auto         	convert_utf8_to_windows1251(const char* utf8, char* windows1251, size_t n) -> int;

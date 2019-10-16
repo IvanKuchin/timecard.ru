@@ -547,8 +547,9 @@ int main(void)
 
 		if(action == "AJAX_getAgencyAutocompleteList")
 		{
-			string			name = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("name"));
+			string			name = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("term"));
 			string			template_name = "json_response.htmlt";
+			string			success_message = "";
 			string			error_message = "";
 			ostringstream	ostResult;
 
@@ -559,15 +560,11 @@ int main(void)
 				int	affected = db.Query("SELECT `id`, `name` FROM `company` WHERE `name` LIKE \"%" + name + "%\" AND `type`=\"agency\" LIMIT 0, 20;");
 				if(affected)
 				{
-					ostResult << "{\"result\":\"success\","
-							  << "\"autocomplete_list\":[";
 					for(int i = 0; i < affected; ++i)
 					{
-						if(i) ostResult << ",";
-						ostResult << "{\"id\":\"" << db.Get(i, "id") << "\","
-								  << "\"label\":\"" << db.Get(i, "name") << "\"}";
+						if(i) success_message += ",";
+						success_message += "{\"id\":\"" + db.Get(i, "id") + "\",\"label\":\"" + RemoveQuotas(ConvertHTMLToText(db.Get(i, "name"))) + "\"}";
 					}
-					ostResult << "]}";
 				}
 				else
 				{
@@ -584,12 +581,13 @@ int main(void)
 
 			if(error_message.empty())
 			{
+				ostResult << "[" << success_message << "]";
 			}
 			else
 			{
 				MESSAGE_DEBUG("", action, "failed");
 				ostResult.str("");
-				ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+				ostResult << "[]";
 			}
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
@@ -633,7 +631,7 @@ int main(void)
 
 			if(error_message.empty())
 			{
-					ostResult << "[" << success_message << "]";
+				ostResult << "[" << success_message << "]";
 			}
 			else
 			{
@@ -1160,6 +1158,19 @@ int main(void)
 			MESSAGE_DEBUG("", action, "finish");
 		}
 
+		if(action == "AJAX_getFaq")
+		{
+			MESSAGE_DEBUG("", action, "start");
+
+			auto			success_message = ""s;
+			auto			error_message = ""s;
+
+			success_message += quoted("faq"s) + ":[" + GetFAQInJSONFormat("SELECT * FROM `faq` WHERE `role`=" + quoted(user.GetType()) + ";", &db, &user) + "]";
+
+			AJAX_ResponseTemplate(&indexPage, success_message, error_message);
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
 
 
 		{

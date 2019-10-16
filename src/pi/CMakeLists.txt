@@ -1,4 +1,5 @@
 set(EXECUTABLE_CGIs
+    helpdesk.cgi
     account.cgi
     avataruploader.cgi
     generalimageuploader.cgi

@@ -22,7 +22,7 @@ auto	C_Company::CheckValidity() -> string
 			if(GetTIN					().empty()) { error_message = gettext("tin is empty"); }
 			if(GetBIK					().empty()) { error_message = gettext("bank_id is empty"); }
 			if(GetAccount				().empty()) { error_message = gettext("account is empty"); }
-			if(GetKPP					().empty()) { error_message = gettext("kpp is empty"); }
+			// if(GetKPP					().empty()) { error_message = gettext("kpp is empty"); } // --- kpp is optional to individual entrepreneurs
 			if(GetOGRN					().empty()) { error_message = gettext("ogrn is empty"); }
 
 			if(error_message.empty())

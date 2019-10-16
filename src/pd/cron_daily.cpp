@@ -195,6 +195,43 @@ auto ExpireOldContracts(CMysql *db)
 	return	result;
 }
 
+auto CloseHelpDeskTicketInClosePendingState(CMysql *db)
+{
+	bool	result = false;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	auto affected = db->Query("SELECT `helpdesk_ticket_id`, `user_id`, `severity` FROM `helpdesk_ticket_history_last_case_state_view` WHERE `state`=\"close_pending\" AND `eventTimestamp`<UNIX_TIMESTAMP()-" + to_string(HELPDESK_TICKET_CLOSE_PENDING_TIMEOUT) + "*24*3600");
+	vector<string> tickets;
+	vector<string> users;
+	vector<string> severity;
+
+	for(auto i = 0; i < affected; ++i)
+	{
+		tickets.push_back(db->Get(i, "helpdesk_ticket_id"));
+		users.push_back(db->Get(i, "user_id"));
+		severity.push_back(db->Get(i, "severity"));
+	}
+
+	for(auto i = 0u; i < tickets.size(); ++i)
+	{
+		db->InsertQuery("INSERT INTO `helpdesk_ticket_history` (`helpdesk_ticket_id`, `user_id`, `severity`, `state`, `description`, `eventTimestamp`) VALUES "s +
+						"(" +
+						quoted(tickets[i]) + ", " +
+						quoted(users[i]) + ", " +
+						quoted(severity[i]) + ", " +
+						quoted("closed"s) + ", " +
+						"\"\", " +
+						"UNIX_TIMESTAMP()"
+						")"
+						";");
+	}
+
+	MESSAGE_DEBUG("", "", "finish (result = " + to_string(result) + ")");
+
+	return	result;
+}
+
 bool RemoveOldCaptcha()
 {
 	DIR 		*dir;
@@ -353,6 +390,8 @@ int main()
 
 		//--- Remove old captcha
 		RemoveOldCaptcha();
+
+		CloseHelpDeskTicketInClosePendingState(&db);
 
 		ExpireOldContracts(&db);
 
