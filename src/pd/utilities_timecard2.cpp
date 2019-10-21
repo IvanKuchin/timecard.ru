@@ -332,6 +332,8 @@ auto	CreatePSoWfromTimecardCustomerIDAndCostCenterID(string timecard_customer_id
 	{
 		// --- get SoW by CustomerID
 		map<string, string> sow_to_positions;
+
+		// --- all SoW with assigned tasks <- projects <- _CUSTOMER_ 
 		auto number_of_sow = db->Query(	"SELECT `id`, `company_position_id` FROM `contracts_sow` WHERE `id` IN ("
 											"SELECT `contract_sow_id` FROM `timecard_task_assignment` WHERE `timecard_tasks_id` IN ("
 												"SELECT `id` FROM `timecard_tasks` WHERE `timecard_projects_id` IN ("
@@ -4317,7 +4319,7 @@ string	SetNewValueByAction(string action, string id, string sow_id, string new_v
 							}
 							else
 							{
-								MESSAGE_ERROR("", "", "fail to create PSoW while cost_center.id(" + new_value + ") assigned to timecard_customer.id(" + id + ")")
+								MESSAGE_DEBUG("", "", "there were no new PSoW(cost_center.id(" + new_value + ") / SoW.id <- timecard_customer.id(" + id + ")) created due to either PSoW already exists, or Customer->projects->tasks not assigned to any SoW")
 							}
 
 							sql_query = "UPDATE	`cost_center_assignment` SET `cost_center_id` =\"" + new_value + "\" WHERE `timecard_customer_id`=\"" + id + "\";";

@@ -1958,7 +1958,7 @@ int main(void)
 															else
 															{
 																error_message = gettext("unable to create psow");
-																MESSAGE_DEBUG("", action, "fail to create psow from sow.id(" + sow_id + ") and task.id(" + task_id + ")");
+																MESSAGE_DEBUG("", action, "there were no new PSoW(cost_center.id<-customer<-project<-task.id(" + task_id + ") / SoW.id(" + sow_id + ")) created due to either PSoW already exists, or Customer<-project<-tasks not assigned to any CostCenter")
 															}
 														}
 														else
