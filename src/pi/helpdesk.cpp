@@ -633,6 +633,13 @@ int main(void)
 
 				if(db.Query("SELECT COUNT(*) FROM `helpdesk_ticket_history_last_helpdesk_user_update_view` WHERE `state`!=" + quoted("closed"s) + " AND `user_id`=" + quoted(user.GetID()) + ";"))
 					success_message += (success_message.length() ? "," : "") + quoted("my_active_cases"s) + ":" + db.Get(0, 0) + "";
+
+				if(db.Query("SELECT COUNT(*) FROM `helpdesk_ticket_history_last_case_state_view` WHERE "
+								"`state`=\"company_pending\" "
+								"AND "
+								"`helpdesk_ticket_id` IN (SELECT `helpdesk_ticket_id` FROM `helpdesk_ticket_history_last_helpdesk_user_update_view` WHERE `user_id`=" + quoted(user.GetID()) + ")"
+							";"))
+					success_message += (success_message.length() ? "," : "") + quoted("my_company_pending_cases"s) + ":" + db.Get(0, 0) + "";
 			}
 			else
 			{

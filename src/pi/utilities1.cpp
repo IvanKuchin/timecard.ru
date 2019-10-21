@@ -47,13 +47,13 @@ auto GetLocale()
 {
 	auto	result = ""s;
 
-	MESSAGE_DEBUG("", "", "start");
+	// MESSAGE_DEBUG("", "", "start");
 
-	result = setlocale(LC_ALL, "");
+	result = setlocale(LC_ALL, NULL);
 
 	if(result.empty()) MESSAGE_ERROR("", "", "fail to define locale");
 
-	MESSAGE_DEBUG("", "", "finish(result length is " + to_string(result.length()) + ")");
+	// MESSAGE_DEBUG("", "", "finish(result length is " + to_string(result.length()) + ")");
 
 	return result;
 }
@@ -122,7 +122,7 @@ auto toUpper(const string &src) -> string
 	}
 	else
 	{
-		MESSAGE_ERROR("", "", "fail to define locale. Impossible run through toLower")
+		MESSAGE_ERROR("", "", "fail to define locale. Impossible run toUpper")
 	}
 
 	MESSAGE_DEBUG("", "", "finish");
@@ -148,7 +148,7 @@ auto toLower(const string &src) -> string
 	}
 	else
 	{
-		MESSAGE_ERROR("", "", "fail to define locale. Impossible run through toLower")
+		MESSAGE_ERROR("", "", "fail to define locale. Impossible run toLower")
 	}
 
 	MESSAGE_DEBUG("", "", "finish");

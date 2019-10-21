@@ -74,6 +74,7 @@ auto			GetSpelledTimecardTaskAssignmentByID(string id, CMysql *) -> string;
 auto			GetSpelledBTExpenseTemplateLineByID(string id, CMysql *) -> string;
 auto			GetSpelledBTAllowanceByID(string id, CMysql *) -> string;
 auto			GetSpelledCostCenterByID(string id, CMysql *) -> string;
+auto			GetSpelledCostCenterByCustomFieldID(string id, CMysql *) -> string;
 auto			GetSpelledAirfareDirectionLimitByID(string id, CMysql *) -> string;
 auto			GetSpelledBTExpenseAssignmentByID(string id, CMysql *) -> string;
 auto			GetSpelledUserNameByID(string id, CMysql *) -> string;

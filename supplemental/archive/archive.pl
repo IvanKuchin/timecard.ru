@@ -255,8 +255,17 @@ if($action =~ /^--backup/)
 		# 	system("cp ".$archive_filename." /storage/".$config{backup_username}."/backup/www.".$domainSuffix."/");
 
 		# }
+
+
 		print "rsync to remote server ....\n";
 		system("rsync -alzhe ssh --exclude '*.tar.gz' ./ ".$config{backup_username}."\@".$config{backup_hostname}.":/storage/".$config{backup_username}."/backup/".$domainSuffix."/rsync/");
+
+		my @date = split(" ", localtime(time));
+		if($date[0] == "Sat") # --- today is Friday least busy day, do full backup
+		{
+			print "full backup to remote server ....\n";
+			system("scp ".$archive_filename." ".$config{backup_hostname}.":/storage/".$config{backup_username}."/backup/".$domainSuffix."/".$archive_filename."")
+		}
 	}
 
 	print "cleaning-up development folder ...\n";
@@ -432,7 +441,7 @@ if($action =~ /^--restore/)
 	# don't change it to lowest value (19),
 	# that way c-compiler can spend a lot of time in "CPU-wait" state, rather than use CPU-cycles
 	#
-	system("cd ".$folders_to_backup{SRCDIR}."/build && nice -5 make -j2");
+	system("cd ".$folders_to_backup{SRCDIR}."/build && nice -10 make -j4");
 	system("cd ".$folders_to_backup{SRCDIR}."/build && ctest ");
 	system("cd ".$folders_to_backup{SRCDIR}."/build && make install");
 	system("cd ".$folders_to_backup{SRCDIR}."/build && make clean");

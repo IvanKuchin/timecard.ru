@@ -284,6 +284,8 @@ auto	C_Print_Invoice_Docs_Base::PrintAsXLS() -> string
 		__book = xlCreateBook();
 		if(__book)
 		{
+			__book->setKey(L"Ivan Kuchin", L"linux-e7d7147298a7a2140508293e47t5j7sf");
+
 			__sheet = __book->addSheet(L"Sheet1");
 			if(__sheet)
 			{

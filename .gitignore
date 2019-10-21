@@ -80,3 +80,4 @@ ftpsync.settings
 sql
 sublime/
 *.original
+libxl/payment*

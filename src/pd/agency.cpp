@@ -798,7 +798,7 @@ int main(void)
 												}
 												else
 												{
-													ostResult << "{\"result\":\"error\",\"description\":\"ошибка отправки таймкарты\"}";
+													ostResult << "{\"result\":\"error\",\"description\":\"ошибка отправки командировки\"}";
 													MESSAGE_ERROR("", action, "fail to submit bt_id(" + bt_id + ")");
 												}
 											}
@@ -811,7 +811,7 @@ int main(void)
 										else
 										{
 											MESSAGE_ERROR("", action, "bt.id(" + bt_id + ") not in pending state on user.id(" + user.GetID() + ")");
-											ostResult << "{\"result\":\"error\",\"description\":\"Вы не должны подтверждать эту таймкарту\"}";
+											ostResult << "{\"result\":\"error\",\"description\":\"Вы не должны подтверждать эту командировку\"}";
 										}
 
 
@@ -819,14 +819,14 @@ int main(void)
 									else
 									{
 										MESSAGE_ERROR("", action, "user.id(" + user.GetID() + ") not an bt.id(" + bt_id + ") approver");
-										ostResult << "{\"result\":\"error\",\"description\":\"Вы не должны подтверждать таймкарту у данного договора\"}";
+										ostResult << "{\"result\":\"error\",\"description\":\"Вы не должны подтверждать командировку у данного договора\"}";
 									}
 
 								}
 								else
 								{
 									MESSAGE_ERROR("", action, "bt.id(" + bt_id + ") have to be in submit state to be approved/rejected, but it is in \"" + bt_state + "\" state");
-									ostResult << "{\"result\":\"error\",\"description\":\"таймкарта не требует подтверждения\"}";
+									ostResult << "{\"result\":\"error\",\"description\":\"командировка не требует подтверждения\"}";
 								}
 							}
 							else
@@ -838,13 +838,13 @@ int main(void)
 						else
 						{
 							MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't allow to see this bt");
-							ostResult << "{\"result\":\"error\",\"description\":\"У Вас нет доступа к этой таймкарте\"}";
+							ostResult << "{\"result\":\"error\",\"description\":\"У Вас нет доступа к этой командировке\"}";
 						}
 					}
 					else
 					{
 						MESSAGE_ERROR("", action, "user.id(" + user.GetID() + ") is " + user.GetType() + ", who can't approve/reject");
-						ostResult << "{\"result\":\"error\",\"description\":\"У Вас нет доступа к этой таймкарте\"}";
+						ostResult << "{\"result\":\"error\",\"description\":\"У Вас нет доступа к этой командировке\"}";
 					}
 				}
 				else
@@ -1340,13 +1340,6 @@ int main(void)
 			(action == "AJAX_updateSoWEndDate")					||
 			(action == "AJAX_updateSoWCustomField")				||
 
-			(action == "AJAX_updateCostCenterNumber")			||
-			(action == "AJAX_updateCostCenterAct")				||
-			(action == "AJAX_updateCostCenterSignDate")			||
-			(action == "AJAX_updateCostCenterStartDate")		||
-			(action == "AJAX_updateCostCenterEndDate")			||
-			(action == "AJAX_updateCostCenterCustomField")		||
-
 			(action == "AJAX_updatePeriodStart")				||
 			(action == "AJAX_updatePeriodEnd")					||
 			(action == "AJAX_updateSubcontractorCreateTasks")
@@ -1601,6 +1594,14 @@ int main(void)
 			(action == "AJAX_updateHolidayCalendarDate")			||
 			(action == "AJAX_updateHolidayCalendarTitle")			||
 			(action == "AJAX_deleteHolidayCalendar")				||
+
+			(action == "AJAX_updateCostCenterNumber")				||
+			(action == "AJAX_updateCostCenterAct")					||
+			(action == "AJAX_updateCostCenterSignDate")				||
+			(action == "AJAX_updateCostCenterStartDate")			||
+			(action == "AJAX_updateCostCenterEndDate")				||
+			(action == "AJAX_updateCostCenterCustomField")			||
+
 			(action == "AJAX_updateCostCenterToCustomer")			||
 			(action == "AJAX_deleteCostCenterFromCustomer")			||
 			(action == "AJAX_deleteCostCenter")						||
@@ -3966,7 +3967,8 @@ int main(void)
 			string			sow_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("sow_id"));
 
 			string			template_name = "json_response.htmlt";
-			string			error_message = "";
+			auto			error_message = ""s;
+			auto			success_message = ""s;
 			ostringstream	ostResult;
 
 			ostResult.str("");
@@ -3984,11 +3986,7 @@ int main(void)
 						error_message = SetNewValueByAction(action, "fake_id", sow_id, new_value, &db, &user);
 						if(error_message.empty())
 						{
-							string info_to_return = GetInfoToReturnByAction(action, "fake_id", sow_id, new_value, &db, &user);
-
-							ostResult << "{\"result\":\"success\"";
-							if(info_to_return.length()) ostResult << "," << info_to_return;
-							ostResult << "}";
+							success_message = GetInfoToReturnByAction(action, "fake_id", sow_id, new_value, &db, &user);
 
 							if(GeneralNotifySoWContractPartiesAboutChanges(action, "fake_id", sow_id, "fake_existing_value", new_value, &db, &user))
 							{
@@ -4019,18 +4017,7 @@ int main(void)
 				MESSAGE_DEBUG("", action, error_message);
 			}
 
-			if(error_message.empty())
-			{
-			}
-			else
-			{
-				MESSAGE_DEBUG("", action, "failed");
-				ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
-			}
-
-			indexPage.RegisterVariableForce("result", ostResult.str());
-
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			AJAX_ResponseTemplate(&indexPage, success_message, error_message);
 		}
 
 		if(	action == "AJAX_deleteTimecardApproverFromSoW" ||
@@ -4041,7 +4028,9 @@ int main(void)
 			string			sow_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("sow_id"));
 
 			string			template_name = "json_response.htmlt";
-			string			error_message = "";
+			auto			error_message = ""s;
+			auto			success_message = ""s;
+
 			ostringstream	ostResult;
 
 			ostResult.str("");
@@ -4069,11 +4058,7 @@ int main(void)
 							error_message = ResubmitEntitiesByAction(action, id, sow_id, "fake_new_value", &db, &user);
 							if(error_message.empty())
 							{
-								string info_to_return = GetInfoToReturnByAction(action, id, sow_id, "fake_new_value", &db, &user);
-
-								ostResult << "{\"result\":\"success\"";
-								if(info_to_return.length()) ostResult << "," << info_to_return;
-								ostResult << "}";
+								success_message = GetInfoToReturnByAction(action, id, sow_id, "fake_new_value", &db, &user);
 							}
 							else
 							{
@@ -4101,18 +4086,7 @@ int main(void)
 				MESSAGE_DEBUG("", action, error_message);
 			}
 
-			if(error_message.empty())
-			{
-			}
-			else
-			{
-				MESSAGE_DEBUG("", action, "failed");
-				ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
-			}
-
-			indexPage.RegisterVariableForce("result", ostResult.str());
-
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			AJAX_ResponseTemplate(&indexPage, success_message, error_message);
 		}
 
 		if(action == "AJAX_getCompanyInfoBySoWID")

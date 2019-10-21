@@ -384,7 +384,6 @@ int main()
 									indexPage.RegisterVariableForce("loginUser", "");
 									mapResult["sessionPersistence"] = "true";
 
-
 									user.SetDB(&db);
 									user.GetFromDBbyLogin(indexPage.SessID_Get_UserFromDB());
 									indexPage.RegisterVariableForce("loginUser", indexPage.SessID_Get_UserFromDB());
@@ -398,7 +397,7 @@ int main()
 										string	remove_flag_timestamp = db.Get(0, "remove_flag_timestamp");
 
 										if(remove_flag == "Y")
-											MESSAGE_DEBUG("", action, "session(" + sessidPersistence + ") would be deleted at " + remove_flag_timestamp + " timestamp, but it is re-used (probably pressed back-button in browser or refreshed old tab).");
+											MESSAGE_ERROR("", action, "session(" + sessidPersistence + ") would be deleted at " + remove_flag_timestamp + " timestamp, but it is re-used (probably pressed back-button in browser or refreshed old tab).");
 
 										if(sessidPersistence == sessidHTTP)
 										{
@@ -408,7 +407,7 @@ int main()
 											// --- 3) /autologin use completely different sessid (WRONG behavior)
 											// --- 4) /checkSessionPersistense have sessidHTTP == sessidPersistence
 											// --- 5) you are here ! No need to remove session from DB
-											MESSAGE_ERROR("", action, "App sessid == cookie sessid. Normal call flow should not send you to autologin. Probably you get here trying to close another tab (check timestamp whan HTTP_REFERER: " + (getenv("HTTP_REFERER") ? getenv("HTTP_REFERER") : "") + " was requested from the server)");
+											MESSAGE_ERROR("", action, "App sessid == cookie sessid. Normal call flow should not send you to autologin. Probably you get here trying to close another tab (check timestamp when HTTP_REFERER: " + (getenv("HTTP_REFERER") ? getenv("HTTP_REFERER") : "") + " was requested from the server)");
 										}
 										else
 										{

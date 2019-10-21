@@ -13,6 +13,19 @@ bool CleanupActivators(CMysql *db)
 	return result;
 }
 
+bool CleanupRemovedSessions(CMysql *db)
+{
+	bool		result = true;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	db->Query("DELETE FROM `sessions` WHERE `remove_flag_timestamp`< (UNIX_TIMESTAMP() - 3600*24*365) AND `remove_flag`=\"Y\";");
+	
+	MESSAGE_DEBUG("", "", "finish");
+
+	return result;
+}
+
 bool ParseXMLAndUpdateDB(const string &xml_block, CMysql *db)
 {
 	bool	result = false;
@@ -384,6 +397,7 @@ int main()
 
 		//--- start of daily cron main functionality
 		CleanupActivators(&db);
+		CleanupRemovedSessions(&db);
 
 		//--- Remove temporarily media files
 		RemoveTempMedia(&db);
@@ -394,6 +408,7 @@ int main()
 		CloseHelpDeskTicketInClosePendingState(&db);
 
 		ExpireOldContracts(&db);
+
 
 		//--- update currency rate exchange
 		UpdateCurrencyRateExchange(&db);

@@ -8,6 +8,7 @@
 #include <iostream>
 #include <sstream>
 #include <chrono>
+#include <fstream>
 
 using namespace std;
 
@@ -112,53 +113,51 @@ class CLog
 
 	void Write(int level, const string &mess)
 	{
-	    if(level < CURRENT_LOG_LEVEL)
-		return;
-
-	    FILE	*fh;
-	    fh = fopen(fileName.c_str(), "a");
-	    if(fh == NULL)
+	    if(level < CURRENT_LOG_LEVEL) 
 	    {
-			cout << "CLog::" << __func__ << "[" << __LINE__ << "]: ERROR: opening log file [" << fileName << "] " << strerror(errno) << "\n";
-
-	        return;
-	    }
-
-	    auto			curr_locale	= setlocale(LC_ALL, LOCALE_ENGLISH.c_str());
-
-	    time_t			binTime		= time((time_t *)NULL);
-	    // char			*time = ctime((const time_t *)&binTime);
-	    struct tm		*timeInfo	= localtime(&binTime);
-	    pid_t			processID	= getpid();
-	    microseconds	ms			= duration_cast< microseconds >(system_clock::now().time_since_epoch());
-
-	    if(timeInfo)
-	    {
-	    	ostringstream	ost;
-	    	string			msCount = to_string(ms.count());
-	    	char			localtimeBuffer[80];
-
-	    	memset(localtimeBuffer, 0, sizeof(localtimeBuffer));
-	    	strftime(localtimeBuffer, 80 - 1, "%b %d %T", timeInfo);
-
-	    	if(msCount.length() > 6) msCount = msCount.substr(msCount.length() - 6, 6);
-
-			ost << localtimeBuffer << "." << msCount << "[" << processID << "] " << (level ? SpellLogLevel(level) + ":" : "") << mess << endl;
-			fprintf(fh, "%s", ost.str().c_str());
-
-			// if(time[strlen(time) - 1] == '\n')
-			//     time[strlen(time) - 1] = 0;
-			// fprintf(fh, "%s:%d: [%d] %s\n", time, ms.count(), processID, mess.c_str());
+	    	return;
 	    }
 	    else
 	    {
-			fprintf(fh, "[%d] %s\n", processID, mess.c_str());
+			fstream	fs;
+
+			fs.open(fileName, std::fstream::out | std::fstream::app);
+			if(fs.is_open())
+			{
+
+			    time_t			binTime		= time((time_t *)NULL);
+			    struct tm		*timeInfo	= localtime(&binTime);
+			    pid_t			processID	= getpid();
+			    microseconds	ms			= duration_cast< microseconds >(system_clock::now().time_since_epoch());
+
+			    if(timeInfo)
+			    {
+			    	string			msCount = to_string(ms.count());
+			    	char			localtimeBuffer[80];
+				    auto			curr_locale	= string(setlocale(LC_ALL, NULL));
+
+				    setlocale(LC_ALL, LOCALE_ENGLISH.c_str());
+			    	strftime(localtimeBuffer, 80 - 1, "%b %d %T", timeInfo);
+				    setlocale(LC_ALL, curr_locale.c_str());
+
+			    	if(msCount.length() > 6) msCount = msCount.substr(msCount.length() - 6, 6);
+
+					fs << localtimeBuffer << "." << msCount << "[" << processID << "] " << (level ? SpellLogLevel(level) + ":" : "") << mess << endl;
+					// fprintf(fh, "%s", ost.str().c_str());
+			    }
+			    else
+			    {
+					fs << "[" << processID << "] " << (level ? SpellLogLevel(level) + ":" : "") << mess << endl;
+			    }
+
+			    fs.close();
+			}
+			else
+			{
+				cout << "CLog::" << __func__ << "[" << __LINE__ << "]: ERROR: opening log file [" << fileName << "] " << "<br>\n";
+			}
 	    }
 
-	    fflush(fh);
-	    fclose(fh);
-
-	    setlocale(LC_ALL, curr_locale);
 //	    lock.UnLock();
 	}
 

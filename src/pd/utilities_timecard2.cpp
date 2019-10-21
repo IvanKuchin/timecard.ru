@@ -900,13 +900,6 @@ auto	isActionEntityBelongsToSoW(string action, string id, string sow_id, CMysql 
 				if(action == "AJAX_updatePSoWEndDate")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
 				if(action == "AJAX_updatePSoWCustomField")			sql_query = "SELECT `contract_psow_id` AS `sow_id` FROM `contract_psow_custom_fields` WHERE `id`=\"" + id + "\";";
 
-				if(action == "AJAX_updateCostCenterNumber")			sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
-				if(action == "AJAX_updateCostCenterAct")			sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
-				if(action == "AJAX_updateCostCenterSignDate")		sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
-				if(action == "AJAX_updateCostCenterStartDate")		sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
-				if(action == "AJAX_updateCostCenterEndDate")		sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
-				if(action == "AJAX_updateCostCenterCustomField")	sql_query = "SELECT `cost_center_id` AS `sow_id` FROM `cost_center_custom_fields` WHERE `id`=\"" + id + "\";";
-
 				if(sql_query.length())
 				{
 					if(db->Query(sql_query))
@@ -1678,7 +1671,7 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 					else if(action == "AJAX_updateCostCenterNumber")					{ /* --- good to go */ }
 					else if(action == "AJAX_updateCostCenterStartDate")
 					{
-						if(db->Query("SELECT `end_date` FROM `cost_centers` WHERE `id`=\"" + sow_id + "\";"))
+						if(db->Query("SELECT `end_date` FROM `cost_centers` WHERE `id`=\"" + id + "\";"))
 						{
 							auto		string_start = new_value;
 							auto		string_end = db->Get(0, "end_date");
@@ -1703,7 +1696,7 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 					}
 					else if(action == "AJAX_updateCostCenterEndDate")
 					{
-						if(db->Query("SELECT `start_date` FROM `cost_centers` WHERE `id`=\"" + sow_id + "\";"))
+						if(db->Query("SELECT `start_date` FROM `cost_centers` WHERE `id`=\"" + id + "\";"))
 						{
 							auto		string_start = db->Get(0, "start_date");
 							auto		string_end = new_value;
@@ -1808,9 +1801,9 @@ string	isActionEntityBelongsToAgency(string action, string id, string agency_id,
 			{
 				string		sql_query = "";
 
-				if(action == "AJAX_updateCustomerTitle") 				sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `timecard_customers` WHERE `id`=\"" + id + "\";";
-				if(action == "AJAX_updateProjectTitle") 				sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `timecard_customers` WHERE `id`=(SELECT `timecard_customers_id` FROM `timecard_projects` WHERE `id`=\"" + id + "\");";
-				if(action == "AJAX_updateTaskTitle") 					sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `timecard_customers` WHERE `id`=(SELECT `timecard_customers_id` FROM `timecard_projects` WHERE `id`=(SELECT `timecard_projects_id` FROM `timecard_tasks` WHERE `id`=\"" + id + "\"));";
+				if(action == "AJAX_updateCustomerTitle") 					sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `timecard_customers` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateProjectTitle") 					sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `timecard_customers` WHERE `id`=(SELECT `timecard_customers_id` FROM `timecard_projects` WHERE `id`=\"" + id + "\");";
+				if(action == "AJAX_updateTaskTitle") 						sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `timecard_customers` WHERE `id`=(SELECT `timecard_customers_id` FROM `timecard_projects` WHERE `id`=(SELECT `timecard_projects_id` FROM `timecard_tasks` WHERE `id`=\"" + id + "\"));";
 
 				if(action == "AJAX_updateAirfareLimitationByDirection")		sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `airfare_limits_by_direction` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_deleteAirfarelimitationByDirection")		sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `airfare_limits_by_direction` WHERE `id`=\"" + id + "\";";
@@ -1837,6 +1830,12 @@ string	isActionEntityBelongsToAgency(string action, string id, string agency_id,
 				if(action == "AJAX_updateCostCenterToCustomer")				sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `timecard_customers` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_deleteCostCenterFromCustomer")			sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `timecard_customers` WHERE `id`=\"" + id + "\";";
 
+				if(action == "AJAX_updateCostCenterNumber")					sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `cost_centers` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateCostCenterAct")					sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `cost_centers` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateCostCenterSignDate")				sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `cost_centers` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateCostCenterStartDate")				sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `cost_centers` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateCostCenterEndDate")				sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `cost_centers` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateCostCenterCustomField")			sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `cost_centers` WHERE `id`=(SELECT `cost_center_id` FROM `cost_center_custom_fields` WHERE `id`=\"" + id + "\");";
 				if(action == "AJAX_deleteCostCenter")						sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `cost_centers` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateCostCenterTitle")					sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `cost_centers` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateCostCenterDescription")			sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `cost_centers` WHERE `id`=\"" + id + "\";";
@@ -2406,11 +2405,11 @@ auto	GetDBValueByAction(string action, string id, string sow_id, CMysql *db, CUs
 				if(action == "AJAX_updatePSoWEndDate")						sql_query = "SELECT `end_date`				as `value` FROM `contracts_psow` WHERE `id`=\"" + sow_id + "\";";
 				if(action == "AJAX_updatePSoWCustomField")					sql_query = "SELECT `value`					as `value` FROM `contract_psow_custom_fields` WHERE `id`=\"" + id + "\";";
 
-				if(action == "AJAX_updateCostCenterNumber")					sql_query = "SELECT `number`				as `value` FROM `cost_centers` WHERE `id`=\"" + sow_id + "\";";
-				if(action == "AJAX_updateCostCenterAct")					sql_query = "SELECT `act_number`			as `value` FROM `cost_centers` WHERE `id`=\"" + sow_id + "\";";
-				if(action == "AJAX_updateCostCenterSignDate")				sql_query = "SELECT `sign_date`				as `value` FROM `cost_centers` WHERE `id`=\"" + sow_id + "\";";
-				if(action == "AJAX_updateCostCenterStartDate")				sql_query = "SELECT `start_date`			as `value` FROM `cost_centers` WHERE `id`=\"" + sow_id + "\";";
-				if(action == "AJAX_updateCostCenterEndDate")				sql_query = "SELECT `end_date`				as `value` FROM `cost_centers` WHERE `id`=\"" + sow_id + "\";";
+				if(action == "AJAX_updateCostCenterNumber")					sql_query = "SELECT `number`				as `value` FROM `cost_centers` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateCostCenterAct")					sql_query = "SELECT `act_number`			as `value` FROM `cost_centers` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateCostCenterSignDate")				sql_query = "SELECT `sign_date`				as `value` FROM `cost_centers` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateCostCenterStartDate")				sql_query = "SELECT `start_date`			as `value` FROM `cost_centers` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateCostCenterEndDate")				sql_query = "SELECT `end_date`				as `value` FROM `cost_centers` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateCostCenterCustomField")			sql_query = "SELECT `value`					as `value` FROM `cost_center_custom_fields` WHERE `id`=\"" + id + "\";";
 
 				if(action == "AJAX_deleteBTAllowance")						sql_query = "SELECT `title`					as `value` FROM `geo_country` WHERE `id`=(SELECT `geo_country_id` FROM `bt_allowance` WHERE `id`=\"" + id + "\");";
@@ -2668,9 +2667,9 @@ bool areThereTimecardsWithExpiredPayment(string multiplier, string sow_sql, CMys
 		if(payment_period != "0")
 		{
 			auto affected = db->Query("SELECT `id` FROM `timecards` WHERE "
-															"`payed_date`<UNIX_TIMESTAMP() - 3600 * 24 * " + payment_period + " * " + multiplier + " "
+															"(`submit_date`<UNIX_TIMESTAMP() - 3600 * 24 * " + payment_period + " * " + multiplier + ") "
 															"AND "
-															"`status`=\"approved\" "
+															"(`status`=\"approved\") "
 															"AND "
 															"`contract_sow_id` IN (" + sow_sql + ");");
 				
@@ -2708,9 +2707,9 @@ bool areThereBTWithExpiredPayment(string multiplier, string sow_sql, CMysql *db,
 		if(payment_period != "0")
 		{
 			auto affected = db->Query("SELECT `id` FROM `bt` WHERE "
-															"`payed_date`<UNIX_TIMESTAMP() - 3600 * 24 * " + payment_period + " * " + multiplier + " "
+															"(`submit_date`<UNIX_TIMESTAMP() - 3600 * 24 * " + payment_period + " * " + multiplier + ") "
 															"AND "
-															"`status`=\"approved\" "
+															"(`status`=\"approved\") "
 															"AND "
 															"`contract_sow_id` IN (" + sow_sql + ");");
 				
@@ -3926,8 +3925,10 @@ string	GetInfoToReturnByAction(string action, string id, string sow_id, string n
 
 	MESSAGE_DEBUG("", "", "start");
 
-	if(action == "AJAX_addTimecardApproverToSoW")	result = "\"timecard_approvers\":[" + GetApproversInJSONFormat("SELECT * FROM `timecard_approvers` WHERE `contract_sow_id`=\"" + sow_id + "\";", db, user, DO_NOT_INCLUDE_SOW_INFO) + "]";
-	if(action == "AJAX_addBTExpenseApproverToSoW")	result = "\"bt_approvers\":[" + GetApproversInJSONFormat("SELECT * FROM `bt_approvers` WHERE `contract_sow_id`=\"" + sow_id + "\";", db, user, DO_NOT_INCLUDE_SOW_INFO) + "]";
+	if((action == "AJAX_addTimecardApproverToSoW") || (action == "AJAX_deleteTimecardApproverFromSoW"))
+		result = "\"timecard_approvers\":[" + GetApproversInJSONFormat("SELECT * FROM `timecard_approvers` WHERE `contract_sow_id`=\"" + sow_id + "\";", db, user, DO_NOT_INCLUDE_SOW_INFO) + "]";
+	if((action == "AJAX_addBTExpenseApproverToSoW") || (action == "AJAX_deleteBTExpenseApproverFromSoW"))
+		result = "\"bt_approvers\":[" + GetApproversInJSONFormat("SELECT * FROM `bt_approvers` WHERE `contract_sow_id`=\"" + sow_id + "\";", db, user, DO_NOT_INCLUDE_SOW_INFO) + "]";
 
 	MESSAGE_DEBUG("", "", "finish (result length is " + to_string(result.length()) + ")");
 
@@ -4160,11 +4161,11 @@ string	SetNewValueByAction(string action, string id, string sow_id, string new_v
 						if(action == "AJAX_updatePSoWBTMarkupType")					sql_query = "UPDATE `contracts_psow` 			SET `bt_markup_type`=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sow_id + "\";";
 
 						if(action == "AJAX_updateCostCenterCustomField")			sql_query = "UPDATE `cost_center_custom_fields` SET `value`			=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
-						if(action == "AJAX_updateCostCenterNumber")					sql_query = "UPDATE `cost_centers`				SET `number`		=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sow_id + "\";";
-						if(action == "AJAX_updateCostCenterAct")					sql_query = "UPDATE `cost_centers`				SET `act_number`	=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sow_id + "\";";
-						if(action == "AJAX_updateCostCenterSignDate")				sql_query = "UPDATE `cost_centers`				SET `sign_date`		=STR_TO_DATE(\"" + new_value + "\",\"%d/%m/%Y\"),`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sow_id + "\";";
-						if(action == "AJAX_updateCostCenterStartDate")				sql_query = "UPDATE `cost_centers`				SET `start_date`	=STR_TO_DATE(\"" + new_value + "\",\"%d/%m/%Y\"),`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sow_id + "\";";
-						if(action == "AJAX_updateCostCenterEndDate")				sql_query = "UPDATE `cost_centers`				SET `end_date`		=STR_TO_DATE(\"" + new_value + "\",\"%d/%m/%Y\"),`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sow_id + "\";";
+						if(action == "AJAX_updateCostCenterNumber")					sql_query = "UPDATE `cost_centers`				SET `number`		=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateCostCenterAct")					sql_query = "UPDATE `cost_centers`				SET `act_number`	=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateCostCenterSignDate")				sql_query = "UPDATE `cost_centers`				SET `sign_date`		=STR_TO_DATE(\"" + new_value + "\",\"%d/%m/%Y\"),`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateCostCenterStartDate")				sql_query = "UPDATE `cost_centers`				SET `start_date`	=STR_TO_DATE(\"" + new_value + "\",\"%d/%m/%Y\"),`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateCostCenterEndDate")				sql_query = "UPDATE `cost_centers`				SET `end_date`		=STR_TO_DATE(\"" + new_value + "\",\"%d/%m/%Y\"),`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
 
 						if(action == "AJAX_updateTemplateAgreement_company_Title")	sql_query = "UPDATE `company_agreement_files`	SET `title`			=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
 						if(action == "AJAX_updateTemplateAgreement_sow_Title")		sql_query = "UPDATE `contract_sow_agreement_files` SET `title`		=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
@@ -4184,7 +4185,8 @@ string	SetNewValueByAction(string action, string id, string sow_id, string new_v
 							// --- insert MAX+1 if approvers are ordered
 							auto	order = "0"s;
 
-							if(db->Query("SELECT MAX(`approver_order`) FROM `timecard_approvers` WHERE `contract_sow_id`=" + quoted(sow_id) + ";"))
+							// if(db->Query("SELECT MAX(`approver_order`) FROM `timecard_approvers` WHERE `contract_sow_id`=" + quoted(sow_id) + ";"))
+							if(db->Query("SELECT `approver_order` FROM `timecard_approvers` WHERE `contract_sow_id`=" + quoted(sow_id) + " ORDER BY `approver_order` DESC LIMIT 0,1;"))
 							{
 								order = db->Get(0, 0);
 
@@ -4199,7 +4201,7 @@ string	SetNewValueByAction(string action, string id, string sow_id, string new_v
 							// --- insert MAX+1 if approvers are ordered
 							auto	order = "0"s;
 
-							if(db->Query("SELECT MAX(`approver_order`) FROM `bt_approvers` WHERE `contract_sow_id`=" + quoted(sow_id) + ";"))
+							if(db->Query("SELECT `approver_order` FROM `bt_approvers` WHERE `contract_sow_id`=" + quoted(sow_id) + " ORDER BY `approver_order` DESC LIMIT 0,1;"))
 							{
 								order = db->Get(0, 0);
 
@@ -4648,6 +4650,26 @@ auto	GetSpelledCostCenterByID(string id, CMysql *db) -> string
 	return result;	
 }
 
+auto	GetSpelledCostCenterByCustomFieldID(string id, CMysql *db) -> string
+{
+	auto	result = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(db->Query("SELECT `title` FROM `cost_centers` WHERE `id`=(SELECT `cost_center_id` FROM `cost_center_custom_fields` WHERE `id`=\"" + id + "\");"))
+	{
+		result = db->Get(0, 0);
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "cost_centers.id(" + id + ") not found");
+	}
+	
+	MESSAGE_DEBUG("", "", "finish (result.length is " + to_string(result.length()) + ")");
+
+	return result;	
+}
+
 auto	GetSpelledBTAllowanceByID(string id, CMysql *db) -> string
 {
 	auto	result = ""s;
@@ -4921,7 +4943,7 @@ string	GetSpelledCostCenterCustomFieldNameByID(string custom_field_id, CMysql *d
 
 	MESSAGE_DEBUG("", "", "start");
 
-	if(db->Query("SELECT `title`,`description` FROM `contract_psow_custom_fields` WHERE `id`=\"" + custom_field_id + "\";"))
+	if(db->Query("SELECT `title`,`description` FROM `cost_center_custom_fields` WHERE `id`=\"" + custom_field_id + "\";"))
 	{
 		auto	description = ""s + db->Get(0, "description");
 
@@ -5485,27 +5507,27 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 	}
 	if(action == "AJAX_updateCostCenterAct")
 	{
-		notification_description = gettext("Cost Center") + " ("s + GetSpelledCostCenterByID(sow_id, db) + "): " + gettext("updated") + " " + gettext("act number") + " " + " " + gettext("from") + " "s + existing_value + " "  + gettext("to") + " "s + new_value;
+		notification_description = gettext("Cost Center") + " ("s + GetSpelledCostCenterByID(id, db) + "): " + gettext("updated") + " " + gettext("act number") + " " + " " + gettext("from") + " "s + existing_value + " "  + gettext("to") + " "s + new_value;
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 	if(action == "AJAX_updateCostCenterSignDate")
 	{
-		notification_description = gettext("Cost Center") + " ("s + GetSpelledCostCenterByID(sow_id, db) + "): " + gettext("sign date changed") + " " + gettext("from") + " " + existing_value + " " + gettext("to") + " " + new_value;
+		notification_description = gettext("Cost Center") + " ("s + GetSpelledCostCenterByID(id, db) + "): " + gettext("sign date changed") + " " + gettext("from") + " " + existing_value + " " + gettext("to") + " " + new_value;
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 	if(action == "AJAX_updateCostCenterStartDate")
 	{
-		notification_description = gettext("Cost Center") + " ("s + GetSpelledCostCenterByID(sow_id, db) + "): " + gettext("start date changed") + " " + gettext("from") + " " + existing_value + " " + gettext("to") + " " + new_value;
+		notification_description = gettext("Cost Center") + " ("s + GetSpelledCostCenterByID(id, db) + "): " + gettext("start date changed") + " " + gettext("from") + " " + existing_value + " " + gettext("to") + " " + new_value;
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 	if(action == "AJAX_updateCostCenterEndDate")
 	{
-		notification_description = gettext("Cost Center") + " ("s + GetSpelledCostCenterByID(sow_id, db) + "): " + gettext("end date changed") + " " + gettext("from") + " " + existing_value + " " + gettext("to") + " " + new_value;
+		notification_description = gettext("Cost Center") + " ("s + GetSpelledCostCenterByID(id, db) + "): " + gettext("end date changed") + " " + gettext("from") + " " + existing_value + " " + gettext("to") + " " + new_value;
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 	if(action == "AJAX_updateCostCenterCustomField")
 	{
-		notification_description = gettext("Cost Center") + " ("s + GetSpelledCostCenterByID(sow_id, db) + "): " + gettext("custom field") + "(" + GetSpelledCostCenterCustomFieldNameByID(id, db) + ") " + gettext("changed") + " " + gettext("from") + " " + existing_value + " " + gettext("to") + " " + new_value;
+		notification_description = gettext("Cost Center") + " ("s + GetSpelledCostCenterByCustomFieldID(id, db) + "): " + gettext("custom field") + "(" + GetSpelledCostCenterCustomFieldNameByID(id, db) + ") " + gettext("changed") + " " + gettext("from") + " " + existing_value + " " + gettext("to") + " " + new_value;
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 

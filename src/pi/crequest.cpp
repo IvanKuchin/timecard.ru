@@ -87,7 +87,8 @@ char* CPost::Binary_strstr(const char *where, const char *what, unsigned int c)
 	char*		beginPos = (char *)where;
 
 	if(c == 0) return NULL;
-	while((currPos = (char *)memchr(currPos, what[0], count)) != NULL)
+
+	while((currPos = (char *)memchr(currPos, what[0], count - (currPos - beginPos))) != NULL)
 	{
 		if((currPos - beginPos + strlen(what)) > c)
 			return NULL;
@@ -518,7 +519,6 @@ char *CPost::ParamValue(int number)
 
     if(!isContentMultipart())
     {
-
 /*
     	simple HTTP POST handling
     	example:
@@ -1115,7 +1115,7 @@ void CRequest::RegisterURLVariables(CVars *v, CFiles *f)
 			s_name = WebString(s_name);
 			s_value = WebString(s_value);
 
-			MESSAGE_DEBUG("CRequest", "", "HTTP parameter #" + to_string(i) + " [" + s_name + "=" + FilterCP1251Symbols(s_value) + "]");
+			MESSAGE_DEBUG("CRequest", "", "HTTP parameter #" + to_string(i) + " [" + s_name + "=" + (s_value) + "]");
 
 			vars->Add(s_name, s_value);
 

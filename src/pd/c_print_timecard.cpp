@@ -282,9 +282,12 @@ auto	C_Print_Timecard::PrintAsXLS() -> string
 		auto	spelled_rur					= multibyte_to_wide(GetSpelledRur());
 		auto	spelled_kop					= multibyte_to_wide(GetSpelledKop());
 
-		libxl::Book* book = xlCreateBook();
+		auto	*book = xlCreateBook();
+		
 		if(book)
 		{
+			book->setKey(L"Ivan Kuchin", L"linux-e7d7147298a7a2140508293e47t5j7sf");
+
 			libxl::Sheet* sheet = book->addSheet(L"Sheet1");
 			if(sheet)
 			{

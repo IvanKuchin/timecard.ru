@@ -368,13 +368,15 @@ string C_TC_BT_Submit::GetLastApproverID()
 				(type == "timecard")? "SELECT `timecard_approvers_id` FROM `timecard_approvals_view` WHERE "
 											"`timecard_approvals_eventTimestamp` > (SELECT `submit_date` FROM `timecards` WHERE `id`=\"" + id + "\") "
 											"AND "
-											"`timecard_approvals_timecard_id`=\"" + id + "\" ORDER BY `timecard_approvers_approver_order` DESC"
-										";" :
+											"`timecard_approvals_timecard_id`=\"" + id + "\" ORDER BY `timecard_approvers_approver_order` DESC "
+											"LIMIT 0,1 "
+											";" :
 				(type == "bt")		? "SELECT `bt_approvers_id` FROM `bt_approvals_view` WHERE "
 											"`bt_approvals_eventTimestamp` > (SELECT `submit_date` FROM `bt` WHERE `id`=\"" + id + "\") "
 											"AND "
-											"`bt_approvals_bt_id`=\"" + id + "\" ORDER BY `bt_approvers_approver_order` DESC"
-										";" :
+											"`bt_approvals_bt_id`=\"" + id + "\" ORDER BY `bt_approvers_approver_order` DESC "
+											"LIMIT 0,1 "
+											";" :
 				"";
 
 	if(sql_query.length())
