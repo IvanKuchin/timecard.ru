@@ -249,7 +249,8 @@ bool CSession::Save()
 		throw CExceptionHTML("session error");
 	}
 
-	if(db->Query("INSERT INTO `sessions` (`id`, `user_id`, `country_auto`, `city_auto`, `lng`, `ip`, `time`,`expire` ) VALUES ('" + GetID() + "', '" + GetUserID() + "', '" + DetectCountry() + "', '" + DetectCity() + "', '" + GetLng() + "', '" + GetIP() + "', NOW(), '" + to_string(SESSION_LEN * 60) + "')") != 0)
+	if(db->Query("INSERT INTO `sessions` (`id`, `user_id`, `country_auto`, `city_auto`, `lng`, `ip`, `time`,`expire` ) VALUES "
+				"(" + quoted(GetID()) + ", " + quoted(GetUserID()) + ", " + quoted(DetectCountry()) + ", " + quoted(DetectCity()) + ", " + quoted(GetLng()) + ", " + quoted(GetIP()) + ", NOW(), " + quoted(to_string(SESSION_LEN * 60)) + ");") != 0)
 	{
 		MESSAGE_ERROR("", "", "ERROR: in insert SQL-query");
 	}

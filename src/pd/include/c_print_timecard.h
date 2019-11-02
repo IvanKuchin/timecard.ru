@@ -17,6 +17,7 @@
 #include "hpdf.h"
 
 #include "utilities_timecard.h" 
+#include "c_invoicing_vars.h"
 #include "c_timecard_to_print.h"
 #include "c_float.h"
 #include "clog.h"
@@ -40,6 +41,7 @@ class C_Print_Timecard
 		string							filename = "";
 
 		C_Timecard_To_Print				timecard;
+		C_Invoicing_Vars				*vars = nullptr;
 
 		vector<Day_Summary_Struct>		day_summary = {};
 		c_float							effort_hours = 0;
@@ -73,19 +75,22 @@ class C_Print_Timecard
 
 		auto		GetSpelledTitle() -> string;
 		auto		GetSpelledPSoW() -> string;
-		auto		GetSpelledProjectID() -> string;
-		auto		GetSpelledTotalHours() -> string;
-		auto		GetSpelledTotalDays() -> string;
-		auto		GetSpelledDayrate() -> string;
-		auto		GetSpelledTotalPayment() -> string;
-		auto		GetSpelledVAT() -> string;
-		auto		GetSpelledTotalPaymentNoVAT() -> string;
-		auto		GetSpelledSignature() -> string;
-		auto		GetSpelledInitials() -> string;
-		auto		GetSpelledPosition() -> string;
-		auto		GetSpelledDate() -> string;
-		auto		GetSpelledRur() -> string;
-		auto		GetSpelledKop() -> string;
+		auto		GetSpelledProjectID()							{ return string(timecard.GetProjectNumber().length() ? gettext("Project ID") + ": "s + timecard.GetProjectNumber() : ""); };
+		auto		GetSpelledTotalHours()							{ return string(gettext("Total hours on duty") + ": "s); };
+		auto		GetSpelledTotalDays()							{ return string(gettext("Total days on duty") + ": "s); };
+		auto		GetSpelledDayrate()								{ return string(gettext("Dayrate") + ": "s); };
+		auto		GetSpelledTotalPayment()						{ return string(gettext("Total payment in reported timecard") + ": "s); };
+		auto		GetSpelledVAT()									{ return string(gettext("VAT") + ": "s); };
+		auto		GetSpelledTotalPaymentNoVAT()					{ return string(gettext("Total payment in reported timecard") + " "s + gettext("w/o") + " " + gettext("VAT") + ": "); };
+		auto		GetSpelledSignature()							{ return string(gettext("Signature") + ":_________________________________"s); };
+		auto		GetSpelledInitials()							{ return string(gettext("Initials")); };
+		auto		GetSpelledInitials(string idx)	-> string;
+		auto		GetSpelledPosition()							{ return string(gettext("Title")); };
+		auto		GetSpelledPosition(string idx)	-> string;
+		auto		GetSpelledDate()								{ return string(gettext("Date") + ": ____________________________________"s); };
+		auto		GetSpelledRur()									{ return string(gettext("rur.")); };
+		auto		GetSpelledKop()									{ return string(gettext("kop.")); };
+		auto		GetSpelledApprovers()							{ return string(gettext("Timecard approvers")); };
 
 		auto		__HPDF_init() -> string;
 		auto		__HPDF_SetDocProps() -> string;
@@ -120,6 +125,7 @@ class C_Print_Timecard
 		auto		GetTotalPayment()								{ return total_payment; };
 
 		auto		SetTimecard(const C_Timecard_To_Print &param1) -> void;
+		auto		SetVariableSet(C_Invoicing_Vars *param)			{ vars = param; };
 
 		auto		SetFilename(const string &param1)				{ filename = param1; };
 		auto		SetFilename(string &&param1) 					{ filename = move(param1); };

@@ -424,6 +424,8 @@ auto C_Invoice_BT_Agency_To_CC::CreateBTObj(string bt_id) -> C_BT_To_Print
 	{
 		if(bt_id.length())
 		{
+			obj.SetApprovers(GetBT_ApprovalChain(bt_id, db));
+
 			if(cost_center_id.length())
 			{
 				string	psow_id = GetPSoWIDByBTIDAndCostCenterID(bt_id, cost_center_id, db, user);

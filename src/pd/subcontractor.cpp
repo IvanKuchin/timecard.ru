@@ -452,7 +452,7 @@ int main()
 							"\"sow\":[" << GetSOWInJSONFormat(
 									"SELECT * FROM `contracts_sow` WHERE "
 										"`subcontractor_company_id` IN (" + companies_list + ") "
-									";", &db, &user) << "],"
+									";", &db, &user, true, false, false, true) << "],"
 							"\"bt\":[" << GetBTsInJSONFormat(
 									"SELECT * FROM `bt` WHERE "
 										"`contract_sow_id` IN ( SELECT `id` FROM `contracts_sow` WHERE `subcontractor_company_id` IN (" + companies_list + "))"
@@ -618,7 +618,7 @@ int main()
 								"\"sow\":[" << GetSOWInJSONFormat(
 										"SELECT * FROM `contracts_sow` WHERE "
 											"`subcontractor_company_id` IN (" + companies_list + ") "
-										";", &db, &user) << "],"
+										";", &db, &user, false, false, false, true) << "],"
 								"\"timecards\":[" << GetTimecardsInJSONFormat(
 										"SELECT * FROM `timecards` WHERE "
 											"`contract_sow_id` IN ( SELECT `id` FROM `contracts_sow` WHERE `subcontractor_company_id` IN (" + companies_list + "))"

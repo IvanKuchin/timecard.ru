@@ -167,6 +167,7 @@ auto C_Invoice_Service_Agency_To_CC::GenerateDocumentArchive() -> string
 			} while(isFileExists(filename_xls) || isFileExists(filename_pdf));
 
 			timecard_printer.SetTimecard(timecard);
+			timecard_printer.SetVariableSet(&invoicing_vars);
 
 			timecard_printer.SetFilename(filename_xls);
 			error_message = timecard_printer.PrintAsXLS();
@@ -498,6 +499,8 @@ auto C_Invoice_Service_Agency_To_CC::CreateTimecardObj(string timecard_id) -> C_
 	{
 		if(timecard_id.length())
 		{
+			obj.SetApprovers(GetTimecard_ApprovalChain(timecard_id, db));
+			
 			if(cost_center_id.length())
 			{
 				string	psow_id = GetPSoWIDByTimecardIDAndCostCenterID(timecard_id, cost_center_id, db, user);

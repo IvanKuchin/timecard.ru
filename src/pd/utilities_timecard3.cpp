@@ -497,3 +497,92 @@ auto	GetHolidayCalendarInJSONFormat(string sqlQuery, CMysql *db, CUser *user) ->
 }
 
 
+
+auto	ApprovalChain(string sql, CMysql *db) -> string
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	error_message = ""s;
+	auto	result = ""s;
+
+
+	if(db)
+	{
+		auto	affected = db->Query(sql);
+
+		for(auto i = 0; i < affected; ++i)
+		{
+			if(result.length()) result += ", ";
+
+			result += db->Get(i, "nameLast") + " " + db->Get(i, "name");
+			if(db->Get(i, "nameMiddle").length()) result += " " + db->Get(i, "nameMiddle");
+		}
+
+	}
+	else
+	{
+		error_message = gettext("db is not initialized");
+		MESSAGE_ERROR("", "", error_message);
+	}
+
+
+	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
+
+	return	result;
+}
+
+auto	GetTimecard_ApprovalChain(string timecard_id, CMysql *db) -> string
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	result = ""s;
+	auto	error_message = ""s;
+
+
+	if(timecard_id.length())
+	{
+		result = ApprovalChain(	"SELECT `name`, `nameLast`, `nameMiddle` FROM `users` WHERE `id` IN ("
+									"SELECT DISTINCT(`approver_user_id`) FROM `timecard_approvers` WHERE `id` IN ("
+										"SELECT `approver_id` FROM `timecard_approvals` WHERE `timecard_id`=" + quoted(timecard_id) + " AND `decision`=\"approved\""
+									")"
+								");", db);
+	}
+	else
+	{
+		error_message = gettext("mandatory parameter missed");
+		MESSAGE_ERROR("", "", error_message);
+	}
+
+
+	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
+
+	return	result;
+}
+
+auto	GetBT_ApprovalChain(string bt_id, CMysql *db) -> string
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	error_message = ""s;
+	auto	result = ""s;
+
+
+	if(bt_id.length())
+	{
+		result = ApprovalChain(	"SELECT `name`, `nameLast`, `nameMiddle` FROM `users` WHERE `id` IN ("
+									"SELECT DISTINCT(`approver_user_id`) FROM `bt_approvers` WHERE `id` IN ("
+										"SELECT `approver_id` FROM `bt_approvals` WHERE `bt_id`=" + quoted(bt_id) + " AND `decision`=\"approved\""
+									")"
+								");", db);
+	}
+	else
+	{
+		error_message = gettext("mandatory parameter missed");
+		MESSAGE_ERROR("", "", error_message);
+	}
+
+
+	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
+
+	return	result;
+}

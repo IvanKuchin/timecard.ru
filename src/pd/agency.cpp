@@ -166,7 +166,7 @@ int main(void)
 								"\"sow\":[" << GetSOWInJSONFormat(
 										"SELECT * FROM `contracts_sow` WHERE "
 											"`agency_company_id` IN (" + companies_list + ") "
-										";", &db, &user) << "],"
+										";", &db, &user, false, false, false, true) << "],"
 								"\"timecards\":[" << GetTimecardsInJSONFormat(
 										"SELECT * FROM `timecards` WHERE "
 											"`contract_sow_id` IN ( SELECT `id` FROM `contracts_sow` WHERE `agency_company_id` IN (" + companies_list + "))"
@@ -214,7 +214,7 @@ int main(void)
 								"\"sow\":[" << GetSOWInJSONFormat(
 										"SELECT * FROM `contracts_sow` WHERE "
 											"`agency_company_id` IN (" + companies_list + ") "
-										";", &db, &user) << "],"
+										";", &db, &user, true, false, false, true) << "],"
 								"\"bt\":[" << GetBTsInJSONFormat(
 										"SELECT * FROM `bt` WHERE "
 											"`contract_sow_id` IN ( SELECT `id` FROM `contracts_sow` WHERE `agency_company_id` IN (" + companies_list + "))"
@@ -1216,7 +1216,8 @@ int main(void)
 				{
 					if(db.Query("SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id`=(SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user.GetID() + "\");"))
 					{
-						string		agency_id = db.Get(0, "id");
+						auto		include_subc_company	= true;
+						string		agency_id				= db.Get(0, "id");
 
 						ostResult << "{"
 										"\"result\":\"success\","
@@ -1224,7 +1225,7 @@ int main(void)
 												"SELECT * FROM `contracts_sow` WHERE "
 													+ (sow_id.length() ? string("`id`=\"" + sow_id + "\" AND ") : "") +
 													"`agency_company_id`=\"" + agency_id + "\" "
-												";", &db, &user, include_tasks, include_bt, include_cost_centers) << "]";
+												";", &db, &user, include_tasks, include_bt, include_cost_centers, include_subc_company) << "]";
 
 						if(include_tasks)
 							ostResult <<	","
@@ -1594,6 +1595,7 @@ int main(void)
 			(action == "AJAX_updateHolidayCalendarDate")			||
 			(action == "AJAX_updateHolidayCalendarTitle")			||
 			(action == "AJAX_deleteHolidayCalendar")				||
+			(action == "AJAX_updateCompanyCustomField")				||
 
 			(action == "AJAX_updateCostCenterNumber")				||
 			(action == "AJAX_updateCostCenterAct")					||
@@ -1615,15 +1617,17 @@ int main(void)
 
 			ostResult.str("");
 			{
-				string			template_name = "json_response.htmlt";
-				string			error_message = "";
+				auto			template_name = "json_response.htmlt"s;
+				auto			error_message = ""s;
 
-				string			company_id		= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("company_id"));
-				string			id				= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
-				string			new_value		= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("value"));
+				auto			company_id		= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("company_id"));
+				auto			id				= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
+				auto			new_value		= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("value"));
 
 				if(
 					new_value.length() 									||
+					(action == "AJAX_updateCompanyCustomField")			||	// --- custom field could be empty
+					(action == "AJAX_updateCostCenterCustomField")		||	// --- custom field could be empty
 					(action == "AJAX_updateCompanyActNumberPrefix")		||	// --- ActNumberPrefix could be empty
 					(action == "AJAX_updateCompanyActNumberPostfix")		 // --- ActNumberPostfix could be empty
 				)
@@ -5033,7 +5037,7 @@ int main(void)
 									else
 									{
 										error_message = gettext("SQL syntax issue");
-										MESSAGE_ERROR("", "", error_message);
+										MESSAGE_ERROR("", action, error_message);
 									}
 								}
 								else
@@ -5043,7 +5047,7 @@ int main(void)
 							}
 							else
 							{
-								MESSAGE_ERROR("", "", "can't define company id by user.id(" + user.GetID() + ")");
+								MESSAGE_ERROR("", action, "can't define company id by user.id(" + user.GetID() + ")");
 							}
 						}
 						else
@@ -5071,7 +5075,7 @@ int main(void)
 								else
 								{
 									error_message = gettext("SQL syntax issue");
-									MESSAGE_ERROR("", "", error_message);
+									MESSAGE_ERROR("", action, error_message);
 								}
 							}
 							else
@@ -5184,7 +5188,7 @@ int main(void)
 											else
 											{
 												error_message = gettext("SQL syntax issue");
-												MESSAGE_ERROR("", "", "can't find contract_sow_agreement_files.id(" + id + ") in DB")
+												MESSAGE_ERROR("", action, "can't find contract_sow_agreement_files.id(" + id + ") in DB")
 											}
 										}
 										else
@@ -5264,7 +5268,7 @@ int main(void)
 				}
 				else
 				{
-					MESSAGE_ERROR("", "", "fail to determine sow.id by contract_sow_agreement_files.id(" + id + ")");
+					MESSAGE_ERROR("", action, "fail to determine sow.id by contract_sow_agreement_files.id(" + id + ")");
 				}
 
 				if(new_value.length())
@@ -5322,7 +5326,7 @@ int main(void)
 											else
 											{
 												error_message = gettext("SQL syntax issue");
-												MESSAGE_ERROR("", "", "can't find contract_sow_agreement_files.id(" + id + ") in DB")
+												MESSAGE_ERROR("", action, "can't find contract_sow_agreement_files.id(" + id + ") in DB")
 											}
 										}
 										else
@@ -5426,13 +5430,13 @@ int main(void)
 								else
 								{
 									error_message = gettext("Agreement already signed");
-									MESSAGE_ERROR("", "", error_message + ". Workflow should not be here.");
+									MESSAGE_ERROR("", action, error_message + ". Workflow should not be here.");
 								}
 							}
 							else
 							{
 								error_message = gettext("SQL syntax issue");
-								MESSAGE_ERROR("", "", error_message + ". Workflow should not be here.");
+								MESSAGE_ERROR("", action, error_message + ". Workflow should not be here.");
 							}
 
 						}
@@ -5511,7 +5515,7 @@ int main(void)
 									}
 									else
 									{
-										MESSAGE_ERROR("", "", "sow_id(" + sow_id + ") not found. Workflow must not be here. Investigate reason.");
+										MESSAGE_ERROR("", action, "sow_id(" + sow_id + ") not found. Workflow must not be here. Investigate reason.");
 									}
 
 									db.Query("DELETE FROM `users_notification` WHERE `actionTypeId`=\"" + to_string(NOTIFICATION_AGENGY_GENERATED_AGREEMENTS) + "\" AND `actionId`=\"" + sow_id + "\";");
@@ -5520,13 +5524,13 @@ int main(void)
 								else
 								{
 									error_message = gettext("Agreement already signed");
-									MESSAGE_ERROR("", "", error_message + ". Workflow should not be here.");
+									MESSAGE_ERROR("", action, error_message + ". Workflow should not be here.");
 								}
 							}
 							else
 							{
 								error_message = gettext("SQL syntax issue");
-								MESSAGE_ERROR("", "", error_message + ". Workflow should not be here.");
+								MESSAGE_ERROR("", action, error_message + ". Workflow should not be here.");
 							}
 
 
@@ -5632,6 +5636,225 @@ int main(void)
 			MESSAGE_DEBUG("", action, "finish");
 		}
 
+		if(action == "AJAX_getSoWListWithCustomFields")
+		{
+			MESSAGE_DEBUG("", action, "start");
+
+			auto			error_message = ""s;
+			auto			success_message = ""s;
+
+			auto			agency_id = GetAgencyID(&user, &db);
+
+			if(agency_id.length())
+			{
+				unordered_set<string>	sow_s;
+				auto					affected = db.Query("SELECT DISTINCT(`contract_sow_id`) FROM `contract_sow_custom_fields` WHERE `contract_sow_id` IN (SELECT `id` FROM `contracts_sow` WHERE `agency_company_id`=" + quoted(agency_id) + ");");
+
+				for(auto i = 0; i < affected; ++i)
+				{
+					sow_s.insert(db.Get(i, 0));
+				}
+
+				affected = db.Query("SELECT DISTINCT(`contract_sow_id`) FROM `contracts_psow` WHERE "
+										"`id` IN (SELECT `contract_psow_id` FROM `contract_psow_custom_fields`) "
+										"AND "
+										"`contract_sow_id` IN (SELECT `id` FROM `contracts_sow` WHERE `agency_company_id`=" + quoted(agency_id) + ")"
+										";"
+									);
+
+				for(auto i = 0; i < affected; ++i)
+				{
+					sow_s.insert(db.Get(i, 0));
+				}
+
+				success_message = "\"sow\":[";
+
+				if(sow_s.size())
+				{
+					auto	sow_list = ""s;
+
+					for(auto &sow: sow_s)
+					{
+						if(sow_list.length()) sow_list += ",";
+						sow_list += sow;
+					}
+
+					success_message += GetSOWInJSONFormat(	"SELECT * FROM `contracts_sow` WHERE "
+																"`id` IN (" + sow_list + ") "
+															";", &db, &user, false, false, false, true);
+
+
+				}
+				else
+				{
+					MESSAGE_DEBUG("", "", "sow_list is empty");
+				}
+
+				success_message += "]";
+
+			}
+			else
+			{
+				error_message = gettext("you are not authorized");
+				MESSAGE_ERROR("", action, error_message);
+			}
+
+			AJAX_ResponseTemplate(&indexPage, success_message, error_message);
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
+
+		if(action == "AJAX_copyCustomFieldsFromSoW")
+		{
+			MESSAGE_DEBUG("", action, "start");
+
+			auto			error_message = ""s;
+			auto			success_message = ""s;
+
+			auto			sow_id_to = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("sow_id_to"));
+			auto			sow_id_from = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("sow_id_from"));
+			auto			with_values = indexPage.GetVarsHandler()->Get("with_values") == "Y";
+
+
+			error_message = isAgencyEmployeeAllowedToChangeSoW(sow_id_to, &db, &user);
+			if(error_message.empty())
+			{
+				error_message = isAgencyEmployeeAllowedToChangeSoW(sow_id_from, &db, &user);
+				if(error_message.empty())
+				{
+					auto			agency_id = GetAgencyID(&user, &db);
+
+					if(agency_id.length())
+					{
+						// --- copy SoW custom fields
+						db.Query("INSERT INTO `contract_sow_custom_fields` ("
+										"`contract_sow_id`,"
+										"`var_name`,"
+										"`title`,"
+										"`description`,"
+										"`type`,"
+										"`value`,"
+										"`visible_by_subcontractor`,"
+										"`editable_by_subcontractor`,"
+										"`owner_user_id`,"
+									    "`eventTimestamp`"
+									") "
+									"SELECT "
+										"\"" + sow_id_to + "\" AS `contract_sow_id`,"
+										"a.`var_name` AS `var_name`,"
+										"a.`title` AS `title`,"
+										"a.`description` AS `description`,"
+										"a.`type` AS `type`,"
+										+ (with_values ? "a.`value`" : "\"\"") + " AS `value`,"
+										"a.`visible_by_subcontractor` AS `visible_by_subcontractor`,"
+										"a.`editable_by_subcontractor` AS `editable_by_subcontractor`,"
+										"\"" + user.GetID() + "\" AS `owner_user_id`,"
+										"UNIX_TIMESTAMP() AS `eventTimestamp` "
+									"FROM (SELECT * FROM `contract_sow_custom_fields` WHERE `contract_sow_id`=" + quoted(sow_id_from) + ") a "
+									"LEFT JOIN (SELECT * FROM `contract_sow_custom_fields` WHERE `contract_sow_id`=" + quoted(sow_id_to) + ") b "
+									"USING(`var_name`) "
+									"WHERE b.`id` is NULL"
+									";"
+									);
+
+						if(db.isError())
+						{
+							error_message = gettext("SQL syntax error");
+						}
+						else
+						{
+							// --- copy PSoW custom fields
+
+							map<string, string>	sow_id_from__cost_center_list;
+							map<string, string>	sow_id_to__cost_center_list;
+							auto				affected = db.Query("SELECT `cost_center_id`,`id` FROM `contracts_psow` WHERE `contract_sow_id`=" + quoted(sow_id_to) + ";");
+
+							for(auto i = 0; i < affected; ++i)
+							{
+								sow_id_to__cost_center_list[db.Get(i, "cost_center_id")] = db.Get(i, "id");
+							}
+
+							affected = db.Query("SELECT `cost_center_id`,`id` FROM `contracts_psow` WHERE `contract_sow_id`=" + quoted(sow_id_from) + ";");
+
+							for(auto i = 0; i < affected; ++i)
+							{
+								sow_id_from__cost_center_list[db.Get(i, "cost_center_id")] = db.Get(i, "id");
+							}
+
+							for(auto &curr_pair: sow_id_to__cost_center_list)
+							{
+								auto	cost_center_id = curr_pair.first;
+								if(error_message.empty())
+								{
+									auto	psow_id_to = sow_id_to__cost_center_list[cost_center_id];
+									auto	psow_id_from = sow_id_from__cost_center_list[cost_center_id];
+
+									if(	psow_id_to.length() && psow_id_from.length())
+									{
+										db.Query("INSERT INTO `contract_psow_custom_fields` ("
+														"`contract_psow_id`,"
+														"`var_name`,"
+														"`title`,"
+														"`description`,"
+														"`type`,"
+														"`value`,"
+														"`visible_by_subcontractor`,"
+														"`editable_by_subcontractor`,"
+														"`owner_user_id`,"
+													    "`eventTimestamp`"
+													") "
+													"SELECT "
+														"\"" + psow_id_to + "\" AS `contract_psow_id`,"
+														"a.`var_name` AS `var_name`,"
+														"a.`title` AS `title`,"
+														"a.`description` AS `description`,"
+														"a.`type` AS `type`,"
+														+ (with_values ? "a.`value`" : "\"\"") + " AS `value`,"
+														"a.`visible_by_subcontractor` AS `visible_by_subcontractor`,"
+														"a.`editable_by_subcontractor` AS `editable_by_subcontractor`,"
+														"\"" + user.GetID() + "\" AS `owner_user_id`,"
+														"UNIX_TIMESTAMP() AS `eventTimestamp` "
+													"FROM (SELECT * FROM `contract_psow_custom_fields` WHERE `contract_psow_id`=" + quoted(psow_id_from) + ") a "
+													"LEFT JOIN (SELECT * FROM `contract_psow_custom_fields` WHERE `contract_psow_id`=" + quoted(psow_id_to) + ") b "
+													"USING(`var_name`) "
+													"WHERE b.`id` is NULL"
+													";"
+													);
+
+										if(db.isError())
+										{
+											error_message = gettext("SQL syntax error");
+										}
+									}
+									else
+									{
+										MESSAGE_DEBUG("", action, "can't copy CostCenter.id(" + cost_center_id + ") custom fields: PSoW() -> PSoW(" + psow_id_to + ")");
+									}
+								}
+							}
+						}
+
+					}
+					else
+					{
+						error_message = gettext("you are not authorized");
+						MESSAGE_ERROR("", action, error_message);
+					}
+				}
+				else
+				{
+					MESSAGE_ERROR("", action, error_message);
+				}
+			}
+			else
+			{
+				MESSAGE_ERROR("", action, error_message);
+			}
+
+			AJAX_ResponseTemplate(&indexPage, success_message, error_message);
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
 
 
 		MESSAGE_DEBUG("", "", "post-condition if(action == \"" + action + "\")");

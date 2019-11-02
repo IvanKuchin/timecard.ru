@@ -43,6 +43,7 @@ class C_BT_To_Print
 		string					cost_center_id = "";
 		string					location = "";
 		string					markup_type = "";
+		string					approvers = ""s;
 		c_float					markup_from_db;
 		c_float					sum_taxable;
 		c_float					sum_non_taxable;
@@ -87,6 +88,8 @@ class C_BT_To_Print
 		auto		SetMarkupType(string &&param1) 				{ markup_type = move(param1); };
 		auto		SetLocation(const string &param1)			{ location = param1; };
 		auto		SetLocation(string &&param1) 				{ location = move(param1); };
+		auto		SetApprovers(const string &param1)			{ approvers = param1; };
+		auto		SetApprovers(string &&param1) 				{ approvers = move(param1); };
 		auto		SetMarkupDB(c_float param1)					{ markup_from_db = param1; };
 		// auto		SetTotalPayment(string param1) 				{ total_payment = param1; };
 
@@ -105,6 +108,7 @@ class C_BT_To_Print
 		auto		GetLocation()								{ return location; };
 		auto		GetMarkupType()								{ return markup_type; };
 		auto		GetExpenseLines()							{ return expense_lines; }
+		auto		GetApprovers()								{ return approvers; };	
 
 		// --- sum calculations
 		auto		GetSumTaxable()		-> c_float;

@@ -186,9 +186,16 @@ $archive_filename  = $mysqldb."_".($action eq "--backup" ? "full_" : "struct_").
 #
 if($action =~ /^--backup/)
 {
+	my $system_err;
+
 	print "\n\nPerforming ".($action eq "--backup" ? "full" : "structure")." backup\n";
-	# print "performing clean-up\n";
-	# system("make clean");
+	print "make clean...\n";
+	$system_err = system("cd ".$config{project_binary_dir}." && make clean"); # --- save around 20MB per backup
+	if($system_err) { print "\n\nmake clean\t[ERROR]\n"; }
+	else			{ print "make clean\t[OK]\n"; }
+
+	print "removing MaxMingDB...\t";
+	unlink (glob($config{binary_maxmind_dir}.'/*')) and print "[OK]\n" or print "[ERROR]\n";
 
 	print "removing old files (sql, *~, *.tar.gz, $mysqldb.tar.gz)\n";
 	unlink 'sql', 'sql_controltables', '$mysqldb.tar.gz';
@@ -220,9 +227,14 @@ if($action =~ /^--backup/)
 	}
 
 	print "archiving ....\n";
-	system("tar -czf ".$archive_filename." *");
+	$system_err = system("tar -czf ".$archive_filename." *");
+	if($system_err) { print "\n\narchiving\t[ERROR]\n"; }
+	else			{ print "archiving\t[OK]\n"; }
+
 	print "copying ".$domainSuffix." development environment ....\n";
-	system("cp ".$archive_filename." /storage/".$config{backup_username}."/backup/".$domainSuffix."/");
+	$system_err = system("cp ".$archive_filename." /storage/".$config{backup_username}."/backup/".$domainSuffix."/");
+	if($system_err) { print "\n\copying\t[ERROR]\n"; }
+	else			{ print "copying\t[OK]\n"; }
 
 	if(isDevServer())
 	{
@@ -258,13 +270,17 @@ if($action =~ /^--backup/)
 
 
 		print "rsync to remote server ....\n";
-		system("rsync -alzhe ssh --exclude '*.tar.gz' ./ ".$config{backup_username}."\@".$config{backup_hostname}.":/storage/".$config{backup_username}."/backup/".$domainSuffix."/rsync/");
+		$system_err = system("rsync -alzhe ssh --exclude '*.tar.gz' ./ ".$config{backup_username}."\@".$config{backup_hostname}.":/storage/".$config{backup_username}."/backup/".$domainSuffix."/rsync/");
+		if($system_err) { print "\n\nrsyncing\t[ERROR]\n"; }
+		else			{ print "rsyncing\t[OK]\n"; }
 
 		my @date = split(" ", localtime(time));
-		if($date[0] == "Sat") # --- today is Friday least busy day, do full backup
+		if($date[0] eq "Sat") # --- today is Friday least busy day, do full backup
 		{
 			print "full backup to remote server ....\n";
-			system("scp ".$archive_filename." ".$config{backup_hostname}.":/storage/".$config{backup_username}."/backup/".$domainSuffix."/".$archive_filename."")
+			$system_err = system("scp ".$archive_filename." ".$config{backup_hostname}.":/storage/".$config{backup_username}."/backup/".$domainSuffix."/".$archive_filename."");
+			if($system_err) { print "\n\nscp to remote server\t[ERROR]\n"; }
+			else			{ print "scp to remote server\t[OK]\n"; }
 		}
 	}
 
@@ -284,6 +300,11 @@ if($action =~ /^--backup/)
 	{
 		print "\n ---recover cli: \nsudo date && rm -rf ./tmp/recover/ && mkdir -p ./tmp/recover/ && cd ./tmp/recover/ && cp /storage/".$config{backup_username}."/backup/".$domainSuffix."/".$archive_filename." ./tmp/recover/ && tar -zxf ".$archive_filename." && time sudo ./archive.pl --restore;\n\n";
 	}
+
+	print "cmake project on local server...\n";
+	$system_err = system("cd ".$config{project_binary_dir}." && cmake -DCMAKE_BUILD_TYPE=debug .."); # --- save around 20MB per backup
+	if($system_err) { print "\n\nproject cmake\t[ERROR]\n"; }
+	else			{ print "project cmake\t[OK]\n"; }
 }
 
 if($action =~ /^--restore/)
@@ -435,13 +456,13 @@ if($action =~ /^--restore/)
 	print "restoring production folders\n";
 	Dirmove_Local_To_Production();
 
-	system("cd ".$folders_to_backup{SRCDIR}."/build && cmake ..");
+	system("cd ".$folders_to_backup{SRCDIR}."/build && cmake -DCMAKE_BUILD_TYPE=debug ..");
 	#
 	# renice process to provide enough resources to mysql and apache.
 	# don't change it to lowest value (19),
 	# that way c-compiler can spend a lot of time in "CPU-wait" state, rather than use CPU-cycles
 	#
-	system("cd ".$folders_to_backup{SRCDIR}."/build && nice -10 make -j4");
+	system("cd ".$folders_to_backup{SRCDIR}."/build && time nice -10 make -j4");
 	system("cd ".$folders_to_backup{SRCDIR}."/build && ctest ");
 	system("cd ".$folders_to_backup{SRCDIR}."/build && make install");
 	system("cd ".$folders_to_backup{SRCDIR}."/build && make clean");
@@ -480,7 +501,7 @@ sub activate_htaccess
 	        # print "(".$from_dir."/".$entry.") =~ matched against ".." \n" if($DEBUG);
 	        print "\tactivate_htaccess: renaming (".$from_dir."/".$entry.") -> (".$from_dir."/.htaccess)";
 	        rename $from_dir."/".$entry, $from_dir."/.htaccess";
-	        print "\t[ok]\n";
+	        print "\t[OK]\n";
 	        next;
         }
     	if(!($entry eq "..") and !($entry eq ".") and (-d $from_dir."/".$entry))
@@ -508,7 +529,7 @@ sub activate_htpasswd
 	        # print "(".$from_dir."/".$entry.") =~ matched against ".." \n" if($DEBUG);
 	        print "\tactivate_htpasswd: renaming (".$from_dir."/".$entry.") -> (".$from_dir."/.htpasswd)";
 	        rename $from_dir."/".$entry, $from_dir."/.htpasswd";
-	        print "\t[ok]\n";
+	        print "\t[OK]\n";
 	        next;
         }
     	if(!($entry eq "..") and !($entry eq ".") and (-d $from_dir."/".$entry))
@@ -639,7 +660,7 @@ sub remove_dir_recursively
 		  }
 		}
 		else {
-			print "\t[ok]\n";
+			print "\t[OK]\n";
 		}
 	}
 }
@@ -1004,7 +1025,7 @@ sub Copy_Production_To_Local
 		{
 			print "\tcopying ".$folders_to_backup{$folder_id}." -> $folder_id";
 			system("cp -R ".$folders_to_backup{$folder_id}." $folder_id");
-			print "\t[ok]\n";
+			print "\t[OK]\n";
 		}
 		else
 		{
@@ -1021,7 +1042,7 @@ sub Copy_Local_To_LocalTmp_PersistentFolders
 		{
 			print "\tcopying ".$persistent_folders{$folder_id}." -> ".$config{local_tmp_folder}.$persistent_folders{$folder_id};
 			dircopy($persistent_folders{$folder_id}, $config{local_tmp_folder}.$persistent_folders{$folder_id}) || die "ERROR: can't copy ".$persistent_folders{$folder_id}." -> ".$config{local_tmp_folder}.$persistent_folders{$folder_id};
-			print "\t[ok]\n";
+			print "\t[OK]\n";
 		}
 		else
 		{
@@ -1039,7 +1060,7 @@ sub Dirmove_Local_To_Production
 			print "\tmoving ".$folder_id." -> ".$folders_to_backup{$folder_id};
 			if(dirmove($folder_id, $folders_to_backup{$folder_id}))
 			{
-				print "\t[ok]\n";
+				print "\t[OK]\n";
 			}
 			else
 			{
@@ -1061,7 +1082,7 @@ sub Dirmove_LocalTmp_To_Local
 		{
 			print "\tmoving ".$config{local_tmp_folder}.$folder_id." -> ".$folder_id;
 			dirmove($config{local_tmp_folder}.$folder_id, $folder_id) || die "can't move ".$config{local_tmp_folder}.$folder_id."-> ".$folder_id;
-			print "\t[ok]\n";
+			print "\t[OK]\n";
 		}
 		else
 		{
@@ -1078,7 +1099,7 @@ sub Dirmove_Local_To_LocalTmp
 		{
 			print "\trenaming ".$folder_id." -> ".$config{local_tmp_folder}.$folder_id;
 			dirmove($folder_id, $config{local_tmp_folder}.$folder_id) || die "can't move ".$folder_id."-> ".$config{local_tmp_folder}.$folder_id;
-			print "\t[ok]\n";
+			print "\t[OK]\n";
 		}
 		else
 		{
@@ -1106,7 +1127,7 @@ sub	CreateRecoveryPoint
 				print "\tcopying ".$folders_to_backup{$folder_id}." -> ".$recovery_point_folder.$folder_id;
 				mkdir($recovery_point_folder.$folder_id);
 				dircopy($folders_to_backup{$folder_id}, $recovery_point_folder.$folder_id);
-				print "\t[ok]\n";
+				print "\t[OK]\n";
 			}
 			else
 			{

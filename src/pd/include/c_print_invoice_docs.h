@@ -352,8 +352,8 @@ class C_Print_Act_Subc : public C_Print_Invoice_Docs_Base
 		auto			GetSignatureTitle2() -> string					{ return vars->Get("Customer"); };
 		auto			GetSignatureName1() -> string					{ return vars->Get("subcontractor_company_name_1"); };
 		auto			GetSignatureName2() -> string					{ return vars->Get("agency_name"); };
-		auto			GetSignatureInfo1() -> string					{ return ""; };
-		auto			GetSignatureInfo2() -> string					{ return ""; };
+		auto			GetSignatureInfo1() -> string					{ return vars->Get("subc2agency_act_position1") + " " + vars->Get("subc2agency_act_signature_name1"); };
+		auto			GetSignatureInfo2() -> string					{ return vars->Get("subc2agency_act_position2") + " " + vars->Get("subc2agency_act_signature_name2"); };
 };
 
 

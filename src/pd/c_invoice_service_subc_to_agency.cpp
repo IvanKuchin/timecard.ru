@@ -50,10 +50,6 @@ static auto GetTimecardLines_By_TimecardID(string timecard_id, CMysql *db, CUser
 }
 
 
-C_Invoice_Service_Subc_To_Agency::C_Invoice_Service_Subc_To_Agency() {}
-
-C_Invoice_Service_Subc_To_Agency::C_Invoice_Service_Subc_To_Agency(CMysql *param1, CUser *param2) : db(param1), user(param2) {}
-
 auto C_Invoice_Service_Subc_To_Agency::GenerateDocumentArchive() -> string
 {
 	MESSAGE_DEBUG("", "", "start");
@@ -128,6 +124,7 @@ auto C_Invoice_Service_Subc_To_Agency::GenerateDocumentArchive() -> string
 			} while(isFileExists(filename_xls) || isFileExists(filename_pdf));
 
 			timecard_printer.SetTimecard(timecard);
+			timecard_printer.SetVariableSet(&invoicing_vars);
 
 			timecard_printer.SetFilename(filename_xls);
 			error_message = timecard_printer.PrintAsXLS();
@@ -394,6 +391,8 @@ auto C_Invoice_Service_Subc_To_Agency::CreateTimecardObj(string timecard_id) -> 
 			{
 				{
 					{
+						obj.SetApprovers(GetTimecard_ApprovalChain(timecard_id, db));
+
 						if(db->Query("SELECT * FROM `timecards` WHERE `id`=\"" + timecard_id + "\";"))
 						{
 							auto	sow_id = db->Get(0, "contract_sow_id");

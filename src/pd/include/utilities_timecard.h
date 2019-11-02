@@ -26,7 +26,7 @@ auto			GetBTExpenseLinesInJSONFormat(string sqlQuery, CMysql *, CUser *) -> stri
 auto			GetTimecardsInJSONFormat(string sqlQuery, CMysql *, CUser *, bool isExtended = false) -> string;
 auto			GetServiceBTInvoicesInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetSoWCustomFieldsInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
-auto			GetSOWInJSONFormat(string sqlQuery, CMysql *, CUser *, bool include_tasks = true, bool include_bt = false, bool include_cost_centers = false) -> string;
+auto			GetSOWInJSONFormat(string sqlQuery, CMysql *, CUser *, bool include_tasks = true, bool include_bt = false, bool include_cost_centers = false, bool include_subc_company = false) -> string;
 auto			GetTemplateCompanyAgreementFiles(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetTemplateSoWAgreementFiles(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetCountryListInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
@@ -108,6 +108,10 @@ auto			GetBTExpenseLineTemplatesInJSONFormat(string sqlQuery, CMysql *, CUser *)
 auto			GetBTsInJSONFormat(string sqlQuery, CMysql *, CUser *, bool isExtended) -> string;
 auto			GetBTAllowanceInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetHolidayCalendarInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
+
+auto			ApprovalChain(string sql, CMysql *) -> string;
+auto			GetTimecard_ApprovalChain(string timecard_id, CMysql *) -> string;
+auto			GetBT_ApprovalChain(string bt_id, CMysql *) -> string;
 
 auto			GetBTExpensesInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetAirlineBookingsInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;

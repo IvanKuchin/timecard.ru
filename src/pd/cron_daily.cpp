@@ -233,8 +233,45 @@ auto CloseHelpDeskTicketInClosePendingState(CMysql *db)
 						quoted(tickets[i]) + ", " +
 						quoted(users[i]) + ", " +
 						quoted(severity[i]) + ", " +
-						quoted("closed"s) + ", " +
-						"\"\", " +
+						quoted(HELPDESK_STATE_CLOSED) + ", " +
+						quoted(RemoveQuotas(gettext("Automatic message") + ": "s + gettext("case closed"))) + ", " +
+						"UNIX_TIMESTAMP()"
+						")"
+						";");
+	}
+
+	MESSAGE_DEBUG("", "", "finish (result = " + to_string(result) + ")");
+
+	return	result;
+}
+
+auto MoveQuietCasesToClosePendingState(CMysql *db)
+{
+	bool	result = false;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	auto affected = db->Query("SELECT `helpdesk_ticket_id`, `user_id`, `severity` FROM `helpdesk_ticket_history_last_case_state_view` WHERE `state`=\"customer_pending\" AND `eventTimestamp`<UNIX_TIMESTAMP()-" + to_string(HELPDESK_TICKET_CUSTOMER_PENDING_TIMEOUT) + "*24*3600;");
+	vector<string> tickets;
+	vector<string> users;
+	vector<string> severity;
+
+	for(auto i = 0; i < affected; ++i)
+	{
+		tickets.push_back(db->Get(i, "helpdesk_ticket_id"));
+		users.push_back(db->Get(i, "user_id"));
+		severity.push_back(db->Get(i, "severity"));
+	}
+
+	for(auto i = 0u; i < tickets.size(); ++i)
+	{
+		db->InsertQuery("INSERT INTO `helpdesk_ticket_history` (`helpdesk_ticket_id`, `user_id`, `severity`, `state`, `description`, `eventTimestamp`) VALUES "s +
+						"(" +
+						quoted(tickets[i]) + ", " +
+						quoted(users[i]) + ", " +
+						quoted(severity[i]) + ", " +
+						quoted(HELPDESK_STATE_CLOSE_PENDING) + ", " +
+						quoted(RemoveQuotas(gettext("Automatic message") + ": "s + gettext("move case to the Close_Pending state due to long waiting period"))) + ", " +
 						"UNIX_TIMESTAMP()"
 						")"
 						";");
@@ -384,6 +421,12 @@ int main()
 	gettimeofday(&tv, NULL);
 	srand(tv.tv_sec * tv.tv_usec * 100000);
 
+	if(SetLocale(LOCALE_DEFAULT)) {}
+	else
+	{
+		MESSAGE_ERROR("", "", "fail to setup locale");
+	}
+
 	try
 	{
 
@@ -405,6 +448,8 @@ int main()
 		//--- Remove old captcha
 		RemoveOldCaptcha();
 
+		// --- helpdesk tickets management
+		MoveQuietCasesToClosePendingState(&db);
 		CloseHelpDeskTicketInClosePendingState(&db);
 
 		ExpireOldContracts(&db);

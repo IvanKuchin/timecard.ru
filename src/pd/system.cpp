@@ -397,7 +397,7 @@ int main()
 										string	remove_flag_timestamp = db.Get(0, "remove_flag_timestamp");
 
 										if(remove_flag == "Y")
-											MESSAGE_ERROR("", action, "session(" + sessidPersistence + ") would be deleted at " + remove_flag_timestamp + " timestamp, but it is re-used (probably pressed back-button in browser or refreshed old tab).");
+											MESSAGE_ERROR("", action, "session(" + sessidPersistence + ") would be deleted at " + remove_flag_timestamp + " timestamp, but it is re-used. Potential root causes: (1)pressed back-button in browser, (2)refreshed few old tab at the same time, (3)if device switches between (WiFi and cellular netw) or (LAN and Anyconnect) and changes IP(look for \"IP was changed\" in logs), then browser refreshes active page, in this case eventtimestamps must be few seconds apart, use bash date -d@xxxx to convert timestamp to local date).");
 
 										if(sessidPersistence == sessidHTTP)
 										{

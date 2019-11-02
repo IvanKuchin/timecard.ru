@@ -603,7 +603,7 @@ string CheckHTTPParam_Float(const string &srcText)
 	return	result;
 }
 
-string CheckHTTPParam_Date(const string &srcText)
+string CheckHTTPParam_Date(string srcText)
 {
 	string	result = "";
 
@@ -615,6 +615,8 @@ string CheckHTTPParam_Date(const string &srcText)
 	{
 		regex	r("^([[:digit:]]{1,2})\\/([[:digit:]]{1,2})\\/([[:digit:]]{2,4})$");
 		smatch	sm;
+
+		trim(srcText);
 
 		if(regex_match(srcText, sm, r))
 		{
@@ -6276,10 +6278,10 @@ auto GetSpellingFormattedDate(struct tm date_obj, string format) -> string
 
 struct tm GetTMObject(string date)
 {
+	MESSAGE_DEBUG("", "", "start (" + date + ")");
+
 	struct tm	result;
 	smatch		sm;
-
-	MESSAGE_DEBUG("", "", "start");
 	
 	result.tm_sec	= 0;   // seconds of minutes from 0 to 61
 	result.tm_min	= 0;   // minutes of hour from 0 to 59

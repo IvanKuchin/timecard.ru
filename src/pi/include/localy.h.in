@@ -98,8 +98,7 @@
 #define	GUEST_USER_DEFAULT_ACTION					string("autologin")
 #define	BREADCRUMBS_STR								" | "
 
-#define	ROBOT_USER_ID								25			// --- user id uses to assign helpdesk case after opening
-
+// --- Helpdesk part
 #define	HELPDESK_USER_ROLE							"helpdesk"s
 #define	HELPDESK_STATE_NEW							"new"s
 #define	HELPDESK_STATE_ASSIGNED						"assigned"s
@@ -110,7 +109,10 @@
 #define	HELPDESK_STATE_SEVERITY_CHANGED				"severity_changed"s
 #define	HELPDESK_STATE_CLOSE_PENDING				"close_pending"s
 #define	HELPDESK_STATE_CLOSED						"closed"s
+
 #define HELPDESK_TICKET_CLOSE_PENDING_TIMEOUT		2			// --- in days
+#define HELPDESK_TICKET_CUSTOMER_PENDING_TIMEOUT	7			// --- in days
+
 
 #define	SMTP_HOST									"127.0.0.1"
 #define	SMTP_PORT									25

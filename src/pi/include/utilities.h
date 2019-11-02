@@ -61,7 +61,7 @@ auto	      	ConvertHTMLToText(const wstring &messageBody) -> wstring;
 auto	      	ConvertHTMLToText(const string &messageBody) -> string;
 auto	 		CheckHTTPParam_Text(const string &srcText) -> string;
 auto 			CheckHTTPParam_Number(const string &srcText) -> string;
-auto	 		CheckHTTPParam_Date(const string &srcText) -> string;
+auto	 		CheckHTTPParam_Date(string srcText) -> string;
 auto	 		CheckHTTPParam_Float(const string &srcText) -> string;
 auto	 		CheckHTTPParam_Email(const string &srcText) -> string;
 // auto	      	CheckIfFurtherThanNow(string occupationStart_cp1251) -> string;

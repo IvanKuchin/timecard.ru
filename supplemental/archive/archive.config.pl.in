@@ -4,7 +4,7 @@ backup_username => "ikuchin",
 
 # Mysql tables need to be upgraded during DEV -> WWW
 # have an effect in backup_structure / restore_structure
-tables_to_upgrade => "action_category action_types site_themes",
+tables_to_upgrade => "action_category action_types site_themes faq",
 
 replace_dev_to_www_files => [
 	"SRCDIR/CMakeLists.txt",
@@ -34,4 +34,5 @@ localy_h_file_restore_location => "SRCDIR/build/src/pi/include/localy.h",
 project_source_dir => "${PROJECT_SOURCE_DIR}",
 project_binary_dir => "${PROJECT_BINARY_DIR}",
 project_domain => "${MAIN_DOMAIN_NAME}",
+binary_maxmind_dir => "${MAXMIND_PROJECT_DIR}",
 

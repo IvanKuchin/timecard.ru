@@ -84,10 +84,13 @@ class C_Print_BT
 		auto		GetSpelledTotalPaymentNoVAT()					{ return vars->Get("Total payment in reported timecard") + " "s + vars->Get("w/o") + " " + vars->Get("VAT") + ": "; };
 		auto		GetSpelledSignature()							{ return vars->Get("Signature") + ":"s; };
 		auto		GetSpelledInitials()							{ return vars->Get("Initials") + ":"s; };
+		auto		GetSpelledInitials(string idx) -> string;
 		auto		GetSpelledPosition()							{ return vars->Get("Title") + ":"s; };
+		auto		GetSpelledPosition(string idx) -> string;
 		auto		GetSpelledDate()								{ return vars->Get("Date") + ":"s; };
 		auto		GetSpelledRur()									{ return vars->Get("rur."); };
 		auto		GetSpelledKop()									{ return vars->Get("kop."); };
+		auto		GetSpelledApprovers()							{ return vars->Get("BT approvers") + ":"s; };
 		auto		GetTitleDate()									{ return vars->Get("Date"); };
 		auto		GetTitleExpense()								{ return vars->Get("Expense"); };
 		auto		GetTitleSumRur()								{ return vars->Get("Sum (rur)"); };
@@ -103,6 +106,7 @@ class C_Print_BT
 		auto		__HPDF_DrawTable() -> string;
 		auto		__HPDF_DrawFooter() -> string;
 		auto		__HPDF_DrawFooter_SingleLine(string text, c_float number) -> string;
+		auto 		__HPDF_PrintApprovers() -> string;
 		auto 		__HPDF_PrintSignature() -> string;
 
 		auto		GetBTSumExpenses(string index)					{ return vars->Get("timecard_price_" + index); };

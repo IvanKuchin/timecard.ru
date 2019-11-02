@@ -1077,31 +1077,31 @@ string GetCompanyListInJSONFormat(string dbQuery, CMysql *db, CUser *user, bool 
 			{
 				CompanyClass	company;
 
-				company.id = db->Get(i, "id");
-				company.type = db->Get(i, "type");
-				company.name = db->Get(i, "name");
-				company.legal_geo_zip_id = db->Get(i, "legal_geo_zip_id");
-				company.legal_address = db->Get(i, "legal_address");
-				company.mailing_geo_zip_id = db->Get(i, "mailing_geo_zip_id");
-				company.mailing_address = db->Get(i, "mailing_address");
-				company.tin = db->Get(i, "tin");
-				company.bank_id = db->Get(i, "bank_id");
-				company.account = db->Get(i, "account");
-				company.kpp = db->Get(i, "kpp");
-				company.ogrn = db->Get(i, "ogrn");
-				company.vat = db->Get(i, "vat");
-				company.link = db->Get(i, "link");
+				company.id					= db->Get(i, "id");
+				company.type				= db->Get(i, "type");
+				company.name				= db->Get(i, "name");
+				company.legal_geo_zip_id	= db->Get(i, "legal_geo_zip_id");
+				company.legal_address		= db->Get(i, "legal_address");
+				company.mailing_geo_zip_id	= db->Get(i, "mailing_geo_zip_id");
+				company.mailing_address		= db->Get(i, "mailing_address");
+				company.tin					= db->Get(i, "tin");
+				company.bank_id				= db->Get(i, "bank_id");
+				company.account				= db->Get(i, "account");
+				company.kpp					= db->Get(i, "kpp");
+				company.ogrn				= db->Get(i, "ogrn");
+				company.vat					= db->Get(i, "vat");
+				company.link				= db->Get(i, "link");
 				company.act_number_prefix	= db->Get(i, "act_number_prefix");
 				company.act_number			= db->Get(i, "act_number");
 				company.act_number_postfix	= db->Get(i, "act_number_postfix");
-				company.admin_userID = db->Get(i, "admin_userID");
-				company.foundationDate = db->Get(i, "foundationDate");
-				company.numberOfEmployee = db->Get(i, "numberOfEmployee");
-				company.webSite = db->Get(i, "webSite");
-				company.description = db->Get(i, "description");
-				company.logo_folder = db->Get(i, "logo_folder");
-				company.logo_filename = db->Get(i, "logo_filename");
-				company.employedUsersList = "";
+				company.admin_userID		= db->Get(i, "admin_userID");
+				company.foundationDate		= db->Get(i, "foundationDate");
+				company.numberOfEmployee	= db->Get(i, "numberOfEmployee");
+				company.webSite				= db->Get(i, "webSite");
+				company.description			= db->Get(i, "description");
+				company.logo_folder			= db->Get(i, "logo_folder");
+				company.logo_filename		= db->Get(i, "logo_filename");
+				company.employedUsersList	= "";
 				companiesList.push_back(company);
 			}
 
@@ -4149,7 +4149,7 @@ auto	GetPSoWInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
 	return result;
 }
 
-auto	GetSOWInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include_tasks, bool include_bt, bool include_cost_centers) -> string
+auto	GetSOWInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include_tasks, bool include_bt, bool include_cost_centers, bool include_subc_company) -> string
 {
 	auto	affected = 0;
 	auto	result = ""s;
@@ -4172,9 +4172,7 @@ auto	GetSOWInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include_t
 	};
 	vector<ItemClass>		itemsList;
 
-	{
-		MESSAGE_DEBUG("", "", "start (include_bt = " + to_string(include_bt) + ", include_tasks = " + to_string(include_tasks) + ")");
-	}
+	MESSAGE_DEBUG("", "", "start (include_bt = " + to_string(include_bt) + ", include_tasks = " + to_string(include_tasks) + ", include_cost_centers = " + to_string(include_cost_centers) + ", include_subc_company = " + to_string(include_subc_company) + ")");
 
 	affected = db->Query(sqlQuery);
 	if(affected)
@@ -4208,6 +4206,7 @@ auto	GetSOWInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include_t
 
 			result += "\"id\":\"" + item.id + "\",";
 			result += "\"subcontractor_company_id\":\"" + item.subcontractor_company_id + "\",";
+			result += "\"subcontractor_company\":[" + (include_subc_company ? GetCompanyListInJSONFormat("SELECT * FROM `company` WHERE `isBlocked`='N' AND `id`=\"" + item.subcontractor_company_id + "\";", db, user) : "") + "],";
 			result += "\"agency_company_id\":[" + GetCompanyListInJSONFormat("SELECT * FROM `company` WHERE `isBlocked`='N' AND `id`=\"" + item.agency_company_id + "\";", db, user) + "],";
 			result += "\"company_position_id\":\"" + item.company_position_id + "\",";
 			result += "\"company_positions\":[" + GetCompanyPositionsInJSONFormat("SELECT * FROM `company_position` WHERE `id`=\"" + item.company_position_id + "\";", db, user) + "],";
@@ -4219,17 +4218,19 @@ auto	GetSOWInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include_t
 
 			// --- either BT or timecard tasks (could be changed in future)
 			// --- configured to keep MySQL DB load low
+			result += "\"bt_expense_templates\":[";
 			if(include_bt)
-			{
-				result += "\"bt_expense_templates\":[" + GetBTExpenseTemplatesInJSONFormat("SELECT * FROM `bt_expense_templates` WHERE `id` IN (SELECT `bt_expense_template_id` FROM `bt_sow_assignment` WHERE `sow_id`=\"" + item.id + "\");", db, user) + "],";
-			}
+				result += GetBTExpenseTemplatesInJSONFormat("SELECT * FROM `bt_expense_templates` WHERE `id` IN (SELECT `bt_expense_template_id` FROM `bt_sow_assignment` WHERE `sow_id`=\"" + item.id + "\");", db, user);
+			result +=  "],";
+
+			result += "\"tasks\":[";
 			if(include_tasks)
-			{
-				result += "\"tasks\":[" + GetTimecardTasksInJSONFormat(
+				result += GetTimecardTasksInJSONFormat(
 					"SELECT * FROM `timecard_tasks` WHERE "
 							"`id` IN (SELECT `timecard_tasks_id` FROM `timecard_task_assignment` WHERE `contract_sow_id`=\"" + item.id + "\" "
-									");", db, user) + "],";
-			}
+									");", db, user);
+			result +=  "],";
+
 			result += "\"bt_approvers\":[" + GetApproversInJSONFormat("SELECT * FROM `bt_approvers` WHERE `contract_sow_id`=\"" + item.id + "\";", db, user, DO_NOT_INCLUDE_SOW_INFO) + "],";
 			result += "\"timecard_approvers\":[" + GetApproversInJSONFormat("SELECT * FROM `timecard_approvers` WHERE `contract_sow_id`=\"" + item.id + "\";", db, user, DO_NOT_INCLUDE_SOW_INFO) + "],";
 			result += "\"subcontractor_create_tasks\":\"" + item.subcontractor_create_tasks + "\",";
@@ -4258,9 +4259,7 @@ auto	GetSOWInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include_t
 	}
 	else
 	{
-		{
-			MESSAGE_DEBUG("", "", "user (" + user->GetID() + ") timecard is empty");
-		}
+		MESSAGE_DEBUG("", "", "user (" + user->GetID() + ") timecard is empty");
 	}
 
 	MESSAGE_DEBUG("", "", "finish");
@@ -4334,9 +4333,7 @@ auto	GetSoWCustomFieldsInJSONFormat(string sqlQuery, CMysql *db, CUser *user) ->
 	}
 	else
 	{
-		{
-			MESSAGE_DEBUG("", "", "no bt items assigned");
-		}
+		MESSAGE_DEBUG("", "", "no bt items assigned");
 	}
 
 	MESSAGE_DEBUG("", "", "finish");

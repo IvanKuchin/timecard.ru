@@ -966,6 +966,8 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 			{
 				if(
 					new_value.length()									||
+					(action == "AJAX_updateCompanyCustomField")			||	// --- custom field could be empty
+					(action == "AJAX_updateCostCenterCustomField")		||	// --- custom field could be empty
 					(action == "AJAX_updateCompanyActNumberPrefix")		||	// --- ActNumberPrefix could be empty
 					(action == "AJAX_updateCompanyActNumberPostfix")		 // --- ActNumberPostfix could be empty
 				)
@@ -1203,6 +1205,7 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 							// --- good to go
 						}
 					}
+					else if(action == "AJAX_updateCompanyCustomField")			{ /* --- good to go */ }
 					else if(action == "AJAX_updateSoWEditCapability")			{ /* --- good to go */ }
 					else if(action == "AJAX_updateAgencyPosition")				{ /* --- good to go */ }
 					else if(action == "AJAX_updateSoWPosition")					{ /* --- good to go */ }
@@ -1366,43 +1369,53 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 					}
 					else if(action == "AJAX_updateSoWEndDate")
 					{
-						if(db->Query("SELECT `start_date` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";"))
+						if(db->Query("SELECT `status`,`start_date` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";"))
 						{
-							auto		string_start = db->Get(0, "start_date");
-							auto		string_end = new_value;
-							auto		tm_start = GetTMObject(string_start);
-							auto		tm_end = GetTMObject(string_end);
+							auto		string_status	= db->Get(0, "status");
+							auto		string_start	= db->Get(0, "start_date");
 
-							mktime(&tm_start);
-							mktime(&tm_end);
-
-							if(tm_start <= tm_end)
+							if(string_status != "expired")
 							{
-								if(db->Query("SELECT `period_start`, `period_end` FROM `timecards` where `contract_sow_id`=\"" + sow_id + "\" ORDER BY `period_end` DESC LIMIT 0,1;"))
-								{
-									auto	string_timecard_report_date = db->Get(0, "period_end");
-									auto	tm_timecard_report_date = GetTMObject(string_timecard_report_date);
+								auto		string_end	= new_value;
+								auto		tm_start	= GetTMObject(string_start);
+								auto		tm_end		= GetTMObject(string_end);
 
-									if(tm_timecard_report_date <= tm_end)
+								mktime(&tm_start);
+								mktime(&tm_end);
+
+								if(tm_start <= tm_end)
+								{
+									if(db->Query("SELECT `period_start`, `period_end` FROM `timecards` where `contract_sow_id`=\"" + sow_id + "\" ORDER BY `period_end` DESC LIMIT 0,1;"))
 									{
-										// --- good to go
+										auto	string_timecard_report_date = db->Get(0, "period_end");
+										auto	tm_timecard_report_date = GetTMObject(string_timecard_report_date);
+
+										if(tm_timecard_report_date <= tm_end)
+										{
+											// --- good to go
+										}
+										else
+										{
+											error_message = gettext("Subcontractor reported time on") + " "s + PrintDate(tm_timecard_report_date);
+											MESSAGE_DEBUG("", "", "Subcontractor reported time on " + PrintDate(tm_timecard_report_date) + " earlier than SoW start " + PrintDate(tm_start));
+										}
 									}
 									else
 									{
-										error_message = gettext("Subcontractor reported time on") + " "s + PrintDate(tm_timecard_report_date);
-										MESSAGE_DEBUG("", "", "Subcontractor reported time on " + PrintDate(tm_timecard_report_date) + " earlier than SoW start " + PrintDate(tm_start));
+										// --- good to go
+										MESSAGE_DEBUG("", "", "No timecards subcontractor reported time on this SoW start ");
 									}
 								}
 								else
 								{
-									// --- good to go
-									MESSAGE_DEBUG("", "", "No timecards subcontractor reported time on this SoW start ");
+									error_message = gettext("period start have to precede period end") + " ("s + string_start + " - " +  string_end + ")";
+									MESSAGE_DEBUG("", "", "period start have to precede period end (" + string_start + " - " + string_end + ")");
 								}
 							}
 							else
 							{
-								error_message = gettext("period start have to precede period end") + " ("s + string_start + " - " +  string_end + ")";
-								MESSAGE_DEBUG("", "", "period start have to precede period end (" + string_start + " - " + string_end + ")");
+								error_message = gettext("contract already expired") + ", "s + gettext("changes prohibited") + ". ";
+								MESSAGE_DEBUG("", "", error_message);
 							}
 						}
 						else
@@ -1791,7 +1804,7 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 
 string	isActionEntityBelongsToAgency(string action, string id, string agency_id, CMysql *db, CUser *user)
 {
-	string	error_message = "";
+	auto	error_message = ""s;
 
 	MESSAGE_DEBUG("", "", "start");
 
@@ -1861,6 +1874,8 @@ string	isActionEntityBelongsToAgency(string action, string id, string agency_id,
 
 				if(action == "AJAX_updateTimecardApproverOrder")			sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `contracts_sow` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateBTApproverOrder")					sql_query = "SELECT `agency_company_id` AS `agency_id` FROM `contracts_sow` WHERE `id`=\"" + id + "\";";
+
+				if(action == "AJAX_updateCompanyCustomField")				sql_query = "SELECT `company_id` AS `agency_id` FROM `company_custom_fields` WHERE `id`=\"" + id + "\";";
 
 				if(
 					(action == "AJAX_updateCompanyTitle")			||
@@ -2049,8 +2064,8 @@ auto	GetCostCenterCustomFieldsInJSONFormat(string sqlQuery, CMysql *db, CUser *u
 
 auto	GetCompanyCustomFieldsInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
 {
-	int		affected;
-	auto	result = ""s;
+	MESSAGE_DEBUG("", "", "start");
+
 	struct ItemClass
 	{
 		string	id;
@@ -2066,12 +2081,9 @@ auto	GetCompanyCustomFieldsInJSONFormat(string sqlQuery, CMysql *db, CUser *user
 		string	eventTimestamp;
 	};
 	vector<ItemClass>		itemsList;
+	auto					result = ""s;
+	auto					affected  = db->Query(sqlQuery);
 
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
-
-	affected = db->Query(sqlQuery);
 	if(affected)
 	{
 		for(auto i = 0; i < affected; i++)
@@ -2099,7 +2111,7 @@ auto	GetCompanyCustomFieldsInJSONFormat(string sqlQuery, CMysql *db, CUser *user
 			result +=	"{";
 
 			result += "\"id\":\""							+ item.id + "\",";
-			result += "\"company_id\":\""				+ item.company_id + "\",";
+			result += "\"company_id\":\""					+ item.company_id + "\",";
 			result += "\"title\":\""						+ item.title + "\",";
 			result += "\"description\":\""					+ item.description + "\",";
 			result += "\"type\":\""							+ item.type + "\",";
@@ -2115,14 +2127,10 @@ auto	GetCompanyCustomFieldsInJSONFormat(string sqlQuery, CMysql *db, CUser *user
 	}
 	else
 	{
-		{
-			MESSAGE_DEBUG("", "", "no bt items assigned");
-		}
+		MESSAGE_DEBUG("", "", "no custom fields assigned");
 	}
 
-	{
-		MESSAGE_DEBUG("", "", "finish");
-	}
+	MESSAGE_DEBUG("", "", "finish");
 
 	return result;
 }
@@ -2366,6 +2374,7 @@ auto	GetDBValueByAction(string action, string id, string sow_id, CMysql *db, CUs
 				if(action == "AJAX_updateCompanyMailingZipID")		sql_query = "SELECT `mailing_geo_zip_id`as `value` FROM `company` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateCompanyLegalZipID")		sql_query = "SELECT `legal_geo_zip_id`	as `value` FROM `company` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateCompanyBankID")			sql_query = "SELECT `bank_id`			as `value` FROM `company` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateCompanyCustomField")		sql_query = "SELECT `value`				as `value` FROM `company_custom_fields` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateAgencyPosition")			sql_query = "SELECT `title`				as `value` FROM `company_position` WHERE `id`=(SELECT `position_id` FROM `company_employees` WHERE `id`=\"" + id + "\");";
 				if(action == "AJAX_updateSoWPosition")				sql_query = "SELECT `title`				as `value` FROM `company_position` WHERE `id`=(SELECT `company_position_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\");";
 				if(action == "AJAX_updatePSoWPosition")				sql_query = "SELECT `title`				as `value` FROM `company_position` WHERE `id`=(SELECT `company_position_id` FROM `contracts_psow` WHERE `id`=\"" + sow_id + "\");";
@@ -2911,7 +2920,7 @@ string	GetObjectsSOW_Reusable_InJSONFormat(string object, string filter, CMysql 
 						"\"sow\":[" + GetSOWInJSONFormat(
 								"SELECT * FROM `contracts_sow` WHERE "
 									"`id` IN ( SELECT `contract_sow_id` FROM `timecards` WHERE " + sql_query_where_statement + ") "
-								";", db, user) + "]";
+								";", db, user, false, false, false,  true) + "]";
 				}
 				else if(object == "bt")
 				{
@@ -2934,7 +2943,7 @@ string	GetObjectsSOW_Reusable_InJSONFormat(string object, string filter, CMysql 
 						"\"sow\":[" + GetSOWInJSONFormat(
 								"SELECT * FROM `contracts_sow` WHERE "
 									"`id` IN ( SELECT `contract_sow_id` FROM `bt` WHERE " + sql_query_where_statement + ") "
-								";", db, user) + "]";
+								";", db, user, true, false, false,  true) + "]"; // --- incl_tasks required to display BT comment with Customer name
 				}
 				else
 				{
@@ -4098,6 +4107,8 @@ string	SetNewValueByAction(string action, string id, string sow_id, string new_v
 			{
 				if(
 					new_value.length()									||
+					(action == "AJAX_updateCompanyCustomField")			||	// --- custom field could be empty
+					(action == "AJAX_updateCostCenterCustomField")		||	// --- custom field could be empty
 					(action == "AJAX_updateCompanyActNumberPrefix")		||	// --- ActNumberPrefix could be empty
 					(action == "AJAX_updateCompanyActNumberPostfix")		 // --- ActNumberPostfix could be empty
 				)
@@ -4136,6 +4147,7 @@ string	SetNewValueByAction(string action, string id, string sow_id, string new_v
 						if(action == "AJAX_updateCompanyMailingZipID")				sql_query = "UPDATE	`company`					SET `mailing_geo_zip_id`			=\"" + new_value + "\",`lastActivity`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
 						if(action == "AJAX_updateCompanyLegalZipID")				sql_query = "UPDATE	`company`					SET `legal_geo_zip_id`				=\"" + new_value + "\",`lastActivity`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
 						if(action == "AJAX_updateCompanyBankID")					sql_query = "UPDATE	`company`					SET `bank_id`						=\"" + new_value + "\",`lastActivity`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateCompanyCustomField")				sql_query = "UPDATE	`company_custom_fields`		SET `value`							=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
 						if(action == "AJAX_updateSoWEditCapability")				sql_query = "UPDATE	`company_employees`			SET `allowed_change_sow`			=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
 						if(action == "AJAX_updateAgencyEditCapability")				sql_query = "UPDATE	`company_employees`			SET `allowed_change_agency_data`	=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
 						if(action == "AJAX_updateSubcontractorCreateTasks")			sql_query = "UPDATE	`contracts_sow`				SET `subcontractor_create_tasks`	=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sow_id + "\";";
@@ -5215,6 +5227,22 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 		{
 			MESSAGE_ERROR("", "", "there is no notification for user type(" + user->GetType() + ")")
 		}
+	}
+	if(action == "AJAX_updateCompanyCustomField")
+	{
+		auto field_name = ""s;
+
+		if(db->Query("SELECT `title` FROM `company_custom_fields` WHERE `id`=" + quoted(id) + ";"))
+		{
+			field_name = db->Get(0, 0);
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "can't find custom name title by id(" + id + ")");
+		}
+
+		notification_description = gettext("Agency:") + " "s + gettext("additional field") + " " + field_name + " " + gettext("changed") + ": " + existing_value + " -> " + new_value;
+		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 	if(action == "AJAX_updateAgencyPosition")
 	{

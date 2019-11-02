@@ -335,7 +335,7 @@ string C_Smartway_Employees::GetEmployeesJSON(const string &sql_query)
 		}
 		else
 		{
-			error_message = gettext("DB is not initialized");
+			error_message = gettext("db is not initialized");
 			MESSAGE_ERROR("", "", error_message);
 		}
 	}

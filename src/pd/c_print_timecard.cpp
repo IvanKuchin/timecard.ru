@@ -65,69 +65,46 @@ auto	C_Print_Timecard::GetSpelledPSoW() -> string
 	return gettext("PSoW") + " №"s + timecard.GetAgreementNumber() + " " + gettext("agreement from") + " " + sign_spelling_date;
 }
 
-auto	C_Print_Timecard::GetSpelledProjectID() -> string
+// TODO: --- spelled initials clean-up
+auto	C_Print_Timecard::GetSpelledInitials(string idx) -> string
 {
-	return timecard.GetProjectNumber().length() ? gettext("Project ID") + ": "s + timecard.GetProjectNumber() : "";
+	auto	result = GetSpelledInitials();
+
+	if(vars && vars->Get("subc2agency_timecard_signature_name" + idx).length())
+	{
+		result += ": " + vars->Get("subc2agency_timecard_signature_name" + idx);
+	}
+	else if(vars && vars->Get("agency2cc_timecard_signature_name" + idx).length())
+	{
+		result += ": " + vars->Get("agency2cc_timecard_signature_name" + idx);
+	}
+	else
+	{
+		result += ": ___________________________________";
+	}
+
+	return result;
 }
 
-auto	C_Print_Timecard::GetSpelledTotalHours() -> string
+// TODO: --- spelled position clean-up
+auto	C_Print_Timecard::GetSpelledPosition(string idx) -> string
 {
-	return gettext("Total hours on duty") + ": "s;
-}
+	auto	result = GetSpelledPosition();
 
-auto	C_Print_Timecard::GetSpelledTotalDays() -> string
-{
-	return gettext("Total days on duty") + ": "s;
-}
+	if(vars && vars->Get("subc2agency_timecard_position" + idx).length())
+	{
+		result += ": " + vars->Get("subc2agency_timecard_position" + idx);
+	}
+	else if(vars && vars->Get("agency2cc_timecard_position" + idx).length())
+	{
+		result += ": " + vars->Get("agency2cc_timecard_position" + idx);
+	}
+	else
+	{
+		result += ": _______________________________";
+	}
 
-auto	C_Print_Timecard::GetSpelledDayrate() -> string
-{
-	return gettext("Dayrate") + ": "s;
-}
-
-auto	C_Print_Timecard::GetSpelledTotalPayment() -> string
-{
-	return gettext("Total payment in reported timecard") + ": "s;
-}
-
-auto	C_Print_Timecard::GetSpelledVAT() -> string
-{
-	return gettext("VAT") + ": "s;
-}
-
-auto	C_Print_Timecard::GetSpelledTotalPaymentNoVAT() -> string
-{
-	return gettext("Total payment in reported timecard") + " "s + gettext("w/o") + " " + gettext("VAT") + ": ";
-}
-
-auto	C_Print_Timecard::GetSpelledSignature() -> string
-{
-	return gettext("Signature") + ":_________________________________"s;
-}
-
-auto	C_Print_Timecard::GetSpelledInitials() -> string
-{
-	return gettext("Initials") + ": ___________________________________"s;
-}
-
-auto	C_Print_Timecard::GetSpelledPosition() -> string
-{
-	return gettext("Title") + ": _______________________________"s;
-}
-
-auto	C_Print_Timecard::GetSpelledDate() -> string
-{
-	return gettext("Date") + ": ____________________________________"s;
-}
-
-auto	C_Print_Timecard::GetSpelledRur() -> string
-{
-	return gettext("rur.");
-}
-
-auto	C_Print_Timecard::GetSpelledKop() -> string
-{
-	return gettext("kop.");
+	return result;
 }
 
 auto	C_Print_Timecard::isDaySummaryStruct_Filled() -> bool
@@ -243,23 +220,31 @@ auto	C_Print_Timecard::PrintAsXLS() -> string
 	// locale cp1251_locale("ru_RU.UTF-8");
 	// std::locale::global(cp1251_locale);
 
-	if(isDaySummaryStruct_Filled())
+	if(vars)
 	{
-		// --- good to go
-		good2go = true;
-	}
-	else
-	{
-		if(AssignValuesToDaySummaryStruct())
+		if(isDaySummaryStruct_Filled())
 		{
 			// --- good to go
 			good2go = true;
 		}
 		else
 		{
-			MESSAGE_ERROR("", "", "fail to fill in day_summary structure");
+			if(AssignValuesToDaySummaryStruct())
+			{
+				// --- good to go
+				good2go = true;
+			}
+			else
+			{
+				MESSAGE_ERROR("", "", "fail to fill in day_summary structure");
+			}
 		}
 	}
+	else
+	{
+		MESSAGE_ERROR("", "", "vars is not initialized, call SetVariableSet(xxx)");
+	}
+
 
 	if(good2go)
 	{
@@ -276,11 +261,10 @@ auto	C_Print_Timecard::PrintAsXLS() -> string
 		auto	spelled_vat					= multibyte_to_wide(GetSpelledVAT());
 		auto	spelled_totalpaymentnovat	= multibyte_to_wide(GetSpelledTotalPaymentNoVAT());
 		auto	spelled_signature			= multibyte_to_wide(GetSpelledSignature());
-		auto	spelled_initials			= multibyte_to_wide(GetSpelledInitials());
-		auto	spelled_position			= multibyte_to_wide(GetSpelledPosition());
 		auto	spelled_date				= multibyte_to_wide(GetSpelledDate());
 		auto	spelled_rur					= multibyte_to_wide(GetSpelledRur());
 		auto	spelled_kop					= multibyte_to_wide(GetSpelledKop());
+		auto	spelled_approvers			= multibyte_to_wide(GetSpelledApprovers());
 
 		auto	*book = xlCreateBook();
 		
@@ -481,6 +465,17 @@ auto	C_Print_Timecard::PrintAsXLS() -> string
 				}
 
 				row_counter++;
+
+				{
+					auto	approvers = multibyte_to_wide(timecard.GetApprovers());
+
+					sheet->writeStr(row_counter, 1, spelled_approvers.c_str());
+					sheet->writeStr(row_counter, 2, approvers.c_str());
+
+					row_counter++;
+				}
+
+				row_counter++;
 				row_counter++;
 
 				{
@@ -500,8 +495,16 @@ auto	C_Print_Timecard::PrintAsXLS() -> string
 				}
 
 				{
-					sheet->writeStr(row_counter, 1, spelled_initials.c_str());
-					sheet->writeStr(row_counter, 9, spelled_initials.c_str());
+					sheet->writeStr(row_counter, 1, multibyte_to_wide(GetSpelledInitials("1")).c_str());
+					sheet->writeStr(row_counter, 9, multibyte_to_wide(GetSpelledInitials("2")).c_str());
+
+					row_counter++;
+					row_counter++;
+				}
+
+				{
+					sheet->writeStr(row_counter, 1, multibyte_to_wide(GetSpelledPosition("1")).c_str());
+					sheet->writeStr(row_counter, 9, multibyte_to_wide(GetSpelledPosition("2")).c_str());
 
 					row_counter++;
 					row_counter++;
@@ -1342,9 +1345,9 @@ auto	C_Print_Timecard::__HPDF_DrawTimecardTable() -> string
 
 auto	C_Print_Timecard::__HPDF_DrawTimecardFooter() -> string
 {
-	auto	error_message = ""s;
-
 	MESSAGE_DEBUG("", "", "start");
+
+	auto	error_message	= ""s;
 
 	MESSAGE_DEBUG("", "", "dayrate " + to_string(timecard.GetDayrate()) + " kop. " + to_string(timecard.GetDayrate().GetFraction()) + ", long kop. " + to_string(long(timecard.GetDayrate().GetFraction())));
 
@@ -1381,27 +1384,35 @@ auto	C_Print_Timecard::__HPDF_DrawTimecardFooter() -> string
 		else if((error_message = __HPDF_PrintText(string(GetSpelledRur())									, __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 3.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())		{ MESSAGE_ERROR("", "", "hpdf: fail to print total payment w/o vat rur"); }
 		else if((error_message = __HPDF_PrintText(to_string(long(GetTotalPayment().GetFraction()))			, __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 4.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT),  __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 5.5 * HPDF_TIMECARD_DAY_WIDTH_PERCENT), HPDF_TALIGN_RIGHT)).length())		{ MESSAGE_ERROR("", "", "hpdf: fail to print total payment w/o vat fraction"); }
 		else if((error_message = __HPDF_PrintText(string(GetSpelledKop())									, __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 6.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())		{ MESSAGE_ERROR("", "", "hpdf: fail to print total payment w/o vat kop"); }
+
+		// --- approvers block
+		else if((error_message = __HPDF_MoveLineDown()).length())																																												{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		else if((error_message = __HPDF_MoveLineDown()).length())																																												{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		else if((error_message = __HPDF_PrintText(GetSpelledApprovers(), HPDF_FIELD_LEFT)).length())																																			{ MESSAGE_ERROR("", "", "hpdf: fail to print spelled approvers"); }
+		else if((error_message = __HPDF_PrintText(timecard.GetApprovers(), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 0.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())											{ MESSAGE_ERROR("", "", "hpdf: fail to print approvers"); }
+
+		// --- signature block
 		else if((error_message = __HPDF_MoveLineDown()).length())																																												{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
 		else if((error_message = __HPDF_MoveLineDown()).length())																																												{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
 		else if((error_message = __HPDF_MoveLineDown()).length())																																												{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
-		else if((error_message = __HPDF_PrintText(timecard.GetSignatureTitle1(), HPDF_FIELD_LEFT)).length())																																	{ MESSAGE_ERROR("", "", "hpdf: fail to print total payment w/o vat title"); }
-		else if((error_message = __HPDF_PrintText(timecard.GetSignatureTitle2(), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 10.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())									{ MESSAGE_ERROR("", "", "hpdf: fail to print total payment w/o vat title"); }
+		else if((error_message = __HPDF_PrintText(timecard.GetSignatureTitle1(), HPDF_FIELD_LEFT)).length())																																	{ MESSAGE_ERROR("", "", "hpdf: fail to signature title 1"); }
+		else if((error_message = __HPDF_PrintText(timecard.GetSignatureTitle2(), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 10.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())									{ MESSAGE_ERROR("", "", "hpdf: fail to signature title 2"); }
 		// else if((error_message = __HPDF_MoveLineDown()).length())																																												{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
 		else if((error_message = __HPDF_MoveLineDown()).length())																																												{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
-		else if((error_message = __HPDF_PrintText(GetSpelledSignature(), HPDF_FIELD_LEFT)).length())																																			{ MESSAGE_ERROR("", "", "hpdf: fail to print total payment w/o vat title"); }
-		else if((error_message = __HPDF_PrintText(GetSpelledSignature(), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 10.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())											{ MESSAGE_ERROR("", "", "hpdf: fail to print total payment w/o vat title"); }
-		// else if((error_message = __HPDF_MoveLineDown()).length())																																												{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		else if((error_message = __HPDF_PrintText(GetSpelledSignature(), HPDF_FIELD_LEFT)).length())																																			{ MESSAGE_ERROR("", "", "hpdf: fail to spelled signature1"); }
+		else if((error_message = __HPDF_PrintText(GetSpelledSignature(), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 10.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())											{ MESSAGE_ERROR("", "", "hpdf: fail to spelled signature2"); }
+		// else if((error_message = __HPDF_MoveLineDown()).length())																																											{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
 		else if((error_message = __HPDF_MoveLineDown()).length())																																												{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
-		else if((error_message = __HPDF_PrintText(GetSpelledInitials(), HPDF_FIELD_LEFT)).length())																																				{ MESSAGE_ERROR("", "", "hpdf: fail to print total payment w/o vat title"); }
-		else if((error_message = __HPDF_PrintText(GetSpelledInitials(), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 10.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())											{ MESSAGE_ERROR("", "", "hpdf: fail to print total payment w/o vat title"); }
-		// else if((error_message = __HPDF_MoveLineDown()).length())																																												{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		else if((error_message = __HPDF_PrintText(GetSpelledInitials("1"), HPDF_FIELD_LEFT)).length())																																			{ MESSAGE_ERROR("", "", "hpdf: fail to print initials1"); }
+		else if((error_message = __HPDF_PrintText(GetSpelledInitials("2"), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 10.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())											{ MESSAGE_ERROR("", "", "hpdf: fail to print initials2"); }
+		// else if((error_message = __HPDF_MoveLineDown()).length())																																											{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
 		else if((error_message = __HPDF_MoveLineDown()).length())																																												{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
-		else if((error_message = __HPDF_PrintText(GetSpelledPosition(), HPDF_FIELD_LEFT)).length())																																				{ MESSAGE_ERROR("", "", "hpdf: fail to print total payment w/o vat title"); }
-		else if((error_message = __HPDF_PrintText(GetSpelledPosition(), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 10.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())											{ MESSAGE_ERROR("", "", "hpdf: fail to print total payment w/o vat title"); }
-		// else if((error_message = __HPDF_MoveLineDown()).length())																																												{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		else if((error_message = __HPDF_PrintText(GetSpelledPosition("1"), HPDF_FIELD_LEFT)).length())																																			{ MESSAGE_ERROR("", "", "hpdf: fail to print position1"); }
+		else if((error_message = __HPDF_PrintText(GetSpelledPosition("2"), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 10.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())											{ MESSAGE_ERROR("", "", "hpdf: fail to print position2"); }
+		// else if((error_message = __HPDF_MoveLineDown()).length())																																											{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
 		else if((error_message = __HPDF_MoveLineDown()).length())																																												{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
-		else if((error_message = __HPDF_PrintText(GetSpelledDate(), HPDF_FIELD_LEFT)).length())																																					{ MESSAGE_ERROR("", "", "hpdf: fail to print total payment w/o vat title"); }
-		else if((error_message = __HPDF_PrintText(GetSpelledDate(), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 10.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())												{ MESSAGE_ERROR("", "", "hpdf: fail to print total payment w/o vat title"); }
+		else if((error_message = __HPDF_PrintText(GetSpelledDate(), HPDF_FIELD_LEFT)).length())																																					{ MESSAGE_ERROR("", "", "hpdf: fail to print date"); }
+		else if((error_message = __HPDF_PrintText(GetSpelledDate(), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 10.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())												{ MESSAGE_ERROR("", "", "hpdf: fail to print date"); }
 	}
 	catch(...)
 	{

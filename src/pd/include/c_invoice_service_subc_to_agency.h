@@ -43,8 +43,8 @@ class C_Invoice_Service_Subc_To_Agency
 		auto		CreateTimecardObj(string timecard_id) -> C_Timecard_To_Print;
 
 	public:
-					C_Invoice_Service_Subc_To_Agency();
-					C_Invoice_Service_Subc_To_Agency(CMysql *, CUser *);
+					C_Invoice_Service_Subc_To_Agency()				{};
+					C_Invoice_Service_Subc_To_Agency(CMysql *param1, CUser *param2) : db(param1), user(param2) {};
 
 		auto		SetTimecardList(const vector<string> &param1)	{ timecard_id_list = param1; };
 

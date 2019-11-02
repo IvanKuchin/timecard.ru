@@ -5348,7 +5348,7 @@ int main()
 			}
 			else
 			{
-				MESSAGE_ERROR("", action, "(not an error, severity error should be monitor) registered user(" + user.GetLogin() + ") attempts to access activateNewUser page, redirect to default page");
+				MESSAGE_ERROR("", action, "(not an error, severity should be monitor) registered user(" + user.GetLogin() + ") attempts to access activateNewUser page, redirect to default page");
 
 				indexPage.Redirect("/" + GetDefaultActionFromUserType(&user, &db) + "?rand=" + GetRandom(10));
 			}

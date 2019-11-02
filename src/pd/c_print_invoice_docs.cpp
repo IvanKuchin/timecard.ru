@@ -23,7 +23,6 @@ auto	C_Print_Invoice_Docs_Base::SpellPrice() -> string
 	return result;
 }
 
-
 // --- XLS part
 auto	C_Print_Invoice_Docs_Base::__XLS_DrawBorder(int left, int top, int right, int bottom) -> string
 {
@@ -225,10 +224,12 @@ auto C_Print_Invoice_Docs_Base::__PrintXLSSignature() -> string
 		__sheet->writeStr(__row_counter, 8, L"", format_underline);
 		__sheet->writeStr(__row_counter, 9, L"", format_underline);
 	}
+
 	++__row_counter;
 	__sheet->writeStr(__row_counter, 4, multibyte_to_wide(GetSignatureName1()).c_str(), format_right);
 	if(GetSignatureTitle2().length())
 		__sheet->writeStr(__row_counter, 9, multibyte_to_wide(GetSignatureName2()).c_str(), format_right);
+
 	++__row_counter;
 	__sheet->writeStr(__row_counter, 4, multibyte_to_wide(GetSignatureInfo1()).c_str(), format_right_small);
 	if(GetSignatureTitle2().length())

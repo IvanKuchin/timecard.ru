@@ -331,6 +331,8 @@ auto C_Invoice_BT_Subc_To_Agency::CreateBTObj(string bt_id) -> C_BT_To_Print
 			{
 				{
 					{
+						obj.SetApprovers(GetBT_ApprovalChain(bt_id, db));
+
 						if(db->Query("SELECT * FROM `bt` WHERE `id`=\"" + bt_id + "\";"))
 						{
 							auto	sow_id = db->Get(0, "contract_sow_id");

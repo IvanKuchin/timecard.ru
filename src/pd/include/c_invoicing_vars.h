@@ -34,6 +34,8 @@ class C_Invoicing_Vars
 		auto		FillStaticDictionary() -> string;
 		auto		CostCenter_VarSet() -> string;
 		auto		Agency_VarSet(string) -> string;
+		auto		Agency_CustomFields_Subc2Agency_VarSet(string) -> string;
+		auto		Agency_CustomFields_Agency2CC_VarSet(string) -> string;
 		auto		CurrentTimestamp_1C_VarSet() -> string;
 		auto		AgreementNumberSpelling_VarSet(string agreement_number) -> string;
 
@@ -53,7 +55,6 @@ class C_Invoicing_Vars
 		auto		TableRowDecsriptions_Index_VarSet(string local_remote_service_description, string index) -> string;
 
 		auto		ShortenWorkPeriodSpelling(struct tm workperiod_start, struct tm workperiod_finish, string index) -> string;
-
 
 	public:
 					C_Invoicing_Vars()						{};

@@ -1041,6 +1041,7 @@ int main(void)
 			auto			legal_address		= CheckHTTPParam_Text	(indexPage.GetVarsHandler()->Get("legal_address"));
 			auto			mailing_geo_zip		= CheckHTTPParam_Number	(indexPage.GetVarsHandler()->Get("geo_zip_mailing"));
 			auto			mailing_address		= CheckHTTPParam_Text	(indexPage.GetVarsHandler()->Get("mailing_address"));
+			auto			kpp					= CheckHTTPParam_Text	(indexPage.GetVarsHandler()->Get("company_kpp"));
 			auto			template_name = "json_response.htmlt"s;
 			auto			error_message = ""s;
 			auto			company_obj = ""s;
@@ -1064,7 +1065,7 @@ int main(void)
 			company.SetTIN				(CheckHTTPParam_Text  (indexPage.GetVarsHandler()->Get("company_tin")));
 			company.SetVAT				(CheckHTTPParam_Text  (indexPage.GetVarsHandler()->Get("company_vat")));
 			company.SetOGRN				(CheckHTTPParam_Text  (indexPage.GetVarsHandler()->Get("company_ogrn")));
-			company.SetKPP				(CheckHTTPParam_Text  (indexPage.GetVarsHandler()->Get("company_kpp")));
+			company.SetKPP				(kpp.length() ? kpp : "0");
 
 			if((error_message = company.CheckValidity()).empty())
 			{

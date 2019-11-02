@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-04 16:25-0400\n"
+"POT-Creation-Date: 2019-10-31 10:47-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -52,6 +52,9 @@ msgstr "Бухгалтер"
 
 msgid "Act"
 msgstr "Акт"
+
+msgid "Agency:"
+msgstr "Данные агенства:"
 
 msgid "Agency: bt allowance"
 msgstr "Данные агенства: надбавка"
@@ -98,6 +101,9 @@ msgstr "Август"
 msgid "August declension"
 msgstr "Августа"
 
+msgid "Automatic message"
+msgstr "Автоматическое сообщение"
+
 msgid "BT doesn't belongs to agency"
 msgstr "Командировка не относится к агенству"
 
@@ -127,9 +133,6 @@ msgstr "Центр Затрат: номер договора"
 
 msgid "Customer"
 msgstr "Заказчик"
-
-msgid "DB is not initialized"
-msgstr "Ошибка инициализации БД"
 
 msgid "Data has not been initialized"
 msgstr "Ошибка инициализации данных"
@@ -428,6 +431,9 @@ msgstr "не указан номер акта"
 msgid "added"
 msgstr "добавлено"
 
+msgid "additional field"
+msgstr "доп. поле"
+
 msgid "agency bank id not found"
 msgstr "банк не найден"
 
@@ -460,6 +466,12 @@ msgstr "уже существует"
 
 msgid "and"
 msgstr "и"
+
+msgid "Timecard approvers"
+msgstr "Таймкарту подтвердили"
+
+msgid "BT approvers"
+msgstr "Командировку подтвердили"
 
 msgid "approver doesn't assigned to SoW"
 msgstr "согласователь не назначен договору"
@@ -521,8 +533,14 @@ msgstr "не удалось создать фаил архива"
 msgid "can't remove absence in the past"
 msgstr "нельзя удаляить отпуск в прошлом"
 
+msgid "case closed"
+msgstr "кейс закрыт"
+
 msgid "changed"
 msgstr "изменилось"
+
+msgid "changes prohibited"
+msgstr "изменения запрещены"
 
 msgid "citizenship code is empty"
 msgstr "не указано гражданство"
@@ -541,6 +559,9 @@ msgstr "компания не найдена"
 
 msgid "company tin is empty"
 msgstr "не указан ИНН компании"
+
+msgid "contract already expired"
+msgstr "договор закончился"
 
 msgid "cost center already exists"
 msgstr "такой центр затрат уже есть"
@@ -695,6 +716,9 @@ msgstr "не указан тип загран паспорта"
 msgid "from"
 msgstr "с"
 
+msgid "helpdesk ticket not found"
+msgstr "кейс не найден"
+
 msgid "hpdf: fail save to file"
 msgstr "hpdf: не удалось сохранить фаил"
 
@@ -736,9 +760,6 @@ msgstr "не указан идентификатор"
 
 msgid "in scope"
 msgstr "в рамках"
-
-msgid "opened"
-msgstr "открыт"
 
 msgid "incorrect confirmation code"
 msgstr "некорректный код"
@@ -806,6 +827,9 @@ msgstr "не указана должность"
 msgid "missed service description"
 msgstr "не указано описание должности"
 
+msgid "move case to the Close_Pending state due to long waiting period"
+msgstr "кейс переводится в Ожидание Закрытия по причине долгого молчания"
+
 msgid "must be in 20-th century"
 msgstr "должна быть после 2000 г."
 
@@ -844,6 +868,9 @@ msgstr "выберите один фаил"
 
 msgid "ogrn is empty"
 msgstr "не указан ОГРН"
+
+msgid "opened"
+msgstr "открыт"
 
 msgid "parameters incorrect"
 msgstr "некорректные параметры"

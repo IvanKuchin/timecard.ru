@@ -133,6 +133,8 @@ auto	C_Invoicing_Vars::FillStaticDictionary() -> string
 	if(error_message.empty()) error_message = AssignVariableValue("Remote service report over period", gettext("Remote service report over period"), true);
 	if(error_message.empty()) error_message = AssignVariableValue("PSoW", gettext("PSoW"), true);
 	if(error_message.empty()) error_message = AssignVariableValue("Project ID", gettext("Project ID"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("Timecard approvers", gettext("Timecard approvers"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("BT approvers", gettext("BT approvers"), true);
 
 	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
 
@@ -283,14 +285,14 @@ auto	C_Invoicing_Vars::CostCenter_VarSet() -> string
 		}
 		else
 		{
-			MESSAGE_ERROR("", "", "db is not initialized");
 			error_message = gettext("db is not initialized");
+			MESSAGE_ERROR("", "", error_message);
 		}
 	}
 	else
 	{
-		MESSAGE_ERROR("", "", "user is not initialized");
 		error_message = gettext("user is not initialized");
+		MESSAGE_ERROR("", "", error_message);
 	}
 
 
@@ -389,7 +391,15 @@ auto	C_Invoicing_Vars::Agency_VarSet(string __agency_company_id) -> string
 			// --- agency company custom fields 
 			if(error_message.empty())
 			{
-				auto	affected = db->Query("SELECT * FROM `company_custom_fields` WHERE `company_id`=\"" + __agency_company_id + "\";");
+				auto	affected = db->Query("SELECT * FROM `company_custom_fields` WHERE "
+												"`company_id`=\"" + __agency_company_id + "\" "
+// TODO: --- spelled position clean-up: begin
+												"AND "
+												"`var_name` NOT LIKE (\"subc2agency_%\") "
+												"AND "
+												"`var_name` NOT LIKE (\"agency2cc_%\") "
+// TODO: --- spelled position clean-up: stop
+												";");
 
 				for(auto i = 0; i < affected; ++i)
 				{
@@ -411,14 +421,96 @@ auto	C_Invoicing_Vars::Agency_VarSet(string __agency_company_id) -> string
 		}
 		else
 		{
-			MESSAGE_ERROR("", "", "db is not initialized");
 			error_message = gettext("db is not initialized");
+			MESSAGE_ERROR("", "", error_message);
 		}
 	}
 	else
 	{
-		MESSAGE_ERROR("", "", "user is not initialized");
 		error_message = gettext("user is not initialized");
+		MESSAGE_ERROR("", "", error_message);
+	}
+
+
+	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
+
+	return	error_message;
+}
+
+// TODO: --- spelled position clean-up
+auto	C_Invoicing_Vars::Agency_CustomFields_Subc2Agency_VarSet(string __agency_company_id) -> string
+{
+	auto	error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+
+	if(user)
+	{
+		if(db)
+		{
+				auto	affected = db->Query("SELECT * FROM `company_custom_fields` WHERE "
+												"`company_id`=\"" + __agency_company_id + "\" "
+												"AND "
+												"`var_name` LIKE (\"subc2agency_%\") "
+												";");
+
+				for(auto i = 0; i < affected; ++i)
+				{
+					if(error_message.empty()) error_message = AssignVariableValue(db->Get(i, "var_name"), db->Get(i, "value"), true);
+				}
+		}
+		else
+		{
+			error_message = gettext("db is not initialized");
+			MESSAGE_ERROR("", "", error_message);
+		}
+	}
+	else
+	{
+		error_message = gettext("user is not initialized");
+		MESSAGE_ERROR("", "", error_message);
+	}
+
+
+	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
+
+	return	error_message;
+}
+
+// TODO: --- spelled position clean-up
+auto	C_Invoicing_Vars::Agency_CustomFields_Agency2CC_VarSet(string __agency_company_id) -> string
+{
+	auto	error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+
+	if(user)
+	{
+		if(db)
+		{
+				auto	affected = db->Query("SELECT * FROM `company_custom_fields` WHERE "
+												"`company_id`=\"" + __agency_company_id + "\" "
+												"AND "
+												"`var_name` LIKE (\"agency2cc_%\") "
+												";");
+
+				for(auto i = 0; i < affected; ++i)
+				{
+					if(error_message.empty()) error_message = AssignVariableValue(db->Get(i, "var_name"), db->Get(i, "value"), true);
+				}
+		}
+		else
+		{
+			error_message = gettext("db is not initialized");
+			MESSAGE_ERROR("", "", error_message);
+		}
+	}
+	else
+	{
+		error_message = gettext("user is not initialized");
+		MESSAGE_ERROR("", "", error_message);
 	}
 
 
@@ -676,14 +768,14 @@ auto	C_Invoicing_Vars::SoW_Index_VarSet(string sql_query, string index) -> strin
 		}
 		else
 		{
-			MESSAGE_ERROR("", "", "db is not initialized");
 			error_message = gettext("db is not initialized");
+			MESSAGE_ERROR("", "", error_message);
 		}
 	}
 	else
 	{
-		MESSAGE_ERROR("", "", "user is not initialized");
 		error_message = gettext("user is not initialized");
+		MESSAGE_ERROR("", "", error_message);
 	}
 
 
@@ -810,14 +902,14 @@ auto	C_Invoicing_Vars::PSoW_Index_VarSet(string psow_id, string index) -> string
 		}
 		else
 		{
-			MESSAGE_ERROR("", "", "db is not initialized");
 			error_message = gettext("db is not initialized");
+			MESSAGE_ERROR("", "", error_message);
 		}
 	}
 	else
 	{
-		MESSAGE_ERROR("", "", "user is not initialized");
 		error_message = gettext("user is not initialized");
+		MESSAGE_ERROR("", "", error_message);
 	}
 
 
@@ -891,14 +983,14 @@ auto	C_Invoicing_Vars::SubcontractorAddress_Index_VarSet(string index) -> string
 		}
 		else
 		{
-			MESSAGE_ERROR("", "", "db is not initialized");
 			error_message = gettext("db is not initialized");
+			MESSAGE_ERROR("", "", error_message);
 		}
 	}
 	else
 	{
-		MESSAGE_ERROR("", "", "user is not initialized");
 		error_message = gettext("user is not initialized");
+		MESSAGE_ERROR("", "", error_message);
 	}
 
 
@@ -964,14 +1056,14 @@ auto	C_Invoicing_Vars::Subcontractor_Index_VarSet(string subcontractor_company_i
 		}
 		else
 		{
-			MESSAGE_ERROR("", "", "db is not initialized");
 			error_message = gettext("db is not initialized");
+			MESSAGE_ERROR("", "", error_message);
 		}
 	}
 	else
 	{
-		MESSAGE_ERROR("", "", "user is not initialized");
 		error_message = gettext("user is not initialized");
+		MESSAGE_ERROR("", "", error_message);
 	}
 
 
@@ -1136,14 +1228,14 @@ auto	C_Invoicing_Vars::CurrentTimestamp_1C_VarSet() -> string
 		}
 		else
 		{
-			MESSAGE_ERROR("", "", "db is not initialized");
 			error_message = gettext("db is not initialized");
+			MESSAGE_ERROR("", "", error_message);
 		}
 	}
 	else
 	{
-		MESSAGE_ERROR("", "", "user is not initialized");
 		error_message = gettext("user is not initialized");
+		MESSAGE_ERROR("", "", error_message);
 	}
 
 
@@ -1315,14 +1407,14 @@ auto	C_Invoicing_Vars::AgreementNumberSpelling_VarSet(string agreement_number) -
 		}
 		else
 		{
-			MESSAGE_ERROR("", "", "db is not initialized");
 			error_message = gettext("db is not initialized");
+			MESSAGE_ERROR("", "", error_message);
 		}
 	}
 	else
 	{
-		MESSAGE_ERROR("", "", "user is not initialized");
 		error_message = gettext("user is not initialized");
+		MESSAGE_ERROR("", "", error_message);
 	}
 
 
@@ -1377,6 +1469,9 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet_AgencyToCC() -> string
 
 				if((error_message = Agency_VarSet(Get("agency_company_id"))).empty()) {}
 				else { MESSAGE_ERROR("", "", "fail returned from AgencyVarSet"); }
+
+				if((error_message = Agency_CustomFields_Agency2CC_VarSet(Get("agency_company_id"))).empty()) {}
+				else { MESSAGE_ERROR("", "", "fail returned from Agency_CustomFields_Agency2CC_VarSet"); }
 			}
 
 			if(error_message.empty())
@@ -1483,14 +1578,14 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet_AgencyToCC() -> string
 		}
 		else
 		{
-			MESSAGE_ERROR("", "", "db is not initialized");
 			error_message = gettext("db is not initialized");
+			MESSAGE_ERROR("", "", error_message);
 		}
 	}
 	else
 	{
-		MESSAGE_ERROR("", "", "user is not initialized");
 		error_message = gettext("user is not initialized");
+		MESSAGE_ERROR("", "", error_message);
 	}
 
 	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
@@ -1528,9 +1623,11 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet_SubcToAgency() -> string
 					MESSAGE_ERROR("", "", "timecard_obj_list is empty.");
 				}
 
-
 				if((error_message = Agency_VarSet(Get("agency_company_id"))).empty()) {}
 				else { MESSAGE_ERROR("", "", "fail returned from AgencyVarSet"); }
+
+				if((error_message = Agency_CustomFields_Subc2Agency_VarSet(Get("agency_company_id"))).empty()) {}
+				else { MESSAGE_ERROR("", "", "fail returned from Agency_CustomFields_Subc2Agency_VarSet"); }
 			}
 
 			if(error_message.empty())
@@ -1592,8 +1689,9 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet_SubcToAgency() -> string
 					if(error_message.empty())
 					{
 						if((error_message = SubcontractorAddress_Index_VarSet("1")).empty()) {}
-						else { MESSAGE_ERROR("", "", "fail returned from Subcontractor_Index_VarSet"); }
+						else { MESSAGE_ERROR("", "", "fail returned from SubcontractorAddress_Index_VarSet"); }
 					}
+
 					// --- subcontractor payment
 					if(error_message.empty())
 					{
@@ -1627,14 +1725,14 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet_SubcToAgency() -> string
 		}
 		else
 		{
-			MESSAGE_ERROR("", "", "db is not initialized");
 			error_message = gettext("db is not initialized");
+			MESSAGE_ERROR("", "", error_message);
 		}
 	}
 	else
 	{
-		MESSAGE_ERROR("", "", "user is not initialized");
 		error_message = gettext("user is not initialized");
+		MESSAGE_ERROR("", "", error_message);
 	}
 
 	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
@@ -1687,6 +1785,9 @@ auto	C_Invoicing_Vars::GenerateBTVariableSet_AgencyToCC() -> string
 
 				if((error_message = Agency_VarSet(Get("agency_company_id"))).empty()) {}
 				else { MESSAGE_ERROR("", "", "fail returned from AgencyVarSet"); }
+
+				if((error_message = Agency_CustomFields_Agency2CC_VarSet(Get("agency_company_id"))).empty()) {}
+				else { MESSAGE_ERROR("", "", "fail returned from Agency_CustomFields_Agency2CC_VarSet"); }
 			}
 
 			if(error_message.empty())
@@ -1788,14 +1889,14 @@ auto	C_Invoicing_Vars::GenerateBTVariableSet_AgencyToCC() -> string
 		}
 		else
 		{
-			MESSAGE_ERROR("", "", "db is not initialized");
 			error_message = gettext("db is not initialized");
+			MESSAGE_ERROR("", "", error_message);
 		}
 	}
 	else
 	{
-		MESSAGE_ERROR("", "", "user is not initialized");
 		error_message = gettext("user is not initialized");
+		MESSAGE_ERROR("", "", error_message);
 	}
 
 	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
@@ -1836,6 +1937,9 @@ auto	C_Invoicing_Vars::GenerateBTVariableSet_SubcToAgency() -> string
 
 				if((error_message = Agency_VarSet(Get("agency_company_id"))).empty()) {}
 				else { MESSAGE_ERROR("", "", "fail returned from AgencyVarSet"); }
+
+				if((error_message = Agency_CustomFields_Subc2Agency_VarSet(Get("agency_company_id"))).empty()) {}
+				else { MESSAGE_ERROR("", "", "fail returned from Agency_CustomFields_Subc2Agency_VarSet"); }
 			}
 
 			if(error_message.empty())
@@ -1928,14 +2032,14 @@ auto	C_Invoicing_Vars::GenerateBTVariableSet_SubcToAgency() -> string
 		}
 		else
 		{
-			MESSAGE_ERROR("", "", "db is not initialized");
 			error_message = gettext("db is not initialized");
+			MESSAGE_ERROR("", "", error_message);
 		}
 	}
 	else
 	{
-		MESSAGE_ERROR("", "", "user is not initialized");
 		error_message = gettext("user is not initialized");
+		MESSAGE_ERROR("", "", error_message);
 	}
 
 	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
@@ -1988,14 +2092,14 @@ auto	C_Invoicing_Vars::GenerateSoWVariableSet() -> string
 		}
 		else
 		{
-			MESSAGE_ERROR("", "", "db is not initialized");
 			error_message = gettext("db is not initialized");
+			MESSAGE_ERROR("", "", error_message);
 		}
 	}
 	else
 	{
-		MESSAGE_ERROR("", "", "user is not initialized");
 		error_message = gettext("user is not initialized");
+		MESSAGE_ERROR("", "", error_message);
 	}
 
 	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
