@@ -66,6 +66,7 @@ auto	C_Print_Timecard::GetSpelledPSoW() -> string
 }
 
 // TODO: --- spelled initials clean-up
+/*
 auto	C_Print_Timecard::GetSpelledInitials(string idx) -> string
 {
 	auto	result = GetSpelledInitials();
@@ -85,8 +86,10 @@ auto	C_Print_Timecard::GetSpelledInitials(string idx) -> string
 
 	return result;
 }
+*/
 
 // TODO: --- spelled position clean-up
+/*
 auto	C_Print_Timecard::GetSpelledPosition(string idx) -> string
 {
 	auto	result = GetSpelledPosition();
@@ -106,6 +109,7 @@ auto	C_Print_Timecard::GetSpelledPosition(string idx) -> string
 
 	return result;
 }
+*/
 
 auto	C_Print_Timecard::isDaySummaryStruct_Filled() -> bool
 {
@@ -265,6 +269,8 @@ auto	C_Print_Timecard::PrintAsXLS() -> string
 		auto	spelled_rur					= multibyte_to_wide(GetSpelledRur());
 		auto	spelled_kop					= multibyte_to_wide(GetSpelledKop());
 		auto	spelled_approvers			= multibyte_to_wide(GetSpelledApprovers());
+		auto	spelled_initials			= multibyte_to_wide(GetSpelledInitials());
+		auto	spelled_position			= multibyte_to_wide(GetSpelledPosition());
 
 		auto	*book = xlCreateBook();
 		
@@ -494,22 +500,59 @@ auto	C_Print_Timecard::PrintAsXLS() -> string
 					row_counter++;
 				}
 
+
 				{
-					sheet->writeStr(row_counter, 1, multibyte_to_wide(GetSpelledInitials("1")).c_str());
-					sheet->writeStr(row_counter, 9, multibyte_to_wide(GetSpelledInitials("2")).c_str());
+					sheet->writeStr(row_counter, 1, (
+														timecard.GetInitials1().length()
+															? spelled_initials.substr(0, 8) + multibyte_to_wide(timecard.GetInitials1())
+															: spelled_initials
+													).c_str());
+
+					sheet->writeStr(row_counter, 9, (
+														timecard.GetInitials2().length()
+															? spelled_initials.substr(0, 8) + multibyte_to_wide(timecard.GetInitials2())
+															: spelled_initials
+													).c_str());
 
 					row_counter++;
 					row_counter++;
 				}
 
 				{
-					sheet->writeStr(row_counter, 1, multibyte_to_wide(GetSpelledPosition("1")).c_str());
-					sheet->writeStr(row_counter, 9, multibyte_to_wide(GetSpelledPosition("2")).c_str());
+					sheet->writeStr(row_counter, 1, (
+														timecard.GetPosition1().length()
+															? spelled_position.substr(0, 11) + multibyte_to_wide(timecard.GetPosition1())
+															: spelled_position
+													).c_str());
+
+					sheet->writeStr(row_counter, 9, (
+														timecard.GetPosition2().length()
+															? spelled_position.substr(0, 11) + multibyte_to_wide(timecard.GetPosition2())
+															: spelled_position
+													).c_str());
 
 					row_counter++;
 					row_counter++;
 				}
 
+// TODO: cleanup initials
+/*				{
+					sheet->writeStr(row_counter, 1, multibyte_to_wide(GetSpelledInitials1()).c_str());
+					sheet->writeStr(row_counter, 9, multibyte_to_wide(GetSpelledInitials2()).c_str());
+
+					row_counter++;
+					row_counter++;
+				}
+*/
+// TODO: cleanup position
+/*				{
+					sheet->writeStr(row_counter, 1, multibyte_to_wide(GetSpelledPosition1()).c_str());
+					sheet->writeStr(row_counter, 9, multibyte_to_wide(GetSpelledPosition2()).c_str());
+
+					row_counter++;
+					row_counter++;
+				}
+*/
 				{
 					sheet->writeStr(row_counter, 1, spelled_date.c_str());
 					sheet->writeStr(row_counter, 9, spelled_date.c_str());
@@ -1403,12 +1446,18 @@ auto	C_Print_Timecard::__HPDF_DrawTimecardFooter() -> string
 		else if((error_message = __HPDF_PrintText(GetSpelledSignature(), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 10.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())											{ MESSAGE_ERROR("", "", "hpdf: fail to spelled signature2"); }
 		// else if((error_message = __HPDF_MoveLineDown()).length())																																											{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
 		else if((error_message = __HPDF_MoveLineDown()).length())																																												{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
-		else if((error_message = __HPDF_PrintText(GetSpelledInitials("1"), HPDF_FIELD_LEFT)).length())																																			{ MESSAGE_ERROR("", "", "hpdf: fail to print initials1"); }
-		else if((error_message = __HPDF_PrintText(GetSpelledInitials("2"), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 10.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())											{ MESSAGE_ERROR("", "", "hpdf: fail to print initials2"); }
+// TODO: update initials
+		else if((error_message = __HPDF_PrintText(GetSpelledInitials(), HPDF_FIELD_LEFT)).length())																																				{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		else if((error_message = __HPDF_PrintText(timecard.GetInitials1(), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT - 13.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())											{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		else if((error_message = __HPDF_PrintText(GetSpelledInitials(), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 10.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())											{ MESSAGE_ERROR("", "", "hpdf: fail to print text "); }
+		else if((error_message = __HPDF_PrintText(timecard.GetInitials2(), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 13.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())											{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		// else if((error_message = __HPDF_MoveLineDown()).length())																																											{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
 		else if((error_message = __HPDF_MoveLineDown()).length())																																												{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
-		else if((error_message = __HPDF_PrintText(GetSpelledPosition("1"), HPDF_FIELD_LEFT)).length())																																			{ MESSAGE_ERROR("", "", "hpdf: fail to print position1"); }
-		else if((error_message = __HPDF_PrintText(GetSpelledPosition("2"), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 10.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())											{ MESSAGE_ERROR("", "", "hpdf: fail to print position2"); }
+// TODO: update position
+		else if((error_message = __HPDF_PrintText(GetSpelledPosition(), HPDF_FIELD_LEFT)).length())																																				{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		else if((error_message = __HPDF_PrintText(timecard.GetPosition1(), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT - 13.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())											{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		else if((error_message = __HPDF_PrintText(GetSpelledPosition(), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 10.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())											{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		else if((error_message = __HPDF_PrintText(timecard.GetPosition2(), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 13.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())											{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		// else if((error_message = __HPDF_MoveLineDown()).length())																																											{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
 		else if((error_message = __HPDF_MoveLineDown()).length())																																												{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
 		else if((error_message = __HPDF_PrintText(GetSpelledDate(), HPDF_FIELD_LEFT)).length())																																					{ MESSAGE_ERROR("", "", "hpdf: fail to print date"); }

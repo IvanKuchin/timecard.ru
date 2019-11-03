@@ -34,6 +34,10 @@ class C_Timecard_To_Print
 		string					supplier_vat = "";
 		string					signature_title_1 = "";
 		string					signature_title_2 = "";
+		string					initials_1 = "";
+		string					initials_2 = "";
+		string					position_1 = "";
+		string					position_2 = "";
 		string					project_number = "";
 		string					cost_center_id = "";
 		string					sow_id = "";
@@ -64,6 +68,14 @@ class C_Timecard_To_Print
 		auto		SetSignatureTitle1(string &&param1) 		{ signature_title_1 = move(param1); };
 		auto		SetSignatureTitle2(const string &param1)	{ signature_title_2 = param1; };
 		auto		SetSignatureTitle2(string &&param1) 		{ signature_title_2 = move(param1); };
+		auto		SetInitials1(const string &param1)			{ initials_1 = param1; };
+		auto		SetInitials1(string &&param1) 				{ initials_1 = move(param1); };
+		auto		SetInitials2(const string &param1)			{ initials_2 = param1; };
+		auto		SetInitials2(string &&param1) 				{ initials_2 = move(param1); };
+		auto		SetPosition1(const string &param1)			{ position_1 = param1; };
+		auto		SetPosition1(string &&param1) 				{ position_1 = move(param1); };
+		auto		SetPosition2(const string &param1)			{ position_2 = param1; };
+		auto		SetPosition2(string &&param1) 				{ position_2 = move(param1); };
 		auto		SetCostCenterID(const string &param1)		{ cost_center_id = param1; };
 		auto		SetCostCenterID(string &&param1) 			{ cost_center_id = move(param1); };
 		auto		SetApprovers(const string &param1)			{ approvers = param1; };
@@ -82,6 +94,10 @@ class C_Timecard_To_Print
 		auto		GetDateSign()								{ return date_sign_str; };
 		auto		GetSignatureTitle1()						{ return signature_title_1; };		
 		auto		GetSignatureTitle2()						{ return signature_title_2; };		
+		auto		GetInitials1()								{ return initials_1; };		
+		auto		GetInitials2()								{ return initials_2; };		
+		auto		GetPosition1()								{ return position_1; };		
+		auto		GetPosition2()								{ return position_2; };		
 		auto		GetProjectNumber()							{ return project_number; };	
 		auto		GetCostCenterID()							{ return cost_center_id; };	
 		auto		GetApprovers()								{ return approvers; };	

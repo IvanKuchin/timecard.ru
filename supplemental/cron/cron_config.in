@@ -1,4 +1,4 @@
 40 23 * * *	root ${CRON_INSTALL_DIR}/health
 * * * * *	root ${CRON_INSTALL_DIR}/cron_minute
 5 1 * * *	root ${CRON_INSTALL_DIR}/cron_daily
-
+30 3 * * *  ikuchin cd ${ARCHIVE_PROJECT_DIR}/ && ./archive.pl --backup

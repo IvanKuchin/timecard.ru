@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-31 10:47-0400\n"
+"POT-Creation-Date: 2019-11-02 16:10-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -103,6 +103,9 @@ msgstr "Августа"
 
 msgid "Automatic message"
 msgstr "Автоматическое сообщение"
+
+msgid "BT approvers"
+msgstr "Командировку подтвердили"
 
 msgid "BT doesn't belongs to agency"
 msgstr "Командировка не относится к агенству"
@@ -368,6 +371,9 @@ msgstr "ТЗ"
 msgid "This task assigned to cost center"
 msgstr "Этой задаче назначена Центр Затрат"
 
+msgid "Timecard approvers"
+msgstr "Таймкарту подтвердили"
+
 msgid "Timecard doesn't belongs to agency"
 msgstr "Таймкарта не принадлежит агенству"
 
@@ -466,12 +472,6 @@ msgstr "уже существует"
 
 msgid "and"
 msgstr "и"
-
-msgid "Timecard approvers"
-msgstr "Таймкарту подтвердили"
-
-msgid "BT approvers"
-msgstr "Командировку подтвердили"
 
 msgid "approver doesn't assigned to SoW"
 msgstr "согласователь не назначен договору"

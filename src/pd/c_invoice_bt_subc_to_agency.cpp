@@ -331,7 +331,6 @@ auto C_Invoice_BT_Subc_To_Agency::CreateBTObj(string bt_id) -> C_BT_To_Print
 			{
 				{
 					{
-						obj.SetApprovers(GetBT_ApprovalChain(bt_id, db));
 
 						if(db->Query("SELECT * FROM `bt` WHERE `id`=\"" + bt_id + "\";"))
 						{
@@ -363,6 +362,13 @@ auto C_Invoice_BT_Subc_To_Agency::CreateBTObj(string bt_id) -> C_BT_To_Print
 									{
 										obj.SetSignatureTitle2(ConvertHTMLToText(db->Get(0, 0)));
 										
+										obj.SetApprovers(GetBT_ApprovalChain(bt_id, db));
+
+										obj.SetPosition1(GetValueFromDB("SELECT `value` FROM `company_custom_fields` WHERE `var_name`=\"subc2agency_bt_position1\";", db));
+										obj.SetPosition2(GetValueFromDB("SELECT `value` FROM `company_custom_fields` WHERE `var_name`=\"subc2agency_bt_position2\";", db));
+										obj.SetInitials1(GetValueFromDB("SELECT `value` FROM `company_custom_fields` WHERE `var_name`=\"subc2agency_bt_signature1\";", db));
+										obj.SetInitials2(GetValueFromDB("SELECT `value` FROM `company_custom_fields` WHERE `var_name`=\"subc2agency_bt_signature2\";", db));
+
 										{
 											if(EnrichObjWithExpenseLines(bt_id, &obj))
 											{

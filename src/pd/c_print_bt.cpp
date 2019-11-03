@@ -31,6 +31,8 @@ auto	C_Print_BT::GetSpelledProjectID() -> string
 	return bt.GetProjectNumber().length() ? vars->Get("Project ID") + ": "s + bt.GetProjectNumber() : "";
 }
 
+// TODO: --- spelled position clean-up
+/*
 auto	C_Print_BT::GetSpelledInitials(string idx) -> string
 {
 	auto	result = ""s;
@@ -50,7 +52,10 @@ auto	C_Print_BT::GetSpelledInitials(string idx) -> string
 
 	return result;
 }
+*/
 
+// TODO: --- spelled position clean-up
+/*
 auto	C_Print_BT::GetSpelledPosition(string idx) -> string
 {
 	auto	result = ""s;
@@ -70,7 +75,7 @@ auto	C_Print_BT::GetSpelledPosition(string idx) -> string
 
 	return result;
 }
-
+*/
 
 auto	C_Print_BT::__XLS_print_formatted_footer_line(string title, c_float temp) -> void
 {
@@ -236,7 +241,6 @@ auto	C_Print_BT::__XLS_DrawUnderline(int left, int right) -> string
 		}
 	}
 
-
 	MESSAGE_DEBUG("", "", "finish");
 
 	return result;
@@ -262,11 +266,7 @@ auto	C_Print_BT::PrintAsXLS() -> string
 		auto	spelled_projectid			= multibyte_to_wide(GetSpelledProjectID());
 		auto	spelled_signature			= multibyte_to_wide(GetSpelledSignature());
 		auto	spelled_initials			= multibyte_to_wide(GetSpelledInitials());
-		auto	spelled_initials1			= multibyte_to_wide(GetSpelledInitials("1"));
-		auto	spelled_initials2			= multibyte_to_wide(GetSpelledInitials("2"));
 		auto	spelled_position			= multibyte_to_wide(GetSpelledPosition());
-		auto	spelled_position1			= multibyte_to_wide(GetSpelledPosition("1"));
-		auto	spelled_position2			= multibyte_to_wide(GetSpelledPosition("2"));
 		auto	spelled_date				= multibyte_to_wide(GetSpelledDate());
 		
 		index = vars->GetIndexByBTID(bt.GetID());
@@ -456,7 +456,6 @@ auto	C_Print_BT::PrintAsXLS() -> string
 					__xls_sheet->writeStr(__xls_row_counter, 6, multibyte_to_wide(bt.GetApprovers()).c_str());
 
 					__xls_row_counter++;
-					__xls_row_counter++;
 				}
 
 
@@ -487,8 +486,12 @@ auto	C_Print_BT::PrintAsXLS() -> string
 				{
 					__xls_sheet->writeStr(__xls_row_counter,  1, spelled_initials.c_str());
 					__xls_sheet->writeStr(__xls_row_counter,  9, spelled_initials.c_str());
-					__xls_sheet->writeStr(__xls_row_counter,  3, spelled_initials1.c_str());
-					__xls_sheet->writeStr(__xls_row_counter, 11, spelled_initials2.c_str());
+
+					__xls_sheet->writeStr(__xls_row_counter,  3, multibyte_to_wide(bt.GetInitials1()).c_str());
+					__xls_sheet->writeStr(__xls_row_counter, 11, multibyte_to_wide(bt.GetInitials2()).c_str());
+// TODO: clean-up initials
+					// __xls_sheet->writeStr(__xls_row_counter,  3, multibyte_to_wide(GetSpelledInitials("1")).c_str());
+					// __xls_sheet->writeStr(__xls_row_counter, 11, multibyte_to_wide(GetSpelledInitials("2")).c_str());
 
 					__XLS_DrawUnderline(2, 6);
 					__XLS_DrawUnderline(10, 13);
@@ -501,8 +504,12 @@ auto	C_Print_BT::PrintAsXLS() -> string
 				{
 					__xls_sheet->writeStr(__xls_row_counter,  1, spelled_position.c_str());
 					__xls_sheet->writeStr(__xls_row_counter,  9, spelled_position.c_str());
-					__xls_sheet->writeStr(__xls_row_counter,  3, spelled_position1.c_str());
-					__xls_sheet->writeStr(__xls_row_counter, 11, spelled_position2.c_str());
+
+					__xls_sheet->writeStr(__xls_row_counter,  3, multibyte_to_wide(bt.GetPosition1()).c_str());
+					__xls_sheet->writeStr(__xls_row_counter, 11, multibyte_to_wide(bt.GetPosition2()).c_str());
+// TODO: clean-up position
+					// __xls_sheet->writeStr(__xls_row_counter,  3, multibyte_to_wide(GetSpelledPosition("1")).c_str());
+					// __xls_sheet->writeStr(__xls_row_counter, 11, multibyte_to_wide(GetSpelledPosition("2")).c_str());
 
 					__XLS_DrawUnderline(2, 6);
 					__XLS_DrawUnderline(10, 13);
@@ -882,6 +889,7 @@ auto C_Print_BT::__HPDF_PrintSignature() -> string
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
 
+		// --- signature
 		if(error_message.empty())
 		{
 			if((error_message = pdf_obj.__HPDF_MoveLineDown()).length())
@@ -921,10 +929,24 @@ auto C_Print_BT::__HPDF_PrintSignature() -> string
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSpelledInitials()), 60, 60+40, HPDF_TALIGN_LEFT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, true)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSpelledInitials()), 60, 60+40, HPDF_TALIGN_LEFT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(bt.GetInitials1()), 10, 40, HPDF_TALIGN_CENTER, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length()) // --- print from variable
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
 		if(error_message.empty())
+		{
+			// --- don't move to the next line because text could be empty
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(bt.GetInitials2()), 70, 100, HPDF_TALIGN_CENTER, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length()) // --- print from variable
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+
+// TODO: clean-up initials
+/*		if(error_message.empty())
 		{
 			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSpelledInitials("1")), 10, 40, HPDF_TALIGN_CENTER, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length()) // --- print from variable
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
@@ -934,6 +956,13 @@ auto C_Print_BT::__HPDF_PrintSignature() -> string
 			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSpelledInitials("2")), 70, 100, HPDF_TALIGN_CENTER, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length()) // --- print from variable
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
+*/
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_MoveLineDown()).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		}
+
 		if(error_message.empty())
 		{
 			if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(10, 40)).length())
@@ -958,9 +987,23 @@ auto C_Print_BT::__HPDF_PrintSignature() -> string
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSpelledPosition()), 60, 60+40, HPDF_TALIGN_LEFT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, true)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSpelledPosition()), 60, 60+40, HPDF_TALIGN_LEFT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
+
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(bt.GetPosition1()), 10, 40, HPDF_TALIGN_CENTER, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length()) // --- print from variable
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(bt.GetPosition2()), 70, 100, HPDF_TALIGN_CENTER, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length()) // --- print from variable
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+
+// TODO: clean-up position
+/*
 		if(error_message.empty())
 		{
 			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSpelledPosition("1")), 10, 40, HPDF_TALIGN_CENTER, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length()) // --- print from variable
@@ -970,6 +1013,12 @@ auto C_Print_BT::__HPDF_PrintSignature() -> string
 		{
 			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSpelledPosition("2")), 70, 100, HPDF_TALIGN_CENTER, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length()) // --- print from variable
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+*/
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_MoveLineDown()).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
 		}
 		if(error_message.empty())
 		{

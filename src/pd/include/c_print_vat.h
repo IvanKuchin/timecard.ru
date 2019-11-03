@@ -246,10 +246,10 @@ class C_Print_VAT_Subc : public C_Print_VAT_Base
 
 		auto			GetSignatureTitle1() -> string					{ return vars->Get("Director"); };
 		auto			GetSignatureTitle2() -> string					{ return vars->Get("Accountant"); };
-		auto			GetSignatureName1() -> string					{ return ""; };
-		auto			GetSignatureName2() -> string					{ return ""; };
-		auto			GetSignatureInfo1() -> string					{ return ""; };
-		auto			GetSignatureInfo2() -> string					{ return ""; };
+		auto			GetSignatureName1() -> string					{ return vars->Get("subc2agency_vat_signature1"); };
+		auto			GetSignatureName2() -> string					{ return vars->Get("subc2agency_vat_signature2"); };
+		auto			GetSignatureInfo1() -> string					{ return vars->Get("subc2agency_vat_position1"); };
+		auto			GetSignatureInfo2() -> string					{ return vars->Get("subc2agency_vat_position2"); };
 };
 
 #endif

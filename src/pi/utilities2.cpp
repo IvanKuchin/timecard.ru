@@ -2856,3 +2856,16 @@ auto	GetFAQInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
 	return result;
 }
 
+
+auto	GetValueFromDB(string sql, CMysql *db) -> string
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	result = ""s;
+
+	if(db->Query(sql)) result = db->Get(0, 0);
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return result;
+}

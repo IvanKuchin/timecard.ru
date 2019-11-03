@@ -391,7 +391,6 @@ auto C_Invoice_Service_Subc_To_Agency::CreateTimecardObj(string timecard_id) -> 
 			{
 				{
 					{
-						obj.SetApprovers(GetTimecard_ApprovalChain(timecard_id, db));
 
 						if(db->Query("SELECT * FROM `timecards` WHERE `id`=\"" + timecard_id + "\";"))
 						{
@@ -422,6 +421,13 @@ auto C_Invoice_Service_Subc_To_Agency::CreateTimecardObj(string timecard_id) -> 
 									{
 										obj.SetSignatureTitle2(ConvertHTMLToText(db->Get(0, 0)));
 										
+										obj.SetApprovers(GetTimecard_ApprovalChain(timecard_id, db));
+
+										obj.SetPosition1(GetValueFromDB("SELECT `value` FROM `company_custom_fields` WHERE `var_name`=\"subc2agency_timecard_position1\";", db));
+										obj.SetPosition2(GetValueFromDB("SELECT `value` FROM `company_custom_fields` WHERE `var_name`=\"subc2agency_timecard_position2\";", db));
+										obj.SetInitials1(GetValueFromDB("SELECT `value` FROM `company_custom_fields` WHERE `var_name`=\"subc2agency_timecard_signature1\";", db));
+										obj.SetInitials2(GetValueFromDB("SELECT `value` FROM `company_custom_fields` WHERE `var_name`=\"subc2agency_timecard_signature2\";", db));
+
 										{
 											auto		timecard_lines = GetTimecardLines_By_TimecardID(timecard_id, db, user);
 											

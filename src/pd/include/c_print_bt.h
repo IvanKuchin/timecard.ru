@@ -84,9 +84,9 @@ class C_Print_BT
 		auto		GetSpelledTotalPaymentNoVAT()					{ return vars->Get("Total payment in reported timecard") + " "s + vars->Get("w/o") + " " + vars->Get("VAT") + ": "; };
 		auto		GetSpelledSignature()							{ return vars->Get("Signature") + ":"s; };
 		auto		GetSpelledInitials()							{ return vars->Get("Initials") + ":"s; };
-		auto		GetSpelledInitials(string idx) -> string;
+		// auto		GetSpelledInitials(string idx) -> string;
 		auto		GetSpelledPosition()							{ return vars->Get("Title") + ":"s; };
-		auto		GetSpelledPosition(string idx) -> string;
+		// auto		GetSpelledPosition(string idx) -> string;
 		auto		GetSpelledDate()								{ return vars->Get("Date") + ":"s; };
 		auto		GetSpelledRur()									{ return vars->Get("rur."); };
 		auto		GetSpelledKop()									{ return vars->Get("kop."); };

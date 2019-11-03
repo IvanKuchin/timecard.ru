@@ -82,11 +82,11 @@ class C_Print_Timecard
 		auto		GetSpelledTotalPayment()						{ return string(gettext("Total payment in reported timecard") + ": "s); };
 		auto		GetSpelledVAT()									{ return string(gettext("VAT") + ": "s); };
 		auto		GetSpelledTotalPaymentNoVAT()					{ return string(gettext("Total payment in reported timecard") + " "s + gettext("w/o") + " " + gettext("VAT") + ": "); };
-		auto		GetSpelledSignature()							{ return string(gettext("Signature") + ":_________________________________"s); };
-		auto		GetSpelledInitials()							{ return string(gettext("Initials")); };
-		auto		GetSpelledInitials(string idx)	-> string;
-		auto		GetSpelledPosition()							{ return string(gettext("Title")); };
-		auto		GetSpelledPosition(string idx)	-> string;
+		auto		GetSpelledSignature()							{ return string(gettext("Signature") + ": ________________________________"s); };
+		auto		GetSpelledInitials()							{ return string(gettext("Initials") + ": ___________________________________"s); };
+		// auto		GetSpelledInitials(string idx)	-> string;
+		auto		GetSpelledPosition()							{ return string(gettext("Title") + ": _______________________________"s); };
+		// auto		GetSpelledPosition(string idx)	-> string;
 		auto		GetSpelledDate()								{ return string(gettext("Date") + ": ____________________________________"s); };
 		auto		GetSpelledRur()									{ return string(gettext("rur.")); };
 		auto		GetSpelledKop()									{ return string(gettext("kop.")); };

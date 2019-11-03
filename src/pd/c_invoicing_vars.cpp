@@ -394,10 +394,10 @@ auto	C_Invoicing_Vars::Agency_VarSet(string __agency_company_id) -> string
 				auto	affected = db->Query("SELECT * FROM `company_custom_fields` WHERE "
 												"`company_id`=\"" + __agency_company_id + "\" "
 // TODO: --- spelled position clean-up: begin
-												"AND "
-												"`var_name` NOT LIKE (\"subc2agency_%\") "
-												"AND "
-												"`var_name` NOT LIKE (\"agency2cc_%\") "
+												// "AND "
+												// "`var_name` NOT LIKE (\"subc2agency_%\") "
+												// "AND "
+												// "`var_name` NOT LIKE (\"agency2cc_%\") "
 // TODO: --- spelled position clean-up: stop
 												";");
 
@@ -438,6 +438,7 @@ auto	C_Invoicing_Vars::Agency_VarSet(string __agency_company_id) -> string
 }
 
 // TODO: --- spelled position clean-up
+/*
 auto	C_Invoicing_Vars::Agency_CustomFields_Subc2Agency_VarSet(string __agency_company_id) -> string
 {
 	auto	error_message = ""s;
@@ -477,8 +478,10 @@ auto	C_Invoicing_Vars::Agency_CustomFields_Subc2Agency_VarSet(string __agency_co
 
 	return	error_message;
 }
+*/
 
 // TODO: --- spelled position clean-up
+/*
 auto	C_Invoicing_Vars::Agency_CustomFields_Agency2CC_VarSet(string __agency_company_id) -> string
 {
 	auto	error_message = ""s;
@@ -518,7 +521,7 @@ auto	C_Invoicing_Vars::Agency_CustomFields_Agency2CC_VarSet(string __agency_comp
 
 	return	error_message;
 }
-
+*/
 auto	C_Invoicing_Vars::SoW_Index_VarSet(string sql_query, string index) -> string
 {
 	auto	error_message = ""s;
@@ -1470,8 +1473,9 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet_AgencyToCC() -> string
 				if((error_message = Agency_VarSet(Get("agency_company_id"))).empty()) {}
 				else { MESSAGE_ERROR("", "", "fail returned from AgencyVarSet"); }
 
-				if((error_message = Agency_CustomFields_Agency2CC_VarSet(Get("agency_company_id"))).empty()) {}
-				else { MESSAGE_ERROR("", "", "fail returned from Agency_CustomFields_Agency2CC_VarSet"); }
+// TODO: --- spelled position clean-up
+				// if((error_message = Agency_CustomFields_Agency2CC_VarSet(Get("agency_company_id"))).empty()) {}
+				// else { MESSAGE_ERROR("", "", "fail returned from Agency_CustomFields_Agency2CC_VarSet"); }
 			}
 
 			if(error_message.empty())
@@ -1626,8 +1630,9 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet_SubcToAgency() -> string
 				if((error_message = Agency_VarSet(Get("agency_company_id"))).empty()) {}
 				else { MESSAGE_ERROR("", "", "fail returned from AgencyVarSet"); }
 
-				if((error_message = Agency_CustomFields_Subc2Agency_VarSet(Get("agency_company_id"))).empty()) {}
-				else { MESSAGE_ERROR("", "", "fail returned from Agency_CustomFields_Subc2Agency_VarSet"); }
+// TODO: --- spelled position clean-up
+				// if((error_message = Agency_CustomFields_Subc2Agency_VarSet(Get("agency_company_id"))).empty()) {}
+				// else { MESSAGE_ERROR("", "", "fail returned from Agency_CustomFields_Subc2Agency_VarSet"); }
 			}
 
 			if(error_message.empty())
@@ -1786,8 +1791,9 @@ auto	C_Invoicing_Vars::GenerateBTVariableSet_AgencyToCC() -> string
 				if((error_message = Agency_VarSet(Get("agency_company_id"))).empty()) {}
 				else { MESSAGE_ERROR("", "", "fail returned from AgencyVarSet"); }
 
-				if((error_message = Agency_CustomFields_Agency2CC_VarSet(Get("agency_company_id"))).empty()) {}
-				else { MESSAGE_ERROR("", "", "fail returned from Agency_CustomFields_Agency2CC_VarSet"); }
+// TODO: --- spelled position clean-up
+				// if((error_message = Agency_CustomFields_Agency2CC_VarSet(Get("agency_company_id"))).empty()) {}
+				// else { MESSAGE_ERROR("", "", "fail returned from Agency_CustomFields_Agency2CC_VarSet"); }
 			}
 
 			if(error_message.empty())
@@ -1938,8 +1944,9 @@ auto	C_Invoicing_Vars::GenerateBTVariableSet_SubcToAgency() -> string
 				if((error_message = Agency_VarSet(Get("agency_company_id"))).empty()) {}
 				else { MESSAGE_ERROR("", "", "fail returned from AgencyVarSet"); }
 
-				if((error_message = Agency_CustomFields_Subc2Agency_VarSet(Get("agency_company_id"))).empty()) {}
-				else { MESSAGE_ERROR("", "", "fail returned from Agency_CustomFields_Subc2Agency_VarSet"); }
+// TODO: --- spelled position clean-up
+				// if((error_message = Agency_CustomFields_Subc2Agency_VarSet(Get("agency_company_id"))).empty()) {}
+				// else { MESSAGE_ERROR("", "", "fail returned from Agency_CustomFields_Subc2Agency_VarSet"); }
 			}
 
 			if(error_message.empty())

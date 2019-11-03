@@ -424,7 +424,6 @@ auto C_Invoice_BT_Agency_To_CC::CreateBTObj(string bt_id) -> C_BT_To_Print
 	{
 		if(bt_id.length())
 		{
-			obj.SetApprovers(GetBT_ApprovalChain(bt_id, db));
 
 			if(cost_center_id.length())
 			{
@@ -464,7 +463,14 @@ auto C_Invoice_BT_Agency_To_CC::CreateBTObj(string bt_id) -> C_BT_To_Print
 									if(db->Query("SELECT `title` FROM `cost_centers` WHERE `id`=\"" + cost_center_id + "\";"))
 									{
 										obj.SetSignatureTitle2(ConvertHTMLToText(db->Get(0, "title")));
+
+										obj.SetApprovers(GetBT_ApprovalChain(bt_id, db));
 										
+										obj.SetPosition1(GetValueFromDB("SELECT `value` FROM `cost_center_custom_fields` WHERE `var_name`=\"bt_position1\";", db));
+										obj.SetPosition2(GetValueFromDB("SELECT `value` FROM `cost_center_custom_fields` WHERE `var_name`=\"bt_position2\";", db));
+										obj.SetInitials1(GetValueFromDB("SELECT `value` FROM `cost_center_custom_fields` WHERE `var_name`=\"bt_signature1\";", db));
+										obj.SetInitials2(GetValueFromDB("SELECT `value` FROM `cost_center_custom_fields` WHERE `var_name`=\"bt_signature2\";", db));
+
 										if(db->Query("SELECT `value` FROM `contract_psow_custom_fields` WHERE `var_name`=\"Department\" AND `contract_psow_id`=\"" + psow_id + "\" AND `type`=\"input\";"))
 											obj.SetProjectNumber(db->Get(0, "value"));
 										else

@@ -34,8 +34,11 @@ class C_Invoicing_Vars
 		auto		FillStaticDictionary() -> string;
 		auto		CostCenter_VarSet() -> string;
 		auto		Agency_VarSet(string) -> string;
-		auto		Agency_CustomFields_Subc2Agency_VarSet(string) -> string;
-		auto		Agency_CustomFields_Agency2CC_VarSet(string) -> string;
+		
+// TODO: --- spelled position clean-up
+		// auto		Agency_CustomFields_Subc2Agency_VarSet(string) -> string;
+		// auto		Agency_CustomFields_Agency2CC_VarSet(string) -> string;
+
 		auto		CurrentTimestamp_1C_VarSet() -> string;
 		auto		AgreementNumberSpelling_VarSet(string agreement_number) -> string;
 
