@@ -4812,9 +4812,7 @@ int main()
 						CMailLocal	mail;
 						string		activator_id = GetRandom(20);
 
-						{
-							MESSAGE_DEBUG("", action, "" + action + ": sending mail message with password to user (" + user.GetLogin() + ")");
-						}
+						MESSAGE_DEBUG("", action, "" + action + ": sending mail message with password to user (" + user.GetLogin() + ")");
 
 						db.Query("INSERT INTO `activators` SET `id`=\"" + activator_id + "\", `user`=\"" + user.GetEmail() + "\", `type`=\"password_recovery\", `date`=NOW();");
 						if(db.isError())

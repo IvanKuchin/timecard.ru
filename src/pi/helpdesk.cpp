@@ -30,7 +30,108 @@ static auto amINewEngineer(string ticket_id, CMysql *db, CUser *user)
 	return result;
 }
 
-static auto NotifyTicketSubscribers(string ticket_id, CMysql *db, CUser *user)
+static auto GetTicketSeverity(string ticket_id, CMysql *db)
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto result = ""s;
+
+	if(db->Query("SELECT `severity` FROM `helpdesk_ticket_history` WHERE `helpdesk_ticket_id`=" + quoted(ticket_id) + "  ORDER BY `eventTimestamp` DESC LIMIT 0,1;"))
+		result = db->Get(0, 0);
+
+	MESSAGE_DEBUG("", "", "finish(" + result + ")");
+
+	return result;
+}
+
+static auto GetEmailNotificationRecipients(string ticket_id, string severity, CMysql *db, CUser *user)
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	vector<string>	result;
+	auto 			affected = db->Query("SELECT DISTINCT(`login`) FROM `users` WHERE "
+											"LENGTH(`email`) > 0 "
+											"AND "
+											"`helpdesk_subscription_S" + severity + "_email` = \"Y\" "
+											"AND "
+											"`id` IN (SELECT DISTINCT(`user_id`) FROM `helpdesk_ticket_history` WHERE `helpdesk_ticket_id`=" + quoted(ticket_id) + ") "
+											"AND "
+											"`id` != " + quoted(user->GetID()) + " "
+											";"
+										);
+
+	for(int i = 0; i < affected; ++i)
+	{
+		result.push_back(db->Get(i, 0));
+	}
+
+	MESSAGE_DEBUG("", "", "finish(size is " + to_string(result.size()) + ")");
+
+	return result;
+}
+
+static auto GetSMSNotificationRecipients(string ticket_id, string severity, CMysql *db, CUser *user)
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	vector<string>	result;
+	auto 			affected = db->Query("SELECT `country_code`,`phone` FROM `users` WHERE "
+											"`is_phone_confirmed` = \"Y\" "
+											"AND "
+											"`helpdesk_subscription_S" + severity + "_sms` = \"Y\" "
+											"AND "
+											"`id` IN (SELECT DISTINCT(`user_id`) FROM `helpdesk_ticket_history` WHERE `helpdesk_ticket_id`=" + quoted(ticket_id) + ") "
+											"AND "
+											"`id` != " + quoted(user->GetID()) + " "
+											";"
+										);
+
+	for(int i = 0; i < affected; ++i)
+	{
+		result.push_back(db->Get(i, "country_code") + db->Get(i, "phone"));
+	}
+
+	MESSAGE_DEBUG("", "", "finish(size is " + to_string(result.size()) + ")");
+
+	return result;
+}
+
+static auto SendSMSNotification(vector<string> recipients, CCgi *indexPage, CMysql *db, CUser *user)
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	error_message = ""s;
+	c_smsc	smsc(db);
+
+	for(auto &recipient: recipients)
+	{
+		auto	ret = smsc.send_sms(recipient, gettext("case") + " "s + indexPage->GetVarsHandler()->Get("case_title") + " (" + indexPage->GetVarsHandler()->Get("case_id") + ") " + gettext("updated") + ".", 0, "", 0, 0, DOMAIN_NAME, "", "");
+	}
+
+	MESSAGE_DEBUG("", "", "finish(" + error_message + ")");
+
+	return error_message;	
+}
+
+static auto SendEmailNotification(vector<string> recipients, CCgi *indexPage, CMysql *db, CUser *user)
+{
+	MESSAGE_DEBUG("", "", "start (# of recepients:" + to_string(recipients.size()) + ")");
+
+	auto		error_message = ""s;
+	CMailLocal	mail;
+
+
+	for(auto &recipient: recipients)
+	{
+		mail.Send(recipient, "helpdesk_notification", indexPage->GetVarsHandler(), db);
+	}
+
+	MESSAGE_DEBUG("", "", "finish(" + error_message + ")");
+
+	return error_message;	
+}
+
+static auto NotifyTicketSubscribers(string ticket_id, CMysql *db, CUser *user, CCgi *indexPage)
 {
 	MESSAGE_DEBUG("", "", "start");
 
@@ -39,45 +140,33 @@ static auto NotifyTicketSubscribers(string ticket_id, CMysql *db, CUser *user)
 	if(db->Query("SELECT `title` FROM `helpdesk_tickets` WHERE `id`=" + quoted(ticket_id) + ";"))
 	{
 		auto	title = db->Get(0, 0);
+		auto	severity = GetTicketSeverity(ticket_id, db);
 
-		if(db->Query("SELECT `severity` FROM `helpdesk_ticket_history` WHERE `helpdesk_ticket_id`=" + quoted(ticket_id) + "  ORDER BY `eventTimestamp` DESC LIMIT 0,1;"))
+		indexPage->RegisterVariableForce("case_title", title);
+		indexPage->RegisterVariableForce("case_id", ticket_id);
+
 		{
-			struct ItemClass
+			auto	email_recipients = GetEmailNotificationRecipients(ticket_id, severity, db, user);
+
+			if((error_message = SendEmailNotification(email_recipients, indexPage, db, user)).empty())
 			{
-				string	country_code;
-				string	phone_number;
-			};
-			vector<ItemClass>		itemsList;
+				auto	sms_recipients = GetSMSNotificationRecipients(ticket_id, severity, db, user);
 
-			c_smsc	smsc(db);
-			auto	severity = db->Get(0, 0);
- 			auto	affected = db->Query("SELECT `country_code` , `phone` FROM `users` WHERE "
-											"(LENGTH(phone) > 0) "
-											"AND "
-											"(LENGTH(country_code) > 0) "
-											"AND "
-											"`helpdesk_subscription_S" + severity + "_sms`=" + quoted("Y"s)
-											);
+				if((error_message = SendSMSNotification(sms_recipients, indexPage, db, user)).empty())
+				{
 
- 			for(auto i = 0; i < affected; ++i)
-			{
-				ItemClass	item;
-
-				item.country_code	= db->Get(i, 0);
-				item.phone_number	= db->Get(i, 1);
-
-				itemsList.push_back(item);
+				}
+				else
+				{
+					MESSAGE_ERROR("", "", error_message);
+				}
 			}
-
- 			for(auto &item: itemsList)
- 			{
-				auto	ret = smsc.send_sms(item.country_code + item.phone_number, "S" + severity + " " + gettext("opened") + " (" + ticket_id + "). " + title, 0, "", 0, 0, DOMAIN_NAME, "", "");
+			else
+			{
+				MESSAGE_ERROR("", "", error_message);
 			}
 		}
-		else
-		{
-			MESSAGE_DEBUG("", "", "no helpdesk history ticket");
-		}
+
 	}
 	else
 	{
@@ -283,7 +372,7 @@ int main(void)
 							{
 								if((error_message = SaveFilesAndUpdateDB(to_string(ticket_history_id), &indexPage, &db)).empty())
 								{
-									auto	local_error_message = NotifyTicketSubscribers(to_string(ticket_id), &db, &user);
+									auto	local_error_message = NotifyTicketSubscribers(to_string(ticket_id), &db, &user, &indexPage);
 									if(local_error_message.length())
 									{
 										MESSAGE_ERROR("", action, local_error_message);
@@ -380,71 +469,45 @@ int main(void)
 							{
 								auto	curr_severity = db.Get(0, 0);
 
-								if(curr_severity == new_severity)
+								auto	new_ticket_state = 
+											(
+												curr_severity != new_severity ?											quoted(HELPDESK_STATE_SEVERITY_CHANGED) :
+												action == "AJAX_closeCase" ?											quoted(HELPDESK_STATE_CLOSED) : 
+												action == "AJAX_closePendingCase" ?										quoted(HELPDESK_STATE_CLOSE_PENDING) : 
+												action == "AJAX_monitoringCase" ?										quoted(HELPDESK_STATE_MONITORING) : 
+												action == "AJAX_solutionProvidedCase" ?									quoted(HELPDESK_STATE_SOLUTION_PROVIDED) : 
+												user.GetType() == "helpdesk" && amINewEngineer(ticket_id, &db, &user) ? quoted(HELPDESK_STATE_ASSIGNED) :
+												user.GetType() == "helpdesk" ? 											quoted(HELPDESK_STATE_CUSTOMER_PENDING) :
+																														quoted(HELPDESK_STATE_COMPANY_PENDING)
+											);
+								// --- regular ticket update
+								auto	ticket_history_id = db.InsertQuery("INSERT INTO `helpdesk_ticket_history` "
+																			"(`helpdesk_ticket_id`, `user_id`, `severity`, `state`, `description`, `eventTimestamp`) "
+																			"VALUES "
+																			"(" + quoted((ticket_id)) + ", " + quoted(user.GetID()) + ", " + quoted(new_severity) + ", " + new_ticket_state + ", " + quoted(description) + ", UNIX_TIMESTAMP());");
+
+								if(ticket_history_id)
 								{
-									auto	new_ticket_state = 
-												(
-													action == "AJAX_closeCase" ?			quoted(HELPDESK_STATE_CLOSED) : 
-													action == "AJAX_closePendingCase" ?		quoted(HELPDESK_STATE_CLOSE_PENDING) : 
-													action == "AJAX_monitoringCase" ?		quoted(HELPDESK_STATE_MONITORING) : 
-													action == "AJAX_solutionProvidedCase" ?	quoted(HELPDESK_STATE_SOLUTION_PROVIDED) : 
-													user.GetType() == "helpdesk" && amINewEngineer(ticket_id, &db, &user) ?
-																							quoted(HELPDESK_STATE_ASSIGNED) :
-													user.GetType() == "helpdesk" ?
-																							quoted(HELPDESK_STATE_CUSTOMER_PENDING) :
-																							quoted(HELPDESK_STATE_COMPANY_PENDING)
-												);
-									// --- regular ticket update
-									auto	ticket_history_id = db.InsertQuery("INSERT INTO `helpdesk_ticket_history` "
-																				"(`helpdesk_ticket_id`, `user_id`, `severity`, `state`, `description`, `eventTimestamp`) "
-																				"VALUES "
-																				"(" + quoted((ticket_id)) + ", " + quoted(user.GetID()) + ", " + quoted(new_severity) + ", " + new_ticket_state + ", " + quoted(description) + ", UNIX_TIMESTAMP());");
-
-									if(ticket_history_id)
+									if((error_message = SaveFilesAndUpdateDB(to_string(ticket_history_id), &indexPage, &db)).empty())
 									{
-										if((error_message = SaveFilesAndUpdateDB(to_string(ticket_history_id), &indexPage, &db)).empty())
-										{
-											success_message = quoted("tickets"s) + ":[" + GetHelpDeskTicketsInJSONFormat("SELECT * FROM `helpdesk_tickets` WHERE `id`=" + quoted((ticket_id)) + ";", &db, &user) + "]";
-										}
-										else
-										{
-											MESSAGE_ERROR("", action, error_message);
-										}
-									}
-									else
-									{
-										error_message = gettext("SQL syntax error");
-										MESSAGE_ERROR("", "", error_message)
-									}
+										auto	local_error_message = NotifyTicketSubscribers(ticket_id, &db, &user, &indexPage);
 
-								}
-								else
-								{
-									// --- change severity
-
-									auto	ticket_history_id = db.InsertQuery("INSERT INTO `helpdesk_ticket_history` "
-																				"(`helpdesk_ticket_id`, `user_id`, `severity`, `state`, `description`, `eventTimestamp`) "
-																				"VALUES "
-																				"(" + quoted((ticket_id)) + ", " + quoted(user.GetID()) + ", " + quoted(new_severity) + ", " + quoted(HELPDESK_STATE_SEVERITY_CHANGED) + ", " + quoted(description) + ", UNIX_TIMESTAMP())");
-
-									if(ticket_history_id)
-									{
-										auto	local_error_message = ""s;
-
-										if((local_error_message = NotifyTicketSubscribers(ticket_id, &db, &user)).empty())
-										{
-											success_message = quoted("tickets"s) + ":[" + GetHelpDeskTicketsInJSONFormat("SELECT * FROM `helpdesk_tickets` WHERE `id`=" + quoted((ticket_id)) + ";", &db, &user) + "]";
-										}
-										else
+										if(local_error_message.length())
 										{
 											MESSAGE_ERROR("", "", local_error_message);
 										}
+
+										success_message = quoted("tickets"s) + ":[" + GetHelpDeskTicketsInJSONFormat("SELECT * FROM `helpdesk_tickets` WHERE `id`=" + quoted((ticket_id)) + ";", &db, &user) + "]";
 									}
 									else
 									{
-										error_message = gettext("SQL syntax error");
-										MESSAGE_ERROR("", "", error_message)
+										MESSAGE_ERROR("", action, error_message);
 									}
+								}
+								else
+								{
+									error_message = gettext("SQL syntax error");
+									MESSAGE_ERROR("", "", error_message)
 								}
 							}
 							else

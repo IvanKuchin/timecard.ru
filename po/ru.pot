@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-02 16:10-0400\n"
+"POT-Creation-Date: 2019-11-04 15:19-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -419,6 +419,9 @@ msgstr "Вы не сотрудник агенства"
 msgid "You are not authorized"
 msgstr "У Вас нет доступа"
 
+msgid "You need to enter phone number in user profile"
+msgstr "Введите номер телефона в своем профиле"
+
 msgid "absence not found"
 msgstr "Заявка на отсутствие не найдена"
 
@@ -466,6 +469,9 @@ msgstr "не указан номер договора"
 
 msgid "airline not found"
 msgstr "авиалинии не найдены"
+
+msgid "algorithm error"
+msgstr ""
 
 msgid "already exists"
 msgstr "уже существует"
@@ -535,6 +541,9 @@ msgstr "нельзя удаляить отпуск в прошлом"
 
 msgid "case closed"
 msgstr "кейс закрыт"
+
+msgid "case"
+msgstr "кейс"
 
 msgid "changed"
 msgstr "изменилось"
@@ -955,6 +964,9 @@ msgstr "не указан подписант 2"
 
 msgid "sow declension"
 msgstr "договора"
+
+msgid "sql syntax error"
+msgstr ""
 
 msgid "start date"
 msgstr "дата начала"

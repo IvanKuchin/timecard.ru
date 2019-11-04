@@ -1816,6 +1816,97 @@ int main()
 		MESSAGE_DEBUG("", action, "finish");
 	}
 
+	if(action == "AJAX_updateHelpdeskSMSSubscription")
+	{
+		MESSAGE_DEBUG("", action, "start");
+
+		auto			success_message = ""s;
+		auto			error_message = ""s;
+
+		auto			new_value	= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("value"));
+
+		if(new_value.length())
+		{
+			if(new_value == "Y")
+			{
+				if(db.Query("SELECT `is_phone_confirmed` FROM `users` WHERE `id`=" + quoted(user.GetID()) + ";"))
+				{
+					auto	is_phone_confirmed = db.Get(0, 0);
+
+					if(is_phone_confirmed == "Y")
+					{
+						db.Query("UPDATE `users` SET "
+											"`helpdesk_subscription_S1_sms`=" + quoted(new_value) + ","
+											"`helpdesk_subscription_S2_sms`=" + quoted(new_value) + ","
+											"`helpdesk_subscription_S3_sms`=" + quoted(new_value) + ","
+											"`helpdesk_subscription_S4_sms`=" + quoted(new_value) + " "
+											"WHERE `id`=" + quoted(user.GetID()) + ";");
+
+						if(db.isError())
+						{
+							error_message = gettext("sql syntax error");
+							MESSAGE_ERROR("", action, error_message);
+						}
+					}
+					else
+					{
+						error_message = gettext("You need to enter phone number in user profile");
+						MESSAGE_DEBUG("", action, error_message);
+					}
+				}
+				else
+				{
+					error_message = gettext("sql syntax error");
+					MESSAGE_ERROR("", action, error_message);
+				}
+			}
+		}
+		else
+		{
+			error_message = gettext("parameters incorrect");
+			MESSAGE_ERROR("", action, "user.id(" + user.GetID() + ") didn't set severity");
+		}
+
+		AJAX_ResponseTemplate(&indexPage, success_message, error_message);
+
+		MESSAGE_DEBUG("", action, "finish");
+	}
+
+	if(action == "AJAX_updateHelpdeskEmailSubscription")
+	{
+		MESSAGE_DEBUG("", action, "start");
+
+		auto			success_message = ""s;
+		auto			error_message = ""s;
+
+		auto			new_value	= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("value"));
+
+		if(new_value.length())
+		{
+			db.Query("UPDATE `users` SET "
+								"`helpdesk_subscription_S1_email`=" + quoted(new_value) + ","
+								"`helpdesk_subscription_S2_email`=" + quoted(new_value) + ","
+								"`helpdesk_subscription_S3_email`=" + quoted(new_value) + ","
+								"`helpdesk_subscription_S4_email`=" + quoted(new_value) + " "
+								"WHERE `id`=" + quoted(user.GetID()) + ";");
+
+			if(db.isError())
+			{
+				error_message = gettext("sql syntax error");
+				MESSAGE_ERROR("", action, error_message);
+			}
+		}
+		else
+		{
+			error_message = gettext("parameters incorrect");
+			MESSAGE_ERROR("", action, "user.id(" + user.GetID() + ") didn't set severity");
+		}
+
+		AJAX_ResponseTemplate(&indexPage, success_message, error_message);
+
+		MESSAGE_DEBUG("", action, "finish");
+	}
+
 
 	MESSAGE_DEBUG("", action, "finish condition")
 

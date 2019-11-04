@@ -1886,6 +1886,14 @@ string GetUserListInJSONFormat(string dbQuery, CMysql *db, CUser *user)
 		string	site_theme_id;
 		string	userLastOnline;
 		string	userLastOnlineSecondSinceY2k;
+		string	helpdesk_subscription_S1_sms;
+		string	helpdesk_subscription_S2_sms;
+		string	helpdesk_subscription_S3_sms;
+		string	helpdesk_subscription_S4_sms;
+		string	helpdesk_subscription_S1_email;
+		string	helpdesk_subscription_S2_email;
+		string	helpdesk_subscription_S3_email;
+		string	helpdesk_subscription_S4_email;
 	};
 	vector<ItemClass>		itemsList;
 	int						itemsCount;
@@ -1925,7 +1933,14 @@ string GetUserListInJSONFormat(string dbQuery, CMysql *db, CUser *user)
 			item.foreign_passport_expiration_date = db->Get(i, "foreign_passport_expiration_date");
 			item.userLastOnline					= db->Get(i, "last_online");
 			item.userLastOnlineSecondSinceY2k	= db->Get(i, "last_onlineSecondsSinceY2k");
-			item.site_theme_id					= db->Get(i, "site_theme_id");
+			item.helpdesk_subscription_S1_email	= db->Get(i, "helpdesk_subscription_S1_email");
+			item.helpdesk_subscription_S2_email	= db->Get(i, "helpdesk_subscription_S2_email");
+			item.helpdesk_subscription_S3_email	= db->Get(i, "helpdesk_subscription_S3_email");
+			item.helpdesk_subscription_S4_email	= db->Get(i, "helpdesk_subscription_S4_email");
+			item.helpdesk_subscription_S1_sms	= db->Get(i, "helpdesk_subscription_S1_sms");
+			item.helpdesk_subscription_S2_sms	= db->Get(i, "helpdesk_subscription_S2_sms");
+			item.helpdesk_subscription_S3_sms	= db->Get(i, "helpdesk_subscription_S3_sms");
+			item.helpdesk_subscription_S4_sms	= db->Get(i, "helpdesk_subscription_S4_sms");
 
 			itemsList.push_back(item);
 		}
@@ -2053,6 +2068,8 @@ string GetUserListInJSONFormat(string dbQuery, CMysql *db, CUser *user)
 						"\"bonuses_airlines\": ["				<< ((user && (userID == user->GetID())) ? GetUserBonusesAirlinesInJSONFormat("SELECT * FROM `user_bonuses_avia` WHERE `user_id`=\"" + itemsList[i].userID + "\";", db, user) : "") << "],"
 						"\"bonuses_railroads\": ["				<< ((user && (userID == user->GetID())) ? GetUserBonusesRailroadsInJSONFormat("SELECT * FROM `user_bonuses_railroads` WHERE `user_id`=\"" + itemsList[i].userID + "\";", db, user) : "") << "],"
 						"\"bonuses_hotel_chains\": ["			<< ((user && (userID == user->GetID())) ? GetUserBonusesHotelchainsInJSONFormat("SELECT * FROM `user_bonuses_hotels` WHERE `user_id`=\"" + itemsList[i].userID + "\";", db, user) : "") << "],"
+						"\"helpdesk_subscriptions_sms\": ["		<< ((user && (userID == user->GetID())) ? quoted(itemsList[i].helpdesk_subscription_S1_sms) + "," + quoted(itemsList[i].helpdesk_subscription_S2_sms) + "," + quoted(itemsList[i].helpdesk_subscription_S3_sms) + "," + quoted(itemsList[i].helpdesk_subscription_S4_sms)  : "") << "],"
+						"\"helpdesk_subscriptions_email\": ["	<< ((user && (userID == user->GetID())) ? quoted(itemsList[i].helpdesk_subscription_S1_email) + "," + quoted(itemsList[i].helpdesk_subscription_S2_email) + "," + quoted(itemsList[i].helpdesk_subscription_S3_email) + "," + quoted(itemsList[i].helpdesk_subscription_S4_email)  : "") << "],"
 						"\"isMe\": \""							<< ((user && (userID == user->GetID())) ? "yes" : "no") << "\""
 						"}";
 			} // --- if user is not dupicated
