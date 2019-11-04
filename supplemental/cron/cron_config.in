@@ -1,4 +1,7 @@
+# --- root user required to access /var/log/fail2ban.log
 40 23 * * *	root ${CRON_INSTALL_DIR}/health
-* * * * *	root ${CRON_INSTALL_DIR}/cron_minute
-5 1 * * *	root ${CRON_INSTALL_DIR}/cron_daily
-30 3 * * *  ikuchin cd ${ARCHIVE_PROJECT_DIR}/ && ./archive.pl --backup
+# --- www-data is normal user
+* * * * *	www-data ${CRON_INSTALL_DIR}/cron_minute
+5 1 * * *	www-data ${CRON_INSTALL_DIR}/cron_daily
+# --- ikuchin required to save backup (ikuchin authenticated w/ key-pair on backup-server)
+15 4 * * *  ikuchin cd ${ARCHIVE_INSTALL_DIR}/ && ./archive.pl --backup

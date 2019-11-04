@@ -586,3 +586,20 @@ auto	GetBT_ApprovalChain(string bt_id, CMysql *db) -> string
 
 	return	result;
 }
+
+auto			GetHolidaysSet(string day_around, CMysql *db) -> unordered_set<string>
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	unordered_set<string>	result;
+	auto					affected = db->Query("SELECT `date` FROM `holiday_calendar` WHERE DATE_SUB(" + quoted(day_around) + ", INTERVAL " + to_string(HOLIDAY_RANGE_FROM_TODAY) + " DAY)<=`date` AND `date`<=DATE_ADD(" + quoted(day_around) + ", INTERVAL " + to_string(HOLIDAY_RANGE_FROM_TODAY) + " DAY);");
+
+	for(auto i = 0; i < affected; ++i)
+	{
+		result.emplace(db->Get(i, 0));
+	}
+
+	MESSAGE_DEBUG("", "", "finish (number of hoildays = " + to_string(result.size()) + ")");
+
+	return result;
+}

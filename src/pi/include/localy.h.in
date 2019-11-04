@@ -113,6 +113,7 @@
 #define HELPDESK_TICKET_CLOSE_PENDING_TIMEOUT		2			// --- in days
 #define HELPDESK_TICKET_CUSTOMER_PENDING_TIMEOUT	7			// --- in days
 
+#define	HOLIDAY_RANGE_FROM_TODAY					31			// --- +/- days to look for holidays
 
 #define	SMTP_HOST									"127.0.0.1"
 #define	SMTP_PORT									25

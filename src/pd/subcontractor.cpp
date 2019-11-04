@@ -79,15 +79,9 @@ static auto	GetTimecardsSOWTaskAssignement_Reusable_InJSONFormat(string date, CM
 															");", db, user) + "],"
 						"\"holiday_calendar\":[" + GetHolidayCalendarInJSONFormat(
 								"SELECT * FROM `holiday_calendar` WHERE "
-									"`date`>=(SELECT DISTINCT(`period_start`) " + timecard_query + ") "
+									"`date`>=(DATE_SUB(" + quoted(date) + ", INTERVAL " + to_string(HOLIDAY_RANGE_FROM_TODAY) + " DAY)) "
 									"AND "
-									"`date`<=(SELECT DISTINCT(`period_end`) " + timecard_query + ") "
-									"AND "
-									"`agency_company_id` IN ("
-										"SELECT `agency_company_id` FROM `contracts_sow` WHERE `subcontractor_company_id` IN ("
-											"SELECT `id` FROM `company` WHERE `admin_userID` = \"" + user->GetID() + "\""
-										")"
-									")"
+									"`date`<=(DATE_ADD(" + quoted(date) + ", INTERVAL " + to_string(HOLIDAY_RANGE_FROM_TODAY) + " DAY)) "
 								";", db, user) + "]";
 			}
 			else
@@ -207,98 +201,63 @@ int main()
 
 	if(action == "AJAX_getMyTimecard")
 	{
-		string			strPageToGet, strFriendsOnSinglePage;
-		ostringstream	ostResult;
-
 		MESSAGE_DEBUG("", action, "start");
 
-		ostResult.str("");
-/*		if(user.GetLogin() == "Guest")
+		auto			error_message = ""s;
+		auto			success_message = ""s;
+		auto			period_start_date = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("period_start_date"));
+		auto			period_start_month = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("period_start_month"));
+		auto			period_start_year = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("period_start_year"));
+		auto			template_name = "json_response.htmlt"s;
+
+		if(period_start_date.length() && period_start_month.length() && period_start_year.length())
 		{
-			MESSAGE_DEBUG("", action, "re-login required");
+			auto		affected = db.Query("SELECT `id` FROM `company` WHERE `admin_userID`=\"" + user.GetID() + "\";");
 
-			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
-		}
-		else
-*/		{
-			string			template_name = "json_response.htmlt";
-			string			period_start_date, period_start_month, period_start_year;
-			string			period_length;
-			string			dbQuery;
-
-			period_start_date = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("period_start_date"));
-			period_start_month = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("period_start_month"));
-			period_start_year = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("period_start_year"));
-
-			if(period_start_date.length() && period_start_month.length() && period_start_year.length())
+			// --- 0-0-0 means today
+			if(period_start_year == "0")
 			{
-				int		affected = 0;
+			    time_t t = time(0);   // get time now
+			    tm* now = localtime(&t);
 
-				// --- 0-0-0 means today
-				if(period_start_year == "0")
+			    period_start_year = to_string(now->tm_year + 1900);
+			    period_start_month = to_string(now->tm_mon + 1);
+			    period_start_date = to_string(now->tm_mday);
+			}
+
+			if(affected)
+			{
+				auto		companies_list= ""s;
+
+				success_message = GetTimecardsSOWTaskAssignement_Reusable_InJSONFormat(period_start_year + "-" + period_start_month + "-" + period_start_date, &db, &user);
+
+				if(success_message.empty())
 				{
-				    time_t t = time(0);   // get time now
-				    tm* now = localtime(&t);
-
-				    period_start_year = to_string(now->tm_year + 1900);
-				    period_start_month = to_string(now->tm_mon + 1);
-				    period_start_date = to_string(now->tm_mday);
-
-				}
-
-				affected = db.Query("SELECT `id` FROM `company` WHERE `admin_userID`=\"" + user.GetID() + "\";");
-				if(affected)
-				{
-					auto		companies_list= ""s;
-					auto		temp = GetTimecardsSOWTaskAssignement_Reusable_InJSONFormat(period_start_year + "-" + period_start_month + "-" + period_start_date, &db, &user);
-
-/*
-					for(int i = 0; i < affected; ++i)
-					{
-						if(companies_list.length()) companies_list += ",";
-						companies_list += db.Get(i, "id");
-					}
-*/
-					if(temp.empty())
-					{
-						MESSAGE_ERROR("", action, "timecard object is empty. check previous error message.")
-						ostResult << "{\"status\":\"error\",\"description\":\"Ошибка в алгоритме.\"}";
-					}
-					else
-					{
-						ostResult	<< "{"
-									<< "\"status\":\"success\","
-									<< temp
-									<< "}";
-					}
-
+					error_message = gettext("algorithm error");
+					MESSAGE_ERROR("", action, error_message)
 				}
 				else
 				{
-					MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't owns company");
+					// --- good2go
 				}
 
 			}
 			else
 			{
-				{
-					MESSAGE_DEBUG("", action, "period_start or period_length missed");
-				}
-				ostResult << "{\"status\":\"error\",\"description\":\"Пропущены обязательные параметры. Обратитьесь в тех. поддержку\"}";
+				error_message = gettext("you are not authorized");
+				MESSAGE_ERROR("", action, error_message);
 			}
 
-			indexPage.RegisterVariableForce("result", ostResult.str());
-
-			if(!indexPage.SetTemplate(template_name))
-			{
-				MESSAGE_ERROR("", action, "can't find template " + template_name);
-			}
 		}
-
-
+		else
 		{
-			MESSAGE_DEBUG("", action, "finish");
+			error_message = gettext("mandatory parameter missed");
+			MESSAGE_DEBUG("", action, error_message);
 		}
+
+		AJAX_ResponseTemplate(&indexPage, success_message, error_message);
+
+		MESSAGE_DEBUG("", action, "finish");
 	}
 
 	if(action == "AJAX_getSoWList")

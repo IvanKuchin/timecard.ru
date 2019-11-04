@@ -148,8 +148,14 @@ auto	C_Print_Timecard::AssignValuesToDaySummaryStruct() -> bool
 
 					mktime(&today);
 
+					// --- GetSpellingFormattedDate is required to covert 2019-8-7 to 2019-08-07
+					auto	holiday = GetSpellingFormattedDate(to_string(today.tm_year + 1900) + "-" + to_string(today.tm_mon + 1) + "-" + to_string(today.tm_mday), "%F");
+
 					if((today.tm_wday == 6) || (today.tm_wday == 0)) single_day.is_weekend = true;
 					else single_day.is_weekend = false;
+
+					if(isHoliday(holiday)) single_day.is_holiday = true;
+					else  single_day.is_holiday = false;
 
 					single_day.date = to_string(today.tm_mday);
 					single_day.efforts = 0;
@@ -283,6 +289,7 @@ auto	C_Print_Timecard::PrintAsXLS() -> string
 			{
 				auto			format_title = book->addFormat();
 				auto			format_weekend = book->addFormat();
+				auto			format_holiday = book->addFormat();
 				auto			format_weekday = book->addFormat();
 				auto			format_summary_over = book->addFormat();
 				auto			format_summary_right = book->addFormat();
@@ -301,6 +308,12 @@ auto	C_Print_Timecard::PrintAsXLS() -> string
 				format_weekend->setPatternForegroundColor(libxl::COLOR_GRAY25);
 				format_weekend->setBorder(libxl::BORDERSTYLE_THIN);
 				format_weekend->setNumFormat(libxl::NUMFORMAT_GENERAL);
+
+				format_holiday->setFillPattern(libxl::FILLPATTERN_SOLID);
+				format_holiday->setFont(font_summary_over);
+				format_holiday->setPatternForegroundColor(libxl::COLOR_ROSE);
+				format_holiday->setBorder(libxl::BORDERSTYLE_THIN);
+				format_holiday->setNumFormat(libxl::NUMFORMAT_GENERAL);
 
 				format_weekday->setBorder(libxl::BORDERSTYLE_THIN);
 				format_weekday->setNumFormat(libxl::NUMFORMAT_GENERAL);
@@ -338,7 +351,9 @@ auto	C_Print_Timecard::PrintAsXLS() -> string
 				{
 					sheet->writeBlank(5, column_counter + 2, format_title);
 
-					sheet->writeNum(5, column_counter + 2, stod(single_day.date), single_day.is_weekend ? format_weekend : format_weekday);
+					sheet->writeNum(5, column_counter + 2, stod(single_day.date),	single_day.is_holiday ? format_holiday
+																					: single_day.is_weekend ? format_weekend
+																					: format_weekday);
 
 					++column_counter;
 				}
@@ -359,7 +374,9 @@ auto	C_Print_Timecard::PrintAsXLS() -> string
 						{
 							auto	hours = stod_noexcept(time_entry);
 
-							sheet->writeBlank(row_counter, column_counter + 2, day_summary[column_counter].is_weekend ? format_weekend : format_weekday);
+							sheet->writeBlank(row_counter, column_counter + 2, 	day_summary[column_counter].is_holiday ? format_holiday 
+																				: day_summary[column_counter].is_weekend ? format_weekend 
+																				: format_weekday);
 
 							if(hours)
 								sheet->writeNum(row_counter, column_counter + 2, hours);
@@ -382,13 +399,17 @@ auto	C_Print_Timecard::PrintAsXLS() -> string
 				{
 					auto	hours = stod_noexcept(single_day.efforts);
 
-					sheet->writeBlank(row_counter, column_counter + 2, single_day.is_weekend ? format_weekend : format_weekday);
+					sheet->writeBlank(row_counter, column_counter + 2,	single_day.is_weekend ? format_weekend 
+																		: format_weekday);
 
 					if(hours)
 					{
 						if(hours == 8)
 							sheet->writeBlank(row_counter, column_counter + 2, format_summary_right);
-						if(hours > 8)
+						if(	single_day.is_holiday	||
+							(hours > 8) 			|| 
+							(hours && single_day.is_weekend)
+							)
 							sheet->writeBlank(row_counter, column_counter + 2, format_summary_over);
 
 						sheet->writeNum(row_counter, column_counter + 2, hours);
@@ -1108,7 +1129,8 @@ auto	C_Print_Timecard::__HPDF_DrawTimecardTableHeader() -> string
 
 				for(auto i = 0; i < number_of_days; ++i)
 				{
-					if(day_summary[i].is_weekend) __HPDF_PaintDay(i, 0.8, 0.8, 0.8);
+					if(day_summary[i].is_holiday) __HPDF_PaintDay(i, 1.0, 0.6, 0.8);
+					else if(day_summary[i].is_weekend) __HPDF_PaintDay(i, 0.8, 0.8, 0.8);
 
 					HPDF_Page_BeginText (__pdf_page);
 					HPDF_Page_SetFontAndSize (__pdf_page, __pdf_font, HPDF_TIMECARD_FONT_SIZE);
@@ -1218,7 +1240,8 @@ auto	C_Print_Timecard::__HPDF_DrawTimecardTableBody() -> string
 						{
 							auto	time_entry = time_entries[i];
 
-							if(day_summary[i].is_weekend) __HPDF_PaintDay(i, 0.8, 0.8, 0.8, number_of_lines);
+							if(day_summary[i].is_holiday) __HPDF_PaintDay(i, 1.0, 0.6, 0.8, number_of_lines);
+							else if(day_summary[i].is_weekend) __HPDF_PaintDay(i, 0.8, 0.8, 0.8, number_of_lines);
 
 							if(time_entry.length() && (time_entry != "0"))
 							{
@@ -1283,6 +1306,7 @@ auto	C_Print_Timecard::__HPDF_DrawTimecardTableFooter() -> string
 				for(auto i = 0; i < number_of_days; ++i)
 				{
 					if(day_summary[i].is_weekend) __HPDF_PaintDay(i, 0.8, 0.8, 0.8);
+
 					if(day_summary[i].efforts)
 					{
 						if(day_summary[i].efforts == 8)
@@ -1290,10 +1314,12 @@ auto	C_Print_Timecard::__HPDF_DrawTimecardTableFooter() -> string
 							__HPDF_PaintDay(i, 0.4, 1, 0.4);
 							HPDF_Page_SetRGBFill(__pdf_page, 0.2, 0.4, 0.2);
 						}
-						if(day_summary[i].efforts > 8)
+						if(	day_summary[i].is_holiday		||
+							(day_summary[i].efforts > 8)	|| 
+							(day_summary[i].efforts && day_summary[i].is_weekend))
 						{
-							__HPDF_PaintDay(i, 1, 0.4, 0.4);
-							HPDF_Page_SetRGBFill(__pdf_page, 0.4, 0.2, 0.2);
+							__HPDF_PaintDay(i, 1, 0.6, 0.8);
+							HPDF_Page_SetRGBFill(__pdf_page, 0.2, 0.0, 0.0);
 						}
 
 						HPDF_Page_BeginText (__pdf_page);

@@ -31,6 +31,7 @@ class C_Print_Timecard
 	{
 		string		date;
 		bool		is_weekend;
+		bool		is_holiday;
 		c_float		efforts = 0;
 	};
 
@@ -43,6 +44,7 @@ class C_Print_Timecard
 		C_Timecard_To_Print				timecard;
 		C_Invoicing_Vars				*vars = nullptr;
 
+		unordered_set<string>			holidays;
 		vector<Day_Summary_Struct>		day_summary = {};
 		c_float							effort_hours = 0;
 		c_float							effort_days = 0;
@@ -66,6 +68,7 @@ class C_Print_Timecard
 		int								__pdf_table_bottom = -1;
 
 		auto		isDaySummaryStruct_Filled() -> bool;
+		auto		isHoliday(const string &date_to_check) const -> bool { return holidays.count(date_to_check); }; // --- YYYY-MM-DD		
 		auto		AssignValuesToDaySummaryStruct() -> bool;
 		auto		GetEffortHours()								{ return effort_hours; };
 		auto		GetEffortDays()									{ return effort_days; };
@@ -130,7 +133,9 @@ class C_Print_Timecard
 		auto		SetFilename(const string &param1)				{ filename = param1; };
 		auto		SetFilename(string &&param1) 					{ filename = move(param1); };
 
-		auto		GetFilename()									{ return filename; }
+		auto		SetHolidays(const unordered_set<string> &param1){ holidays = param1; };
+
+		auto		GetFilename() const								{ return filename; }
 
 		auto		PrintAsXLS() -> string;
 		auto		PrintAsPDF() -> string;

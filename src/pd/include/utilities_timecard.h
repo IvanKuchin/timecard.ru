@@ -101,6 +101,7 @@ auto			isEmployeeIDValidToRemove(string employee_id, CMysql *) -> string;
 pair<string, string> GetCustomerIDProjectIDByTaskID(string task_id, CMysql *);
 pair<int, int>	FirstAndLastReportingDaysFromTimereport(const vector<string> &timereport);
 
+auto			GetHolidaysSet(string day_around, CMysql *) -> unordered_set<string>;
 
 auto			GetBTApprovalsInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetBTExpenseTemplatesInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;

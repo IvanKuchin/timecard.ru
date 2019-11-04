@@ -125,6 +125,7 @@ auto C_Invoice_Service_Subc_To_Agency::GenerateDocumentArchive() -> string
 
 			timecard_printer.SetTimecard(timecard);
 			timecard_printer.SetVariableSet(&invoicing_vars);
+			timecard_printer.SetHolidays(GetHolidaysSet(GetSpellingFormattedDate(timecard.GetDateStart(), "%F"), db));
 
 			timecard_printer.SetFilename(filename_xls);
 			error_message = timecard_printer.PrintAsXLS();
