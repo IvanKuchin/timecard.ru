@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-04 15:19-0500\n"
+"POT-Creation-Date: 2019-11-05 10:04-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -52,6 +52,9 @@ msgstr "Бухгалтер"
 
 msgid "Act"
 msgstr "Акт"
+
+msgid "Address"
+msgstr "Адрес"
 
 msgid "Agency:"
 msgstr "Данные агенства:"
@@ -175,6 +178,9 @@ msgstr "Февраль"
 
 msgid "February declension"
 msgstr "Февраля"
+
+msgid "Good name"
+msgstr "Наименование товара(описание выполненных работ, оказанных услуг)"
 
 msgid "Goods"
 msgstr "Товары"
@@ -471,7 +477,7 @@ msgid "airline not found"
 msgstr "авиалинии не найдены"
 
 msgid "algorithm error"
-msgstr ""
+msgstr "проблема алгоритма"
 
 msgid "already exists"
 msgstr "уже существует"
@@ -539,11 +545,11 @@ msgstr "не удалось создать фаил архива"
 msgid "can't remove absence in the past"
 msgstr "нельзя удаляить отпуск в прошлом"
 
-msgid "case closed"
-msgstr "кейс закрыт"
-
 msgid "case"
 msgstr "кейс"
+
+msgid "case closed"
+msgstr "кейс закрыт"
 
 msgid "changed"
 msgstr "изменилось"
@@ -902,6 +908,9 @@ msgstr "невозможно сгенерировать XLS"
 msgid "promouted from"
 msgstr "перешел(шла) с должности"
 
+msgid "re-login required"
+msgstr "необходимо аутентифицироваться"
+
 msgid "removal prohibited"
 msgstr "Нельзя удалить"
 
@@ -964,9 +973,6 @@ msgstr "не указан подписант 2"
 
 msgid "sow declension"
 msgstr "договора"
-
-msgid "sql syntax error"
-msgstr ""
 
 msgid "start date"
 msgstr "дата начала"
@@ -1084,6 +1090,39 @@ msgstr "перенеменная не найдена"
 
 msgid "vat"
 msgstr "НДС"
+
+msgid "vat_consignee_address"
+msgstr "Грузополучатель и его адрес: --"
+
+msgid "vat_correction"
+msgstr "Исправление № -- от --"
+
+msgid "vat_doc_accompany"
+msgstr "К платежно-расчетному документу № от"
+
+msgid "vat_header_1"
+msgstr "Приложение № 1"
+
+msgid "vat_header_2"
+msgstr "к постановлению Правительства"
+
+msgid "vat_header_3"
+msgstr "Российской Федерации"
+
+msgid "vat_header_4"
+msgstr "от 26 декабря 2011г. № 1137"
+
+msgid "vat_header_TIN_KPP_buyer"
+msgstr "ИНН/КПП покупателя"
+
+msgid "vat_header_TIN_KPP_seller"
+msgstr "ИНН/КПП продавца"
+
+msgid "vat_shipper_address"
+msgstr "Грузоотправитель и его адрес: --"
+
+msgid "vat_title_currency"
+msgstr "Валюта: наименование, код Российский рубль, 643"
 
 msgid "voucher content is empty"
 msgstr "содержимое ваучера пустое"

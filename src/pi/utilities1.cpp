@@ -1894,6 +1894,8 @@ string GetUserListInJSONFormat(string dbQuery, CMysql *db, CUser *user)
 		string	helpdesk_subscription_S2_email;
 		string	helpdesk_subscription_S3_email;
 		string	helpdesk_subscription_S4_email;
+		string	pending_approval_notification_timecard;
+		string	pending_approval_notification_bt;
 	};
 	vector<ItemClass>		itemsList;
 	int						itemsCount;
@@ -1906,41 +1908,43 @@ string GetUserListInJSONFormat(string dbQuery, CMysql *db, CUser *user)
 		for(int i = 0; i < itemsCount; ++i)
 		{
 			ItemClass	item;
-			item.userID							= db->Get(i, "id");
-			item.userLogin						= db->Get(i, "login");
-			item.userName						= db->Get(i, "name");
-			item.userNameLast					= db->Get(i, "nameLast");
-			item.userNameMiddle					= db->Get(i, "nameMiddle");
-			item.country_code					= db->Get(i, "country_code");
-			item.phone							= db->Get(i, "phone");
-			item.email							= db->Get(i, "email");
-			item.userSex						= db->Get(i, "sex");
-			item.userType						= db->Get(i, "type");
-			item.userBirthday					= db->Get(i, "birthday");
-			item.userBirthdayAccess				= db->Get(i, "birthdayAccess");
-			item.userAppliedVacanciesRender		= db->Get(i, "appliedVacanciesRender");
-			item.userCurrentCityID				= db->Get(i, "geo_locality_id");
-			item.site_theme_id					= db->Get(i, "site_theme_id");
-			item.passport_series				= db->Get(i, "passport_series");
-			item.passport_number				= db->Get(i, "passport_number");
-			item.passport_issue_date			= db->Get(i, "passport_issue_date");
-			item.passport_issue_authority		= db->Get(i, "passport_issue_authority");
-			item.citizenship_code				= db->Get(i, "citizenship_code");
-			item.first_name_en					= db->Get(i, "first_name_en");
-			item.last_name_en					= db->Get(i, "last_name_en");
-			item.middle_name_en					= db->Get(i, "middle_name_en");
-			item.foreign_passport_number		= db->Get(i, "foreign_passport_number");
-			item.foreign_passport_expiration_date = db->Get(i, "foreign_passport_expiration_date");
-			item.userLastOnline					= db->Get(i, "last_online");
-			item.userLastOnlineSecondSinceY2k	= db->Get(i, "last_onlineSecondsSinceY2k");
-			item.helpdesk_subscription_S1_email	= db->Get(i, "helpdesk_subscription_S1_email");
-			item.helpdesk_subscription_S2_email	= db->Get(i, "helpdesk_subscription_S2_email");
-			item.helpdesk_subscription_S3_email	= db->Get(i, "helpdesk_subscription_S3_email");
-			item.helpdesk_subscription_S4_email	= db->Get(i, "helpdesk_subscription_S4_email");
-			item.helpdesk_subscription_S1_sms	= db->Get(i, "helpdesk_subscription_S1_sms");
-			item.helpdesk_subscription_S2_sms	= db->Get(i, "helpdesk_subscription_S2_sms");
-			item.helpdesk_subscription_S3_sms	= db->Get(i, "helpdesk_subscription_S3_sms");
-			item.helpdesk_subscription_S4_sms	= db->Get(i, "helpdesk_subscription_S4_sms");
+			item.userID								= db->Get(i, "id");
+			item.userLogin							= db->Get(i, "login");
+			item.userName							= db->Get(i, "name");
+			item.userNameLast						= db->Get(i, "nameLast");
+			item.userNameMiddle						= db->Get(i, "nameMiddle");
+			item.country_code						= db->Get(i, "country_code");
+			item.phone								= db->Get(i, "phone");
+			item.email								= db->Get(i, "email");
+			item.userSex							= db->Get(i, "sex");
+			item.userType							= db->Get(i, "type");
+			item.userBirthday						= db->Get(i, "birthday");
+			item.userBirthdayAccess					= db->Get(i, "birthdayAccess");
+			item.userAppliedVacanciesRender			= db->Get(i, "appliedVacanciesRender");
+			item.userCurrentCityID					= db->Get(i, "geo_locality_id");
+			item.site_theme_id						= db->Get(i, "site_theme_id");
+			item.passport_series					= db->Get(i, "passport_series");
+			item.passport_number					= db->Get(i, "passport_number");
+			item.passport_issue_date				= db->Get(i, "passport_issue_date");
+			item.passport_issue_authority			= db->Get(i, "passport_issue_authority");
+			item.citizenship_code					= db->Get(i, "citizenship_code");
+			item.first_name_en						= db->Get(i, "first_name_en");
+			item.last_name_en						= db->Get(i, "last_name_en");
+			item.middle_name_en						= db->Get(i, "middle_name_en");
+			item.foreign_passport_number			= db->Get(i, "foreign_passport_number");
+			item.foreign_passport_expiration_date	= db->Get(i, "foreign_passport_expiration_date");
+			item.userLastOnline						= db->Get(i, "last_online");
+			item.userLastOnlineSecondSinceY2k		= db->Get(i, "last_onlineSecondsSinceY2k");
+			item.helpdesk_subscription_S1_email		= db->Get(i, "helpdesk_subscription_S1_email");
+			item.helpdesk_subscription_S2_email		= db->Get(i, "helpdesk_subscription_S2_email");
+			item.helpdesk_subscription_S3_email		= db->Get(i, "helpdesk_subscription_S3_email");
+			item.helpdesk_subscription_S4_email		= db->Get(i, "helpdesk_subscription_S4_email");
+			item.helpdesk_subscription_S1_sms		= db->Get(i, "helpdesk_subscription_S1_sms");
+			item.helpdesk_subscription_S2_sms		= db->Get(i, "helpdesk_subscription_S2_sms");
+			item.helpdesk_subscription_S3_sms		= db->Get(i, "helpdesk_subscription_S3_sms");
+			item.helpdesk_subscription_S4_sms		= db->Get(i, "helpdesk_subscription_S4_sms");
+			item.pending_approval_notification_timecard	= db->Get(i, "pending_approval_notification_timecard");
+			item.pending_approval_notification_bt	= db->Get(i, "pending_approval_notification_bt");
 
 			itemsList.push_back(item);
 		}
@@ -2070,6 +2074,8 @@ string GetUserListInJSONFormat(string dbQuery, CMysql *db, CUser *user)
 						"\"bonuses_hotel_chains\": ["			<< ((user && (userID == user->GetID())) ? GetUserBonusesHotelchainsInJSONFormat("SELECT * FROM `user_bonuses_hotels` WHERE `user_id`=\"" + itemsList[i].userID + "\";", db, user) : "") << "],"
 						"\"helpdesk_subscriptions_sms\": ["		<< ((user && (userID == user->GetID())) ? quoted(itemsList[i].helpdesk_subscription_S1_sms) + "," + quoted(itemsList[i].helpdesk_subscription_S2_sms) + "," + quoted(itemsList[i].helpdesk_subscription_S3_sms) + "," + quoted(itemsList[i].helpdesk_subscription_S4_sms)  : "") << "],"
 						"\"helpdesk_subscriptions_email\": ["	<< ((user && (userID == user->GetID())) ? quoted(itemsList[i].helpdesk_subscription_S1_email) + "," + quoted(itemsList[i].helpdesk_subscription_S2_email) + "," + quoted(itemsList[i].helpdesk_subscription_S3_email) + "," + quoted(itemsList[i].helpdesk_subscription_S4_email)  : "") << "],"
+						"\"pending_approval_notification_timecard\": \"" << ((user && (userID == user->GetID())) ? itemsList[i].pending_approval_notification_timecard : "") << "\","
+						"\"pending_approval_notification_bt\": \"" << ((user && (userID == user->GetID())) ? itemsList[i].pending_approval_notification_bt : "") << "\","
 						"\"isMe\": \""							<< ((user && (userID == user->GetID())) ? "yes" : "no") << "\""
 						"}";
 			} // --- if user is not dupicated

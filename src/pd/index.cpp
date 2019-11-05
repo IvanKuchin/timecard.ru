@@ -6053,53 +6053,33 @@ int main()
 			MESSAGE_DEBUG("", action, "finish");
 		}
 
-		// --- AJAX_updateActiveAvatar
 		if(action == "AJAX_updateActiveAvatar")
 		{
-			string			avatarID, companyId;
-			ostringstream	ostFinal;
-
 			MESSAGE_DEBUG("", action, "start");
+
+			auto 			avatarID = (indexPage.GetVarsHandler()->Get("id") == "-1" ? "" : CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id")));
+			auto			success_message = ""s;
+			auto			error_message = ""s;
 
 			if(user.GetLogin() == "Guest")
 			{
-				MESSAGE_DEBUG("", action, "re-login required");
-
-				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
+				error_message = gettext("re-login required");
+				MESSAGE_DEBUG("", action, error_message);
 			}
 
-			avatarID = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
-
-			if((avatarID.length() > 0))
+			if(avatarID.length() > 0)
 			{
 				db.Query("update `users_avatars` set `isActive`=\"0\" WHERE `userid`='" + user.GetID() + "';");
 				db.Query("update `users_avatars` set `isActive`=\"1\" WHERE `id`=\"" + avatarID + "\" and `userid`=\"" + user.GetID() + "\";");
 				db.Query("INSERT INTO `feed` (`title`, `userId`, `actionTypeId`, `actionId`, `eventTimestamp`) values(\"\",\"" + user.GetID() + "\", \"8\", \"" + avatarID + "\", NOW())");
-
-				ostFinal.str("");
-				ostFinal << "{" << std::endl;
-				ostFinal << "\"result\" : \"success\"," << std::endl;
-				ostFinal << "}" << std::endl;
 			}
 			else
 			{
-				MESSAGE_ERROR("", action, "required html parameter avatarID is empty");
-
-				ostFinal.str("");
-				ostFinal << "{" << std::endl;
-				ostFinal << "\"result\" : \"error\"," << std::endl;
-				ostFinal << "\"description\" : \"avatarID is empty\"" << std::endl;
-				ostFinal << "}" << std::endl;
-
+				error_message = gettext("mandatory parameter missed");
+				MESSAGE_DEBUG("", action, error_message);
 			}
 
-			indexPage.RegisterVariableForce("result", ostFinal.str());
-
-			if(!indexPage.SetTemplate("json_response.htmlt"))
-			{
-				MESSAGE_ERROR("", action, "template file json_response.htmlt was missing");
-				throw CException("Template file was missing");
-			}
+			AJAX_ResponseTemplate(&indexPage, success_message, error_message);
 
 			MESSAGE_DEBUG("", action, "" + action + ": finish");
 		}

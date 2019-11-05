@@ -2869,3 +2869,18 @@ auto	GetValueFromDB(string sql, CMysql *db) -> string
 
 	return result;
 }
+
+auto	GetValuesFromDB(string sql, CMysql *db) -> vector<string>
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	vector<string>	result;
+	auto			affected = db->Query(sql);
+
+	for(auto i = 0; i < affected; ++i) result.push_back(db->Get(i, 0));
+
+	MESSAGE_DEBUG("", "", "finish (result size is " + to_string(result.size()) + ")");
+
+	return result;
+}
+

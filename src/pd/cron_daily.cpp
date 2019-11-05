@@ -146,12 +146,13 @@ string	GetXMLLocaly()
 
 string	GetXMLFromRemoteServer()
 {
+	MESSAGE_DEBUG("", "", "start");
+
 	string		result = "";
 
 	// --- !!! IMPORTANT !!! Create and destroy CHTML just once in the app
 	CHTML	downloader;
 
-	MESSAGE_DEBUG("", "", "start");
 
 	downloader.SetParsingDisable();
 	if(downloader.PerformRequest("http://www.cbr.ru/scripts/XML_daily_eng.asp"))
@@ -168,8 +169,55 @@ string	GetXMLFromRemoteServer()
 	return result;
 }
 
-bool UpdateCurrencyRateExchange(CMysql *db)
+
+
+static bool NotifyAboutPendingApprovals(string entity, CMysql *db)
 {
+	MESSAGE_DEBUG("", "", "start");
+
+	bool		result = false;
+	auto		user_ids = GetValuesFromDB(	"SELECT `approver_user_id` FROM `" + entity + "_approvers` WHERE `id` IN ("
+											    "SELECT `approver_id` FROM `" + entity + "_approvals` WHERE `decision`=\"pending\""
+											");", db);
+	CVars		vars;
+	CMailLocal	mail;
+
+	vars.Redefine("rand", GetRandom(10));
+	vars.Redefine("SERVER_NAME", DOMAIN_NAME);
+
+	for(auto &user_id: user_ids)
+	{
+		auto	number_of_pending_items = GetValueFromDB("SELECT COUNT(*) FROM `" + entity + "_approvals` WHERE `decision`=\"pending\" AND `approver_id` IN (SELECT `id` FROM `" + entity + "_approvers` WHERE `approver_user_id`=" + quoted(user_id) + ");", db);
+		auto	login = GetValueFromDB("SELECT `login` FROM `users` WHERE `id`=" + quoted(user_id) + ";", db);
+		auto	name = GetValueFromDB("SELECT `name` FROM `users` WHERE `id`=" + quoted(user_id) + ";", db);
+
+		vars.Redefine("name", name);
+		vars.Redefine("number_of_pending_items", number_of_pending_items);
+
+		mail.Send(login, "notification_about_pending_approvals_" + entity + "", &vars, db);
+	}
+
+
+	MESSAGE_DEBUG("", "", "finish (result = " + to_string(result) + ")");
+
+	return	result;
+}
+
+static bool NotifyAboutPendingApprovals_Timecard(CMysql *db)
+{
+	return	NotifyAboutPendingApprovals("timecard", db);
+}
+
+static bool NotifyAboutPendingApprovals_BT(CMysql *db)
+{
+	return	NotifyAboutPendingApprovals("bt", db);
+}
+
+
+static bool UpdateCurrencyRateExchange(CMysql *db)
+{
+	MESSAGE_DEBUG("", "", "start");
+
 	bool	result = false;
 	// string	xml_block = GetXMLLocaly();
 	string	xml_block = GetXMLFromRemoteServer();
@@ -454,6 +502,9 @@ int main()
 
 		ExpireOldContracts(&db);
 
+		//--- update currency rate exchange
+		NotifyAboutPendingApprovals_Timecard(&db);
+		NotifyAboutPendingApprovals_BT(&db);
 
 		//--- update currency rate exchange
 		UpdateCurrencyRateExchange(&db);

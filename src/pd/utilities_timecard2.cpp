@@ -2693,7 +2693,7 @@ bool areThereTimecardsWithExpiredPayment(string multiplier, string sow_sql, CMys
 	}
 	else
 	{
-		MESSAGE_ERROR("", "", "sql syntax error");
+		MESSAGE_ERROR("", "", "SQL syntax error");
 	}
 
 	MESSAGE_DEBUG("", "", "finish (" + to_string(result) + ")");
@@ -2733,7 +2733,7 @@ bool areThereBTWithExpiredPayment(string multiplier, string sow_sql, CMysql *db,
 	}
 	else
 	{
-		MESSAGE_ERROR("", "", "sql syntax error");
+		MESSAGE_ERROR("", "", "SQL syntax error");
 	}
 
 	MESSAGE_DEBUG("", "", "finish (" + to_string(result) + ")");

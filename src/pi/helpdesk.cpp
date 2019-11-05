@@ -44,12 +44,27 @@ static auto GetTicketSeverity(string ticket_id, CMysql *db)
 	return result;
 }
 
-static auto GetEmailNotificationRecipients(string ticket_id, string severity, CMysql *db, CUser *user)
+static auto	ReturnVectorFromTwoFields(string sql, CMysql *db)
 {
 	MESSAGE_DEBUG("", "", "start");
 
 	vector<string>	result;
-	auto 			affected = db->Query("SELECT DISTINCT(`login`) FROM `users` WHERE "
+	auto 			affected = db->Query(sql);
+
+	for(int i = 0; i < affected; ++i)
+	{
+		result.push_back(db->Get(i, 0) + db->Get(i, 1));
+	}
+
+	MESSAGE_DEBUG("", "", "finish(size is " + to_string(result.size()) + ")");
+
+	return result;
+
+}
+
+static auto Get_ExistingTicket_NotificationRecipients_Email(string ticket_id, string severity, CMysql *db, CUser *user)
+{
+	return ReturnVectorFromTwoFields("SELECT DISTINCT(`login`),\"\" FROM `users` WHERE "
 											"LENGTH(`email`) > 0 "
 											"AND "
 											"`helpdesk_subscription_S" + severity + "_email` = \"Y\" "
@@ -58,24 +73,22 @@ static auto GetEmailNotificationRecipients(string ticket_id, string severity, CM
 											"AND "
 											"`id` != " + quoted(user->GetID()) + " "
 											";"
-										);
-
-	for(int i = 0; i < affected; ++i)
-	{
-		result.push_back(db->Get(i, 0));
-	}
-
-	MESSAGE_DEBUG("", "", "finish(size is " + to_string(result.size()) + ")");
-
-	return result;
+										, db);
 }
 
-static auto GetSMSNotificationRecipients(string ticket_id, string severity, CMysql *db, CUser *user)
+static auto Get_NewTicket_NotificationRecipients_Email(string ticket_id, string severity, CMysql *db, CUser *user)
 {
-	MESSAGE_DEBUG("", "", "start");
+	return ReturnVectorFromTwoFields("SELECT DISTINCT(`login`),\"\" FROM `users` WHERE "
+											"LENGTH(`email`) > 0 "
+											"AND "
+											"`helpdesk_new_notification_S" + severity + "_email` = \"Y\" "
+											";"
+										, db);
+}
 
-	vector<string>	result;
-	auto 			affected = db->Query("SELECT `country_code`,`phone` FROM `users` WHERE "
+static auto Get_ExistingTicket_NotificationRecipients_SMS(string ticket_id, string severity, CMysql *db, CUser *user)
+{
+	return ReturnVectorFromTwoFields("SELECT `country_code`,`phone` FROM `users` WHERE "
 											"`is_phone_confirmed` = \"Y\" "
 											"AND "
 											"`helpdesk_subscription_S" + severity + "_sms` = \"Y\" "
@@ -84,19 +97,20 @@ static auto GetSMSNotificationRecipients(string ticket_id, string severity, CMys
 											"AND "
 											"`id` != " + quoted(user->GetID()) + " "
 											";"
-										);
-
-	for(int i = 0; i < affected; ++i)
-	{
-		result.push_back(db->Get(i, "country_code") + db->Get(i, "phone"));
-	}
-
-	MESSAGE_DEBUG("", "", "finish(size is " + to_string(result.size()) + ")");
-
-	return result;
+										, db);
 }
 
-static auto SendSMSNotification(vector<string> recipients, CCgi *indexPage, CMysql *db, CUser *user)
+static auto Get_NewTicket_NotificationRecipients_SMS(string ticket_id, string severity, CMysql *db, CUser *user)
+{
+	return ReturnVectorFromTwoFields("SELECT `country_code`,`phone` FROM `users` WHERE "
+											"`is_phone_confirmed` = \"Y\" "
+											"AND "
+											"`helpdesk_new_notification_S" + severity + "_sms` = \"Y\" "
+											";"
+										, db);
+}
+
+static auto SendSMSNotification(vector<string> recipients, string message, CCgi *indexPage, CMysql *db, CUser *user)
 {
 	MESSAGE_DEBUG("", "", "start");
 
@@ -105,7 +119,7 @@ static auto SendSMSNotification(vector<string> recipients, CCgi *indexPage, CMys
 
 	for(auto &recipient: recipients)
 	{
-		auto	ret = smsc.send_sms(recipient, gettext("case") + " "s + indexPage->GetVarsHandler()->Get("case_title") + " (" + indexPage->GetVarsHandler()->Get("case_id") + ") " + gettext("updated") + ".", 0, "", 0, 0, DOMAIN_NAME, "", "");
+		auto	ret = smsc.send_sms(recipient, message, 0, "", 0, 0, DOMAIN_NAME, "", "");
 	}
 
 	MESSAGE_DEBUG("", "", "finish(" + error_message + ")");
@@ -113,7 +127,17 @@ static auto SendSMSNotification(vector<string> recipients, CCgi *indexPage, CMys
 	return error_message;	
 }
 
-static auto SendEmailNotification(vector<string> recipients, CCgi *indexPage, CMysql *db, CUser *user)
+static auto SendSMSNotification_NewTicket(vector<string> recipients, CCgi *indexPage, CMysql *db, CUser *user)
+{
+	return SendSMSNotification(recipients, gettext("case") + " "s + indexPage->GetVarsHandler()->Get("case_title") + " (" + indexPage->GetVarsHandler()->Get("case_id") /*+ " S" + indexPage->GetVarsHandler()->Get("severity")*/ + ") " + gettext("opened") + ".", indexPage, db, user);
+}
+
+static auto SendSMSNotification_ExistingTicket(vector<string> recipients, CCgi *indexPage, CMysql *db, CUser *user)
+{
+	return SendSMSNotification(recipients, gettext("case") + " "s + indexPage->GetVarsHandler()->Get("case_title") + " (" + indexPage->GetVarsHandler()->Get("case_id") /*+ " S" + indexPage->GetVarsHandler()->Get("severity")*/ + ") " + gettext("updated") + ".", indexPage, db, user);
+}
+
+static auto SendEmailNotification(vector<string> recipients, string email_template, CCgi *indexPage, CMysql *db, CUser *user)
 {
 	MESSAGE_DEBUG("", "", "start (# of recepients:" + to_string(recipients.size()) + ")");
 
@@ -123,7 +147,7 @@ static auto SendEmailNotification(vector<string> recipients, CCgi *indexPage, CM
 
 	for(auto &recipient: recipients)
 	{
-		mail.Send(recipient, "helpdesk_notification", indexPage->GetVarsHandler(), db);
+		mail.Send(recipient, email_template, indexPage->GetVarsHandler(), db);
 	}
 
 	MESSAGE_DEBUG("", "", "finish(" + error_message + ")");
@@ -131,7 +155,17 @@ static auto SendEmailNotification(vector<string> recipients, CCgi *indexPage, CM
 	return error_message;	
 }
 
-static auto NotifyTicketSubscribers(string ticket_id, CMysql *db, CUser *user, CCgi *indexPage)
+static auto SendEmailNotification_NewTicket(vector<string> recipients, CCgi *indexPage, CMysql *db, CUser *user)
+{
+	return SendEmailNotification(recipients, "helpdesk_notification_new_case", indexPage, db, user);
+}
+
+static auto SendEmailNotification_ExistingTicket(vector<string> recipients, CCgi *indexPage, CMysql *db, CUser *user)
+{
+	return SendEmailNotification(recipients, "helpdesk_notification_existing_case", indexPage, db, user);
+}
+
+static auto Notify_ExistingTicket_Subscribers(string ticket_id, CMysql *db, CUser *user, CCgi *indexPage)
 {
 	MESSAGE_DEBUG("", "", "start");
 
@@ -144,15 +178,65 @@ static auto NotifyTicketSubscribers(string ticket_id, CMysql *db, CUser *user, C
 
 		indexPage->RegisterVariableForce("case_title", title);
 		indexPage->RegisterVariableForce("case_id", ticket_id);
+		indexPage->RegisterVariableForce("severity", severity);
 
 		{
-			auto	email_recipients = GetEmailNotificationRecipients(ticket_id, severity, db, user);
+			auto	email_recipients = Get_ExistingTicket_NotificationRecipients_Email(ticket_id, severity, db, user);
 
-			if((error_message = SendEmailNotification(email_recipients, indexPage, db, user)).empty())
+			if((error_message = SendEmailNotification_ExistingTicket(email_recipients, indexPage, db, user)).empty())
 			{
-				auto	sms_recipients = GetSMSNotificationRecipients(ticket_id, severity, db, user);
+				auto	sms_recipients = Get_ExistingTicket_NotificationRecipients_SMS(ticket_id, severity, db, user);
 
-				if((error_message = SendSMSNotification(sms_recipients, indexPage, db, user)).empty())
+				if((error_message = SendSMSNotification_ExistingTicket(sms_recipients, indexPage, db, user)).empty())
+				{
+
+				}
+				else
+				{
+					MESSAGE_ERROR("", "", error_message);
+				}
+			}
+			else
+			{
+				MESSAGE_ERROR("", "", error_message);
+			}
+		}
+
+	}
+	else
+	{
+		error_message = gettext("helpdesk ticket not found");
+		MESSAGE_ERROR("", "", error_message);
+	}
+
+	MESSAGE_DEBUG("", "", "finish (" + error_message + ")");
+
+	return error_message;
+}
+
+static auto Notify_NewTicket_Subscribers(string ticket_id, CMysql *db, CUser *user, CCgi *indexPage)
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	error_message	= ""s;
+
+	if(db->Query("SELECT `title` FROM `helpdesk_tickets` WHERE `id`=" + quoted(ticket_id) + ";"))
+	{
+		auto	title = db->Get(0, 0);
+		auto	severity = GetTicketSeverity(ticket_id, db);
+
+		indexPage->RegisterVariableForce("case_title", title);
+		indexPage->RegisterVariableForce("case_id", ticket_id);
+		indexPage->RegisterVariableForce("severity", severity);
+
+		{
+			auto	email_recipients = Get_NewTicket_NotificationRecipients_Email(ticket_id, severity, db, user);
+
+			if((error_message = SendEmailNotification_NewTicket(email_recipients, indexPage, db, user)).empty())
+			{
+				auto	sms_recipients = Get_NewTicket_NotificationRecipients_SMS(ticket_id, severity, db, user);
+
+				if((error_message = SendSMSNotification_NewTicket(sms_recipients, indexPage, db, user)).empty())
 				{
 
 				}
@@ -372,7 +456,7 @@ int main(void)
 							{
 								if((error_message = SaveFilesAndUpdateDB(to_string(ticket_history_id), &indexPage, &db)).empty())
 								{
-									auto	local_error_message = NotifyTicketSubscribers(to_string(ticket_id), &db, &user, &indexPage);
+									auto	local_error_message = Notify_NewTicket_Subscribers(to_string(ticket_id), &db, &user, &indexPage);
 									if(local_error_message.length())
 									{
 										MESSAGE_ERROR("", action, local_error_message);
@@ -490,7 +574,7 @@ int main(void)
 								{
 									if((error_message = SaveFilesAndUpdateDB(to_string(ticket_history_id), &indexPage, &db)).empty())
 									{
-										auto	local_error_message = NotifyTicketSubscribers(ticket_id, &db, &user, &indexPage);
+										auto	local_error_message = Notify_ExistingTicket_Subscribers(ticket_id, &db, &user, &indexPage);
 
 										if(local_error_message.length())
 										{

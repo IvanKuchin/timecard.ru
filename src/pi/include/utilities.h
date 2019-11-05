@@ -193,6 +193,7 @@ auto			GetBankInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			stod_noexcept(const string &) -> double;
 auto			MaskSymbols(string src, int first_pos, int last_pos) -> string;
 auto			GetValueFromDB(string sql, CMysql *) -> string;
+auto			GetValuesFromDB(string sql, CMysql *) -> vector<string>;
 
 // --- function set for image upload/removal
 auto 			GetSpecificData_GetNumberOfFolders(string itemType) -> int;

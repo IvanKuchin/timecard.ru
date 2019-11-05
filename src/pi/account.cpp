@@ -1827,6 +1827,8 @@ int main()
 
 		if(new_value.length())
 		{
+			auto	good2go = false;
+
 			if(new_value == "Y")
 			{
 				if(db.Query("SELECT `is_phone_confirmed` FROM `users` WHERE `id`=" + quoted(user.GetID()) + ";"))
@@ -1835,18 +1837,7 @@ int main()
 
 					if(is_phone_confirmed == "Y")
 					{
-						db.Query("UPDATE `users` SET "
-											"`helpdesk_subscription_S1_sms`=" + quoted(new_value) + ","
-											"`helpdesk_subscription_S2_sms`=" + quoted(new_value) + ","
-											"`helpdesk_subscription_S3_sms`=" + quoted(new_value) + ","
-											"`helpdesk_subscription_S4_sms`=" + quoted(new_value) + " "
-											"WHERE `id`=" + quoted(user.GetID()) + ";");
-
-						if(db.isError())
-						{
-							error_message = gettext("sql syntax error");
-							MESSAGE_ERROR("", action, error_message);
-						}
+						good2go = true;
 					}
 					else
 					{
@@ -1856,9 +1847,33 @@ int main()
 				}
 				else
 				{
-					error_message = gettext("sql syntax error");
+					error_message = gettext("SQL syntax error");
 					MESSAGE_ERROR("", action, error_message);
 				}
+			}
+			else
+			{
+				good2go = true;
+			}
+
+			if(good2go)
+			{
+				db.Query("UPDATE `users` SET "
+									"`helpdesk_subscription_S1_sms`=" + quoted(new_value) + ","
+									"`helpdesk_subscription_S2_sms`=" + quoted(new_value) + ","
+									"`helpdesk_subscription_S3_sms`=" + quoted(new_value) + ","
+									"`helpdesk_subscription_S4_sms`=" + quoted(new_value) + " "
+									"WHERE `id`=" + quoted(user.GetID()) + ";");
+
+				if(db.isError())
+				{
+					error_message = gettext("SQL syntax error");
+					MESSAGE_ERROR("", action, error_message);
+				}
+			}
+			else
+			{
+				MESSAGE_DEBUG("", action, "previous erros prevent to change subscription mode");
 			}
 		}
 		else
@@ -1892,7 +1907,7 @@ int main()
 
 			if(db.isError())
 			{
-				error_message = gettext("sql syntax error");
+				error_message = gettext("SQL syntax error");
 				MESSAGE_ERROR("", action, error_message);
 			}
 		}
@@ -1900,6 +1915,70 @@ int main()
 		{
 			error_message = gettext("parameters incorrect");
 			MESSAGE_ERROR("", action, "user.id(" + user.GetID() + ") didn't set severity");
+		}
+
+		AJAX_ResponseTemplate(&indexPage, success_message, error_message);
+
+		MESSAGE_DEBUG("", action, "finish");
+	}
+
+	if(action == "AJAX_updateTimecardNotifications")
+	{
+		MESSAGE_DEBUG("", action, "start");
+
+		auto			success_message = ""s;
+		auto			error_message = ""s;
+
+		auto			new_value	= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("value"));
+
+		if(new_value.length())
+		{
+			db.Query("UPDATE `users` SET "
+								"`pending_approval_notification_timecard`=" + quoted(new_value) + " "
+								"WHERE `id`=" + quoted(user.GetID()) + ";");
+
+			if(db.isError())
+			{
+				error_message = gettext("SQL syntax error");
+				MESSAGE_ERROR("", action, error_message);
+			}
+		}
+		else
+		{
+			error_message = gettext("parameters incorrect");
+			MESSAGE_ERROR("", action, error_message);
+		}
+
+		AJAX_ResponseTemplate(&indexPage, success_message, error_message);
+
+		MESSAGE_DEBUG("", action, "finish");
+	}
+
+	if(action == "AJAX_updateBTNotifications")
+	{
+		MESSAGE_DEBUG("", action, "start");
+
+		auto			success_message = ""s;
+		auto			error_message = ""s;
+
+		auto			new_value	= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("value"));
+
+		if(new_value.length())
+		{
+			db.Query("UPDATE `users` SET "
+								"`pending_approval_notification_bt`=" + quoted(new_value) + " "
+								"WHERE `id`=" + quoted(user.GetID()) + ";");
+
+			if(db.isError())
+			{
+				error_message = gettext("SQL syntax error");
+				MESSAGE_ERROR("", action, error_message);
+			}
+		}
+		else
+		{
+			error_message = gettext("parameters incorrect");
+			MESSAGE_ERROR("", action, error_message);
 		}
 
 		AJAX_ResponseTemplate(&indexPage, success_message, error_message);
