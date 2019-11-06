@@ -45,8 +45,8 @@ class C_Print_VAT_Base
 
 		int								total_table_items = 0;
 
-		auto			GetSupplierCompanyDetails() -> string;
-		auto			GetCustomerCompanyDetails() -> string;
+		auto			GetSupplierFullAddress() -> string;
+		auto			GetCustomerFullAddress() -> string;
 		auto			SpellTotalItemsAndSum()							{ return vars->Get("Sum items") + " " + to_string(total_table_items) + ", " + vars->Get("total amount") + " " + GetTableTotal() + " " + vars->Get("rub."); };
 		auto			SpellPrice() -> string;
 

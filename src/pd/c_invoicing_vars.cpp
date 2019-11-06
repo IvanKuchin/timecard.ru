@@ -79,7 +79,6 @@ auto	C_Invoicing_Vars::FillStaticDictionary() -> string
 	if(error_message.empty()) error_message = AssignVariableValue("Sum expense",			gettext("Sum expense"), true);
 	if(error_message.empty()) error_message = AssignVariableValue("VAT",					gettext("VAT"), true);
 	if(error_message.empty()) error_message = AssignVariableValue("VAT doc",				gettext("VAT doc"), true);
-	if(error_message.empty()) error_message = AssignVariableValue("VAT comment1",			gettext("VAT comment1"), true);
 	if(error_message.empty()) error_message = AssignVariableValue("agreement from",			gettext("agreement from"), true);
 	if(error_message.empty()) error_message = AssignVariableValue("agreement declensioned",	gettext("agreement declensioned"), true);
 	if(error_message.empty()) error_message = AssignVariableValue("Technical Requirement agreement short", gettext("Technical Requirement agreement short"), true);
@@ -87,6 +86,7 @@ auto	C_Invoicing_Vars::FillStaticDictionary() -> string
 	if(error_message.empty()) error_message = AssignVariableValue("up to",					gettext("up to"), true);
 	if(error_message.empty()) error_message = AssignVariableValue("in scope",				gettext("in scope"), true);
 	if(error_message.empty()) error_message = AssignVariableValue("Provider",				gettext("Provider"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("Implementor",			gettext("Implementor"), true);
 	if(error_message.empty()) error_message = AssignVariableValue("Customer",				gettext("Customer"), true);
 	if(error_message.empty()) error_message = AssignVariableValue("Seller",					gettext("Seller"), true);
 	if(error_message.empty()) error_message = AssignVariableValue("Buyer",					gettext("Buyer"), true);
@@ -111,6 +111,7 @@ auto	C_Invoicing_Vars::FillStaticDictionary() -> string
 	if(error_message.empty()) error_message = AssignVariableValue("Items short",			gettext("Items short"), true);
 	if(error_message.empty()) error_message = AssignVariableValue("item short",				gettext("item short"), true);
 	if(error_message.empty()) error_message = AssignVariableValue("VAT short",				gettext("VAT short"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("VAT sum",				gettext("VAT sum"), true);
 	if(error_message.empty()) error_message = AssignVariableValue("Total payment",			gettext("Total payment"), true);
 	if(error_message.empty()) error_message = AssignVariableValue("Sum items",				gettext("Sum items"), true);
 	if(error_message.empty()) error_message = AssignVariableValue("Sum (rur)",				gettext("Sum (rur)"), true);
@@ -141,12 +142,17 @@ auto	C_Invoicing_Vars::FillStaticDictionary() -> string
 	if(error_message.empty()) error_message = AssignVariableValue("vat_header_2", 			gettext("vat_header_2"), true);
 	if(error_message.empty()) error_message = AssignVariableValue("vat_header_3", 			gettext("vat_header_3"), true);
 	if(error_message.empty()) error_message = AssignVariableValue("vat_header_4", 			gettext("vat_header_4"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("vat_header_5", 			gettext("vat_header_5"), true);
 	if(error_message.empty()) error_message = AssignVariableValue("vat_correction", 		gettext("vat_correction"), true);
 	if(error_message.empty()) error_message = AssignVariableValue("vat_header_TIN_KPP_seller", 	gettext("vat_header_TIN_KPP_seller"), true);
 	if(error_message.empty()) error_message = AssignVariableValue("vat_header_TIN_KPP_buyer", 	gettext("vat_header_TIN_KPP_buyer"), true);
 	if(error_message.empty()) error_message = AssignVariableValue("vat_shipper_address",	gettext("vat_shipper_address"), true);
 	if(error_message.empty()) error_message = AssignVariableValue("vat_consignee_address",	gettext("vat_consignee_address"), true);
 	if(error_message.empty()) error_message = AssignVariableValue("vat_doc_accompany",		gettext("vat_doc_accompany"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("VAT comment1",			gettext("VAT comment1"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("VAT comment2",			gettext("VAT comment2"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("invoice_table_header",	gettext("invoice_table_header"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("act_table_header",		gettext("act_table_header"), true);
 
 	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
 

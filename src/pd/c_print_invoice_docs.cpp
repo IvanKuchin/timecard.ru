@@ -16,7 +16,7 @@ auto	C_Print_Invoice_Docs_Base::SpellPrice() -> string
 	MESSAGE_DEBUG("", "", "start");
 
 	C_Price_Spelling	price(stod_noexcept(GetTableTotal()));
-	auto				result = vars->Get("Total payment") + ": " + price.Spelling();
+	auto				result = GetTotalPaymentSpelling() + price.Spelling();
 
 	MESSAGE_DEBUG("", "", "finish");
 
@@ -266,6 +266,28 @@ auto	C_Print_Invoice_Docs_Base::__DrawXLSRowUnderline() -> string
 	return result;
 }
 
+auto	C_Print_Invoice_Docs_Base::__PrintXLSComment() -> string
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	result				= ""s;
+	auto	format_top_left		= __book->addFormat();
+
+	format_top_left->setWrap(true);
+	format_top_left->setBorderTop		(libxl::BORDERSTYLE_THIN);
+	format_top_left->setBorderLeft		(libxl::BORDERSTYLE_THIN);
+
+	++__row_counter;
+	++__row_counter;
+	__sheet->setRow(__row_counter, LIBXL_DEFAULT_ROW_HEIGHT * (ceil(double(GetFooterComment().length()) / 120)));
+	__sheet->setMerge(__row_counter, __row_counter, 1, 9);
+	__sheet->writeStr(__row_counter, 1, multibyte_to_wide(GetFooterComment()).c_str(), format_top_left);
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return result;
+}
+
 auto	C_Print_Invoice_Docs_Base::PrintAsXLS() -> string
 {
 	auto	error_message = ""s;
@@ -371,7 +393,7 @@ auto	C_Print_Invoice_Docs_Base::PrintAsXLS() -> string
 				__sheet->setMerge(__row_counter, __row_counter, 1, 2);
 				__sheet->setMerge(__row_counter, __row_counter, 3, 9);
 				__sheet->setRow(__row_counter, LIBXL_DEFAULT_ROW_HEIGHT * 2);
-				__sheet->writeStr(__row_counter, 1, multibyte_to_wide(vars->Get("Supplier")).c_str(), format_top_left);
+				__sheet->writeStr(__row_counter, 1, multibyte_to_wide(GetSupplierSpelling()).c_str(), format_top_left);
 				__sheet->writeStr(__row_counter, 3, multibyte_to_wide(GetSupplierCompanyDetails()).c_str(), format_top_left);
 
 				++__row_counter;
@@ -379,7 +401,7 @@ auto	C_Print_Invoice_Docs_Base::PrintAsXLS() -> string
 				__sheet->setMerge(__row_counter, __row_counter, 1, 2);
 				__sheet->setMerge(__row_counter, __row_counter, 3, 9);
 				__sheet->setRow(__row_counter, LIBXL_DEFAULT_ROW_HEIGHT * 2);
-				__sheet->writeStr(__row_counter, 1, multibyte_to_wide(vars->Get("Customer")).c_str(), format_top_left);
+				__sheet->writeStr(__row_counter, 1, multibyte_to_wide(GetCustomerSpelling()).c_str(), format_top_left);
 				__sheet->writeStr(__row_counter, 3, multibyte_to_wide(GetCustomerCompanyDetails()).c_str(), format_top_left);
 
 				++__row_counter;
@@ -396,7 +418,7 @@ auto	C_Print_Invoice_Docs_Base::PrintAsXLS() -> string
 				++__row_counter;
 				__sheet->setMerge(__row_counter, __row_counter, 2, 5);
 				__sheet->writeStr(__row_counter, 1, L"№", format_bold_border);
-				__sheet->writeStr(__row_counter, 2, multibyte_to_wide(vars->Get("Goods")).c_str(), format_bold_border);
+				__sheet->writeStr(__row_counter, 2, multibyte_to_wide(GetTableMainTitleSpelling()).c_str(), format_bold_border);
 				__sheet->writeStr(__row_counter, 3, L"", format_bold_border);
 				__sheet->writeStr(__row_counter, 4, L"", format_bold_border);
 				__sheet->writeStr(__row_counter, 5, L"", format_bold_border);
@@ -437,7 +459,7 @@ auto	C_Print_Invoice_Docs_Base::PrintAsXLS() -> string
 				__sheet->writeNum(__row_counter, 9, stod_noexcept(GetTableSum()), format_number_d2_bold_right);
 
 				++__row_counter;
-				__sheet->writeStr(__row_counter, 7, multibyte_to_wide(vars->Get("VAT short") + ":").c_str(), format_bold_right);
+				__sheet->writeStr(__row_counter, 7, multibyte_to_wide(vars->Get("VAT sum") + ":").c_str(), format_bold_right);
 				__sheet->writeNum(__row_counter, 9, stod_noexcept(GetTableVAT()), format_number_d2_bold_right);
 
 				++__row_counter;
@@ -454,12 +476,7 @@ auto	C_Print_Invoice_Docs_Base::PrintAsXLS() -> string
 				__sheet->setMerge(__row_counter, __row_counter, 1, 9);
 				__sheet->writeStr(__row_counter, 1, multibyte_to_wide(SpellPrice()).c_str(), format_top_left_bold);
 
-				++__row_counter;
-				++__row_counter;
-				__sheet->setRow(__row_counter, LIBXL_DEFAULT_ROW_HEIGHT * (ceil(double(vars->Get("act_footnote").length()) / 120)));
-				__sheet->setMerge(__row_counter, __row_counter, 1, 9);
-				__sheet->writeStr(__row_counter, 1, multibyte_to_wide(vars->Get("act_footnote")).c_str(), format_top_left);
-
+				PrintXLSComment();
 				PrintXLSFooter();
 
 				++__row_counter;
@@ -489,9 +506,6 @@ auto	C_Print_Invoice_Docs_Base::PrintAsXLS() -> string
 
 	return error_message;
 }
-
-
-
 
 // --- PDF part
 auto	C_Print_Invoice_Docs_Base::__PrintPDFHeaderTable() -> string
@@ -804,7 +818,7 @@ auto	C_Print_Invoice_Docs_Base::__HPDF_DrawHeader() -> string
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("Supplier")), 0, 20, HPDF_TALIGN_LEFT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSupplierSpelling()), 0, 20, HPDF_TALIGN_LEFT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
 		if(error_message.empty())
@@ -814,7 +828,7 @@ auto	C_Print_Invoice_Docs_Base::__HPDF_DrawHeader() -> string
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("Customer")), 0, 20, HPDF_TALIGN_LEFT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetCustomerSpelling()), 0, 20, HPDF_TALIGN_LEFT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
 		if(error_message.empty())
@@ -881,7 +895,7 @@ auto	C_Print_Invoice_Docs_Base::__HPDF_DrawTable() -> string
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(1, utf8_to_cp1251(vars->Get("Goods")), HPDF_TALIGN_CENTER, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(1, utf8_to_cp1251(GetTableMainTitleSpelling()), HPDF_TALIGN_CENTER, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
 			{ MESSAGE_ERROR("", "", "fail to write table title description line"); }
 		}
 		if(error_message.empty())
@@ -1015,7 +1029,7 @@ auto	C_Print_Invoice_Docs_Base::__HPDF_DrawFooter() -> string
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("Vat short") + ":"), 20, 85, HPDF_TALIGN_RIGHT, BOLD_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("VAT sum") + ":"), 20, 85, HPDF_TALIGN_RIGHT, BOLD_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
 		if(error_message.empty())
@@ -1046,7 +1060,7 @@ auto	C_Print_Invoice_Docs_Base::__HPDF_DrawFooter() -> string
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("act_footnote")), 0, 100, HPDF_TALIGN_LEFT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, true)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetFooterComment()), 0, 100, HPDF_TALIGN_LEFT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, true)).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
 

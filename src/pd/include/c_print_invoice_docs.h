@@ -47,6 +47,9 @@ class C_Print_Invoice_Docs_Base
 		auto			SpellTotalItemsAndSum()							{ return vars->Get("Sum items") + " " + to_string(total_table_items) + ", " + vars->Get("total amount") + " " + GetTableTotal() + " " + vars->Get("rub."); };
 		auto			SpellPrice() -> string;
 
+		auto			__PrintXLSComment() -> string;
+		virtual	auto	PrintXLSComment() -> string						= 0;
+
 	public:
 
 		auto			Restart() -> void;
@@ -80,6 +83,7 @@ class C_Print_Invoice_Docs_Base
 
 		virtual auto	GetDocumentTitle() -> string					= 0;
 
+		virtual auto	GetSupplierSpelling() -> string					= 0;
 		virtual auto	GetSupplierName() -> string						= 0;
 		virtual auto	GetSupplierBankName() -> string					= 0;
 		virtual auto	GetSupplierBankAccount() -> string				= 0;
@@ -91,6 +95,7 @@ class C_Print_Invoice_Docs_Base
 		virtual auto	GetSupplierLegalZIP() -> string					= 0;
 		virtual auto	GetSupplierLegalLocality() -> string			= 0;
 		virtual auto	GetSupplierLegalAddress() -> string				= 0;
+		virtual auto	GetCustomerSpelling() -> string					= 0;
 		virtual auto	GetCustomerName() -> string						= 0;
 		virtual auto	GetCustomerBankName() -> string					= 0;
 		virtual auto	GetCustomerBankAccount() -> string				= 0;
@@ -102,6 +107,8 @@ class C_Print_Invoice_Docs_Base
 		virtual auto	GetCustomerLegalZIP() -> string					= 0;
 		virtual auto	GetCustomerLegalLocality() -> string			= 0;
 		virtual auto	GetCustomerLegalAddress() -> string				= 0;
+
+		virtual	auto	GetTableMainTitleSpelling() -> string			= 0;
 		virtual	auto	isTableRowExists(int i) -> bool					= 0;
 		virtual	auto	GetTableRowDescription(int i) -> string			= 0;
 		virtual	auto	GetTableRowIndex(int i) -> string				= 0;
@@ -112,6 +119,10 @@ class C_Print_Invoice_Docs_Base
 		virtual	auto	GetTableSum() -> string							= 0;
 		virtual	auto	GetTableVAT() -> string							= 0;
 		virtual	auto	GetTableTotal() -> string						= 0;
+
+		virtual	auto	GetTotalPaymentSpelling() -> string				= 0;
+		virtual	auto	GetFooterComment() -> string					= 0;
+
 		virtual	auto	GetSignatureTitle1() -> string					= 0;
 		virtual	auto	GetSignatureTitle2() -> string					= 0;
 		virtual	auto	GetSignatureName1() -> string					= 0;
@@ -126,7 +137,11 @@ ostream&	operator<<(ostream& os, const C_Print_Invoice_Docs_Base &);
 
 class C_Print_Invoice_Agency : public C_Print_Invoice_Docs_Base
 {
+	protected:
+		auto			PrintXLSComment() -> string						{ return ""s; }
+
 	public:
+
 		auto			PrintXLSHeader() -> string						{ return __PrintXLSHeaderTable(); };
 		auto			PrintXLSFooter() -> string						{ return ""s; };
 
@@ -134,6 +149,7 @@ class C_Print_Invoice_Agency : public C_Print_Invoice_Docs_Base
 		auto			PrintPDFFooter() -> string						{ return ""s; };
 
 		auto			GetDocumentTitle() -> string					{ return vars->Get("Invoice") + " " + vars->Get("invoice_agreement"); };
+		auto			GetSupplierSpelling() -> string					{ return vars->Get("Provider") + " (" + vars->Get("Implementor") + ")"; };
 		auto			GetSupplierName() -> string						{ return vars->Get("agency_name"); };
 		auto			GetSupplierBankName() -> string					{ return vars->Get("agency_bank_title"); };
 		auto			GetSupplierBankAccount() -> string				{ return vars->Get("agency_bank_account"); };
@@ -148,6 +164,7 @@ class C_Print_Invoice_Agency : public C_Print_Invoice_Docs_Base
 		auto			GetSupplierMailingZIP() -> string				{ return vars->Get("agency_mailing_geo_zip"); };
 		auto			GetSupplierMailingLocality() -> string			{ return vars->Get("agency_mailing_locality_title"); };
 		auto			GetSupplierMailingAddress() -> string			{ return vars->Get("agency_mailing_address"); };
+		auto			GetCustomerSpelling() -> string					{ return vars->Get("Buyer") + " (" + vars->Get("Customer") + ")"; };
 		auto			GetCustomerName() -> string						{ return vars->Get("cost_center_name"); };
 		auto			GetCustomerBankName() -> string					{ return vars->Get("cost_center_bank_title"); };
 		auto			GetCustomerBankAccount() -> string				{ return vars->Get("cost_center_bank_account"); };
@@ -163,6 +180,7 @@ class C_Print_Invoice_Agency : public C_Print_Invoice_Docs_Base
 		auto			GetCustomerMailingLocality() -> string			{ return vars->Get("cost_center_mailing_locality_title"); };
 		auto			GetCustomerMailingAddress() -> string			{ return vars->Get("cost_center_mailing_address"); };
 
+		auto			GetTableMainTitleSpelling() -> string			{ return vars->Get("invoice_table_header"); };
 		auto			isTableRowExists(int i) -> bool					{ return vars->Get("index_" + to_string(i)).length(); };
 		auto			GetTableRowDescription(int i) -> string			{ return vars->Get("cost_center_table_row_description_" + to_string(i)); };
 		auto			GetTableRowIndex(int i) -> string				{ return vars->Get("index_" + to_string(i)); };
@@ -173,6 +191,9 @@ class C_Print_Invoice_Agency : public C_Print_Invoice_Docs_Base
 		auto			GetTableSum() -> string							{ return c_float(vars->Get("cost_center_sum_amount")).PrintPriceTag(); };
 		auto			GetTableVAT() -> string							{ return c_float(vars->Get("cost_center_vat_amount")).PrintPriceTag(); };
 		auto			GetTableTotal() -> string						{ return c_float(vars->Get("cost_center_total_payment")).PrintPriceTag(); };
+
+		auto			GetTotalPaymentSpelling() -> string				{ return vars->Get("Total payment") + ": "; };
+		auto			GetFooterComment() -> string					{ return ""s; };
 
 		auto			GetSignatureTitle1() -> string					{ return vars->Get("Director"); };
 		auto			GetSignatureTitle2() -> string					{ return vars->Get("Accountant"); };
@@ -184,7 +205,11 @@ class C_Print_Invoice_Agency : public C_Print_Invoice_Docs_Base
 
 class C_Print_Invoice_Subc : public C_Print_Invoice_Docs_Base
 {
+	protected:
+		auto			PrintXLSComment() -> string						{ return ""s; }
+
 	public:
+
 		auto			PrintXLSHeader() -> string						{ return __PrintXLSHeaderTable(); };
 		auto			PrintXLSFooter() -> string						{ return ""s; };
 
@@ -192,6 +217,7 @@ class C_Print_Invoice_Subc : public C_Print_Invoice_Docs_Base
 		auto			PrintPDFFooter() -> string						{ return ""s; };
 
 		auto			GetDocumentTitle() -> string					{ return vars->Get("Invoice") + " " + vars->Get("invoice_agreement"); };
+		auto			GetSupplierSpelling() -> string					{ return vars->Get("Provider") + " (" + vars->Get("Implementor") + ")"; };
 		auto			GetSupplierName() -> string						{ return vars->Get("subcontractor_company_name_1"); };
 		auto			GetSupplierBankName() -> string					{ return vars->Get("subcontractor_bank_title_1"); };
 		auto			GetSupplierBankAccount() -> string				{ return vars->Get("subcontractor_bank_account_1"); };
@@ -206,6 +232,7 @@ class C_Print_Invoice_Subc : public C_Print_Invoice_Docs_Base
 		auto			GetSupplierMailingZIP() -> string				{ return vars->Get("subcontractor_mailing_geo_zip_1"); };
 		auto			GetSupplierMailingLocality() -> string			{ return vars->Get("subcontractor_mailing_locality_title_1"); };
 		auto			GetSupplierMailingAddress() -> string			{ return vars->Get("subcontractor_mailing_address_1"); };
+		auto			GetCustomerSpelling() -> string					{ return vars->Get("Buyer") + " (" + vars->Get("Customer") + ")"; };
 		auto			GetCustomerName() -> string						{ return vars->Get("agency_name"); };
 		auto			GetCustomerBankName() -> string					{ return vars->Get("agency_bank_title"); };
 		auto			GetCustomerBankAccount() -> string				{ return vars->Get("agency_bank_account"); };
@@ -221,6 +248,7 @@ class C_Print_Invoice_Subc : public C_Print_Invoice_Docs_Base
 		auto			GetCustomerMailingLocality() -> string			{ return vars->Get("agency_mailing_locality_title"); };
 		auto			GetCustomerMailingAddress() -> string			{ return vars->Get("agency_mailing_address"); };
 
+		auto			GetTableMainTitleSpelling() -> string			{ return vars->Get("invoice_table_header"); };
 		auto			isTableRowExists(int i) -> bool					{ return vars->Get("index_" + to_string(i)).length(); };
 		auto			GetTableRowDescription(int i) -> string			{ return vars->Get("subcontractor_table_row_description_" + to_string(i)); };
 		auto			GetTableRowIndex(int i) -> string				{ return vars->Get("index_" + to_string(i)); };
@@ -232,6 +260,9 @@ class C_Print_Invoice_Subc : public C_Print_Invoice_Docs_Base
 		auto			GetTableVAT() -> string							{ return c_float(vars->Get("subcontractors_vat_amount")).PrintPriceTag(); };
 		auto			GetTableTotal() -> string						{ return c_float(vars->Get("subcontractors_total_payment")).PrintPriceTag(); };
 
+		auto			GetTotalPaymentSpelling() -> string				{ return vars->Get("Total payment") + ": "; };
+		auto			GetFooterComment() -> string					{ return ""s; };
+
 		auto			GetSignatureTitle1() -> string					{ return vars->Get("Supplier"); };
 		auto			GetSignatureTitle2() -> string					{ return ""; };
 		auto			GetSignatureName1() -> string					{ return vars->Get("subcontractor_company_name_1"); };
@@ -242,7 +273,11 @@ class C_Print_Invoice_Subc : public C_Print_Invoice_Docs_Base
 
 class C_Print_Act_Agency : public C_Print_Invoice_Docs_Base
 {
+	protected:
+		auto			PrintXLSComment() -> string						{ return __PrintXLSComment(); }
+
 	public:
+
 		auto			PrintXLSHeader() -> string						{ return ""s; };
 		auto			PrintXLSFooter() -> string						{ return ""s; };
 
@@ -250,6 +285,7 @@ class C_Print_Act_Agency : public C_Print_Invoice_Docs_Base
 		auto			PrintPDFFooter() -> string						{ return ""s; };
 
 		auto			GetDocumentTitle() -> string					{ return vars->Get("Act") + " " + vars->Get("invoice_agreement"); };
+		auto			GetSupplierSpelling() -> string					{ return vars->Get("Implementor"); };
 		auto			GetSupplierName() -> string						{ return vars->Get("agency_name"); };
 		auto			GetSupplierBankName() -> string					{ return vars->Get("agency_bank_title"); };
 		auto			GetSupplierBankAccount() -> string				{ return vars->Get("agency_bank_account"); };
@@ -264,6 +300,7 @@ class C_Print_Act_Agency : public C_Print_Invoice_Docs_Base
 		auto			GetSupplierMailingZIP() -> string				{ return vars->Get("agency_mailing_geo_zip"); };
 		auto			GetSupplierMailingLocality() -> string			{ return vars->Get("agency_mailing_locality_title"); };
 		auto			GetSupplierMailingAddress() -> string			{ return vars->Get("agency_mailing_address"); };
+		auto			GetCustomerSpelling() -> string					{ return vars->Get("Customer"); };
 		auto			GetCustomerName() -> string						{ return vars->Get("cost_center_name"); };
 		auto			GetCustomerBankName() -> string					{ return vars->Get("cost_center_bank_title"); };
 		auto			GetCustomerBankAccount() -> string				{ return vars->Get("cost_center_bank_account"); };
@@ -279,6 +316,7 @@ class C_Print_Act_Agency : public C_Print_Invoice_Docs_Base
 		auto			GetCustomerMailingLocality() -> string			{ return vars->Get("cost_center_mailing_locality_title"); };
 		auto			GetCustomerMailingAddress() -> string			{ return vars->Get("cost_center_mailing_address"); };
 
+		auto			GetTableMainTitleSpelling() -> string			{ return vars->Get("act_table_header"); };
 		auto			isTableRowExists(int i) -> bool					{ return vars->Get("index_" + to_string(i)).length(); };
 		auto			GetTableRowDescription(int i) -> string			{ return vars->Get("cost_center_table_row_description_" + to_string(i)); };
 		auto			GetTableRowIndex(int i) -> string				{ return vars->Get("index_" + to_string(i)); };
@@ -290,7 +328,10 @@ class C_Print_Act_Agency : public C_Print_Invoice_Docs_Base
 		auto			GetTableVAT() -> string							{ return c_float(vars->Get("cost_center_vat_amount")).PrintPriceTag(); };
 		auto			GetTableTotal() -> string						{ return c_float(vars->Get("cost_center_total_payment")).PrintPriceTag(); };
 
-		auto			GetSignatureTitle1() -> string					{ return vars->Get("Provider"); };
+		auto			GetTotalPaymentSpelling() -> string				{ return ""; };
+		auto			GetFooterComment() -> string					{ return vars->Get("act_footnote"); };
+
+		auto			GetSignatureTitle1() -> string					{ return vars->Get("Implementor"); };
 		auto			GetSignatureTitle2() -> string					{ return vars->Get("Customer"); };
 		auto			GetSignatureName1() -> string					{ return vars->Get("act_signature_name1"); };
 		auto			GetSignatureName2() -> string					{ return vars->Get("act_signature_name2"); };
@@ -300,7 +341,11 @@ class C_Print_Act_Agency : public C_Print_Invoice_Docs_Base
 
 class C_Print_Act_Subc : public C_Print_Invoice_Docs_Base
 {
+	protected:
+		auto			PrintXLSComment() -> string						{ return __PrintXLSComment(); }
+
 	public:
+
 		auto			PrintXLSHeader() -> string						{ return ""s; };
 		auto			PrintXLSFooter() -> string						{ return ""s; };
 
@@ -308,6 +353,7 @@ class C_Print_Act_Subc : public C_Print_Invoice_Docs_Base
 		auto			PrintPDFFooter() -> string						{ return ""s; };
 
 		auto			GetDocumentTitle() -> string					{ return vars->Get("Act") + " " + vars->Get("invoice_agreement"); };
+		auto			GetSupplierSpelling() -> string					{ return vars->Get("Implementor"); };
 		auto			GetSupplierName() -> string						{ return vars->Get("subcontractor_company_name_1"); };
 		auto			GetSupplierBankName() -> string					{ return vars->Get("subcontractor_bank_title_1"); };
 		auto			GetSupplierBankAccount() -> string				{ return vars->Get("subcontractor_bank_account_1"); };
@@ -322,6 +368,7 @@ class C_Print_Act_Subc : public C_Print_Invoice_Docs_Base
 		auto			GetSupplierMailingZIP() -> string				{ return vars->Get("subcontractor_mailing_geo_zip_1"); };
 		auto			GetSupplierMailingLocality() -> string			{ return vars->Get("subcontractor_mailing_locality_title_1"); };
 		auto			GetSupplierMailingAddress() -> string			{ return vars->Get("subcontractor_mailing_address_1"); };
+		auto			GetCustomerSpelling() -> string					{ return vars->Get("Customer"); };
 		auto			GetCustomerName() -> string						{ return vars->Get("agency_name"); };
 		auto			GetCustomerBankName() -> string					{ return vars->Get("agency_bank_title"); };
 		auto			GetCustomerBankAccount() -> string				{ return vars->Get("agency_bank_account"); };
@@ -337,6 +384,7 @@ class C_Print_Act_Subc : public C_Print_Invoice_Docs_Base
 		auto			GetCustomerMailingLocality() -> string			{ return vars->Get("agency_mailing_locality_title"); };
 		auto			GetCustomerMailingAddress() -> string			{ return vars->Get("agency_mailing_address"); };
 
+		auto			GetTableMainTitleSpelling() -> string			{ return vars->Get("act_table_header"); };
 		auto			isTableRowExists(int i) -> bool					{ return vars->Get("index_" + to_string(i)).length(); };
 		auto			GetTableRowDescription(int i) -> string			{ return vars->Get("subcontractor_table_row_description_" + to_string(i)); };
 		auto			GetTableRowIndex(int i) -> string				{ return vars->Get("index_" + to_string(i)); };
@@ -348,7 +396,10 @@ class C_Print_Act_Subc : public C_Print_Invoice_Docs_Base
 		auto			GetTableVAT() -> string							{ return c_float(vars->Get("subcontractors_vat_amount")).PrintPriceTag(); };
 		auto			GetTableTotal() -> string						{ return c_float(vars->Get("subcontractors_total_payment")).PrintPriceTag(); };
 
-		auto			GetSignatureTitle1() -> string					{ return vars->Get("Provider"); };
+		auto			GetTotalPaymentSpelling() -> string				{ return ""; };
+		auto			GetFooterComment() -> string					{ return vars->Get("act_footnote"); };
+
+		auto			GetSignatureTitle1() -> string					{ return vars->Get("Implementor"); };
 		auto			GetSignatureTitle2() -> string					{ return vars->Get("Customer"); };
 		auto			GetSignatureName1() -> string					{ return vars->Get("subcontractor_company_name_1"); };
 		auto			GetSignatureName2() -> string					{ return vars->Get("agency_name"); };

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-05 10:04-0500\n"
+"POT-Creation-Date: 2019-11-06 14:21-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -184,6 +184,9 @@ msgstr "Наименование товара(описание выполнен�
 
 msgid "Goods"
 msgstr "Товары"
+
+msgid "Implementor"
+msgstr "Исполнитель"
 
 msgid "Incorrect bt list"
 msgstr "Некорректный список командировок"
@@ -390,7 +393,7 @@ msgid "Title"
 msgstr "Должность"
 
 msgid "Total"
-msgstr "Сумма"
+msgstr "Итого"
 
 msgid "Total (tax free)"
 msgstr "Сумма (без налога)"
@@ -411,13 +414,19 @@ msgid "VAT"
 msgstr "НДС"
 
 msgid "VAT comment1"
-msgstr "Валюта: наименование код Российский рубль, 643"
+msgstr "Валюта: наименование, код Российский рубль, 643"
+
+msgid "VAT comment2"
+msgstr "Идентификатор государственного контракта, договора (соглашения) (при наличии)"
 
 msgid "VAT doc"
 msgstr "Счет-фактура"
 
 msgid "VAT short"
 msgstr "НДС"
+
+msgid "VAT sum"
+msgstr "Сумма НДС"
 
 msgid "You are not agency employee"
 msgstr "Вы не сотрудник агенства"
@@ -442,6 +451,9 @@ msgstr "номер акта"
 
 msgid "act number is empty"
 msgstr "не указан номер акта"
+
+msgid "act_table_header"
+msgstr "Наименование работ, услуг"
 
 msgid "added"
 msgstr "добавлено"
@@ -779,6 +791,9 @@ msgstr "в рамках"
 msgid "incorrect confirmation code"
 msgstr "некорректный код"
 
+msgid "invoice_table_header"
+msgstr "Товары (работы, услуги)"
+
 msgid "is empty"
 msgstr "не указан"
 
@@ -1112,6 +1127,9 @@ msgstr "Российской Федерации"
 msgid "vat_header_4"
 msgstr "от 26 декабря 2011г. № 1137"
 
+msgid "vat_header_5"
+msgstr "(в ред. Постановления Правительства РФ от 19.08.2017 № 981)"
+
 msgid "vat_header_TIN_KPP_buyer"
 msgstr "ИНН/КПП покупателя"
 
@@ -1120,9 +1138,6 @@ msgstr "ИНН/КПП продавца"
 
 msgid "vat_shipper_address"
 msgstr "Грузоотправитель и его адрес: --"
-
-msgid "vat_title_currency"
-msgstr "Валюта: наименование, код Российский рубль, 643"
 
 msgid "voucher content is empty"
 msgstr "содержимое ваучера пустое"
