@@ -174,6 +174,7 @@ auto 			isBotIP(string ip) -> bool;
 auto 			isAdverseWordsHere(string text, CMysql *) -> bool;
 auto			GetCompanyPositionsInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetSiteThemesInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
+pair<struct tm, struct tm> GetFirstAndLastMonthDaysByDate(const struct tm &_date);
 pair<struct tm, struct tm> GetFirstAndLastDateOfLastMonth();
 pair<struct tm, struct tm> GetFirstAndLastDateOfThisMonth();
 struct tm		GetTMObject(string date);

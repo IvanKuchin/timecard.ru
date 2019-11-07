@@ -45,10 +45,14 @@ class C_Print_VAT_Base
 
 		int								total_table_items = 0;
 
+		auto			__PrintXLSHeader() -> string;
+		auto			__PrintXLSTable() -> string;
+
 		auto			GetSupplierFullAddress() -> string;
 		auto			GetCustomerFullAddress() -> string;
 		auto			SpellTotalItemsAndSum()							{ return vars->Get("Sum items") + " " + to_string(total_table_items) + ", " + vars->Get("total amount") + " " + GetTableTotal() + " " + vars->Get("rub."); };
 		auto			SpellPrice() -> string;
+		auto			MergeApplyFormat(int start_col, int end_col, libxl::Format* fmt) -> string;
 
 	public:
 
@@ -128,7 +132,7 @@ ostream&	operator<<(ostream& os, const C_Print_VAT_Base &);
 class C_Print_VAT_Agency : public C_Print_VAT_Base
 {
 	public:
-		auto			PrintXLSHeader() -> string						{ return ""s; };
+		auto			PrintXLSHeader() -> string						{ return __PrintXLSHeader(); };
 		auto			PrintXLSFooter() -> string						{ return ""s; };
 
 		auto			PrintPDFHeader() -> string						{ return ""s; };
@@ -191,7 +195,7 @@ class C_Print_VAT_Agency : public C_Print_VAT_Base
 class C_Print_VAT_Subc : public C_Print_VAT_Base
 {
 	public:
-		auto			PrintXLSHeader() -> string						{ return ""s; };
+		auto			PrintXLSHeader() -> string						{ return __PrintXLSHeader(); };
 		auto			PrintXLSFooter() -> string						{ return ""s; };
 
 		auto			PrintPDFHeader() -> string						{ return ""s; };

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-06 14:21-0500\n"
+"POT-Creation-Date: 2019-11-07 18:45-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -167,9 +167,6 @@ msgstr "Руководитель"
 msgid "Employee data"
 msgstr "Данные сотрудника"
 
-msgid "Excise"
-msgstr "Акциза"
-
 msgid "Expense"
 msgstr "Расход"
 
@@ -178,9 +175,6 @@ msgstr "Февраль"
 
 msgid "February declension"
 msgstr "Февраля"
-
-msgid "Good name"
-msgstr "Наименование товара(описание выполненных работ, оказанных услуг)"
 
 msgid "Goods"
 msgstr "Товары"
@@ -244,12 +238,6 @@ msgstr "Май"
 
 msgid "May declension"
 msgstr "Мая"
-
-msgid "Measure unit (code)"
-msgstr "Ед. изм. (код)"
-
-msgid "Measure unit (name)"
-msgstr "Ед. изм. (имя)"
 
 msgid "Non-taxable sum"
 msgstr "Итого (налого-необлагаемая база)"
@@ -414,10 +402,14 @@ msgid "VAT"
 msgstr "НДС"
 
 msgid "VAT comment1"
-msgstr "Валюта: наименование, код Российский рубль, 643"
+msgstr "Валюта: наименование, код"
 
 msgid "VAT comment2"
-msgstr "Идентификатор государственного контракта, договора (соглашения) (при наличии)"
+msgstr "Российский рубль, 643"
+
+msgid "VAT comment3"
+msgstr ""
+"Идентификатор государственного контракта, договора (соглашения) (при наличии)"
 
 msgid "VAT doc"
 msgstr "Счет-фактура"
@@ -425,8 +417,71 @@ msgstr "Счет-фактура"
 msgid "VAT short"
 msgstr "НДС"
 
+msgid "VAT sign - Accountant"
+msgstr "Главный бухгалтер"
+
+msgid "VAT sign - Authorized person"
+msgstr "или иное уполномоченное лицо"
+
+msgid "VAT sign - CxO"
+msgstr "Руководитель организации"
+
+msgid "VAT sign - Entrepreneur"
+msgstr "Индивидуальный предприниматель"
+
+msgid "VAT sign - Entrepreneur registration"
+msgstr ""
+"(реквизиты свидетельства о государственной регистрации индивидуального "
+"предпринимателя)"
+
 msgid "VAT sum"
 msgstr "Сумма НДС"
+
+msgid "VAT title - Country"
+msgstr "Страна происхождения товара"
+
+msgid "VAT title - Country code"
+msgstr "цифровой код"
+
+msgid "VAT title - Country name"
+msgstr "краткое наименование"
+
+msgid "VAT title - Custom number"
+msgstr "Регистра-ционный номер таможенной декларации"
+
+msgid "VAT title - Excise"
+msgstr "В том числе сумма акциза"
+
+msgid "VAT title - Good code"
+msgstr "Код вида товара"
+
+msgid "VAT title - Good name"
+msgstr "Наименование товара(описание выполненных работ, оказанных услуг)"
+
+msgid "VAT title - Measure unit"
+msgstr "Единица измерения"
+
+msgid "VAT title - Measure unit (code)"
+msgstr "код"
+
+msgid "VAT title - Measure unit (name)"
+msgstr "условное обозначение (национальное)"
+
+msgid "VAT title - Price per unit"
+msgstr "Цена (тариф) за единицу измерения"
+
+msgid "VAT title - Price w tax"
+msgstr "Стоимость товаров (работ, услуг), имущественных прав с налогом - всего"
+
+msgid "VAT title - Price wo tax"
+msgstr ""
+"Стоимость товаров (работ, услуг), имущественных прав без налога - всего"
+
+msgid "VAT title - Quantity"
+msgstr "Количество (объем)"
+
+msgid "VAT title - Tax amount"
+msgstr "Сумма налога, предъяв-ляемая покупателю"
 
 msgid "You are not agency employee"
 msgstr "Вы не сотрудник агенства"
