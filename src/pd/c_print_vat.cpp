@@ -703,17 +703,20 @@ auto	C_Print_VAT_Base::__HPDF_DrawTable() -> string
 
 		if(error_message.empty())
 		{
-			pdf_obj.AddColumn(3);
-			pdf_obj.AddColumn(45);
-			pdf_obj.AddColumn(3);
-			pdf_obj.AddColumn(3);
-			pdf_obj.AddColumn(3);
-			pdf_obj.AddColumn(3);
-			pdf_obj.AddColumn(10);
+			pdf_obj.AddColumn(20);
+			pdf_obj.AddColumn(4);
+			pdf_obj.AddColumn(5);
+			pdf_obj.AddColumn(6);
 			pdf_obj.AddColumn(5);
 			pdf_obj.AddColumn(5);
-			pdf_obj.AddColumn(10);
-			pdf_obj.AddColumn(10);
+			pdf_obj.AddColumn(9);
+			pdf_obj.AddColumn(4);
+			pdf_obj.AddColumn(5);
+			pdf_obj.AddColumn(9);
+			pdf_obj.AddColumn(9);
+			pdf_obj.AddColumn(5);
+			pdf_obj.AddColumn(5);
+			pdf_obj.AddColumn(5);
 
 			if((error_message = pdf_obj.__HPDF_StartTable()).length())
 			{
@@ -723,12 +726,12 @@ auto	C_Print_VAT_Base::__HPDF_DrawTable() -> string
 
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(0, utf8_to_cp1251("№"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(0, utf8_to_cp1251(vars->Get("VAT title - Good name")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 2, false)).length())
 			{ MESSAGE_ERROR("", "", "fail to write table title index line"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(1, utf8_to_cp1251(vars->Get("VAT title - Good name")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(1, utf8_to_cp1251(vars->Get("VAT title - Good code")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 2, false)).length())
 			{ MESSAGE_ERROR("", "", "fail to write table title description line"); }
 		}
 		if(error_message.empty())
@@ -748,8 +751,8 @@ auto	C_Print_VAT_Base::__HPDF_DrawTable() -> string
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(5, utf8_to_cp1251(vars->Get("Price")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 3, false)).length())
-			{ MESSAGE_ERROR("", "", "fail to write table title price line"); }
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(5, utf8_to_cp1251(vars->Get("VAT title - Price per unit")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 3, false)).length())
+			{ MESSAGE_ERROR("", "", "fail to write table title price per unit"); }
 		}
 		if(error_message.empty())
 		{
@@ -778,6 +781,21 @@ auto	C_Print_VAT_Base::__HPDF_DrawTable() -> string
 		}
 		if(error_message.empty())
 		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(10, utf8_to_cp1251(vars->Get("VAT title - Country code")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
+			{ MESSAGE_ERROR("", "", "fail to write table title Country code"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(10, utf8_to_cp1251(vars->Get("VAT title - Country name")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
+			{ MESSAGE_ERROR("", "", "fail to write table title Country name"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(10, utf8_to_cp1251(vars->Get("VAT title - Custom number")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
+			{ MESSAGE_ERROR("", "", "fail to write table title total line"); }
+		}
+		if(error_message.empty())
+		{
 			if((error_message = pdf_obj.__HPDF_MoveTableLineDown(2)).length())
 			{ MESSAGE_ERROR("", "", "fail to write table title total line"); }
 		}
@@ -787,12 +805,12 @@ auto	C_Print_VAT_Base::__HPDF_DrawTable() -> string
 			total_table_items = 0;
 			for(auto i = 1; isTableRowExists(i); ++i)
 			{
-				auto	max_lines = pdf_obj.__HPDF_GetNumberOfLinesInTable(1, utf8_to_cp1251(GetTableRowDescription(i))	, NORMAL_FONT, __pdf_font_size);
+				auto	max_lines = pdf_obj.__HPDF_GetNumberOfLinesInTable(0, utf8_to_cp1251(GetTableRowDescription(i))	, NORMAL_FONT, __pdf_font_size - 2);
 
 
-				if((error_message = pdf_obj.__HPDF_PrintTextTableCell(0, utf8_to_cp1251(GetTableRowIndex(i)), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).empty())
+				if((error_message = pdf_obj.__HPDF_PrintTextTableCell(0, utf8_to_cp1251(GetTableRowDescription(i)), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 2, false)).empty())
 				{
-					if((error_message = pdf_obj.__HPDF_PrintTextTableCell(1, utf8_to_cp1251(GetTableRowDescription(i)), HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).empty())
+					if((error_message = pdf_obj.__HPDF_PrintTextTableCell(1, utf8_to_cp1251("-"), HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).empty())
 					{
 						if((error_message = pdf_obj.__HPDF_PrintTextTableCell(2, utf8_to_cp1251("796"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).empty())
 						{
