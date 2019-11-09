@@ -285,7 +285,7 @@ auto AJAX_ResponseTemplate(CCgi *indexPage, const string &success_message, const
 	else
 	{
 		MESSAGE_DEBUG("", "", error_message);
-		result = "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+		result = "{\"result\":\"error\",\"description\":\"" + RemoveQuotas(error_message) + "\"}";
 	}
 
 	indexPage->RegisterVariableForce("result", result);

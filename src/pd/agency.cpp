@@ -1340,7 +1340,7 @@ int main(void)
 			(action == "AJAX_updateSoWStartDate")				||
 			(action == "AJAX_updateSoWEndDate")					||
 			(action == "AJAX_updateSoWCustomField")				||
-
+			(action == "AJAX_deleteSoWCustomField")				||
 			(action == "AJAX_updatePeriodStart")				||
 			(action == "AJAX_updatePeriodEnd")					||
 			(action == "AJAX_updateSubcontractorCreateTasks")
@@ -1359,7 +1359,11 @@ int main(void)
 				string			id				= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
 				string			new_value		= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("value"));
 
-				if(new_value.length())
+				if(
+					new_value.length()						||
+					(action == "AJAX_updateSoWCustomField")	||
+					(action == "AJAX_deleteSoWCustomField")
+				)
 				{
 					error_message = isAgencyEmployeeAllowedToChangeSoW(sow_id, &db, &user);
 					if(error_message.empty())
@@ -1370,41 +1374,57 @@ int main(void)
 							error_message = CheckNewValueByAction(action, id, sow_id, new_value, &db, &user);
 							if(error_message.empty())
 							{
-								if(action.find("update"))
+								auto		existing_value = ""s;
+
+								if(action.find("update") != string::npos)
 								{
-									string		existing_value = GetDBValueByAction(action, id, sow_id, &db, &user);
+									existing_value = GetDBValueByAction(action, id, sow_id, &db, &user);
 
 									error_message = SetNewValueByAction(action, id, sow_id, new_value, &db, &user);
 									if(error_message.empty())
 									{
 										ostResult << "{\"result\":\"success\"}";
-
-										if(GeneralNotifySoWContractPartiesAboutChanges(action, id, sow_id, existing_value, new_value, &db, &user))
-										{
-										}
-										else
-										{
-											MESSAGE_DEBUG("", action, "fail to notify sow.id(" + sow_id + ") parties about changes");
-										}
 									}
 									else
 									{
 										MESSAGE_DEBUG("", action, "unable to set new value (action/sow_id/id/value = " + action + "/" + sow_id + "/" + id + "/[" + FilterCP1251Symbols(new_value) + "])");
 									}
 								}
-								else if(action.find("insert"))
+								else if(action.find("insert") != string::npos)
 								{
 									
 								}
-								else if(action.find("delete"))
+								else if(action.find("delete") != string::npos)
 								{
+									existing_value = GetDBValueByAction(action, id, sow_id, &db, &user);
 
+									error_message = DeleteEntryByAction(action, id, &db, &user);
+									if(error_message.empty())
+									{
+										ostResult << "{\"result\":\"success\"}";
+									}
+									else
+									{
+										MESSAGE_DEBUG("", action, "unable to remove item (action/sow_id/id/value = " + action + "/" + sow_id + "/" + id + "/[" + FilterCP1251Symbols(new_value) + "])");
+									}
 								}
 								else
 								{
+									error_message = gettext("unsupported operation");
 									MESSAGE_ERROR("", action, "unsupported action type(" + action + ")");
 								}
 
+								if(error_message.empty())
+								{
+									if(GeneralNotifySoWContractPartiesAboutChanges(action, id, sow_id, existing_value, new_value, &db, &user))
+									{
+										// --- don't do anything here
+									}
+									else
+									{
+										MESSAGE_DEBUG("", action, "fail to notify sow.id(" + sow_id + ") parties about changes");
+									}
+								}
 							}
 							else
 							{
@@ -1454,7 +1474,8 @@ int main(void)
 			(action == "AJAX_updatePSoWSignDate")				||
 			(action == "AJAX_updatePSoWStartDate")				||
 			(action == "AJAX_updatePSoWEndDate")				||
-			(action == "AJAX_updatePSoWCustomField")
+			(action == "AJAX_updatePSoWCustomField")			||
+			(action == "AJAX_deletePSoWCustomField")
 		)
 		{
 			ostringstream	ostResult;
@@ -1463,14 +1484,18 @@ int main(void)
 
 			ostResult.str("");
 			{
-				string			template_name = "json_response.htmlt";
-				string			error_message = "";
+				auto			template_name = "json_response.htmlt"s;
+				auto			error_message = ""s;
 
-				string			sow_id 			= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("sow_id"));
-				string			id				= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
-				string			new_value		= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("value"));
+				auto			sow_id 			= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("sow_id"));
+				auto			id				= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
+				auto			new_value		= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("value"));
 
-				if(new_value.length())
+				if(	
+					new_value.length()							||
+					(action == "AJAX_updatePSoWCustomField")	||
+					(action == "AJAX_deletePSoWCustomField")
+				)
 				{
 					error_message = isAgencyEmployeeAllowedToChangePSoW(sow_id, &db, &user);
 					if(error_message.empty())
@@ -1481,41 +1506,57 @@ int main(void)
 							error_message = CheckNewValueByAction(action, id, sow_id, new_value, &db, &user);
 							if(error_message.empty())
 							{
-								if(action.find("update"))
+								auto		existing_value = ""s;
+
+								if(action.find("update") != string::npos)
 								{
-									string		existing_value = GetDBValueByAction(action, id, sow_id, &db, &user);
+									existing_value = GetDBValueByAction(action, id, sow_id, &db, &user);
 
 									error_message = SetNewValueByAction(action, id, sow_id, new_value, &db, &user);
 									if(error_message.empty())
 									{
 										ostResult << "{\"result\":\"success\"}";
-
-										if(GeneralNotifySoWContractPartiesAboutChanges(action, id, sow_id, existing_value, new_value, &db, &user))
-										{
-										}
-										else
-										{
-											MESSAGE_DEBUG("", action, "fail to notify sow.id(" + sow_id + ") parties about changes");
-										}
 									}
 									else
 									{
 										MESSAGE_DEBUG("", action, "unable to set new value (action/sow_id/id/value = " + action + "/" + sow_id + "/" + id + "/[" + FilterCP1251Symbols(new_value) + "])");
 									}
 								}
-								else if(action.find("insert"))
+								else if(action.find("insert") != string::npos)
 								{
 									
 								}
-								else if(action.find("delete"))
+								else if(action.find("delete") != string::npos)
 								{
-
+									existing_value = GetDBValueByAction(action, id, sow_id, &db, &user);
+								
+									error_message = DeleteEntryByAction(action, id, &db, &user);
+									if(error_message.empty())
+									{
+										ostResult << "{\"result\":\"success\"}";
+									}
+									else
+									{
+										MESSAGE_DEBUG("", action, "unable to remove item (action/sow_id/id/value = " + action + "/" + sow_id + "/" + id + "/[" + FilterCP1251Symbols(new_value) + "])");
+									}
 								}
 								else
 								{
+									error_message = gettext("unsupported operation");
 									MESSAGE_ERROR("", action, "unsupported action type(" + action + ")");
 								}
 
+								if(error_message.empty())
+								{
+									if(GeneralNotifySoWContractPartiesAboutChanges(action, id, sow_id, existing_value, new_value, &db, &user))
+									{
+										// --- don't do anything here
+									}
+									else
+									{
+										MESSAGE_DEBUG("", action, "fail to notify sow.id(" + sow_id + ") parties about changes");
+									}
+								}
 							}
 							else
 							{
@@ -3481,7 +3522,7 @@ int main(void)
 				{
 					MESSAGE_DEBUG("", action, "failed");
 					ostResult.str("");
-					ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+					ostResult << "{\"result\":\"error\",\"description\":\"" + RemoveQuotas(error_message) + "\"}";
 				}
 
 				indexPage.RegisterVariableForce("result", ostResult.str());

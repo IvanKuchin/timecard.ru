@@ -119,7 +119,7 @@ static auto SendSMSNotification(vector<string> recipients, string message, CCgi 
 
 	for(auto &recipient: recipients)
 	{
-		auto	ret = smsc.send_sms(recipient, message, 0, "", 0, 0, DOMAIN_NAME, "", "");
+		auto	ret = smsc.send_sms(recipient, message + "\n" + gettext("Sent by") + " " + DOMAIN_NAME, 0, "", 0, 0, DOMAIN_NAME, "", "");
 	}
 
 	MESSAGE_DEBUG("", "", "finish(" + error_message + ")");
@@ -129,12 +129,12 @@ static auto SendSMSNotification(vector<string> recipients, string message, CCgi 
 
 static auto SendSMSNotification_NewTicket(vector<string> recipients, CCgi *indexPage, CMysql *db, CUser *user)
 {
-	return SendSMSNotification(recipients, gettext("case") + " "s + indexPage->GetVarsHandler()->Get("case_title") + " (" + indexPage->GetVarsHandler()->Get("case_id") /*+ " S" + indexPage->GetVarsHandler()->Get("severity")*/ + ") " + gettext("opened") + ".", indexPage, db, user);
+	return SendSMSNotification(recipients, gettext("case") + " "s + indexPage->GetVarsHandler()->Get("case_title") + " (" + indexPage->GetVarsHandler()->Get("case_id") + ") (S" + indexPage->GetVarsHandler()->Get("severity") + ") " + gettext("opened") + ".", indexPage, db, user);
 }
 
 static auto SendSMSNotification_ExistingTicket(vector<string> recipients, CCgi *indexPage, CMysql *db, CUser *user)
 {
-	return SendSMSNotification(recipients, gettext("case") + " "s + indexPage->GetVarsHandler()->Get("case_title") + " (" + indexPage->GetVarsHandler()->Get("case_id") /*+ " S" + indexPage->GetVarsHandler()->Get("severity")*/ + ") " + gettext("updated") + ".", indexPage, db, user);
+	return SendSMSNotification(recipients, gettext("case") + " "s + indexPage->GetVarsHandler()->Get("case_title") + " (" + indexPage->GetVarsHandler()->Get("case_id") + ") (S" + indexPage->GetVarsHandler()->Get("severity") + ") " + gettext("updated") + ".", indexPage, db, user);
 }
 
 static auto SendEmailNotification(vector<string> recipients, string email_template, CCgi *indexPage, CMysql *db, CUser *user)

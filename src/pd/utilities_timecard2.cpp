@@ -890,6 +890,7 @@ auto	isActionEntityBelongsToSoW(string action, string id, string sow_id, CMysql 
 				if(action == "AJAX_updateSoWStartDate")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
 				if(action == "AJAX_updateSoWEndDate")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
 				if(action == "AJAX_updateSoWCustomField")			sql_query = "SELECT `contract_sow_id` AS `sow_id` FROM `contract_sow_custom_fields` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_deleteSoWCustomField")			sql_query = "SELECT `contract_sow_id` AS `sow_id` FROM `contract_sow_custom_fields` WHERE `id`=\"" + id + "\";";
 
 				if(action == "AJAX_updatePSoWNumber")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
 				if(action == "AJAX_updatePSoWAct")					sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
@@ -901,6 +902,7 @@ auto	isActionEntityBelongsToSoW(string action, string id, string sow_id, CMysql 
 				if(action == "AJAX_updatePSoWStartDate")			sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
 				if(action == "AJAX_updatePSoWEndDate")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
 				if(action == "AJAX_updatePSoWCustomField")			sql_query = "SELECT `contract_psow_id` AS `sow_id` FROM `contract_psow_custom_fields` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_deletePSoWCustomField")			sql_query = "SELECT `contract_psow_id` AS `sow_id` FROM `contract_psow_custom_fields` WHERE `id`=\"" + id + "\";";
 
 				if(sql_query.length())
 				{
@@ -968,6 +970,11 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 					new_value.length()									||
 					(action == "AJAX_updateCompanyCustomField")			||	// --- custom field could be empty
 					(action == "AJAX_updateCostCenterCustomField")		||	// --- custom field could be empty
+					(action == "AJAX_updateSoWCustomField")				||	// --- custom field could be empty
+					(action == "AJAX_updatePSoWCustomField")			||	// --- custom field could be empty
+					(action == "AJAX_deleteCostCenterCustomField")		||	// --- custom field could be empty
+					(action == "AJAX_deleteSoWCustomField")				||	// --- custom field could be empty
+					(action == "AJAX_deletePSoWCustomField")			||	// --- custom field could be empty
 					(action == "AJAX_updateCompanyActNumberPrefix")		||	// --- ActNumberPrefix could be empty
 					(action == "AJAX_updateCompanyActNumberPostfix")		 // --- ActNumberPostfix could be empty
 				)
@@ -1232,6 +1239,7 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 					else if(action == "AJAX_updateSoWAct")						{ /* --- good to go */ }
 					else if(action == "AJAX_updateSoWSignDate")					{ /* --- good to go */ }
 					else if(action == "AJAX_updateSoWCustomField")				{ /* --- good to go */ }
+					else if(action == "AJAX_deleteSoWCustomField")				{ /* --- good to go */ }
 					else if(action == "AJAX_deleteTemplateAgreement_company")	{ /* --- good to go */ }
 					else if(action == "AJAX_deleteTemplateAgreement_sow")		{ /* --- good to go */ }
 					else if(action == "AJAX_updateAirfareLimitationByDirection"){ /* --- good to go */ }
@@ -1586,6 +1594,7 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 					else if(action == "AJAX_updatePSoWAct")						{ /* --- good to go */ }
 					else if(action == "AJAX_updatePSoWSignDate")				{ /* --- good to go */ }
 					else if(action == "AJAX_updatePSoWCustomField")				{ /* --- good to go */ }
+					else if(action == "AJAX_deletePSoWCustomField")				{ /* --- good to go */ }
 					else if(action == "AJAX_updatePSoWStartDate")
 					{
 						if(db->Query("SELECT `end_date` FROM `contracts_psow` WHERE `id`=\"" + sow_id + "\";"))
@@ -2405,6 +2414,7 @@ auto	GetDBValueByAction(string action, string id, string sow_id, CMysql *db, CUs
 				if(action == "AJAX_updateSoWStartDate")						sql_query = "SELECT `start_date`			as `value` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 				if(action == "AJAX_updateSoWEndDate")						sql_query = "SELECT `end_date`				as `value` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 				if(action == "AJAX_updateSoWCustomField")					sql_query = "SELECT `value`					as `value` FROM `contract_sow_custom_fields` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_deleteSoWCustomField")					sql_query = "SELECT `var_name`				as `value` FROM `contract_sow_custom_fields` WHERE `id`=\"" + id + "\";";
 
 				if(action == "AJAX_updatePSoWNumber")						sql_query = "SELECT `number`				as `value` FROM `contracts_psow` WHERE `id`=\"" + sow_id + "\";";
 				if(action == "AJAX_updatePSoWAct")							sql_query = "SELECT `act_number`			as `value` FROM `contracts_psow` WHERE `id`=\"" + sow_id + "\";";
@@ -2415,6 +2425,7 @@ auto	GetDBValueByAction(string action, string id, string sow_id, CMysql *db, CUs
 				if(action == "AJAX_updatePSoWStartDate")					sql_query = "SELECT `start_date`			as `value` FROM `contracts_psow` WHERE `id`=\"" + sow_id + "\";";
 				if(action == "AJAX_updatePSoWEndDate")						sql_query = "SELECT `end_date`				as `value` FROM `contracts_psow` WHERE `id`=\"" + sow_id + "\";";
 				if(action == "AJAX_updatePSoWCustomField")					sql_query = "SELECT `value`					as `value` FROM `contract_psow_custom_fields` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_deletePSoWCustomField")					sql_query = "SELECT `var_name`				as `value` FROM `contract_psow_custom_fields` WHERE `id`=\"" + id + "\";";
 
 				if(action == "AJAX_updateCostCenterNumber")					sql_query = "SELECT `number`				as `value` FROM `cost_centers` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateCostCenterAct")					sql_query = "SELECT `act_number`			as `value` FROM `cost_centers` WHERE `id`=\"" + id + "\";";
@@ -4073,7 +4084,23 @@ auto DeleteEntryByAction(string action, string id, CMysql *db, CUser *user) -> s
 				db->Query("DELETE FROM `contract_sow_agreement_files` WHERE `id`=\"" + id + "\";");
 				if(db->isError())
 				{
-					MESSAGE_ERROR("", "", "fail to remove from table company_agreement_files");
+					MESSAGE_ERROR("", "", "fail to remove from table contract_sow_agreement_files");
+				}
+			}
+			else if(action == "AJAX_deletePSoWCustomField")
+			{
+				db->Query("DELETE FROM `contract_psow_custom_fields` WHERE `id`=\"" + id + "\";");
+				if(db->isError())
+				{
+					MESSAGE_ERROR("", "", "fail to remove from table contract_psow_custom_fields");
+				}
+			}
+			else if(action == "AJAX_deleteSoWCustomField")
+			{
+				db->Query("DELETE FROM `contract_sow_custom_fields` WHERE `id`=\"" + id + "\";");
+				if(db->isError())
+				{
+					MESSAGE_ERROR("", "", "fail to remove from table contract_sow_custom_fields");
 				}
 			}
 			else
@@ -4109,6 +4136,8 @@ string	SetNewValueByAction(string action, string id, string sow_id, string new_v
 					new_value.length()									||
 					(action == "AJAX_updateCompanyCustomField")			||	// --- custom field could be empty
 					(action == "AJAX_updateCostCenterCustomField")		||	// --- custom field could be empty
+					(action == "AJAX_updateSoWCustomField")				||	// --- custom field could be empty
+					(action == "AJAX_updatePSoWCustomField")			||	// --- custom field could be empty
 					(action == "AJAX_updateCompanyActNumberPrefix")		||	// --- ActNumberPrefix could be empty
 					(action == "AJAX_updateCompanyActNumberPostfix")		 // --- ActNumberPostfix could be empty
 				)
@@ -5476,7 +5505,14 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 	if(action == "AJAX_updateSoWCustomField")
 	{
 		notification_description = gettext("SoW") + " ("s + GetSpelledSoWByID(sow_id, db) + "): " + gettext("custom field") + "(" + GetSpelledSoWCustomFieldNameByID(id, db) + ") " + gettext("changed") + " " + gettext("from") + " " + existing_value + " " + gettext("to") + " " + new_value;
-		sql_query = "SELECT `contract_sow_id` AS `contract_sow_id` FROM `contract_sow_custom_fields` WHERE `id`=\"" + id + "\";";
+		// sql_query = "SELECT `contract_sow_id` AS `contract_sow_id` FROM `contract_sow_custom_fields` WHERE `id`=\"" + id + "\";";
+		sql_query = ""; // --- don't notify subcontractors, only agency
+	}
+	if(action == "AJAX_deleteSoWCustomField")
+	{
+		notification_description = gettext("SoW") + " ("s + GetSpelledSoWByID(sow_id, db) + "): " + gettext("custom field") + "(" + existing_value + ") " + gettext("removed");
+		// sql_query = "SELECT `contract_sow_id` AS `contract_sow_id` FROM `contract_sow_custom_fields` WHERE `id`=\"" + id + "\";";
+		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 
 	if(action == "AJAX_updatePSoWNumber")
@@ -5527,6 +5563,11 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 	if(action == "AJAX_updatePSoWCustomField")
 	{
 		notification_description = gettext("PSoW") + " ("s + GetSpelledPSoWByID(sow_id, db) + "): " + gettext("custom field") + "(" + GetSpelledPSoWCustomFieldNameByID(id, db) + ") " + gettext("changed") + " " + gettext("from") + " " + existing_value + " " + gettext("to") + " " + new_value;
+		sql_query = ""; // --- don't notify subcontractors, only agency
+	}
+	if(action == "AJAX_deletePSoWCustomField")
+	{
+		notification_description = gettext("PSoW") + " ("s + GetSpelledPSoWByID(sow_id, db) + "): " + gettext("custom field") + "(" + existing_value + ") " + gettext("removed");
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 
