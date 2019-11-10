@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-08 10:35-0500\n"
+"POT-Creation-Date: 2019-11-09 22:54-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -834,6 +834,9 @@ msgstr "hpdf: не удалось напечатать заголовок тай
 msgid "hpdf: fail to print title"
 msgstr "hpdf: не удалось напечатать текст"
 
+msgid "hpdf: fail to remove column separator"
+msgstr "hpdf: не удалось удалить разделитель в таблице"
+
 msgid "hpdf: table top must be higher than bottom"
 msgstr "hpdf: верх таблицы должен быть выше чем нижняя часть"
 
@@ -1136,6 +1139,9 @@ msgstr "неизвестный тип"
 
 msgid "unsupported action"
 msgstr "неизвестное действие"
+
+msgid "unsupported operation"
+msgstr "неподдерживаемая операция"
 
 msgid "up to"
 msgstr "по"

@@ -460,109 +460,6 @@ auto	C_Print_VAT_Base::PrintAsXLS() -> string
 
 
 // --- PDF part
-auto C_Print_VAT_Base::__HPDF_PrintSignature() -> string
-{
-
-	MESSAGE_DEBUG("", "", "start");
-
-	auto	error_message = ""s;
-
-	try
-	{
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_MoveLineDown()).length())
-			{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
-		}
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSignatureTitle1()), 0, 20, HPDF_TALIGN_LEFT, BOLD_FONT, __pdf_font_size, false)).length())
-			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
-		}
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSignatureTitle2()), 60, 60+20, HPDF_TALIGN_LEFT, BOLD_FONT, __pdf_font_size, true)).length())
-			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
-		}
-
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_MoveLineDown()).length())
-			{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
-		}
-
-		if(GetSignatureTitle1().length())
-		{
-			if(error_message.empty())
-			{
-				if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(10, 40)).length())
-					{ MESSAGE_ERROR("", "", "hpdf: fail to draw horizontal line"); }
-			}
-		}
-		if(GetSignatureTitle2().length())
-		{
-			if(error_message.empty())
-			{
-				if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(70, 100)).length())
-					{ MESSAGE_ERROR("", "", "hpdf: fail to draw horizontal line"); }
-			}
-		}
-
-		if(GetSignatureTitle1().length())
-		{
-			if(error_message.empty())
-			{
-				if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSignatureName1()), 0, 40, HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, false)).length())
-				{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
-			}
-		}
-		if(GetSignatureTitle2().length())
-		{
-			if(error_message.empty())
-			{
-				if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSignatureName2()), 60, 60+40, HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, false)).length())
-				{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
-			}
-		}
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_MoveLineDown()).length())
-			{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
-		}
-
-		if(GetSignatureTitle1().length())
-		{
-			if(error_message.empty())
-			{
-				if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSignatureInfo1()), 0, 40, HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size - 2, false)).length())
-				{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
-			}
-		}
-		if(GetSignatureTitle2().length())
-		{
-			if(error_message.empty())
-			{
-				if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSignatureInfo2()), 60, 60+40, HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size - 2, false)).length())
-				{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
-			}
-		}
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_MoveLineDown()).length())
-			{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
-		}
-	}
-	catch(...)
-	{
-		error_message = "hpdf: "s + gettext("fail to print header table");
-		MESSAGE_ERROR("", "", error_message);
-	}
-
-	MESSAGE_DEBUG("", "", "finish");
-
-	return error_message;
-}
-
 auto	C_Print_VAT_Base::__HPDF_DrawHeader() -> string
 {
 	MESSAGE_DEBUG("", "", "start");
@@ -671,13 +568,338 @@ auto	C_Print_VAT_Base::__HPDF_DrawHeader() -> string
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("VAT comment2")), 0, 100, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, true)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("VAT comment3")), 0, 100, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, true)).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
 	}
 	catch(...)
 	{
 		error_message = gettext("hpdf: fail to print title");
+		MESSAGE_ERROR("", "", error_message);
+	}
+
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return error_message;
+}
+
+auto	C_Print_VAT_Base::__HPDF_DrawTable_Header() -> string
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	error_message = ""s;
+
+	try
+	{
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(0, utf8_to_cp1251(vars->Get("VAT title - Good name")), HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size - 2, false)).length())
+			{ MESSAGE_ERROR("", "", "fail to write table title index line"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(1, utf8_to_cp1251(vars->Get("VAT title - Good code")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 2, false)).length())
+			{ MESSAGE_ERROR("", "", "fail to write table title description line"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(2, " \n \n \n \n " + utf8_to_cp1251(vars->Get("VAT title - Measure unit (code)")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 2, false)).length())
+			{ MESSAGE_ERROR("", "", "fail to write table title measure unit line"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(3, " \n \n \n \n " + utf8_to_cp1251(vars->Get("VAT title - Measure unit (name)")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 4, false)).length())
+			{ MESSAGE_ERROR("", "", "fail to write table title measure unit line"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(4, utf8_to_cp1251(vars->Get("VAT title - Quantity")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 3, false)).length())
+			{ MESSAGE_ERROR("", "", "fail to write table title quantity line"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(5, utf8_to_cp1251(vars->Get("VAT title - Price per unit")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 3, false)).length())
+			{ MESSAGE_ERROR("", "", "fail to write table title price per unit"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(6, utf8_to_cp1251(vars->Get("VAT title - Price wo tax")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 3, false)).length())
+			{ MESSAGE_ERROR("", "", "fail to write table title VAT title - Price wo tax line"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(7, utf8_to_cp1251(vars->Get("VAT title - Excise")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 4, false)).length())
+			{ MESSAGE_ERROR("", "", "fail to write table title excise line"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(8, utf8_to_cp1251(vars->Get("Tax rate")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 4, false)).length())
+			{ MESSAGE_ERROR("", "", "fail to write table title tax rate line"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(9, utf8_to_cp1251(vars->Get("VAT title - Tax amount")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 2, false)).length())
+			{ MESSAGE_ERROR("", "", "fail to write table title tax amount line"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(10, utf8_to_cp1251(vars->Get("VAT title - Price w tax")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 4, false)).length())
+			{ MESSAGE_ERROR("", "", "fail to write table title total line"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(11, " \n \n \n \n " + utf8_to_cp1251(vars->Get("VAT title - Country code")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 3, false)).length())
+			{ MESSAGE_ERROR("", "", "fail to write table title Country code"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(12, " \n \n \n \n " + utf8_to_cp1251(vars->Get("VAT title - Country name")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 3, false)).length())
+			{ MESSAGE_ERROR("", "", "fail to write table title Country name"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(13, utf8_to_cp1251(vars->Get("VAT title - Custom number")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 4, false)).length())
+			{ MESSAGE_ERROR("", "", "fail to write table title total line"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_MoveTableLineDown(3)).length())
+			{ MESSAGE_ERROR("", "", "fail to move table line down"); }
+		}
+
+		// --- all these tricks to merge cells
+		// --- VERY IMPORTANT to ensure that there is no page break here. 
+		// --- pega break doesn't handle on move up
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_StopTable()).length())
+			{ MESSAGE_ERROR("", "", "fail to stop table"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_MoveLineDown___(-3)).length())
+			{ MESSAGE_ERROR("", "", "fail to move line down"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_RemoveTableSeparator(3)).length())
+			{ MESSAGE_ERROR("", "", "fail to move line down"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_MoveLineDown___(3)).length())
+			{ MESSAGE_ERROR("", "", "fail to move line down"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_StartTable()).length())
+			{ MESSAGE_ERROR("", "", "fail to start table"); }
+		}
+	}
+	catch(...)
+	{
+		error_message = gettext("hpdf: fail to print table");
+		MESSAGE_ERROR("", "", error_message);
+	}
+
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return error_message;
+}
+
+auto	C_Print_VAT_Base::__HPDF_DrawTable_Footer() -> string
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	error_message = ""s;
+
+	try
+	{
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(0, utf8_to_cp1251(vars->Get("Total payment") + ":"), HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
+			{ MESSAGE_ERROR("", "", "fail to write table footer description line"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(6, utf8_to_cp1251(GetTableSum()), HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, false)).length())
+			{ MESSAGE_ERROR("", "", "fail to write table footer sum_pre_tax line"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(7, utf8_to_cp1251("X"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
+			{ MESSAGE_ERROR("", "", "fail to write table footer sum_pre_tax line"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(8, utf8_to_cp1251("X"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
+			{ MESSAGE_ERROR("", "", "fail to write table footer sum_pre_tax line"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(9, utf8_to_cp1251(GetTableVAT()), HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, false)).length())
+			{ MESSAGE_ERROR("", "", "fail to write table footer sum_tax line"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(10, utf8_to_cp1251(GetTableTotal()), HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, true)).length())
+			{ MESSAGE_ERROR("", "", "fail to write table footer sum_post_tax line"); }
+		}
+
+
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_StopTable()).length())
+			{ MESSAGE_ERROR("", "", "fail to stop table"); }
+		}
+	}
+	catch(...)
+	{
+		error_message = gettext("hpdf: fail to print table");
+		MESSAGE_ERROR("", "", error_message);
+	}
+
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return error_message;
+}
+
+auto	C_Print_VAT_Base::__HPDF_DrawTable_Body() -> string
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	error_message = ""s;
+
+	try
+	{
+		if(error_message.empty())
+		{
+			total_table_items = 0;
+			for(auto i = 1; isTableRowExists(i); ++i)
+			{
+				auto	max_lines = pdf_obj.__HPDF_GetNumberOfLinesInTable(0, utf8_to_cp1251(GetTableRowDescription(i))	, NORMAL_FONT, __pdf_font_size - 2);
+
+
+				if((error_message = pdf_obj.__HPDF_PrintTextTableCell(0, utf8_to_cp1251(GetTableRowDescription(i)), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 2, false)).empty())
+				{
+					if((error_message = pdf_obj.__HPDF_PrintTextTableCell(1, utf8_to_cp1251("-"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).empty())
+					{
+						if((error_message = pdf_obj.__HPDF_PrintTextTableCell(2, utf8_to_cp1251("796"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).empty())
+						{
+							if((error_message = pdf_obj.__HPDF_PrintTextTableCell(3, utf8_to_cp1251(GetTableRowItem(i)), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).empty())
+							{
+								if((error_message = pdf_obj.__HPDF_PrintTextTableCell(4, utf8_to_cp1251(GetTableRowQuantity(i)), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).empty())
+								{
+									if((error_message = pdf_obj.__HPDF_PrintTextTableCell(5, utf8_to_cp1251("-"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).empty())
+									{
+										if((error_message = pdf_obj.__HPDF_PrintTextTableCell(6, utf8_to_cp1251(GetTableRowPrice(i)), HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, false)).empty())
+										{
+											if((error_message = pdf_obj.__HPDF_PrintTextTableCell(7, utf8_to_cp1251(vars->Get("no excise")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 1, false)).empty())
+											{
+												if((error_message = pdf_obj.__HPDF_PrintTextTableCell(8, utf8_to_cp1251(GetSupplierVATSpellingShort()), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 1, false)).empty())
+												{
+													if((error_message = pdf_obj.__HPDF_PrintTextTableCell(9, utf8_to_cp1251(GetTableRowVAT(i)), HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, false)).empty())
+													{
+														if((error_message = pdf_obj.__HPDF_PrintTextTableCell(10, utf8_to_cp1251(GetTableRowTotal(i)), HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, false)).empty())
+														{
+															if((error_message = pdf_obj.__HPDF_PrintTextTableCell(11, utf8_to_cp1251("-"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).empty())
+															{
+																if((error_message = pdf_obj.__HPDF_PrintTextTableCell(12, utf8_to_cp1251("-"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).empty())
+																{
+																	if((error_message = pdf_obj.__HPDF_PrintTextTableCell(13, utf8_to_cp1251("-"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).empty())
+																	{
+																		if((error_message = pdf_obj.__HPDF_MoveTableLineDown(max_lines)).empty())
+																		{
+
+																		}
+																		else
+																		{
+																			MESSAGE_ERROR("", "", "fail to move table line down " + to_string(max_lines) + " line(s)");
+																		}
+																	}
+																	else
+																	{
+																		MESSAGE_ERROR("", "", "fail to write table text (" + to_string(i) + ") line");
+																	}
+																}
+																else
+																{
+																	MESSAGE_ERROR("", "", "fail to write table text (" + to_string(i) + ") line");
+																}
+															}
+															else
+															{
+																MESSAGE_ERROR("", "", "fail to write table text (" + to_string(i) + ") line");
+															}
+														}
+														else
+														{
+															MESSAGE_ERROR("", "", "fail to write table total (" + to_string(i) + ") line");
+														}
+													}
+													else
+													{
+														MESSAGE_ERROR("", "", "fail to write table tax (" + to_string(i) + ") line");
+													}
+												}
+												else
+												{
+													MESSAGE_ERROR("", "", "fail to write vat percentage (" + to_string(i) + ") line");
+												}
+											}
+											else
+											{
+												MESSAGE_ERROR("", "", "fail to write table excise (" + to_string(i) + ") line");
+											}
+										}
+										else
+										{
+											MESSAGE_ERROR("", "", "fail to write table price (" + to_string(i) + ") line");
+										}
+									}
+									else
+									{
+										MESSAGE_ERROR("", "", "fail to write table price per unit (" + to_string(i) + ") line");
+									}
+								}
+								else
+								{
+									MESSAGE_ERROR("", "", "fail to write table quantity (" + to_string(i) + ") line");
+								}
+							}
+							else
+							{
+								MESSAGE_ERROR("", "", "fail to write table item (" + to_string(i) + ") line");
+							}
+						}
+						else
+						{
+							MESSAGE_ERROR("", "", "fail to write table measure unit (" + to_string(i) + ") line");
+						}
+					}
+					else
+					{
+						MESSAGE_ERROR("", "", "fail to write table description (" + to_string(i) + ") line");
+					}
+
+				}
+				else
+				{
+					MESSAGE_ERROR("", "", "fail to write table index (" + to_string(i) + ") line");
+				}
+
+				if(error_message.length()) break;
+
+				++total_table_items;
+			}
+		}
+	}
+	catch(...)
+	{
+		error_message = gettext("hpdf: fail to print table");
 		MESSAGE_ERROR("", "", error_message);
 	}
 
@@ -726,212 +948,24 @@ auto	C_Print_VAT_Base::__HPDF_DrawTable() -> string
 
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(0, utf8_to_cp1251(vars->Get("VAT title - Good name")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 2, false)).length())
-			{ MESSAGE_ERROR("", "", "fail to write table title index line"); }
-		}
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(1, utf8_to_cp1251(vars->Get("VAT title - Good code")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 2, false)).length())
-			{ MESSAGE_ERROR("", "", "fail to write table title description line"); }
-		}
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(2, utf8_to_cp1251(vars->Get("VAT titela - Measure unit (code)")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 4, false)).length())
-			{ MESSAGE_ERROR("", "", "fail to write table title measure unit line"); }
-		}
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(3, utf8_to_cp1251(vars->Get("VAT title - Measure unit (name)")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 4, false)).length())
-			{ MESSAGE_ERROR("", "", "fail to write table title measure unit line"); }
-		}
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(4, utf8_to_cp1251(vars->Get("VAT title - Quantity")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 3, false)).length())
-			{ MESSAGE_ERROR("", "", "fail to write table title quantity line"); }
-		}
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(5, utf8_to_cp1251(vars->Get("VAT title - Price per unit")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 3, false)).length())
-			{ MESSAGE_ERROR("", "", "fail to write table title price per unit"); }
-		}
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(6, utf8_to_cp1251(vars->Get("VAT title - Price wo tax")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 2, false)).length())
-			{ MESSAGE_ERROR("", "", "fail to write table title VAT title - Price wo tax line"); }
-		}
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(7, utf8_to_cp1251(vars->Get("VAT title - Excise")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 4, false)).length())
-			{ MESSAGE_ERROR("", "", "fail to write table title excise line"); }
-		}
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(8, utf8_to_cp1251(vars->Get("Tax rate")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 4, false)).length())
-			{ MESSAGE_ERROR("", "", "fail to write table title tax rate line"); }
-		}
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(9, utf8_to_cp1251(vars->Get("VAT title - Tax amount")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
-			{ MESSAGE_ERROR("", "", "fail to write table title tax amount line"); }
-		}
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(10, utf8_to_cp1251(vars->Get("VAT title - Price w tax")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
-			{ MESSAGE_ERROR("", "", "fail to write table title total line"); }
-		}
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(10, utf8_to_cp1251(vars->Get("VAT title - Country code")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
-			{ MESSAGE_ERROR("", "", "fail to write table title Country code"); }
-		}
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(10, utf8_to_cp1251(vars->Get("VAT title - Country name")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
-			{ MESSAGE_ERROR("", "", "fail to write table title Country name"); }
-		}
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(10, utf8_to_cp1251(vars->Get("VAT title - Custom number")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
-			{ MESSAGE_ERROR("", "", "fail to write table title total line"); }
-		}
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_MoveTableLineDown(2)).length())
-			{ MESSAGE_ERROR("", "", "fail to write table title total line"); }
+			if((error_message = __HPDF_DrawTable_Header()).length())
+			{ MESSAGE_ERROR("", "", "fail to write table footer sum_pre_tax line"); }
 		}
 
 		if(error_message.empty())
 		{
-			total_table_items = 0;
-			for(auto i = 1; isTableRowExists(i); ++i)
-			{
-				auto	max_lines = pdf_obj.__HPDF_GetNumberOfLinesInTable(0, utf8_to_cp1251(GetTableRowDescription(i))	, NORMAL_FONT, __pdf_font_size - 2);
-
-
-				if((error_message = pdf_obj.__HPDF_PrintTextTableCell(0, utf8_to_cp1251(GetTableRowDescription(i)), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 2, false)).empty())
-				{
-					if((error_message = pdf_obj.__HPDF_PrintTextTableCell(1, utf8_to_cp1251("-"), HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).empty())
-					{
-						if((error_message = pdf_obj.__HPDF_PrintTextTableCell(2, utf8_to_cp1251("796"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).empty())
-						{
-							if((error_message = pdf_obj.__HPDF_PrintTextTableCell(3, utf8_to_cp1251(GetTableRowItem(i)), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).empty())
-							{
-								if((error_message = pdf_obj.__HPDF_PrintTextTableCell(4, utf8_to_cp1251(GetTableRowQuantity(i)), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).empty())
-								{
-									if((error_message = pdf_obj.__HPDF_PrintTextTableCell(6, utf8_to_cp1251(GetTableRowPrice(i)), HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, false)).empty())
-									{
-										if((error_message = pdf_obj.__HPDF_PrintTextTableCell(7, utf8_to_cp1251(vars->Get("no excise")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 2, false)).empty())
-										{
-											if((error_message = pdf_obj.__HPDF_PrintTextTableCell(8, utf8_to_cp1251(GetSupplierVATSpellingShort()), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).empty())
-											{
-
-												if((error_message = pdf_obj.__HPDF_PrintTextTableCell(9, utf8_to_cp1251(GetTableRowVAT(i)), HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, false)).empty())
-												{
-													if((error_message = pdf_obj.__HPDF_PrintTextTableCell(10, utf8_to_cp1251(GetTableRowTotal(i)), HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, false)).empty())
-													{
-														if((error_message = pdf_obj.__HPDF_MoveTableLineDown(max_lines)).empty())
-														{
-
-														}
-														else
-														{
-															MESSAGE_ERROR("", "", "fail to move table line down " + to_string(max_lines) + " line(s)");
-														}
-													}
-													else
-													{
-														MESSAGE_ERROR("", "", "fail to write table total (" + to_string(i) + ") line");
-													}
-												}
-												else
-												{
-													MESSAGE_ERROR("", "", "fail to write table tax (" + to_string(i) + ") line");
-												}
-
-
-
-											}
-											else
-											{
-												MESSAGE_ERROR("", "", "fail to write vat percentage (" + to_string(i) + ") line");
-											}
-										}
-										else
-										{
-											MESSAGE_ERROR("", "", "fail to write table excise (" + to_string(i) + ") line");
-										}
-									}
-									else
-									{
-										MESSAGE_ERROR("", "", "fail to write table price (" + to_string(i) + ") line");
-									}
-
-
-								}
-								else
-								{
-									MESSAGE_ERROR("", "", "fail to write table description (" + to_string(i) + ") line");
-								}
-							}
-							else
-							{
-								MESSAGE_ERROR("", "", "fail to write table item (" + to_string(i) + ") line");
-							}
-						}
-						else
-						{
-							MESSAGE_ERROR("", "", "fail to write table measure unit (" + to_string(i) + ") line");
-						}
-					}
-					else
-					{
-						MESSAGE_ERROR("", "", "fail to write table description (" + to_string(i) + ") line");
-					}
-
-				}
-				else
-				{
-					MESSAGE_ERROR("", "", "fail to write table index (" + to_string(i) + ") line");
-				}
-
-				if(error_message.length()) break;
-
-				++total_table_items;
-			}
-		}
-
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(1, utf8_to_cp1251(vars->Get("Total payment") + ":"), HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
-			{ MESSAGE_ERROR("", "", "fail to write table footer description line"); }
-		}
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(6, utf8_to_cp1251(GetTableSum()), HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, false)).length())
+			if((error_message = __HPDF_DrawTable_Body()).length())
 			{ MESSAGE_ERROR("", "", "fail to write table footer sum_pre_tax line"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(9, utf8_to_cp1251(GetTableVAT()), HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, false)).length())
-			{ MESSAGE_ERROR("", "", "fail to write table footer sum_tax line"); }
+			if((error_message = __HPDF_DrawTable_Footer()).length())
+			{ MESSAGE_ERROR("", "", "fail to write table footer sum_pre_tax line"); }
 		}
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(10, utf8_to_cp1251(GetTableTotal()), HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, true)).length())
-			{ MESSAGE_ERROR("", "", "fail to write table footer sum_post_tax line"); }
-		}
-
-
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_StopTable()).length())
-			{ MESSAGE_ERROR("", "", "fail to stop table"); }
-		}
-
 	}
 	catch(...)
 	{
-		error_message = gettext("hpdf: fail to print title");
+		error_message = gettext("hpdf: fail to print table");
 		MESSAGE_ERROR("", "", error_message);
 	}
 
@@ -949,58 +983,6 @@ auto	C_Print_VAT_Base::__HPDF_DrawFooter() -> string
 
 	try
 	{
-/*		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("VAT title - Price w tax") + ":"), 20, 85, HPDF_TALIGN_RIGHT, BOLD_FONT, __pdf_font_size, false)).length())
-			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
-		}
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetTableSum()), 85, 100, HPDF_TALIGN_RIGHT, BOLD_FONT, __pdf_font_size, true)).length())
-			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
-		}
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("Vat short") + ":"), 20, 85, HPDF_TALIGN_RIGHT, BOLD_FONT, __pdf_font_size, false)).length())
-			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
-		}
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetTableVAT()), 85, 100, HPDF_TALIGN_RIGHT, BOLD_FONT, __pdf_font_size, true)).length())
-			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
-		}
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("Total payment") + ":"), 20, 85, HPDF_TALIGN_RIGHT, BOLD_FONT, __pdf_font_size, false)).length())
-			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
-		}
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetTableTotal()), 85, 100, HPDF_TALIGN_RIGHT, BOLD_FONT, __pdf_font_size, true)).length())
-			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
-		}
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(SpellTotalItemsAndSum()), 0, 100, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, true)).length())
-			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
-		}
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(SpellPrice()), 0, 100, HPDF_TALIGN_LEFT, BOLD_FONT, __pdf_font_size, true)).length())
-			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
-		}
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("act_footnote")), 0, 100, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, true)).length())
-			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
-		}
-
-
-		if(error_message.empty())
-		{
-			if((error_message = PrintPDFFooter()).length())
-			{ MESSAGE_ERROR("", "", "hpdf: fail to print pdf footer"); }
-		}
 		if(error_message.empty())
 		{
 			if((error_message = pdf_obj.__HPDF_MoveLineDown()).length())
@@ -1008,14 +990,80 @@ auto	C_Print_VAT_Base::__HPDF_DrawFooter() -> string
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(0, 100)).length())
-			{ MESSAGE_ERROR("", "", "hpdf: fail to draw horizontal line"); }
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSignatureTitle1()), 0, 20, HPDF_TALIGN_LEFT, BOLD_FONT, __pdf_font_size, false)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
-*/
 		if(error_message.empty())
 		{
-			if((error_message = __HPDF_PrintSignature()).length())
-			{ MESSAGE_ERROR("", "", "hpdf: fail to print pdf footer"); }
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSignatureTitle2()), 60, 60+20, HPDF_TALIGN_LEFT, BOLD_FONT, __pdf_font_size, true)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_MoveLineDown()).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		}
+
+		if(GetSignatureTitle1().length())
+		{
+			if(error_message.empty())
+			{
+				if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(10, 40)).length())
+					{ MESSAGE_ERROR("", "", "hpdf: fail to draw horizontal line"); }
+			}
+		}
+		if(GetSignatureTitle2().length())
+		{
+			if(error_message.empty())
+			{
+				if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(70, 100)).length())
+					{ MESSAGE_ERROR("", "", "hpdf: fail to draw horizontal line"); }
+			}
+		}
+
+		if(GetSignatureTitle1().length())
+		{
+			if(error_message.empty())
+			{
+				if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSignatureName1()), 0, 40, HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, false)).length())
+				{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+			}
+		}
+		if(GetSignatureTitle2().length())
+		{
+			if(error_message.empty())
+			{
+				if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSignatureName2()), 60, 60+40, HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, false)).length())
+				{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+			}
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_MoveLineDown()).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		}
+
+		if(GetSignatureTitle1().length())
+		{
+			if(error_message.empty())
+			{
+				if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSignatureInfo1()), 0, 40, HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size - 2, false)).length())
+				{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+			}
+		}
+		if(GetSignatureTitle2().length())
+		{
+			if(error_message.empty())
+			{
+				if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSignatureInfo2()), 60, 60+40, HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size - 2, false)).length())
+				{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+			}
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_MoveLineDown()).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
 		}
 	}
 	catch(...)

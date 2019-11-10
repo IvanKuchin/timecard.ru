@@ -47,6 +47,7 @@ class C_Print_VAT_Base
 
 		auto			__PrintXLSHeader() -> string;
 		auto			__PrintXLSTable() -> string;
+		auto			__PrintXLSSignature() -> string;
 
 		auto			GetSupplierFullAddress() -> string;
 		auto			GetCustomerFullAddress() -> string;
@@ -54,6 +55,12 @@ class C_Print_VAT_Base
 		auto			SpellPrice() -> string;
 		auto			MergeApplyFormat(int start_col, int end_col, libxl::Format* fmt) -> string;
 
+		auto			__HPDF_DrawTable_Header() -> string;
+		auto			__HPDF_DrawTable_Body() -> string;
+		auto			__HPDF_DrawTable_Footer() -> string;
+		auto			__HPDF_DrawHeader() -> string;
+		auto			__HPDF_DrawTable() -> string;
+		auto			__HPDF_DrawFooter() -> string;
 	public:
 
 		auto			Restart() -> void;
@@ -67,13 +74,7 @@ class C_Print_VAT_Base
 		auto			GetFilename()									{ return filename; }
 
 		auto			PrintAsXLS() -> string;
-		auto			__PrintXLSSignature() -> string;
-
 		auto			PrintAsPDF() -> string;
-		auto			__HPDF_DrawHeader() -> string;
-		auto			__HPDF_DrawTable() -> string;
-		auto			__HPDF_DrawFooter() -> string;
-		auto			__HPDF_PrintSignature() -> string;
 
 		virtual auto	PrintXLSHeader() -> string						= 0;
 		virtual auto	PrintXLSFooter() -> string						= 0;

@@ -115,7 +115,14 @@ string CCookies::GetTimestampShifted(int deltaTimeStamp)
 	utc_tm = gmtime(&t);
 	if(utc_tm)
 	{
-		if(strftime(utc_str, sizeof(utc_str), "%a, %02d %b %Y %T %Z", utc_tm))
+		auto			curr_locale	= string(setlocale(LC_ALL, NULL));	// --- DO NOT remove string() !
+																		// --- otherwise following setlocale call will change memory content where curr_locale pointing out
+																		// --- string() copies memory content to local stack therefore it could be reused later.
+	    setlocale(LC_ALL, LOCALE_ENGLISH.c_str());
+		auto	str_length = strftime(utc_str, sizeof(utc_str), "%a, %02d %b %Y %T %Z", utc_tm);
+	    setlocale(LC_ALL, curr_locale.c_str());
+
+		if(str_length)
 		{
 			result = utc_str;
 		} 

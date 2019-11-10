@@ -108,7 +108,7 @@ auto	C_PDF::__HPDF_MoveTableLineDown(int number_of_lines) -> string
 
 		if((error_message = __HPDF_StopTable()).empty())
 		{
-			if((error_message = __HPDF_MoveLineDown(line_decrement)).empty())
+			if((error_message = __HPDF_MoveLineDown___(line_decrement)).empty())
 			{
 				if((error_message = __HPDF_StartTable()).empty())
 				{
@@ -131,7 +131,7 @@ auto	C_PDF::__HPDF_MoveTableLineDown(int number_of_lines) -> string
 	}
 	else
 	{
-		if((error_message = __HPDF_MoveLineDown(line_decrement)).empty())
+		if((error_message = __HPDF_MoveLineDown___(line_decrement)).empty())
 		{
 		}
 		else
@@ -149,13 +149,18 @@ auto	C_PDF::__HPDF_MoveTableLineDown(int number_of_lines) -> string
 
 auto	C_PDF::__HPDF_PrintTextTableCell(unsigned int index_col, string text, HPDF_TextAlignment text_align, Font_Type font_type, HPDF_REAL font_size, bool move_line_down) -> string
 {
+	return __HPDF_PrintTextTableCell(index_col, index_col, text, text_align, font_type, font_size, move_line_down);
+}
+
+auto	C_PDF::__HPDF_PrintTextTableCell(unsigned int index_col_start, unsigned int index_col_finish, string text, HPDF_TextAlignment text_align, Font_Type font_type, HPDF_REAL font_size, bool move_line_down) -> string
+{
 	auto	error_message = ""s;
 
-	MESSAGE_DEBUG("", "", "start (column: " + to_string(index_col) + ", text.length(" + to_string(text.length()) + "))");
+	MESSAGE_DEBUG("", "", "start (column: " + to_string(index_col_start) + ", text.length(" + to_string(text.length()) + "))");
 
-	if(index_col <= grid_widths.size())
+	if(index_col_start <= grid_widths.size())
 	{
-		auto	number_of_lines = __HPDF_GetNumberOfLinesInTable(index_col, text, font_type, font_size);
+		auto	number_of_lines = __HPDF_GetNumberOfLinesInTable(index_col_start, text, font_type, font_size);
 		auto	line_decrement = number_of_lines * __pdf_font_height + HPDF_TIMECARD_TABLE_SPACING;
 
 		if((__pdf_line - line_decrement) < HPDF_FIELD_BOTTOM)
@@ -175,11 +180,16 @@ auto	C_PDF::__HPDF_PrintTextTableCell(unsigned int index_col, string text, HPDF_
 			auto	left_shift_percent = 0.0;
 			auto	right_shift_percent = 0.0;
 
-			for(auto i = 0u; i < index_col; ++i)
+			for(auto i = 0u; i < index_col_start; ++i)
 			{
 				left_shift_percent += grid_widths[i];
 			}
-			right_shift_percent = left_shift_percent + grid_widths[index_col];
+
+			right_shift_percent = left_shift_percent;
+			for(auto i = index_col_start; i <= index_col_finish; ++i)
+			{
+				right_shift_percent += grid_widths[i];
+			}
 
 			// --- shrink text square, so text will be spaced from vertical table lines
 			// --- with narrow cells (<= 5%) don't shrink print area
@@ -212,7 +222,7 @@ auto	C_PDF::__HPDF_PrintTextTableCell(unsigned int index_col, string text, HPDF_
 	}
 	else
 	{
-		error_message = gettext("col index out of range") + "( "s + to_string(index_col) + " of " + to_string(grid_widths.size()) +")";
+		error_message = gettext("col index out of range") + "( "s + to_string(index_col_start) + " of " + to_string(grid_widths.size()) +")";
 		MESSAGE_ERROR("", "", error_message);
 	}
 
@@ -225,7 +235,7 @@ auto	C_PDF::__HPDF_StopTable() -> string
 {
 	auto	error_message = ""s;
 
-	MESSAGE_DEBUG("", "", "start");
+	MESSAGE_DEBUG("", "", "start (top/bottom: " + to_string(__pdf_table_top) + "/" + to_string(__pdf_line) + ")");
 
 	__pdf_table_bottom = __pdf_line;
 
@@ -368,11 +378,11 @@ auto	C_PDF::__HPDF_SetDocProps() -> string
 	return error_message;	
 }
 
-auto	C_PDF::__HPDF_MoveLineDown(int line_decrement) -> string
+auto	C_PDF::__HPDF_MoveLineDown___(int line_decrement) -> string
 {
 	auto	error_message = ""s;
 
-	MESSAGE_DEBUG("", "", "start");
+	MESSAGE_DEBUG("", "", "start (" + to_string(line_decrement) + ")");
 
 	__pdf_line -= line_decrement;
 
@@ -407,7 +417,7 @@ auto	C_PDF::__HPDF_MoveLineDown(int line_decrement) -> string
 
 auto	C_PDF::__HPDF_DrawVerticalLine(double percentage) -> string
 {
-	MESSAGE_DEBUG("", "", "start (at " + to_string(percentage) + "%)");
+	MESSAGE_DEBUG("", "", "start (at " + to_string(percentage) + "%, top/bottom " + to_string(__pdf_table_top) + "/" + to_string(__pdf_table_bottom) + ")");
 
 	auto	error_message = ""s;
 
@@ -421,6 +431,39 @@ auto	C_PDF::__HPDF_DrawVerticalLine(double percentage) -> string
 	{
 		MESSAGE_ERROR("", "", "hpdf: fail to draw the line");
 		error_message = gettext("hpdf: fail to draw the line");
+	}
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return error_message;
+}
+
+// --- remove table separator at index(col_idx) one line height
+auto	C_PDF::__HPDF_RemoveTableSeparator(unsigned int col_idx) -> string
+{
+	MESSAGE_DEBUG("", "", "start (column index " + to_string(__HPDF_GetPixelOffsetByPercentage(col_idx)) + ", top " + to_string(__pdf_line) + ")");
+
+	auto	error_message = ""s;
+	auto	percentage = 0.0;
+
+	for(auto i = 0u; i < col_idx; ++i) percentage += grid_widths[i];
+
+	try
+	{
+		if(HPDF_Page_SetGrayStroke(__pdf_page, 0.5) != HPDF_OK) { MESSAGE_ERROR("", "", "fail to set stroke color"); }
+		HPDF_Page_MoveTo (__pdf_page, __HPDF_GetPixelOffsetByPercentage(percentage - 1), __pdf_line);
+		HPDF_Page_LineTo (__pdf_page, __HPDF_GetPixelOffsetByPercentage(percentage + 1), __pdf_line);
+		HPDF_Page_LineTo (__pdf_page, __HPDF_GetPixelOffsetByPercentage(percentage + 1), __pdf_line + __pdf_font_height);
+		HPDF_Page_LineTo (__pdf_page, __HPDF_GetPixelOffsetByPercentage(percentage - 1), __pdf_line + __pdf_font_height);
+		HPDF_Page_LineTo (__pdf_page, __HPDF_GetPixelOffsetByPercentage(percentage - 1), __pdf_line);
+		// HPDF_Page_LineTo (__pdf_page, __HPDF_GetPixelOffsetByPercentage(percentage), __pdf_line - __pdf_font_height);
+		HPDF_Page_Stroke (__pdf_page);
+		if(HPDF_Page_SetGrayStroke(__pdf_page, 0) != HPDF_OK) { MESSAGE_ERROR("", "", "fail to set stroke color"); }
+	}
+	catch(...)
+	{
+		MESSAGE_ERROR("", "", "hpdf: fail to remove column separator");
+		error_message = gettext("hpdf: fail to remove column separator");
 	}
 
 	MESSAGE_DEBUG("", "", "finish");
@@ -515,6 +558,8 @@ auto	C_PDF::__HPDF_GetNumberOfLines(string text, double left_shift_percent, doub
 		number_of_lines			= ceil(text_width * 1.1 / cell_width);
 	}
 
+	for(auto &symbol: text) if(symbol == '\n') ++ number_of_lines;
+		
 	MESSAGE_DEBUG("", "", "finish (text height is " + to_string(number_of_lines) + " lines = text_width(" + to_string(text_width_pdf_struct.width * font_size / 1000.0) + ") / cell_width(" + to_string(cell_width) + "))");
 
 	return number_of_lines;
