@@ -196,31 +196,38 @@ auto C_Invoice_BT_Subc_To_Agency::GenerateDocumentArchive() -> string
 
 		if(error_message.empty())
 		{
-			C_Print_VAT_Subc						__vat_obj;
-			C_Print_VAT_Base						*vat_printer = &__vat_obj;
-
-			vat_printer->SetDB(db);
-			vat_printer->SetVariableSet(&invoicing_vars);
-
-			if(error_message.empty()) 
+			if(invoicing_vars.Get("subcontractor_company_vat_1") == "Y")
 			{
-				vat_printer->SetFilename(vat_filename_xls);
-				error_message = vat_printer->PrintAsXLS();
-				if(error_message.empty()) {}
-				else
+				C_Print_VAT_Subc						__vat_obj;
+				C_Print_VAT_Base						*vat_printer = &__vat_obj;
+
+				vat_printer->SetDB(db);
+				vat_printer->SetVariableSet(&invoicing_vars);
+
+				if(error_message.empty()) 
 				{
-					MESSAGE_ERROR("", "", "fail to build vat (xls format)");
+					vat_printer->SetFilename(vat_filename_xls);
+					error_message = vat_printer->PrintAsXLS();
+					if(error_message.empty()) {}
+					else
+					{
+						MESSAGE_ERROR("", "", "fail to build vat (xls format)");
+					}
+				}
+				if(error_message.empty()) 
+				{
+					vat_printer->SetFilename(vat_filename_pdf);
+					error_message = vat_printer->PrintAsPDF();
+					if(error_message.empty()) {}
+					else
+					{
+						MESSAGE_ERROR("", "", "fail to build vat (pdf format)");
+					}
 				}
 			}
-			if(error_message.empty()) 
+			else
 			{
-				vat_printer->SetFilename(vat_filename_pdf);
-				error_message = vat_printer->PrintAsPDF();
-				if(error_message.empty()) {}
-				else
-				{
-					MESSAGE_ERROR("", "", "fail to build vat (pdf format)");
-				}
+				MESSAGE_DEBUG("", "", "company(" + invoicing_vars.Get("subcontractor_company_id_1") + ") works w/o vat, no need to generate vat-docs");
 			}
 		}
 		else
