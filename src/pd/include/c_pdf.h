@@ -23,6 +23,7 @@ class C_PDF
 		string			filename = "";
 		vector<double>	grid_widths = {};
 
+		auto			__HPDF_MoveLineDownByPixels(int pixel_lines) -> string;
 		auto			__HPDF_GetPixelSizeByPercentage(double percents) -> double;
 		auto			__HPDF_GetPixelOffsetByPercentage(double percents) -> double;
 		auto			__HPDF_GetNumberOfLines(string text, double left_shift_percent, double right_shift_percent, Font_Type font_type, HPDF_REAL font_size) -> int;
@@ -58,8 +59,7 @@ class C_PDF
 		auto			__HPDF_DrawHorizontalLine(double, double) -> string;
 
 		auto			__HPDF_PrintText(string text, int x) -> string;
-		auto			__HPDF_MoveLineDown() -> string					{ return __HPDF_MoveLineDown___(__pdf_font_height); };
-		auto			__HPDF_MoveLineDown___(int line_increment) -> string;
+		auto			__HPDF_MoveLineDown(int num_lines = 1)			{ return __HPDF_MoveLineDownByPixels(num_lines * __pdf_font_height); };
 		auto			__HPDF_PrintTextRect(string text, double left_shift_percent, double right_shift_percent, HPDF_TextAlignment align, Font_Type font_type, HPDF_REAL font_size, bool move_line_down) -> string;
 		auto			__HPDF_DrawRect(double left_shift_percent, double top_shift_line, double right_shift_percent, double bottom_shift_line) -> string;
 
@@ -68,9 +68,9 @@ class C_PDF
 		auto			__HPDF_PrintTextTableCell(unsigned int index_col, string text, HPDF_TextAlignment text_align, Font_Type font_type, HPDF_REAL font_size, bool move_line_down) -> string;
 		auto			__HPDF_PrintTextTableCell(unsigned int index_col_start, unsigned int index_col_finish, string text, HPDF_TextAlignment text_align, Font_Type font_type, HPDF_REAL font_size, bool move_line_down) -> string;
 
-		auto			__HPDF_RemoveTableSeparator(unsigned int col_idx) -> string;
+		auto			__HPDF_RemoveTableSeparator(unsigned int col_idx, unsigned int num_lines = 1) -> string const;
 		auto			__HPDF_MoveTableLineDown(int ) -> string;
-		auto			__HPDF_MoveTableLineDown() -> string			{ return __HPDF_MoveTableLineDown(__pdf_table_line_height); };
+		auto			__HPDF_MoveTableLineDown()						{ return __HPDF_MoveTableLineDown(__pdf_table_line_height); };
 		auto			__HPDF_StopTable() -> string;
 
 

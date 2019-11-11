@@ -108,7 +108,7 @@ auto	C_PDF::__HPDF_MoveTableLineDown(int number_of_lines) -> string
 
 		if((error_message = __HPDF_StopTable()).empty())
 		{
-			if((error_message = __HPDF_MoveLineDown___(line_decrement)).empty())
+			if((error_message = __HPDF_MoveLineDownByPixels(line_decrement)).empty())
 			{
 				if((error_message = __HPDF_StartTable()).empty())
 				{
@@ -131,7 +131,7 @@ auto	C_PDF::__HPDF_MoveTableLineDown(int number_of_lines) -> string
 	}
 	else
 	{
-		if((error_message = __HPDF_MoveLineDown___(line_decrement)).empty())
+		if((error_message = __HPDF_MoveLineDownByPixels(line_decrement)).empty())
 		{
 		}
 		else
@@ -378,13 +378,13 @@ auto	C_PDF::__HPDF_SetDocProps() -> string
 	return error_message;	
 }
 
-auto	C_PDF::__HPDF_MoveLineDown___(int line_decrement) -> string
+auto	C_PDF::__HPDF_MoveLineDownByPixels(int pixel_lines) -> string
 {
 	auto	error_message = ""s;
 
-	MESSAGE_DEBUG("", "", "start (" + to_string(line_decrement) + ")");
+	MESSAGE_DEBUG("", "", "start (" + to_string(pixel_lines) + ")");
 
-	__pdf_line -= line_decrement;
+	__pdf_line -= pixel_lines;
 
 	if(__pdf_line < HPDF_FIELD_BOTTOM)
 	{
@@ -439,7 +439,7 @@ auto	C_PDF::__HPDF_DrawVerticalLine(double percentage) -> string
 }
 
 // --- remove table separator at index(col_idx) one line height
-auto	C_PDF::__HPDF_RemoveTableSeparator(unsigned int col_idx) -> string
+auto	C_PDF::__HPDF_RemoveTableSeparator(unsigned int col_idx, unsigned int num_lines) -> string const
 {
 	MESSAGE_DEBUG("", "", "start (column index " + to_string(__HPDF_GetPixelOffsetByPercentage(col_idx)) + ", top " + to_string(__pdf_line) + ")");
 
@@ -450,12 +450,9 @@ auto	C_PDF::__HPDF_RemoveTableSeparator(unsigned int col_idx) -> string
 
 	try
 	{
-		if(HPDF_Page_SetGrayStroke(__pdf_page, 0.5) != HPDF_OK) { MESSAGE_ERROR("", "", "fail to set stroke color"); }
-		HPDF_Page_MoveTo (__pdf_page, __HPDF_GetPixelOffsetByPercentage(percentage - 1), __pdf_line);
-		HPDF_Page_LineTo (__pdf_page, __HPDF_GetPixelOffsetByPercentage(percentage + 1), __pdf_line);
-		HPDF_Page_LineTo (__pdf_page, __HPDF_GetPixelOffsetByPercentage(percentage + 1), __pdf_line + __pdf_font_height);
-		HPDF_Page_LineTo (__pdf_page, __HPDF_GetPixelOffsetByPercentage(percentage - 1), __pdf_line + __pdf_font_height);
-		HPDF_Page_LineTo (__pdf_page, __HPDF_GetPixelOffsetByPercentage(percentage - 1), __pdf_line);
+		if(HPDF_Page_SetGrayStroke(__pdf_page, 1) != HPDF_OK) { MESSAGE_ERROR("", "", "fail to set stroke color"); }
+		HPDF_Page_MoveTo (__pdf_page, __HPDF_GetPixelOffsetByPercentage(percentage), __pdf_line);
+		HPDF_Page_LineTo (__pdf_page, __HPDF_GetPixelOffsetByPercentage(percentage), __pdf_line - num_lines * __pdf_font_height);
 		// HPDF_Page_LineTo (__pdf_page, __HPDF_GetPixelOffsetByPercentage(percentage), __pdf_line - __pdf_font_height);
 		HPDF_Page_Stroke (__pdf_page);
 		if(HPDF_Page_SetGrayStroke(__pdf_page, 0) != HPDF_OK) { MESSAGE_ERROR("", "", "fail to set stroke color"); }
