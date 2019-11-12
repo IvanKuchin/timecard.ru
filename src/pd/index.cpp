@@ -418,10 +418,7 @@ int main()
 
 		if(action == "autologin")
 		{
-			{
-				
-				MESSAGE_DEBUG("", action, "start");
-			}
+			MESSAGE_DEBUG("", action, "start");
 
 			if(!indexPage.SetTemplate("autologin.htmlt"))
 			{
@@ -429,10 +426,7 @@ int main()
 				throw CException("Template file was missing");
 			}
 
-			{
-				
-				MESSAGE_DEBUG("", action, "finish");
-			}
+			MESSAGE_DEBUG("", action, "finish");
 		}
 
 		// --- JSON part has started
@@ -444,10 +438,7 @@ int main()
 	        vector<int>     vectorFriendList;
 	        string			userLogin = "", userID = "", result = "";
 
-			{
-			    
-			    MESSAGE_DEBUG("", action, "start");
-			}
+		    MESSAGE_DEBUG("", action, "start");
 
 	        userID			    = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("id"));
 	        userLogin		    = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("login"));
@@ -536,10 +527,7 @@ int main()
 	            throw CExceptionHTML("user not activated");
 	        } // if(!indexPage.SetTemplate("json_response.htmlt"))
 
-			{
-			    
-			    MESSAGE_DEBUG("", action, "finish");
-			}
+		    MESSAGE_DEBUG("", action, "finish");
 	    }
 
 	    // --- JSON news feed
