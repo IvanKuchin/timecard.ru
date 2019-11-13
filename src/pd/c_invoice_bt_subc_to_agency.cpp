@@ -363,18 +363,33 @@ auto C_Invoice_BT_Subc_To_Agency::CreateBTObj(string bt_id) -> C_BT_To_Print
 									obj.SetSignatureTitle1(ConvertHTMLToText(db->Get(0, "name")));
 									obj.SetSupplierVAT(ConvertHTMLToText(db->Get(0, "vat")));
 
-									if(db->Query("SELECT `name` FROM `company` WHERE `id`=("
+									if(db->Query("SELECT `id`, `name` FROM `company` WHERE `id`=("
 													"SELECT `agency_company_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\""
 												");"))
 									{
-										obj.SetSignatureTitle2(ConvertHTMLToText(db->Get(0, 0)));
+										auto	agency_id = db->Get(0, "id");
+
+										obj.SetSignatureTitle2(ConvertHTMLToText(db->Get(0, "name")));
 										
 										obj.SetApprovers(GetBT_ApprovalChain(bt_id, db));
 
-										obj.SetPosition1(GetValueFromDB("SELECT `value` FROM `company_custom_fields` WHERE `var_name`=\"subc2agency_bt_position1\";", db));
-										obj.SetPosition2(GetValueFromDB("SELECT `value` FROM `company_custom_fields` WHERE `var_name`=\"subc2agency_bt_position2\";", db));
-										obj.SetInitials1(GetValueFromDB("SELECT `value` FROM `company_custom_fields` WHERE `var_name`=\"subc2agency_bt_signature1\";", db));
-										obj.SetInitials2(GetValueFromDB("SELECT `value` FROM `company_custom_fields` WHERE `var_name`=\"subc2agency_bt_signature2\";", db));
+										obj.SetPosition1(GetValueFromDB("SELECT `value` FROM `company_custom_fields` WHERE `company_id`=" + quoted(agency_id) + " AND `var_name`=\"subc2agency_bt_position1\";", db));
+										obj.SetPosition2(GetValueFromDB("SELECT `value` FROM `company_custom_fields` WHERE `company_id`=" + quoted(agency_id) + " AND `var_name`=\"subc2agency_bt_position2\";", db));
+										obj.SetInitials1(GetValueFromDB("SELECT `value` FROM `company_custom_fields` WHERE `company_id`=" + quoted(agency_id) + " AND `var_name`=\"subc2agency_bt_signature1\";", db));
+										obj.SetInitials2(GetValueFromDB("SELECT `value` FROM `company_custom_fields` WHERE `company_id`=" + quoted(agency_id) + " AND `var_name`=\"subc2agency_bt_signature2\";", db));
+										obj.SetSignRole1(GetValueFromDB("SELECT `value` FROM `company_custom_fields` WHERE `company_id`=" + quoted(agency_id) + " AND `var_name`=\"subc2agency_bt_role1\";", db));
+										obj.SetSignRole2(GetValueFromDB("SELECT `value` FROM `company_custom_fields` WHERE `company_id`=" + quoted(agency_id) + " AND `var_name`=\"subc2agency_bt_role2\";", db));
+
+										// --- override agency roles with SoW-specific roles
+										{
+											auto	temp_role = ""s;
+
+											temp_role = GetValueFromDB("SELECT `value` FROM `contract_sow_custom_fields` WHERE `contract_sow_id`=" + quoted(obj.GetAgreementNumber()) + " AND `var_name`=\"subc2agency_bt_role1\";", db);
+											if(temp_role.length()) obj.SetSignRole1(temp_role);
+
+											temp_role = GetValueFromDB("SELECT `value` FROM `contract_sow_custom_fields` WHERE `contract_sow_id`=" + quoted(obj.GetAgreementNumber()) + " AND `var_name`=\"subc2agency_bt_role2\";", db);
+											if(temp_role.length()) obj.SetSignRole2(temp_role);
+										}
 
 										{
 											if(EnrichObjWithExpenseLines(bt_id, &obj))

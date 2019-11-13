@@ -117,6 +117,8 @@ class C_Print_BT
 		virtual auto	GetBTPaymentAndVAT(string index)-> string	= 0;
 		virtual auto	GetSignatureTitle1()			-> string	= 0;
 		virtual auto	GetSignatureTitle2()			-> string	= 0;
+		virtual auto	GetSignRole1()					-> string	= 0;
+		virtual auto	GetSignRole2()					-> string	= 0;
 
 	public:
 					C_Print_BT()									{};
@@ -144,6 +146,8 @@ class C_Print_BT_To_CC : public C_Print_BT
 		auto		GetBTPaymentNoVAT(string index)		-> string	{ return vars->Get("cost_center_price_" + index); };
 		auto		GetBTVAT(string index)				-> string	{ return vars->Get("cost_center_vat_" + index); };
 		auto		GetBTPaymentAndVAT(string index)	-> string	{ return vars->Get("cost_center_total_" + index); };
+		auto		GetSignRole1()						-> string	{ return bt.GetSignRole1(); };
+		auto		GetSignRole2()						-> string	{ return bt.GetSignRole2(); };
 		auto		GetSignatureTitle1()				-> string	{ return bt.GetSignatureTitle1(); };
 		auto		GetSignatureTitle2()				-> string	{ return bt.GetSignatureTitle2(); };
 };
@@ -155,6 +159,8 @@ class C_Print_BT_To_Subc : public C_Print_BT
 		auto		GetBTPaymentNoVAT(string index)		-> string	{ return vars->Get("timecard_price_" + index); };
 		auto		GetBTVAT(string index)				-> string	{ return vars->Get("timecard_vat_" + index); };
 		auto		GetBTPaymentAndVAT(string index)	-> string	{ return vars->Get("timecard_total_" + index); };
+		auto		GetSignRole1()						-> string	{ return bt.GetSignRole1(); };
+		auto		GetSignRole2()						-> string	{ return bt.GetSignRole2(); };
 		auto		GetSignatureTitle1()				-> string	{ return bt.GetSignatureTitle1(); };
 		auto		GetSignatureTitle2()				-> string	{ return bt.GetSignatureTitle2(); };
 };

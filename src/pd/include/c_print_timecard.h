@@ -94,6 +94,8 @@ class C_Print_Timecard
 		auto		GetSpelledRur()									{ return string(gettext("rur.")); };
 		auto		GetSpelledKop()									{ return string(gettext("kop.")); };
 		auto		GetSpelledApprovers()							{ return string(gettext("Timecard approvers")); };
+		auto		GetSignRole1()									{ return timecard.GetSignRole1(); };
+		auto		GetSignRole2()									{ return timecard.GetSignRole2(); };
 
 		auto		__HPDF_init() -> string;
 		auto		__HPDF_SetDocProps() -> string;

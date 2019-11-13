@@ -185,8 +185,8 @@ class C_Print_VAT_Agency : public C_Print_VAT_Base
 		auto			GetTableVAT() -> string							{ return c_float(vars->Get("cost_center_vat_amount")).PrintPriceTag(); };
 		auto			GetTableTotal() -> string						{ return c_float(vars->Get("cost_center_total_payment")).PrintPriceTag(); };
 
-		auto			GetSignatureTitle1() -> string					{ return vars->Get("Director"); };
-		auto			GetSignatureTitle2() -> string					{ return vars->Get("Accountant"); };
+		auto			GetSignatureTitle1() -> string					{ return vars->Get("vat_role1"); }; // --- not used
+		auto			GetSignatureTitle2() -> string					{ return vars->Get("vat_role2"); }; // --- not used
 		auto			GetSignatureName1() -> string					{ return vars->Get("vat_signature_name1"); };
 		auto			GetSignatureName2() -> string					{ return vars->Get("vat_signature_name2"); };
 		auto			GetSignatureInfo1() -> string					{ return vars->Get("vat_signature_info1"); };
@@ -249,8 +249,8 @@ class C_Print_VAT_Subc : public C_Print_VAT_Base
 		auto			GetTableVAT() -> string							{ return c_float(vars->Get("subcontractors_vat_amount")).PrintPriceTag(); };
 		auto			GetTableTotal() -> string						{ return c_float(vars->Get("subcontractors_total_payment")).PrintPriceTag(); };
 
-		auto			GetSignatureTitle1() -> string					{ return vars->Get("Director"); };
-		auto			GetSignatureTitle2() -> string					{ return vars->Get("Accountant"); };
+		auto			GetSignatureTitle1() -> string					{ return vars->Get("subc2agency_vat_role1"); }; // --- not used
+		auto			GetSignatureTitle2() -> string					{ return vars->Get("subc2agency_vat_role2"); }; // --- not used
 		auto			GetSignatureName1() -> string					{ return vars->Get("subc2agency_vat_signature1"); };
 		auto			GetSignatureName2() -> string					{ return vars->Get("subc2agency_vat_signature2"); };
 		auto			GetSignatureInfo1() -> string					{ return vars->Get("subc2agency_vat_position1"); };

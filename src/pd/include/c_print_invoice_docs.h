@@ -195,12 +195,12 @@ class C_Print_Invoice_Agency : public C_Print_Invoice_Docs_Base
 		auto			GetTotalPaymentSpelling() -> string				{ return vars->Get("Total payment") + ": "; };
 		auto			GetFooterComment() -> string					{ return ""s; };
 
-		auto			GetSignatureTitle1() -> string					{ return vars->Get("Director"); };
-		auto			GetSignatureTitle2() -> string					{ return vars->Get("Accountant"); };
-		auto			GetSignatureName1() -> string					{ return vars->Get("invoice_signature_name1"); };
-		auto			GetSignatureName2() -> string					{ return vars->Get("invoice_signature_name2"); };
-		auto			GetSignatureInfo1() -> string					{ return vars->Get("invoice_signature_info1"); };
-		auto			GetSignatureInfo2() -> string					{ return vars->Get("invoice_signature_info2"); };
+		auto			GetSignatureTitle1() -> string					{ return vars->Get("invoice_role1"); };
+		auto			GetSignatureTitle2() -> string					{ return vars->Get("invoice_role2"); };
+		auto			GetSignatureName1() -> string					{ return vars->Get("agency_name"); };
+		auto			GetSignatureName2() -> string					{ return vars->Get("agency_name"); };
+		auto			GetSignatureInfo1() -> string					{ return vars->Get("invoice_signature_info1") + " " + vars->Get("invoice_signature_name1"); };
+		auto			GetSignatureInfo2() -> string					{ return vars->Get("invoice_signature_info2") + " " + vars->Get("invoice_signature_name2"); };
 };
 
 class C_Print_Invoice_Subc : public C_Print_Invoice_Docs_Base
@@ -263,12 +263,12 @@ class C_Print_Invoice_Subc : public C_Print_Invoice_Docs_Base
 		auto			GetTotalPaymentSpelling() -> string				{ return vars->Get("Total payment") + ": "; };
 		auto			GetFooterComment() -> string					{ return ""s; };
 
-		auto			GetSignatureTitle1() -> string					{ return vars->Get("Supplier"); };
-		auto			GetSignatureTitle2() -> string					{ return ""; };
+		auto			GetSignatureTitle1() -> string					{ return vars->Get("subc2agency_invoice_role1"); };
+		auto			GetSignatureTitle2() -> string					{ return vars->Get("subc2agency_invoice_role2"); };
 		auto			GetSignatureName1() -> string					{ return vars->Get("subcontractor_company_name_1"); };
-		auto			GetSignatureName2() -> string					{ return ""; };
-		auto			GetSignatureInfo1() -> string					{ return ""; };
-		auto			GetSignatureInfo2() -> string					{ return ""; };
+		auto			GetSignatureName2() -> string					{ return vars->Get("subcontractor_company_name_1"); };
+		auto			GetSignatureInfo1() -> string					{ return vars->Get("subc2agency_invoice_position1") + " " + vars->Get("subc2agency_invoice_signature1"); };
+		auto			GetSignatureInfo2() -> string					{ return vars->Get("subc2agency_invoice_position2") + " " + vars->Get("subc2agency_invoice_signature2"); };
 };
 
 class C_Print_Act_Agency : public C_Print_Invoice_Docs_Base
@@ -331,12 +331,12 @@ class C_Print_Act_Agency : public C_Print_Invoice_Docs_Base
 		auto			GetTotalPaymentSpelling() -> string				{ return ""; };
 		auto			GetFooterComment() -> string					{ return vars->Get("act_footnote"); };
 
-		auto			GetSignatureTitle1() -> string					{ return vars->Get("Implementor"); };
-		auto			GetSignatureTitle2() -> string					{ return vars->Get("Customer"); };
-		auto			GetSignatureName1() -> string					{ return vars->Get("act_signature_name1"); };
-		auto			GetSignatureName2() -> string					{ return vars->Get("act_signature_name2"); };
-		auto			GetSignatureInfo1() -> string					{ return vars->Get("act_signature_info1"); };
-		auto			GetSignatureInfo2() -> string					{ return vars->Get("act_signature_info2"); };
+		auto			GetSignatureTitle1() -> string					{ return vars->Get("act_role1"); };
+		auto			GetSignatureTitle2() -> string					{ return vars->Get("act_role2"); };
+		auto			GetSignatureName1() -> string					{ return vars->Get("agency_name"); };
+		auto			GetSignatureName2() -> string					{ return vars->Get("cost_center_name"); };
+		auto			GetSignatureInfo1() -> string					{ return vars->Get("act_signature_info1") + " " + vars->Get("act_signature_name1"); };
+		auto			GetSignatureInfo2() -> string					{ return vars->Get("act_signature_info2") + " " + vars->Get("act_signature_name2"); };
 };
 
 class C_Print_Act_Subc : public C_Print_Invoice_Docs_Base
@@ -399,8 +399,8 @@ class C_Print_Act_Subc : public C_Print_Invoice_Docs_Base
 		auto			GetTotalPaymentSpelling() -> string				{ return ""; };
 		auto			GetFooterComment() -> string					{ return vars->Get("act_footnote"); };
 
-		auto			GetSignatureTitle1() -> string					{ return vars->Get("Implementor"); };
-		auto			GetSignatureTitle2() -> string					{ return vars->Get("Customer"); };
+		auto			GetSignatureTitle1() -> string					{ return vars->Get("subc2agency_act_role1"); };
+		auto			GetSignatureTitle2() -> string					{ return vars->Get("subc2agency_act_role2"); };
 		auto			GetSignatureName1() -> string					{ return vars->Get("subcontractor_company_name_1"); };
 		auto			GetSignatureName2() -> string					{ return vars->Get("agency_name"); };
 		auto			GetSignatureInfo1() -> string					{ return vars->Get("subc2agency_act_position1") + " " + vars->Get("subc2agency_act_signature_name1"); };

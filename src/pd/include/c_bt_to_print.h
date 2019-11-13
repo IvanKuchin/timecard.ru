@@ -37,6 +37,8 @@ class C_BT_To_Print
 		string					agreement_number = "";
 		string					date_sign_str = "";
 		string					supplier_vat = "";
+		string					sign_role_1 = ""s;
+		string					sign_role_2 = ""s;
 		string					signature_title_1 = "";
 		string					signature_title_2 = "";
 		string					initials_1 = "";
@@ -80,6 +82,10 @@ class C_BT_To_Print
 		auto		SetAgreementNumber(string &&param1) 		{ agreement_number = move(param1); };
 		auto		SetDateSign(const string &param1)			{ date_sign_str = param1; };
 		auto		SetDateSign(string &&param1) 				{ date_sign_str = move(param1); };
+		auto		SetSignRole1(const string &param1)			{ sign_role_1 = param1; };
+		auto		SetSignRole1(string &&param1) 				{ sign_role_1 = move(param1); };
+		auto		SetSignRole2(const string &param1)			{ sign_role_2 = param1; };
+		auto		SetSignRole2(string &&param1) 				{ sign_role_2 = move(param1); };
 		auto		SetSignatureTitle1(const string &param1)	{ signature_title_1 = param1; };
 		auto		SetSignatureTitle1(string &&param1) 		{ signature_title_1 = move(param1); };
 		auto		SetSignatureTitle2(const string &param1)	{ signature_title_2 = param1; };
@@ -112,6 +118,8 @@ class C_BT_To_Print
 		auto		GetSupplierVAT()							{ return supplier_vat; };
 		auto		GetAgreementNumber()						{ return agreement_number; };		
 		auto		GetDateSign()								{ return date_sign_str; };
+		auto		GetSignRole1()								{ return sign_role_1; };
+		auto		GetSignRole2()								{ return sign_role_2; };
 		auto		GetSignatureTitle1()						{ return signature_title_1; };		
 		auto		GetSignatureTitle2()						{ return signature_title_2; };		
 		auto		GetInitials1()								{ return initials_1; };		

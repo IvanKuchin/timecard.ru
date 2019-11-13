@@ -312,8 +312,8 @@ auto C_Print_VAT_Base::__PrintXLSSignature() -> string
 	format_wrap_small_up->setAlignH(libxl::ALIGNH_CENTER);
 
 	++__row_counter;
-	__sheet->writeStr(__row_counter, 0, multibyte_to_wide(vars->Get("VAT sign - CxO")).c_str(), format_left_small);
-	__sheet->writeStr(__row_counter, 7, multibyte_to_wide(vars->Get("VAT sign - Accountant")).c_str(), format_left_small);
+	__sheet->writeStr(__row_counter, 0, multibyte_to_wide(GetSignatureInfo1()).c_str(), format_left_small);
+	__sheet->writeStr(__row_counter, 7, multibyte_to_wide(GetSignatureInfo2()).c_str(), format_left_small);
 
 	++__row_counter;
 	__sheet->writeStr(__row_counter, 0, multibyte_to_wide(vars->Get("VAT sign - Authorized person")).c_str(), format_left_small);

@@ -464,19 +464,24 @@ auto	C_Print_BT::PrintAsXLS() -> string
 
 				// --- signature block
 				{
-					__xls_sheet->writeStr(__xls_row_counter, 1, multibyte_to_wide(GetSignatureTitle1()).c_str());
-					__xls_sheet->writeStr(__xls_row_counter, 9, multibyte_to_wide(GetSignatureTitle2()).c_str());
+					if(GetSignRole1().length()) __xls_sheet->writeStr(__xls_row_counter, 1, multibyte_to_wide(GetSignatureTitle1()).c_str());
+					if(GetSignRole2().length()) __xls_sheet->writeStr(__xls_row_counter, 9, multibyte_to_wide(GetSignatureTitle2()).c_str());
 
 					__xls_row_counter++;
 					__xls_row_counter++;
 				}
 
 				{
-					__xls_sheet->writeStr(__xls_row_counter, 1, spelled_signature.c_str());
-					__xls_sheet->writeStr(__xls_row_counter, 9, spelled_signature.c_str());
-
-					__XLS_DrawUnderline(2, 6);
-					__XLS_DrawUnderline(10, 13);
+					if(GetSignRole1().length())
+					{
+											__xls_sheet->writeStr(__xls_row_counter, 1, spelled_signature.c_str());
+											__XLS_DrawUnderline(2, 6);
+					}
+					if(GetSignRole2().length())
+					{
+											__xls_sheet->writeStr(__xls_row_counter, 9, spelled_signature.c_str());
+											__XLS_DrawUnderline(10, 13);
+					}
 
 					__xls_row_counter++;
 					__xls_row_counter++;
@@ -484,17 +489,18 @@ auto	C_Print_BT::PrintAsXLS() -> string
 
 				// --- initials block
 				{
-					__xls_sheet->writeStr(__xls_row_counter,  1, spelled_initials.c_str());
-					__xls_sheet->writeStr(__xls_row_counter,  9, spelled_initials.c_str());
-
-					__xls_sheet->writeStr(__xls_row_counter,  3, multibyte_to_wide(bt.GetInitials1()).c_str());
-					__xls_sheet->writeStr(__xls_row_counter, 11, multibyte_to_wide(bt.GetInitials2()).c_str());
-// TODO: clean-up initials
-					// __xls_sheet->writeStr(__xls_row_counter,  3, multibyte_to_wide(GetSpelledInitials("1")).c_str());
-					// __xls_sheet->writeStr(__xls_row_counter, 11, multibyte_to_wide(GetSpelledInitials("2")).c_str());
-
-					__XLS_DrawUnderline(2, 6);
-					__XLS_DrawUnderline(10, 13);
+					if(GetSignRole1().length())
+					{
+											__xls_sheet->writeStr(__xls_row_counter,  1, spelled_initials.c_str());
+											__xls_sheet->writeStr(__xls_row_counter,  3, multibyte_to_wide(bt.GetInitials1()).c_str());
+											__XLS_DrawUnderline(2, 6);
+					}
+					if(GetSignRole2().length())
+					{
+											__xls_sheet->writeStr(__xls_row_counter,  9, spelled_initials.c_str());
+											__xls_sheet->writeStr(__xls_row_counter, 11, multibyte_to_wide(bt.GetInitials2()).c_str());
+											__XLS_DrawUnderline(10, 13);
+					}
 
 					__xls_row_counter++;
 					__xls_row_counter++;
@@ -502,17 +508,18 @@ auto	C_Print_BT::PrintAsXLS() -> string
 
 				// --- position block
 				{
-					__xls_sheet->writeStr(__xls_row_counter,  1, spelled_position.c_str());
-					__xls_sheet->writeStr(__xls_row_counter,  9, spelled_position.c_str());
-
-					__xls_sheet->writeStr(__xls_row_counter,  3, multibyte_to_wide(bt.GetPosition1()).c_str());
-					__xls_sheet->writeStr(__xls_row_counter, 11, multibyte_to_wide(bt.GetPosition2()).c_str());
-// TODO: clean-up position
-					// __xls_sheet->writeStr(__xls_row_counter,  3, multibyte_to_wide(GetSpelledPosition("1")).c_str());
-					// __xls_sheet->writeStr(__xls_row_counter, 11, multibyte_to_wide(GetSpelledPosition("2")).c_str());
-
-					__XLS_DrawUnderline(2, 6);
-					__XLS_DrawUnderline(10, 13);
+					if(GetSignRole1().length())
+					{
+											__xls_sheet->writeStr(__xls_row_counter,  1, spelled_position.c_str());
+											__xls_sheet->writeStr(__xls_row_counter,  3, multibyte_to_wide(bt.GetPosition1()).c_str());
+											__XLS_DrawUnderline(2, 6);
+					}
+					if(GetSignRole2().length())
+					{
+											__xls_sheet->writeStr(__xls_row_counter,  9, spelled_position.c_str());
+											__xls_sheet->writeStr(__xls_row_counter, 11, multibyte_to_wide(bt.GetPosition2()).c_str());
+											__XLS_DrawUnderline(10, 13);
+					}
 
 					__xls_row_counter++;
 					__xls_row_counter++;
@@ -520,17 +527,20 @@ auto	C_Print_BT::PrintAsXLS() -> string
 
 				// --- date block
 				{
-					__xls_sheet->writeStr(__xls_row_counter, 1, spelled_date.c_str());
-					__xls_sheet->writeStr(__xls_row_counter, 9, spelled_date.c_str());
-
-					__XLS_DrawUnderline(2, 6);
-					__XLS_DrawUnderline(10, 13);
+					if(GetSignRole1().length()) 
+					{
+											__xls_sheet->writeStr(__xls_row_counter, 1, spelled_date.c_str());
+											__XLS_DrawUnderline(2, 6);
+					}
+					if(GetSignRole2().length()) 
+					{
+											__xls_sheet->writeStr(__xls_row_counter, 9, spelled_date.c_str());
+											__XLS_DrawUnderline(10, 13);
+					}
 
 					__xls_row_counter++;
 					__xls_row_counter++;
 				}
-
-				
 			}
 
 			if(__xls_book->save(multibyte_to_wide(GetFilename()).c_str())) {}
@@ -878,15 +888,20 @@ auto C_Print_BT::__HPDF_PrintSignature() -> string
 			if((error_message = pdf_obj.__HPDF_MoveLineDown()).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
 		}
-		if(error_message.empty())
+		if(error_message.empty() && GetSignRole1().length())
 		{
 			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSignatureTitle1()), 0, 20, HPDF_TALIGN_LEFT, BOLD_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
+		if(error_message.empty() && GetSignRole2().length())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSignatureTitle2()), 60, 60+20, HPDF_TALIGN_LEFT, BOLD_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSignatureTitle2()), 60, 60+20, HPDF_TALIGN_LEFT, BOLD_FONT, HPDF_TIMECARD_FONT_SIZE, true)).length())
-			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+			if((error_message = pdf_obj.__HPDF_MoveLineDown()).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
 		}
 
 		// --- signature
@@ -895,22 +910,27 @@ auto C_Print_BT::__HPDF_PrintSignature() -> string
 			if((error_message = pdf_obj.__HPDF_MoveLineDown()).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
 		}
-		if(error_message.empty())
+		if(error_message.empty() && GetSignRole1().length())
 		{
 			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSpelledSignature()), 0, 40, HPDF_TALIGN_LEFT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
-		if(error_message.empty())
+		if(error_message.empty() && GetSignRole2().length())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSpelledSignature()), 60, 60+40, HPDF_TALIGN_LEFT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, true)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSpelledSignature()), 60, 60+40, HPDF_TALIGN_LEFT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
 		if(error_message.empty())
 		{
+			if((error_message = pdf_obj.__HPDF_MoveLineDown()).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		}
+		if(error_message.empty() && GetSignRole1().length())
+		{
 			if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(10, 40)).length())
 				{ MESSAGE_ERROR("", "", "hpdf: fail to draw horizontal line"); }
 		}
-		if(error_message.empty())
+		if(error_message.empty() && GetSignRole2().length())
 		{
 			if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(70, 100)).length())
 				{ MESSAGE_ERROR("", "", "hpdf: fail to draw horizontal line"); }
@@ -922,23 +942,23 @@ auto C_Print_BT::__HPDF_PrintSignature() -> string
 			if((error_message = pdf_obj.__HPDF_MoveLineDown()).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
 		}
-		if(error_message.empty())
+		if(error_message.empty() && GetSignRole1().length())
 		{
 			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSpelledInitials()), 0, 40, HPDF_TALIGN_LEFT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
-		if(error_message.empty())
+		if(error_message.empty() && GetSignRole2().length())
 		{
 			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSpelledInitials()), 60, 60+40, HPDF_TALIGN_LEFT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
 
-		if(error_message.empty())
+		if(error_message.empty() && GetSignRole1().length())
 		{
 			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(bt.GetInitials1()), 10, 40, HPDF_TALIGN_CENTER, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length()) // --- print from variable
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
-		if(error_message.empty())
+		if(error_message.empty() && GetSignRole2().length())
 		{
 			// --- don't move to the next line because text could be empty
 			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(bt.GetInitials2()), 70, 100, HPDF_TALIGN_CENTER, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length()) // --- print from variable
@@ -963,12 +983,12 @@ auto C_Print_BT::__HPDF_PrintSignature() -> string
 			{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
 		}
 
-		if(error_message.empty())
+		if(error_message.empty() && GetSignRole1().length())
 		{
 			if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(10, 40)).length())
 				{ MESSAGE_ERROR("", "", "hpdf: fail to draw horizontal line"); }
 		}
-		if(error_message.empty())
+		if(error_message.empty() && GetSignRole2().length())
 		{
 			if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(70, 100)).length())
 				{ MESSAGE_ERROR("", "", "hpdf: fail to draw horizontal line"); }
@@ -980,23 +1000,23 @@ auto C_Print_BT::__HPDF_PrintSignature() -> string
 			if((error_message = pdf_obj.__HPDF_MoveLineDown()).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
 		}
-		if(error_message.empty())
+		if(error_message.empty() && GetSignRole1().length())
 		{
 			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSpelledPosition()), 0, 40, HPDF_TALIGN_LEFT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
-		if(error_message.empty())
+		if(error_message.empty() && GetSignRole2().length())
 		{
 			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSpelledPosition()), 60, 60+40, HPDF_TALIGN_LEFT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
 
-		if(error_message.empty())
+		if(error_message.empty() && GetSignRole1().length())
 		{
 			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(bt.GetPosition1()), 10, 40, HPDF_TALIGN_CENTER, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length()) // --- print from variable
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
-		if(error_message.empty())
+		if(error_message.empty() && GetSignRole2().length())
 		{
 			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(bt.GetPosition2()), 70, 100, HPDF_TALIGN_CENTER, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length()) // --- print from variable
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
@@ -1020,12 +1040,12 @@ auto C_Print_BT::__HPDF_PrintSignature() -> string
 			if((error_message = pdf_obj.__HPDF_MoveLineDown()).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
 		}
-		if(error_message.empty())
+		if(error_message.empty() && GetSignRole1().length())
 		{
 			if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(10, 40)).length())
 				{ MESSAGE_ERROR("", "", "hpdf: fail to draw horizontal line"); }
 		}
-		if(error_message.empty())
+		if(error_message.empty() && GetSignRole2().length())
 		{
 			if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(70, 100)).length())
 				{ MESSAGE_ERROR("", "", "hpdf: fail to draw horizontal line"); }
@@ -1037,22 +1057,27 @@ auto C_Print_BT::__HPDF_PrintSignature() -> string
 			if((error_message = pdf_obj.__HPDF_MoveLineDown()).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
 		}
-		if(error_message.empty())
+		if(error_message.empty() && GetSignRole1().length())
 		{
 			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSpelledDate()), 0, 40, HPDF_TALIGN_LEFT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
-		if(error_message.empty())
+		if(error_message.empty() && GetSignRole2().length())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSpelledDate()), 60, 60+40, HPDF_TALIGN_LEFT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, true)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSpelledDate()), 60, 60+40, HPDF_TALIGN_LEFT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
 		if(error_message.empty())
 		{
+			if((error_message = pdf_obj.__HPDF_MoveLineDown()).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		}
+		if(error_message.empty() && GetSignRole1().length())
+		{
 			if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(10, 40)).length())
 				{ MESSAGE_ERROR("", "", "hpdf: fail to draw horizontal line"); }
 		}
-		if(error_message.empty())
+		if(error_message.empty() && GetSignRole2().length())
 		{
 			if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(70, 100)).length())
 				{ MESSAGE_ERROR("", "", "hpdf: fail to draw horizontal line"); }

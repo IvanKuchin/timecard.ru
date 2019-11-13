@@ -506,16 +506,16 @@ auto	C_Print_Timecard::PrintAsXLS() -> string
 				row_counter++;
 
 				{
-					sheet->writeStr(row_counter, 1, multibyte_to_wide(timecard.GetSignatureTitle1()).c_str());
-					sheet->writeStr(row_counter, 9, multibyte_to_wide(timecard.GetSignatureTitle2()).c_str());
+					if(GetSignRole1().length()) sheet->writeStr(row_counter, 1, multibyte_to_wide(timecard.GetSignatureTitle1()).c_str());
+					if(GetSignRole2().length()) sheet->writeStr(row_counter, 9, multibyte_to_wide(timecard.GetSignatureTitle2()).c_str());
 
 					row_counter++;
 					row_counter++;
 				}
 
 				{
-					sheet->writeStr(row_counter, 1, spelled_signature.c_str());
-					sheet->writeStr(row_counter, 9, spelled_signature.c_str());
+					if(GetSignRole1().length()) sheet->writeStr(row_counter, 1, spelled_signature.c_str());
+					if(GetSignRole2().length()) sheet->writeStr(row_counter, 9, spelled_signature.c_str());
 
 					row_counter++;
 					row_counter++;
@@ -523,13 +523,15 @@ auto	C_Print_Timecard::PrintAsXLS() -> string
 
 
 				{
-					sheet->writeStr(row_counter, 1, (
+					if(GetSignRole1().length()) 
+						sheet->writeStr(row_counter, 1, (
 														timecard.GetInitials1().length()
 															? spelled_initials.substr(0, 8) + multibyte_to_wide(timecard.GetInitials1())
 															: spelled_initials
 													).c_str());
 
-					sheet->writeStr(row_counter, 9, (
+					if(GetSignRole2().length()) 
+						sheet->writeStr(row_counter, 9, (
 														timecard.GetInitials2().length()
 															? spelled_initials.substr(0, 8) + multibyte_to_wide(timecard.GetInitials2())
 															: spelled_initials
@@ -540,13 +542,15 @@ auto	C_Print_Timecard::PrintAsXLS() -> string
 				}
 
 				{
-					sheet->writeStr(row_counter, 1, (
+					if(GetSignRole1().length()) 
+						sheet->writeStr(row_counter, 1, (
 														timecard.GetPosition1().length()
 															? spelled_position.substr(0, 11) + multibyte_to_wide(timecard.GetPosition1())
 															: spelled_position
 													).c_str());
 
-					sheet->writeStr(row_counter, 9, (
+					if(GetSignRole2().length()) 
+						sheet->writeStr(row_counter, 9, (
 														timecard.GetPosition2().length()
 															? spelled_position.substr(0, 11) + multibyte_to_wide(timecard.GetPosition2())
 															: spelled_position
@@ -556,27 +560,9 @@ auto	C_Print_Timecard::PrintAsXLS() -> string
 					row_counter++;
 				}
 
-// TODO: cleanup initials
-/*				{
-					sheet->writeStr(row_counter, 1, multibyte_to_wide(GetSpelledInitials1()).c_str());
-					sheet->writeStr(row_counter, 9, multibyte_to_wide(GetSpelledInitials2()).c_str());
-
-					row_counter++;
-					row_counter++;
-				}
-*/
-// TODO: cleanup position
-/*				{
-					sheet->writeStr(row_counter, 1, multibyte_to_wide(GetSpelledPosition1()).c_str());
-					sheet->writeStr(row_counter, 9, multibyte_to_wide(GetSpelledPosition2()).c_str());
-
-					row_counter++;
-					row_counter++;
-				}
-*/
 				{
-					sheet->writeStr(row_counter, 1, spelled_date.c_str());
-					sheet->writeStr(row_counter, 9, spelled_date.c_str());
+					if(GetSignRole1().length()) sheet->writeStr(row_counter, 1, spelled_date.c_str());
+					if(GetSignRole2().length()) sheet->writeStr(row_counter, 9, spelled_date.c_str());
 
 					row_counter++;
 					row_counter++;
@@ -1461,33 +1447,111 @@ auto	C_Print_Timecard::__HPDF_DrawTimecardFooter() -> string
 		else if((error_message = __HPDF_PrintText(timecard.GetApprovers(), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 0.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())											{ MESSAGE_ERROR("", "", "hpdf: fail to print approvers"); }
 
 		// --- signature block
-		else if((error_message = __HPDF_MoveLineDown()).length())																																												{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
-		else if((error_message = __HPDF_MoveLineDown()).length())																																												{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
-		else if((error_message = __HPDF_MoveLineDown()).length())																																												{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
-		else if((error_message = __HPDF_PrintText(timecard.GetSignatureTitle1(), HPDF_FIELD_LEFT)).length())																																	{ MESSAGE_ERROR("", "", "hpdf: fail to signature title 1"); }
-		else if((error_message = __HPDF_PrintText(timecard.GetSignatureTitle2(), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 10.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())									{ MESSAGE_ERROR("", "", "hpdf: fail to signature title 2"); }
-		// else if((error_message = __HPDF_MoveLineDown()).length())																																												{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
-		else if((error_message = __HPDF_MoveLineDown()).length())																																												{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
-		else if((error_message = __HPDF_PrintText(GetSpelledSignature(), HPDF_FIELD_LEFT)).length())																																			{ MESSAGE_ERROR("", "", "hpdf: fail to spelled signature1"); }
-		else if((error_message = __HPDF_PrintText(GetSpelledSignature(), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 10.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())											{ MESSAGE_ERROR("", "", "hpdf: fail to spelled signature2"); }
-		// else if((error_message = __HPDF_MoveLineDown()).length())																																											{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
-		else if((error_message = __HPDF_MoveLineDown()).length())																																												{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
-// TODO: update initials
-		else if((error_message = __HPDF_PrintText(GetSpelledInitials(), HPDF_FIELD_LEFT)).length())																																				{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
-		else if((error_message = __HPDF_PrintText(timecard.GetInitials1(), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT - 13.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())											{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
-		else if((error_message = __HPDF_PrintText(GetSpelledInitials(), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 10.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())											{ MESSAGE_ERROR("", "", "hpdf: fail to print text "); }
-		else if((error_message = __HPDF_PrintText(timecard.GetInitials2(), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 13.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())											{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
-		// else if((error_message = __HPDF_MoveLineDown()).length())																																											{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
-		else if((error_message = __HPDF_MoveLineDown()).length())																																												{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
-// TODO: update position
-		else if((error_message = __HPDF_PrintText(GetSpelledPosition(), HPDF_FIELD_LEFT)).length())																																				{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
-		else if((error_message = __HPDF_PrintText(timecard.GetPosition1(), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT - 13.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())											{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
-		else if((error_message = __HPDF_PrintText(GetSpelledPosition(), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 10.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())											{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
-		else if((error_message = __HPDF_PrintText(timecard.GetPosition2(), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 13.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())											{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
-		// else if((error_message = __HPDF_MoveLineDown()).length())																																											{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
-		else if((error_message = __HPDF_MoveLineDown()).length())																																												{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
-		else if((error_message = __HPDF_PrintText(GetSpelledDate(), HPDF_FIELD_LEFT)).length())																																					{ MESSAGE_ERROR("", "", "hpdf: fail to print date"); }
-		else if((error_message = __HPDF_PrintText(GetSpelledDate(), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 10.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())												{ MESSAGE_ERROR("", "", "hpdf: fail to print date"); }
+		if(error_message.empty())
+		{
+			if((error_message = __HPDF_MoveLineDown()).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = __HPDF_MoveLineDown()).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = __HPDF_MoveLineDown()).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		}
+		if(error_message.empty() && GetSignRole1().length())
+		{
+			if((error_message = __HPDF_PrintText(timecard.GetSignatureTitle1(), HPDF_FIELD_LEFT)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to signature title 1"); }
+		}
+		if(error_message.empty() && GetSignRole2().length())
+		{
+			if((error_message = __HPDF_PrintText(timecard.GetSignatureTitle2(), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 10.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to signature title 2"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = __HPDF_MoveLineDown()).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		}
+		if(error_message.empty() && GetSignRole1().length())
+		{
+			if((error_message = __HPDF_PrintText(GetSpelledSignature(), HPDF_FIELD_LEFT)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to spelled signature1"); }
+		}
+		if(error_message.empty() && GetSignRole2().length())
+		{
+			if((error_message = __HPDF_PrintText(GetSpelledSignature(), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 10.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to spelled signature2"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = __HPDF_MoveLineDown()).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		}
+		if(error_message.empty() && GetSignRole1().length())
+		{
+			if((error_message = __HPDF_PrintText(GetSpelledInitials(), HPDF_FIELD_LEFT)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty() && GetSignRole1().length())
+		{
+			if((error_message = __HPDF_PrintText(timecard.GetInitials1(), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT - 13.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty() && GetSignRole2().length())
+		{
+			if((error_message = __HPDF_PrintText(GetSpelledInitials(), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 10.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text "); }
+		}
+		if(error_message.empty() && GetSignRole2().length())
+		{
+			if((error_message = __HPDF_PrintText(timecard.GetInitials2(), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 13.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = __HPDF_MoveLineDown()).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		}
+		if(error_message.empty() && GetSignRole1().length())
+		{
+			if((error_message = __HPDF_PrintText(GetSpelledPosition(), HPDF_FIELD_LEFT)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty() && GetSignRole1().length())
+		{
+			if((error_message = __HPDF_PrintText(timecard.GetPosition1(), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT - 13.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty() && GetSignRole2().length())
+		{
+			if((error_message = __HPDF_PrintText(GetSpelledPosition(), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 10.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty() && GetSignRole2().length())
+		{
+			if((error_message = __HPDF_PrintText(timecard.GetPosition2(), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 13.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = __HPDF_MoveLineDown()).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
+		}
+		if(error_message.empty() && GetSignRole1().length())
+		{
+			if((error_message = __HPDF_PrintText(GetSpelledDate(), HPDF_FIELD_LEFT)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print date"); }
+		}
+		if(error_message.empty() && GetSignRole2().length())
+		{
+			if((error_message = __HPDF_PrintText(GetSpelledDate(), __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT + 10.0 * HPDF_TIMECARD_DAY_WIDTH_PERCENT))).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print date"); }
+		}
 	}
 	catch(...)
 	{

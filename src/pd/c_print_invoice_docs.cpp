@@ -215,25 +215,26 @@ auto C_Print_Invoice_Docs_Base::__PrintXLSSignature() -> string
 	format_underline->setBorderBottom(libxl::BORDERSTYLE_THIN);
 
 	++__row_counter;
-	__sheet->writeStr(__row_counter, 1, multibyte_to_wide(GetSignatureTitle1()).c_str(), format_bold);
-	__sheet->writeStr(__row_counter, 6, multibyte_to_wide(GetSignatureTitle2()).c_str(), format_bold);
-	__sheet->writeStr(__row_counter, 3, L"", format_underline);
-	__sheet->writeStr(__row_counter, 4, L"", format_underline);
+	if(GetSignatureTitle1().length())
+	{
+		__sheet->writeStr(__row_counter, 1, multibyte_to_wide(GetSignatureTitle1()).c_str(), format_bold);
+		__sheet->writeStr(__row_counter, 3, L"", format_underline);
+		__sheet->writeStr(__row_counter, 4, L"", format_underline);
+	}
 	if(GetSignatureTitle2().length())
 	{
+		__sheet->writeStr(__row_counter, 6, multibyte_to_wide(GetSignatureTitle2()).c_str(), format_bold);
 		__sheet->writeStr(__row_counter, 8, L"", format_underline);
 		__sheet->writeStr(__row_counter, 9, L"", format_underline);
 	}
 
 	++__row_counter;
-	__sheet->writeStr(__row_counter, 4, multibyte_to_wide(GetSignatureName1()).c_str(), format_right);
-	if(GetSignatureTitle2().length())
-		__sheet->writeStr(__row_counter, 9, multibyte_to_wide(GetSignatureName2()).c_str(), format_right);
+	if(GetSignatureTitle1().length()) __sheet->writeStr(__row_counter, 4, multibyte_to_wide(GetSignatureName1()).c_str(), format_right);
+	if(GetSignatureTitle2().length()) __sheet->writeStr(__row_counter, 9, multibyte_to_wide(GetSignatureName2()).c_str(), format_right);
 
 	++__row_counter;
-	__sheet->writeStr(__row_counter, 4, multibyte_to_wide(GetSignatureInfo1()).c_str(), format_right_small);
-	if(GetSignatureTitle2().length())
-		__sheet->writeStr(__row_counter, 9, multibyte_to_wide(GetSignatureInfo2()).c_str(), format_right_small);
+	if(GetSignatureTitle1().length()) __sheet->writeStr(__row_counter, 4, multibyte_to_wide(GetSignatureInfo1()).c_str(), format_right_small);
+	if(GetSignatureTitle2().length()) __sheet->writeStr(__row_counter, 9, multibyte_to_wide(GetSignatureInfo2()).c_str(), format_right_small);
 
 
 	MESSAGE_DEBUG("", "", "finish");

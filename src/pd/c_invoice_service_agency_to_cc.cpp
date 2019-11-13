@@ -541,10 +541,12 @@ auto C_Invoice_Service_Agency_To_CC::CreateTimecardObj(string timecard_id) -> C_
 
 										obj.SetApprovers(GetTimecard_ApprovalChain(timecard_id, db));
 
-										obj.SetPosition1(GetValueFromDB("SELECT `value` FROM `cost_center_custom_fields` WHERE `var_name`=\"timecard_position1\";", db));
-										obj.SetPosition2(GetValueFromDB("SELECT `value` FROM `cost_center_custom_fields` WHERE `var_name`=\"timecard_position2\";", db));
-										obj.SetInitials1(GetValueFromDB("SELECT `value` FROM `cost_center_custom_fields` WHERE `var_name`=\"timecard_signature1\";", db));
-										obj.SetInitials2(GetValueFromDB("SELECT `value` FROM `cost_center_custom_fields` WHERE `var_name`=\"timecard_signature2\";", db));
+										obj.SetPosition1(GetValueFromDB("SELECT `value` FROM `cost_center_custom_fields` WHERE  `cost_center_id`=" + quoted(cost_center_id) + " AND `var_name`=\"timecard_position1\";", db));
+										obj.SetPosition2(GetValueFromDB("SELECT `value` FROM `cost_center_custom_fields` WHERE  `cost_center_id`=" + quoted(cost_center_id) + " AND `var_name`=\"timecard_position2\";", db));
+										obj.SetInitials1(GetValueFromDB("SELECT `value` FROM `cost_center_custom_fields` WHERE  `cost_center_id`=" + quoted(cost_center_id) + " AND `var_name`=\"timecard_signature1\";", db));
+										obj.SetInitials2(GetValueFromDB("SELECT `value` FROM `cost_center_custom_fields` WHERE  `cost_center_id`=" + quoted(cost_center_id) + " AND `var_name`=\"timecard_signature2\";", db));
+										obj.SetSignRole1(GetValueFromDB("SELECT `value` FROM `cost_center_custom_fields` WHERE  `cost_center_id`=" + quoted(cost_center_id) + " AND `var_name`=\"timecard_role1\";", db));
+										obj.SetSignRole2(GetValueFromDB("SELECT `value` FROM `cost_center_custom_fields` WHERE  `cost_center_id`=" + quoted(cost_center_id) + " AND `var_name`=\"timecard_role2\";", db));
 										
 										if(db->Query("SELECT `value` FROM `contract_psow_custom_fields` WHERE `var_name`=\"Department\" AND `contract_psow_id`=\"" + psow_id + "\" AND `type`=\"input\";"))
 											obj.SetProjectNumber(db->Get(0, "value"));

@@ -44,6 +44,8 @@ class C_Timecard_To_Print
 		c_float					dayrate;
 		c_float					total_payment;
 		string					approvers = ""s;
+		string					sign_role_1 = ""s;
+		string					sign_role_2 = ""s;
 
 		vector<Timecard_Line>	timecard_lines = {};
 	public:
@@ -62,6 +64,10 @@ class C_Timecard_To_Print
 		auto		SetSupplierVAT(string &&param1) 			{ supplier_vat = move(param1); };
 		auto		SetAgreementNumber(const string &param1)	{ agreement_number = param1; };
 		auto		SetAgreementNumber(string &&param1) 		{ agreement_number = move(param1); };
+		auto		SetSignRole1(const string &param1)			{ sign_role_1 = param1; };
+		auto		SetSignRole1(string &&param1) 				{ sign_role_1 = move(param1); };
+		auto		SetSignRole2(const string &param1)			{ sign_role_2 = param1; };
+		auto		SetSignRole2(string &&param1) 				{ sign_role_2 = move(param1); };
 		auto		SetDateSign(const string &param1)			{ date_sign_str = param1; };
 		auto		SetDateSign(string &&param1) 				{ date_sign_str = move(param1); };
 		auto		SetSignatureTitle1(const string &param1)	{ signature_title_1 = param1; };
@@ -92,6 +98,8 @@ class C_Timecard_To_Print
 		auto		GetSupplierVAT()							{ return supplier_vat; };
 		auto		GetAgreementNumber()						{ return agreement_number; };		
 		auto		GetDateSign()								{ return date_sign_str; };
+		auto		GetSignRole1()								{ return sign_role_1; };
+		auto		GetSignRole2()								{ return sign_role_2; };
 		auto		GetSignatureTitle1()						{ return signature_title_1; };		
 		auto		GetSignatureTitle2()						{ return signature_title_2; };		
 		auto		GetInitials1()								{ return initials_1; };		
