@@ -263,12 +263,32 @@ class C_Print_Invoice_Subc : public C_Print_Invoice_Docs_Base
 		auto			GetTotalPaymentSpelling() -> string				{ return vars->Get("Total payment") + ": "; };
 		auto			GetFooterComment() -> string					{ return ""s; };
 
-		auto			GetSignatureTitle1() -> string					{ return vars->Get("subc2agency_invoice_role1"); };
-		auto			GetSignatureTitle2() -> string					{ return vars->Get("subc2agency_invoice_role2"); };
 		auto			GetSignatureName1() -> string					{ return vars->Get("subcontractor_company_name_1"); };
 		auto			GetSignatureName2() -> string					{ return vars->Get("subcontractor_company_name_1"); };
-		auto			GetSignatureInfo1() -> string					{ return vars->Get("subc2agency_invoice_position1") + " " + vars->Get("subc2agency_invoice_signature1"); };
-		auto			GetSignatureInfo2() -> string					{ return vars->Get("subc2agency_invoice_position2") + " " + vars->Get("subc2agency_invoice_signature2"); };
+		auto			GetSignatureTitle1() -> string
+						{
+							return	vars->Get("subc2agency_invoice_role1_1").length()
+									? vars->Get("subc2agency_invoice_role1_1")
+									: vars->Get("subc2agency_invoice_role1");
+						};
+		auto			GetSignatureTitle2() -> string
+						{
+							return	vars->Get("subc2agency_invoice_role2_1").length()
+									? vars->Get("subc2agency_invoice_role2_1")
+									: vars->Get("subc2agency_invoice_role2");
+						};
+		auto			GetSignatureInfo1() -> string					
+						{
+							return	vars->Get("subc2agency_invoice_position1_1").length() + vars->Get("subc2agency_invoice_signature1_1").length()
+									? vars->Get("subc2agency_invoice_position1_1") + " " + vars->Get("subc2agency_invoice_signature1_1")
+									: vars->Get("subc2agency_invoice_position1") + " " + vars->Get("subc2agency_invoice_signature1");
+						};
+		auto			GetSignatureInfo2() -> string					
+						{
+							return	vars->Get("subc2agency_invoice_position2_1").length() + vars->Get("subc2agency_invoice_signature2_1").length()
+									? vars->Get("subc2agency_invoice_position2_1") + " " + vars->Get("subc2agency_invoice_signature2_1")
+									: vars->Get("subc2agency_invoice_position2") + " " + vars->Get("subc2agency_invoice_signature2");
+						};
 };
 
 class C_Print_Act_Agency : public C_Print_Invoice_Docs_Base
@@ -403,8 +423,20 @@ class C_Print_Act_Subc : public C_Print_Invoice_Docs_Base
 		auto			GetSignatureTitle2() -> string					{ return vars->Get("subc2agency_act_role2"); };
 		auto			GetSignatureName1() -> string					{ return vars->Get("subcontractor_company_name_1"); };
 		auto			GetSignatureName2() -> string					{ return vars->Get("agency_name"); };
-		auto			GetSignatureInfo1() -> string					{ return vars->Get("subc2agency_act_position1") + " " + vars->Get("subc2agency_act_signature_name1"); };
-		auto			GetSignatureInfo2() -> string					{ return vars->Get("subc2agency_act_position2") + " " + vars->Get("subc2agency_act_signature_name2"); };
+		auto			GetSignatureInfo1() -> string					
+						{ 
+							// --- SoW specific variables override agency variables
+							return vars->Get("subc2agency_act_position1_1").length() + vars->Get("subc2agency_act_signature_name1_1").length()
+									? vars->Get("subc2agency_act_position1_1") + " " + vars->Get("subc2agency_act_signature_name1_1")
+									: vars->Get("subc2agency_act_position1") + " " + vars->Get("subc2agency_act_signature_name1");
+						};
+		auto			GetSignatureInfo2() -> string					
+						{
+							// --- SoW specific variables override agency variables
+							return  vars->Get("subc2agency_act_position2_1").length() + vars->Get("subc2agency_act_signature_name2_1").length()
+									? vars->Get("subc2agency_act_position2_1") + " " + vars->Get("subc2agency_act_signature_name2_1") 
+									: vars->Get("subc2agency_act_position2") + " " + vars->Get("subc2agency_act_signature_name2"); 
+						};
 };
 
 

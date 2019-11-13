@@ -428,14 +428,7 @@ auto	C_Invoicing_Vars::Agency_VarSet(string __agency_company_id) -> string
 			if(error_message.empty())
 			{
 				auto	affected = db->Query("SELECT * FROM `company_custom_fields` WHERE "
-												"`company_id`=\"" + __agency_company_id + "\" "
-// TODO: --- spelled position clean-up: begin
-												// "AND "
-												// "`var_name` NOT LIKE (\"subc2agency_%\") "
-												// "AND "
-												// "`var_name` NOT LIKE (\"agency2cc_%\") "
-// TODO: --- spelled position clean-up: stop
-												";");
+												"`company_id`=\"" + __agency_company_id + "\";");
 
 				for(auto i = 0; i < affected; ++i)
 				{
@@ -473,91 +466,6 @@ auto	C_Invoicing_Vars::Agency_VarSet(string __agency_company_id) -> string
 	return	error_message;
 }
 
-// TODO: --- spelled position clean-up
-/*
-auto	C_Invoicing_Vars::Agency_CustomFields_Subc2Agency_VarSet(string __agency_company_id) -> string
-{
-	auto	error_message = ""s;
-
-	MESSAGE_DEBUG("", "", "start");
-
-
-	if(user)
-	{
-		if(db)
-		{
-				auto	affected = db->Query("SELECT * FROM `company_custom_fields` WHERE "
-												"`company_id`=\"" + __agency_company_id + "\" "
-												"AND "
-												"`var_name` LIKE (\"subc2agency_%\") "
-												";");
-
-				for(auto i = 0; i < affected; ++i)
-				{
-					if(error_message.empty()) error_message = AssignVariableValue(db->Get(i, "var_name"), db->Get(i, "value"), true);
-				}
-		}
-		else
-		{
-			error_message = gettext("db is not initialized");
-			MESSAGE_ERROR("", "", error_message);
-		}
-	}
-	else
-	{
-		error_message = gettext("user is not initialized");
-		MESSAGE_ERROR("", "", error_message);
-	}
-
-
-	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
-
-	return	error_message;
-}
-*/
-
-// TODO: --- spelled position clean-up
-/*
-auto	C_Invoicing_Vars::Agency_CustomFields_Agency2CC_VarSet(string __agency_company_id) -> string
-{
-	auto	error_message = ""s;
-
-	MESSAGE_DEBUG("", "", "start");
-
-
-	if(user)
-	{
-		if(db)
-		{
-				auto	affected = db->Query("SELECT * FROM `company_custom_fields` WHERE "
-												"`company_id`=\"" + __agency_company_id + "\" "
-												"AND "
-												"`var_name` LIKE (\"agency2cc_%\") "
-												";");
-
-				for(auto i = 0; i < affected; ++i)
-				{
-					if(error_message.empty()) error_message = AssignVariableValue(db->Get(i, "var_name"), db->Get(i, "value"), true);
-				}
-		}
-		else
-		{
-			error_message = gettext("db is not initialized");
-			MESSAGE_ERROR("", "", error_message);
-		}
-	}
-	else
-	{
-		error_message = gettext("user is not initialized");
-		MESSAGE_ERROR("", "", error_message);
-	}
-
-
-	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
-
-	return	error_message;
-}
-*/
 auto	C_Invoicing_Vars::SoW_Index_VarSet(string sql_query, string index) -> string
 {
 	auto	error_message = ""s;

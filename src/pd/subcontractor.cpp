@@ -1909,6 +1909,120 @@ int main()
 		MESSAGE_DEBUG("", action, "finish");
 	}
 
+	if(
+		(action == "AJAX_updateSoWCustomField")	||
+		(action == "AJAX_deleteSoWCustomField")
+	)
+	{
+			MESSAGE_DEBUG("", action, "start");
+
+			auto	error_message = ""s;
+			auto	success_message = ""s;
+
+
+			{
+				string			template_name = "json_response.htmlt";
+				string			error_message = "";
+
+				string			sow_id 			= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("sow_id"));
+				string			id				= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
+				string			new_value		= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("value"));
+
+				if(
+					new_value.length()						||
+					(action == "AJAX_updateSoWCustomField")	||
+					(action == "AJAX_deleteSoWCustomField")
+				)
+				{
+					error_message = isSubcontractorAllowedToChangeSoW(sow_id, &db, &user);
+					if(error_message.empty())
+					{
+						error_message = isActionEntityBelongsToSoW(action, id, sow_id, &db, &user);
+						if(error_message.empty())
+						{
+							error_message = CheckNewValueByAction(action, id, sow_id, new_value, &db, &user);
+							if(error_message.empty())
+							{
+								auto		existing_value = ""s;
+
+								if(action.find("update") != string::npos)
+								{
+									existing_value = GetDBValueByAction(action, id, sow_id, &db, &user);
+
+									error_message = SetNewValueByAction(action, id, sow_id, new_value, &db, &user);
+									if(error_message.empty())
+									{
+										// --- good2go
+									}
+									else
+									{
+										MESSAGE_DEBUG("", action, "unable to set new value (action/sow_id/id/value = " + action + "/" + sow_id + "/" + id + "/[" + FilterCP1251Symbols(new_value) + "])");
+									}
+								}
+								else if(action.find("insert") != string::npos)
+								{
+									
+								}
+								else if(action.find("delete") != string::npos)
+								{
+									existing_value = GetDBValueByAction(action, id, sow_id, &db, &user);
+
+									error_message = DeleteEntryByAction(action, id, &db, &user);
+									if(error_message.empty())
+									{
+										// --- good2go
+									}
+									else
+									{
+										MESSAGE_DEBUG("", action, "unable to remove item (action/sow_id/id/value = " + action + "/" + sow_id + "/" + id + "/[" + FilterCP1251Symbols(new_value) + "])");
+									}
+								}
+								else
+								{
+									error_message = gettext("unsupported operation");
+									MESSAGE_ERROR("", action, "unsupported action type(" + action + ")");
+								}
+
+								if(error_message.empty())
+								{
+									if(GeneralNotifySoWContractPartiesAboutChanges(action, id, sow_id, existing_value, new_value, &db, &user))
+									{
+										// --- don't do anything here
+									}
+									else
+									{
+										MESSAGE_DEBUG("", action, "fail to notify sow.id(" + sow_id + ") parties about changes");
+									}
+								}
+							}
+							else
+							{
+								MESSAGE_DEBUG("", action, "new value failed to pass validity check");
+							}
+						}
+						else
+						{
+							MESSAGE_DEBUG("", action, "action entity id(" + user.GetID() + ") doesn't belong to sow.id(" + sow_id + ")");
+						}
+					}
+					else
+					{
+						MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") doesn't allowed to change sow.id(" + sow_id + ")");
+					}
+				}
+				else
+				{
+					error_message = gettext("parameters incorrect");
+					MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") didn't set new value in sow.id(" + sow_id + ")");
+				}
+
+				AJAX_ResponseTemplate(&indexPage, success_message, error_message);
+			}
+
+			MESSAGE_DEBUG("", action, "finish");
+	}
+
+
 	if(action == "AJAX_agreeSoW")
 	{
 		ostringstream	ostResult;

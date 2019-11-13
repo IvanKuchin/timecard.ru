@@ -712,6 +712,43 @@ string isAgencyEmployeeAllowedToChangeSoW(string sow_id, CMysql *db, CUser *user
 	return error_message;
 }
 
+string isSubcontractorAllowedToChangeSoW(string sow_id, CMysql *db, CUser *user)
+{
+	string	error_message = "";
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(sow_id.length())
+	{
+		if(user->GetType() == "subcontractor")
+		{
+			if(db->Query("SELECT `id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\" AND `subcontractor_company_id`=(SELECT `id` FROM `company` WHERE `admin_userID`=\"" + user->GetID() + "\");"))
+			{
+				// --- everything is good
+			}
+			else
+			{
+				MESSAGE_DEBUG("", "", "user(" + user->GetID() + ") have not rights to change SoW(" + sow_id + ")");
+				error_message = gettext("You are not authorized");
+			}
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "user(" + user->GetID() + ") is not a subcontractor");
+			error_message = gettext("You are not authorized");
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "sow_id is empty");
+		error_message = gettext("Data has not been initialized");
+	}
+
+	MESSAGE_DEBUG("", "", "finish (result length is " + to_string(error_message.length()) + ")");
+
+	return error_message;
+}
+
 string isAgencyEmployeeAllowedToChangePSoW(string sow_id, CMysql *db, CUser *user)
 {
 	string	error_message = "";
@@ -5505,8 +5542,10 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 	if(action == "AJAX_updateSoWCustomField")
 	{
 		notification_description = gettext("SoW") + " ("s + GetSpelledSoWByID(sow_id, db) + "): " + gettext("custom field") + "(" + GetSpelledSoWCustomFieldNameByID(id, db) + ") " + gettext("changed") + " " + gettext("from") + " " + existing_value + " " + gettext("to") + " " + new_value;
-		// sql_query = "SELECT `contract_sow_id` AS `contract_sow_id` FROM `contract_sow_custom_fields` WHERE `id`=\"" + id + "\";";
-		sql_query = ""; // --- don't notify subcontractors, only agency
+		if(user->GetType() == "subcontractor")
+			sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
+		if(user->GetType() == "agency")
+			sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 	if(action == "AJAX_deleteSoWCustomField")
 	{

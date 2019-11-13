@@ -382,13 +382,24 @@ auto C_Invoice_BT_Subc_To_Agency::CreateBTObj(string bt_id) -> C_BT_To_Print
 
 										// --- override agency roles with SoW-specific roles
 										{
-											auto	temp_role = ""s;
+											auto	temp1 = ""s;
+											auto	temp2 = ""s;
 
-											temp_role = GetValueFromDB("SELECT `value` FROM `contract_sow_custom_fields` WHERE `contract_sow_id`=" + quoted(obj.GetAgreementNumber()) + " AND `var_name`=\"subc2agency_bt_role1\";", db);
-											if(temp_role.length()) obj.SetSignRole1(temp_role);
+											temp1 = GetValueFromDB("SELECT `value` FROM `contract_sow_custom_fields` WHERE `contract_sow_id`=" + quoted(sow_id) + " AND `var_name`=\"subc2agency_bt_position1\";", db);
+											temp2 = GetValueFromDB("SELECT `value` FROM `contract_sow_custom_fields` WHERE `contract_sow_id`=" + quoted(sow_id) + " AND `var_name`=\"subc2agency_bt_signature1\";", db);
+											if(temp1.length() + temp2.length())
+											{
+												obj.SetPosition1(temp1);
+												obj.SetInitials1(temp2);
+											}
 
-											temp_role = GetValueFromDB("SELECT `value` FROM `contract_sow_custom_fields` WHERE `contract_sow_id`=" + quoted(obj.GetAgreementNumber()) + " AND `var_name`=\"subc2agency_bt_role2\";", db);
-											if(temp_role.length()) obj.SetSignRole2(temp_role);
+											temp1 = GetValueFromDB("SELECT `value` FROM `contract_sow_custom_fields` WHERE `contract_sow_id`=" + quoted(sow_id) + " AND `var_name`=\"subc2agency_bt_position2\";", db);
+											temp2 = GetValueFromDB("SELECT `value` FROM `contract_sow_custom_fields` WHERE `contract_sow_id`=" + quoted(sow_id) + " AND `var_name`=\"subc2agency_bt_signature2\";", db);
+											if(temp1.length() + temp2.length())
+											{
+												obj.SetPosition2(temp1);
+												obj.SetInitials2(temp2);
+											}
 										}
 
 										{

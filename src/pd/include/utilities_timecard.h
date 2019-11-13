@@ -158,6 +158,7 @@ auto			isTimecardsHavePSOWAssigned(const vector<string> &timecard_list, string c
 auto			isTimecardsBelongToAgency(const vector<string> &timecard_list, string agency_id, CMysql *, CUser *) -> string;
 auto			isBTsHavePSOWAssigned(const vector<string> &timecard_list, string cost_center_id, CMysql *, CUser *) -> string;
 auto			isBTsBelongToAgency(const vector<string> &timecard_list, string agency_id, CMysql *, CUser *) -> string;
+auto			isSubcontractorAllowedToChangeSoW(string sow_id, CMysql *, CUser *) -> string;
 auto			isAgencyEmployeeAllowedToChangeSoW(string sow_id, CMysql *, CUser *) -> string;
 auto			isAgencyEmployeeAllowedToChangePSoW(string sow_id, CMysql *, CUser *) -> string;
 auto			isAgencyEmployeeAllowedToChangeAgencyData(CMysql *, CUser *) -> string;
