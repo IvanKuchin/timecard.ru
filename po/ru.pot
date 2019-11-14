@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-09 22:54-0500\n"
+"POT-Creation-Date: 2019-11-14 16:39-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -730,7 +730,7 @@ msgid "employeer not found"
 msgstr "не найден работодатель"
 
 msgid "empty vars list"
-msgstr "список не заданных переменных: "
+msgstr "список не заданных переменных"
 
 msgid "end date"
 msgstr "дата окончания"
@@ -821,6 +821,9 @@ msgstr "hpdf: не удалось нарисовать основную част
 
 msgid "hpdf: fail to draw timecard table header"
 msgstr "hpdf: не удалось нарисовать заголовок таймкарты"
+
+msgid "hpdf: fail to print table"
+msgstr "hpdf: не удалось отобразить таблицу"
 
 msgid "hpdf: fail to print text"
 msgstr "hpdf: не удалось напечатать текст"
@@ -938,6 +941,9 @@ msgstr "не найдена командировка"
 
 msgid "no excise"
 msgstr "без акциза"
+
+msgid "no phone entered"
+msgstr "телефон не указан"
 
 msgid "no timecard found"
 msgstr "не найдена таймкарта"

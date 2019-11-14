@@ -44,10 +44,15 @@ auto	C_Template2PDF_Printer::RenderTemplate() -> string
 			MESSAGE_ERROR("", "", error_message);
 		}
 
-		if((error_message = SaveTemporaryFile()).length())
+		if(error_message.empty())
 		{
-			MESSAGE_ERROR("", "", "fail to save file ");
+			if((error_message = SaveTemporaryFile()).length()) { MESSAGE_ERROR("", "", "fail to save file "); }
 		}
+		else
+		{
+			MESSAGE_ERROR("", "", "fail to save tempfile due to prev errors");
+		}
+
 	}
 	else
 	{

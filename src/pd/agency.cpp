@@ -5424,94 +5424,77 @@ int main(void)
 
 		if(action == "AJAX_generateSoWAgreementDocuments")
 		{
-			ostringstream	ostResult;
-
 			MESSAGE_DEBUG("", action, "start");
 
-			ostResult.str("");
+			auto	template_name	= "json_response.htmlt"s;
+			auto	error_message	= ""s;
+			auto	success_message	= ""s;
+
+			auto	sow_id			= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("sow_id"));
+
+			if(sow_id.length())
 			{
-				auto	template_name	= "json_response.htmlt"s;
-				auto	error_message	= ""s;
-				auto	success_message	= ""s;
-
-				auto	sow_id			= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("sow_id"));
-
-				if(sow_id.length())
+				error_message = isAgencyEmployeeAllowedToChangeSoW(sow_id, &db, &user);
+				if(error_message.empty())
 				{
-					error_message = isAgencyEmployeeAllowedToChangeSoW(sow_id, &db, &user);
-					if(error_message.empty())
+					auto	agency_id = GetAgencyID(&user, &db);
+					if(agency_id.length())
 					{
-						auto	agency_id = GetAgencyID(&user, &db);
-						if(agency_id.length())
+						if(db.Query("SELECT `status` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";"))	
 						{
-							if(db.Query("SELECT `status` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";"))	
+							if(db.Get(0, 0) == "negotiating")
 							{
-								if(db.Get(0, 0) == "negotiating")
+								C_Agreements_SoW_Factory	agreements(&db, &user);
+
+								agreements.SetSoWID(sow_id);
+
+								if((error_message = agreements.GenerateDocumentArchive()).empty())
 								{
-									C_Agreements_SoW_Factory	agreements(&db, &user);
+									success_message = "\"filename\":\"" + agreements.GetShortFilename() + "\"";
 
-									agreements.SetSoWID(sow_id);
-
-									if((error_message = agreements.GenerateDocumentArchive()).empty())
 									{
-										success_message = ",\"filename\":\"" + agreements.GetShortFilename() + "\"";
+										auto	temp_error_message = NotifySoWContractPartiesAboutChanges(to_string(NOTIFICATION_AGENGY_GENERATED_AGREEMENTS), sow_id, &db, &user);
 
-										{
-											auto	temp_error_message = NotifySoWContractPartiesAboutChanges(to_string(NOTIFICATION_AGENGY_GENERATED_AGREEMENTS), sow_id, &db, &user);
-
-											if(temp_error_message.length()) MESSAGE_ERROR("", action, temp_error_message);
-										}
-
+										if(temp_error_message.length()) MESSAGE_ERROR("", action, temp_error_message);
 									}
-									else
-									{
-										MESSAGE_ERROR("", action, error_message);
-									}
+
 								}
 								else
 								{
-									error_message = gettext("Agreement already signed");
-									MESSAGE_ERROR("", action, error_message + ". Workflow should not be here.");
+									MESSAGE_ERROR("", action, error_message);
 								}
 							}
 							else
 							{
-								error_message = gettext("SQL syntax issue");
+								error_message = gettext("Agreement already signed");
 								MESSAGE_ERROR("", action, error_message + ". Workflow should not be here.");
 							}
-
 						}
 						else
 						{
-							error_message = "Агенство не найдено";
-							MESSAGE_ERROR("", action, "agency.id not found by user.id(" + user.GetID() + ") employment");
+							error_message = gettext("SQL syntax issue");
+							MESSAGE_ERROR("", action, error_message + ". Workflow should not be here.");
 						}
+
 					}
 					else
 					{
-						MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") doesn't allowed to change agency data");
+						error_message = "Агенство не найдено";
+						MESSAGE_ERROR("", action, "agency.id not found by user.id(" + user.GetID() + ") employment");
 					}
 				}
 				else
 				{
-					error_message = gettext("parameters incorrect");
-					MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") didn't set new_value");
+					MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") doesn't allowed to change agency data");
 				}
-
-				if(error_message.empty())
-				{
-					ostResult << "{\"result\":\"success\"" + success_message + "}";
-				}
-				else
-				{
-					MESSAGE_DEBUG("", action, "failed");
-					ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
-				}
-
-				indexPage.RegisterVariableForce("result", ostResult.str());
-
-				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 			}
+			else
+			{
+				error_message = gettext("parameters incorrect");
+				MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") didn't set new_value");
+			}
+
+			AJAX_ResponseTemplate(&indexPage, success_message, error_message);
 
 			MESSAGE_DEBUG("", action, "finish");
 		}

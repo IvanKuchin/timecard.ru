@@ -1008,7 +1008,7 @@ auto	C_Invoicing_Vars::Subcontractor_Index_VarSet(string subcontractor_company_i
 				if(affected)
 				{
 					if(error_message.empty()) error_message = AssignVariableValue("subcontractor_email_" + index, db->Get(0, "email"), true);
-					if(error_message.empty()) error_message = AssignVariableValue("subcontractor_phone_" + index, db->Get(0, "is_phone_confirmed") == "Y" ? "+" + db->Get(0, "country_code") + db->Get(0, "phone") : "", true);
+					if(error_message.empty()) error_message = AssignVariableValue("subcontractor_phone_" + index, db->Get(0, "is_phone_confirmed") == "Y" ? "+" + db->Get(0, "country_code") + db->Get(0, "phone") : "("s + gettext("no phone entered") + ")", true);
 				}
 				else
 				{
