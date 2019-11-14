@@ -5854,7 +5854,7 @@ bool GeneralNotifySoWContractPartiesAboutChanges(string action, string id, strin
 						// --- for example SELECT NOW()=CURDATE() gives false, 
 						// --- reason behind is SELECT "YYYY-MM-DD HH:MM:SS" NOT equal "YYYY-MM-DD" due to type inconsistency
 						// --- in comparison opertions "datetime" can't be compared to "date"
-						agency_list_sql_query = "SELECT DISTINCT `agency_company_id` FROM `contracts_sow` WHERE `id` IN (" + join(sow_list) + ") AND `start_date`<=CURDATE() AND `end_date`>=CURDATE();";
+						agency_list_sql_query = "SELECT DISTINCT `agency_company_id` FROM `contracts_sow` WHERE `id` IN (" + join(sow_list) + ") AND (`start_date`<=CURDATE()) AND (CURDATE()<=`end_date`);";
 					}
 					else
 					{
