@@ -2884,3 +2884,218 @@ auto	GetValuesFromDB(string sql, CMysql *db) -> vector<string>
 	return result;
 }
 
+static bool CheckImageFileInTempFolder(string src, string dst, string f_type)
+{
+	bool		result = false;
+
+	MESSAGE_DEBUG("", "", "start (src: " + src + ", dst: " + dst + ")");
+
+#ifndef IMAGEMAGICK_DISABLE
+	// Construct the image object. Seperating image construction from the
+	// the read operation ensures that a failure to read the image file
+	// doesn't render the image object useless.
+	try {
+		Magick::Image		   image;
+		Magick::OrientationType imageOrientation;
+		Magick::Geometry		imageGeometry;
+
+		// Read a file into image object
+		image.read( src );
+
+		imageGeometry = image.size();
+		imageOrientation = image.orientation();
+
+		MESSAGE_DEBUG("", "", "imageOrientation = " + to_string(imageOrientation) + ", xRes = " + to_string(imageGeometry.width()) + ", yRes = " + to_string(imageGeometry.height()))
+
+		if(imageOrientation == Magick::TopRightOrientation) image.flop();
+		if(imageOrientation == Magick::BottomRightOrientation) image.rotate(180);
+		if(imageOrientation == Magick::BottomLeftOrientation) { image.flop(); image.rotate(180); }
+		if(imageOrientation == Magick::LeftTopOrientation) { image.flop(); image.rotate(-90); }
+		if(imageOrientation == Magick::RightTopOrientation) image.rotate(90);
+		if(imageOrientation == Magick::RightBottomOrientation) { image.flop(); image.rotate(90); }
+		if(imageOrientation == Magick::LeftBottomOrientation) image.rotate(-90);
+
+		if((imageGeometry.width() > GetSpecificData_GetMaxWidth(f_type)) || (imageGeometry.height() > GetSpecificData_GetMaxHeight(f_type)))
+		{
+			int   newHeight, newWidth;
+			if(imageGeometry.width() >= imageGeometry.height())
+			{
+				newWidth = GetSpecificData_GetMaxWidth(f_type);
+				newHeight = newWidth * imageGeometry.height() / imageGeometry.width();
+			}
+			else
+			{
+				newHeight = GetSpecificData_GetMaxHeight(f_type);
+				newWidth = newHeight * imageGeometry.width() / imageGeometry.height();
+			}
+
+			image.resize(Magick::Geometry(newWidth, newHeight, 0, 0));
+		}
+
+		// --- strip EXIF info
+		image.strip();
+
+		// Write the image to a file
+		image.write( dst );
+		result = true;
+	}
+	catch( Magick::Exception &error_ )
+	{
+		MESSAGE_DEBUG("", "", "ImageMagick read/write trown exception [" + error_.what() + "]");
+	}
+#else
+
+	MESSAGE_DEBUG("", "", "simple file coping, because ImageMagick++ is not activated");
+
+	CopyFile(src, dst);
+	result = true;
+
+#endif
+
+	MESSAGE_DEBUG("", "", "finish (result = " + to_string(result) + ")");
+
+	return result;
+}
+
+static string SaveOrCheckFileFromHandler(string f_name, string f_type, CFiles *files, string file_extension, bool is_check_only)
+{
+	MESSAGE_DEBUG("", "", "start (f_name = " + f_name + ", f_type = " + f_type + ", check_only = " + to_string(is_check_only) + ")");
+
+	auto		result = ""s;
+	auto		error_message = ""s;
+	auto		finalFilename = ""s;
+	auto		originalFilename = ""s;
+	auto		preFinalFilename = ""s;
+	auto		fileName = ""s;
+	auto		fileExtention = ""s;
+	auto		filePrefix = ""s;
+	auto		folderID = 0;
+	
+	if(f_name.length())
+	{
+		if(f_type.length())
+		{
+			if(files->GetSize(f_name) && (files->GetSize(f_name) <= GetSpecificData_GetMaxFileSize(f_type)))
+			{
+				FILE	*f;
+
+				//--- check logo file existing
+				do
+				{
+					std::size_t  	foundPos;
+
+					folderID = (int)(rand()/(RAND_MAX + 1.0) * GetSpecificData_GetNumberOfFolders(f_type)) + 1;
+					filePrefix = GetRandom(20);
+
+					if((foundPos = f_name.rfind(".")) != string::npos) 
+						fileExtention = f_name.substr(foundPos, f_name.length() - foundPos);
+					else
+					{
+						MESSAGE_ERROR("", "", "fileExtension MUST be predefined, if workflow gets here then filename doesn't contains extension which is wrong. Require to check subcontractor.cpp:AJAX_sumitBT part");
+						fileExtention = ".jpg";
+					}
+
+					originalFilename = "/tmp/tmp_" + filePrefix + fileExtention;
+					preFinalFilename = "/tmp/" + filePrefix + fileExtention;
+					finalFilename = GetSpecificData_GetBaseDirectory(f_type) + "/" + to_string(folderID) + "/" + filePrefix + fileExtention;
+				} while(isFileExists(finalFilename) || isFileExists(originalFilename) || isFileExists(preFinalFilename));
+
+				MESSAGE_DEBUG("", "", "Save file to /tmp for checking of image validity [" + originalFilename + "]");
+
+				// --- Save file to "/tmp/" for checking of image validity
+				f = fopen(originalFilename.c_str(), "w");
+				if(f)
+				{
+					fwrite(files->Get(f_name), files->GetSize(f_name), 1, f);
+					fclose(f);
+
+					if(file_extension == ".jpg")
+					{
+						if(CheckImageFileInTempFolder(originalFilename, preFinalFilename, f_type)) {}
+						else
+						{
+							error_message = gettext("incorrect image file") + ", "s + gettext("try to upload as pdf");
+							MESSAGE_ERROR("", "", error_message + " (" + f_name + ") ");
+						}
+					}
+					else if(file_extension == ".pdf")
+					{
+						CopyFile(originalFilename, preFinalFilename);
+					}
+					else
+					{
+						error_message = gettext("unknown file type");
+						MESSAGE_ERROR("", "", error_message);
+					}
+				}
+				else
+				{
+					error_message = "fail writing to temp file " + originalFilename;
+					MESSAGE_ERROR("", "", error_message);
+				}
+			}
+			else
+			{
+				error_message = f_name + " size(" + to_string(GetSpecificData_GetMaxFileSize(f_type)) + ") is beyond the limit (1, " + to_string(GetSpecificData_GetMaxFileSize(f_type)) + ")";
+				MESSAGE_ERROR("", "", error_message);
+			}
+		}
+		else
+		{
+			error_message = "f_type is empty";
+			MESSAGE_ERROR("", "", error_message);
+		}
+	}
+	else
+	{
+		error_message = "f_name is empty";
+		MESSAGE_ERROR("", "", error_message);
+	}
+
+	if(is_check_only)
+	{
+		if(preFinalFilename.length()) unlink(preFinalFilename.c_str());
+
+		if(error_message.empty())
+		{
+			unlink(originalFilename.c_str());
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "keep file copy that failed sanity check (" + originalFilename + ")")
+			result = error_message;
+		}
+	}
+	else
+	{
+		// --- copy checked file from temp folder to final place 
+		if(error_message.empty())
+		{
+			unlink(originalFilename.c_str());
+
+			CopyFile(preFinalFilename, finalFilename);
+
+			unlink(preFinalFilename.c_str());
+
+			result = to_string(folderID) + "/" + filePrefix + fileExtention;
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "file(" + originalFilename + ") neither image, nor pdf");
+		}
+	}
+
+	MESSAGE_DEBUG("", "", "finish (result = " + result + ")");
+
+	return result;
+}
+
+string	CheckFileFromHandler(string f_name, string f_type, CFiles *files, string file_extension) // --- f_type required to check file size specific to file type
+{
+	return(SaveOrCheckFileFromHandler(f_name, f_type, files, file_extension, true));
+}
+
+string	SaveFileFromHandler(string f_name, string f_type, CFiles *files, string file_extension)
+{
+	return(SaveOrCheckFileFromHandler(f_name, f_type, files, file_extension, false));
+}

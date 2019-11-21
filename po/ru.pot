@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-14 16:39-0500\n"
+"POT-Creation-Date: 2019-11-20 17:58-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -855,6 +855,9 @@ msgstr "в рамках"
 msgid "incorrect confirmation code"
 msgstr "некорректный код"
 
+msgid "incorrect image file"
+msgstr "некорректный формат изображения"
+
 msgid "invoice_table_header"
 msgstr "Товары (работы, услуги)"
 
@@ -1122,6 +1125,9 @@ msgstr "на сумму"
 msgid "trip_id failure"
 msgstr "идентификатор поездки не найден"
 
+msgid "try to upload as pdf"
+msgstr "попробуйте преобразовать в PDF"
+
 msgid "type is empty"
 msgstr "не указан тип"
 
@@ -1130,6 +1136,9 @@ msgstr "тип не указан"
 
 msgid "unable to create psow"
 msgstr "не удалось создать PSoW"
+
+msgid "unknown file type"
+msgstr "допустимый формат фаилов либо JPG, либо PDF"
 
 msgid "unknown invoice"
 msgstr "Неизвестный счет"

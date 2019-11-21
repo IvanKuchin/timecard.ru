@@ -271,7 +271,7 @@ auto 		LogoutIfGuest(string action, CCgi *indexPage, CMysql *db, CUser *user) ->
 
 }
 
-auto AJAX_ResponseTemplate(CCgi *indexPage, const string &success_message, const string &error_message) -> string
+/*auto AJAX_ResponseTemplate(CCgi *indexPage, const string &success_message, const string &error_message) -> string
 {
 	MESSAGE_DEBUG("", "", "start");
 
@@ -286,6 +286,51 @@ auto AJAX_ResponseTemplate(CCgi *indexPage, const string &success_message, const
 	{
 		MESSAGE_DEBUG("", "", error_message);
 		result = "{\"result\":\"error\",\"description\":\"" + RemoveQuotas(error_message) + "\"}";
+	}
+
+	indexPage->RegisterVariableForce("result", result);
+
+	if(!indexPage->SetTemplate(template_name))
+	{
+		MESSAGE_DEBUG("", "", "can't find template " + template_name);
+	}
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return ""s;
+}
+*/
+auto AJAX_ResponseTemplate(CCgi *indexPage, const string &success_message, const string &error_message) -> string
+{
+	vector<pair<string, string>> error_messages;
+
+	if(error_message.length()) error_messages.push_back(make_pair("description", error_message));
+
+	return AJAX_ResponseTemplate(indexPage, success_message, error_messages);
+}
+
+auto AJAX_ResponseTemplate(CCgi *indexPage, const string &success_message, const vector<pair<string, string>> &error_messages) -> string
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	template_name = "json_response.htmlt"s;
+	auto	result = ""s;
+
+	if(error_messages.size())
+	{
+		auto	error_message = ""s;
+
+		for(const auto &temp: error_messages)
+		{
+			error_message += ",\"" + RemoveQuotas(temp.first) + "\":\"" + RemoveQuotas(temp.second) + "\"";
+		}
+
+		MESSAGE_DEBUG("", "", error_message);
+		result = "{\"result\":\"error\"" + error_message + "}";
+	}
+	else
+	{
+		result = "{\"result\":\"success\"" + (success_message.length() ? "," + success_message : "") + "}";
 	}
 
 	indexPage->RegisterVariableForce("result", result);

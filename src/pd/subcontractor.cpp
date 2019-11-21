@@ -1241,177 +1241,254 @@ int main()
 
 	if(action == "AJAX_submitBT")
 	{
-		string			strPageToGet, strFriendsOnSinglePage;
-		ostringstream	ostResult;
-
 		MESSAGE_DEBUG("", action, "start");
 
-		ostResult.str("");
-/*		if(user.GetLogin() == "Guest")
+		auto					template_name = "json_response.htmlt"s;
+		auto					success_message = ""s;
+		vector<pair<string, string>>	error_messages;
+		CVars					*http_params = indexPage.GetVarsHandler();
+		regex					regex1("expense_item_random_");
+		regex					regex2("expense_item_doc_random_");
+		C_BT					bt;
+		vector<C_Expense>		expenses;
+		vector<string>			expense_randoms;
+		vector<string>			expense_line_randoms;
+
+		// --- build HTTP-param arrays
 		{
-			MESSAGE_DEBUG("", action, "re-login required");
-
-			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
-		}
-		else
-*/		{
-			string					template_name = "json_response.htmlt";
-			string					error_message = "";
-			CVars					*http_params = indexPage.GetVarsHandler();
-			string					expense_random_name;
-			string					expense_line_random_name;
-			regex					regex1("expense_item_random_");
-			regex					regex2("expense_item_doc_random_");
-			C_BT					bt;
-			vector<C_Expense>		expenses;
-
-			bt.SetDB			(&db);
-			bt.SetUser			(&user);
-			bt.SetID			(CheckHTTPParam_Number	(http_params->Get("bt_id")));
-			bt.SetSowID			(CheckHTTPParam_Number	(http_params->Get("sow_id")));
-			bt.SetCustomerID	(CheckHTTPParam_Number	(http_params->Get("customer_id")));
-			bt.SetDestination	(CheckHTTPParam_Text	(http_params->Get("destination")));
-			bt.SetPurpose		(CheckHTTPParam_Text	(http_params->Get("bt_purpose")));
-			bt.SetStartDate		(CheckHTTPParam_Date	(http_params->Get("bt_start_date")));
-			bt.SetEndDate		(CheckHTTPParam_Date	(http_params->Get("bt_end_date")));
-			bt.SetAction		(CheckHTTPParam_Text	(http_params->Get("action_type")));
-	
-			expense_random_name = http_params->GetNameByRegex(regex1);
-			while(expense_random_name.length() && error_message.empty())
+			auto	http_param_name = http_params->GetNameByRegex(regex1);
+			while(http_param_name.length())
 			{
-				string expense_random = CheckHTTPParam_Number(http_params->Get(expense_random_name));
+				expense_randoms.push_back(http_params->Get(http_param_name));
 
-				if(expense_random.length())
-				{
-					C_Expense	expense;
-
-					expense.SetRandom				(expense_random);
-					expense.SetID					(CheckHTTPParam_Number	(http_params->Get("bt_expense_id_" + expense_random)));
-					expense.SetDate					(CheckHTTPParam_Date	(http_params->Get("expense_item_date_" + expense_random)));
-					expense.SetPaymentType			(CheckHTTPParam_Text	(http_params->Get("expense_item_payment_type_" + expense_random)));
-					expense.SetExpenseTemplateID	(CheckHTTPParam_Number	(http_params->Get("expense_item_type_" + expense_random)));
-					expense.SetComment				(CheckHTTPParam_Text	(http_params->Get("expense_item_comment_" + expense_random)));
-					expense.SetPriceDomestic		(CheckHTTPParam_Float	(http_params->Get("expense_item_price_domestic_" + expense_random)));
-					expense.SetPriceForeign			(CheckHTTPParam_Float	(http_params->Get("expense_item_price_foreign_" + expense_random)));
-					expense.SetCurrencyNominal		(CheckHTTPParam_Number	(http_params->Get("expense_item_currency_nominal_" + expense_random)));
-					expense.SetCurrencyName			(CheckHTTPParam_Text	(http_params->Get("expense_item_currency_name_" + expense_random)));
-					expense.SetCurrencyValue		(CheckHTTPParam_Float	(http_params->Get("expense_item_currency_value_" + expense_random)));
-
-					expenses.push_back(expense);
-					bt.AddExpense(expense);
-				}
-				else
-				{
-					error_message = "некорректный параметер random у растраты";
-					MESSAGE_ERROR("", action, "Can't convert expense_random(" + http_params->Get(expense_random_name) + ") to number")
-				}
-
-				http_params->Delete(expense_random_name);
-				expense_random_name = http_params->GetNameByRegex(regex1);
+				http_params->Delete(http_param_name);
+				http_param_name = http_params->GetNameByRegex(regex1);
 			}
 
-			expense_line_random_name = http_params->GetNameByRegex(regex2);
-			while(expense_line_random_name.length() && error_message.empty())
+		}
+		{
+			auto	http_param_name = http_params->GetNameByRegex(regex2);
+			while(http_param_name.length())
 			{
-				string expense_line_random = CheckHTTPParam_Number(http_params->Get(expense_line_random_name));
+				expense_line_randoms.push_back(http_params->Get(http_param_name));
 
-				if(expense_line_random.length())
+				http_params->Delete(http_param_name);
+				http_param_name = http_params->GetNameByRegex(regex2);
+			}
+		}
+
+		// --- craft BT object
+		bt.SetDB				(&db);
+		bt.SetUser				(&user);
+		bt.SetID				(CheckHTTPParam_Number	(http_params->Get("bt_id")));
+		bt.SetSowID				(CheckHTTPParam_Number	(http_params->Get("sow_id")));
+		bt.SetCustomerID		(CheckHTTPParam_Number	(http_params->Get("customer_id")));
+		bt.SetDestination		(CheckHTTPParam_Text	(http_params->Get("destination")));
+		bt.SetPurpose			(CheckHTTPParam_Text	(http_params->Get("bt_purpose")));
+		bt.SetStartDate			(CheckHTTPParam_Date	(http_params->Get("bt_start_date")));
+		bt.SetEndDate			(CheckHTTPParam_Date	(http_params->Get("bt_end_date")));
+		bt.SetAction			(CheckHTTPParam_Text	(http_params->Get("action_type")));
+
+		// --- assign expense objects to BT
+		for(const auto &temp: expense_randoms)
+		{
+			auto expense_random = CheckHTTPParam_Number(temp);
+
+			if(expense_random.length())
+			{
+				C_Expense	expense;
+
+				expense.SetRandom				(expense_random);
+				expense.SetID					(CheckHTTPParam_Number	(http_params->Get("bt_expense_id_" + expense_random)));
+				expense.SetDate					(CheckHTTPParam_Date	(http_params->Get("expense_item_date_" + expense_random)));
+				expense.SetPaymentType			(CheckHTTPParam_Text	(http_params->Get("expense_item_payment_type_" + expense_random)));
+				expense.SetExpenseTemplateID	(CheckHTTPParam_Number	(http_params->Get("expense_item_type_" + expense_random)));
+				expense.SetComment				(CheckHTTPParam_Text	(http_params->Get("expense_item_comment_" + expense_random)));
+				expense.SetPriceDomestic		(CheckHTTPParam_Float	(http_params->Get("expense_item_price_domestic_" + expense_random)));
+				expense.SetPriceForeign			(CheckHTTPParam_Float	(http_params->Get("expense_item_price_foreign_" + expense_random)));
+				expense.SetCurrencyNominal		(CheckHTTPParam_Number	(http_params->Get("expense_item_currency_nominal_" + expense_random)));
+				expense.SetCurrencyName			(CheckHTTPParam_Text	(http_params->Get("expense_item_currency_name_" + expense_random)));
+				expense.SetCurrencyValue		(CheckHTTPParam_Float	(http_params->Get("expense_item_currency_value_" + expense_random)));
+
+				expenses.push_back(expense);
+				bt.AddExpense(expense);
+			}
+			else
+			{
+				error_messages.push_back(make_pair("description"s, "некорректный параметер random у растраты"s));
+				MESSAGE_ERROR("", action, "Can't convert expense_random(" + expense_random + ") to number")
+			}
+
+			if(error_messages.size()) break;
+		}
+
+
+		// --- check files send over HTTP, so that if some are not recognized as valid, rollback cleanly
+		if(error_messages.size() == 0)
+		{
+			for(const auto &expense_line_random: expense_line_randoms)
+			{
+				if(expense_line_random == CheckHTTPParam_Number(expense_line_random))
 				{
-					C_ExpenseLine	expense_line;
-					string			parent_random = 	CheckHTTPParam_Number	(http_params->Get("expense_item_parent_random_" + expense_line_random));
-
-					if(parent_random.length())
+					if(expense_line_random.length())
 					{
-						string		dom_type = 			CheckHTTPParam_Text	(http_params->Get("expense_item_doc_dom_type_" + expense_line_random));
+						auto	parent_random =	CheckHTTPParam_Number	(http_params->Get("expense_item_parent_random_" + expense_line_random));
 
-						if((dom_type == "image") || (dom_type == "input") || (dom_type == "allowance"))
+						if(parent_random.length())
 						{
-							expense_line.SetRandom					(expense_line_random);
-							expense_line.SetParentRandom			(parent_random);
-							expense_line.SetID						(CheckHTTPParam_Number	(http_params->Get("expense_line_id_" + expense_line_random)));
-							expense_line.SetExpenseLineTemplateID	(CheckHTTPParam_Number	(http_params->Get("expense_item_doc_id_" + expense_line_random)));
-							expense_line.SetComment					(CheckHTTPParam_Text	(http_params->Get("expense_item_doc_comment_" + expense_line_random)));
+							auto	dom_type = 	CheckHTTPParam_Text	(http_params->Get("expense_item_doc_dom_type_" + expense_line_random));
 
-							if(dom_type == "input")
-								expense_line.SetValue				(CheckHTTPParam_Text	(http_params->Get("expense_item_doc_main_field_" + expense_line_random)));
-							if(dom_type == "allowance")
-								expense_line.SetValue				(CheckHTTPParam_Text	(http_params->Get("expense_item_doc_main_field_" + expense_line_random)));
-							if(dom_type == "image")
+							if((dom_type == "image") || (dom_type == "input") || (dom_type == "allowance"))
 							{
-								string		path_to_file = "";
-								auto		file_size = 0;
-								auto		file_ext = ""s;
-
-								for(auto &temp: {".jpg", ".pdf"})
+								if(dom_type == "image")							
 								{
-									if((file_size = indexPage.GetFilesHandler()->GetSize("expense_item_doc_main_field_" + expense_line_random + temp)) > 0)
+									auto		file_size = 0;
+									auto		file_ext = ""s;
+
+									for(auto &temp: {".jpg", ".pdf"})
 									{
-										file_ext = temp;
-										break;
+										if((file_size = indexPage.GetFilesHandler()->GetSize("expense_item_doc_main_field_" + expense_line_random + temp)) > 0)
+										{
+											file_ext = temp;
+											break;
+										}
 									}
-								}
 
-								if(file_size > 0)
-								{
-									// --- take care of an image/pdf file
-									MESSAGE_DEBUG("", action, "expense_item_doc_main_field_" + expense_line_random + file_ext + " file size is " + to_string(file_size));
-									path_to_file = SaveFileFromHandler("expense_item_doc_main_field_" + expense_line_random + file_ext, "expense_line", indexPage.GetFilesHandler(), file_ext);
-									expense_line.SetValue(path_to_file);
-
-									if(path_to_file.length())
+									if(file_size > 0)
 									{
-										MESSAGE_DEBUG("", action, "image to expense_line(random = " + expense_line_random + ") uploaded to " + path_to_file + "");
-									}
-								}
-								else
-								{
-									MESSAGE_DEBUG("", "", "file for line item(" + expense_line_random + ") already uploaded to server");
-								}
-							}
+										// --- take care of an image/pdf file
+										MESSAGE_DEBUG("", action, "expense_item_doc_main_field_" + expense_line_random + file_ext + " file size is " + to_string(file_size));
 
-							if(bt.AssignExpenseLineByParentRandom(expense_line))
-							{
+										auto	error_message = CheckFileFromHandler("expense_item_doc_main_field_" + expense_line_random + file_ext, "expense_line", indexPage.GetFilesHandler(), file_ext);
+
+										if(error_message.empty())
+										{
+										}
+										else
+										{
+											error_messages.push_back(make_pair("description"s, error_message));
+											error_messages.push_back(make_pair("file_id"s, "expense_item_doc_main_field_" + expense_line_random));
+											MESSAGE_ERROR("", action, "file(" + "expense_item_doc_main_field_" + expense_line_random + file_ext + ") failed sanity check")
+										}
+									}
+									else
+									{
+										MESSAGE_DEBUG("", "", "file for line item(" + expense_line_random + ") already uploaded to server");
+									}
+
+								}
 							}
 							else
 							{
-								error_message = "неполучилось определить принажделжность док-та";
-								MESSAGE_ERROR("", action, "AssignExpenseLineByParentRandom fail");
+								error_messages.push_back(make_pair("description", "некорректный тип основного док-та"));
+								MESSAGE_ERROR("", action, "primary doc-t wrong type(" + dom_type + ")");
 							}
 						}
 						else
 						{
-							error_message = "некорректный тип основного док-та";
-							MESSAGE_ERROR("", action, "primary doc-t wrong type(" + dom_type + ")");
+							error_messages.push_back(make_pair("description", "невозможно определить принажделжность документа"));
+							MESSAGE_ERROR("", action, "parent expense.id missed for expense_line.rand(" + expense_line_random + ")");
 						}
 					}
 					else
 					{
-						error_message = "невозможно определить принажделжность документа";
-						MESSAGE_ERROR("", action, "parent expense.id missed for expense_line.rand(" + expense_line_random + ")");
+						error_messages.push_back(make_pair("description", "некорректный параметер random у док-та"));
+						MESSAGE_ERROR("", action, "Can't convert expense_line_random(" + expense_line_random + ") to number")
 					}
 				}
 				else
 				{
-					error_message = "некорректный параметер random у док-та";
-					MESSAGE_ERROR("", action, "Can't convert expense_line_random(" + http_params->Get(expense_random_name) + ") to number")
+					error_messages.push_back(make_pair("description", gettext("parameters incorrect")));
+					MESSAGE_ERROR("", "", "error in parsing expense_line_random(" + expense_line_random + " != " + CheckHTTPParam_Number(expense_line_random) + ")");
 				}
 
-				http_params->Delete(expense_line_random_name);
-				expense_line_random_name = http_params->GetNameByRegex(regex2);
+
+				if(error_messages.size()) break;
+			}
+		}
+
+
+		// --- save files to final folders and assign lines to expences
+		// --- NOTE: such as files save to final folders, there is no place for mistake
+		if(error_messages.size() == 0)
+		{
+			for(const auto &expense_line_random: expense_line_randoms)
+			{
+				C_ExpenseLine	expense_line;
+				auto			parent_random =	CheckHTTPParam_Number	(http_params->Get("expense_item_parent_random_" + expense_line_random));
+				auto			dom_type = 	CheckHTTPParam_Text	(http_params->Get("expense_item_doc_dom_type_" + expense_line_random));
+
+				expense_line.SetRandom					(expense_line_random);
+				expense_line.SetParentRandom			(parent_random);
+				expense_line.SetID						(CheckHTTPParam_Number	(http_params->Get("expense_line_id_" + expense_line_random)));
+				expense_line.SetExpenseLineTemplateID	(CheckHTTPParam_Number	(http_params->Get("expense_item_doc_id_" + expense_line_random)));
+				expense_line.SetComment					(CheckHTTPParam_Text	(http_params->Get("expense_item_doc_comment_" + expense_line_random)));
+
+				if(dom_type == "input")
+					expense_line.SetValue				(CheckHTTPParam_Text	(http_params->Get("expense_item_doc_main_field_" + expense_line_random)));
+				if(dom_type == "allowance")
+					expense_line.SetValue				(CheckHTTPParam_Text	(http_params->Get("expense_item_doc_main_field_" + expense_line_random)));
+				if(dom_type == "image")
+				{
+					string		path_to_file = "";
+					auto		file_size = 0;
+					auto		file_ext = ""s;
+
+					for(auto &temp: {".jpg", ".pdf"})
+					{
+						if((file_size = indexPage.GetFilesHandler()->GetSize("expense_item_doc_main_field_" + expense_line_random + temp)) > 0)
+						{
+							file_ext = temp;
+							break;
+						}
+					}
+
+					if(file_size > 0)
+					{
+						// --- take care of an image/pdf file
+						MESSAGE_DEBUG("", action, "expense_item_doc_main_field_" + expense_line_random + file_ext + " file size is " + to_string(file_size));
+						path_to_file = SaveFileFromHandler("expense_item_doc_main_field_" + expense_line_random + file_ext, "expense_line", indexPage.GetFilesHandler(), file_ext);
+						expense_line.SetValue(path_to_file);
+
+						if(path_to_file.length())
+						{
+							MESSAGE_DEBUG("", action, "image to expense_line(random = " + expense_line_random + ") uploaded to " + path_to_file + "");
+						}
+					}
+					else
+					{
+						MESSAGE_DEBUG("", "", "file for line item(" + expense_line_random + ") already uploaded to server");
+					}
+				}
+
+				if(bt.AssignExpenseLineByParentRandom(expense_line))
+				{
+				}
+				else
+				{
+					error_messages.push_back(make_pair("description", "невозможно определить принажделжность документа"));
+					MESSAGE_ERROR("", action, "AssignExpenseLineByParentRandom fail");
+				}
+
+				if(error_messages.size()) break;
 			}
 
-			if(error_message.empty())
+			if(error_messages.size() == 0)
 			{
-				error_message = bt.CheckValidity();
+				auto	error_message = bt.CheckValidity();
 				if(error_message.empty())
 				{
 					// --- update DB
 					error_message = bt.SaveToDB();
-					if(error_message.length()) MESSAGE_ERROR("", action, "fail saving BT to DB");
-					
+					if(error_message.length())
+					{
+						error_messages.push_back(make_pair("description", error_message));
+						MESSAGE_ERROR("", action, "fail saving BT to DB");
+					}
 				}
 				else
 				{
+					error_messages.push_back(make_pair("description", error_message));
 					MESSAGE_DEBUG("", action, "BT validity chack failed");
 				}
 			}
@@ -1424,7 +1501,9 @@ int main()
 				MESSAGE_DEBUG("", action, "C_BT obj dump: " + ost.str());
 			}
 
-			if(error_message.empty())
+		}
+
+/*			if(error_messages.size())
 			{
 				ostResult << "{\"status\":\"success\"}";
 			}
@@ -1449,11 +1528,11 @@ int main()
 			{
 				MESSAGE_ERROR("", action, "can't find template " + template_name);
 			}
-		}
+*/
 
-		{
-			MESSAGE_DEBUG("", action, "finish");
-		}
+		AJAX_ResponseTemplate(&indexPage, success_message, error_messages);
+
+		MESSAGE_DEBUG("", action, "finish");
 	}
 
 	if(action == "AJAX_removeExpense")

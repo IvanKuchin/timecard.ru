@@ -209,6 +209,7 @@ auto 			GetSpecificData_GetDBCoverPhotoFolderString(string itemType) -> string;
 auto 			GetSpecificData_GetDBCoverPhotoFilenameString(string itemType) -> string;
 auto 			GetSpecificData_GetDataTypeByItemType(const string &itemType) -> string;
 auto 			GetSpecificData_AllowedToChange(string itemID, string itemType, CMysql *, CUser *) -> bool;
+auto			CheckFileFromHandler(string f_name, string f_type, CFiles *files, string file_extension) -> string;
 auto			SaveFileFromHandler(string f_name, string f_type, CFiles *files, string file_extension) -> string;
 auto 			isCBCurrencyRate(string date, string currency_name, string currency_nominal, string currency_value, CMysql *) -> string;
 auto			DateInPast(string date_to_check) -> bool;

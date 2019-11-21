@@ -502,7 +502,7 @@ int main()
 
 		ExpireOldContracts(&db);
 
-		//--- update currency rate exchange
+		//--- notify about approvals require your attention
 		NotifyAboutPendingApprovals_Timecard(&db);
 		NotifyAboutPendingApprovals_BT(&db);
 
