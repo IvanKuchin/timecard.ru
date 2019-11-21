@@ -401,13 +401,16 @@ int main()
 
 										if(sessidPersistence == sessidHTTP)
 										{
-											// --- you can get here in case Safari iPhone cache problem
-											// --- 1) session expired on server before triggering /news_feed
-											// --- 2) redirect to /autologin
-											// --- 3) /autologin use completely different sessid (WRONG behavior)
-											// --- 4) /checkSessionPersistense have sessidHTTP == sessidPersistence
+											// --- you can get here in case browser cached entry page
+											// --- Reproduce step:
+											// --- 1) clear session and close browser
+											// --- 2) open browser and go to URL domain.com/some_url_inside_web_site?random=123
+											// ---    web-site will create new session and return "autologin" page from index.cgi (web-site wants to recover your session)
+											// --- 3) once you'll see landing page - close current browser tab
+											// --- 4) re-open exactly same URL from step(2)
+											// ---    browser will not send request to the server, it will provide cached page/autologin from step(2), even though it is not needed anymore (session been created on previous  steps)
 											// --- 5) you are here ! No need to remove session from DB
-											MESSAGE_ERROR("", action, "App sessid == cookie sessid. Normal call flow should not send you to autologin. Probably you get here trying to close another tab (check timestamp when HTTP_REFERER: " + (getenv("HTTP_REFERER") ? getenv("HTTP_REFERER") : "") + " was requested from the server)");
+											MESSAGE_DEBUG("", action, "App sessid == cookie sessid. This workflow may be utilized if entry page was requested twice in short amount of time");
 										}
 										else
 										{
