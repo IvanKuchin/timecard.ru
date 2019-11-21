@@ -109,10 +109,12 @@ class CCgi
 		string	GetCookie(string name);
 
 		//add cookie to set in HTTP-Response
-		void	AddCookie(string cn, string cv, string ce = "", string cp = "", string cd = "", string cs = "");
-		void	AddCookie(string cn, string cv, string ce = "", int cma = 0, string cp = "", string cd = "", string cs = "");
+		void	AddCookie(string cn, string cv, struct tm *ce = nullptr, string cp = "", string cd = "", string cs = "");
+		void	AddCookie(string cn, string cv, int shift_in_seconds_from_now, string cp = "", string cd = "", string cs = "");
+		// void	AddCookie(string cn, string cv, string ce = "", string cp = "", string cd = "", string cs = "");
+		// void	AddCookie(string cn, string cv, string ce = "", int cma = 0, string cp = "", string cd = "", string cs = "");
 		bool	CookieUpdateTS(string name, int deltaTimeStamp);
-		void	ModifyCookie(string cn, string cv, string cma = "", string cp = "", string cd = "", string cs = "");
+		// void	ModifyCookie(string cn, string cv, string cma = "", string cp = "", string cd = "", string cs = "");
 		void	DeleteCookie(string cn, string cd = "", string cp = "/", string cs = "");
 
 		//return environment variable HTTP_HOST

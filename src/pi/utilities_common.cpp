@@ -271,35 +271,6 @@ auto 		LogoutIfGuest(string action, CCgi *indexPage, CMysql *db, CUser *user) ->
 
 }
 
-/*auto AJAX_ResponseTemplate(CCgi *indexPage, const string &success_message, const string &error_message) -> string
-{
-	MESSAGE_DEBUG("", "", "start");
-
-	auto	template_name = "json_response.htmlt"s;
-	auto	result = ""s;
-
-	if(error_message.empty())
-	{
-		result = "{\"result\":\"success\"" + (success_message.length() ? "," + success_message : "") + "}";
-	}
-	else
-	{
-		MESSAGE_DEBUG("", "", error_message);
-		result = "{\"result\":\"error\",\"description\":\"" + RemoveQuotas(error_message) + "\"}";
-	}
-
-	indexPage->RegisterVariableForce("result", result);
-
-	if(!indexPage->SetTemplate(template_name))
-	{
-		MESSAGE_DEBUG("", "", "can't find template " + template_name);
-	}
-
-	MESSAGE_DEBUG("", "", "finish");
-
-	return ""s;
-}
-*/
 auto AJAX_ResponseTemplate(CCgi *indexPage, const string &success_message, const string &error_message) -> string
 {
 	vector<pair<string, string>> error_messages;

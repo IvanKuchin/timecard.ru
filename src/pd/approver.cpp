@@ -22,7 +22,7 @@ int main()
 	{
 
 	indexPage.ParseURL();
-	indexPage.AddCookie("lng", "ru", "", "", "/");
+	indexPage.AddCookie("lng", "ru", nullptr, "", "/");
 
 	if(!indexPage.SetTemplate("index.htmlt"))
 	{

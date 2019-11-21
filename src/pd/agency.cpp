@@ -23,7 +23,7 @@ int main(void)
 	{
 
 		indexPage.ParseURL();
-		indexPage.AddCookie("lng", "ru", "", "", "/");
+		indexPage.AddCookie("lng", "ru", nullptr, "", "/");
 
 		if(!indexPage.SetTemplate("index.htmlt"))
 		{
@@ -1077,12 +1077,12 @@ int main(void)
 								")";
 
 				success_message = 
-								"\"number_of_payment_pending_timecards\":" + GetNumberOfTimecardsInPaymentPendingState(sow_sql, &db, &user) + ","
-								"\"timecard_late_payment\":" + quoted(to_string(areThereTimecardsWithExpiredPayment("1", sow_sql, &db, &user))) + ","
-								"\"timecard_payment_will_be_late_soon\":" + quoted(to_string(areThereTimecardsWithExpiredPayment("1/2", sow_sql, &db, &user))) + ","
-								"\"number_of_payment_pending_bt\":" + GetNumberOfBTInPaymentPendingState(sow_sql, &db, &user) + ","
-								"\"bt_late_payment\":" + quoted(to_string(areThereBTWithExpiredPayment("1", sow_sql, &db, &user))) + ","
-								"\"bt_payment_will_be_late_soon\":" + quoted(to_string(areThereBTWithExpiredPayment("1/2", sow_sql, &db, &user))) + ""
+								"\"number_of_payment_pending_timecards\":"	+ GetNumberOfTimecardsInPaymentPendingState(sow_sql, &db, &user) + ","
+								"\"timecard_late_payment\":["				+ join(GetTimecardsWithExpiredPayment("1", sow_sql, &db, &user)) + "],"
+								"\"timecard_payment_will_be_late_soon\":["	+ join(GetTimecardsWithExpiredPayment("1/2", sow_sql, &db, &user)) + "],"
+								"\"number_of_payment_pending_bt\":"			+ GetNumberOfBTInPaymentPendingState(sow_sql, &db, &user) + ","
+								"\"bt_late_payment\":["						+ join(GetBTWithExpiredPayment("1", sow_sql, &db, &user)) + "],"
+								"\"bt_payment_will_be_late_soon\":["		+ join(GetBTWithExpiredPayment("1/2", sow_sql, &db, &user)) + "]"
 							;
 			}
 			else

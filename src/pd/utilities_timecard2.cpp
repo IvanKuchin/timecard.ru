@@ -2665,13 +2665,13 @@ string GetNumberOfTimecardsInPendingState(CMysql *db, CUser *user)
 }
 */
 
-string GetNumberOfTimecardsInPaymentPendingState(string sow_sql, CMysql *db, CUser *user)
+static auto __Get_NumberOfTimecardsORBT_InPaymentPendingState(string entity_type, string sow_sql, CMysql *db, CUser *user)
 {
 	MESSAGE_DEBUG("", "", "start");
 
 	auto	pending_items = "0"s;
 
-	if(db->Query("SELECT COUNT(*) FROM `timecards` WHERE "
+	if(db->Query("SELECT COUNT(*) FROM `" + entity_type + "` WHERE "
 													"`payed_date`=\"0\" "
 													"AND "
 													"`status`=\"approved\" "
@@ -2685,108 +2685,69 @@ string GetNumberOfTimecardsInPaymentPendingState(string sow_sql, CMysql *db, CUs
 	MESSAGE_DEBUG("", "", "finish (number of pending_items is " + pending_items + ")");
 
 	return pending_items;
+}
+
+string GetNumberOfTimecardsInPaymentPendingState(string sow_sql, CMysql *db, CUser *user)
+{
+	return __Get_NumberOfTimecardsORBT_InPaymentPendingState("timecards", sow_sql, db, user);
 }
 
 string GetNumberOfBTInPaymentPendingState(string sow_sql, CMysql *db, CUser *user)
 {
-	MESSAGE_DEBUG("", "", "start");
-
-	auto	pending_items = "0"s;
-
-	if(db->Query("SELECT COUNT(*) FROM `bt` WHERE "
-													"`payed_date`=\"0\" "
-													"AND "
-													"`status`=\"approved\" "
-													"AND "
-													"`contract_sow_id` IN (" + sow_sql + ");")
-		)
-	{
-		pending_items = db->Get(0,0);
-	}
-
-	MESSAGE_DEBUG("", "", "finish (number of pending_items is " + pending_items + ")");
-
-	return pending_items;
+	return __Get_NumberOfTimecardsORBT_InPaymentPendingState("bt", sow_sql, db, user);
 }
 
-bool areThereTimecardsWithExpiredPayment(string multiplier, string sow_sql, CMysql *db, CUser *user)
+static auto __Get_TimecardsORBT_WithExpiredPayment(string entity_type, string multiplier, string sow_sql, CMysql *db, CUser *user)
 {
 	MESSAGE_DEBUG("", "", "start");
 
-	auto	result = false;
+	vector<string>	result;
+	auto			table = ""s;
+	auto			table_column = ""s;
 
-	if(db->Query("SELECT `payment_period_service` FROM `company` WHERE `id`=("
-					"SELECT `company_id` FROM `company_employees` WHERE `user_id`=" + quoted(user->GetID()) + 
-				")"
-		";")
-		)
+	if(entity_type == "timecards")
 	{
-		auto 	payment_period = db->Get(0, 0);
-
-		if(payment_period != "0")
-		{
-			auto affected = db->Query("SELECT `id` FROM `timecards` WHERE "
-															"(`submit_date`<UNIX_TIMESTAMP() - 3600 * 24 * " + payment_period + " * " + multiplier + ") "
-															"AND "
-															"(`status`=\"approved\") "
-															"AND "
-															"`contract_sow_id` IN (" + sow_sql + ");");
-				
-			result = (affected > 0);
-		}
-		else
-		{
-			MESSAGE_DEBUG("", "", "payment period not set");
-		}
+		table = "timecards"s;
+		table_column = "payment_period_service"s;
+	}
+	else if(entity_type == "bt")
+	{
+		table = "bt"s;
+		table_column = "payment_period_bt"s;
 	}
 	else
 	{
-		MESSAGE_ERROR("", "", "SQL syntax error");
+		MESSAGE_ERROR("", "", "unknown entity_type(" + entity_type + ")");
 	}
 
-	MESSAGE_DEBUG("", "", "finish (" + to_string(result) + ")");
+	auto affected = db->Query(
+				"SELECT `a`.`id`, `b`.`id`, `b`.`payment_period_service`, `b`.`payment_period_bt` FROM `" + table + "` as `a` "
+				"INNER JOIN `contracts_sow` as `b` ON `a`.`contract_sow_id`=`b`.`id` "
+				"WHERE  "
+					"(`a`.`submit_date`<UNIX_TIMESTAMP() - 3600 * 24 * `b`.`" + table_column + "` * " + multiplier + ")  "
+					"AND  "
+					"(`a`.`status`=\"approved\")  "
+				    "AND  "
+				    "`payed_date`=\"0\" "
+					"AND  "
+					"(`a`.`contract_sow_id` IN (" + sow_sql + "));");
+		
+	for(auto i = 0; i < affected; ++i)
+		result.push_back(db->Get(i, 0));
+
+	MESSAGE_DEBUG("", "", "finish (" + to_string(result.size()) + ")");
 
 	return result;
 }
 
-bool areThereBTWithExpiredPayment(string multiplier, string sow_sql, CMysql *db, CUser *user)
+vector<string> GetTimecardsWithExpiredPayment(string multiplier, string sow_sql, CMysql *db, CUser *user)
 {
-	MESSAGE_DEBUG("", "", "start");
+	return __Get_TimecardsORBT_WithExpiredPayment("timecards", multiplier, sow_sql, db, user);
+}
 
-	auto	result = false;
-
-	if(db->Query("SELECT `payment_period_bt` FROM `company` WHERE `id`=("
-					"SELECT `company_id` FROM `company_employees` WHERE `user_id`=" + quoted(user->GetID()) + 
-				")"
-		";")
-		)
-	{
-		auto 	payment_period = db->Get(0, 0);
-
-		if(payment_period != "0")
-		{
-			auto affected = db->Query("SELECT `id` FROM `bt` WHERE "
-															"(`submit_date`<UNIX_TIMESTAMP() - 3600 * 24 * " + payment_period + " * " + multiplier + ") "
-															"AND "
-															"(`status`=\"approved\") "
-															"AND "
-															"`contract_sow_id` IN (" + sow_sql + ");");
-				
-			result = (affected > 0);
-		}
-		else
-		{
-			MESSAGE_DEBUG("", "", "payment period not set");
-		}
-	}
-	else
-	{
-		MESSAGE_ERROR("", "", "SQL syntax error");
-	}
-
-	MESSAGE_DEBUG("", "", "finish (" + to_string(result) + ")");
-
-	return result;
+vector<string> GetBTWithExpiredPayment(string multiplier, string sow_sql, CMysql *db, CUser *user)
+{
+	return __Get_TimecardsORBT_WithExpiredPayment("bt", multiplier, sow_sql, db, user);
 }
 
 string GetNumberOfTimecardsInPendingState(CMysql *db, CUser *user)

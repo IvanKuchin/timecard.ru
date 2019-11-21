@@ -269,29 +269,15 @@ string CCgi::GetCookie(string name)
 {
 	return cookie.Get(name);
 }
-
+/*
 void CCgi::ModifyCookie(string name, string value, string cma, string cp, string cd, string cs)
 {
 	cookie.Modify(name, value, cma, cd, cp, cs);
 }
-
+*/
 bool CCgi::CookieUpdateTS(string name, int deltaTimeStamp)
 {
-	bool	result;
-
-	{
-		CLog	log;
-		log.Write(DEBUG, "CCgi::" + string(__func__) + "[" + to_string(__LINE__) + "]: start (name = " + name + ", deltaTimeStamp = " + to_string(deltaTimeStamp) + ")");
-	}
-
-	result = cookie.UpdateTS(name, deltaTimeStamp);
-
-	{
-		CLog	log;
-		log.Write(DEBUG, "CCgi::" + string(__func__) + "[" + to_string(__LINE__) + "]: finish (result = " + (result ? "true" : "false") + ")");
-	}
-
-	return result;
+	return cookie.UpdateTS(name, deltaTimeStamp);
 }
 
 void CCgi::DeleteCookie(string name, string cd, string cp, string cs)
@@ -309,6 +295,7 @@ string CCgi::GetRequestURI()
     return getenv("REQUEST_URI");
 }
 
+/*
 void CCgi::AddCookie(string cn, string cv, string ce, int cma, string cd, string cp, string cs)
 {
     cookie.Add(cn, cv, ce, cma, cd, cp, cs, TRUE);
@@ -317,6 +304,15 @@ void CCgi::AddCookie(string cn, string cv, string ce, int cma, string cd, string
 void CCgi::AddCookie(string cn, string cv, string ce, string cd, string cp, string cs)
 {
     cookie.Add(cn, cv, ce, cd, cp, cs, TRUE);
+}
+*/
+void CCgi::AddCookie(string cn, string cv, struct tm *ce, string cd, string cp, string cs)
+{
+    cookie.Add(cn, cv, ce, cd, cp, cs, TRUE);
+}
+void CCgi::AddCookie(string cn, string cv, int shift_in_seconds_from_now, string cd, string cp, string cs)
+{
+    cookie.Add(cn, cv, shift_in_seconds_from_now, cd, cp, cs, TRUE);
 }
 
 string CCgi::RecvLine(FILE *s)
@@ -537,15 +533,17 @@ string CCgi::GlobalMessageReplace(string where, string src, string dst)
 }
 
 // --- Session part
-string CCgi::SessID_Get_FromHTTP (void) {
-	string sessid;
+string CCgi::SessID_Get_FromHTTP (void) 
+{
+/*
+	string sessid ;
 
 	sessid = "";
 	if (cookie.IsExist("sessid")) {
 		sessid = cookie.Get("sessid");
 	};
-
-	return sessid;
+*/
+	return cookie.Get("sessid");
 }
 
 string CCgi::SessID_Create_HTTP_DB (int max_age)
@@ -563,7 +561,7 @@ string CCgi::SessID_Create_HTTP_DB (int max_age)
 		}
 
 		// --- AddCookie(name, value, expiration, max-age, domain, path)
-		AddCookie("sessid", sessionDB.GetID(), "", max_age, "", "/");
+		AddCookie("sessid", sessionDB.GetID(), max_age, "", "/");
 
 		{
 			CLog	log;
@@ -653,7 +651,7 @@ bool CCgi::Cookie_InitialAction_Assign(string inviteHash)
 	}
 
 	// --- AddCookie(name, value, expiration, max-age, domain, path)
-	AddCookie("initialactionid", inviteHash, "", "", "/");
+	AddCookie("initialactionid", inviteHash, nullptr, "", "/");
 
 	{
 		CLog	log;

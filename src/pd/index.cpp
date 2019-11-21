@@ -319,7 +319,7 @@ int main()
 	{
 
 		indexPage.ParseURL();
-		indexPage.AddCookie("lng", "ru", "", "", "/");
+		indexPage.AddCookie("lng", "ru", nullptr, "", "/");
 
 		if(!indexPage.SetTemplate("index.htmlt"))
 		{
@@ -407,7 +407,7 @@ int main()
 			string		lng;
 
 			lng = indexPage.GetVarsHandler()->Get("lng");
-			indexPage.AddCookie("lng", lng, "", "", "/");
+			indexPage.AddCookie("lng", lng, nullptr, "", "/");
 
 			if(!indexPage.SetTemplate("index.htmlt"))
 			{

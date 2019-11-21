@@ -31,71 +31,66 @@ string CSession::GetRandom(int len)
 
 void CSession::InitMaxMind()
 {
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	MMDB_usage = false;
 
 #ifndef MAXMIND_DISABLE
 	if(getenv("REMOTE_ADDR"))
 	{
-		int		status;
+		int		status = MMDB_open(MMDB_fname, MMDB_MODE_MMAP, &mmdb);
 
-		{
-		    status = MMDB_open(MMDB_fname, MMDB_MODE_MMAP, &mmdb);
-		}
 	    if (status == MMDB_SUCCESS)
 	    {
 	    	int gai_error, mmdb_error;
 
-			MMDB_usage = true;
-			{
-				MESSAGE_DEBUG("", "", "MMDB_open(" + MMDB_fname + ") opened succesfully. ");
-			}
+			MESSAGE_DEBUG("", "", "MMDB_open(" + MMDB_fname + ") opened succesfully. ");
 
 		    MMDB_result = MMDB_lookup_string(&mmdb, getenv("REMOTE_ADDR"), &gai_error, &mmdb_error);
 
-		    if (0 != gai_error) {
-		    	{
-					MESSAGE_ERROR("", "", "ERROR: MMDB_open(" + MMDB_fname + ") Error from getaddrinfo for " + getenv("REMOTE_ADDR") + ", " + gai_strerror(gai_error) + ". ");
-				}
+		    if (0 == gai_error) 
+		    {
+				if (mmdb_error == MMDB_SUCCESS) 
+				{
+					MMDB_entry_data_list = NULL;
 
-				MMDB_usage = false;
-				MMDB_close(&mmdb);
-		    }
+					if (MMDB_result.found_entry) 
+					{
+					    int status = MMDB_get_entry_data_list(&MMDB_result.entry, &MMDB_entry_data_list);
 
-		    if (MMDB_SUCCESS != mmdb_error) {
-		    	{
-					MESSAGE_ERROR("", "", "ERROR: MMDB_open(" + MMDB_fname + ") Got an error from libmaxminddb: " + MMDB_strerror(mmdb_error));
-				}
+					    if (status == MMDB_SUCCESS) 
+					    {
+							MMDB_usage = true;
+					    }
+					    else
+					    {
+							MESSAGE_ERROR("", "", "ERROR: MMDB_open(" + MMDB_fname + ") : Got an error looking up the entry data -" + MMDB_strerror(status));
 
-				MMDB_usage = false;
-				MMDB_close(&mmdb);
-		    }
-
-		    MMDB_entry_data_list = NULL;
-		    if (MMDB_result.found_entry) {
-		        int status = MMDB_get_entry_data_list(&MMDB_result.entry, &MMDB_entry_data_list);
-
-		        if (MMDB_SUCCESS != status) {
-			    	{
-						MESSAGE_ERROR("", "", "ERROR: MMDB_open(" + MMDB_fname + ") : Got an error looking up the entry data -" + MMDB_strerror(status));
+							MMDB_close(&mmdb);
+					    }
 					}
+					else
+					{
+						MMDB_usage = true;
+					}
+				}
+				else
+				{
+					MESSAGE_ERROR("", "", "ERROR: MMDB_open(" + MMDB_fname + ") Got an error from libmaxminddb: " + MMDB_strerror(mmdb_error));
 
-					MMDB_usage = false;
 					MMDB_close(&mmdb);
-		        }
-
+				}
 		    }
+		    else
+		    {
+				MESSAGE_ERROR("", "", "ERROR: MMDB_open(" + MMDB_fname + ") Error from getaddrinfo for " + getenv("REMOTE_ADDR") + ", " + gai_strerror(gai_error) + ". ");
 
-
+				MMDB_close(&mmdb);
+		    }
 	    }
 	    else
 	    {
 			MESSAGE_ERROR("", "", "ERROR: in reading GeoInfo DB MMDB_open(" + MMDB_fname + ") error is: " + MMDB_strerror(status) + ". ");
-
-			MMDB_usage = false;
 
 	        if (MMDB_IO_ERROR == status)
 	        {
@@ -106,18 +101,15 @@ void CSession::InitMaxMind()
 	}
 	else
 	{
-	    {
-			MESSAGE_DEBUG("", "", "REMOTE_ADDR is empty, no way to determine remote IP");
-		}
+		MESSAGE_DEBUG("", "", "REMOTE_ADDR is empty, no way to determine remote IP");
 	}
 #endif
 
-	{
-		MESSAGE_DEBUG("", "", "finish (MMDB_usage = " + to_string(MMDB_usage) + ")");
-	}
+	MESSAGE_DEBUG("", "", "finish (MMDB_usage = " + to_string(MMDB_usage) + ")");
 }
 
-string CSession::DetectItem(string MMDB_itemName) {
+string CSession::DetectItem(string MMDB_itemName) 
+{
 	string		item = "";
 
 #ifndef MAXMIND_DISABLE
@@ -173,6 +165,7 @@ string CSession::DetectItem(string MMDB_itemName) {
 
     MESSAGE_DEBUG("", "", "finish (" + item + ")");
 #endif
+    
 	return	item;
 }
 
@@ -419,9 +412,7 @@ bool CSession::isExist(string id)
 	ostringstream	ost;
 	string		currIP;
 
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	if(!db)
 	{
@@ -447,30 +438,22 @@ bool CSession::isExist(string id)
 		return false;
 	}
 
-	{
-		MESSAGE_DEBUG("", "", "finish (true)");
-	}
+	MESSAGE_DEBUG("", "", "finish (true)");
 
 	return true;
 }
 
 CSession::~CSession()
 {
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
-
 #ifndef MAXMIND_DISABLE
+	MESSAGE_DEBUG("", "", "start");
 
 	if(MMDB_usage) {
 		MMDB_close(&mmdb);
 	}
 
+	MESSAGE_DEBUG("", "", "finish");
 #endif
-
-	{
-		MESSAGE_DEBUG("", "", "finish");
-	}
 }
 
 
