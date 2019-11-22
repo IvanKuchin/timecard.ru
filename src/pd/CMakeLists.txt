@@ -26,6 +26,7 @@ set(INVOICE_LIB_SRCs
     c_invoice_bt_agency_to_cc.cpp
     c_invoice_bt_subc_to_agency.cpp
     c_invoicing_vars.cpp
+    c_download_bt_attachments.cpp
     c_print_timecard.cpp
     c_print_bt.cpp
     c_print_invoice_docs.cpp

@@ -3099,3 +3099,106 @@ string	SaveFileFromHandler(string f_name, string f_type, CFiles *files, string f
 {
 	return(SaveOrCheckFileFromHandler(f_name, f_type, files, file_extension, false));
 }
+
+bool isFileExists(const std::string& name)
+{
+	struct stat buffer;
+	return (stat (name.c_str(), &buffer) == 0);
+}
+
+bool isDirExists(const std::string& name)
+{
+	struct stat buffer;
+	auto		result = false;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(stat(name.c_str(), &buffer) != 0)
+	{
+		MESSAGE_DEBUG("", "", "can't access " + name);
+	}
+	else if(buffer.st_mode & S_IFDIR)
+	{
+		result = true;
+	}
+	else
+	{
+		MESSAGE_DEBUG("", "", name + " isn't directory");
+	}
+
+	MESSAGE_DEBUG("", "", "finish (file " + name + " " + (result ? "" : "not") + " exists)");
+
+	return result;
+}
+
+bool CreateDir(const string &dir)
+{
+	auto		result = false;
+	struct stat buffer;
+
+	MESSAGE_DEBUG("", "", "start (" + dir + ")");
+
+	if(stat(dir.c_str(), &buffer) != 0)
+	{
+		if ((mkdir(dir.c_str(), 0750) != 0) && (errno != EEXIST))
+		{
+			MESSAGE_ERROR("", "", "can't create directory(" + dir + ")");
+		}
+		else
+			result = true;
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "dir(" + dir + ") already exists")
+	}
+
+	MESSAGE_DEBUG("", "", "finish (result = " + (result ? "true" : "false") + ")");
+
+	return result;
+}
+
+bool RmDirRecursive(const char *dirname)
+{
+	DIR		*dir;
+	struct	dirent *entry;
+	char	path[4096];
+
+	MESSAGE_DEBUG("", "", "start (" + dirname + ")");
+	
+	dir = opendir(dirname);
+
+	if(dir == NULL) 
+	{
+		MESSAGE_ERROR("", "", "fail to open dir("s + dirname + ")")
+		return false;
+	}
+	
+	while ((entry = readdir(dir)) != NULL)
+	{
+		if (strcmp(entry->d_name, ".") && strcmp(entry->d_name, "..")) 
+		{
+			snprintf(path, (size_t) 4095, "%s%s", dirname, entry->d_name);
+
+			if (entry->d_type == DT_DIR)
+			{
+				RmDirRecursive((string(path) + "/").c_str());
+			} 
+			else
+			{
+
+				MESSAGE_DEBUG("", "", "remove file " + path);
+				unlink(path);
+			}
+		}
+	}
+	
+	closedir(dir);
+	
+	MESSAGE_DEBUG("", "", "remove dir " + dirname);
+	rmdir(dirname);
+	
+	MESSAGE_DEBUG("", "", "finish (" + dirname + ")");
+
+	return true;
+}
+

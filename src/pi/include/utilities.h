@@ -140,14 +140,6 @@ auto 			GetOpenVacanciesInJSONFormat(string companyID, CMysql *, CUser * = NULL)
 auto			GetGeoLocalityIDByCityAndRegion(string regionName, string cityName, CMysql *) -> string;
 auto        	AllowMessageInNewsFeed(CUser *me, const string messageOwnerID, const string messageAccessRights, vector<string> *messageFriendList) -> bool;
 auto        	isPersistenceRateLimited(string REMOTE_ADDR, CMysql *) -> bool;
-auto			CreateDir(const string &dir) -> bool;
-auto 			RmDirRecursive(const char *dirname) -> bool;
-auto        	isDirExists(const std::string& name) -> bool;
-auto        	isFileExists(const std::string& name) -> bool;
-auto			isFilenameImage(string	filename) -> bool;
-auto			isFilenameVideo(string	filename) -> bool;
-auto			CleanupFilename(string	filename) -> string;
-auto        	CopyFile(const string src, const string dst) -> void;
 auto      		GetCompanyDuplicates(CMysql *) -> string;
 auto      		GetPicturesWithEmptySet(CMysql *) -> string;
 auto      		GetPicturesWithUnknownMessage(CMysql *) -> string;
@@ -174,6 +166,8 @@ auto 			isBotIP(string ip) -> bool;
 auto 			isAdverseWordsHere(string text, CMysql *) -> bool;
 auto			GetCompanyPositionsInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetSiteThemesInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
+
+// --- date functions
 pair<struct tm, struct tm> GetFirstAndLastMonthDaysByDate(const struct tm &_date);
 pair<struct tm, struct tm> GetFirstAndLastDateOfLastMonth();
 pair<struct tm, struct tm> GetFirstAndLastDateOfThisMonth();
@@ -195,6 +189,17 @@ auto			stod_noexcept(const string &) -> double;
 auto			MaskSymbols(string src, int first_pos, int last_pos) -> string;
 auto			GetValueFromDB(string sql, CMysql *) -> string;
 auto			GetValuesFromDB(string sql, CMysql *) -> vector<string>;
+
+// --- file system functions
+auto			CreateDir(const string &dir) -> bool;
+auto 			RmDirRecursive(const char *dirname) -> bool;
+auto        	isDirExists(const std::string& name) -> bool;
+auto        	isFileExists(const std::string& name) -> bool;
+auto			isFilenameImage(const string &filename) -> bool;
+auto			isFilenameVideo(const string &filename) -> bool;
+auto			GetFileExtension(const string &filename) -> string;
+auto			CleanupFilename(string	filename) -> string;
+auto        	CopyFile(const string src, const string dst) -> void;
 
 // --- function set for image upload/removal
 auto 			GetSpecificData_GetNumberOfFolders(string itemType) -> int;

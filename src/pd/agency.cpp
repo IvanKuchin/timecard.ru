@@ -5880,6 +5880,60 @@ int main(void)
 			MESSAGE_DEBUG("", action, "finish");
 		}
 
+		if(action == "AJAX_downloadBTAttachments")
+		{
+			MESSAGE_DEBUG("", action, "start");
+
+			auto			error_message = ""s;
+			auto			success_message = ""s;
+
+			auto			id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("bt_id"));
+
+			if(id.length())
+			{
+				if(db.Query("SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id`=(SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user.GetID() + "\");"))
+				{
+					auto			agency_id = db.Get(0, "id");
+					vector<string>	bts = {id};
+
+					if((error_message = isBTsBelongToAgency(bts, agency_id, &db, &user)).empty())
+					{
+						C_Download_BT_Attachments	bt_attachments(&db, &user);
+						bt_attachments.SetBTID(id);
+
+						if((error_message = bt_attachments.GenerateDocumentArchive()).empty())
+						{
+							success_message = "\"href\":\"" + bt_attachments.GetArchiveFilename() + "\"";
+						}
+						else
+						{
+							MESSAGE_ERROR("", action, error_message);
+						}
+					}
+					else
+					{
+						error_message = gettext("you are not authorized");
+						MESSAGE_ERROR("", action, "user.id(" + user.GetID() + ") isn't agency employee");
+					}
+				}
+				else
+				{
+					error_message = gettext("You are not agency employee");
+					MESSAGE_ERROR("", action, "Can't define agency.id by user.id(" + user.GetID() + ")");
+				}
+			}
+			else
+			{
+				error_message = gettext("mandatory parameter missed");
+				MESSAGE_ERROR("", action, error_message);
+			}
+
+
+			AJAX_ResponseTemplate(&indexPage, success_message, error_message);
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
+
 
 		MESSAGE_DEBUG("", "", "post-condition if(action == \"" + action + "\")");
 

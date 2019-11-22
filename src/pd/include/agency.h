@@ -23,5 +23,6 @@
 #include "c_invoice_bt_agency_to_cc.h"
 #include "c_invoice_bt_subc_to_agency.h"
 #include "c_agreements_sow_factory.h"
+#include "c_download_bt_attachments.h"
 
 #endif

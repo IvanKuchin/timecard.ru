@@ -3391,9 +3391,7 @@ string	GetBTExpenseAssignmentInJSONFormat(string sqlQuery, CMysql *db, CUser *us
 	}
 	else
 	{
-		{
-			MESSAGE_DEBUG("", "", "bt_expenses are not assigned (" + sqlQuery + ")");
-		}
+		MESSAGE_DEBUG("", "", "bt_expenses are not assigned (" + sqlQuery + ")");
 	}
 
 	MESSAGE_DEBUG("", "", "finish");
