@@ -244,7 +244,7 @@ auto C_Print_VAT_Base::__PrintXLSTable() -> string
 		__sheet->setMerge(__row_counter, __row_counter, 2, 3);
 		__sheet->writeStr(__row_counter,  4, multibyte_to_wide(GetTableRowItem(i)).c_str(), format_table_center);
 		__sheet->writeNum(__row_counter,  5, stod_noexcept(GetTableRowQuantity(i)), format_table_center);
-		__sheet->writeStr(__row_counter,  6, L"-", format_table_center);
+		__sheet->writeNum(__row_counter,  6, stod_noexcept(GetTableRowPrice(i)), format_small_border);
 		__sheet->writeNum(__row_counter,  7, stod_noexcept(GetTableRowPrice(i)), format_table_right);
 		__sheet->writeStr(__row_counter,  8, multibyte_to_wide(vars->Get("no excise")).c_str(), format_small_border);
 		__sheet->writeStr(__row_counter,  9, multibyte_to_wide(GetSupplierVATSpellingShort()).c_str(), format_small_border);
@@ -816,6 +816,84 @@ auto	C_Print_VAT_Base::__HPDF_DrawTable_Header() -> string
 			if((error_message = pdf_obj.__HPDF_StartTable()).length())
 			{ MESSAGE_ERROR("", "", "fail to start table"); }
 		}
+
+
+		// --- numeration
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(0, utf8_to_cp1251("1"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
+			{ MESSAGE_ERROR("", "", "fail to print text to table cell"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(1, utf8_to_cp1251("1a"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
+			{ MESSAGE_ERROR("", "", "fail to print text to table cell"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(2, utf8_to_cp1251("2"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
+			{ MESSAGE_ERROR("", "", "fail to print text to table cell"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(3, utf8_to_cp1251("2a"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
+			{ MESSAGE_ERROR("", "", "fail to print text to table cell"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(4, utf8_to_cp1251("3"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
+			{ MESSAGE_ERROR("", "", "fail to print text to table cell"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(5, utf8_to_cp1251("4"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
+			{ MESSAGE_ERROR("", "", "fail to print text to table cell"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(6, utf8_to_cp1251("5"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
+			{ MESSAGE_ERROR("", "", "fail to print text to table cell"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(7, utf8_to_cp1251("6"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
+			{ MESSAGE_ERROR("", "", "fail to print text to table cell"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(8, utf8_to_cp1251("7"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
+			{ MESSAGE_ERROR("", "", "fail to print text to table cell"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(9, utf8_to_cp1251("8"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
+			{ MESSAGE_ERROR("", "", "fail to print text to table cell"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(10, utf8_to_cp1251("9"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
+			{ MESSAGE_ERROR("", "", "fail to print text to table cell"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(11, utf8_to_cp1251("10"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
+			{ MESSAGE_ERROR("", "", "fail to print text to table cell"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(12, utf8_to_cp1251("10a"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
+			{ MESSAGE_ERROR("", "", "fail to print text to table cell"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(13, utf8_to_cp1251("11"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
+			{ MESSAGE_ERROR("", "", "fail to print text to table cell"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_MoveTableLineDown(1)).length())
+			{ MESSAGE_ERROR("", "", "fail to move table line down"); }
+		}
 	}
 	catch(...)
 	{
@@ -953,7 +1031,7 @@ auto	C_Print_VAT_Base::__HPDF_DrawTable_Body() -> string
 							{
 								if((error_message = pdf_obj.__HPDF_PrintTextTableCell(4, utf8_to_cp1251(GetTableRowQuantity(i)), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).empty())
 								{
-									if((error_message = pdf_obj.__HPDF_PrintTextTableCell(5, utf8_to_cp1251("-"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).empty())
+									if((error_message = pdf_obj.__HPDF_PrintTextTableCell(5, utf8_to_cp1251(GetTableRowPrice(i)), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 2, false)).empty())
 									{
 										if((error_message = pdf_obj.__HPDF_PrintTextTableCell(6, utf8_to_cp1251(GetTableRowPrice(i)), HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, false)).empty())
 										{

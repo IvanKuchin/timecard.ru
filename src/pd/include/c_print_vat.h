@@ -148,7 +148,7 @@ class C_Print_VAT_Agency : public C_Print_VAT_Base
 		auto			GetSupplierTIN() -> string						{ return vars->Get("agency_tin"); };
 		auto			GetSupplierVAT() -> string						{ return vars->Get("agency_vat"); };
 		auto			GetSupplierVATSpelling() -> string				{ return vars->Get("agency_vat_spelling"); };
-		auto			GetSupplierVATSpellingShort() -> string			{ return vars->Get("agency_vat_spelling_short"); };
+		auto			GetSupplierVATSpellingShort() -> string			{ return vars->Get("VAT rate"); };
 		auto			GetSupplierKPP() -> string						{ return vars->Get("agency_kpp"); };
 		auto			GetSupplierOGRN() -> string						{ return vars->Get("agency_ogrn"); };
 		auto			GetSupplierLegalZIP() -> string					{ return vars->Get("agency_legal_geo_zip"); };
@@ -212,7 +212,7 @@ class C_Print_VAT_Subc : public C_Print_VAT_Base
 
 		auto			GetSupplierVAT() -> string						{ return vars->Get("subcontractor_company_vat_1"); };
 		auto			GetSupplierVATSpelling() -> string				{ return vars->Get("subcontractor_company_vat_spelling_1"); };
-		auto			GetSupplierVATSpellingShort() -> string			{ return vars->Get("subcontractor_company_vat_spelling_short_1"); };
+		auto			GetSupplierVATSpellingShort() -> string			{ return vars->Get("VAT rate"); };
 
 		auto			GetSupplierKPP() -> string						{ return vars->Get("subcontractor_company_kpp_1"); };
 		auto			GetSupplierOGRN() -> string						{ return vars->Get("subcontractor_company_ogrn_1"); };

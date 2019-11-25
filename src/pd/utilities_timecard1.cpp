@@ -3847,6 +3847,7 @@ string	GetTimecardsInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool i
 		string				submit_date;
 		string				approve_date;
 		string				payed_date;
+		string				originals_received_date;
 		string				invoice_filename;
 		string				eventTimestamp;
 	};
@@ -3869,6 +3870,7 @@ string	GetTimecardsInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool i
 			item.approve_date = db->Get(i, "approve_date");
 			item.payed_date = db->Get(i, "payed_date");
 			item.invoice_filename = db->Get(i, "invoice_filename");
+			item.originals_received_date = db->Get(i, "originals_received_date");
 			item.status = db->Get(i, "status");
 			item.eventTimestamp = db->Get(i, "eventTimestamp");
 
@@ -3888,6 +3890,7 @@ string	GetTimecardsInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool i
 			result += "\"submit_date\":\"" + item.submit_date + "\",";
 			result += "\"approve_date\":\"" + item.approve_date + "\",";
 			result += "\"payed_date\":\"" + item.payed_date + "\",";
+			result += "\"originals_received_date\":\"" + item.originals_received_date + "\",";
 			result += "\"invoice_filename\":\"" + item.invoice_filename + "\",";
 			result += "\"status\":\"" + item.status + "\",";
 			result += "\"lines\":[" + GetTimecardLinesInJSONFormat("SELECT * FROM `timecard_lines` WHERE `timecard_id`=\"" + item.id + "\";", db, user) + "],";
@@ -3933,6 +3936,7 @@ string	GetBTsInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool isExten
 		string	submit_date;
 		string	approve_date;
 		string	payed_date;
+		string	originals_received_date;
 		string	invoice_filename;
 		string	eventTimestamp;
 	};
@@ -3958,6 +3962,7 @@ string	GetBTsInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool isExten
 			item.submit_date = db->Get(i, "submit_date");
 			item.approve_date = db->Get(i, "approve_date");
 			item.payed_date = db->Get(i, "payed_date");
+			item.originals_received_date = db->Get(i, "originals_received_date");
 			item.invoice_filename = db->Get(i, "invoice_filename");
 			item.eventTimestamp = db->Get(i, "eventTimestamp");
 
@@ -3981,6 +3986,7 @@ string	GetBTsInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool isExten
 			result += "\"submit_date\":\"" + item.submit_date + "\",";
 			result += "\"approve_date\":\"" + item.approve_date + "\",";
 			result += "\"payed_date\":\"" + item.payed_date + "\",";
+			result += "\"originals_received_date\":\"" + item.originals_received_date + "\",";
 			result += "\"invoice_filename\":\"" + item.invoice_filename + "\",";
 			if(isExtended)
 			{
@@ -4165,6 +4171,8 @@ auto	GetSOWInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include_t
 		string	subcontractor_create_tasks;
 		string	day_rate;
 		string	status;
+		string	payment_period_service;
+		string	payment_period_bt;
 		string	agreement_filename;
 		string	eventTimestamp;
 	};
@@ -4190,6 +4198,8 @@ auto	GetSOWInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include_t
 			item.timecard_period = db->Get(i, "timecard_period");
 			item.subcontractor_create_tasks = db->Get(i, "subcontractor_create_tasks");
 			item.status = db->Get(i, "status");
+			item.payment_period_service = db->Get(i, "payment_period_service");
+			item.payment_period_bt = db->Get(i, "payment_period_bt");
 			item.agreement_filename = db->Get(i, "agreement_filename");
 			item.day_rate = db->Get(i, "day_rate");
 			item.eventTimestamp = db->Get(i, "eventTimestamp");
@@ -4210,6 +4220,8 @@ auto	GetSOWInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include_t
 			result += "\"company_positions\":[" + GetCompanyPositionsInJSONFormat("SELECT * FROM `company_position` WHERE `id`=\"" + item.company_position_id + "\";", db, user) + "],";
 			result += "\"start_date\":\"" + item.start_date + "\",";
 			result += "\"end_date\":\"" + item.end_date + "\",";
+			result += "\"payment_period_service\":\"" + item.payment_period_service + "\",";
+			result += "\"payment_period_bt\":\"" + item.payment_period_bt + "\",";
 			result += "\"number\":\"" + item.number + "\",";
 			result += "\"sign_date\":\"" + item.sign_date + "\",";
 			result += "\"timecard_period\":\"" + item.timecard_period + "\",";

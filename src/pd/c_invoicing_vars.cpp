@@ -168,6 +168,7 @@ auto	C_Invoicing_Vars::FillStaticDictionary() -> string
 	if(error_message.empty()) error_message = AssignVariableValue("VAT sign - Authorized person",		gettext("VAT sign - Authorized person"), true);
 	if(error_message.empty()) error_message = AssignVariableValue("VAT sign - Entrepreneur",			gettext("VAT sign - Entrepreneur"), true);
 	if(error_message.empty()) error_message = AssignVariableValue("VAT sign - Entrepreneur registration",gettext("VAT sign - Entrepreneur registration"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("VAT rate",				to_string(VAT_PERCENTAGE) + "%", true);
 
 	if(error_message.empty()) error_message = AssignVariableValue("invoice_table_header",	gettext("invoice_table_header"), true);
 	if(error_message.empty()) error_message = AssignVariableValue("act_table_header",		gettext("act_table_header"), true);
