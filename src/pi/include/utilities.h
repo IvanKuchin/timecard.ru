@@ -18,6 +18,7 @@
 #include <Magick++.h>
 #include <codecvt>
 
+#include "c_date_spelling.h"
 #include "cfiles.h"
 #include "cmysql.h"
 #include "cuser.h"
@@ -172,6 +173,7 @@ pair<struct tm, struct tm> GetFirstAndLastMonthDaysByDate(const struct tm &_date
 pair<struct tm, struct tm> GetFirstAndLastDateOfLastMonth();
 pair<struct tm, struct tm> GetFirstAndLastDateOfThisMonth();
 struct tm		GetTMObject(string date);
+auto			GetSpellingDate(long int seconds_since_epoch) -> string;
 auto			GetSpellingFormattedDate(string date, string format) -> string;
 auto			GetSpellingFormattedDate(struct tm, string format) -> string;
 auto			operator <(const struct tm &tm_1, const struct tm &tm_2) -> bool;

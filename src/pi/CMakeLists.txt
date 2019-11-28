@@ -30,11 +30,11 @@ set(JOINT_LIBRARY_SRCs
     utilities2.cpp
     utilities_common.cpp
     c_cache_obj.cpp
+    c_date_spelling.cpp
     )
 
 # ---- list of independent libraries
 set(INDEPENDENT_LIBRARIES_SRC
-    c_date_spelling.cpp
     c_price_spelling.cpp
     c_archive.cpp
     )

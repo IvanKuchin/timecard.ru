@@ -548,87 +548,104 @@ int main()
 			MESSAGE_DEBUG("", action, "finish");
 		}
 	}
-
+/*
 	if(action == "AJAX_getTimecardList")
 	{
-		string			strPageToGet, strFriendsOnSinglePage;
 		ostringstream	ostResult;
 
 		MESSAGE_DEBUG("", action, "start");
 
 		ostResult.str("");
 
+		string			template_name = "json_response.htmlt";
+		int				affected = db.Query("SELECT `id` FROM `company` WHERE `admin_userID`=\"" + user.GetID() + "\";");
+
+		if(affected)
 		{
-			string			template_name = "json_response.htmlt";
-			int				affected = db.Query("SELECT `id` FROM `company` WHERE `admin_userID`=\"" + user.GetID() + "\";");
+			string		companies_list= "";
 
-			if(affected)
+			for(int i = 0; i < affected; ++i)
 			{
-				string		companies_list= "";
-
-				for(int i = 0; i < affected; ++i)
-				{
-					if(companies_list.length()) companies_list += ",";
-					companies_list += db.Get(i, 0);
-				}
-
-				ostResult << "{"
-								"\"status\":\"success\","
-								"\"sow\":[" << GetSOWInJSONFormat(
-										"SELECT * FROM `contracts_sow` WHERE "
-											"`subcontractor_company_id` IN (" + companies_list + ") "
-										";", &db, &user, false, false, false, true) << "],"
-								"\"timecards\":[" << GetTimecardsInJSONFormat(
-										"SELECT * FROM `timecards` WHERE "
-											"`contract_sow_id` IN ( SELECT `id` FROM `contracts_sow` WHERE `subcontractor_company_id` IN (" + companies_list + "))"
-										";", &db, &user) << "]"
-							"}";
-			}
-			else
-			{
-				MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't owns company");
-				ostResult << "{\"status\":\"error\",\"description\":\"Вы не создали компанию\"}";
+				if(companies_list.length()) companies_list += ",";
+				companies_list += db.Get(i, 0);
 			}
 
-			indexPage.RegisterVariableForce("result", ostResult.str());
-
-			if(!indexPage.SetTemplate(template_name))
-			{
-				MESSAGE_ERROR("", action, "can't find template " + template_name);
-			}
+			ostResult << "{"
+							"\"result\":\"success\","
+							"\"sow\":[" << GetSOWInJSONFormat(
+									"SELECT * FROM `contracts_sow` WHERE "
+										"`subcontractor_company_id` IN (" + companies_list + ") "
+									";", &db, &user, false, false, false, true) << "],"
+							"\"timecards\":[" << GetTimecardsInJSONFormat(
+									"SELECT * FROM `timecards` WHERE "
+										"`contract_sow_id` IN ( SELECT `id` FROM `contracts_sow` WHERE `subcontractor_company_id` IN (" + companies_list + "))"
+									";", &db, &user) << "],"
+							"\"holiday_calendar\":[" + GetHolidayCalendarInJSONFormat("SELECT * FROM `holiday_calendar` WHERE `agency_company_id` IN (SELECT `agency_company_id` FROM `contracts_sow` WHERE `subcontractor_company_id` IN (" + companies_list + "));", &db, &user) + "]"
+						"}";
+		}
+		else
+		{
+			MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't owns company");
+			ostResult << "{\"result\":\"error\",\"description\":\"Вы не создали компанию\"}";
 		}
 
+		indexPage.RegisterVariableForce("result", ostResult.str());
 
+		if(!indexPage.SetTemplate(template_name))
 		{
-			MESSAGE_DEBUG("", action, "finish");
+			MESSAGE_ERROR("", action, "can't find template " + template_name);
 		}
+
+		MESSAGE_DEBUG("", action, "finish");
+	}
+*/
+	if(action == "AJAX_getTimecardList")
+	{
+		MESSAGE_DEBUG("", action, "start");
+
+		auto			error_message = ""s;
+		auto			success_message = ""s;
+		int				affected = db.Query("SELECT `id` FROM `company` WHERE `admin_userID`=\"" + user.GetID() + "\";");
+
+		if(affected)
+		{
+			auto		companies_list= ""s;
+
+			for(int i = 0; i < affected; ++i)
+			{
+				if(companies_list.length()) companies_list += ",";
+				companies_list += db.Get(i, 0);
+			}
+
+			success_message = GetTimecardList("`subcontractor_company_id` IN (" + companies_list + ")", &db, &user);
+		}
+		else
+		{
+			error_message = gettext("you are not authorized");
+			MESSAGE_ERROR("", action, error_message);
+		}
+
+		AJAX_ResponseTemplate(&indexPage, success_message, error_message);
+
+		MESSAGE_DEBUG("", action, "finish");
 	}
 
 	if(action == "AJAX_getTimecardEntry")
 	{
-		string			strPageToGet, strFriendsOnSinglePage;
 		ostringstream	ostResult;
 
 		MESSAGE_DEBUG("", action, "start");
 
 		ostResult.str("");
-/*		if(user.GetLogin() == "Guest")
 		{
-			MESSAGE_DEBUG("", action, "re-login required");
-
-			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
-		}
-		else
-*/		{
 			string			template_name = "json_response.htmlt";
-			int				affected = 0;
 			string			timecard_id = "";
 
 			timecard_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("timecard_id"));
 
 			if(timecard_id.length())
 			{
-				affected = db.Query("SELECT `id` FROM `company` WHERE `admin_userID`=\"" + user.GetID() + "\";");
+				auto	affected = db.Query("SELECT `id` FROM `company` WHERE `admin_userID`=\"" + user.GetID() + "\";");
 
 				if(affected)
 				{
@@ -644,26 +661,26 @@ int main()
 					if(db.Query("SELECT `id` FROM `timecards` WHERE `id`=\"" + timecard_id + "\" AND `contract_sow_id` IN (SELECT `id` FROM `contracts_sow` WHERE `subcontractor_company_id` IN (" + companies_list + "))"))
 					{
 						ostResult << "{"
-										"\"status\":\"success\","
+										"\"result\":\"success\","
 										"\"timecards\":[" << GetTimecardsInJSONFormat("SELECT * FROM `timecards` WHERE `id`=\"" + timecard_id + "\";", &db, &user, true) << "]"
 									"}";
 					}
 					else
 					{
 						MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't allow to see this timecard");
-						ostResult << "{\"status\":\"error\",\"description\":\"У Вас нет доступа к этой таймкарте\"}";
+						ostResult << "{\"result\":\"error\",\"description\":\"У Вас нет доступа к этой таймкарте\"}";
 					}
 				}
 				else
 				{
 					MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't owns company");
-					ostResult << "{\"status\":\"error\",\"description\":\"Вы не создали компанию\"}";
+					ostResult << "{\"result\":\"error\",\"description\":\"Вы не создали компанию\"}";
 				}
 			}
 			else
 			{
 				MESSAGE_ERROR("", action, "parameter timecard_id is empty");
-				ostResult << "{\"status\":\"error\",\"description\":\"Некорректые параметры\"}";
+				ostResult << "{\"result\":\"error\",\"description\":\"Некорректые параметры\"}";
 			}
 
 
@@ -1207,30 +1224,11 @@ int main()
 
 		if(affected)
 		{
-			string		company_id= db.Get(0, 0);
-			bool		successFlag = true;
-			string		pending_timecards = "";
+			auto sow_sql =	"SELECT `id` FROM `contracts_sow` WHERE `subcontractor_company_id`=("
+								"SELECT `id` FROM `company` WHERE `admin_userID`=" + quoted(user.GetID()) + 
+							")";
 
-			if(successFlag)
-			{
-				auto sow_sql =	"SELECT `id` FROM `contracts_sow` WHERE `subcontractor_company_id`=("
-									"SELECT `id` FROM `company` WHERE `admin_userID`=" + quoted(user.GetID()) + 
-								")";
-
-				success_message = 
-								"\"number_of_payment_pending_timecards\":"	+ GetNumberOfTimecardsInPaymentPendingState(sow_sql, &db, &user) + ","
-								"\"timecard_late_payment\":["				+ join(GetTimecardsWithExpiredPayment("1", sow_sql, &db, &user)) + "],"
-								"\"timecard_payment_will_be_late_soon\":["	+ join(GetTimecardsWithExpiredPayment("1/2", sow_sql, &db, &user)) + "],"
-								"\"number_of_payment_pending_bt\":"			+ GetNumberOfBTInPaymentPendingState(sow_sql, &db, &user) + ","
-								"\"bt_late_payment\":["						+ join(GetBTWithExpiredPayment("1", sow_sql, &db, &user)) + "],"
-								"\"bt_payment_will_be_late_soon\":["		+ join(GetBTWithExpiredPayment("1/2", sow_sql, &db, &user)) + "]"
-							;
-			}
-			else
-			{
-				error_message = "Ошибка построения панели управления";
-				MESSAGE_ERROR("", action, error_message);
-			}
+			success_message = GetDashboardPaymentData(sow_sql, &db, &user);
 		}
 		else
 		{

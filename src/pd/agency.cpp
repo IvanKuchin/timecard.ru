@@ -140,6 +140,7 @@ int main(void)
 			MESSAGE_DEBUG("", action, "finish");
 		}
 
+/*
 		if(action == "AJAX_getTimecardList")
 		{
 			ostringstream	ostResult;
@@ -160,9 +161,8 @@ int main(void)
 					if(companies_list.length()) companies_list += ",";
 					companies_list += db.Get(i, 0);
 				}
-
 				ostResult << "{"
-								"\"status\":\"success\","
+								"\"result\":\"success\","
 								"\"sow\":[" << GetSOWInJSONFormat(
 										"SELECT * FROM `contracts_sow` WHERE "
 											"`agency_company_id` IN (" + companies_list + ") "
@@ -170,13 +170,14 @@ int main(void)
 								"\"timecards\":[" << GetTimecardsInJSONFormat(
 										"SELECT * FROM `timecards` WHERE "
 											"`contract_sow_id` IN ( SELECT `id` FROM `contracts_sow` WHERE `agency_company_id` IN (" + companies_list + "))"
-										";", &db, &user) << "]" // --- extended true due to approved date is required
+										";", &db, &user) << "],"
+								"\"holiday_calendar\":[" + GetHolidayCalendarInJSONFormat("SELECT * FROM `holiday_calendar` WHERE `agency_company_id` IN (SELECT `agency_company_id` FROM `contracts_sow` WHERE `agency_company_id` IN (" + companies_list + "));", &db, &user) + "]"
 							"}";
 			}
 			else
 			{
 				MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't owns company");
-				ostResult << "{\"status\":\"error\",\"description\":\"Вы не создали компанию\"}";
+				ostResult << "{\"result\":\"error\",\"description\":\"Вы не создали компанию\"}";
 			}
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
@@ -188,6 +189,37 @@ int main(void)
 
 			MESSAGE_DEBUG("", action, "finish");
 		}
+*/
+	if(action == "AJAX_getTimecardList")
+	{
+		MESSAGE_DEBUG("", action, "start");
+
+		auto			error_message = ""s;
+		auto			success_message = ""s;
+		int				affected = db.Query("SELECT `id` FROM `company` WHERE `admin_userID`=\"" + user.GetID() + "\";");
+
+		if(affected)
+		{
+			auto		companies_list= ""s;
+
+			for(int i = 0; i < affected; ++i)
+			{
+				if(companies_list.length()) companies_list += ",";
+				companies_list += db.Get(i, 0);
+			}
+
+			success_message = GetTimecardList("`agency_company_id` IN (" + companies_list + ")", &db, &user);
+		}
+		else
+		{
+			error_message = gettext("you are not authorized");
+			MESSAGE_ERROR("", action, error_message);
+		}
+
+		AJAX_ResponseTemplate(&indexPage, success_message, error_message);
+
+		MESSAGE_DEBUG("", action, "finish");
+	}
 
 		if(action == "AJAX_getBTList")
 		{
@@ -1076,14 +1108,7 @@ int main(void)
 									"SELECT `company_id` FROM `company_employees` WHERE `user_id`=" + quoted(user.GetID()) + 
 								")";
 
-				success_message = 
-								"\"number_of_payment_pending_timecards\":"	+ GetNumberOfTimecardsInPaymentPendingState(sow_sql, &db, &user) + ","
-								"\"timecard_late_payment\":["				+ join(GetTimecardsWithExpiredPayment("1", sow_sql, &db, &user)) + "],"
-								"\"timecard_payment_will_be_late_soon\":["	+ join(GetTimecardsWithExpiredPayment("1/2", sow_sql, &db, &user)) + "],"
-								"\"number_of_payment_pending_bt\":"			+ GetNumberOfBTInPaymentPendingState(sow_sql, &db, &user) + ","
-								"\"bt_late_payment\":["						+ join(GetBTWithExpiredPayment("1", sow_sql, &db, &user)) + "],"
-								"\"bt_payment_will_be_late_soon\":["		+ join(GetBTWithExpiredPayment("1/2", sow_sql, &db, &user)) + "]"
-							;
+				success_message = GetDashboardPaymentData(sow_sql, &db, &user);
 			}
 			else
 			{
@@ -5669,79 +5694,115 @@ int main(void)
 		{
 			MESSAGE_DEBUG("", action, "start");
 
-			auto			timestamp = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("timestamp"));
-			auto			list_param = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("id"));
+			auto			timestamp	= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("timestamp"));
+			auto			list_param	= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("id"));
+			auto			entity		= (
+											action == "AJAX_updateTimecardOriginalDocumentsDelivery"? "timecard"s :
+											action == "AJAX_updateBTOriginalDocumentsDelivery"		? "bt"s :
+											""s
+											);
 
 			auto			error_message = ""s;
 			auto			success_message = ""s;
 
 			auto			list = split(list_param, ',');
 
-			for(auto i = 0u; i < list.size() && error_message.empty(); ++i)
+			if(entity.length())
 			{
-				auto	sql_query = ""s;
-
-				if(action == "AJAX_updateTimecardOriginalDocumentsDelivery")sql_query = "SELECT `contract_sow_id` FROM `timecards` WHERE `id`=" + quoted(list[i]) + ";";
-				else if(action == "AJAX_updateBTOriginalDocumentsDelivery")	sql_query = "SELECT `contract_sow_id` FROM `bt` WHERE `id`=" + quoted(list[i]) + ";";
-				else
+				for(auto i = 0u; i < list.size() && error_message.empty(); ++i)
 				{
-					error_message = gettext("entity type is unknown");
-					MESSAGE_ERROR("", action, error_message);
-				}
+					auto	sql_query = ""s;
 
-				if(error_message.empty())
-				{
-					if(db.Query(sql_query))
+					if(entity == "timecard")	sql_query = "SELECT `contract_sow_id` FROM `timecards` WHERE `id`=" + quoted(list[i]) + ";";
+					else if(entity == "bt")		sql_query = "SELECT `contract_sow_id` FROM `bt` WHERE `id`=" + quoted(list[i]) + ";";
+					else
 					{
-						auto	sow_id = db.Get(0, 0);
+						error_message = gettext("entity type is unknown");
+						MESSAGE_ERROR("", action, error_message);
+					}
 
-						error_message = isAgencyEmployeeAllowedToChangeSoW(sow_id, &db, &user);
-						if(error_message.empty())
+					if(error_message.empty())
+					{
+						if(db.Query(sql_query))
 						{
-							auto	sql_query = ""s;
+							auto	sow_id = db.Get(0, 0);
 
-							if(action == "AJAX_updateTimecardOriginalDocumentsDelivery")sql_query = "UPDATE `timecards` SET `originals_received_date`=" + quoted(timestamp) + " WHERE `id`=" + quoted(list[i]) + ";";
-							else if(action == "AJAX_updateBTOriginalDocumentsDelivery")	sql_query = "UPDATE `bt` SET `originals_received_date`=" + quoted(timestamp) + " WHERE `id`=" + quoted(list[i]) + ";";
+							error_message = isAgencyEmployeeAllowedToChangeSoW(sow_id, &db, &user);
+							if(error_message.empty())
+							{
+								auto	sql_query = ""s;
+
+								if(entity == "timecard")	sql_query = "UPDATE `timecards` SET `originals_received_date`=" + quoted(timestamp) + " WHERE `id`=" + quoted(list[i]) + ";";
+								else if(entity == "bt")		sql_query = "UPDATE `bt` SET `originals_received_date`=" + quoted(timestamp) + " WHERE `id`=" + quoted(list[i]) + ";";
+								else
+								{
+									error_message = gettext("entity type is unknown");
+									MESSAGE_ERROR("", action, error_message);
+								}
+
+								db.Query(sql_query);
+								if(db.isError())
+								{
+									error_message = db.GetErrorMessage();
+									MESSAGE_ERROR("", action, error_message);
+								}
+
+								if(error_message.empty())
+								{
+									if((error_message = Update_TimecardBT_ExpectedPayDate(entity, list[i], &db, &user)).empty()) 
+									{
+										if(GeneralNotifySoWContractPartiesAboutChanges(action, list[i], sow_id, GetDBValueByAction(action, list[i], sow_id, &db, &user), timestamp, &db, &user))
+										{
+											// --- don't do anything here
+										}
+										else
+										{
+											MESSAGE_DEBUG("", action, "fail to notify sow.id(" + sow_id + ") parties about changes");
+										}
+									}
+									else
+									{
+										MESSAGE_ERROR("", action, error_message);
+									}
+								}
+								
+								if(error_message.empty())
+								{
+									if(entity == "timecard")
+									{
+										success_message += GetTimecardsInJSONFormat("SELECT * FROM `timecards` WHERE `id`=" + quoted(list[i]) + ";", &db, &user, false);
+									}
+									else if(entity == "bt")
+									{
+										success_message += GetBTsInJSONFormat("SELECT * FROM `bt` WHERE `id`=" + quoted(list[i]) + ";", &db, &user, false);
+									}
+									else
+									{
+										error_message = gettext("entity type is unknown");
+										MESSAGE_ERROR("", action, error_message);
+									}
+								}
+							}
 							else
 							{
-								error_message = gettext("entity type is unknown");
-								MESSAGE_ERROR("", action, error_message);
-							}
-
-							db.Query(sql_query);
-							if(db.isError())
-							{
-								error_message = db.GetErrorMessage();
-								MESSAGE_ERROR("", action, error_message);
-							}
-
-							if(action == "AJAX_updateTimecardOriginalDocumentsDelivery")
-							{
-								success_message += GetTimecardsInJSONFormat("SELECT * FROM `timecards` WHERE `id`=" + quoted(list[i]) + ";", &db, &user, false);
-							}
-							else if(action == "AJAX_updateBTOriginalDocumentsDelivery")
-							{
-								success_message += GetBTsInJSONFormat("SELECT * FROM `bt` WHERE `id`=" + quoted(list[i]) + ";", &db, &user, false);
-							}
-							else
-							{
-								error_message = gettext("entity type is unknown");
-								MESSAGE_ERROR("", action, error_message);
+								MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") doesn't allowed to change agency data");
 							}
 						}
 						else
 						{
-							MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") doesn't allowed to change agency data");
+							error_message = gettext("SoW not known");
+							MESSAGE_ERROR("", action, error_message);
 						}
 					}
-					else
-					{
-						error_message = gettext("SoW not known");
-						MESSAGE_ERROR("", action, error_message);
-					}
-				}
 
+				}
 			}
+			else
+			{
+				error_message = gettext("entity type is unknown");
+				MESSAGE_ERROR("", action, error_message);
+			}
+
 
 			if(success_message.length()) success_message = "\"items\":[" + success_message + "]";
 

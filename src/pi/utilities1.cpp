@@ -6088,6 +6088,14 @@ pair<struct tm, struct tm> GetFirstAndLastDateOfLastMonth()
 	return make_pair(start_of_last_mon, end_of_last_mon);
 }
 */
+
+auto GetSpellingDate(long int seconds_since_epoch) -> string
+{
+	C_Date_Spelling	date_spelling(*(localtime(&seconds_since_epoch)));
+
+	return date_spelling.Spell();
+}
+
 auto GetSpellingFormattedDate(string date, string format) -> string
 {
 	return GetSpellingFormattedDate(GetTMObject(date), format);
@@ -6095,7 +6103,7 @@ auto GetSpellingFormattedDate(string date, string format) -> string
 
 auto GetSpellingFormattedDate(struct tm date_obj, string format) -> string
 {
-	MESSAGE_DEBUG("", "", "start (, " + format + ")");
+	MESSAGE_DEBUG("", "", "start (" + format + ")");
 
 	auto	result = ""s;
 	char	buffer[100];

@@ -67,6 +67,8 @@ auto			GetCostCentersAssignmentInJSONFormat(string sqlQuery, CMysql *, CUser *) 
 auto			GetApproversInJSONFormat(string sqlQuery, CMysql *, CUser *, bool include_sow) -> string;
 auto			GetAbsenceListInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetAbsenceTypesInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
+
+// --- notification spellers
 auto			GetSpelledTimecardCustomerByID(string id, CMysql *) -> string;
 auto			GetSpelledTimecardProjectByID(string id, CMysql *) -> string;
 auto			GetSpelledTimecardTaskByID(string id, CMysql *) -> string;
@@ -91,6 +93,9 @@ auto			GetSpelledBankByID(string id, CMysql *) -> string;
 auto			GetSpelledBTExpenseTemplateByID(string id, CMysql *) -> string;
 auto			GetSpelledBTExpenseTemplateByLineID(string id, CMysql *) -> string;
 auto			GetSpelledBTExpenseTemplateByAssignmentID(string id, CMysql *) -> string;
+auto			GetSpelledBT(string id, CMysql *db) -> string;
+auto			GetSpelledTimecard(string id, CMysql *db) -> string;
+
 auto			isValidToReportTime(string timecard_id, string task_id, string timereport, CMysql *, CUser *) -> string;
 auto			isTaskIDValidToRemove(string task_id, CMysql *) -> string;
 auto			isProjectIDValidToRemove(string task_id, CMysql *) -> bool;
@@ -171,10 +176,16 @@ auto			GetAirfareLimitaionsByDirectionInJSONFormat(string sqlQuery, CMysql *, CU
 auto			GetAirportCountryInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			isValidToAddAirfareLimitByDirection(string from_id, string to_id, string agency_id, CMysql *, CUser *) -> string;
 
-
 auto			GetAbsenceOverlap(string company_id, string start_date, string end_date, CMysql *, CUser *, string exclude_id = "") -> string;
 
+auto			Update_TimecardBT_ExpectedPayDate(string entity, string id, CMysql *db, CUser *user) -> string;
+
 auto			CheckAgreementSoWTitle(string title, string sow_id, CMysql *, CUser *) -> string;
+
+auto			GetDashboardPaymentData(string sow_sql, CMysql *db, CUser *user) -> string;
+auto			GetTimecardList(string where_companies_list, CMysql *db, CUser *user) -> string;
+
+
 auto			isDemoDomain() -> bool;
 
 #endif

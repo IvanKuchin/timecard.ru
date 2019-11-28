@@ -3847,6 +3847,7 @@ string	GetTimecardsInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool i
 		string				submit_date;
 		string				approve_date;
 		string				payed_date;
+		string				expected_pay_date;
 		string				originals_received_date;
 		string				invoice_filename;
 		string				eventTimestamp;
@@ -3869,6 +3870,7 @@ string	GetTimecardsInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool i
 			item.submit_date = db->Get(i, "submit_date");
 			item.approve_date = db->Get(i, "approve_date");
 			item.payed_date = db->Get(i, "payed_date");
+			item.expected_pay_date = db->Get(i, "expected_pay_date");
 			item.invoice_filename = db->Get(i, "invoice_filename");
 			item.originals_received_date = db->Get(i, "originals_received_date");
 			item.status = db->Get(i, "status");
@@ -3890,6 +3892,7 @@ string	GetTimecardsInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool i
 			result += "\"submit_date\":\"" + item.submit_date + "\",";
 			result += "\"approve_date\":\"" + item.approve_date + "\",";
 			result += "\"payed_date\":\"" + item.payed_date + "\",";
+			result += "\"expected_pay_date\":\"" + item.expected_pay_date + "\",";
 			result += "\"originals_received_date\":\"" + item.originals_received_date + "\",";
 			result += "\"invoice_filename\":\"" + item.invoice_filename + "\",";
 			result += "\"status\":\"" + item.status + "\",";
@@ -3936,6 +3939,7 @@ string	GetBTsInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool isExten
 		string	submit_date;
 		string	approve_date;
 		string	payed_date;
+		string	expected_pay_date;
 		string	originals_received_date;
 		string	invoice_filename;
 		string	eventTimestamp;
@@ -3962,6 +3966,7 @@ string	GetBTsInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool isExten
 			item.submit_date = db->Get(i, "submit_date");
 			item.approve_date = db->Get(i, "approve_date");
 			item.payed_date = db->Get(i, "payed_date");
+			item.expected_pay_date = db->Get(i, "expected_pay_date");
 			item.originals_received_date = db->Get(i, "originals_received_date");
 			item.invoice_filename = db->Get(i, "invoice_filename");
 			item.eventTimestamp = db->Get(i, "eventTimestamp");
@@ -3986,6 +3991,7 @@ string	GetBTsInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool isExten
 			result += "\"submit_date\":\"" + item.submit_date + "\",";
 			result += "\"approve_date\":\"" + item.approve_date + "\",";
 			result += "\"payed_date\":\"" + item.payed_date + "\",";
+			result += "\"expected_pay_date\":\"" + item.expected_pay_date + "\",";
 			result += "\"originals_received_date\":\"" + item.originals_received_date + "\",";
 			result += "\"invoice_filename\":\"" + item.invoice_filename + "\",";
 			if(isExtended)

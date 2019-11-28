@@ -587,7 +587,7 @@ auto	GetBT_ApprovalChain(string bt_id, CMysql *db) -> string
 	return	result;
 }
 
-auto			GetHolidaysSet(string day_around, CMysql *db) -> unordered_set<string>
+auto GetHolidaysSet(string day_around, CMysql *db) -> unordered_set<string>
 {
 	MESSAGE_DEBUG("", "", "start");
 
@@ -602,4 +602,84 @@ auto			GetHolidaysSet(string day_around, CMysql *db) -> unordered_set<string>
 	MESSAGE_DEBUG("", "", "finish (number of hoildays = " + to_string(result.size()) + ")");
 
 	return result;
+}
+
+auto Update_TimecardBT_ExpectedPayDate(string entity, string id, CMysql *db, CUser *user) -> string
+{
+	MESSAGE_DEBUG("", "", "start(" + entity + ", " + id + ")");
+
+	auto	error_message = ""s;
+
+	if(entity.length())
+	{
+		auto	sql_query = ""s;
+
+		if(entity == "timecard")
+		{
+			sql_query = "UPDATE `timecards` SET `expected_pay_date`=";
+			if(db->Query("SELECT `contract_sow_id` FROM `timecards` WHERE `id`=" + quoted(id) + " AND `originals_received_date`>\"0\";"))
+				sql_query += "`originals_received_date` + 3600 * 24 * (SELECT `payment_period_service` FROM `contracts_sow` WHERE `id`=" + quoted(db->Get(0, "contract_sow_id")) + ")";
+			else
+				sql_query += quoted("0"s);
+			sql_query += " WHERE `id`=" + quoted(id) + ";";
+		}
+		else if(entity == "bt")
+		{
+			sql_query = "UPDATE `bt` SET `expected_pay_date`=";
+			if(db->Query("SELECT `contract_sow_id` FROM `bt` WHERE `id`=" + quoted(id) + " AND `originals_received_date`>\"0\";"))
+				sql_query += "`originals_received_date` + 3600 * 24 * (SELECT `payment_period_bt` FROM `contracts_sow` WHERE `id`=" + quoted(db->Get(0, "contract_sow_id")) + ")";
+			else
+				sql_query += quoted("0"s);
+			sql_query += " WHERE `id`=" + quoted(id) + ";";
+		}
+		else
+		{
+			error_message = gettext("entity type is unknown");
+			MESSAGE_ERROR("", "", error_message);
+		}
+
+		db->Query(sql_query);
+		if(db->isError())
+		{
+			error_message = gettext("SQL syntax error");
+			MESSAGE_ERROR("", "", error_message);
+		}
+		else
+		{
+		}
+
+	}
+	else
+	{
+		error_message = gettext("entity type is unknown");
+		MESSAGE_ERROR("", "", error_message);
+	}
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return error_message;
+}
+
+auto	GetDashboardPaymentData(string sow_sql, CMysql *db, CUser *user) -> string
+{
+	return 
+		"\"number_of_payment_pending_timecards\":"	+ GetNumberOfTimecardsInPaymentPendingState(sow_sql, db, user) + ","
+		"\"timecard_late_payment\":["				+ join(GetTimecardsWithExpiredPayment("0", sow_sql, db, user)) + "],"
+		"\"timecard_payment_will_be_late_soon\":["	+ join(GetTimecardsWithExpiredPayment("1/2", sow_sql, db, user)) + "],"
+		"\"number_of_payment_pending_bt\":"			+ GetNumberOfBTInPaymentPendingState(sow_sql, db, user) + ","
+		"\"bt_late_payment\":["						+ join(GetBTWithExpiredPayment("0", sow_sql, db, user)) + "],"
+		"\"bt_payment_will_be_late_soon\":["		+ join(GetBTWithExpiredPayment("1/2", sow_sql, db, user)) + "]"
+		;
+}
+
+auto	GetTimecardList(string where_companies_list, CMysql *db, CUser *user) -> string
+{
+	return
+		"\"sow\":[" + GetSOWInJSONFormat("SELECT * FROM `contracts_sow` WHERE " + where_companies_list + ";", db, user, false, false, false, true) + "],"
+		"\"timecards\":[" + GetTimecardsInJSONFormat(
+				"SELECT * FROM `timecards` WHERE "
+					"`contract_sow_id` IN ( SELECT `id` FROM `contracts_sow` WHERE " + where_companies_list + ")"
+				";", db, user) + "],"
+		"\"holiday_calendar\":[" + GetHolidayCalendarInJSONFormat("SELECT * FROM `holiday_calendar` WHERE `agency_company_id` IN (SELECT `agency_company_id` FROM `contracts_sow` WHERE " + where_companies_list + ");", db, user) + "]"
+		;
 }
