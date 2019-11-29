@@ -144,14 +144,14 @@ auto C_Invoice_BT_Agency_To_CC::GenerateDocumentArchive() -> string
 			vat_filename_xls				= temp_dir_cost_center_invoices + "vat_" + to_string(i) + ".xls";
 			vat_filename_pdf				= temp_dir_cost_center_invoices + "vat_" + to_string(i) + ".pdf";
 			cc_service_filename_1c			= temp_dir_1c + "costcenter_bt_" + to_string(i) + ".xml";
-			subc_payment_filename_1c		= temp_dir_1c + "subcontractor_payment_" + to_string(i) + ".xml";
-			subc_payment_order_filename_1c	= temp_dir_1c + "subcontractor_payment_order_" + to_string(i) + ".xml";
+			// subc_payment_filename_1c		= temp_dir_1c + "subcontractor_payment_" + to_string(i) + ".xml";
+			// subc_payment_order_filename_1c	= temp_dir_1c + "subcontractor_payment_order_" + to_string(i) + ".xml";
 		} while(
 				isFileExists(invoice_filename_xls)		|| isFileExists(invoice_filename_pdf) ||
 				isFileExists(act_filename_xls)			|| isFileExists(act_filename_pdf) ||
 				isFileExists(vat_filename_xls)			|| isFileExists(vat_filename_pdf) ||
-				isFileExists(cc_service_filename_1c)	|| 
-				isFileExists(subc_payment_filename_1c)	|| isFileExists(subc_payment_order_filename_1c)
+				isFileExists(cc_service_filename_1c) 
+				// isFileExists(subc_payment_filename_1c)	|| isFileExists(subc_payment_order_filename_1c)
 				);
 
 		if(error_message.empty())
@@ -280,9 +280,12 @@ auto C_Invoice_BT_Agency_To_CC::GenerateDocumentArchive() -> string
 			subc_1c_payment_printer->SetDB(db);
 			subc_1c_payment_printer->SetVariableSet(&invoicing_vars);
 
-			if(error_message.empty()) 
+			for(auto i = 1; subc_1c_payment_printer->isTableRowExists(i) && error_message.empty(); ++i)
 			{
-				subc_1c_payment_printer->SetFilename(subc_payment_filename_1c);
+				subc_1c_payment_printer->SetIdx(i);
+				
+				// subc_1c_payment_printer->SetFilename(subc_payment_filename_1c);
+				subc_1c_payment_printer->SetFolder(temp_dir_1c_subc_payments);
 				error_message = subc_1c_payment_printer->Print();
 				if(error_message.empty()) {}
 				else
@@ -300,9 +303,12 @@ auto C_Invoice_BT_Agency_To_CC::GenerateDocumentArchive() -> string
 			subc_1c_payment_order_printer->SetDB(db);
 			subc_1c_payment_order_printer->SetVariableSet(&invoicing_vars);
 
-			if(error_message.empty()) 
+			for(auto i = 1; subc_1c_payment_order_printer->isTableRowExists(i) && error_message.empty(); ++i)
 			{
-				subc_1c_payment_order_printer->SetFilename(subc_payment_order_filename_1c);
+				subc_1c_payment_order_printer->SetIdx(i);
+
+				// subc_1c_payment_order_printer->SetFilename(subc_payment_order_filename_1c);
+				subc_1c_payment_order_printer->SetFolder(temp_dir_1c_subc_payment_orders);
 				error_message = subc_1c_payment_order_printer->Print();
 				if(error_message.empty()) {}
 				else
@@ -382,6 +388,8 @@ auto C_Invoice_BT_Agency_To_CC::CreateTempDirectory() -> bool
 		temp_dir_bt = temp_dir + "bt/";
 		temp_dir_cost_center_invoices = temp_dir + "invoices/";
 		temp_dir_1c = temp_dir + "1c/";
+		temp_dir_1c_subc_payments = temp_dir_1c + "subc_payments/";
+		temp_dir_1c_subc_payment_orders = temp_dir_1c + "subc_payment_orders/";
 
 		if(CreateDir(temp_dir_bt))
 		{
@@ -389,7 +397,21 @@ auto C_Invoice_BT_Agency_To_CC::CreateTempDirectory() -> bool
 			{
 				if(CreateDir(temp_dir_1c))
 				{
-					result = true;
+					if(CreateDir(temp_dir_1c_subc_payments))
+					{
+						if(CreateDir(temp_dir_1c_subc_payment_orders))
+						{
+							result = true;
+						}
+						else
+						{
+							MESSAGE_ERROR("", "", "fail to create " + temp_dir_1c_subc_payment_orders);
+						}
+					}
+					else
+					{
+						MESSAGE_ERROR("", "", "fail to create " + temp_dir_1c_subc_payments);
+					}
 				}
 				else
 				{

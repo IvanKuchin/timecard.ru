@@ -33,6 +33,8 @@ class C_Invoice_Service_Agency_To_CC
 		string							temp_dir_timecards = "";
 		string							temp_dir_cost_center_invoices = "";
 		string							temp_dir_1c = "";
+		string							temp_dir_1c_subc_payments = "";
+		string							temp_dir_1c_subc_payment_orders = "";
 		string							temp_archive_file = "";	// --- archive in temp_dir
 		string							archive_folder = "";	// --- production archive folder
 		string							archive_file = "";		// --- archive in production folder

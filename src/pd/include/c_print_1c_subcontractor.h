@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <locale>
+#include <wctype.h>
 
 #pragma GCC diagnostic push 
 #pragma GCC diagnostic ignored "-Wunused-local-typedefs"
@@ -25,23 +26,35 @@ class C_Print_1C_Subcontractor_Base
 		CMysql							*db = NULL;
 		C_Invoicing_Vars				*vars;
 
+		string							folder = "";
 		string							filename = "";
 		string							subcontractor_id = "";
+		int								idx = 0;
 
 		int								total_table_items = 0;
 
 		string							content = "";
+
+		auto			PreprocessFilename(string filename) -> string;
+		auto			CraftUniqueFilename() -> string;
+
+		auto			GetIdx()										{ return idx; }
+		auto			GetFolder()										{ return folder; }
+		// auto			GetFilename()									{ return filename; }
 	public:
 		auto			isTableRowExists(int i) -> bool					{ return vars->Get("index_" + to_string(i)).length(); };
 
 		auto			SetDB(CMysql *param)							{ db = param; };
 		auto			SetFilename(const string &param1)				{ filename = param1; };
 		auto			SetFilename(string &&param1) 					{ filename = move(param1); };
+		auto			SetFolder(const string &param1)					{ folder = param1; };
+		auto			SetFolder(string &&param1) 						{ folder = move(param1); };
 		auto			SetSubcontractorID(const string &param1)		{ subcontractor_id = param1; };
 		auto			SetSubcontractorID(string &&param1) 			{ subcontractor_id = move(param1); };
 		auto			SetVariableSet(C_Invoicing_Vars *param)			{ vars = param; };
 
-		auto			GetFilename()									{ return filename; }
+		auto			SetIdx(int param)								{ idx = param; }
+
 		auto			SaveFile() -> string;
 
 		auto			RenderTemplate() -> string;

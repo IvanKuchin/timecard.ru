@@ -190,36 +190,36 @@ int main(void)
 			MESSAGE_DEBUG("", action, "finish");
 		}
 */
-	if(action == "AJAX_getTimecardList")
-	{
-		MESSAGE_DEBUG("", action, "start");
-
-		auto			error_message = ""s;
-		auto			success_message = ""s;
-		int				affected = db.Query("SELECT `id` FROM `company` WHERE `admin_userID`=\"" + user.GetID() + "\";");
-
-		if(affected)
+		if(action == "AJAX_getTimecardList")
 		{
-			auto		companies_list= ""s;
+			MESSAGE_DEBUG("", action, "start");
 
-			for(int i = 0; i < affected; ++i)
+			auto			error_message = ""s;
+			auto			success_message = ""s;
+			auto			affected = db.Query("SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user.GetID() + "\";");
+
+			if(affected)
 			{
-				if(companies_list.length()) companies_list += ",";
-				companies_list += db.Get(i, 0);
+				auto		companies_list= ""s;
+
+				for(int i = 0; i < affected; ++i)
+				{
+					if(companies_list.length()) companies_list += ",";
+					companies_list += db.Get(i, 0);
+				}
+
+				success_message = GetTimecardList("`agency_company_id` IN (" + companies_list + ")", &db, &user);
+			}
+			else
+			{
+				error_message = gettext("you are not authorized");
+				MESSAGE_ERROR("", action, error_message);
 			}
 
-			success_message = GetTimecardList("`agency_company_id` IN (" + companies_list + ")", &db, &user);
-		}
-		else
-		{
-			error_message = gettext("you are not authorized");
-			MESSAGE_ERROR("", action, error_message);
-		}
+			AJAX_ResponseTemplate(&indexPage, success_message, error_message);
 
-		AJAX_ResponseTemplate(&indexPage, success_message, error_message);
-
-		MESSAGE_DEBUG("", action, "finish");
-	}
+			MESSAGE_DEBUG("", action, "finish");
+		}
 
 		if(action == "AJAX_getBTList")
 		{
@@ -1733,7 +1733,12 @@ int main(void)
 										{
 											string		existing_value = GetDBValueByAction(action, id, "", &db, &user);
 
-											error_message = SetNewValueByAction(action, id, "", new_value, &db, &user);
+											if(existing_value != new_value)
+												error_message = SetNewValueByAction(action, id, "", new_value, &db, &user);
+											else
+											{
+												MESSAGE_DEBUG("", action, "existing_value == new_value(" + new_value + "), no need to change DB");
+											}
 											if(error_message.empty())
 											{
 												// --- good finish

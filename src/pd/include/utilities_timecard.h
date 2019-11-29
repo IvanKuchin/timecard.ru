@@ -145,6 +145,7 @@ auto			GetSoWIDByTimecardID(string timecard_id, CMysql *, CUser *) -> string;
 auto			GetPSoWIDByBTIDAndCostCenterID(string timecard_id, string cost_center_id, CMysql *, CUser *) -> string;
 auto			GetPositionByCompanyID(string company_id, CMysql *, CUser *) -> string;
 
+auto			isUserAllowedToCreateBIK(CUser *, CMysql *) -> string;
 auto			isServiceInvoiceBelongsToUser(string service_invoice_id, CMysql *, CUser *) -> bool;
 auto			RecallServiceInvoice(string service_invoice_id, CMysql *, CUser *) -> string;
 auto			isBTInvoiceBelongsToUser(string service_invoice_id, CMysql *, CUser *) -> bool;

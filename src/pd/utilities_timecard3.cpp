@@ -683,3 +683,10 @@ auto	GetTimecardList(string where_companies_list, CMysql *db, CUser *user) -> st
 		"\"holiday_calendar\":[" + GetHolidayCalendarInJSONFormat("SELECT * FROM `holiday_calendar` WHERE `agency_company_id` IN (SELECT `agency_company_id` FROM `contracts_sow` WHERE " + where_companies_list + ");", db, user) + "]"
 		;
 }
+
+// --- stub function: deny all 
+// --- if some users need to be allowed to create BIK, algorithm must be written here
+auto isUserAllowedToCreateBIK(CUser *user, CMysql *sql) -> string 
+{
+	return gettext("you are not authorized to create new BIK");
+}

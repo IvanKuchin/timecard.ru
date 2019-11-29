@@ -320,7 +320,7 @@ int main(void)
 			}
 			else
 			{
-				error_message = "Некорректный параметры";
+				error_message = gettext("parameters incorrect");
 				MESSAGE_DEBUG("", "", "fail to get country name or zip code");
 			}
 
@@ -377,7 +377,7 @@ int main(void)
 			}
 			else
 			{
-				error_message = "Некорректный параметры";
+				error_message = gettext("parameters incorrect");
 				MESSAGE_DEBUG("", "", "fail to get country name or region code");
 			}
 
@@ -437,7 +437,7 @@ int main(void)
 			}
 			else
 			{
-				error_message = "Некорректный параметры";
+				error_message = gettext("parameters incorrect");
 				MESSAGE_DEBUG("", "", "fail to get country name or region code");
 			}
 
@@ -903,7 +903,7 @@ int main(void)
 			}
 			else
 			{
-				error_message = "Некорректный параметры";
+				error_message = gettext("parameters incorrect");
 				MESSAGE_DEBUG("", "", "mandatory parameter missed");
 			}
 
@@ -924,38 +924,42 @@ int main(void)
 
 		if(action == "AJAX_getBankInfoByBIK")
 		{
-			string			bik = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("bik"));
-			string			template_name = "json_response.htmlt";
-			string			error_message = "";
-			ostringstream	ostResult;
+			MESSAGE_DEBUG("", action, "start");
 
-			ostResult.str("");
+			auto			bik = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("bik"));
+			auto			success_message = ""s;
+			auto			error_message = ""s;
 
 			if(bik.length())
 			{
-				ostResult << "{\"result\":\"success\","
-						  << "\"banks\":[" << GetBankInJSONFormat("SELECT * FROM `banks` WHERE `bik`=\"" + bik + "\";", &db, &user) << "]"
-						  << "}";
+				auto temp_message = GetBankInJSONFormat("SELECT * FROM `banks` WHERE `bik`=\"" + bik + "\";", &db, &user);
+
+				if(temp_message.length())
+				{
+					success_message = "\"banks\":[" + temp_message + "]";
+				}
+				else
+				{
+					if((error_message = isUserAllowedToCreateBIK(&user, &db)).empty())
+					{
+						// --- user allowed to create new BIK
+						success_message = "\"banks\":[]";
+					}
+					else
+					{
+						MESSAGE_DEBUG("", action, error_message);
+					}
+				}
 			}
 			else
 			{
-				error_message = "Некорректный параметры";
-				MESSAGE_DEBUG("", "", "fail to get country name or zip code");
+				error_message = gettext("bank_id is empty");
+				MESSAGE_DEBUG("", "", error_message);
 			}
 
-			if(error_message.empty())
-			{
-			}
-			else
-			{
-				MESSAGE_DEBUG("", action, "failed");
-				ostResult.str("");
-				ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
-			}
+			AJAX_ResponseTemplate(&indexPage, success_message, error_message);
 
-			indexPage.RegisterVariableForce("result", ostResult.str());
-
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			MESSAGE_DEBUG("", action, "finish");
 		}
 
 		if(action == "AJAX_submitNewBank")
