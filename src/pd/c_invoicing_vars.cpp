@@ -1367,7 +1367,7 @@ auto	C_Invoicing_Vars::AgreementNumberSpelling_VarSet(string agreement_number) -
 				}
 				if(error_message.empty())
 				{
-					if((error_message = AssignVariableValue("comment_1C", gettext("Local service delivery") + " "s + date_obj.GetFormatted("%B %Y"), true)).length())
+					if((error_message = AssignVariableValue("comment_1C_suffix", date_obj.GetFormatted("%B %Y"), true)).length())
 						{ MESSAGE_ERROR("", "", "fail to assign variable value"); }
 				}
 			}

@@ -31,6 +31,11 @@ class C_Print_1C_CostCenter_Base
 		int								total_table_items = 0;
 
 		string							content = "";
+
+		virtual auto	GetTemplateFullPath()					-> string	const	= 0;
+		virtual auto	GetTemplateTableRowFullPath()			-> string	const	= 0;
+		virtual auto	SetTableVariable(const string &param)	-> void	= 0;
+		virtual	auto	SetCommentVariable()					-> void = 0;
 	public:
 		auto			isTableRowExists(int i) -> bool					{ return vars->Get("index_" + to_string(i)).length(); };
 
@@ -46,15 +51,33 @@ class C_Print_1C_CostCenter_Base
 
 		auto			RenderTemplate() -> string;
 
-		virtual	auto	Print() -> string								= 0;
+		auto			Print() -> string;
 };
 
 ostream&	operator<<(ostream& os, const C_Print_1C_CostCenter_Base &);
 
-class C_Print_1C_CostCenter_Selling : public C_Print_1C_CostCenter_Base
+class C_Print_1C_CostCenter_Service : public C_Print_1C_CostCenter_Base
 {
-	public:
-		auto			Print() -> string;
+	protected:
+		auto			GetTemplateFullPath()					-> string	const	{ return vars->Get("1C_template_invoice_to_cc_service_full_path"); };
+		auto			GetTemplateTableRowFullPath()			-> string	const	{ return vars->Get("1C_template_invoice_to_cc_service_table_row_full_path"); };
+		auto			SetTableVariable(const string &param)	-> void				{ vars->AssignVariableValue("Table_Service_Invoice_To_CostCenter_1C", param, true); };
+		auto			SetCommentVariable()					-> void				{ vars->AssignVariableValue("comment_1C", gettext("Local service delivery") + " "s + vars->Get("comment_1C_suffix"), true); };
+};
+
+class C_Print_1C_CostCenter_BT : public C_Print_1C_CostCenter_Base
+{
+	protected:
+		auto			GetTemplateFullPath()					-> string	const	{ return vars->Get("1C_template_invoice_to_cc_bt_full_path"); };
+		auto			GetTemplateTableRowFullPath()			-> string	const	{ return vars->Get("1C_template_invoice_to_cc_bt_table_row_full_path"); };
+		auto			SetTableVariable(const string &param)	-> void				{ vars->AssignVariableValue("Table_BT_Invoice_To_CostCenter_1C", param, true); };
+		auto			SetCommentVariable()					-> void				{ vars->AssignVariableValue("comment_1C", gettext("Remote service delivery") + " "s + vars->Get("comment_1C_suffix"), true); };
+/*
+		auto			GetTemplateFullPath()					-> string	const	{ return vars->Get("1C_template_invoice_to_cc_service_full_path"); };
+		auto			GetTemplateTableRowFullPath()			-> string	const	{ return vars->Get("1C_template_invoice_to_cc_service_table_row_full_path"); };
+		auto			SetTableVariable(const string &param)	-> void				{ vars->AssignVariableValue("Table_Service_Invoice_To_CostCenter_1C", param, true); };
+		auto			SetCommentVariable()					-> void				{ vars->AssignVariableValue("comment_1C", gettext("Remote service delivery") + " "s + vars->Get("comment_1C_suffix"), true); };
+*/
 };
 
 #endif

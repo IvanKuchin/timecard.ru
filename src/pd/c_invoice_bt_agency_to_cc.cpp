@@ -17,7 +17,7 @@ auto C_Invoice_BT_Agency_To_CC::GenerateDocumentArchive() -> string
 	C_Print_VAT_Agency						__vat_obj;
 	C_Print_VAT_Base						*vat_printer = &__vat_obj;
 
-	C_Print_1C_CostCenter_Selling			__cc_1c_main_obj1;
+	C_Print_1C_CostCenter_BT				__cc_1c_main_obj1;
 	C_Print_1C_CostCenter_Base				*cc_1c_selling_printer = &__cc_1c_main_obj1;
 
 	C_Print_1C_Subcontractor_Payment		__subc_1c_main_obj1;

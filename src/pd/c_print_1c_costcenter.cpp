@@ -10,10 +10,12 @@ auto	C_Print_1C_CostCenter_Base::RenderTemplate() -> string
 	// --- build table for service invoice
 	if(error_message.empty())
 	{
-		if(vars->Get("1C_template_invoice_to_cc_service_table_row_full_path").length())
+		if(GetTemplateTableRowFullPath().length())
 		{
 			auto	table_content = ""s;
 
+			SetCommentVariable();
+			
 			for(auto i = 1; isTableRowExists(i); ++i)
 			{
 				CCgi		render_obj;
@@ -22,7 +24,7 @@ auto	C_Print_1C_CostCenter_Base::RenderTemplate() -> string
 				vars_obj.SetIndex(to_string(i));
 				render_obj.SetVars(vars_obj);
 
-				if(render_obj.SetTemplateFile(vars->Get("1C_template_invoice_to_cc_service_table_row_full_path")))
+				if(render_obj.SetTemplateFile(GetTemplateTableRowFullPath()))
 				{
 					table_content += render_obj.RenderTemplate();
 				}
@@ -35,7 +37,8 @@ auto	C_Print_1C_CostCenter_Base::RenderTemplate() -> string
 				if(error_message.length()) break;
 			}
 
-			vars->AssignVariableValue("Table_Service_Invoice_To_CostCenter_1C", table_content, true);
+			SetTableVariable(table_content);
+			// vars->AssignVariableValue("Table_Service_Invoice_To_CostCenter_1C", table_content, true);
 		}
 		else
 		{
@@ -46,14 +49,14 @@ auto	C_Print_1C_CostCenter_Base::RenderTemplate() -> string
 	// --- build service invoice
 	if(error_message.empty())
 	{
-		if(vars->Get("1C_template_invoice_to_cc_service_full_path").length())
+		if(GetTemplateFullPath().length())
 		{
 			CCgi		render_obj;
 			CVars		vars_obj = vars->GetVars();
 
 			render_obj.SetVars(vars_obj);
 
-			if(render_obj.SetTemplateFile(vars->Get("1C_template_invoice_to_cc_service_full_path")))
+			if(render_obj.SetTemplateFile(GetTemplateFullPath()))
 			{
 				content = render_obj.RenderTemplate();
 			}
@@ -108,7 +111,7 @@ auto	C_Print_1C_CostCenter_Base::SaveFile() -> string
 	return error_message;
 }
 
-auto	C_Print_1C_CostCenter_Selling::Print() -> string
+auto	C_Print_1C_CostCenter_Base::Print() -> string
 {
 	auto			error_message = ""s;
 
