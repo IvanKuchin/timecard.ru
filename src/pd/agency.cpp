@@ -1360,6 +1360,8 @@ int main(void)
 			(action == "AJAX_updateSoWNumber")					||
 			(action == "AJAX_updateSoWAct")						||
 			(action == "AJAX_updateSoWPosition")				||
+			(action == "AJAX_updateSoWPaymentPeriodService")	||
+			(action == "AJAX_updateSoWPaymentPeriodBT")			||
 			(action == "AJAX_updateSoWDayRate")					||
 			(action == "AJAX_updateSoWSignDate")				||
 			(action == "AJAX_updateSoWStartDate")				||

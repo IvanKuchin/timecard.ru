@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-02 18:12-0500\n"
+"POT-Creation-Date: 2019-12-05 16:43-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -31,6 +31,13 @@ msgid_plural "%d subcontractors"
 msgstr[0] "%d субконтрактору"
 msgstr[1] "%d субконтракторам"
 msgstr[2] "%d субконтракторам"
+
+#, c-format
+msgid "%d days"
+msgid_plural "%d days"
+msgstr[0] "%d день"
+msgstr[1] "%d дня"
+msgstr[2] "%d дней"
 
 msgid "1C generation failed"
 msgstr "Ошибка в выгрузке 1С"
@@ -596,6 +603,9 @@ msgstr "изменилась наценка комндировки"
 msgid "bt markup type changed"
 msgstr "изменился тип нацеки у командировки"
 
+msgid "bt period payment"
+msgstr "период оплаты за командировки"
+
 msgid "bt-s reported"
 msgstr "командировок"
 
@@ -1057,6 +1067,9 @@ msgstr "руб."
 
 msgid "service is not reachable"
 msgstr "сервисе недоступен"
+
+msgid "service period payment"
+msgstr "период оплаты за работы"
 
 msgid "sex is empty"
 msgstr "не указан пол"

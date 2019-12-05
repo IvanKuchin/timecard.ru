@@ -115,6 +115,14 @@ string c_float::PrintPriceTag() const
 	return result;
 }
 
+string c_float::PrintPriceTag_SpaceIfZero() const
+{
+	// --- replace " " to empty may result to following lines overlap. 
+	// --- Empty symbol have 0px height, therefore next line will be printed over existing
+	// --- for example: subc invoice, subc act in summary after table "Total"-line will override "VAT"-line
+	return Get() ? PrintPriceTag() : " ";
+}
+
 c_float::operator string() const
 {
 	return GetFormattedOutput();
@@ -159,7 +167,7 @@ c_float	c_float::operator/(const c_float &term2)
 
 	result = RoundWithPrecision(fma(Get(), 1 / term2.Get(), 0));
 
-	MESSAGE_DEBUG("c_float", "", to_string(Get()) + TIMECARD_ENTRY_TITLE_SEPARATOR + to_string(term2.Get()) + " = " + to_string(result.Get()));
+	MESSAGE_DEBUG("c_float", "", to_string(Get()) + " / " + to_string(term2.Get()) + " = " + to_string(result.Get()));
 
 	return result;
 }
@@ -169,7 +177,7 @@ c_float	c_float::operator/(const long int &term2)
 	c_float	result;
 
 	result = RoundWithPrecision(Get() / term2);
-	MESSAGE_DEBUG("c_float", "", to_string(Get()) + TIMECARD_ENTRY_TITLE_SEPARATOR + to_string(term2) + " = " + to_string(result.Get()));
+	MESSAGE_DEBUG("c_float", "", to_string(Get()) + " / " + to_string(term2) + " = " + to_string(result.Get()));
 
 	return result;
 }

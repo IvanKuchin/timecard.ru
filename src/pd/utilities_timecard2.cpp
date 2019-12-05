@@ -922,6 +922,8 @@ auto	isActionEntityBelongsToSoW(string action, string id, string sow_id, CMysql 
 				if(action == "AJAX_updateSoWNumber")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
 				if(action == "AJAX_updateSoWAct")					sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
 				if(action == "AJAX_updateSoWPosition")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
+				if(action == "AJAX_updateSoWPaymentPeriodService")	sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
+				if(action == "AJAX_updateSoWPaymentPeriodBT")		sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
 				if(action == "AJAX_updateSoWDayRate")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
 				if(action == "AJAX_updateSoWSignDate")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
 				if(action == "AJAX_updateSoWStartDate")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
@@ -1274,6 +1276,8 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 					else if(action == "AJAX_updateCostCenterTitle")				{ /* --- good to go */ }
 					else if(action == "AJAX_updateCostCenterDescription")		{ /* --- good to go */ }
 					else if(action == "AJAX_updateSoWAct")						{ /* --- good to go */ }
+					else if(action == "AJAX_updateSoWPaymentPeriodService")		{ /* --- good to go */ }
+					else if(action == "AJAX_updateSoWPaymentPeriodBT")			{ /* --- good to go */ }
 					else if(action == "AJAX_updateSoWSignDate")					{ /* --- good to go */ }
 					else if(action == "AJAX_updateSoWCustomField")				{ /* --- good to go */ }
 					else if(action == "AJAX_deleteSoWCustomField")				{ /* --- good to go */ }
@@ -2447,6 +2451,8 @@ auto	GetDBValueByAction(string action, string id, string sow_id, CMysql *db, CUs
 				if(action == "AJAX_updateSoWNumber")						sql_query = "SELECT `number`						FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 				if(action == "AJAX_updateSoWAct")							sql_query = "SELECT `act_number`					FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 				if(action == "AJAX_updateSoWDayRate")						sql_query = "SELECT `day_rate`						FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
+				if(action == "AJAX_updateSoWPaymentPeriodService")			sql_query = "SELECT `payment_period_service`		FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
+				if(action == "AJAX_updateSoWPaymentPeriodBT")				sql_query = "SELECT `payment_period_bt`				FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 				if(action == "AJAX_updateSoWSignDate")						sql_query = "SELECT `sign_date`						FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 				if(action == "AJAX_updateSoWStartDate")						sql_query = "SELECT `start_date`					FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 				if(action == "AJAX_updateSoWEndDate")						sql_query = "SELECT `end_date`						FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
@@ -4199,6 +4205,8 @@ string	SetNewValueByAction(string action, string id, string sow_id, string new_v
 						if(action == "AJAX_updateSoWStartDate")						sql_query = "UPDATE `contracts_sow`				SET `start_date`	=STR_TO_DATE(\"" + new_value + "\",\"%d/%m/%Y\"),`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sow_id + "\";";
 						if(action == "AJAX_updateSoWEndDate")						sql_query = "UPDATE `contracts_sow`				SET `end_date`		=STR_TO_DATE(\"" + new_value + "\",\"%d/%m/%Y\"),`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sow_id + "\";";
 						if(action == "AJAX_updateSoWDayRate") {c_float	num(new_value); sql_query = "UPDATE `contracts_sow` 		SET `day_rate`		=\"" + string(num) + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sow_id + "\";"; }
+						if(action == "AJAX_updateSoWPaymentPeriodService")			sql_query = "UPDATE `contracts_sow`				SET `payment_period_service`=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sow_id + "\";";
+						if(action == "AJAX_updateSoWPaymentPeriodBT")				sql_query = "UPDATE `contracts_sow`				SET `payment_period_bt`=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sow_id + "\";";
 
 						if(action == "AJAX_updatePSoWCustomField")					sql_query = "UPDATE `contract_psow_custom_fields`SET `value`		=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
 						if(action == "AJAX_updatePSoWNumber")						sql_query = "UPDATE `contracts_psow`			SET `number`		=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sow_id + "\";";
@@ -5547,6 +5555,22 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 	if(action == "AJAX_updateSoWEndDate")
 	{
 		notification_description = gettext("SoW") + " ("s + GetSpelledSoWByID(sow_id, db) + "): " + gettext("end date changed") + " " + gettext("from") + " " + existing_value + " " + gettext("to") + " " + new_value;
+		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
+	}
+	if(action == "AJAX_updateSoWPaymentPeriodService")
+	{
+		char	buffer[50];
+		sprintf(buffer, ngettext("%d days", "%d days", stoi(new_value)), stoi(new_value));
+
+		notification_description = gettext("SoW") + " ("s + GetSpelledSoWByID(sow_id, db) + "): " + gettext("service period payment") + " " + gettext("updated") + " " + gettext("from") + " "s + existing_value + " "  + gettext("to") + " "s + buffer;
+		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
+	}
+	if(action == "AJAX_updateSoWPaymentPeriodBT")
+	{
+		char	buffer[50];
+		sprintf(buffer, ngettext("%d days", "%d days", stoi(new_value)), stoi(new_value));
+
+		notification_description = gettext("SoW") + " ("s + GetSpelledSoWByID(sow_id, db) + "): " + gettext("bt period payment") + " " + gettext("updated") + " " + gettext("from") + " "s + existing_value + " "  + gettext("to") + " "s + buffer;
 		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 	}
 	if(action == "AJAX_updateSoWCustomField")

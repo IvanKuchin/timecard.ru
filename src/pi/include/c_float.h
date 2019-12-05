@@ -42,6 +42,7 @@ class c_float
 		long		GetFraction()	const;
 
 		string		PrintPriceTag() const;
+		string		PrintPriceTag_SpaceIfZero() const;
 
 					operator double() 						{ return Get(); };
 					operator string() const;

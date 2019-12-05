@@ -486,6 +486,8 @@ auto	C_Invoicing_Vars::SoW_Index_VarSet(string sql_query, string index) -> strin
 				auto	sow_end_date = db->Get(0, "end_date");
 				auto	subcontractor_company_id = db->Get(0, "subcontractor_company_id");
 				auto	subcontractor_dayrate = db->Get(0, "day_rate");
+				auto	sow_payment_period_service = db->Get(0, "payment_period_service");
+				auto	sow_payment_period_bt = db->Get(0, "payment_period_bt");
 				auto	act_number = ""s;
 
 				if(db->Query("SELECT * FROM `company` WHERE `id`=\"" + subcontractor_company_id + "\";"))
@@ -517,6 +519,28 @@ auto	C_Invoicing_Vars::SoW_Index_VarSet(string sql_query, string index) -> strin
 				else
 				{
 					error_message = gettext("Agreement") + " "s + sow_number + " " + gettext("agreement from") + " " + sow_date + " " + gettext("number is empty");
+					MESSAGE_ERROR("", "", error_message);
+				}
+
+				if(sow_payment_period_service.length())
+				{
+					if((error_message = AssignVariableValue("sow_payment_period_service_" + index, sow_payment_period_service, true)).empty()) {}
+					else { MESSAGE_ERROR("", "", "fail to assign variable"); }
+				}
+				else
+				{
+					error_message = gettext("Agreement") + " "s + sow_number + " " + gettext("agreement from") + " " + sow_date + " " + gettext("service payment period is empty");
+					MESSAGE_ERROR("", "", error_message);
+				}
+
+				if(sow_payment_period_bt.length())
+				{
+					if((error_message = AssignVariableValue("sow_payment_period_bt_" + index, sow_payment_period_bt, true)).empty()) {}
+					else { MESSAGE_ERROR("", "", "fail to assign variable"); }
+				}
+				else
+				{
+					error_message = gettext("Agreement") + " "s + sow_number + " " + gettext("agreement from") + " " + sow_date + " " + gettext("bt payment period is empty");
 					MESSAGE_ERROR("", "", error_message);
 				}
 

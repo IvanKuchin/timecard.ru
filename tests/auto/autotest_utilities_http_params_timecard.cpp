@@ -4,7 +4,7 @@
 #include "cmysql.h"
 #include "cuser.h"
 #include "cstatistics.h"
-// #include "utilities_timecard.h"
+#include "utilities_timecard.h"
 #include "utilities_common.h"
 #include "localy.h"
 
@@ -285,6 +285,28 @@ bool Test1()
 		}
 	}
 
+	for(auto str: timeentry_test_fail)
+	{
+		if(CheckHTTPParam_Timeentry(str) != str) {}
+		else
+		{
+			result = false;
+			cout << "failure timeentry test failed: " << str << " -> " << CheckHTTPParam_Timeentry(str) << endl;
+		}
+	}
+
+	for(auto str: timeentry_test_success)
+	{
+		if(CheckHTTPParam_Timeentry(str) == str) {}
+		else
+		{
+			result = false;
+			cout << "success timeentry test failed: " << str << " -> " << CheckHTTPParam_Timeentry(str) << endl;
+		}
+	}
+
+
+
 	return result;
 }
 
@@ -293,6 +315,13 @@ bool Test2()
 	auto	result = true;
 	auto	error_message = ""s;
 
+	if(SplitTimeentry(",2,,4,5,,7,,9,,,12,", ',').size() == 13) {}
+	else
+	{
+		result = false;
+		cout << "fail to SplitTimeentry" << endl;
+	}
+
 	if(split(",2,,4,5,,7,,9,,,12,", ',').size() == 6) {}
 	else
 	{
@@ -300,6 +329,70 @@ bool Test2()
 		cout << "fail to split" << endl;
 	}
 
+
+	return result;
+}
+
+bool Test3()
+{
+	auto			result = true;
+	auto			error_message = ""s;
+	vector<string>	timeentry_empty_test_fail = {"0.05", ",900.1", "1", ",,,,,,,0.05,,,,,,,,,,", "1,,,,,,,0,,,,,,,,,,", ",,,,,,,0,,,,,,,,,,1", ",,,,,,,,,,,,,,,,,1", ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,1"};
+	vector<string>	timeentry_empty_test_success = {"0.004,0.004,0.004,0.004,0.004,", "0,0,0,0", ",", "", "000000.00000000", "000000", "0.0000000,000000,0000.00", ",,,,,,,,,,,,,,,,,", ",,,,0.0000,,,000000000.0000000000,,000000000000,,0,,,,,,", "0,", ",0"};
+
+	auto			original_locale = setlocale(LC_ALL, "ru_RU.utf8");
+
+	for(auto str: timeentry_empty_test_fail)
+	{
+		if(!isTimecardEntryEmpty(str)) {}
+		else
+		{
+			result = false;
+			cout << "failure timeentry empty test failed: " << str << " -> " << isTimecardEntryEmpty(str) << endl;
+		}
+	}
+
+	for(auto str: timeentry_empty_test_success)
+	{
+		if(isTimecardEntryEmpty(str)) {}
+		else
+		{
+			result = false;
+			cout << "success timeentry empty test failed: " << str << " -> " << isTimecardEntryEmpty(str) << endl;
+		}
+	}
+
+	setlocale(LC_ALL, original_locale);
+
+	return result;
+}
+
+bool Test4()
+{
+	auto			result = true;
+	auto			error_message = ""s;
+	vector<string>	timeentry_empty_test_fail = {"0.05", ",900.1", "1", ",,,,,,,0.05,,,,,,,,,,", "1,,,,,,,0,,,,,,,,,,", ",,,,,,,0,,,,,,,,,,1", ",,,,,,,,,,,,,,,,,1", ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,1"};
+	vector<string>	timeentry_empty_test_success = {"0.004,0.004,0.004,0.004,0.004,", "0,0,0,0", ",", "", "000000.00000000", "000000", "0.0000000,000000,0000.00", ",,,,,,,,,,,,,,,,,", ",,,,0.0000,,,000000000.0000000000,,000000000000,,0,,,,,,", "0,", ",0"};
+
+	for(auto str: timeentry_empty_test_fail)
+	{
+		if(!isTimecardEntryEmpty(str)) {}
+		else
+		{
+			result = false;
+			cout << "failure timeentry empty test failed: " << str << " -> " << isTimecardEntryEmpty(str) << endl;
+		}
+	}
+
+	for(auto str: timeentry_empty_test_success)
+	{
+		if(isTimecardEntryEmpty(str)) {}
+		else
+		{
+			result = false;
+			cout << "success timeentry empty test failed: " << str << " -> " << isTimecardEntryEmpty(str) << endl;
+		}
+	}
 
 	return result;
 }
@@ -325,6 +418,16 @@ int main(void)
 	{
 		testing_success = false;
 		cout << "Test2 failed" << endl;
+	}
+	if(!Test3())
+	{
+		testing_success = false;
+		cout << "Test3 failed" << endl;
+	}
+	if(!Test4())
+	{
+		testing_success = false;
+		cout << "Test4 failed" << endl;
 	}
 
 	if(testing_success)

@@ -80,7 +80,7 @@ std::string trim(std::string& str)
 static auto ReplaceWstringAccordingToMap(const wstring &src, const map<wstring, wstring> &replacements)
 {
 	auto	result(src);
-	auto	pos = result.find(L"1"); // --- fake find to define type
+	auto	pos = result.find(L"1"); // --- fake find to deduct type
 
 	MESSAGE_DEBUG("", "", "start");
 
