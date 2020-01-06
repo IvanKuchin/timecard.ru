@@ -357,8 +357,9 @@ string	C_ExpenseLine::CheckValidity(C_ExpenseLineTemplate exp_line_template, CMy
 							}
 							else
 							{
-								result = "Обязательное фото(" + exp_line_template.title + ") не загружено";
-								MESSAGE_ERROR("C_ExpenseLine", "", "required image expense_line_template.id(" + exp_line_template.id + ") didn't upload in expense_line (id/random: " + GetID() + "/" + GetRandom() + ")");
+								result = "Обязательное фото(" + exp_line_template.title + ") не загружено (возможно вы изменили форму оплаты и требуются доп. док-ты)";
+								// --- severity could be changed to DEBUG, if there will be no actual errors till Jan 2021
+								MESSAGE_ERROR("C_ExpenseLine", "", "required image expense_line_template.id(" + exp_line_template.id + ") didn't upload in expense_line (id/random: " + GetID() + "/" + GetRandom() + ") (probably expense payment type cash/card has changed)");
 							}
 						}
 						else

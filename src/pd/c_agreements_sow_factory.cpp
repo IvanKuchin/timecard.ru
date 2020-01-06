@@ -8,7 +8,7 @@ auto C_Agreements_SoW_Factory::GenerateDocumentArchive() -> string
 
 	if(db == nullptr)
 	{
-		error_message = gettext("SQL syntax issue");
+		error_message = gettext("SQL syntax error");
 		MESSAGE_ERROR("", "", "db not initialized");
 	}
 
@@ -243,7 +243,7 @@ auto C_Agreements_SoW_Factory::RemoveExistingAgreementFile() -> string
 			}
 			else
 			{
-				error_message = gettext("SQL syntax issue");
+				error_message = gettext("SQL syntax error");
 				MESSAGE_DEBUG("", "", "SoW doesn't exists in DB. This is unacceptable at this stage. Investigate the reason.");
 			}
 		}

@@ -15,9 +15,9 @@ using namespace std;
 class c_cache_obj
 {
 	private:
-		map<string, string>		cache;
-		unsigned int			cache_misses = 0;
-		unsigned int			cache_hits = 0;
+		map<string, string>				cache;
+		unsigned int					cache_misses = 0;
+		unsigned int					cache_hits = 0;
 
 	public:
 		auto		Get(string db_query, CMysql *db, CUser *user, string (*func)(string, CMysql *, CUser *)) -> string;

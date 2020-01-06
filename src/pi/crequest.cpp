@@ -828,7 +828,7 @@ char *CGet::GetParamToken(unsigned int number, unsigned int token_idx)
         }
         else
         {
-            MESSAGE_DEBUG("", "", "HTTP(S) key_value doesn't have either kay or value: " + params[number - 1]);
+            MESSAGE_DEBUG("", "", "HTTP(S) key_value doesn't have either key or value: " + params[number - 1]);
         }
     }
     else

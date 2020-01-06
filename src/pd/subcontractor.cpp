@@ -2135,7 +2135,7 @@ int main()
 					db.Query("UPDATE `contracts_sow` SET `status`=\"signed\" WHERE `id`=\"" + sow_id + "\";");
 					if(db.isError())
 					{
-						error_message = gettext("SQL syntax issue");
+						error_message = gettext("SQL syntax error");
 						MESSAGE_ERROR("", "", error_message);
 					}
 					
@@ -2307,7 +2307,7 @@ int main()
 								}
 								else
 								{
-									error_message = gettext("SQL syntax issue");
+									error_message = gettext("SQL syntax error");
 									MESSAGE_ERROR("", action, error_message);
 								}
 							}
@@ -2409,7 +2409,7 @@ int main()
 
 										if(db.isError())
 										{
-											error_message = gettext("SQL syntax issue");
+											error_message = gettext("SQL syntax error");
 											MESSAGE_ERROR("", action, error_message);
 										}
 										else
@@ -2515,7 +2515,7 @@ int main()
 
 					if(db.isError())
 					{
-						error_message = gettext("SQL syntax issue");
+						error_message = gettext("SQL syntax error");
 						MESSAGE_ERROR("", action, error_message);
 					}
 					else
@@ -2599,7 +2599,7 @@ int main()
 
 							if(db.isError())
 							{
-								error_message = gettext("SQL syntax issue");
+								error_message = gettext("SQL syntax error");
 								MESSAGE_ERROR("", action, error_message);
 							}
 							else

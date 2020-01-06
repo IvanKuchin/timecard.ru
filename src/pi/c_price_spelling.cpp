@@ -59,23 +59,23 @@ auto C_Price_Spelling::SpellOrderOfMagnitude(int order_of_magnitude, long number
     return result;
 }
 
-auto C_Price_Spelling::SpellHundreds(long number) -> string
+auto C_Price_Spelling::SpellHundreds(long number, int gender) -> string
 {
-    return spelling_hundreds[number - 1];
+    return spelling_hundreds[gender][number - 1];
 }
 
-auto C_Price_Spelling::SpellTenths(long number) -> string
+auto C_Price_Spelling::SpellTenths(long number, int gender) -> string
 {
-    return spelling_tenths[number - 1];
+    return spelling_tenths[gender][number - 1];
 }
 
-auto C_Price_Spelling::Spell11_19(long number) -> string
+auto C_Price_Spelling::Spell11_19(long number, int gender) -> string
 {
     MESSAGE_DEBUG("", "", "start (" + to_string(number) + ")");
 
     MESSAGE_DEBUG("", "", "finish");
 
-    return spelling_11_19[number - 11];
+    return spelling_11_19[gender][number - 11];
 }
 
 auto C_Price_Spelling::SpellDigit(long number, int gender) -> string
@@ -86,7 +86,7 @@ auto C_Price_Spelling::SpellDigit(long number, int gender) -> string
 
 auto C_Price_Spelling::SpellUpToThouthand(long number, int gender) -> string
 {
-    MESSAGE_DEBUG("", "", "start (" + to_string(number) + ", " + (gender == MALE_GENDER ? "male" : "female") + ")");
+    MESSAGE_DEBUG("", "", "start (" + to_string(number) + ", " + to_string(gender) + ")");
 
     auto    result = ""s;
     auto    hundreds = number / 100;
@@ -96,11 +96,11 @@ auto C_Price_Spelling::SpellUpToThouthand(long number, int gender) -> string
     auto    tenths_spelled = ""s;
     auto    digit_spelled = ""s;
 
-    if(hundreds)                hundreds_spelled = SpellHundreds(hundreds);
-    if((tenths == 1) && digit)  tenths_spelled = Spell11_19(tenths * 10 + digit);
+    if(hundreds)                hundreds_spelled = SpellHundreds(hundreds, gender);
+    if((tenths == 1) && digit)  tenths_spelled = Spell11_19(tenths * 10 + digit, gender);
     else
     {
-        if(tenths)              tenths_spelled = SpellTenths(tenths);
+        if(tenths)              tenths_spelled = SpellTenths(tenths, gender);
         if(digit)               digit_spelled = SpellDigit(digit, gender);
     }
 

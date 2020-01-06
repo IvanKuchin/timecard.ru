@@ -117,8 +117,8 @@ string c_float::PrintPriceTag() const
 
 string c_float::PrintPriceTag_SpaceIfZero() const
 {
-	// --- replace " " to empty may result to following lines overlap. 
-	// --- Empty symbol have 0px height, therefore next line will be printed over existing
+	// --- replace " " to empty may result to overlap with next line. 
+	// --- Empty symbol have 0px height, therefore next line will be printed over current
 	// --- for example: subc invoice, subc act in summary after table "Total"-line will override "VAT"-line
 	return Get() ? PrintPriceTag() : " ";
 }

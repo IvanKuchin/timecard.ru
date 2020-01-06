@@ -1025,6 +1025,11 @@ string GetNewsFeedInJSONFormat(string whereStatement, int currPage, int newsOnSi
 //			  user				- current user object, used to define company admin
 //			  quickSearch		- owners, founders, openVacancies are not included into result
 //			  include_employees	- used in admin _ONLY_ to get company list + # of users in each company
+string GetCompanyListInJSONFormat(string dbQuery, CMysql *db, CUser *user)
+{
+	return GetCompanyListInJSONFormat(dbQuery, db, user, true, false);
+}
+
 string GetCompanyListInJSONFormat(string dbQuery, CMysql *db, CUser *user, bool quickSearch/* = true*/, bool include_employees/*= false*/)
 {
 	struct CompanyClass {
@@ -3278,6 +3283,8 @@ string	GetTimecardTasksInJSONFormat(string sqlQuery, CMysql *db, CUser *user)
 
 string	GetTimecardTaskAssignmentInJSONFormat(string sqlQuery, CMysql *db, CUser *user)
 {
+	MESSAGE_DEBUG("", "", "start");
+
 	string	result = "";
 	int		affected;
 
@@ -3293,8 +3300,7 @@ string	GetTimecardTaskAssignmentInJSONFormat(string sqlQuery, CMysql *db, CUser 
 		string	eventTimestamp;
 	};
 	vector<ItemClass>		itemsList;
-
-	MESSAGE_DEBUG("", "", "start");
+	c_cache_obj				user_cache;
 
 	affected = db->Query(sqlQuery);
 	if(affected)
@@ -3321,7 +3327,7 @@ string	GetTimecardTaskAssignmentInJSONFormat(string sqlQuery, CMysql *db, CUser 
 			result +=	"{";
 			result +=	"\"id\":\"" + item.id + "\",";
 			result +=	"\"timecard_tasks_id\":\"" + item.timecard_tasks_id + "\",";
-			result +=	"\"assignee_user\":[" + GetUserListInJSONFormat("SELECT * FROM `users` WHERE `id`=\"" + item.assignee_user_id + "\" AND `isblocked`=\"N\";", db, NULL) + "],";
+			result +=	"\"assignee_user\":[" + user_cache.Get("SELECT * FROM `users` WHERE `id`=\"" + item.assignee_user_id + "\" AND `isblocked`=\"N\";", db, user, GetUserListInJSONFormat) + "],";
 			result +=	"\"period_start\":\"" + item.period_start + "\",";
 			result +=	"\"period_end\":\"" + item.period_end + "\",";
 			result +=	"\"hour_limit\":\"" + item.hour_limit + "\",";
@@ -3357,6 +3363,7 @@ string	GetBTExpenseAssignmentInJSONFormat(string sqlQuery, CMysql *db, CUser *us
 		string	eventTimestamp;
 	};
 	vector<ItemClass>		itemsList;
+	c_cache_obj				user_cache;
 
 	MESSAGE_DEBUG("", "", "start");
 
@@ -3382,7 +3389,7 @@ string	GetBTExpenseAssignmentInJSONFormat(string sqlQuery, CMysql *db, CUser *us
 			result +=	"{";
 			result +=	"\"id\":\"" + item.id + "\",";
 			result +=	"\"bt_expense_template_id\":\"" + item.bt_expense_template_id + "\",";
-			result +=	"\"assignee_user\":[" + GetUserListInJSONFormat("SELECT * FROM `users` WHERE `id`=\"" + item.assignee_user_id + "\" AND `isblocked`=\"N\";", db, NULL) + "],";
+			result +=	"\"assignee_user\":[" + user_cache.Get("SELECT * FROM `users` WHERE `id`=\"" + item.assignee_user_id + "\" AND `isblocked`=\"N\";", db, user, GetUserListInJSONFormat) + "],";
 			result +=	"\"sow_id\":\"" + item.sow_id + "\",";
 			result +=	"\"eventTimestamp\":\"" + item.eventTimestamp + "\"";
 			result += 	"}";
@@ -3630,6 +3637,11 @@ string	GetBTApprovalsInJSONFormat(string sqlQuery, CMysql *db, CUser *user)
 	return result;
 }
 
+string	GetApproversInJSONFormat(string sqlQuery, CMysql *db, CUser *user)
+{
+	return GetApproversInJSONFormat(sqlQuery, db, user, false);
+}
+
 string	GetApproversInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include_sow)
 {
 	struct ItemClass
@@ -3646,6 +3658,7 @@ string	GetApproversInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool i
 	int						affected;
 	string					result;
 	vector<ItemClass>		itemsList;
+	c_cache_obj				user_cache;
 
 	MESSAGE_DEBUG("", "", "start");
 
@@ -3677,7 +3690,7 @@ string	GetApproversInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool i
 			result += "\"contract_sow_id\":\"" + item.contract_sow_id + "\",";
 			if(include_sow)
 				result += "\"sow\":[" + GetSOWInJSONFormat("SELECT * FROM `contracts_sow` WHERE `id`=\"" + item.contract_sow_id + "\";", db, user) + "],";
-			result += "\"users\":[" + GetUserListInJSONFormat("SELECT * FROM `users` WHERE `id`=\"" + item.approver_user_id + "\";", db, user) + "],";
+			result += "\"users\":[" + user_cache.Get("SELECT * FROM `users` WHERE `id`=\"" + item.approver_user_id + "\";", db, user, GetUserListInJSONFormat) + "],";
 			result += "\"approver_order\":\"" + item.approver_order + "\",";
 			result += "\"auto_approve\":\"" + item.auto_approve + "\",";
 			result += "\"type\":\"" + item.type + "\",";
@@ -4161,6 +4174,8 @@ auto	GetPSoWInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
 
 auto	GetSOWInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include_tasks, bool include_bt, bool include_cost_centers, bool include_subc_company) -> string
 {
+	MESSAGE_DEBUG("", "", "start (include_bt = " + to_string(include_bt) + ", include_tasks = " + to_string(include_tasks) + ", include_cost_centers = " + to_string(include_cost_centers) + ", include_subc_company = " + to_string(include_subc_company) + ")");
+
 	auto	affected = 0;
 	auto	result = ""s;
 	struct ItemClass
@@ -4183,8 +4198,8 @@ auto	GetSOWInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include_t
 		string	eventTimestamp;
 	};
 	vector<ItemClass>		itemsList;
+	c_cache_obj				cache_obj;
 
-	MESSAGE_DEBUG("", "", "start (include_bt = " + to_string(include_bt) + ", include_tasks = " + to_string(include_tasks) + ", include_cost_centers = " + to_string(include_cost_centers) + ", include_subc_company = " + to_string(include_subc_company) + ")");
 
 	affected = db->Query(sqlQuery);
 	if(affected)
@@ -4220,8 +4235,8 @@ auto	GetSOWInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include_t
 
 			result += "\"id\":\"" + item.id + "\",";
 			result += "\"subcontractor_company_id\":\"" + item.subcontractor_company_id + "\",";
-			result += "\"subcontractor_company\":[" + (include_subc_company ? GetCompanyListInJSONFormat("SELECT * FROM `company` WHERE `isBlocked`='N' AND `id`=\"" + item.subcontractor_company_id + "\";", db, user) : "") + "],";
-			result += "\"agency_company_id\":[" + GetCompanyListInJSONFormat("SELECT * FROM `company` WHERE `isBlocked`='N' AND `id`=\"" + item.agency_company_id + "\";", db, user) + "],";
+			result += "\"subcontractor_company\":[" + (include_subc_company ? cache_obj.Get("SELECT * FROM `company` WHERE `isBlocked`='N' AND `id`=\"" + item.subcontractor_company_id + "\";", db, user, GetCompanyListInJSONFormat) : "") + "],";
+			result += "\"agency_company_id\":[" + cache_obj.Get("SELECT * FROM `company` WHERE `isBlocked`='N' AND `id`=\"" + item.agency_company_id + "\";", db, user, GetCompanyListInJSONFormat) + "],";
 			result += "\"company_position_id\":\"" + item.company_position_id + "\",";
 			result += "\"company_positions\":[" + GetCompanyPositionsInJSONFormat("SELECT * FROM `company_position` WHERE `id`=\"" + item.company_position_id + "\";", db, user) + "],";
 			result += "\"start_date\":\"" + item.start_date + "\",";
@@ -4236,19 +4251,29 @@ auto	GetSOWInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include_t
 			// --- configured to keep MySQL DB load low
 			result += "\"bt_expense_templates\":[";
 			if(include_bt)
-				result += GetBTExpenseTemplatesInJSONFormat("SELECT * FROM `bt_expense_templates` WHERE `id` IN (SELECT `bt_expense_template_id` FROM `bt_sow_assignment` WHERE `sow_id`=\"" + item.id + "\");", db, user);
+			{
+				// --- this is used to leverage cache in next SQL-query
+				auto number_of_bt_expense_templates = db->Query("SELECT `bt_expense_template_id` FROM `bt_sow_assignment` WHERE `sow_id`=\"" + item.id + "\" ORDER BY `bt_expense_template_id` ASC;");
+				if(number_of_bt_expense_templates)
+				{
+					vector<string>	bt_expense_templates;
+					for(auto i = 0; i < number_of_bt_expense_templates; ++i) { bt_expense_templates.push_back(db->Get(i, 0)); };
+
+					result += cache_obj.Get("SELECT * FROM `bt_expense_templates` WHERE `id` IN (" + join(bt_expense_templates) + ");", db, user, GetBTExpenseTemplatesInJSONFormat);
+				}
+			}
 			result +=  "],";
 
 			result += "\"tasks\":[";
 			if(include_tasks)
-				result += GetTimecardTasksInJSONFormat(
+				result += GetTimecardTasksInJSONFormat(     // --- no caching, such as same assignment chances are low
 					"SELECT * FROM `timecard_tasks` WHERE "
 							"`id` IN (SELECT `timecard_tasks_id` FROM `timecard_task_assignment` WHERE `contract_sow_id`=\"" + item.id + "\" "
 									");", db, user);
 			result +=  "],";
 
-			result += "\"bt_approvers\":[" + GetApproversInJSONFormat("SELECT * FROM `bt_approvers` WHERE `contract_sow_id`=\"" + item.id + "\";", db, user, DO_NOT_INCLUDE_SOW_INFO) + "],";
-			result += "\"timecard_approvers\":[" + GetApproversInJSONFormat("SELECT * FROM `timecard_approvers` WHERE `contract_sow_id`=\"" + item.id + "\";", db, user, DO_NOT_INCLUDE_SOW_INFO) + "],";
+			result += "\"bt_approvers\":[" + cache_obj.Get("SELECT * FROM `bt_approvers` WHERE `contract_sow_id`=\"" + item.id + "\";", db, user, GetApproversInJSONFormat) + "],";
+			result += "\"timecard_approvers\":[" + cache_obj.Get("SELECT * FROM `timecard_approvers` WHERE `contract_sow_id`=\"" + item.id + "\";", db, user, GetApproversInJSONFormat) + "],";
 			result += "\"subcontractor_create_tasks\":\"" + item.subcontractor_create_tasks + "\",";
 			result += "\"day_rate\":\"" + (user->GetType() == "agency" || user->GetType() == "subcontractor" ? item.day_rate : "") + "\",";
 			result += "\"status\":\"" + item.status + "\",";
@@ -4257,7 +4282,7 @@ auto	GetSOWInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include_t
 						+ (user->GetType() == "subcontractor" ? " AND (`visible_by_subcontractor`=\"Y\" OR `editable_by_subcontractor`=\"Y\") " : "")
 						+ ";", db, user)
 						+ "],";
-			result += "\"cost_centers\":[" + (include_cost_centers ? GetCostCentersInJSONFormat(
+			result += "\"cost_centers\":[" + (include_cost_centers ? cache_obj.Get(
 																		"SELECT * FROM `cost_centers` WHERE `id` IN ("
 																			"SELECT `cost_center_id` FROM `cost_center_assignment` WHERE `timecard_customer_id` IN ("
 																				"SELECT `timecard_customers_id` FROM `timecard_projects` WHERE `id` IN ("
@@ -4266,7 +4291,7 @@ auto	GetSOWInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include_t
 																					")"
 																				")"
 																			")"
-																		")", db, user) : "") + "],";
+																		")", db, user, GetCostCentersInJSONFormat) : "") + "],";
 			result += "\"psow\":[" + (include_cost_centers ? GetPSoWInJSONFormat("SELECT * FROM `contracts_psow` WHERE `contract_sow_id`=\"" + item.id + "\";", db, user) : "") + "],";
 			result += "\"eventTimestamp\":\"" + item.eventTimestamp + "\"";
 

@@ -557,7 +557,7 @@ int main()
 				else
 				{
 					MESSAGE_ERROR("", action, "fail to insert to db");
-					error_message = gettext("SQL syntax issue");
+					error_message = gettext("SQL syntax error");
 				}
 			}
 			else
@@ -621,7 +621,7 @@ int main()
 				if(db.isError())
 				{
 					MESSAGE_ERROR("", action, "fail to update db");
-					error_message = gettext("SQL syntax issue");
+					error_message = gettext("SQL syntax error");
 				}
 				else
 				{
@@ -700,7 +700,7 @@ int main()
 				db.Query("UPDATE `users` SET `passport_series`=\"" + new_value + "\" WHERE `id`=\"" + user.GetID() + "\";");
 				if(db.isError())
 				{
-					error_message = gettext("SQL syntax issue");
+					error_message = gettext("SQL syntax error");
 					MESSAGE_ERROR("", "", error_message);
 				}
 				if(error_message.empty())
@@ -752,7 +752,7 @@ int main()
 				db.Query("UPDATE `users` SET `passport_number`=\"" + new_value + "\" WHERE `id`=\"" + user.GetID() + "\";");
 				if(db.isError())
 				{
-					error_message = gettext("SQL syntax issue");
+					error_message = gettext("SQL syntax error");
 					MESSAGE_ERROR("", "", error_message);
 				}
 				if(error_message.empty())
@@ -804,7 +804,7 @@ int main()
 				db.Query("UPDATE `users` SET `foreign_passport_number`=\"" + new_value + "\" WHERE `id`=\"" + user.GetID() + "\";");
 				if(db.isError())
 				{
-					error_message = gettext("SQL syntax issue");
+					error_message = gettext("SQL syntax error");
 					MESSAGE_ERROR("", "", error_message);
 				}
 				if(error_message.empty())
@@ -856,7 +856,7 @@ int main()
 				db.Query("UPDATE `users` SET `passport_issue_date`=STR_TO_DATE(\"" + new_value + "\",\"%d/%m/%Y\") WHERE `id`=\"" + user.GetID() + "\";");
 				if(db.isError())
 				{
-					error_message = gettext("SQL syntax issue");
+					error_message = gettext("SQL syntax error");
 					MESSAGE_ERROR("", "", error_message);
 				}
 				if(error_message.empty())
@@ -908,7 +908,7 @@ int main()
 				db.Query("UPDATE `users` SET `foreign_passport_expiration_date`=STR_TO_DATE(\"" + new_value + "\",\"%d/%m/%Y\") WHERE `id`=\"" + user.GetID() + "\";");
 				if(db.isError())
 				{
-					error_message = gettext("SQL syntax issue");
+					error_message = gettext("SQL syntax error");
 					MESSAGE_ERROR("", "", error_message);
 				}
 				if(error_message.empty())
@@ -960,7 +960,7 @@ int main()
 				db.Query("UPDATE `users` SET `passport_issue_authority`=\"" + new_value + "\" WHERE `id`=\"" + user.GetID() + "\";");
 				if(db.isError())
 				{
-					error_message = gettext("SQL syntax issue");
+					error_message = gettext("SQL syntax error");
 					MESSAGE_ERROR("", "", error_message);
 				}
 				if(error_message.empty())
@@ -1012,7 +1012,7 @@ int main()
 				db.Query("UPDATE `users` SET `birthday`=STR_TO_DATE(\"" + new_value + "\",\"%d/%m/%Y\") WHERE `id`=\"" + user.GetID() + "\";");
 				if(db.isError())
 				{
-					error_message = gettext("SQL syntax issue");
+					error_message = gettext("SQL syntax error");
 					MESSAGE_ERROR("", "", error_message);
 				}
 				if(error_message.empty())
@@ -1064,7 +1064,7 @@ int main()
 				db.Query("UPDATE `users` SET `first_name_en`=\"" + new_value + "\" WHERE `id`=\"" + user.GetID() + "\";");
 				if(db.isError())
 				{
-					error_message = gettext("SQL syntax issue");
+					error_message = gettext("SQL syntax error");
 					MESSAGE_ERROR("", "", error_message);
 				}
 				if(error_message.empty())
@@ -1116,7 +1116,7 @@ int main()
 				db.Query("UPDATE `users` SET `last_name_en`=\"" + new_value + "\" WHERE `id`=\"" + user.GetID() + "\";");
 				if(db.isError())
 				{
-					error_message = gettext("SQL syntax issue");
+					error_message = gettext("SQL syntax error");
 					MESSAGE_ERROR("", "", error_message);
 				}
 				if(error_message.empty())
@@ -1168,7 +1168,7 @@ int main()
 				db.Query("UPDATE `users` SET `middle_name_en`=\"" + new_value + "\" WHERE `id`=\"" + user.GetID() + "\";");
 				if(db.isError())
 				{
-					error_message = gettext("SQL syntax issue");
+					error_message = gettext("SQL syntax error");
 					MESSAGE_ERROR("", "", error_message);
 				}
 				if(error_message.empty())
@@ -1220,7 +1220,7 @@ int main()
 				db.Query("UPDATE `users` SET `name`=\"" + new_value + "\" WHERE `id`=\"" + user.GetID() + "\";");
 				if(db.isError())
 				{
-					error_message = gettext("SQL syntax issue");
+					error_message = gettext("SQL syntax error");
 					MESSAGE_ERROR("", "", error_message);
 				}
 				if(error_message.empty())
@@ -1272,7 +1272,7 @@ int main()
 				db.Query("UPDATE `users` SET `nameLast`=\"" + new_value + "\" WHERE `id`=\"" + user.GetID() + "\";");
 				if(db.isError())
 				{
-					error_message = gettext("SQL syntax issue");
+					error_message = gettext("SQL syntax error");
 					MESSAGE_ERROR("", "", error_message);
 				}
 				if(error_message.empty())
@@ -1324,7 +1324,7 @@ int main()
 				db.Query("UPDATE `users` SET `nameMiddle`=\"" + new_value + "\" WHERE `id`=\"" + user.GetID() + "\";");
 				if(db.isError())
 				{
-					error_message = gettext("SQL syntax issue");
+					error_message = gettext("SQL syntax error");
 					MESSAGE_ERROR("", "", error_message);
 				}
 				if(error_message.empty())
@@ -1395,7 +1395,7 @@ int main()
 					}
 					else
 					{
-						error_message = gettext("SQL syntax issue");
+						error_message = gettext("SQL syntax error");
 						MESSAGE_ERROR("", "", error_message);
 					}
 				}
@@ -1460,7 +1460,7 @@ int main()
 					}
 					else
 					{
-						error_message = gettext("SQL syntax issue");
+						error_message = gettext("SQL syntax error");
 						MESSAGE_ERROR("", "", error_message);
 					}
 				}
@@ -1525,7 +1525,7 @@ int main()
 					}
 					else
 					{
-						error_message = gettext("SQL syntax issue");
+						error_message = gettext("SQL syntax error");
 						MESSAGE_ERROR("", "", error_message);
 					}
 				}

@@ -189,7 +189,7 @@ class C_Print_Invoice_Agency : public C_Print_Invoice_Docs_Base
 		auto			GetTableRowPrice(int i) -> string				{ return c_float(vars->Get("cost_center_price_" + to_string(i))).PrintPriceTag(); };
 		auto			GetTableRowTotal(int i) -> string				{ return c_float(vars->Get("cost_center_total_" + to_string(i))).PrintPriceTag(); };
 		auto			GetTableSum() -> string							{ return c_float(vars->Get("cost_center_sum_amount")).PrintPriceTag(); };
-		auto			GetTableVAT() -> string							{ return c_float(vars->Get("cost_center_vat_amount")).PrintPriceTag_SpaceIfZero(); };
+		auto			GetTableVAT() -> string							{ return c_float(vars->Get("cost_center_vat_amount")).PrintPriceTag(); };
 		auto			GetTableTotal() -> string						{ return c_float(vars->Get("cost_center_total_payment")).PrintPriceTag(); };
 
 		auto			GetTotalPaymentSpelling() -> string				{ return vars->Get("Total payment") + ": "; };
@@ -257,7 +257,7 @@ class C_Print_Invoice_Subc : public C_Print_Invoice_Docs_Base
 		auto			GetTableRowPrice(int i) -> string				{ return c_float(vars->Get("timecard_price_" + to_string(i))).PrintPriceTag(); };
 		auto			GetTableRowTotal(int i) -> string				{ return c_float(vars->Get("timecard_total_" + to_string(i))).PrintPriceTag(); };
 		auto			GetTableSum() -> string							{ return c_float(vars->Get("subcontractors_sum_amount")).PrintPriceTag(); };
-		auto			GetTableVAT() -> string							{ return c_float(vars->Get("subcontractors_vat_amount")).PrintPriceTag_SpaceIfZero(); };
+		auto			GetTableVAT() -> string							{ return c_float(vars->Get("subcontractors_vat_amount")).PrintPriceTag(); };
 		auto			GetTableTotal() -> string						{ return c_float(vars->Get("subcontractors_total_payment")).PrintPriceTag(); };
 
 		auto			GetTotalPaymentSpelling() -> string				{ return vars->Get("Total payment") + ": "; };
@@ -345,7 +345,7 @@ class C_Print_Act_Agency : public C_Print_Invoice_Docs_Base
 		auto			GetTableRowPrice(int i) -> string				{ return c_float(vars->Get("cost_center_price_" + to_string(i))).PrintPriceTag(); };
 		auto			GetTableRowTotal(int i) -> string				{ return c_float(vars->Get("cost_center_total_" + to_string(i))).PrintPriceTag(); };
 		auto			GetTableSum() -> string							{ return c_float(vars->Get("cost_center_sum_amount")).PrintPriceTag(); };
-		auto			GetTableVAT() -> string							{ return c_float(vars->Get("cost_center_vat_amount")).PrintPriceTag_SpaceIfZero(); };
+		auto			GetTableVAT() -> string							{ return c_float(vars->Get("cost_center_vat_amount")).PrintPriceTag(); };
 		auto			GetTableTotal() -> string						{ return c_float(vars->Get("cost_center_total_payment")).PrintPriceTag(); };
 
 		auto			GetTotalPaymentSpelling() -> string				{ return ""; };
@@ -413,7 +413,7 @@ class C_Print_Act_Subc : public C_Print_Invoice_Docs_Base
 		auto			GetTableRowPrice(int i) -> string				{ return c_float(vars->Get("timecard_price_" + to_string(i))).PrintPriceTag(); };
 		auto			GetTableRowTotal(int i) -> string				{ return c_float(vars->Get("timecard_total_" + to_string(i))).PrintPriceTag(); };
 		auto			GetTableSum() -> string							{ return c_float(vars->Get("subcontractors_sum_amount")).PrintPriceTag(); };
-		auto			GetTableVAT() -> string							{ return c_float(vars->Get("subcontractors_vat_amount")).PrintPriceTag_SpaceIfZero(); };
+		auto			GetTableVAT() -> string							{ return c_float(vars->Get("subcontractors_vat_amount")).PrintPriceTag(); };
 		auto			GetTableTotal() -> string						{ return c_float(vars->Get("subcontractors_total_payment")).PrintPriceTag(); };
 
 		auto			GetTotalPaymentSpelling() -> string				{ return ""; };

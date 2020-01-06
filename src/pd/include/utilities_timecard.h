@@ -13,7 +13,9 @@
 auto	 		CheckHTTPParam_Timeentry(const string &srcText) -> string;
 
 auto 			GetNewsFeedInJSONFormat(string whereStatement, int currPage, int newsOnSinglePage, CUser *, CMysql *) -> string;
-auto      		GetCompanyListInJSONFormat(string dbQuery, CMysql *, CUser *, bool quickSearch = true, bool includeEmployedUsersList = false) -> string;
+// auto      		GetCompanyListInJSONFormat(string dbQuery, CMysql *, CUser *, bool quickSearch = true, bool includeEmployedUsersList = false) -> string;
+auto      		GetCompanyListInJSONFormat(string dbQuery, CMysql *, CUser *, bool quickSearch, bool includeEmployedUsersList) -> string;
+auto      		GetCompanyListInJSONFormat(string dbQuery, CMysql *, CUser *) -> string;
 auto      		GetUserNotificationSpecificDataByType(unsigned long typeID, unsigned long actionID, CMysql *, CUser *) -> string;
 auto      		GetUserNotificationInJSONFormat(string sqlRequest, CMysql *, CUser *) -> string;
 
@@ -64,6 +66,7 @@ auto			CreateTaskAssignment(string task_id, string sow_id, string assignment_sta
 auto 			CreateBTExpenseTemplateAssignmentToSoW(string new_bt_expense_template_id, string sow_id, CMysql *, CUser *) -> string;
 auto			GetCostCentersInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetCostCentersAssignmentInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
+auto			GetApproversInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetApproversInJSONFormat(string sqlQuery, CMysql *, CUser *, bool include_sow) -> string;
 auto			GetAbsenceListInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetAbsenceTypesInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;

@@ -6300,6 +6300,37 @@ int main()
 			}
 		}
 */
+		if(action == "AJAX_demoRequest")
+		{
+			MESSAGE_DEBUG("", action, "start");
+
+			auto	error_message = ""s;
+			auto	name = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("name"));
+			auto	contact = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("contact"));
+
+			if(name.length() && contact.length())
+			{
+				if(db.InsertQuery("INSERT INTO `demo_requests` (`name`, `contact`, `date`) VALUES (" + quoted(name) + "," + quoted(contact) + ", NOW());"))
+				{
+
+				}
+				else
+				{
+					error_message = gettext("SQL syntax error");
+					MESSAGE_ERROR("", action, error_message);
+				}
+			}
+			else
+			{
+				error_message = gettext("mandatory parameter missed");
+				MESSAGE_ERROR("", action, error_message);
+			}
+
+			AJAX_ResponseTemplate(&indexPage, "", error_message);
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
+
 		if(action == "forget")
 		{
 			string		login;

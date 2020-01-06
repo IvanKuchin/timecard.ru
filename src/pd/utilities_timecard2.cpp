@@ -2,6 +2,8 @@
 
 auto	GetServiceBTInvoicesInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
 {
+	MESSAGE_DEBUG("", "", "start");
+	
 	auto	affected = 0;
 	auto	result = ""s;;
 
@@ -16,8 +18,6 @@ auto	GetServiceBTInvoicesInJSONFormat(string sqlQuery, CMysql *db, CUser *user) 
 	};
 	vector<ItemClass>		itemsList;
 	c_cache_obj				user_cache;
-
-	MESSAGE_DEBUG("", "", "start");
 
 	affected = db->Query(sqlQuery);
 	if(affected)
@@ -118,7 +118,7 @@ auto	RecallServiceInvoice(string service_invoice_id, CMysql *db, CUser *user) ->
 			if(db->isError())
 			{
 				MESSAGE_ERROR("", "", "fail to delete from invoice_cost_center_service_details")
-				error_message = gettext("SQL syntax issue");
+				error_message = gettext("SQL syntax error");
 			}
 			else
 			{
@@ -126,7 +126,7 @@ auto	RecallServiceInvoice(string service_invoice_id, CMysql *db, CUser *user) ->
 				if(db->isError())
 				{
 					MESSAGE_ERROR("", "", "fail to delete from invoice_cost_center_service")
-					error_message = gettext("SQL syntax issue");
+					error_message = gettext("SQL syntax error");
 				}
 				else
 				{
@@ -175,7 +175,7 @@ auto	RecallBTInvoice(string bt_invoice_id, CMysql *db, CUser *user) -> string
 			if(db->isError())
 			{
 				MESSAGE_ERROR("", "", "fail to delete from invoice_cost_center_bt_details")
-				error_message = gettext("SQL syntax issue");
+				error_message = gettext("SQL syntax error");
 			}
 			else
 			{
@@ -183,7 +183,7 @@ auto	RecallBTInvoice(string bt_invoice_id, CMysql *db, CUser *user) -> string
 				if(db->isError())
 				{
 					MESSAGE_ERROR("", "", "fail to delete from invoice_cost_center_bt")
-					error_message = gettext("SQL syntax issue");
+					error_message = gettext("SQL syntax error");
 				}
 				else
 				{
@@ -1412,7 +1412,7 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 						}
 						else
 						{
-							error_message = gettext("SQL syntax issue");
+							error_message = gettext("SQL syntax error");
 							MESSAGE_ERROR("", "", "issue in SQL-syntax");
 						}
 					}
@@ -1469,7 +1469,7 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 						}
 						else
 						{
-							error_message = gettext("SQL syntax issue");
+							error_message = gettext("SQL syntax error");
 							MESSAGE_ERROR("", "", "issue in SQL-syntax");
 						}
 					}
@@ -1504,7 +1504,7 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 						}
 						else
 						{
-							error_message = gettext("SQL syntax issue");
+							error_message = gettext("SQL syntax error");
 							MESSAGE_ERROR("", "", "issue in SQL-syntax");
 						}
 					}					
@@ -1657,7 +1657,7 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 						}
 						else
 						{
-							error_message = gettext("SQL syntax issue");
+							error_message = gettext("SQL syntax error");
 							MESSAGE_ERROR("", "", "issue in SQL-syntax");
 						}
 					}
@@ -1685,7 +1685,7 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 						}
 						else
 						{
-							error_message = gettext("SQL syntax issue");
+							error_message = gettext("SQL syntax error");
 							MESSAGE_ERROR("", "", "issue in SQL-syntax");
 						}
 					}
@@ -1755,7 +1755,7 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 						}
 						else
 						{
-							error_message = gettext("SQL syntax issue");
+							error_message = gettext("SQL syntax error");
 							MESSAGE_ERROR("", "", "issue in SQL-syntax");
 						}
 					}
@@ -1783,7 +1783,7 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 						}
 						else
 						{
-							error_message = gettext("SQL syntax issue");
+							error_message = gettext("SQL syntax error");
 							MESSAGE_ERROR("", "", "issue in SQL-syntax");
 						}
 					}
@@ -5795,7 +5795,7 @@ auto NotifySoWContractPartiesAboutChanges(string action_type_id, string sow_id, 
 				}
 				else
 				{
-					error_message = gettext("SQL syntax issue");
+					error_message = gettext("SQL syntax error");
 					MESSAGE_ERROR("", "", "fail to insert to db");
 					break;
 				}
@@ -5846,7 +5846,7 @@ auto NotifyAgencyAboutChanges(string agency_id, string action_type_id, string ac
 				}
 				else
 				{
-					error_message = gettext("SQL syntax issue");
+					error_message = gettext("SQL syntax error");
 					MESSAGE_ERROR("", "", "fail to insert to db");
 					break;
 				}

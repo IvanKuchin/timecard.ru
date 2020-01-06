@@ -3984,7 +3984,7 @@ int main(void)
 									}
 									else
 									{
-										error_message = gettext("SQL syntax issue");
+										error_message = gettext("SQL syntax error");
 										MESSAGE_ERROR("", action, error_message);
 									}
 								}
@@ -4834,7 +4834,7 @@ int main(void)
 							}
 							else
 							{
-								error_message = gettext("SQL syntax issue");
+								error_message = gettext("SQL syntax error");
 								MESSAGE_ERROR("", action, "fail to create sow");
 							}
 						}
@@ -4846,7 +4846,7 @@ int main(void)
 					}
 					else
 					{
-						error_message = gettext("SQL syntax issue");
+						error_message = gettext("SQL syntax error");
 						MESSAGE_ERROR("", action, "fail to determine position_id");
 					}
 				}
@@ -5109,7 +5109,7 @@ int main(void)
 									}
 									else
 									{
-										error_message = gettext("SQL syntax issue");
+										error_message = gettext("SQL syntax error");
 										MESSAGE_ERROR("", action, error_message);
 									}
 								}
@@ -5147,7 +5147,7 @@ int main(void)
 								}
 								else
 								{
-									error_message = gettext("SQL syntax issue");
+									error_message = gettext("SQL syntax error");
 									MESSAGE_ERROR("", action, error_message);
 								}
 							}
@@ -5260,7 +5260,7 @@ int main(void)
 											}
 											else
 											{
-												error_message = gettext("SQL syntax issue");
+												error_message = gettext("SQL syntax error");
 												MESSAGE_ERROR("", action, "can't find contract_sow_agreement_files.id(" + id + ") in DB")
 											}
 										}
@@ -5398,7 +5398,7 @@ int main(void)
 											}
 											else
 											{
-												error_message = gettext("SQL syntax issue");
+												error_message = gettext("SQL syntax error");
 												MESSAGE_ERROR("", action, "can't find contract_sow_agreement_files.id(" + id + ") in DB")
 											}
 										}
@@ -5504,7 +5504,7 @@ int main(void)
 						}
 						else
 						{
-							error_message = gettext("SQL syntax issue");
+							error_message = gettext("SQL syntax error");
 							MESSAGE_ERROR("", action, error_message + ". Workflow should not be here.");
 						}
 
@@ -5585,7 +5585,7 @@ int main(void)
 							}
 							else
 							{
-								error_message = gettext("SQL syntax issue");
+								error_message = gettext("SQL syntax error");
 								MESSAGE_ERROR("", action, error_message + ". Workflow should not be here.");
 							}
 

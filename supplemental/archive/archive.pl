@@ -463,7 +463,7 @@ if($action =~ /^--restore/)
 	# that way c-compiler can spend a lot of time in "CPU-wait" state, rather than use CPU-cycles
 	#
 	system("cd ".$folders_to_backup{SRCDIR}."/build && time nice -10 make -j4");
-	system("cd ".$folders_to_backup{SRCDIR}."/build && ctest ");
+	system("cd ".$folders_to_backup{SRCDIR}."/build");
 	system("cd ".$folders_to_backup{SRCDIR}."/build && make install");
 	system("cd ".$folders_to_backup{SRCDIR}."/build && make clean");
 
@@ -501,7 +501,7 @@ sub activate_htaccess
 	        # print "(".$from_dir."/".$entry.") =~ matched against ".." \n" if($DEBUG);
 	        print "\tactivate_htaccess: renaming (".$from_dir."/".$entry.") -> (".$from_dir."/.htaccess)";
 	        rename $from_dir."/".$entry, $from_dir."/.htaccess";
-	        print "\t[OK]\n";
+	        print "\t[ok]\n";
 	        next;
         }
     	if(!($entry eq "..") and !($entry eq ".") and (-d $from_dir."/".$entry))
@@ -529,7 +529,7 @@ sub activate_htpasswd
 	        # print "(".$from_dir."/".$entry.") =~ matched against ".." \n" if($DEBUG);
 	        print "\tactivate_htpasswd: renaming (".$from_dir."/".$entry.") -> (".$from_dir."/.htpasswd)";
 	        rename $from_dir."/".$entry, $from_dir."/.htpasswd";
-	        print "\t[OK]\n";
+	        print "\t[ok]\n";
 	        next;
         }
     	if(!($entry eq "..") and !($entry eq ".") and (-d $from_dir."/".$entry))
@@ -660,7 +660,7 @@ sub remove_dir_recursively
 		  }
 		}
 		else {
-			print "\t[OK]\n";
+			print "\t[ok]\n";
 		}
 	}
 }
@@ -1025,7 +1025,7 @@ sub Copy_Production_To_Local
 		{
 			print "\tcopying ".$folders_to_backup{$folder_id}." -> $folder_id";
 			system("cp -R ".$folders_to_backup{$folder_id}." $folder_id");
-			print "\t[OK]\n";
+			print "\t[ok]\n";
 		}
 		else
 		{
@@ -1042,7 +1042,7 @@ sub Copy_Local_To_LocalTmp_PersistentFolders
 		{
 			print "\tcopying ".$persistent_folders{$folder_id}." -> ".$config{local_tmp_folder}.$persistent_folders{$folder_id};
 			dircopy($persistent_folders{$folder_id}, $config{local_tmp_folder}.$persistent_folders{$folder_id}) || die "ERROR: can't copy ".$persistent_folders{$folder_id}." -> ".$config{local_tmp_folder}.$persistent_folders{$folder_id};
-			print "\t[OK]\n";
+			print "\t[ok]\n";
 		}
 		else
 		{
@@ -1060,7 +1060,7 @@ sub Dirmove_Local_To_Production
 			print "\tmoving ".$folder_id." -> ".$folders_to_backup{$folder_id};
 			if(dirmove($folder_id, $folders_to_backup{$folder_id}))
 			{
-				print "\t[OK]\n";
+				print "\t[ok]\n";
 			}
 			else
 			{
@@ -1082,7 +1082,7 @@ sub Dirmove_LocalTmp_To_Local
 		{
 			print "\tmoving ".$config{local_tmp_folder}.$folder_id." -> ".$folder_id;
 			dirmove($config{local_tmp_folder}.$folder_id, $folder_id) || die "can't move ".$config{local_tmp_folder}.$folder_id."-> ".$folder_id;
-			print "\t[OK]\n";
+			print "\t[ok]\n";
 		}
 		else
 		{
@@ -1099,7 +1099,7 @@ sub Dirmove_Local_To_LocalTmp
 		{
 			print "\trenaming ".$folder_id." -> ".$config{local_tmp_folder}.$folder_id;
 			dirmove($folder_id, $config{local_tmp_folder}.$folder_id) || die "can't move ".$folder_id."-> ".$config{local_tmp_folder}.$folder_id;
-			print "\t[OK]\n";
+			print "\t[ok]\n";
 		}
 		else
 		{
@@ -1127,7 +1127,7 @@ sub	CreateRecoveryPoint
 				print "\tcopying ".$folders_to_backup{$folder_id}." -> ".$recovery_point_folder.$folder_id;
 				mkdir($recovery_point_folder.$folder_id);
 				dircopy($folders_to_backup{$folder_id}, $recovery_point_folder.$folder_id);
-				print "\t[OK]\n";
+				print "\t[ok]\n";
 			}
 			else
 			{

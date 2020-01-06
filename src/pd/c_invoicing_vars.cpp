@@ -532,10 +532,34 @@ auto	C_Invoicing_Vars::SoW_Index_VarSet(string sql_query, string index) -> strin
 					error_message = gettext("Agreement") + " "s + sow_number + " " + gettext("agreement from") + " " + sow_date + " " + gettext("service payment period is empty");
 					MESSAGE_ERROR("", "", error_message);
 				}
+				if(sow_payment_period_service.length())
+				{
+					C_Price_Spelling	price_spelling;
+
+					if((error_message = AssignVariableValue("sow_payment_period_service_spelling_" + index, price_spelling.SpellNumber(stol(sow_payment_period_service), PLURAL_MALE_GENDER), true)).empty()) {}
+					else { MESSAGE_ERROR("", "", "fail to assign variable"); }
+				}
+				else
+				{
+					error_message = gettext("Agreement") + " "s + sow_number + " " + gettext("agreement from") + " " + sow_date + " " + gettext("service payment period is empty");
+					MESSAGE_ERROR("", "", error_message);
+				}
 
 				if(sow_payment_period_bt.length())
 				{
 					if((error_message = AssignVariableValue("sow_payment_period_bt_" + index, sow_payment_period_bt, true)).empty()) {}
+					else { MESSAGE_ERROR("", "", "fail to assign variable"); }
+				}
+				else
+				{
+					error_message = gettext("Agreement") + " "s + sow_number + " " + gettext("agreement from") + " " + sow_date + " " + gettext("bt payment period is empty");
+					MESSAGE_ERROR("", "", error_message);
+				}
+				if(sow_payment_period_bt.length())
+				{
+					C_Price_Spelling	price_spelling;
+
+					if((error_message = AssignVariableValue("sow_payment_period_bt_spelling_" + index, price_spelling.SpellNumber(stol(sow_payment_period_bt), PLURAL_MALE_GENDER), true)).empty()) {}
 					else { MESSAGE_ERROR("", "", "fail to assign variable"); }
 				}
 				else
@@ -658,8 +682,8 @@ auto	C_Invoicing_Vars::SoW_Index_VarSet(string sql_query, string index) -> strin
 			}
 			else
 			{
-				error_message = gettext("SQL syntax issue");
-				MESSAGE_ERROR("", "", "SQL syntax issue");
+				error_message = gettext("SQL syntax error");
+				MESSAGE_ERROR("", "", "SQL syntax error");
 			}
 
 			if(error_message.empty())
@@ -701,8 +725,8 @@ auto	C_Invoicing_Vars::SoW_Index_VarSet(string sql_query, string index) -> strin
 							}
 							else
 							{
-								error_message = gettext("SQL syntax issue");
-								MESSAGE_ERROR("", "", "SQL syntax issue");
+								error_message = gettext("SQL syntax error");
+								MESSAGE_ERROR("", "", "SQL syntax error");
 							}
 						}
 					}
@@ -715,8 +739,8 @@ auto	C_Invoicing_Vars::SoW_Index_VarSet(string sql_query, string index) -> strin
 						}
 						else
 						{
-							error_message = gettext("SQL syntax issue");
-							MESSAGE_ERROR("", "", "SQL syntax issue");
+							error_message = gettext("SQL syntax error");
+							MESSAGE_ERROR("", "", "SQL syntax error");
 						}
 					}
 				}
@@ -1005,7 +1029,7 @@ auto	C_Invoicing_Vars::Subcontractor_Index_VarSet(string subcontractor_company_i
 			}
 			else
 			{
-				error_message = gettext("SQL syntax issue");
+				error_message = gettext("SQL syntax error");
 				MESSAGE_ERROR("", "", error_message);
 			}
 
@@ -1021,7 +1045,7 @@ auto	C_Invoicing_Vars::Subcontractor_Index_VarSet(string subcontractor_company_i
 				}
 				else
 				{
-					error_message = gettext("SQL syntax issue");
+					error_message = gettext("SQL syntax error");
 					MESSAGE_ERROR("", "", error_message);
 				}
 			}
@@ -1037,7 +1061,7 @@ auto	C_Invoicing_Vars::Subcontractor_Index_VarSet(string subcontractor_company_i
 				}
 				else
 				{
-					error_message = gettext("SQL syntax issue");
+					error_message = gettext("SQL syntax error");
 					MESSAGE_ERROR("", "", error_message);
 				}
 			}

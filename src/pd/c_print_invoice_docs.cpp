@@ -459,9 +459,16 @@ auto	C_Print_Invoice_Docs_Base::PrintAsXLS() -> string
 				__sheet->writeStr(__row_counter, 7, multibyte_to_wide(vars->Get("Total") + ":").c_str(), format_bold_right);
 				__sheet->writeNum(__row_counter, 9, stod_noexcept(GetTableSum()), format_number_d2_bold_right);
 
-				++__row_counter;
-				__sheet->writeStr(__row_counter, 7, multibyte_to_wide(vars->Get("VAT sum") + ":").c_str(), format_bold_right);
-				__sheet->writeNum(__row_counter, 9, stod_noexcept(GetTableVAT()), format_number_d2_bold_right);
+				if(stod_noexcept(GetTableVAT()))
+				{
+					++__row_counter;
+					__sheet->writeStr(__row_counter, 7, multibyte_to_wide(vars->Get("VAT sum") + ":").c_str(), format_bold_right);
+					__sheet->writeNum(__row_counter, 9, stod_noexcept(GetTableVAT()), format_number_d2_bold_right);
+				}
+				else
+				{
+					MESSAGE_DEBUG("", "", "don't print VAT-line due to it is zero")
+				}
 
 				++__row_counter;
 				__sheet->writeStr(__row_counter, 7, multibyte_to_wide(vars->Get("Total payment") + ":").c_str(), format_bold_right);
@@ -1028,16 +1035,25 @@ auto	C_Print_Invoice_Docs_Base::__HPDF_DrawFooter() -> string
 			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetTableSum()), 85, 100, HPDF_TALIGN_RIGHT, BOLD_FONT, HPDF_TIMECARD_FONT_SIZE, true)).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
-		if(error_message.empty())
+
+		if(stod_noexcept(GetTableVAT()))
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("VAT sum") + ":"), 20, 85, HPDF_TALIGN_RIGHT, BOLD_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
-			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+			if(error_message.empty())
+			{
+				if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("VAT sum") + ":"), 20, 85, HPDF_TALIGN_RIGHT, BOLD_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
+				{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+			}
+			if(error_message.empty())
+			{
+				if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetTableVAT()), 85, 100, HPDF_TALIGN_RIGHT, BOLD_FONT, HPDF_TIMECARD_FONT_SIZE, true)).length())
+				{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+			}
 		}
-		if(error_message.empty())
+		else
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetTableVAT()), 85, 100, HPDF_TALIGN_RIGHT, BOLD_FONT, HPDF_TIMECARD_FONT_SIZE, true)).length())
-			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+			MESSAGE_DEBUG("", "", "don't print VAT-line due to it is zero")
 		}
+
 		if(error_message.empty())
 		{
 			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("Total payment") + ":"), 20, 85, HPDF_TALIGN_RIGHT, BOLD_FONT, HPDF_TIMECARD_FONT_SIZE, false)).length())
