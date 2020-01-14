@@ -1155,17 +1155,17 @@ auto	C_Invoicing_Vars::DocumentSubmissionDate_1C_Index_VarSet(const struct tm &d
 	MESSAGE_DEBUG("", "", "start");
 
 	auto		error_message = ""s;
+/*
 	struct tm	first_day_of_month, last_day_of_month;
 
 	tie(first_day_of_month, last_day_of_month) = GetFirstAndLastMonthDaysByDate(date_inside_month_obj);
 
-	// --- current implementation:
+	// --- former implementation:
 	// ---  *) subc_payment and subc_payment_order - will take last month of current item (BT or TC)
 	// ---  *) cost_center - will take latest item (BT or TC) in <vecto> and take the date
 
-	if(error_message.empty()) error_message = AssignVariableValue("LastDayOfMonth_Timestamp_1CFormat_" + index, GetSpellingFormattedDate(last_day_of_month, "%FT%T"), true);
 	if(error_message.empty()) error_message = AssignVariableValue("LastDayOfMonth_Date_1CFormat_" + index, GetSpellingFormattedDate(last_day_of_month, "%F"), true);
-
+*/
 	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
 
 	return	error_message;
@@ -1432,6 +1432,11 @@ auto	C_Invoicing_Vars::AgreementNumberSpelling_VarSet(string agreement_number) -
 				if(error_message.empty())
 				{
 					if((error_message = AssignVariableValue("Invoicing_Timestamp_1CFormat", date_obj.GetFormatted("%FT%T"), true)).length())
+						{ MESSAGE_ERROR("", "", "fail to assign variable value"); }
+				}
+				if(error_message.empty())
+				{
+					if((error_message = AssignVariableValue("Invoicing_Date_1CFormat", date_obj.GetFormatted("%F"), true)).length())
 						{ MESSAGE_ERROR("", "", "fail to assign variable value"); }
 				}
 				if(error_message.empty())
