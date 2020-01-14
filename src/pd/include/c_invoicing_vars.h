@@ -46,7 +46,8 @@ class C_Invoicing_Vars
 		auto		CostCenterTotal_VarSet(c_float cost_center_sum) -> string;
 
 		auto		Common_Index_VarSet(string index) -> string;
-		auto		DocumentSubmissionDate_1C_Index_VarSet(string date_inside_month, string index) -> string;
+		auto		DocumentSubmissionDate_1C_Index_VarSet(string, string index) -> string;
+		auto		DocumentSubmissionDate_1C_Index_VarSet(const struct tm &, string index) -> string;
 		auto		SoW_Index_VarSet(string sql_query, string index) -> string;
 		auto		PSoW_Index_VarSet(string sql_query, string index) -> string;
 		auto		CostCenterPayment_Index_VarSet(c_float cost_center_price, string index) -> string;

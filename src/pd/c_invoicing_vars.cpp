@@ -1150,25 +1150,30 @@ auto	C_Invoicing_Vars::Common_Index_VarSet(string index) -> string
 	return	error_message;
 }
 
-auto	C_Invoicing_Vars::DocumentSubmissionDate_1C_Index_VarSet(string date_inside_month, string index) -> string
+auto	C_Invoicing_Vars::DocumentSubmissionDate_1C_Index_VarSet(const struct tm &date_inside_month_obj, string index) -> string
 {
 	MESSAGE_DEBUG("", "", "start");
 
-	auto	error_message = ""s;
-	auto	date_inside_month_obj = GetTMObject(date_inside_month);
+	auto		error_message = ""s;
+	struct tm	first_day_of_month, last_day_of_month;
 
-	// --- build last day of given month
-	date_inside_month_obj.tm_mon += 1;
-	date_inside_month_obj.tm_mday = -1;
+	tie(first_day_of_month, last_day_of_month) = GetFirstAndLastMonthDaysByDate(date_inside_month_obj);
 
-	if(error_message.empty()) error_message = AssignVariableValue("LastDayOfMonth_Timestamp_1CFormat_" + index, GetSpellingFormattedDate(date_inside_month, "%FT%T"), true);
-	if(error_message.empty()) error_message = AssignVariableValue("LastDayOfMonth_Date_1CFormat_" + index, GetSpellingFormattedDate(date_inside_month, "%F"), true);
-	if(error_message.empty()) error_message = AssignVariableValue("LastDayOfMonth_Timestamp_1CFormat", Get("LastDayOfMonth_Timestamp_1CFormat_" + index), true);
+	// --- current implementation:
+	// ---  *) subc_payment and subc_payment_order - will take last month of current item (BT or TC)
+	// ---  *) cost_center - will take latest item (BT or TC) in <vecto> and take the date
 
+	if(error_message.empty()) error_message = AssignVariableValue("LastDayOfMonth_Timestamp_1CFormat_" + index, GetSpellingFormattedDate(last_day_of_month, "%FT%T"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("LastDayOfMonth_Date_1CFormat_" + index, GetSpellingFormattedDate(last_day_of_month, "%F"), true);
 
 	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
 
 	return	error_message;
+}
+
+auto	C_Invoicing_Vars::DocumentSubmissionDate_1C_Index_VarSet(string date_inside_month, string index) -> string
+{
+	return DocumentSubmissionDate_1C_Index_VarSet(GetTMObject(date_inside_month), index);
 }
 
 auto	C_Invoicing_Vars::SubcontractorsTotal_VarSet(string sum, string tax, string total) -> string
@@ -1388,17 +1393,28 @@ auto	C_Invoicing_Vars::AgreementNumberSpelling_VarSet(string agreement_number) -
 
 				if(timecard_obj_list.size())
 				{
-					date_obj.SetTMObj(GetTMObject(timecard_obj_list[0].GetDateFinish()));
+					// --- note that tc_objs are not in sorted order.
+					// --- last in <vector> not necessary will be latest by date
+					// --- if TCs need to be sorted, then have to sort it explicitely
+					auto		last_idx = timecard_obj_list.size() - 1;
+
+					date_obj.SetTMObj(GetTMObject(timecard_obj_list[last_idx].GetDateFinish()));
 				}
 				else if(bt_obj_list.size())
 				{
-					struct tm start_of_mon, end_of_mon;
+					// --- note that bt_objs are not in sorted order.
+					// --- last in <vector> not necessary will be latest by date
+					// --- if BTs need to be sorted, then have to sort it explicitely
+					auto		last_idx = bt_obj_list.size() - 1;
+					struct tm	start_of_mon, end_of_mon;
 
-					tie(start_of_mon, end_of_mon) = GetFirstAndLastMonthDaysByDate(GetTMObject(bt_obj_list[0].GetDateFinish()));
+					tie(start_of_mon, end_of_mon) = GetFirstAndLastMonthDaysByDate(GetTMObject(bt_obj_list[last_idx].GetDateFinish()));
 					date_obj.SetTMObj(end_of_mon);
 				}
 				else
 				{
+					MESSAGE_ERROR("", "", "while poke around the code, I didn't understand how to get to this block. If this error_message will appear, then need to investigate 'why workflow get you here'. This is not an error, just out of curiosity investigate this branch.");
+
 					time (&rawtime);
 					timeinfo = localtime (&rawtime);
 
@@ -1411,6 +1427,11 @@ auto	C_Invoicing_Vars::AgreementNumberSpelling_VarSet(string agreement_number) -
 				if(error_message.empty())
 				{
 					if((error_message = AssignVariableValue("invoice_agreement", "№" + agreement_number + " " + Get("agreement from") + " " + date_obj.Spell(), true)).length())
+						{ MESSAGE_ERROR("", "", "fail to assign variable value"); }
+				}
+				if(error_message.empty())
+				{
+					if((error_message = AssignVariableValue("Invoicing_Timestamp_1CFormat", date_obj.GetFormatted("%FT%T"), true)).length())
 						{ MESSAGE_ERROR("", "", "fail to assign variable value"); }
 				}
 				if(error_message.empty())
