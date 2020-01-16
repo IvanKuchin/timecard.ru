@@ -6403,6 +6403,10 @@ auto GetSoWIDByTimecardID(string timecard_id, CMysql *db, CUser *user) -> string
 			{
 				result = db->Get(0, "contract_sow_id");
 			}
+			else
+			{
+				MESSAGE_DEBUG("", "", "timecard(" + timecard_id + ") not found");
+			}
 		}
 		else
 		{
@@ -6419,3 +6423,36 @@ auto GetSoWIDByTimecardID(string timecard_id, CMysql *db, CUser *user) -> string
 	return result;
 }
 
+auto GetSoWIDByPSoWID(string psow_id, CMysql *db, CUser *user) -> string
+{
+	auto	result = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(user)
+	{
+		if(db)
+		{
+			if(db->Query("SELECT `contract_sow_id` FROM `contracts_psow` WHERE `id`=\"" + psow_id + "\";"))
+			{
+				result = db->Get(0, 0);
+			}
+			else
+			{
+				MESSAGE_DEBUG("", "", "psow_id(" + psow_id + ") not found");
+			}
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "db not initialized");
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "user not initialized");
+	}
+
+	MESSAGE_DEBUG("", "", "finish (result is " + result + ")");
+
+	return result;
+}

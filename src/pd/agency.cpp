@@ -3842,10 +3842,13 @@ int main(void)
 		if(action == "AJAX_getApproversAutocompleteList")
 		{
 			auto			name = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("term"));
+			auto			psow_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("psow_id"));
 			auto			sow_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("sow_id"));
 			auto			template_name = "json_response.htmlt"s;
 			auto			error_message = ""s;
 			auto			success_message = ""s;
+
+			if(psow_id.length()) sow_id = GetSoWIDByPSoWID(psow_id, &db, &user);
 
 			if(name.length() && sow_id.length())
 			{

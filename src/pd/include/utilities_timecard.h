@@ -144,6 +144,7 @@ auto			GetNumberOfApprovedTimecardsLastMonth(CMysql *, CUser *) -> string;
 auto 			GetNumberOfSoWActiveThisMonth(CMysql *, CUser *) -> string;
 auto 			GetNumberOfSoWActiveLastMonth(CMysql *, CUser *) -> string;
 auto			GetPSoWIDByTimecardIDAndCostCenterID(string timecard_id, string cost_center_id, CMysql *, CUser *) -> string;
+auto			GetSoWIDByPSoWID(string psow_id, CMysql *, CUser *) -> string;
 auto			GetSoWIDByTimecardID(string timecard_id, CMysql *, CUser *) -> string;
 auto			GetPSoWIDByBTIDAndCostCenterID(string timecard_id, string cost_center_id, CMysql *, CUser *) -> string;
 auto			GetPositionByCompanyID(string company_id, CMysql *, CUser *) -> string;

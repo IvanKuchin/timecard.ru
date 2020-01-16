@@ -3649,6 +3649,7 @@ string	GetApproversInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool i
 		string	id;
 		string	approver_user_id;
 		string	contract_sow_id;
+		string	contract_psow_id;
 		string	approver_order;
 		string	auto_approve;
 		string	type;
@@ -3672,6 +3673,7 @@ string	GetApproversInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool i
 			item.id = db->Get(i, "id");
 			item.approver_user_id	= db->Get(i, "approver_user_id");
 			item.contract_sow_id	= db->Get(i, "contract_sow_id");
+			item.contract_psow_id	= db->Get(i, "contract_psow_id");
 			item.approver_order		= db->Get(i, "approver_order");
 			item.auto_approve		= db->Get(i, "auto_approve");
 			item.type				= db->Get(i, "type");
@@ -3687,6 +3689,7 @@ string	GetApproversInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool i
 
 			result += "\"id\":\"" + item.id + "\",";
 			result += "\"approver_user_id\":\"" + item.approver_user_id + "\",";
+			result += "\"contract_psow_id\":\"" + item.contract_psow_id + "\",";
 			result += "\"contract_sow_id\":\"" + item.contract_sow_id + "\",";
 			if(include_sow)
 				result += "\"sow\":[" + GetSOWInJSONFormat("SELECT * FROM `contracts_sow` WHERE `id`=\"" + item.contract_sow_id + "\";", db, user) + "],";
