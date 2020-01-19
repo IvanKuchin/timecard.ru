@@ -15,10 +15,10 @@ string		C_TC_BT_Submit::FetchApprovers()
 	{
 		auto affected = db->Query(
 				(type == "timecard")? "SELECT * FROM `timecard_approvers` WHERE "
-											"`contract_sow_id` IN (SELECT `contract_sow_id` FROM `timecards` WHERE `id`=\"" + id + "\") ORDER BY `approver_order` ASC"
+											"`contract_psow_id` IN (SELECT `contract_psow_id` FROM `timecards` WHERE `id`=\"" + id + "\") ORDER BY `approver_order` ASC"
 										";" :
 				(type == "bt")		? "SELECT * FROM `bt_approvers` WHERE "
-											"`contract_sow_id` IN (SELECT `contract_sow_id` FROM `bt` WHERE `id`=\"" + id + "\") ORDER BY `approver_order` ASC"
+											"`contract_psow_id` IN (SELECT `contract_psow_id` FROM `bt` WHERE `id`=\"" + id + "\") ORDER BY `approver_order` ASC"
 										";" :
 				"SELECT 'fake'"
 			);
@@ -29,7 +29,7 @@ string		C_TC_BT_Submit::FetchApprovers()
 
 			item.id					= db->Get(i, "id");
 			item.approver_user_id	= db->Get(i, "approver_user_id");
-			item.contract_sow_id	= db->Get(i, "contract_sow_id");
+			item.contract_psow_id	= db->Get(i, "contract_psow_id");
 			item.approver_order		= db->Get(i, "approver_order");
 			item.auto_approve		= db->Get(i, "auto_approve");
 

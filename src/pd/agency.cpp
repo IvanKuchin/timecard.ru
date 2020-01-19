@@ -1414,7 +1414,7 @@ int main(void)
 									}
 									else
 									{
-										MESSAGE_DEBUG("", action, "unable to set new value (action/sow_id/id/value = " + action + "/" + sow_id + "/" + id + "/[" + FilterCP1251Symbols(new_value) + "])");
+										MESSAGE_DEBUG("", action, "unable to set new value (action/sow_id/id/value = " + action + "/" + sow_id + "/" + id + "/[" + new_value + "])");
 									}
 								}
 								else if(action.find("insert") != string::npos)
@@ -1432,7 +1432,7 @@ int main(void)
 									}
 									else
 									{
-										MESSAGE_DEBUG("", action, "unable to remove item (action/sow_id/id/value = " + action + "/" + sow_id + "/" + id + "/[" + FilterCP1251Symbols(new_value) + "])");
+										MESSAGE_DEBUG("", action, "unable to remove item (action/sow_id/id/value = " + action + "/" + sow_id + "/" + id + "/[" + new_value + "])");
 									}
 								}
 								else
@@ -1546,7 +1546,7 @@ int main(void)
 									}
 									else
 									{
-										MESSAGE_DEBUG("", action, "unable to set new value (action/sow_id/id/value = " + action + "/" + sow_id + "/" + id + "/[" + FilterCP1251Symbols(new_value) + "])");
+										MESSAGE_DEBUG("", action, "unable to set new value (action/sow_id/id/value = " + action + "/" + sow_id + "/" + id + "/[" + new_value + "])");
 									}
 								}
 								else if(action.find("insert") != string::npos)
@@ -1564,7 +1564,7 @@ int main(void)
 									}
 									else
 									{
-										MESSAGE_DEBUG("", action, "unable to remove item (action/sow_id/id/value = " + action + "/" + sow_id + "/" + id + "/[" + FilterCP1251Symbols(new_value) + "])");
+										MESSAGE_DEBUG("", action, "unable to remove item (action/sow_id/id/value = " + action + "/" + sow_id + "/" + id + "/[" + new_value + "])");
 									}
 								}
 								else
@@ -1755,7 +1755,7 @@ int main(void)
 											}
 											else
 											{
-												MESSAGE_DEBUG("", action, "unable to set new value (action/id/value = " + action + "/" + id + "/[" + FilterCP1251Symbols(new_value) + "])");
+												MESSAGE_DEBUG("", action, "unable to set new value (action/id/value = " + action + "/" + id + "/[" + new_value + "])");
 											}
 										}
 										else if(action.find("insert") != string::npos)
@@ -1781,7 +1781,7 @@ int main(void)
 											}
 											else
 											{
-												MESSAGE_DEBUG("", action, "unable to set new value (action/id/value = " + action + "/" + id + "/[" + FilterCP1251Symbols(new_value) + "])");
+												MESSAGE_DEBUG("", action, "unable to set new value (action/id/value = " + action + "/" + id + "/[" + new_value + "])");
 											}
 										}
 										else
@@ -1850,84 +1850,102 @@ int main(void)
 				auto			error_message = ""s;
 				auto			success_message = ""s;
 
-				auto			sow_id			= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("sow_id"));
+				auto			db_table		= (action == "AJAX_updateTimecardApproverOrder" ? "timecard_approvers"s : "bt_approvers");
 				auto			new_value		= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("value"));
+				auto			values			= split(new_value, ',');
 
-				ostringstream	ostResult;
 
-				ostResult.str("");
-
-				if(new_value.length() && sow_id.length())
+				if(values.size())
 				{
-					error_message = isAgencyEmployeeAllowedToChangeSoW(sow_id, &db, &user);
-					if(error_message.empty())
-					{
-						string	agency_id = GetAgencyID(&user, &db);
-						if(agency_id.length())
-						{
-							{
-								error_message = isActionEntityBelongsToAgency(action, sow_id, agency_id, &db, &user);
-								if(error_message.empty())
-								{
-									error_message = CheckNewValueByAction(action, "fake", sow_id, new_value, &db, &user);
-									if(error_message.empty())
-									{
-										if((action.find("update") != string::npos))
-										{
-											string		existing_value = GetDBValueByAction(action, sow_id, "", &db, &user);
+					auto		psow_ids		= GetValuesFromDB("SELECT DISTINCT(`contract_psow_id`) FROM " + db_table + " WHERE `id` IN (" + join(values) + ");", &db);
 
-											error_message = SetNewValueByAction(action, sow_id, "", new_value, &db, &user);
+					if(psow_ids.size() == 1)
+					{
+						auto			psow_id			= psow_ids[0];
+						auto			sow_id			= GetSoWIDByPSoWID(psow_id, &db, &user);
+
+						if(sow_id.length())
+						{
+							error_message = isAgencyEmployeeAllowedToChangeSoW(sow_id, &db, &user);
+							if(error_message.empty())
+							{
+								string	agency_id = GetAgencyID(&user, &db);
+								if(agency_id.length())
+								{
+									{
+										error_message = isActionEntityBelongsToAgency(action, sow_id, agency_id, &db, &user);
+										if(error_message.empty())
+										{
+											error_message = CheckNewValueByAction(action, psow_id, sow_id, new_value, &db, &user);
 											if(error_message.empty())
 											{
-												// --- good finish
-
-												if(GeneralNotifySoWContractPartiesAboutChanges(action, sow_id, "", existing_value, new_value, &db, &user))
+												if((action.find("update") != string::npos))
 												{
+													string		existing_value = GetDBValueByAction(action, sow_id, "", &db, &user);
 
-													if(action == "AJAX_updateTimecardApproverOrder")	success_message = "\"timecard_approvers\":[" + GetApproversInJSONFormat("SELECT * FROM `timecard_approvers` WHERE `contract_sow_id`=" + quoted(sow_id) + ";", &db, &user, false) + "]";
-													else if(action == "AJAX_updateBTApproverOrder")		success_message = "\"bt_approvers\":[" + GetApproversInJSONFormat("SELECT * FROM `bt_approvers` WHERE `contract_sow_id`=" + quoted(sow_id) + ";", &db, &user, false) + "]";
+													error_message = SetNewValueByAction(action, sow_id, "", new_value, &db, &user);
+													if(error_message.empty())
+													{
+														// --- good finish
+
+														if(GeneralNotifySoWContractPartiesAboutChanges(action, sow_id, "", existing_value, new_value, &db, &user))
+														{
+
+															if(action == "AJAX_updateTimecardApproverOrder")	success_message = "\"timecard_approvers\":[" + GetApproversInJSONFormat("SELECT * FROM `timecard_approvers` WHERE `contract_sow_id`=" + quoted(sow_id) + ";", &db, &user, false) + "]";
+															else if(action == "AJAX_updateBTApproverOrder")		success_message = "\"bt_approvers\":[" + GetApproversInJSONFormat("SELECT * FROM `bt_approvers` WHERE `contract_sow_id`=" + quoted(sow_id) + ";", &db, &user, false) + "]";
+															else
+															{
+																error_message = gettext("unsupported action");
+																MESSAGE_ERROR("", action, error_message + " type(" + action + ")");
+															}
+														}
+														else
+														{
+															MESSAGE_DEBUG("", action, "fail to notify agency about changes");
+														}
+													}
 													else
 													{
-														error_message = gettext("unsupported action");
-														MESSAGE_ERROR("", action, error_message + " type(" + action + ")");
+														MESSAGE_DEBUG("", action, "unable to set new value (action/id/value = " + action + "/" + sow_id + "/[" + new_value + "])");
 													}
 												}
 												else
 												{
-													MESSAGE_DEBUG("", action, "fail to notify agency about changes");
+													MESSAGE_ERROR("", action, "unsupported action type(" + action + ")");
 												}
+
 											}
 											else
 											{
-												MESSAGE_DEBUG("", action, "unable to set new value (action/id/value = " + action + "/" + sow_id + "/[" + FilterCP1251Symbols(new_value) + "])");
+												MESSAGE_DEBUG("", action, "new value failed to pass validity check");
 											}
 										}
 										else
 										{
-											MESSAGE_ERROR("", action, "unsupported action type(" + action + ")");
+											MESSAGE_DEBUG("", action, "action entity id(" + user.GetID() + ") doesn't belongs to agency.id(" + agency_id + ")");
 										}
-
-									}
-									else
-									{
-										MESSAGE_DEBUG("", action, "new value failed to pass validity check");
 									}
 								}
 								else
 								{
-									MESSAGE_DEBUG("", action, "action entity id(" + user.GetID() + ") doesn't belongs to agency.id(" + agency_id + ")");
+									error_message = "Агенство не найдено";
+									MESSAGE_ERROR("", action, "agency.id not found by user.id(" + user.GetID() + ") employment");
 								}
+							}
+							else
+							{
+								MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") doesn't allowed to change agency data");
 							}
 						}
 						else
 						{
-							error_message = "Агенство не найдено";
-							MESSAGE_ERROR("", action, "agency.id not found by user.id(" + user.GetID() + ") employment");
+
 						}
 					}
 					else
 					{
-						MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") doesn't allowed to change agency data");
+						error_message = gettext("approvers belong to different PSoW") + ". "s + gettext("Quantity short") + " " + gettext("PSoW") + " " + to_string(psow_ids.size());
+						MESSAGE_ERROR("", action, error_message);
 					}
 				}
 				else
@@ -3849,6 +3867,10 @@ int main(void)
 			auto			success_message = ""s;
 
 			if(psow_id.length()) sow_id = GetSoWIDByPSoWID(psow_id, &db, &user);
+			else
+			{
+				MESSAGE_DEBUG("", action, "take sow_id(" + sow_id + ") from HTTP param");
+			}
 
 			if(name.length() && sow_id.length())
 			{
@@ -4039,36 +4061,33 @@ int main(void)
 			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 		}
 
-		if(	action == "AJAX_addTimecardApproverToSoW" ||
-			action == "AJAX_addBTExpenseApproverToSoW"
+		if(	action == "AJAX_addTimecardApproverToPSoW" ||
+			action == "AJAX_addBTExpenseApproverToPSoW"
 		)
 		{
-			string			new_value = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("new_value"));
-			string			sow_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("sow_id"));
+			auto			new_value = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("new_value"));
+			auto			psow_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("psow_id"));
+			auto			sow_id = GetSoWIDByPSoWID(psow_id, &db, &user);
 
-			string			template_name = "json_response.htmlt";
 			auto			error_message = ""s;
 			auto			success_message = ""s;
-			ostringstream	ostResult;
 
-			ostResult.str("");
-
-			if(new_value.length() && sow_id.length())
+			if(new_value.length() && sow_id.length() && psow_id.length())
 			{
 				error_message = isAgencyEmployeeAllowedToChangeSoW(sow_id, &db, &user);
 				if(error_message.empty())
 				{
 					string	approver_id = "";
 
-					error_message = CheckNewValueByAction(action, "fake_id", sow_id, new_value, &db, &user);
+					error_message = CheckNewValueByAction(action, psow_id, sow_id, new_value, &db, &user);
 					if(error_message.empty())
 					{
-						error_message = SetNewValueByAction(action, "fake_id", sow_id, new_value, &db, &user);
+						error_message = SetNewValueByAction(action, psow_id, sow_id, new_value, &db, &user);
 						if(error_message.empty())
 						{
-							success_message = GetInfoToReturnByAction(action, "fake_id", sow_id, new_value, &db, &user);
+							success_message = GetInfoToReturnByAction(action, psow_id, sow_id, new_value, &db, &user);
 
-							if(GeneralNotifySoWContractPartiesAboutChanges(action, "fake_id", sow_id, "fake_existing_value", new_value, &db, &user))
+							if(GeneralNotifySoWContractPartiesAboutChanges(action, psow_id, sow_id, "fake_existing_value", new_value, &db, &user))
 							{
 							}
 							else
@@ -4078,7 +4097,7 @@ int main(void)
 						}
 						else
 						{
-							MESSAGE_DEBUG("", action, "unable to set new value (action/sow_id/value = " + action + "/" + sow_id + "/[" + FilterCP1251Symbols(new_value) + "])");
+							MESSAGE_DEBUG("", action, "unable to set new value (action/sow_id/value = " + action + "/" + sow_id + "/[" + new_value + "])");
 						}
 					}
 					else
@@ -4100,64 +4119,77 @@ int main(void)
 			AJAX_ResponseTemplate(&indexPage, success_message, error_message);
 		}
 
-		if(	action == "AJAX_deleteTimecardApproverFromSoW" ||
-			action == "AJAX_deleteBTExpenseApproverFromSoW"
+		if(	action == "AJAX_deleteTimecardApproverFromPSoW" ||
+			action == "AJAX_deleteBTExpenseApproverFromPSoW"
 		)
 		{
-			string			id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
-			string			sow_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("sow_id"));
+			auto			id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
 
-			string			template_name = "json_response.htmlt";
 			auto			error_message = ""s;
 			auto			success_message = ""s;
 
-			ostringstream	ostResult;
-
-			ostResult.str("");
-
-			if(id.length() && sow_id.length())
+			if(id.length())
 			{
-				error_message = isAgencyEmployeeAllowedToChangeSoW(sow_id, &db, &user);
-				if(error_message.empty())
+				auto		db_table	= (action == "AJAX_deleteTimecardApproverFromPSoW" ? "timecard_approvers"s : "bt_approvers");
+				auto		psow_id		= GetPSoWIDByApprover("SELECT `contract_psow_id` FROM `" + db_table + "` WHERE `id`=\"" + id + "\";", &db, &user);
+				if(psow_id.length())
 				{
-					error_message = isActionEntityBelongsToSoW(action, id, sow_id, &db, &user);
-					if(error_message.empty())
+					auto		sow_id	= GetSoWIDByPSoWID(psow_id, &db, &user);
+					if(psow_id.length())
 					{
-						// --- notify before actual removal
-						if(GeneralNotifySoWContractPartiesAboutChanges(action, id, sow_id, "fake_existing_value", "fake_new_value", &db, &user))
-						{
-						}
-						else
-						{
-							MESSAGE_DEBUG("", action, "fail to notify sow.id(" + sow_id + ") parties about changes");
-						}
-
-						error_message = SetNewValueByAction(action, id, sow_id, "fake_new_value", &db, &user);
+						error_message	= isAgencyEmployeeAllowedToChangeSoW(sow_id, &db, &user);
 						if(error_message.empty())
 						{
-							error_message = ResubmitEntitiesByAction(action, id, sow_id, "fake_new_value", &db, &user);
+							error_message = isActionEntityBelongsToSoW(action, id, sow_id, &db, &user);
 							if(error_message.empty())
 							{
-								success_message = GetInfoToReturnByAction(action, id, sow_id, "fake_new_value", &db, &user);
+								// --- notify before actual removal
+								if(GeneralNotifySoWContractPartiesAboutChanges(action, id, sow_id, "fake_existing_value", "fake_new_value", &db, &user))
+								{
+								}
+								else
+								{
+									MESSAGE_DEBUG("", action, "fail to notify sow.id(" + sow_id + ") parties about changes");
+								}
+
+								error_message = SetNewValueByAction(action, id, sow_id, "fake_new_value", &db, &user);
+								if(error_message.empty())
+								{
+									error_message = ResubmitEntitiesByAction(action, "fake", sow_id, "fake_new_value", &db, &user);
+									if(error_message.empty())
+									{
+										success_message = GetInfoToReturnByAction(action, psow_id, sow_id, "fake_new_value", &db, &user);
+									}
+									else
+									{
+										MESSAGE_DEBUG("", action, "fail to resubmit entities by action");
+									}
+								}
+								else
+								{
+									MESSAGE_DEBUG("", action, "unable to delete value (action/sow_id/id = " + action + "/" + sow_id + "/" + id + ")");
+								}
 							}
 							else
 							{
-								MESSAGE_DEBUG("", action, "fail to resubmit entities by action");
+								MESSAGE_DEBUG("", action, "action entity id(" + user.GetID() + ") doesn't belong to sow.id(" + sow_id + ")");
 							}
 						}
 						else
 						{
-							MESSAGE_DEBUG("", action, "unable to delete value (action/sow_id/id = " + action + "/" + sow_id + "/" + id + ")");
+							MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") doesn't allowed to change sow.id(" + sow_id + ")");
 						}
 					}
 					else
 					{
-						MESSAGE_DEBUG("", action, "action entity id(" + user.GetID() + ") doesn't belong to sow.id(" + sow_id + ")");
+						error_message = gettext("mandatory parameter missed");
+						MESSAGE_DEBUG("", action, error_message);
 					}
 				}
 				else
 				{
-					MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") doesn't allowed to change sow.id(" + sow_id + ")");
+					error_message = gettext("mandatory parameter missed");
+					MESSAGE_DEBUG("", action, error_message);
 				}
 			}
 			else
@@ -5236,7 +5268,7 @@ int main(void)
 											}
 											else
 											{
-												MESSAGE_DEBUG("", action, "unable to set new value (action/id/value = " + action + "/" + id + "/[" + FilterCP1251Symbols(new_value) + "])");
+												MESSAGE_DEBUG("", action, "unable to set new value (action/id/value = " + action + "/" + id + "/[" + new_value + "])");
 											}
 										}
 										else if(action.find("insert") != string::npos)
@@ -5258,7 +5290,7 @@ int main(void)
 												}
 												else
 												{
-													MESSAGE_DEBUG("", action, "unable to set new value (action/id/value = " + action + "/" + id + "/[" + FilterCP1251Symbols(new_value) + "])");
+													MESSAGE_DEBUG("", action, "unable to set new value (action/id/value = " + action + "/" + id + "/[" + new_value + "])");
 												}
 											}
 											else
@@ -5374,7 +5406,7 @@ int main(void)
 											}
 											else
 											{
-												MESSAGE_DEBUG("", action, "unable to set new value (action/id/value = " + action + "/" + id + "/[" + FilterCP1251Symbols(new_value) + "])");
+												MESSAGE_DEBUG("", action, "unable to set new value (action/id/value = " + action + "/" + id + "/[" + new_value + "])");
 											}
 										}
 										else if(action.find("insert") != string::npos)
@@ -5396,7 +5428,7 @@ int main(void)
 												}
 												else
 												{
-													MESSAGE_DEBUG("", action, "unable to set new value (action/id/value = " + action + "/" + id + "/[" + FilterCP1251Symbols(new_value) + "])");
+													MESSAGE_DEBUG("", action, "unable to set new value (action/id/value = " + action + "/" + id + "/[" + new_value + "])");
 												}
 											}
 											else

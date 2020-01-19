@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-05 16:43-0500\n"
+"POT-Creation-Date: 2020-01-19 17:06-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,18 +26,18 @@ msgstr[1] "%d заказчикам"
 msgstr[2] "%d заказчикам"
 
 #, c-format
-msgid "%d subcontractors"
-msgid_plural "%d subcontractors"
-msgstr[0] "%d субконтрактору"
-msgstr[1] "%d субконтракторам"
-msgstr[2] "%d субконтракторам"
-
-#, c-format
 msgid "%d days"
 msgid_plural "%d days"
 msgstr[0] "%d день"
 msgstr[1] "%d дня"
 msgstr[2] "%d дней"
+
+#, c-format
+msgid "%d subcontractors"
+msgid_plural "%d subcontractors"
+msgstr[0] "%d субконтрактору"
+msgstr[1] "%d субконтракторам"
+msgstr[2] "%d субконтракторам"
 
 msgid "1C generation failed"
 msgstr "Ошибка в выгрузке 1С"
@@ -573,6 +573,9 @@ msgstr "и"
 msgid "approver doesn't assigned to SoW"
 msgstr "согласователь не назначен договору"
 
+msgid "approvers belong to different PSoW"
+msgstr "согласователи назначены разным ТЗ"
+
 msgid "bank_id is empty"
 msgstr "не указан банк"
 
@@ -599,6 +602,9 @@ msgstr "изменилась наценка комндировки"
 
 msgid "bt markup type changed"
 msgstr "изменился тип нацеки у командировки"
+
+msgid "bt payment period is empty"
+msgstr ""
 
 msgid "bt period payment"
 msgstr "период оплаты за командировки"
@@ -1064,6 +1070,9 @@ msgstr "руб."
 
 msgid "service is not reachable"
 msgstr "сервисе недоступен"
+
+msgid "service payment period is empty"
+msgstr ""
 
 msgid "service period payment"
 msgstr "период оплаты за работы"

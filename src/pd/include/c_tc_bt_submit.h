@@ -26,7 +26,7 @@ class C_TC_BT_Submit
 		{
 			string	id;
 			string	approver_user_id;
-			string	contract_sow_id;
+			string	contract_psow_id;
 			string	approver_order;
 			string	auto_approve;
 		};

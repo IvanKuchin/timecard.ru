@@ -12,19 +12,13 @@ string	ResubmitEntitiesByAction(string action, string id, string sow_id, string 
 		{
 			if(new_value.length())
 			{
-					if(action == "AJAX_deleteTimecardApproverFromSoW")
+					if(action == "AJAX_deleteTimecardApproverFromPSoW")
 					{
 						if(sow_id.length())
 						{
-							int	affected = db->Query("SELECT `id` FROM `timecards` WHERE `status`=\"submit\" AND `contract_sow_id`=\"" + sow_id + "\";");
-							vector<string> timecard_list;
+							auto	item_list = GetValuesFromDB("SELECT `id` FROM `timecards` WHERE `status`=\"submit\" AND `contract_sow_id`=\"" + sow_id + "\";", db);
 
-							for(int i = 0; i < affected; ++i)
-							{
-								timecard_list.push_back(db->Get(i, "id"));
-							}
-
-							for (auto &timecard_id: timecard_list)
+							for (auto &timecard_id: item_list)
 							{
 								if(SubmitTimecard(timecard_id, db, user))
 								{
@@ -43,19 +37,13 @@ string	ResubmitEntitiesByAction(string action, string id, string sow_id, string 
 							MESSAGE_ERROR("", "", "sow.id is empty")
 						}
 					}
-					else if(action == "AJAX_deleteBTExpenseApproverFromSoW")
+					else if(action == "AJAX_deleteBTExpenseApproverFromPSoW")
 					{
 						if(sow_id.length())
 						{
-							int	affected = db->Query("SELECT `id` FROM `bt` WHERE `status`=\"submit\" AND `contract_sow_id`=\"" + sow_id + "\";");
-							vector<string> bt_list;
+							auto	item_list = GetValuesFromDB("SELECT `id` FROM `bt` WHERE `status`=\"submit\" AND `contract_sow_id`=\"" + sow_id + "\";", db);
 
-							for(int i = 0; i < affected; ++i)
-							{
-								bt_list.push_back(db->Get(i, "id"));
-							}
-
-							for (auto &bt_id: bt_list)
+							for (auto &bt_id: item_list)
 							{
 								if(SubmitBT(bt_id, db, user))
 								{

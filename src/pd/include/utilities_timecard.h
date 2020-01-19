@@ -138,13 +138,14 @@ auto			DeleteEntryByAction(string action, string id, CMysql *, CUser *) -> strin
 // auto			ResubmitEntitiesByAction(string action, string id, string sow_id, string new_value, CMysql *, CUser *) -> string;
 auto			GetAgencyEmployeesInJSONFormat(string sql_query, CMysql *, CUser *) -> string;
 auto			GetAgencyObjectInJSONFormat(string agency_id, bool include_tasks, bool include_bt, CMysql *, CUser *) -> string;
-auto			GetInfoToReturnByAction(string action, string id, string sow_id, string new_value, CMysql *, CUser *) -> string;
+auto			GetInfoToReturnByAction(string action, string, string sow_id, string new_value, CMysql *, CUser *) -> string;
 auto			GetNumberOfApprovedTimecardsThisMonth(CMysql *, CUser *) -> string;
 auto			GetNumberOfApprovedTimecardsLastMonth(CMysql *, CUser *) -> string;
 auto 			GetNumberOfSoWActiveThisMonth(CMysql *, CUser *) -> string;
 auto 			GetNumberOfSoWActiveLastMonth(CMysql *, CUser *) -> string;
 auto			GetPSoWIDByTimecardIDAndCostCenterID(string timecard_id, string cost_center_id, CMysql *, CUser *) -> string;
 auto			GetSoWIDByPSoWID(string psow_id, CMysql *, CUser *) -> string;
+auto			GetPSoWIDByApprover(string sql_query, CMysql *, CUser *) -> string;
 auto			GetSoWIDByTimecardID(string timecard_id, CMysql *, CUser *) -> string;
 auto			GetPSoWIDByBTIDAndCostCenterID(string timecard_id, string cost_center_id, CMysql *, CUser *) -> string;
 auto			GetPositionByCompanyID(string company_id, CMysql *, CUser *) -> string;

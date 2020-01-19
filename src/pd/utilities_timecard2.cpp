@@ -915,8 +915,8 @@ auto	isActionEntityBelongsToSoW(string action, string id, string sow_id, CMysql 
 				if(action == "AJAX_updateTaskTitle") 				sql_query = "SELECT `contract_sow_id` AS `sow_id` FROM `timecard_task_assignment` WHERE `timecard_tasks_id`=\"" + id + "\";";
 				if(action == "AJAX_updatePeriodStart") 				sql_query = "SELECT `contract_sow_id` AS `sow_id` FROM `timecard_task_assignment` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updatePeriodEnd") 				sql_query = "SELECT `contract_sow_id` AS `sow_id` FROM `timecard_task_assignment` WHERE `id`=\"" + id + "\";";
-				if(action == "AJAX_deleteTimecardApproverFromSoW")	sql_query = "SELECT `contract_sow_id` AS `sow_id` FROM `timecard_approvers` WHERE `id`=\"" + id + "\";";
-				if(action == "AJAX_deleteBTExpenseApproverFromSoW")	sql_query = "SELECT `contract_sow_id` AS `sow_id` FROM `bt_approvers` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_deleteTimecardApproverFromPSoW")	sql_query = "SELECT `contract_sow_id` AS `sow_id` FROM `contracts_psow` WHERE `id`=(SELECT `contract_psow_id` FROM `timecard_approvers` WHERE `id`=\"" + id + "\");";
+				if(action == "AJAX_deleteBTExpenseApproverFromPSoW")sql_query = "SELECT `contract_sow_id` AS `sow_id` FROM `contracts_psow` WHERE `id`=(SELECT `contract_psow_id` FROM `bt_approvers` WHERE `id`=\"" + id + "\");";
 				if(action == "AJAX_updateSubcontractorCreateTasks")	sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
 
 				if(action == "AJAX_updateSoWNumber")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
@@ -1023,7 +1023,7 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 					{
 						if(sow_id.length())
 						{
-							string	assignment_id = id;
+							auto	assignment_id = id;
 
 							// --- find existing period_start and period_end
 							if(error_message.empty())
@@ -1520,9 +1520,11 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 							// --- good to go
 						}
 					}
-					else if(action == "AJAX_addTimecardApproverToSoW")
+					else if(action == "AJAX_addTimecardApproverToPSoW")
 					{
-						if(db->Query("SELECT `id` FROM `timecard_approvers` WHERE `approver_user_id`=\"" + new_value + "\" AND `contract_sow_id`=\"" + sow_id + "\";"))
+						auto	psow_id = id;
+
+						if(db->Query("SELECT `id` FROM `timecard_approvers` WHERE `approver_user_id`=\"" + new_value + "\" AND `contract_psow_id`=\"" + psow_id + "\";"))
 						{
 							error_message = "Уже в списке утвердителей";
 							MESSAGE_DEBUG("", "", "user.id(" + new_value + ") already in sow.id(" + sow_id + ") approver list");
@@ -1557,9 +1559,11 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 							MESSAGE_DEBUG("", "", "cost center doesn't belongs to your company");
 						}
 					}
-					else if(action == "AJAX_addBTExpenseApproverToSoW")
+					else if(action == "AJAX_addBTExpenseApproverToPSoW")
 					{
-						if(db->Query("SELECT `id` FROM `bt_approvers` WHERE `approver_user_id`=\"" + new_value + "\" AND `contract_sow_id`=\"" + sow_id + "\";"))
+						auto	psow_id = id;
+
+						if(db->Query("SELECT `id` FROM `bt_approvers` WHERE `approver_user_id`=\"" + new_value + "\" AND `contract_psow_id`=\"" + psow_id + "\";"))
 						{
 							error_message = "Уже в списке утвердителей";
 							MESSAGE_DEBUG("", "", "user.id(" + new_value + ") already in sow.id(" + sow_id + ") approver list");
@@ -1789,36 +1793,30 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 					}
 					else if(action == "AJAX_updateTimecardApproverOrder")
 					{
-						auto	user_id_list = split(new_value, ',');
+						auto	psow_id = id;
+						auto	other_psow_id = GetValueFromDB("SELECT DISTINCT(`contract_psow_id`) FROM `timecard_approvers` WHERE `id` IN (" + new_value + ") AND `contract_psow_id`!=" + quoted(psow_id) + ";", db);
 
-						for(auto &user_id : user_id_list)
+						if(other_psow_id.length())
 						{
-							if(db->Query("SELECT `approver_user_id` FROM `timecard_approvers` WHERE `id`=" + quoted(user_id) + " AND `contract_sow_id`=" + quoted(sow_id) + ";"))
-							{
-
-							}
-							else
-							{
-								error_message = gettext("approver doesn't assigned to SoW");
-								MESSAGE_ERROR("", "", error_message);
-							}
+							error_message = gettext("approvers belong to different PSoW");
+							MESSAGE_ERROR("", "", error_message);
+						}
+						else
+						{
 						}
 					}
 					else if(action == "AJAX_updateBTApproverOrder")
 					{
-						auto	user_id_list = split(new_value, ',');
+						auto	psow_id = id;
+						auto	other_psow_id = GetValueFromDB("SELECT DISTINCT(`contract_psow_id`) FROM `bt_approvers` WHERE `id` IN (" + new_value + ") AND `contract_psow_id`!=" + quoted(psow_id) + ";", db);
 
-						for(auto &user_id : user_id_list)
+						if(other_psow_id.length())
 						{
-							if(db->Query("SELECT `approver_user_id` FROM `bt_approvers` WHERE `id`=" + quoted(user_id) + " AND `contract_sow_id`=" + quoted(sow_id) + ";"))
-							{
-
-							}
-							else
-							{
-								error_message = gettext("approver doesn't assigned to SoW");
-								MESSAGE_ERROR("", "", error_message);
-							}
+							error_message = gettext("approvers belong to different PSoW");
+							MESSAGE_ERROR("", "", error_message);
+						}
+						else
+						{
 						}
 					}
 
@@ -3954,16 +3952,17 @@ string	isValidToReportTime(string timecard_id, string task_id, string timereport
 	return error_message;	
 }
 
-string	GetInfoToReturnByAction(string action, string id, string sow_id, string new_value, CMysql *db, CUser *user)
+string	GetInfoToReturnByAction(string action, string temp_id, string sow_id, string new_value, CMysql *db, CUser *user)
 {
-	string	result = "";
+	auto	result = ""s;
+	auto	psow_id = temp_id;
 
 	MESSAGE_DEBUG("", "", "start");
 
-	if((action == "AJAX_addTimecardApproverToSoW") || (action == "AJAX_deleteTimecardApproverFromSoW"))
-		result = "\"timecard_approvers\":[" + GetApproversInJSONFormat("SELECT * FROM `timecard_approvers` WHERE `contract_sow_id`=\"" + sow_id + "\";", db, user, DO_NOT_INCLUDE_SOW_INFO) + "]";
-	if((action == "AJAX_addBTExpenseApproverToSoW") || (action == "AJAX_deleteBTExpenseApproverFromSoW"))
-		result = "\"bt_approvers\":[" + GetApproversInJSONFormat("SELECT * FROM `bt_approvers` WHERE `contract_sow_id`=\"" + sow_id + "\";", db, user, DO_NOT_INCLUDE_SOW_INFO) + "]";
+	if((action == "AJAX_addTimecardApproverToPSoW") || (action == "AJAX_deleteTimecardApproverFromPSoW"))
+		result = "\"timecard_approvers\":[" + GetApproversInJSONFormat("SELECT * FROM `timecard_approvers` WHERE `contract_psow_id`=\"" + psow_id + "\";", db, user, DO_NOT_INCLUDE_SOW_INFO) + "]";
+	if((action == "AJAX_addBTExpenseApproverToPSoW") || (action == "AJAX_deleteBTExpenseApproverFromPSoW"))
+		result = "\"bt_approvers\":[" + GetApproversInJSONFormat("SELECT * FROM `bt_approvers` WHERE `contract_psow_id`=\"" + psow_id + "\";", db, user, DO_NOT_INCLUDE_SOW_INFO) + "]";
 
 	MESSAGE_DEBUG("", "", "finish (result length is " + to_string(result.length()) + ")");
 
@@ -3982,7 +3981,7 @@ string	ResubmitEntitiesByAction(string action, string id, string sow_id, string 
 		{
 			if(new_value.length())
 			{
-					if(action == "AJAX_deleteTimecardApproverFromSoW")
+					if(action == "AJAX_deleteTimecardApproverFromPSoW")
 					{
 						if(sow_id.length())
 						{
@@ -4013,7 +4012,7 @@ string	ResubmitEntitiesByAction(string action, string id, string sow_id, string 
 							MESSAGE_ERROR("", "", "sow.id is empty")
 						}
 					}
-					else if(action == "AJAX_deleteBTExpenseApproverFromSoW")
+					else if(action == "AJAX_deleteBTExpenseApproverFromPSoW")
 					{
 						if(sow_id.length())
 						{
@@ -4237,36 +4236,39 @@ string	SetNewValueByAction(string action, string id, string sow_id, string new_v
 						if(action == "AJAX_deleteBTAllowance")						sql_query = "DELETE FROM `bt_allowance` WHERE `id`=\"" + id + "\";";
 
 						// --- add approver
-						if(action == "AJAX_addTimecardApproverToSoW")
+						if(action == "AJAX_addTimecardApproverToPSoW")
 						{
+							auto	psow_id = id;
+
 							// --- insert 0 if everybody else have 0 order
 							// --- insert MAX+1 if approvers are ordered
 							auto	order = "0"s;
 
-							// if(db->Query("SELECT MAX(`approver_order`) FROM `timecard_approvers` WHERE `contract_sow_id`=" + quoted(sow_id) + ";"))
-							if(db->Query("SELECT `approver_order` FROM `timecard_approvers` WHERE `contract_sow_id`=" + quoted(sow_id) + " ORDER BY `approver_order` DESC LIMIT 0,1;"))
+							if(db->Query("SELECT `approver_order` FROM `timecard_approvers` WHERE `contract_psow_id`=" + quoted(psow_id) + " ORDER BY `approver_order` DESC LIMIT 0,1;"))
 							{
 								order = db->Get(0, 0);
 
 								if(order == "0") {} else { order += "+1"; }
 							}
 
-							sql_query = "INSERT INTO `timecard_approvers` (`approver_user_id`,`contract_sow_id`, `approver_order`) VALUES (\"" + new_value + "\", \"" + sow_id + "\"," + order + ");";
+							sql_query = "INSERT INTO `timecard_approvers` (`approver_user_id`,`contract_sow_id`,`contract_psow_id`, `approver_order`) VALUES (\"" + new_value + "\", \"" + sow_id + "\", \"" + psow_id + "\"," + order + ");";
 						}
-						if(action == "AJAX_addBTExpenseApproverToSoW")
+						if(action == "AJAX_addBTExpenseApproverToPSoW")
 						{
+							auto	psow_id = id;
+
 							// --- insert 0 if everybody else have 0 order
 							// --- insert MAX+1 if approvers are ordered
 							auto	order = "0"s;
 
-							if(db->Query("SELECT `approver_order` FROM `bt_approvers` WHERE `contract_sow_id`=" + quoted(sow_id) + " ORDER BY `approver_order` DESC LIMIT 0,1;"))
+							if(db->Query("SELECT `approver_order` FROM `bt_approvers` WHERE `contract_psow_id`=" + quoted(psow_id) + " ORDER BY `approver_order` DESC LIMIT 0,1;"))
 							{
 								order = db->Get(0, 0);
 
 								if(order == "0") {} else { order += "+1"; }
 							}
 
-							sql_query = "INSERT INTO `bt_approvers` (`approver_user_id`,`contract_sow_id`, `approver_order`) VALUES (\"" + new_value + "\", \"" + sow_id + "\", " + order + ");";
+							sql_query = "INSERT INTO `bt_approvers` (`approver_user_id`,`contract_sow_id`,`contract_psow_id`, `approver_order`) VALUES (\"" + new_value + "\", \"" + sow_id + "\", \"" + psow_id + "\", " + order + ");";
 						}
 
 						// --- expense line template payment part
@@ -4381,64 +4383,80 @@ string	SetNewValueByAction(string action, string id, string sow_id, string new_v
 							sql_query = "UPDATE	`cost_center_assignment` SET `cost_center_id` =\"" + new_value + "\" WHERE `timecard_customer_id`=\"" + id + "\";";
 						}
 
-						if(action == "AJAX_deleteTimecardApproverFromSoW")
+						if(action == "AJAX_deleteTimecardApproverFromPSoW")
 						{
 							auto	affected = 0;
+							auto	psow_id = GetValueFromDB("SELECT `contract_psow_id` FROM `timecard_approvers` WHERE `id`="s + quoted(id) + ";", db);
 
-							db->Query("DELETE FROM `timecard_approvals` WHERE `approver_id`=\"" + id + "\";");
-							db->Query("DELETE FROM `timecard_approvers` WHERE `id`=\"" + id + "\";");
-
-							// --- renumber approvers
-							if((affected = db->Query("SELECT `id` FROM `timecard_approvers` WHERE `contract_sow_id`=" + quoted(sow_id) + " AND `approver_order`>0 ORDER BY `approver_order` ASC;")))
+							if(psow_id.length())
 							{
-								vector<string>	id_arr;
-								auto			i = 0;
+								db->Query("DELETE FROM `timecard_approvals` WHERE `approver_id`=\"" + id + "\";");
+								db->Query("DELETE FROM `timecard_approvers` WHERE `id`=\"" + id + "\";");
 
-								for(i = 0; i < affected; ++i)
+								// --- renumber approvers
+								if((affected = db->Query("SELECT `id` FROM `timecard_approvers` WHERE `contract_psow_id`=" + quoted(psow_id) + " AND `approver_order`>0 ORDER BY `approver_order` ASC;")))
 								{
-									id_arr.push_back(db->Get(i, 0));
+									vector<string>	id_arr;
+									auto			i = 0;
+
+									for(i = 0; i < affected; ++i)
+									{
+										id_arr.push_back(db->Get(i, 0));
+									}
+
+									i = 1;
+									for(auto &id: id_arr)
+									{
+										db->Query("UPDATE `timecard_approvers` SET `approver_order`=" + quoted(to_string(i++)) + " WHERE `id`=" + quoted(id) + ";");
+									}
 								}
-
-								i = 1;
-								for(auto &id: id_arr)
+								else
 								{
-									db->Query("UPDATE `timecard_approvers` SET `approver_order`=" + quoted(to_string(i++)) + " WHERE `id`=" + quoted(id) + ";");
+									MESSAGE_DEBUG("", action, "no need to reorder");
 								}
 							}
 							else
 							{
-								MESSAGE_DEBUG("", action, "no need to reorder");
+								MESSAGE_ERROR("", "", "psow_id can't be found by approver_id(" + id + ")");
 							}
 
 							sql_query = "SELECT 'fake'";
 						}
-						if(action == "AJAX_deleteBTExpenseApproverFromSoW")
+						if(action == "AJAX_deleteBTExpenseApproverFromPSoW")
 						{
 							auto	affected = 0;
+							auto	psow_id = GetValueFromDB("SELECT `contract_psow_id` FROM `bt_approvers` WHERE `id`="s + quoted(id) + ";", db);
 
-							db->Query("DELETE FROM `bt_approvals` WHERE `approver_id`=\"" + id + "\";");
-							db->Query("DELETE FROM `bt_approvers` WHERE `id`=\"" + id + "\";");
-
-							// --- renumber approvers
-							if((affected = db->Query("SELECT `id` FROM `bt_approvers` WHERE `contract_sow_id`=" + quoted(sow_id) + " AND `approver_order`>0 ORDER BY `approver_order` ASC;")))
+							if(psow_id.length())
 							{
-								vector<string>	id_arr;
-								auto			i = 0;
+								db->Query("DELETE FROM `bt_approvals` WHERE `approver_id`=\"" + id + "\";");
+								db->Query("DELETE FROM `bt_approvers` WHERE `id`=\"" + id + "\";");
 
-								for(i = 0; i < affected; ++i)
+								// --- renumber approvers
+								if((affected = db->Query("SELECT `id` FROM `bt_approvers` WHERE `contract_psow_id`=" + quoted(psow_id) + " AND `approver_order`>0 ORDER BY `approver_order` ASC;")))
 								{
-									id_arr.push_back(db->Get(i, 0));
+									vector<string>	id_arr;
+									auto			i = 0;
+
+									for(i = 0; i < affected; ++i)
+									{
+										id_arr.push_back(db->Get(i, 0));
+									}
+
+									i = 1;
+									for(auto &id: id_arr)
+									{
+										db->Query("UPDATE `bt_approvers` SET `approver_order`=" + quoted(to_string(i++)) + " WHERE `id`=" + quoted(id) + ";");
+									}
 								}
-
-								i = 1;
-								for(auto &id: id_arr)
+								else
 								{
-									db->Query("UPDATE `bt_approvers` SET `approver_order`=" + quoted(to_string(i++)) + " WHERE `id`=" + quoted(id) + ";");
+									MESSAGE_DEBUG("", action, "no need to reorder");
 								}
 							}
 							else
 							{
-								MESSAGE_DEBUG("", action, "no need to reorder");
+								MESSAGE_ERROR("", "", "psow_id can't be found by approver_id(" + id + ")");
 							}
 
 							sql_query = "SELECT 'fake'";
@@ -5379,22 +5397,24 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 			MESSAGE_ERROR("", "", "there is no notification for user type(" + user->GetType() + ")")
 		}
 	}
-	if(action == "AJAX_addTimecardApproverToSoW")
+	if(action == "AJAX_addTimecardApproverToPSoW")
 	{
-		notification_description = "Данные таймкарты: Добавили нового утвердителя " + GetSpelledUserNameByID(new_value, db) + "  (SoW " + GetSpelledSoWByID(sow_id, db) + ")";
+		auto	psow_id = id;
+		notification_description = "Данные таймкарты: Добавили нового утвердителя " + GetSpelledUserNameByID(new_value, db) + " (SoW " + GetSpelledPSoWByID(psow_id, db) + ")";
 		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 	}
-	if(action == "AJAX_addBTExpenseApproverToSoW")
+	if(action == "AJAX_addBTExpenseApproverToPSoW")
 	{
-		notification_description = "Данные командировки: Добавили нового утвердителя " + GetSpelledUserNameByID(new_value, db) + "  (SoW " + GetSpelledSoWByID(sow_id, db) + ")";
+		auto	psow_id = id;
+		notification_description = "Данные командировки: Добавили нового утвердителя " + GetSpelledUserNameByID(new_value, db) + " (SoW " + GetSpelledPSoWByID(psow_id, db) + ")";
 		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 	}
-	if(action == "AJAX_deleteTimecardApproverFromSoW")
+	if(action == "AJAX_deleteTimecardApproverFromPSoW")
 	{
-		notification_description = "Данные таймкарты: Удалили утвердителя таймкарт " + GetSpelledTimecardApproverNameByID(id, db) + "  (SoW " + GetSpelledSoWByID(sow_id, db) + ")";
+		notification_description = "Данные таймкарты: Удалили утвердителя таймкарт " + GetSpelledTimecardApproverNameByID(id, db) + " (SoW " + GetSpelledSoWByID(sow_id, db) + ")";
 		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 	}
-	if(action == "AJAX_deleteBTExpenseApproverFromSoW")
+	if(action == "AJAX_deleteBTExpenseApproverFromPSoW")
 	{
 		notification_description = "Данные командировки: Удалили утвердителя командировочных расходов " + GetSpelledBTExpenseApproverNameByID(id, db) + " (SoW " + GetSpelledSoWByID(sow_id, db) + ")";
 		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
@@ -6455,4 +6475,9 @@ auto GetSoWIDByPSoWID(string psow_id, CMysql *db, CUser *user) -> string
 	MESSAGE_DEBUG("", "", "finish (result is " + result + ")");
 
 	return result;
+}
+
+auto GetPSoWIDByApprover(string sql_query, CMysql *db, CUser *user) -> string
+{
+	return GetValueFromDB(sql_query, db);
 }
