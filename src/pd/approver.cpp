@@ -252,8 +252,8 @@ int main()
 				ostResult << "{"
 								"\"status\":\"success\","
 								"\"users\":[" << GetUserListInJSONFormat("SELECT * FROM `users` WHERE `id`=\"" + user.GetID() + "\";", &db, &user) << "],"
-								"\"timecard_approvers\":[" << GetApproversInJSONFormat("SELECT * FROM `timecard_approvers` WHERE `approver_user_id`=\"" + user.GetID() + "\";", &db, &user, INCLUDE_SOW_INFO) << "],"
-								"\"bt_approvers\":[" << GetApproversInJSONFormat("SELECT * FROM `bt_approvers` WHERE `approver_user_id`=\"" + user.GetID() + "\";", &db, &user, INCLUDE_SOW_INFO) << "]"
+								"\"timecard_approvers\":[" << GetApproversInJSONFormat("SELECT * FROM `timecard_approvers` WHERE `approver_user_id`=\"" + user.GetID() + "\";", &db, &user, INCLUDE_PSOW_INFO) << "],"
+								"\"bt_approvers\":[" << GetApproversInJSONFormat("SELECT * FROM `bt_approvers` WHERE `approver_user_id`=\"" + user.GetID() + "\";", &db, &user, INCLUDE_PSOW_INFO) << "]"
 							"}";
 			}
 			else

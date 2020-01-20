@@ -1891,8 +1891,8 @@ int main(void)
 														if(GeneralNotifySoWContractPartiesAboutChanges(action, sow_id, "", existing_value, new_value, &db, &user))
 														{
 
-															if(action == "AJAX_updateTimecardApproverOrder")	success_message = "\"timecard_approvers\":[" + GetApproversInJSONFormat("SELECT * FROM `timecard_approvers` WHERE `contract_sow_id`=" + quoted(sow_id) + ";", &db, &user, false) + "]";
-															else if(action == "AJAX_updateBTApproverOrder")		success_message = "\"bt_approvers\":[" + GetApproversInJSONFormat("SELECT * FROM `bt_approvers` WHERE `contract_sow_id`=" + quoted(sow_id) + ";", &db, &user, false) + "]";
+															if(action == "AJAX_updateTimecardApproverOrder")	success_message = "\"timecard_approvers\":[" + GetApproversInJSONFormat("SELECT * FROM `timecard_approvers` WHERE `contract_psow_id` IN (SELECT `id` FROM `contracts_psow` WHERE `contract_sow_id`=" + quoted(sow_id) + ");", &db, &user, DO_NOT_INCLUDE_PSOW_INFO) + "]";
+															else if(action == "AJAX_updateBTApproverOrder")		success_message = "\"bt_approvers\":[" + GetApproversInJSONFormat("SELECT * FROM `bt_approvers` WHERE `contract_psow_id` IN (SELECT `id` FROM `contracts_psow` WHERE `contract_sow_id`=" + quoted(sow_id) + ");", &db, &user, DO_NOT_INCLUDE_PSOW_INFO) + "]";
 															else
 															{
 																error_message = gettext("unsupported action");

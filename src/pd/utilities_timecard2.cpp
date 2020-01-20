@@ -3960,9 +3960,9 @@ string	GetInfoToReturnByAction(string action, string temp_id, string sow_id, str
 	MESSAGE_DEBUG("", "", "start");
 
 	if((action == "AJAX_addTimecardApproverToPSoW") || (action == "AJAX_deleteTimecardApproverFromPSoW"))
-		result = "\"timecard_approvers\":[" + GetApproversInJSONFormat("SELECT * FROM `timecard_approvers` WHERE `contract_psow_id`=\"" + psow_id + "\";", db, user, DO_NOT_INCLUDE_SOW_INFO) + "]";
+		result = "\"timecard_approvers\":[" + GetApproversInJSONFormat("SELECT * FROM `timecard_approvers` WHERE `contract_psow_id`=\"" + psow_id + "\";", db, user, DO_NOT_INCLUDE_PSOW_INFO) + "]";
 	if((action == "AJAX_addBTExpenseApproverToPSoW") || (action == "AJAX_deleteBTExpenseApproverFromPSoW"))
-		result = "\"bt_approvers\":[" + GetApproversInJSONFormat("SELECT * FROM `bt_approvers` WHERE `contract_psow_id`=\"" + psow_id + "\";", db, user, DO_NOT_INCLUDE_SOW_INFO) + "]";
+		result = "\"bt_approvers\":[" + GetApproversInJSONFormat("SELECT * FROM `bt_approvers` WHERE `contract_psow_id`=\"" + psow_id + "\";", db, user, DO_NOT_INCLUDE_PSOW_INFO) + "]";
 
 	MESSAGE_DEBUG("", "", "finish (result length is " + to_string(result.length()) + ")");
 
@@ -4251,7 +4251,7 @@ string	SetNewValueByAction(string action, string id, string sow_id, string new_v
 								if(order == "0") {} else { order += "+1"; }
 							}
 
-							sql_query = "INSERT INTO `timecard_approvers` (`approver_user_id`,`contract_sow_id`,`contract_psow_id`, `approver_order`) VALUES (\"" + new_value + "\", \"" + sow_id + "\", \"" + psow_id + "\"," + order + ");";
+							sql_query = "INSERT INTO `timecard_approvers` (`approver_user_id`,`contract_psow_id`, `approver_order`) VALUES (\"" + new_value + "\", \"" + psow_id + "\"," + order + ");";
 						}
 						if(action == "AJAX_addBTExpenseApproverToPSoW")
 						{
@@ -4268,7 +4268,7 @@ string	SetNewValueByAction(string action, string id, string sow_id, string new_v
 								if(order == "0") {} else { order += "+1"; }
 							}
 
-							sql_query = "INSERT INTO `bt_approvers` (`approver_user_id`,`contract_sow_id`,`contract_psow_id`, `approver_order`) VALUES (\"" + new_value + "\", \"" + sow_id + "\", \"" + psow_id + "\", " + order + ");";
+							sql_query = "INSERT INTO `bt_approvers` (`approver_user_id`,`contract_psow_id`, `approver_order`) VALUES (\"" + new_value + "\", \"" + psow_id + "\", " + order + ");";
 						}
 
 						// --- expense line template payment part

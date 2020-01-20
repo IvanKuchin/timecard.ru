@@ -259,8 +259,8 @@
 
 #define	INCLUDE_ADDITIONAL_INFO						true
 
-#define	DO_NOT_INCLUDE_SOW_INFO						false
-#define	INCLUDE_SOW_INFO							true
+#define	DO_NOT_INCLUDE_PSOW_INFO					false
+#define	INCLUDE_PSOW_INFO							true
 
 #define	INCLUDE_BT_EXPENSE_TEMPLATES				true
 #define	DO_NOT_INCLUDE_BT							false
