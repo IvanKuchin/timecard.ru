@@ -1208,21 +1208,6 @@ string	C_BT::SaveToDB()
 		// --- submit BT, if needed
 		if(error_message.empty() && (GetAction() == "submit"))
 		{
-			// --- auto approve will be done in SubmitBT function
-/*
-			if(GetID().length() && GetSowID().length())
-			{
-				// --- auto_approve
-				// --- UNIX_TIMESTAMP() + 1 needed to make visibility that approve been done after submission
-				db->Query("INSERT INTO `bt_approvals` (`bt_id`, `approver_id`, `decision`, `comment`, `eventTimestamp`) "
-								"SELECT \"" + GetID() + "\", `id`, \"approved\", \"auto-approve\",UNIX_TIMESTAMP()+1 FROM `bt_approvers` WHERE `contract_sow_id`=\"" + GetSowID() + "\" AND `auto_approve`=\"Y\"");
-			}
-			else
-			{
-				// doesn't assign anything to error_message to allow process to continue
-				MESSAGE_ERROR("C_BT", "", "fail to auto_approve due to bt.id(" + GetID() + ") is empty");
-			}
-*/
 			if(SubmitBT(GetID(), db, GetUser()))
 			{
 			}

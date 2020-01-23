@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-19 17:06-0500\n"
+"POT-Creation-Date: 2020-01-21 14:29-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -299,6 +299,9 @@ msgstr "Курс"
 
 msgid "Recipient"
 msgstr "Получатель"
+
+msgid "Reject reason is empty"
+msgstr "Необходимо обосновать отказ"
 
 msgid "Remote service delivery"
 msgstr "Услуги на удаленном участке"
@@ -604,7 +607,7 @@ msgid "bt markup type changed"
 msgstr "изменился тип нацеки у командировки"
 
 msgid "bt payment period is empty"
-msgstr ""
+msgstr "не указан период командировки"
 
 msgid "bt period payment"
 msgstr "период оплаты за командировки"
@@ -797,6 +800,9 @@ msgstr "не удалось напечатать таблицу"
 
 msgid "fail to produce object set"
 msgstr "не удалось собрать внутреннюю структуру"
+
+msgid "fail to submit bt"
+msgstr "ошибка отправки таймкарты"
 
 msgid "file not found"
 msgstr "фаил не найден"
@@ -1072,7 +1078,7 @@ msgid "service is not reachable"
 msgstr "сервисе недоступен"
 
 msgid "service payment period is empty"
-msgstr ""
+msgstr "не указан период оплаты"
 
 msgid "service period payment"
 msgstr "период оплаты за работы"
@@ -1277,6 +1283,9 @@ msgstr "у Вас недостаточно прав"
 
 msgid "you are not authorized to create new BIK"
 msgstr "Вам не разрешено создание нового БИК"
+
+msgid "your approval is not required"
+msgstr "Ваше подтверждение не требуется"
 
 msgid "za"
 msgstr "за"

@@ -14,13 +14,9 @@ string		C_TC_BT_Submit::FetchApprovers()
 	if(db)
 	{
 		auto affected = db->Query(
-				(type == "timecard")? "SELECT * FROM `timecard_approvers` WHERE "
-											"`contract_psow_id` IN (SELECT `contract_psow_id` FROM `timecards` WHERE `id`=\"" + id + "\") ORDER BY `approver_order` ASC"
-										";" :
-				(type == "bt")		? "SELECT * FROM `bt_approvers` WHERE "
-											"`contract_psow_id` IN (SELECT `contract_psow_id` FROM `bt` WHERE `id`=\"" + id + "\") ORDER BY `approver_order` ASC"
-										";" :
-				"SELECT 'fake'"
+				(type == "timecard")?	"SELECT * FROM `timecard_approvers` WHERE `contract_psow_id` IN (" + Get_PSoWIDByTimecardID_sqlquery(id) + ") ORDER BY `approver_order` ASC;" :
+				(type == "bt")		?	"SELECT * FROM `bt_approvers` WHERE `contract_psow_id`=(" + Get_PSoWIDByBTID_sqlquery(id) + ") ORDER BY `approver_order` ASC;" :
+ 										"SELECT 'fake'"
 			);
 
 		for(auto i = 0; i < affected; i++)

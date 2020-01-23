@@ -150,7 +150,7 @@ int main(void)
 			ostResult.str("");
 
 			string			template_name = "json_response.htmlt";
-			int				affected = db.Query("SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user.GetID() + "\";");
+			int				affected = db.Query("" + Get_CompanyIDByUserID_sqlquery(user.GetID()) + ";");
 
 			if(affected)
 			{
@@ -196,7 +196,7 @@ int main(void)
 
 			auto			error_message = ""s;
 			auto			success_message = ""s;
-			auto			affected = db.Query("SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user.GetID() + "\";");
+			auto			affected = db.Query("" + Get_CompanyIDByUserID_sqlquery(user.GetID()) + ";");
 
 			if(affected)
 			{
@@ -225,7 +225,7 @@ int main(void)
 		{
 			ostringstream	ostResult;
 			auto			template_name = "json_response.htmlt"s;
-			auto			affected = db.Query("SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user.GetID() + "\";");
+			auto			affected = db.Query("" + Get_CompanyIDByUserID_sqlquery(user.GetID()) + ";");
 
 			MESSAGE_DEBUG("", action, "start");
 
@@ -288,7 +288,7 @@ int main(void)
 					if(user.GetType() == "agency")
 					{
 						// --- check ability to see this timecard
-						if(db.Query("SELECT `id` FROM `timecards` WHERE `id`=\"" + timecard_id + "\" AND `contract_sow_id` IN (SELECT `id` FROM `contracts_sow` WHERE `agency_company_id` IN (SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user.GetID() + "\"))"))
+						if(db.Query("SELECT `id` FROM `timecards` WHERE `id`=\"" + timecard_id + "\" AND `contract_sow_id` IN (SELECT `id` FROM `contracts_sow` WHERE `agency_company_id` IN (" + Get_CompanyIDByUserID_sqlquery(user.GetID()) + "))"))
 						{
 							ostResult << "{"
 											"\"result\":\"success\","
@@ -589,92 +589,43 @@ int main(void)
 
 		if(action == "AJAX_rejectBT")
 		{
-			string			strPageToGet, strFriendsOnSinglePage;
-			ostringstream	ostResult;
-
 			MESSAGE_DEBUG("", action, "start");
 
-			ostResult.str("");
 			{
-				string			template_name = "json_response.htmlt";
-				string			bt_id = "";
-				string			comment = "";
-
-				bt_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("bt_id"));
-				comment = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("comment"));
+				auto	bt_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("bt_id"));
+				auto	comment = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("comment"));
+				auto	success_message = ""s;
+				auto	error_message = ""s;
 
 				if(bt_id.length())
 				{
 					if(comment.empty())
 					{
-						MESSAGE_ERROR("", action, "reject reason is empty");
-						ostResult << "{\"result\":\"error\",\"description\":\"Необходимо обосновать отказ\"}";
+						error_message = gettext("Reject reason is empty");
+						MESSAGE_DEBUG("", action, error_message);
 					}
 					else
 					{
 						if((user.GetType() == "approver") || (user.GetType() == "agency"))
 						{
 							// --- check ability to see this bt
-							string	error_string = isUserAllowedAccessToBT(bt_id, &db, &user);
+							auto	error_string = isUserAllowedAccessToBT(bt_id, &db, &user);
 							if(error_string.empty())
 							{
 								if(db.Query("SELECT `status` FROM `bt` WHERE `id`=\"" + bt_id + "\";"))
 								{
-									string	bt_state = db.Get(0, "status");
+									auto	bt_state = db.Get(0, "status");
 
 									if(bt_state == "submit")
 									{
-
-										if(db.Query("SELECT `id` FROM `bt_approvers` WHERE "
-														"`approver_user_id`=\"" + user.GetID() + "\" "
-														"AND "
-														"`contract_sow_id`=( SELECT `contract_sow_id` FROM `bt` WHERE `id`=\"" + bt_id + "\")"
-														";"))
+										auto	approver_id = GetValueFromDB("SELECT `id` FROM `bt_approvers` WHERE "
+																			"`approver_user_id`=\"" + user.GetID() + "\" "
+																			"AND "
+																			"`contract_psow_id`=(" + Get_PSoWIDByBTID_sqlquery(bt_id) + ")"
+																			";"
+																			, &db);
+										if(approver_id.length())
 										{
-											string		approver_id = db.Get(0, "id");
-/*
-											long int	temp;
-
-											temp = db.InsertQuery(	"INSERT INTO `bt_approvals` SET "
-																	"`bt_id`=\"" + bt_id + "\","
-																	"`approver_id`=\"" + approver_id + "\","
-																	"`decision`=\"rejected\","
-																	"`comment`=\"" + comment + "\","
-																	"`eventTimestamp`=UNIX_TIMESTAMP();"
-																);
-
-											if(temp)
-											{
-												db.Query("UPDATE `bt` SET `status`=\"rejected\", `eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + bt_id + "\";");
-												if(!db.isError())
-												{
-													string	success_description = GetObjectsSOW_Reusable_InJSONFormat("bt", "submit", &db, &user);
-
-													if(success_description.length())
-													{
-														ostResult	<< "{"
-																	<< "\"result\":\"success\","
-																	<< success_description
-																	<< "}";
-													}
-													else
-													{
-														ostResult << "{\"result\":\"error\",\"description\":\"ошибка БД\"}";
-														MESSAGE_ERROR("", action, "error getting info about pending bt");
-													}
-												}
-												else
-												{
-													ostResult << "{\"result\":\"error\",\"description\":\"ошибка БД\"}";
-													MESSAGE_ERROR("", action, "fail to update bt_id(" + bt_id + "): " + db.GetErrorMessage());
-												}
-											}
-											else
-											{
-												ostResult << "{\"result\":\"error\",\"description\":\"ошибка обновления списка апруверов\"}";
-												MESSAGE_ERROR("", action, "fail to insert to bt table with bt_id(" + bt_id + ")");
-											}
-*/
 											if(db.Query("SELECT `id` FROM `bt_approvals` WHERE `approver_id`=" + quoted(approver_id) + " AND `decision`=\"pending\" AND `bt_id`=" + quoted(bt_id) + ";"))
 											{
 												db.Query("UPDATE `bt_approvals` SET `decision`=\"rejected\",`comment`=" + quoted(comment) + ", `eventTimestamp`=UNIX_TIMESTAMP() WHERE  `approver_id`=" + quoted(approver_id) + " AND `decision`=\"pending\" AND `bt_id`=" + quoted(bt_id) + ";");
@@ -682,85 +633,75 @@ int main(void)
 												{
 													if(SubmitBT(bt_id, &db, &user))
 													{
-														string	success_description = GetObjectsSOW_Reusable_InJSONFormat("bt", "submit", &db, &user);
+														success_message = GetObjectsSOW_Reusable_InJSONFormat("bt", "submit", &db, &user);
 
-														if(success_description.length())
+														if(success_message.length())
 														{
-															ostResult	<< "{"
-																		<< "\"result\":\"success\","
-																		<< success_description
-																		<< "}";
 														}
 														else
 														{
-															ostResult << "{\"result\":\"error\",\"description\":\"ошибка БД\"}";
+															error_message = gettext("SQL syntax error");
 															MESSAGE_ERROR("", action, "error getting info about pending bts");
 														}
 													}
 													else
 													{
-														ostResult << "{\"result\":\"error\",\"description\":\"ошибка отправки таймкарты\"}";
-														MESSAGE_ERROR("", action, "fail to submit bt_id(" + bt_id + ")");
+														error_message = gettext("fail to submit bt");
+														MESSAGE_ERROR("", action, error_message + "("s + bt_id + ")");
 													}
 												}
 												else
 												{
-													ostResult << "{\"result\":\"error\",\"description\":\"ошибка БД\"}";
+													error_message = gettext("SQL syntax error");
 													MESSAGE_ERROR("", action, "fail to update bt_id(" + bt_id + "): " + db.GetErrorMessage());
 												}
 											}
 											else
 											{
+												error_message = gettext("your approval is not required");
 												MESSAGE_ERROR("", action, "bt.id(" + bt_id + ") not in pending state on user.id(" + user.GetID() + ")");
-												ostResult << "{\"result\":\"error\",\"description\":\"Вы не должны подтверждать эту таймкарту\"}";
 											}
 
 										}
 										else
 										{
+											error_message = gettext("your approval is not required");
 											MESSAGE_ERROR("", action, "user.id(" + user.GetID() + ") not an bt.id(" + bt_id + ") approver");
-											ostResult << "{\"result\":\"error\",\"description\":\"Вы не должны подтверждать командировку у данного договора\"}";
 										}
 
 									}
 									else
 									{
+										error_message = gettext("your approval is not required");
 										MESSAGE_ERROR("", action, "bt.id(" + bt_id + ") have to be in submit state to be approved/rejected, but it is in \"" + bt_state + "\" state");
-										ostResult << "{\"result\":\"error\",\"description\":\"командировка не требует подтверждения\"}";
 									}
 								}
 								else
 								{
+									error_message = gettext("SQL syntax error");
 									MESSAGE_ERROR("", action, "issue get info about bt.id(" + bt_id + ") from DB");
-									ostResult << "{\"result\":\"error\",\"description\":\"Ошибка ДБ\"}";
 								}
 							}
 							else
 							{
+								error_message = gettext("You are not authorized");
 								MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't allow to see this bt");
-								ostResult << "{\"result\":\"error\",\"description\":\"У Вас нет доступа к этой командировке\"}";
 							}
 						}
 						else
 						{
+							error_message = gettext("You are not authorized");
 							MESSAGE_ERROR("", action, "user.id(" + user.GetID() + ") is " + user.GetType() + ", who can't approve/reject");
-							ostResult << "{\"result\":\"error\",\"description\":\"У Вас нет доступа к этой таймкарте\"}";
 						}
 					}
 				}
 				else
 				{
+					error_message = gettext("mandatory parameter missed");
 					MESSAGE_ERROR("", action, "parameter bt_id is empty");
-					ostResult << "{\"result\":\"error\",\"description\":\"Некорректые параметры\"}";
 				}
 
-
-				indexPage.RegisterVariableForce("result", ostResult.str());
-
-				if(!indexPage.SetTemplate(template_name))
-				{
-					MESSAGE_ERROR("", action, "can't find template " + template_name);
-				}
+				AJAX_ResponseTemplate(&indexPage, success_message, error_message);
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
@@ -769,43 +710,37 @@ int main(void)
 
 		if(action == "AJAX_approveBT")
 		{
-			string			strPageToGet, strFriendsOnSinglePage;
-			ostringstream	ostResult;
-
 			MESSAGE_DEBUG("", action, "start");
 
-			ostResult.str("");
 			{
-				string			template_name = "json_response.htmlt";
-				string			bt_id = "";
-				string			comment = "";
-
-				bt_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("bt_id"));
-				comment = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("comment"));
+				auto	bt_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("bt_id"));
+				auto	comment = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("comment"));
+				auto	success_message = ""s;
+				auto	error_message = ""s;
 
 				if(bt_id.length())
 				{
 					if((user.GetType() == "approver") || (user.GetType() == "agency"))
 					{
 						// --- check ability to see this bt
-						string	error_string = isUserAllowedAccessToBT(bt_id, &db, &user);
+						auto	error_string = isUserAllowedAccessToBT(bt_id, &db, &user);
 						if(error_string.empty())
 						{
 							if(db.Query("SELECT `status` FROM `bt` WHERE `id`=\"" + bt_id + "\";"))
 							{
-								string	bt_state = db.Get(0, "status");
+								auto	bt_state = db.Get(0, "status");
 
 								if(bt_state == "submit")
 								{
 
-									if(db.Query("SELECT `id` FROM `bt_approvers` WHERE "
-													"`approver_user_id`=\"" + user.GetID() + "\" "
-													"AND "
-													"`contract_sow_id`=( SELECT `contract_sow_id` FROM `bt` WHERE `id`=\"" + bt_id + "\")"
-													";"))
+									auto	approver_id = GetValueFromDB("SELECT `id` FROM `bt_approvers` WHERE "
+																		"`approver_user_id`=\"" + user.GetID() + "\" "
+																		"AND "
+																		"`contract_psow_id`=(" + Get_PSoWIDByBTID_sqlquery(bt_id) + ")"
+																		";"
+																		, &db);
+									if(approver_id.length())
 									{
-										string		approver_id = db.Get(0, "id");
-
 										if(db.Query("SELECT `id` FROM `bt_approvals` WHERE `approver_id`=" + quoted(approver_id) + " AND `decision`=\"pending\" AND `bt_id`=" + quoted(bt_id) + ";"))
 										{
 											db.Query("UPDATE `bt_approvals` SET `decision`=\"approved\",`comment`=" + quoted(comment) + ", `eventTimestamp`=UNIX_TIMESTAMP() WHERE  `approver_id`=" + quoted(approver_id) + " AND `decision`=\"pending\" AND `bt_id`=" + quoted(bt_id) + ";");
@@ -813,236 +748,80 @@ int main(void)
 											{
 												if(SubmitBT(bt_id, &db, &user))
 												{
-													string	success_description = GetObjectsSOW_Reusable_InJSONFormat("bt", "submit", &db, &user);
+													success_message = GetObjectsSOW_Reusable_InJSONFormat("bt", "submit", &db, &user);
 
-													if(success_description.length())
+													if(success_message.length())
 													{
-														ostResult	<< "{"
-																	<< "\"result\":\"success\","
-																	<< success_description
-																	<< "}";
 													}
 													else
 													{
-														ostResult << "{\"result\":\"error\",\"description\":\"ошибка БД\"}";
+														error_message = gettext("SQL syntax error");
 														MESSAGE_ERROR("", action, "error getting info about pending bts");
 													}
 												}
 												else
 												{
-													ostResult << "{\"result\":\"error\",\"description\":\"ошибка отправки командировки\"}";
+													error_message = gettext("fail to submit bt");
 													MESSAGE_ERROR("", action, "fail to submit bt_id(" + bt_id + ")");
 												}
 											}
 											else
 											{
-												ostResult << "{\"result\":\"error\",\"description\":\"ошибка БД\"}";
+												error_message = gettext("SQL syntax error");
 												MESSAGE_ERROR("", action, "fail to update bt_id(" + bt_id + "): " + db.GetErrorMessage());
 											}
 										}
 										else
 										{
+											error_message = gettext("your approval is not required");
 											MESSAGE_ERROR("", action, "bt.id(" + bt_id + ") not in pending state on user.id(" + user.GetID() + ")");
-											ostResult << "{\"result\":\"error\",\"description\":\"Вы не должны подтверждать эту командировку\"}";
 										}
-
-
 									}
 									else
 									{
+										error_message = gettext("your approval is not required");
 										MESSAGE_ERROR("", action, "user.id(" + user.GetID() + ") not an bt.id(" + bt_id + ") approver");
-										ostResult << "{\"result\":\"error\",\"description\":\"Вы не должны подтверждать командировку у данного договора\"}";
 									}
 
 								}
 								else
 								{
+									error_message = gettext("your approval is not required");
 									MESSAGE_ERROR("", action, "bt.id(" + bt_id + ") have to be in submit state to be approved/rejected, but it is in \"" + bt_state + "\" state");
-									ostResult << "{\"result\":\"error\",\"description\":\"командировка не требует подтверждения\"}";
 								}
 							}
 							else
 							{
+								error_message = gettext("SQL syntax error");
 								MESSAGE_ERROR("", action, "issue get info about bt.id(" + bt_id + ") from DB");
-								ostResult << "{\"result\":\"error\",\"description\":\"Ошибка ДБ\"}";
 							}
 						}
 						else
 						{
+							error_message = gettext("You are not authorized");
 							MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't allow to see this bt");
-							ostResult << "{\"result\":\"error\",\"description\":\"У Вас нет доступа к этой командировке\"}";
 						}
 					}
 					else
 					{
+						error_message = gettext("You are not authorized");
 						MESSAGE_ERROR("", action, "user.id(" + user.GetID() + ") is " + user.GetType() + ", who can't approve/reject");
-						ostResult << "{\"result\":\"error\",\"description\":\"У Вас нет доступа к этой командировке\"}";
 					}
 				}
 				else
 				{
+					error_message = gettext("mandatory parameter missed");
 					MESSAGE_ERROR("", action, "parameter bt_id is empty");
-					ostResult << "{\"result\":\"error\",\"description\":\"Некорректые параметры\"}";
 				}
 
 
-				indexPage.RegisterVariableForce("result", ostResult.str());
-
-				if(!indexPage.SetTemplate(template_name))
-				{
-					MESSAGE_ERROR("", action, "can't find template " + template_name);
-				}
+				AJAX_ResponseTemplate(&indexPage, success_message, error_message);
 			}
 
 
 			MESSAGE_DEBUG("", action, "finish");
 		}
 
-/*
-		if(action == "AJAX_approveBT")
-		{
-			string			strPageToGet, strFriendsOnSinglePage;
-			ostringstream	ostResult;
-
-			MESSAGE_DEBUG("", action, "start");
-
-			ostResult.str("");
-			{
-				string			template_name = "json_response.htmlt";
-				string			bt_id = "";
-				string			comment = "";
-
-				bt_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("bt_id"));
-				comment = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("comment"));
-
-				if(bt_id.length())
-				{
-					if((user.GetType() == "approver") || (user.GetType() == "agency"))
-					{
-						// --- check ability to see this bt
-						string	error_string = isUserAllowedAccessToBT(bt_id, &db, &user);
-						if(error_string.empty())
-						{
-
-							if(db.Query("SELECT `status`, `submit_date` FROM `bt` WHERE `id`=\"" + bt_id + "\";"))
-							{
-								string	bt_state = db.Get(0, "status");
-								string	bt_submit_date = db.Get(0, "submit_date");
-
-								if(bt_state == "submit")
-								{
-
-									// --- find approver_id for user and sow
-									if(db.Query("SELECT `id` FROM `bt_approvers` WHERE "
-													"`approver_user_id`=\"" + user.GetID() + "\" "
-													"AND "
-													"`contract_sow_id`=( SELECT `contract_sow_id` FROM `bt` WHERE `id`=\"" + bt_id + "\")"
-													";"))
-									{
-										string		approver_id = db.Get(0, "id");
-
-										// --- did approver approved after user submission ?
-										if(db.Query("SELECT `eventTimestamp` FROM `bt_approvals` WHERE `approver_id`=\"" + approver_id + "\" AND `bt_id`=\"" + bt_id + "\" AND `eventTimestamp`>\"" + bt_submit_date + "\";"))
-										{
-											// --- this approver already approved this bt
-											ostResult << "{\"result\":\"error\",\"description\":\"Вы уже подтвердили\"}";
-											MESSAGE_ERROR("", action, "approver.id(" + approver_id + ") already approved bt.id(" + bt_id + ") at timestamp(" + db.Get(0, "eventTimestamp") + ")");
-										}
-										else
-										{
-											long int	temp;
-
-											temp = db.InsertQuery(	"INSERT INTO `bt_approvals` SET "
-																	"`bt_id`=\"" + bt_id + "\","
-																	"`approver_id`=\"" + approver_id + "\","
-																	"`decision`=\"approved\","
-																	"`comment`=\"" + comment + "\","
-																	"`eventTimestamp`=UNIX_TIMESTAMP();"
-																);
-
-											if(temp)
-											{
-												if(SubmitBT(bt_id, &db, &user))
-												{
-													string	success_description = GetObjectsSOW_Reusable_InJSONFormat("bt", "submit", &db, &user);
-
-													if(success_description.length())
-													{
-														ostResult	<< "{"
-																	<< "\"result\":\"success\","
-																	<< success_description
-																	<< "}";
-													}
-													else
-													{
-														ostResult << "{\"result\":\"error\",\"description\":\"ошибка БД\"}";
-														MESSAGE_ERROR("", action, "error getting info about pending bt");
-													}
-												}
-												else
-												{
-													ostResult << "{\"result\":\"error\",\"description\":\"ошибка подтверждения таймкарты\"}";
-													MESSAGE_ERROR("", action, "fail to submit bt_id(" + bt_id + "): ");
-												}
-											}
-											else
-											{
-												ostResult << "{\"result\":\"error\",\"description\":\"ошибка обновления списка апруверов\"}";
-												MESSAGE_ERROR("", action, "fail to insert to bt table with bt_id(" + bt_id + ")");
-											}
-										}
-
-									}
-									else
-									{
-										MESSAGE_ERROR("", action, "user.id(" + user.GetID() + ") not an bt.id(" + bt_id + ") approver");
-										ostResult << "{\"result\":\"error\",\"description\":\"Вы не должны подтверждать таймкарту у данного договора\"}";
-									}
-
-								}
-								else
-								{
-									MESSAGE_ERROR("", action, "bt.id(" + bt_id + ") have to be in submit state to be approved/rejected, but it is in \"" + bt_state + "\" state");
-									ostResult << "{\"result\":\"error\",\"description\":\"таймкарта не требует подтверждения\"}";
-								}
-							}
-							else
-							{
-								MESSAGE_ERROR("", action, "issue get info about bt.id(" + bt_id + ") from DB");
-								ostResult << "{\"result\":\"error\",\"description\":\"Ошибка ДБ\"}";
-							}
-						}
-						else
-						{
-							MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't allow to see this bt");
-							ostResult << "{\"result\":\"error\",\"description\":\"У Вас нет доступа к этой таймкарте\"}";
-						}
-					}
-					else
-					{
-						MESSAGE_ERROR("", action, "user.id(" + user.GetID() + ") is " + user.GetType() + ", who can't approve/reject");
-						ostResult << "{\"result\":\"error\",\"description\":\"У Вас нет доступа к этой таймкарте\"}";
-					}
-				}
-				else
-				{
-					MESSAGE_ERROR("", action, "parameter bt_id is empty");
-					ostResult << "{\"result\":\"error\",\"description\":\"Некорректые параметры\"}";
-				}
-
-
-				indexPage.RegisterVariableForce("result", ostResult.str());
-
-				if(!indexPage.SetTemplate(template_name))
-				{
-					MESSAGE_ERROR("", action, "can't find template " + template_name);
-				}
-			}
-
-
-			MESSAGE_DEBUG("", action, "finish");
-		}
-*/
 		if(action == "AJAX_getDashboardPendingData")
 		{
 			string			strPageToGet, strFriendsOnSinglePage;
@@ -1053,7 +832,7 @@ int main(void)
 			ostResult.str("");
 			{
 				string		template_name = "json_response.htmlt";
-				int			affected = db.Query("SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user.GetID() + "\";");
+				int			affected = db.Query("" + Get_CompanyIDByUserID_sqlquery(user.GetID()) + ";");
 
 				if(affected)
 				{
@@ -1100,7 +879,7 @@ int main(void)
 			auto		template_name = "json_response.htmlt"s;
 			auto		error_message = ""s;
 			auto		success_message = ""s;
-			auto		affected = db.Query("SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user.GetID() + "\";");
+			auto		affected = db.Query("" + Get_CompanyIDByUserID_sqlquery(user.GetID()) + ";");
 
 			if(affected)
 			{
@@ -1131,7 +910,7 @@ int main(void)
 			ostResult.str("");
 			{
 				string		template_name = "json_response.htmlt";
-				int			affected = db.Query("SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user.GetID() + "\";");
+				int			affected = db.Query("" + Get_CompanyIDByUserID_sqlquery(user.GetID()) + ";");
 
 				if(affected)
 				{
@@ -1180,7 +959,7 @@ int main(void)
 			ostResult.str("");
 			{
 				string		template_name = "json_response.htmlt";
-				int			affected = db.Query("SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user.GetID() + "\";");
+				int			affected = db.Query("" + Get_CompanyIDByUserID_sqlquery(user.GetID()) + ";");
 
 				if(affected)
 				{
@@ -1239,7 +1018,7 @@ int main(void)
 
 				if(user.GetType() == "agency")
 				{
-					if(db.Query("SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id`=(SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user.GetID() + "\");"))
+					if(db.Query("SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id`=(" + Get_CompanyIDByUserID_sqlquery(user.GetID()) + ");"))
 					{
 						auto		include_subc_company	= true;
 						string		agency_id				= db.Get(0, "id");
@@ -1317,7 +1096,7 @@ int main(void)
 
 				if(user.GetType() == "agency")
 				{
-					if(db.Query("SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id`=(SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user.GetID() + "\");"))
+					if(db.Query("SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id`=(" + Get_CompanyIDByUserID_sqlquery(user.GetID()) + ");"))
 					{
 						string		agency_id = db.Get(0, "id");
 
@@ -3492,7 +3271,7 @@ int main(void)
 							{
 								if(isCostCenterBelongsToAgency(cost_center_id, &db, &user))
 								{
-									if(db.Query("SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id`=(SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user.GetID() + "\");"))
+									if(db.Query("SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id`=(" + Get_CompanyIDByUserID_sqlquery(user.GetID()) + ");"))
 									{
 										string		agency_id = db.Get(0, "id");
 
@@ -3618,7 +3397,7 @@ int main(void)
 							{
 								if(isCostCenterBelongsToAgency(cost_center_id, &db, &user))
 								{
-									if(db.Query("SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id`=(SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user.GetID() + "\");"))
+									if(db.Query("SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id`=(" + Get_CompanyIDByUserID_sqlquery(user.GetID()) + ");"))
 									{
 										string		agency_id = db.Get(0, "id");
 
@@ -4215,7 +3994,7 @@ int main(void)
 
 				if(user.GetType() == "agency")
 				{
-					if(db.Query("SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id`=(SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user.GetID() + "\");"))
+					if(db.Query("SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id`=(" + Get_CompanyIDByUserID_sqlquery(user.GetID()) + ");"))
 					{
 						string	agency_id = db.Get(0, "id");
 						if(agency_id.length())
@@ -4304,7 +4083,7 @@ int main(void)
 										"\"cost_centers\":[" << GetCostCentersInJSONFormat(
 												"SELECT * FROM `cost_centers` WHERE `agency_company_id`=("
 													"SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id`=("
-														"SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user.GetID() + "\""
+														+ Get_CompanyIDByUserID_sqlquery(user.GetID()) + 
 													")"
 												");", &db, &user) << "]";
 						ostResult << "}";
@@ -4998,7 +4777,7 @@ int main(void)
 							db.Query("DELETE FROM `contract_sow_custom_fields` WHERE `contract_sow_id`=\"" + sow_id + "\";");
 							db.Query("DELETE FROM `timecard_task_assignment` WHERE `contract_sow_id`=\"" + sow_id + "\";");
 							db.Query("DELETE FROM `timecard_approvers` WHERE `contract_sow_id`=\"" + sow_id + "\";");
-							db.Query("DELETE FROM `bt_approvers` WHERE `contract_sow_id`=\"" + sow_id + "\";");
+							db.Query("DELETE FROM `bt_approvers` WHERE `contract_psow_id` IN (SELECT `id` FROM `contracts_psow` WHERE `contract_sow_id`=\"" + sow_id + "\");");
 							db.Query("DELETE FROM `bt_sow_assignment` WHERE `sow_id`=\"" + sow_id + "\";");
 
 							db.Query("DELETE FROM `contract_psow_custom_fields` WHERE `contract_psow_id` IN ("
@@ -5066,7 +4845,7 @@ int main(void)
 						}
 						else if(entity_type == "company")
 						{
-							auto	sql_query = "SELECT * FROM `company_agreement_files` WHERE `company_id`=(SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user.GetID() + "\")";
+							auto	sql_query = "SELECT * FROM `company_agreement_files` WHERE `company_id`=(" + Get_CompanyIDByUserID_sqlquery(user.GetID()) + ")";
 							success_message = ",\"template_agreement_files\":[" + GetTemplateCompanyAgreementFiles(sql_query, &db, &user) + "]";
 						}
 						else
@@ -6084,7 +5863,7 @@ int main(void)
 
 			if(id.length())
 			{
-				if(db.Query("SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id`=(SELECT `company_id` FROM `company_employees` WHERE `user_id`=\"" + user.GetID() + "\");"))
+				if(db.Query("SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id`=(" + Get_CompanyIDByUserID_sqlquery(user.GetID()) + ");"))
 				{
 					auto			agency_id = db.Get(0, "id");
 					vector<string>	bts = {id};

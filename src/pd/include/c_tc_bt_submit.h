@@ -5,6 +5,8 @@
 #include "cmysql.h"
 #include "clog.h"
 #include "localy.h"
+#include "utilities_sql_queries.h"
+// #include "utilities_timecard.h"  --- NO ! cross-reference with utilities_timecard.h
 
 using namespace std;
 

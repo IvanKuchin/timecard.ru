@@ -29,6 +29,8 @@ auto C_BT_To_Print::isValid() -> string
 
 	MESSAGE_DEBUG("", "", "start");
 
+MESSAGE_DEBUG("", "", "------"s + GetSignatureTitle2());
+
 	if(GetID().empty())						{ MESSAGE_ERROR("", "", "bt.id is empty"); 					error_message = gettext("bt id is empty"); }
 	// else if(GetMarkupType().empty()) 		{ MESSAGE_ERROR("", "", "bt markup type is empty"); 			error_message = gettext("bt date start is empty"); }
 	else if(GetDateStart().empty()) 		{ MESSAGE_ERROR("", "", "bt date start is empty"); 			error_message = gettext("bt date start is empty"); }

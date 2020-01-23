@@ -16,7 +16,8 @@
 #include "cstatistics.h"
 #include "utilities.h"
 #include "utilities_common.h"
-#include "localy.h"
+
+#include "utilities_sql_queries.h"
 #include "c_bt.h"
 #include "c_invoice_service_agency_to_cc.h"
 #include "c_invoice_service_subc_to_agency.h"

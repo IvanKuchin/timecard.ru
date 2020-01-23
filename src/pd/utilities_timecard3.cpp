@@ -690,3 +690,4 @@ auto isUserAllowedToCreateBIK(CUser *user, CMysql *sql) -> string
 {
 	return gettext("you are not authorized to create new BIK");
 }
+

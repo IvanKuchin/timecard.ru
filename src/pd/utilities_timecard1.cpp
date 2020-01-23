@@ -4012,7 +4012,7 @@ string	GetBTsInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool isExten
 				result += "\"customers\":[" + GetCustomersInJSONFormat("SELECT * FROM `timecard_customers` WHERE `id`=\"" + item.customer_id + "\";", db, user) + "],";
 				result += "\"sow\":[" + GetSOWInJSONFormat("SELECT * FROM `contracts_sow` WHERE `id`=\"" + item.contract_sow_id + "\";", db, user, INCLUDE_TIMECARD_TASKS, INCLUDE_BT_EXPENSE_TEMPLATES) + "],";
 				result += "\"expenses\":[" + GetBTExpensesInJSONFormat("SELECT * FROM `bt_expenses` WHERE `bt_id`=\"" + item.id + "\";", db, user) + "],";
-				result += "\"approvers\":[" + GetApproversInJSONFormat("SELECT * FROM `bt_approvers` WHERE `contract_sow_id`=\"" + item.contract_sow_id + "\";", db, user, DO_NOT_INCLUDE_PSOW_INFO) + "],";
+				result += "\"approvers\":[" + GetApproversInJSONFormat("SELECT * FROM `bt_approvers` WHERE `contract_psow_id` IN (SELECT DISTINCT(`id`) FROM `contracts_psow` WHERE `contract_sow_id`=\"" + item.contract_sow_id + "\");", db, user, DO_NOT_INCLUDE_PSOW_INFO) + "],";
 				result += "\"approvals\":[" + GetBTApprovalsInJSONFormat("SELECT * FROM `bt_approvals` WHERE `bt_id`=\"" + item.id + "\";", db, user) + "],";
 			}
 			result += "\"eventTimestamp\":\"" + item.eventTimestamp + "\"";
@@ -4272,8 +4272,8 @@ auto	GetSOWInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include_t
 									");", db, user);
 			result +=  "],";
 
-			result += "\"bt_approvers\":[" + cache_obj.Get("SELECT * FROM `bt_approvers` WHERE `contract_psow_id` IN (SELECT `id` FROM `contracts_psow` WHERE `contract_sow_id`=\"" + item.id + "\");", db, user, GetApproversInJSONFormat) + "],";
-			result += "\"timecard_approvers\":[" + cache_obj.Get("SELECT * FROM `timecard_approvers` WHERE `contract_psow_id` IN (SELECT `id` FROM `contracts_psow` WHERE `contract_sow_id`=\"" + item.id + "\");", db, user, GetApproversInJSONFormat) + "],";
+			result += "\"bt_approvers\":[" + cache_obj.Get("SELECT * FROM `bt_approvers` WHERE `contract_psow_id` IN (" + Get_PSoWIDsBySoWID_sqlquery(item.id) + ");", db, user, GetApproversInJSONFormat) + "],";
+			result += "\"timecard_approvers\":[" + cache_obj.Get("SELECT * FROM `timecard_approvers` WHERE `contract_psow_id` IN (" + Get_PSoWIDsBySoWID_sqlquery(item.id) + ");", db, user, GetApproversInJSONFormat) + "],";
 			result += "\"subcontractor_create_tasks\":\"" + item.subcontractor_create_tasks + "\",";
 			result += "\"day_rate\":\"" + (user->GetType() == "agency" || user->GetType() == "subcontractor" ? item.day_rate : "") + "\",";
 			result += "\"status\":\"" + item.status + "\",";

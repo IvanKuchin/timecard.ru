@@ -7,7 +7,7 @@
 #include "c_cache_obj.h"
 
 // --- IMPORTANT !!!
-// --- do NOT add any header file with potentialy recursive indludes
+// --- do NOT add any header file with potentialy recursive includes
 
 // --- timecard functions
 auto	 		CheckHTTPParam_Timeentry(const string &srcText) -> string;
@@ -190,7 +190,6 @@ auto			CheckAgreementSoWTitle(string title, string sow_id, CMysql *, CUser *) ->
 
 auto			GetDashboardPaymentData(string sow_sql, CMysql *db, CUser *user) -> string;
 auto			GetTimecardList(string where_companies_list, CMysql *db, CUser *user) -> string;
-
 
 auto			isDemoDomain() -> bool;
 

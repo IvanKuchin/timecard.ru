@@ -482,9 +482,11 @@ auto C_Invoice_BT_Agency_To_CC::CreateBTObj(string bt_id) -> C_BT_To_Print
 									obj.SetSignatureTitle1(ConvertHTMLToText(db->Get(0, "name")));
 									obj.SetSupplierVAT(ConvertHTMLToText(db->Get(0, "vat")));
 
-									if(db->Query("SELECT `title` FROM `cost_centers` WHERE `id`=\"" + cost_center_id + "\";"))
+									if(db->Query("SELECT `name` FROM `company` WHERE `id`=("
+													"SELECT `company_id` FROM `cost_centers` WHERE `id`=\"" + cost_center_id + "\""
+												");"))
 									{
-										obj.SetSignatureTitle2(ConvertHTMLToText(db->Get(0, "title")));
+										obj.SetSignatureTitle2(ConvertHTMLToText(db->Get(0, 0)));
 
 										obj.SetApprovers(GetBT_ApprovalChain(bt_id, db));
 										
