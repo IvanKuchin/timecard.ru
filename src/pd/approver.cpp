@@ -175,17 +175,16 @@ int main()
 		}
 		else
 		{
-			string			template_name = "json_response.htmlt";
-			string			timecard_id = "";
-
-			timecard_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("timecard_id"));
+			auto			template_name = "json_response.htmlt"s;
+			auto			timecard_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("timecard_id"));
 
 			if(timecard_id.length())
 			{
 				if(user.GetType() == "approver")
 				{
 					// --- check ability to see this timecard
-					if(db.Query("SELECT `id` FROM `timecards` WHERE `id`=\"" + timecard_id + "\" AND `contract_sow_id` IN (SELECT `contract_sow_id` FROM `timecard_approvers` WHERE `approver_user_id`=\"" + user.GetID() + "\")"))
+					// if(db.Query("SELECT `id` FROM `timecards` WHERE `id`=\"" + timecard_id + "\" AND `contract_sow_id` IN (SELECT `contract_sow_id` FROM `timecard_approvers` WHERE `approver_user_id`=\"" + user.GetID() + "\")"))
+					if(db.Query("SELECT `id` FROM `timecards` WHERE `id`=\"" + timecard_id + "\" AND `contract_sow_id` IN (" + Get_SoWIDsByTimecardApproverUserID_sqlquery(user.GetID()) + ")"))
 					{
 						ostResult << "{"
 										"\"status\":\"success\","
@@ -207,7 +206,7 @@ int main()
 			else
 			{
 				MESSAGE_ERROR("", action, "parameter timecard_id is empty");
-				ostResult << "{\"status\":\"error\",\"description\":\"Некорректые параметры\"}";
+				ostResult << "{\"status\":\"error\",\"description\":" + quoted(string(gettext("mandatory parameter missed"))) + "}";
 			}
 
 
@@ -259,7 +258,7 @@ int main()
 			else
 			{
 				MESSAGE_ERROR("", action, "user.id(" + user.GetID() + ") is not an approver(" + user.GetType() + ")");
-				ostResult << "{\"status\":\"error\",\"description\":\"Некорректые параметры\"}";
+				ostResult << "{\"status\":\"error\",\"description\":" + quoted(string(gettext("mandatory parameter missed"))) + "}";
 			}
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
@@ -358,7 +357,7 @@ int main()
 			else
 			{
 				MESSAGE_ERROR("", action, "any of HTTP-request parameters is empty");
-				ostResult << "{\"result\":\"error\",\"description\":\"Некорректые параметры\"}";
+				ostResult << "{\"result\":\"error\",\"description\":" + quoted(string(gettext("mandatory parameter missed"))) + "}";
 			}
 
 

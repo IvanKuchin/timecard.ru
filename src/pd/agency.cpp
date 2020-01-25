@@ -304,7 +304,8 @@ int main(void)
 					else if(user.GetType() == "approver")
 					{
 						// --- check ability to see this timecard
-						if(db.Query("SELECT `id` FROM `timecards` WHERE `id`=\"" + timecard_id + "\" AND `contract_sow_id` IN (SELECT `contract_sow_id` FROM `timecard_approvers` WHERE `approver_user_id`=\"" + user.GetID() + "\")"))
+						// if(db.Query("SELECT `id` FROM `timecards` WHERE `id`=\"" + timecard_id + "\" AND `contract_sow_id` IN (SELECT `contract_sow_id` FROM `timecard_approvers` WHERE `approver_user_id`=\"" + user.GetID() + "\")"))
+						if(db.Query("SELECT `id` FROM `timecards` WHERE `id`=\"" + timecard_id + "\" AND `contract_sow_id` IN (" + Get_SoWIDsByTimecardApproverUserID_sqlquery(user.GetID()) + ")"))
 						{
 							ostResult << "{"
 											"\"result\":\"success\","
@@ -345,79 +346,75 @@ int main(void)
 
 		if(action == "AJAX_approveTimecard")
 		{
-			string			strPageToGet, strFriendsOnSinglePage;
-			ostringstream	ostResult;
-
 			MESSAGE_DEBUG("", action, "start");
 
-			ostResult.str("");
 			{
-				string			template_name = "json_response.htmlt";
-				string			timecard_id = "";
-				string			comment = "";
-
-				timecard_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("timecard_id"));
-				comment = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("comment"));
+				auto			timecard_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("timecard_id"));
+				auto			comment = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("comment"));
+				auto			success_message = ""s;
+				auto			error_message = ""s;
 
 				if(timecard_id.length())
 				{
 					{
 						// --- check ability to see this timecard
+// TODO: redesign this part due to several approvers could be returned
+/*
 						if(db.Query("SELECT `id` FROM `timecard_approvers` WHERE "
 										"`approver_user_id`=\"" + user.GetID() + "\" "
 										"AND "
 										"`contract_sow_id`=( SELECT `contract_sow_id` FROM `timecards` WHERE `id`=\"" + timecard_id + "\")"
 										";"))
+*/
+						auto	approver_ids = GetValuesFromDB(	Get_ApproverIDsByTimecardID_sqlquery(timecard_id) +
+																" AND "
+																"`approver_user_id`=\"" + user.GetID() + "\" "
+																";", &db);
+						if(approver_ids.size())
 						{
-							string		approver_id = db.Get(0, "id");
-
 							if(db.Query("SELECT `status`, `submit_date` FROM `timecards` WHERE `id`=\"" + timecard_id + "\";"))
 							{
-								string	timecard_state = db.Get(0, "status");
-								string	timecard_submit_date = db.Get(0, "submit_date");
+								auto	timecard_state = db.Get(0, "status");
+								auto	timecard_submit_date = db.Get(0, "submit_date");
 
 								if(timecard_state == "submit")
 								{
 									{
-										if(db.Query("SELECT `id` FROM `timecard_approvals` WHERE `approver_id`=" + quoted(approver_id) + " AND `decision`=\"pending\" AND `timecard_id`=" + quoted(timecard_id) + ";"))
+										if(db.Query("SELECT `id` FROM `timecard_approvals` WHERE `approver_id` IN (" + join(approver_ids) + ") AND `decision`=\"pending\" AND `timecard_id`=" + quoted(timecard_id) + ";"))
 										{
-											db.Query("UPDATE `timecard_approvals` SET `decision`=\"approved\", `eventTimestamp`=UNIX_TIMESTAMP() WHERE  `approver_id`=" + quoted(approver_id) + " AND `decision`=\"pending\" AND `timecard_id`=" + quoted(timecard_id) + ";");
+											db.Query("UPDATE `timecard_approvals` SET `decision`=\"approved\", `eventTimestamp`=UNIX_TIMESTAMP() WHERE  `approver_id` IN (" + join(approver_ids) + ") AND `decision`=\"pending\" AND `timecard_id`=" + quoted(timecard_id) + ";");
 											if(!db.isError())
 											{
 												if(SubmitTimecard(timecard_id, &db, &user))
 												{
-													string	success_description = GetObjectsSOW_Reusable_InJSONFormat("timecard", "submit", &db, &user);
+													success_message = GetObjectsSOW_Reusable_InJSONFormat("timecard", "submit", &db, &user);
 
-													if(success_description.length())
+													if(success_message.length())
 													{
-														ostResult	<< "{"
-																	<< "\"result\":\"success\","
-																	<< success_description
-																	<< "}";
 													}
 													else
 													{
-														ostResult << "{\"result\":\"error\",\"description\":\"ошибка БД\"}";
+														error_message = gettext("SQL syntax error");
 														MESSAGE_ERROR("", action, "error getting info about pending timecards");
 													}
 												}
 												else
 												{
-													ostResult << "{\"result\":\"error\",\"description\":\"ошибка подтверждения таймкарты\"}";
+													error_message = gettext("fail to submit timecard");
 													MESSAGE_ERROR("", action, "fail to submit timecard_id(" + timecard_id + "): ");
 												}
 											}
 											else
 											{
-												ostResult << "{\"result\":\"error\",\"description\":\"ошибка обновления списка апруверов\"}";
-												MESSAGE_ERROR("", action, "fail to insert to timecards table with timecard_id(" + timecard_id + ")");
+												error_message = gettext("SQL syntax error");
+												MESSAGE_ERROR("", action, "fail to update timecard_approvals table with timecard_id(" + timecard_id + ")");
 											}
 										}
 										else
 										{
 											// --- this approver already approved this bt
-											ostResult << "{\"result\":\"error\",\"description\":\"Вы уже подтвердили\"}";
-											MESSAGE_ERROR("", action, "approver.id(" + approver_id + ") already approved timecard.id(" + timecard_id + ") at timestamp(" + db.Get(0, "eventTimestamp") + ")");
+											error_message = gettext("your approval is not required");
+											MESSAGE_ERROR("", action, "approver.ids(" + join(approver_ids) + ") already approved timecard.id(" + timecard_id + ") at timestamp(" + db.Get(0, "eventTimestamp") + ")");
 										}
 										
 									}
@@ -430,36 +427,31 @@ int main(void)
 								}
 								else
 								{
+									error_message = gettext("your approval is not required");
 									MESSAGE_ERROR("", action, "timecard.id(" + timecard_id + ") have to be in submit state to be approved/rejected, but it is in \"" + timecard_state + "\" state");
-									ostResult << "{\"result\":\"error\",\"description\":\"таймкарта не требует подтверждения\"}";
 								}
 							}
 							else
 							{
+								error_message = gettext("SQL syntax error");
 								MESSAGE_ERROR("", action, "issue get info about timecard.id(" + timecard_id + ") from DB");
-								ostResult << "{\"result\":\"error\",\"description\":\"Ошибка ДБ\"}";
 							}
 						}
 						else
 						{
+							error_message = gettext("You are not authorized");
 							MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't allow to see this timecard");
-							ostResult << "{\"result\":\"error\",\"description\":\"У Вас нет доступа к этой таймкарте\"}";
 						}
 					}
 				}
 				else
 				{
+					error_message = gettext("mandatory parameter missed");
 					MESSAGE_ERROR("", action, "parameter timecard_id is empty");
-					ostResult << "{\"result\":\"error\",\"description\":\"Некорректые параметры\"}";
 				}
 
 
-				indexPage.RegisterVariableForce("result", ostResult.str());
-
-				if(!indexPage.SetTemplate(template_name))
-				{
-					MESSAGE_ERROR("", action, "can't find template " + template_name);
-				}
+				AJAX_ResponseTemplate(&indexPage, success_message, error_message);
 			}
 
 
@@ -468,119 +460,107 @@ int main(void)
 
 		if(action == "AJAX_rejectTimecard")
 		{
-			string			strPageToGet, strFriendsOnSinglePage;
-			ostringstream	ostResult;
-
 			MESSAGE_DEBUG("", action, "start");
 
-			ostResult.str("");
 			{
-				string			template_name = "json_response.htmlt";
-				string			timecard_id = "";
-				string			comment = "";
-
-				timecard_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("timecard_id"));
-				comment = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("comment"));
+				auto			timecard_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("timecard_id"));
+				auto			comment = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("comment"));
+				auto			success_message = ""s;
+				auto			error_message = ""s;
 
 				if(timecard_id.length())
 				{
 					if(comment.empty())
 					{
+						error_message = gettext("Reject reason is empty");
 						MESSAGE_ERROR("", action, "reject reason is empty");
-						ostResult << "{\"result\":\"error\",\"description\":\"Необходимо обосновать отказ\"}";
 					}
 					else
 					{
 						// --- check ability to see this timecard
-						if(db.Query("SELECT `id` FROM `timecard_approvers` WHERE "
+/*						if(db.Query("SELECT `id` FROM `timecard_approvers` WHERE "
 										"`approver_user_id`=\"" + user.GetID() + "\" "
 										"AND "
 										"`contract_sow_id`=( SELECT `contract_sow_id` FROM `timecards` WHERE `id`=\"" + timecard_id + "\")"
 										";"))
+*/
+						auto	approver_ids = GetValuesFromDB(	Get_ApproverIDsByTimecardID_sqlquery(timecard_id) +
+																" AND "
+																"`approver_user_id`=\"" + user.GetID() + "\" "
+																";", &db);
+						if(approver_ids.size())
 						{
-							string		approver_id = db.Get(0, "id");
-
 							if(db.Query("SELECT `status`, `submit_date` FROM `timecards` WHERE `id`=\"" + timecard_id + "\";"))
 							{
-								string	timecard_state = db.Get(0, "status");
-								string	timecard_submit_date = db.Get(0, "submit_date");
+								auto	timecard_state = db.Get(0, "status");
+								auto	timecard_submit_date = db.Get(0, "submit_date");
 
 								if(timecard_state == "submit")
 								{
 									{
-										if(db.Query("SELECT `id` FROM `timecard_approvals` WHERE `approver_id`=" + quoted(approver_id) + " AND `decision`=\"pending\" AND `timecard_id`=" + quoted(timecard_id) + ";"))
+										if(db.Query("SELECT `id` FROM `timecard_approvals` WHERE `approver_id` IN (" + join(approver_ids) + ") AND `decision`=\"pending\" AND `timecard_id`=" + quoted(timecard_id) + ";"))
 										{
-											db.Query("UPDATE `timecard_approvals` SET `decision`=\"rejected\",`comment`=" + quoted(comment) + ", `eventTimestamp`=UNIX_TIMESTAMP() WHERE  `approver_id`=" + quoted(approver_id) + " AND `decision`=\"pending\" AND `timecard_id`=" + quoted(timecard_id) + ";");
+											db.Query("UPDATE `timecard_approvals` SET `decision`=\"rejected\",`comment`=" + quoted(comment) + ", `eventTimestamp`=UNIX_TIMESTAMP() WHERE  `approver_id` IN (" + join(approver_ids) + ") AND `decision`=\"pending\" AND `timecard_id`=" + quoted(timecard_id) + ";");
 											if(!db.isError())
 											{
 												if(SubmitTimecard(timecard_id, &db, &user))
 												{
-													string	success_description = GetObjectsSOW_Reusable_InJSONFormat("timecard", "submit", &db, &user);
+													success_message = GetObjectsSOW_Reusable_InJSONFormat("timecard", "submit", &db, &user);
 
-													if(success_description.length())
+													if(success_message.length())
 													{
-														ostResult	<< "{"
-																	<< "\"result\":\"success\","
-																	<< success_description
-																	<< "}";
 													}
 													else
 													{
-														ostResult << "{\"result\":\"error\",\"description\":\"ошибка БД\"}";
+														error_message = gettext("SQL syntax error");
 														MESSAGE_ERROR("", action, "error getting info about pending timecards");
 													}
 												}
 												else
 												{
-													ostResult << "{\"result\":\"error\",\"description\":\"ошибка отправки таймкарты\"}";
+													error_message = gettext("fail to submit timecard");
 													MESSAGE_ERROR("", action, "fail to submit timecard_id(" + timecard_id + ")");
 												}
 											}
 											else
 											{
-												ostResult << "{\"result\":\"error\",\"description\":\"ошибка БД\"}";
+												error_message = gettext("SQL syntax error");
 												MESSAGE_ERROR("", action, "fail to update timecard_id(" + timecard_id + "): " + db.GetErrorMessage());
 											}
 										}
 										else
 										{
+											error_message = gettext("your approval is not required");
 											MESSAGE_ERROR("", action, "timecard.id(" + timecard_id + ") not in pending state on user.id(" + user.GetID() + ")");
-											ostResult << "{\"result\":\"error\",\"description\":\"Вы не должны подтверждать эту таймкарту\"}";
 										}
 									}
 								}
 								else
 								{
+									error_message = gettext("your approval is not required");
 									MESSAGE_ERROR("", action, "timecard.id(" + timecard_id + ") have to be in submit state to be approved/rejected, but it is in \"" + timecard_state + "\" state");
-									ostResult << "{\"result\":\"error\",\"description\":\"таймкарта не требует подтверждения\"}";
 								}
 							}
 							else
 							{
+								error_message = gettext("SQL syntax error");
 								MESSAGE_ERROR("", action, "issue get info about timecard.id(" + timecard_id + ") from DB");
-								ostResult << "{\"result\":\"error\",\"description\":\"Ошибка ДБ\"}";
 							}
 						}
 						else
 						{
+							error_message = gettext("You are not authorized");
 							MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't allow to see this timecard");
-							ostResult << "{\"result\":\"error\",\"description\":\"У Вас нет доступа к этой таймкарте\"}";
 						}
 					}
 				}
 				else
 				{
+					error_message = gettext("mandatory parameter missed");
 					MESSAGE_ERROR("", action, "parameter timecard_id is empty");
-					ostResult << "{\"result\":\"error\",\"description\":\"Некорректые параметры\"}";
 				}
 
-
-				indexPage.RegisterVariableForce("result", ostResult.str());
-
-				if(!indexPage.SetTemplate(template_name))
-				{
-					MESSAGE_ERROR("", action, "can't find template " + template_name);
-				}
+				AJAX_ResponseTemplate(&indexPage, success_message, error_message);
 			}
 
 
@@ -1670,8 +1650,8 @@ int main(void)
 														if(GeneralNotifySoWContractPartiesAboutChanges(action, sow_id, "", existing_value, new_value, &db, &user))
 														{
 
-															if(action == "AJAX_updateTimecardApproverOrder")	success_message = "\"timecard_approvers\":[" + GetApproversInJSONFormat("SELECT * FROM `timecard_approvers` WHERE `contract_psow_id` IN (SELECT `id` FROM `contracts_psow` WHERE `contract_sow_id`=" + quoted(sow_id) + ");", &db, &user, DO_NOT_INCLUDE_PSOW_INFO) + "]";
-															else if(action == "AJAX_updateBTApproverOrder")		success_message = "\"bt_approvers\":[" + GetApproversInJSONFormat("SELECT * FROM `bt_approvers` WHERE `contract_psow_id` IN (SELECT `id` FROM `contracts_psow` WHERE `contract_sow_id`=" + quoted(sow_id) + ");", &db, &user, DO_NOT_INCLUDE_PSOW_INFO) + "]";
+															if(action == "AJAX_updateTimecardApproverOrder")	success_message = "\"timecard_approvers\":[" + GetApproversInJSONFormat("SELECT * FROM `timecard_approvers` WHERE `contract_psow_id` IN (" + Get_PSoWIDsBySoWID_sqlquery(sow_id) + ");", &db, &user, DO_NOT_INCLUDE_PSOW_INFO) + "]";
+															else if(action == "AJAX_updateBTApproverOrder")		success_message = "\"bt_approvers\":[" + GetApproversInJSONFormat("SELECT * FROM `bt_approvers` WHERE `contract_psow_id` IN (" + Get_PSoWIDsBySoWID_sqlquery(sow_id) + ");", &db, &user, DO_NOT_INCLUDE_PSOW_INFO) + "]";
 															else
 															{
 																error_message = gettext("unsupported action");
@@ -4776,8 +4756,8 @@ int main(void)
 							db.Query("DELETE FROM `contract_sow_agreement_files` WHERE `contract_sow_id`=\"" + sow_id + "\";");
 							db.Query("DELETE FROM `contract_sow_custom_fields` WHERE `contract_sow_id`=\"" + sow_id + "\";");
 							db.Query("DELETE FROM `timecard_task_assignment` WHERE `contract_sow_id`=\"" + sow_id + "\";");
-							db.Query("DELETE FROM `timecard_approvers` WHERE `contract_sow_id`=\"" + sow_id + "\";");
-							db.Query("DELETE FROM `bt_approvers` WHERE `contract_psow_id` IN (SELECT `id` FROM `contracts_psow` WHERE `contract_sow_id`=\"" + sow_id + "\");");
+							db.Query("DELETE FROM `timecard_approvers` WHERE `contract_psow_id` IN (" + Get_PSoWIDsBySoWID_sqlquery(sow_id) + ");");
+							db.Query("DELETE FROM `bt_approvers` WHERE `contract_psow_id` IN (" + Get_PSoWIDsBySoWID_sqlquery(sow_id) + ");");
 							db.Query("DELETE FROM `bt_sow_assignment` WHERE `sow_id`=\"" + sow_id + "\";");
 
 							db.Query("DELETE FROM `contract_psow_custom_fields` WHERE `contract_psow_id` IN ("
