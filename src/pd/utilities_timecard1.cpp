@@ -3912,8 +3912,7 @@ string	GetTimecardsInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool i
 			result += "\"lines\":[" + GetTimecardLinesInJSONFormat("SELECT * FROM `timecard_lines` WHERE `timecard_id`=\"" + item.id + "\";", db, user) + "],";
 			if(isExtended)
 			{
-				// result += "\"approvers\":[" + GetSOWTimecardApproversInJSONFormat("SELECT * FROM `timecard_approvers` WHERE `contract_sow_id`=\"" + item.contract_sow_id + "\";", db, user) + "],";
-				result += "\"approvers\":[" + GetApproversInJSONFormat("SELECT * FROM `timecard_approvers` WHERE `contract_sow_id`=\"" + item.contract_sow_id + "\";", db, user, DO_NOT_INCLUDE_PSOW_INFO) + "],";
+				result += "\"approvers\":[" + GetApproversInJSONFormat("SELECT * FROM `timecard_approvers` WHERE `contract_psow_id` IN (" + Get_PSoWIDsBySoWID_sqlquery(item.contract_sow_id) + ");", db, user, DO_NOT_INCLUDE_PSOW_INFO) + "],";
 				result += "\"approvals\":[" + GetTimecardApprovalsInJSONFormat("SELECT * FROM `timecard_approvals` WHERE `timecard_id`=\"" + item.id + "\";", db, user) + "],";
 			}
 			result += "\"eventTimestamp\":\"" + item.eventTimestamp + "\"";

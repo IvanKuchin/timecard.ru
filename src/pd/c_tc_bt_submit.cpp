@@ -2,7 +2,7 @@
 
 bool		C_TC_BT_Submit::isOrderedApprovals()
 {
-	return approvers.size() && (approvers[0].approver_order != "0");
+	return approvers.size() && (approvers[approvers.size() - 1].approver_order != "0");
 }
 
 string		C_TC_BT_Submit::FetchApprovers()

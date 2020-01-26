@@ -2761,7 +2761,7 @@ string GetNumberOfTimecardsInPendingState(CMysql *db, CUser *user)
 {
 	MESSAGE_DEBUG("", "", "start");
 
-	auto	number_of_pending_items = db->Query("SELECT `id` FROM `timecard_approvals` WHERE "
+	auto	number_of_pending_items = db->Query("SELECT DISTINCT(`timecard_id`) FROM `timecard_approvals` WHERE "
 													"`decision`=\"pending\" "
 													"AND "
 													"`approver_id` IN (SELECT `id` FROM `timecard_approvers` WHERE `approver_user_id`=" + quoted(user->GetID()) + ")"
@@ -2776,7 +2776,7 @@ string GetNumberOfBTInPendingState(CMysql *db, CUser *user)
 {
 	MESSAGE_DEBUG("", "", "start");
 
-	auto	number_of_pending_items = db->Query("SELECT `id` FROM `bt_approvals` WHERE "
+	auto	number_of_pending_items = db->Query("SELECT DISTINCT(`bt_id`) FROM `bt_approvals` WHERE "
 													"`decision`=\"pending\" "
 													"AND "
 													"`approver_id` IN (SELECT `id` FROM `bt_approvers` WHERE `approver_user_id`=" + quoted(user->GetID()) + ")"
@@ -2931,9 +2931,7 @@ string	GetObjectsSOW_Reusable_InJSONFormat(string object, string filter, CMysql 
 						"\"timecards\":[" + GetTimecardsInJSONFormat("SELECT * FROM `timecards` WHERE " + sql_query_where_statement, db, user, true) + "],"
 						"\"holiday_calendar\":[" + GetHolidayCalendarInJSONFormat("SELECT * FROM `holiday_calendar` WHERE "
 																					"`agency_company_id` IN (" // --- this part important if user is an approver
-																						"SELECT `agency_company_id` FROM `contracts_sow` WHERE `id` IN ("
-																					    	"SELECT `contract_sow_id` FROM `timecard_approvers` WHERE `approver_user_id`=" + quoted(user->GetID()) +
-																					    ")"
+																						"SELECT `agency_company_id` FROM `contracts_sow` WHERE `id` IN (" + Get_SoWIDsByTimecardApproverUserID_sqlquery(user->GetID()) + ")"
 																					") "
 																					"OR "
 																					"`agency_company_id` IN (" // --- this part important if user is not an approver, but agency employee
@@ -4391,12 +4389,12 @@ string	SetNewValueByAction(string action, string id, string sow_id, string new_v
 						if(action == "AJAX_deleteTimecardApproverFromPSoW")
 						{
 							auto	affected = 0;
-							auto	psow_id = GetValueFromDB("SELECT `contract_psow_id` FROM `timecard_approvers` WHERE `id`="s + quoted(id) + ";", db);
+							auto	psow_id = GetValueFromDB("SELECT `contract_psow_id` FROM `timecard_approvers` WHERE `id`=" + quoted(id) + ";", db);
 
 							if(psow_id.length())
 							{
-								db->Query("DELETE FROM `timecard_approvals` WHERE `approver_id`=\"" + id + "\";");
-								db->Query("DELETE FROM `timecard_approvers` WHERE `id`=\"" + id + "\";");
+								db->Query("DELETE FROM `timecard_approvals` WHERE `approver_id`=" + quoted(id) + ";");
+								db->Query("DELETE FROM `timecard_approvers` WHERE `id`=" + quoted(id) + ";");
 
 								// --- renumber approvers
 								if((affected = db->Query("SELECT `id` FROM `timecard_approvers` WHERE `contract_psow_id`=" + quoted(psow_id) + " AND `approver_order`>0 ORDER BY `approver_order` ASC;")))
@@ -4547,7 +4545,7 @@ string	SetNewValueByAction(string action, string id, string sow_id, string new_v
 
 string	GetSpelledEmployeeByID(string id, CMysql *db)
 {
-	string	result = "";
+	auto	result = ""s;
 
 	MESSAGE_DEBUG("", "", "start");
 
@@ -4576,7 +4574,7 @@ string	GetSpelledEmployeeByID(string id, CMysql *db)
 
 string	GetSpelledTimecardCustomerByID(string id, CMysql *db)
 {
-	string	result = "";
+	auto	result = ""s;
 
 	MESSAGE_DEBUG("", "", "start");
 
@@ -4596,7 +4594,7 @@ string	GetSpelledTimecardCustomerByID(string id, CMysql *db)
 
 string	GetSpelledTimecardProjectByID(string id, CMysql *db)
 {
-	string	result = "";
+	auto	result = ""s;
 
 	MESSAGE_DEBUG("", "", "start");
 
@@ -4619,7 +4617,7 @@ string	GetSpelledTimecardProjectByID(string id, CMysql *db)
 
 string	GetSpelledTimecardTaskByID(string id, CMysql *db)
 {
-	string	result = "";
+	auto	result = ""s;
 
 	MESSAGE_DEBUG("", "", "start");
 
@@ -4902,8 +4900,7 @@ auto	GetSpelledBTExpenseTemplateLineByID(string id, CMysql *db) -> string
 
 auto	GetSpelledTimecardTaskAssignmentByID(string id, CMysql *db) -> string
 {
-	string	result = "";
-	string	task_id = "";
+	auto	result = ""s;
 
 	MESSAGE_DEBUG("", "", "start");
 
@@ -4927,14 +4924,13 @@ auto	GetSpelledTimecardTaskAssignmentByID(string id, CMysql *db) -> string
 
 auto	GetSpelledBTExpenseAssignmentByID(string id, CMysql *db) -> string
 {
-	string	result = "";
-	string	bt_expense_template_id = "";
+	auto	result = ""s;
 
 	MESSAGE_DEBUG("", "", "start");
 
 	if(db->Query("SELECT `bt_expense_template_id` FROM `bt_sow_assignment` WHERE `id`=\"" + id + "\";"))
 	{
-		string		bt_expense_template_id = db->Get(0, "bt_expense_template_id");
+		auto		bt_expense_template_id = db->Get(0, "bt_expense_template_id");
 
 		result = GetSpelledBTExpenseTemplateByID(id, db);
 	}
@@ -4950,8 +4946,7 @@ auto	GetSpelledBTExpenseAssignmentByID(string id, CMysql *db) -> string
 
 string	GetSpelledUserNameByID(string id, CMysql *db)
 {
-	string	result = "";
-	string	task_id = "";
+	auto	result = ""s;
 
 	MESSAGE_DEBUG("", "", "start");
 
@@ -4971,8 +4966,7 @@ string	GetSpelledUserNameByID(string id, CMysql *db)
 
 string	GetSpelledTimecardApproverNameByID(string id, CMysql *db)
 {
-	string	result = "";
-	string	task_id = "";
+	auto	result = ""s;
 
 	MESSAGE_DEBUG("", "", "start");
 
@@ -4992,8 +4986,7 @@ string	GetSpelledTimecardApproverNameByID(string id, CMysql *db)
 
 string	GetSpelledBTExpenseApproverNameByID(string id, CMysql *db)
 {
-	string	result = "";
-	string	task_id = "";
+	auto	result = ""s;
 
 	MESSAGE_DEBUG("", "", "start");
 
@@ -5013,8 +5006,7 @@ string	GetSpelledBTExpenseApproverNameByID(string id, CMysql *db)
 
 string	GetSpelledSoWCustomFieldNameByID(string custom_field_id, CMysql *db)
 {
-	string	result = "";
-	string	task_id = "";
+	auto	result = ""s;
 
 	MESSAGE_DEBUG("", "", "start");
 
@@ -5036,8 +5028,7 @@ string	GetSpelledSoWCustomFieldNameByID(string custom_field_id, CMysql *db)
 
 string	GetSpelledPSoWCustomFieldNameByID(string custom_field_id, CMysql *db)
 {
-	string	result = "";
-	string	task_id = "";
+	auto	result = ""s;
 
 	MESSAGE_DEBUG("", "", "start");
 
@@ -5059,8 +5050,7 @@ string	GetSpelledPSoWCustomFieldNameByID(string custom_field_id, CMysql *db)
 
 string	GetSpelledCostCenterCustomFieldNameByID(string custom_field_id, CMysql *db)
 {
-	string	result = "";
-	string	task_id = "";
+	auto	result = ""s;
 
 	MESSAGE_DEBUG("", "", "start");
 
@@ -5082,8 +5072,7 @@ string	GetSpelledCostCenterCustomFieldNameByID(string custom_field_id, CMysql *d
 
 string	GetSpelledSoWByID(string sow_id, CMysql *db)
 {
-	string	result = "";
-	string	task_id = "";
+	auto	result = ""s;
 
 	MESSAGE_DEBUG("", "", "start");
 
@@ -5103,8 +5092,7 @@ string	GetSpelledSoWByID(string sow_id, CMysql *db)
 
 string	GetSpelledPSoWByID(string psow_id, CMysql *db)
 {
-	string	result = "";
-	string	task_id = "";
+	auto	result = ""s;
 
 	MESSAGE_DEBUG("", "", "start");
 
@@ -6085,7 +6073,7 @@ bool GeneralNotifySoWContractPartiesAboutChanges(string action, string id, strin
 
 string GetAgencyEmployeesInJSONFormat(string company_id, CMysql *db, CUser *user)
 {
-	string	result = "";
+	auto	result = ""s;
 	int		affected = 0;
 	string	sql_query;
 
@@ -6149,7 +6137,7 @@ string GetAgencyEmployeesInJSONFormat(string company_id, CMysql *db, CUser *user
 
 string GetAgencyObjectInJSONFormat(string agency_id, bool include_tasks, bool include_bt, CMysql *db, CUser *user)
 {
-	string	result = "";
+	auto	result = ""s;
 	string	sql_query;
 
 	MESSAGE_DEBUG("", "", "start (agency_id=" + agency_id + ")");
