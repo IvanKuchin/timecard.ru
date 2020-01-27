@@ -3909,7 +3909,11 @@ string	GetTimecardsInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool i
 			result += "\"originals_received_date\":\"" + item.originals_received_date + "\",";
 			result += "\"invoice_filename\":\"" + item.invoice_filename + "\",";
 			result += "\"status\":\"" + item.status + "\",";
-			result += "\"lines\":[" + GetTimecardLinesInJSONFormat("SELECT * FROM `timecard_lines` WHERE `timecard_id`=\"" + item.id + "\";", db, user) + "],";
+			result += "\"lines\":[" + GetTimecardLinesInJSONFormat(
+										"SELECT * FROM `timecard_lines` WHERE "
+											"`timecard_id`=\"" + item.id + "\" "
+											+ (user && (user->GetType() == "approver") ? " AND `timecard_task_id` IN (" + Get_TimecardTaskIDsByTimecardApproverUserID_sqlquery(user->GetID()) + ")" : "") +
+											";", db, user) + "],";
 			if(isExtended)
 			{
 				result += "\"approvers\":[" + GetApproversInJSONFormat("SELECT * FROM `timecard_approvers` WHERE `contract_psow_id` IN (" + Get_PSoWIDsBySoWID_sqlquery(item.contract_sow_id) + ");", db, user, DO_NOT_INCLUDE_PSOW_INFO) + "],";

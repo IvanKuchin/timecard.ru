@@ -248,7 +248,7 @@ auto 		LogoutIfGuest(string action, CCgi *indexPage, CMysql *db, CUser *user) ->
 		{
 			auto	template_name = "json_response.htmlt"s;
 
-			indexPage->RegisterVariableForce("result", "{\"result\":\"error\",\"description\":\"re-login required\"}");
+			indexPage->RegisterVariableForce("result", "{\"result\":\"error\",\"description\":\""s + gettext("re-login required") + "\"}");
 
 			if(!indexPage->SetTemplate(template_name))
 			{

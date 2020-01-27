@@ -119,7 +119,8 @@ auto			GetBTAllowanceInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetHolidayCalendarInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 
 auto			ApprovalChain(string sql, CMysql *) -> string;
-auto			GetTimecard_ApprovalChain(string timecard_id, CMysql *) -> string;
+auto			GetTimecard_ApprovalChain(const string &timecard_id, CMysql *) -> string;
+auto			GetTimecard_ApprovalChain(const string &timecard_id, string psow_id, CMysql *) -> string;
 auto			GetBT_ApprovalChain(string bt_id, CMysql *) -> string;
 
 auto			GetBTExpensesInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;

@@ -6,7 +6,7 @@
 inline auto Get_CustomerIDByBTID_sqlquery(const string &bt_id)
 {
 	return (
-			" SELECT `customer_id` FROM `bt` WHERE `id`=(" + bt_id + ")"
+			" SELECT `customer_id` FROM `bt` WHERE `id` IN (" + bt_id + ")"
 		);
 }
 
@@ -25,8 +25,8 @@ inline auto Get_PSoWIDByBTID_sqlquery(const string &bt_id) -> string
 {
 	return (
 			" SELECT `id` FROM `contracts_psow` WHERE "
-			" `contract_sow_id`=("
-				" SELECT `contract_sow_id` FROM `bt` WHERE `id`=(" + bt_id + ")"
+			" `contract_sow_id` IN ("
+				" SELECT `contract_sow_id` FROM `bt` WHERE `id` IN (" + bt_id + ")"
 			" )"
 			" AND "
 			" (`cost_center_id` IN ("
@@ -41,7 +41,7 @@ inline auto Get_PSoWIDByTimecardID_sqlquery(const string &tc_id) -> string
 	return (
 			" SELECT `id` FROM `contracts_psow` WHERE "
 			" `contract_sow_id`=( "
-				"SELECT `contract_sow_id` FROM `timecards` WHERE `id`=(" + tc_id + ")"
+				"SELECT `contract_sow_id` FROM `timecards` WHERE `id` IN (" + tc_id + ")"
 			" )"
 			" AND " // --- this part is required in case of there are several PSoW assigned to SoW, 
 					// --- but customers reported in this timecard belong to fewer PSoW(s)
@@ -55,7 +55,7 @@ inline auto Get_PSoWIDByTimecardID_sqlquery(const string &tc_id) -> string
 inline auto Get_PSoWIDsBySoWID_sqlquery(const string &sow_id) -> string
 {
 	return (
-			" SELECT `id` FROM `contracts_psow` WHERE `contract_sow_id`=(" + sow_id + ") "
+			" SELECT `id` FROM `contracts_psow` WHERE `contract_sow_id` IN (" + sow_id + ") "
 		);
 }
 
@@ -113,11 +113,26 @@ inline auto Get_ApprovalIDsByBTID_sqlquery(const string &id) -> string
 {
 	return(
 			" SELECT `id` FROM `bt_approvals` WHERE "
-				" `bt_id`=(" + id + ")"
+				" `bt_id` IN (" + id + ")"
 				" AND "
 				" `decision`=\"approved\""
 				" AND "
-				" `eventTimestamp` > (SELECT `submit_date` FROM `bt` WHERE `id`=(" + id + ")) "
+				" `eventTimestamp` > (SELECT `submit_date` FROM `bt` WHERE `id` IN (" + id + ")) "
+		);
+}
+
+inline auto	Get_TimecardTaskIDsByTimecardApproverUserID_sqlquery(const string &id)
+{
+	return (
+			" SELECT `id` FROM `timecard_tasks` WHERE `timecard_projects_id` IN ("
+			    " SELECT `id` FROM `timecard_projects` WHERE `timecard_customers_id` IN ("
+			        " SELECT `timecard_customer_id` FROM `cost_center_assignment` WHERE `cost_center_id` IN ("
+			            " SELECT `cost_center_id` FROM `contracts_psow` WHERE `id` IN ("
+			                " SELECT `contract_psow_id` FROM `timecard_approvers` WHERE `approver_user_id` IN (" + id + ")"
+			            " )"
+			        " )"
+			    " )"
+			" )"
 		);
 }
 

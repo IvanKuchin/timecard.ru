@@ -561,7 +561,7 @@ auto C_Invoice_Service_Agency_To_CC::CreateTimecardObj(string timecard_id) -> C_
 									{
 										obj.SetSignatureTitle2(ConvertHTMLToText(db->Get(0, 0)));
 
-										obj.SetApprovers(GetTimecard_ApprovalChain(timecard_id, db));
+										obj.SetApprovers(GetTimecard_ApprovalChain(timecard_id, psow_id, db));
 
 										obj.SetPosition1(GetValueFromDB("SELECT `value` FROM `cost_center_custom_fields` WHERE  `cost_center_id`=" + quoted(cost_center_id) + " AND `var_name`=\"timecard_position1\";", db));
 										obj.SetPosition2(GetValueFromDB("SELECT `value` FROM `cost_center_custom_fields` WHERE  `cost_center_id`=" + quoted(cost_center_id) + " AND `var_name`=\"timecard_position2\";", db));

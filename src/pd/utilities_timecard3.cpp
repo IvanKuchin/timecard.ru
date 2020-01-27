@@ -526,14 +526,14 @@ auto	ApprovalChain(string sql, CMysql *db) -> string
 	}
 
 
-	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
+	MESSAGE_DEBUG("", "", "finish (error_message is " + error_message+ ")");
 
 	return	result;
 }
 
-auto	GetTimecard_ApprovalChain(string timecard_id, CMysql *db) -> string
+auto	GetTimecard_ApprovalChain(const string &timecard_id, CMysql *db) -> string
 {
-	MESSAGE_DEBUG("", "", "start");
+	MESSAGE_DEBUG("", "", "start (timecard_id " + timecard_id + ")");
 
 	auto	result = ""s;
 	auto	error_message = ""s;
@@ -541,9 +541,16 @@ auto	GetTimecard_ApprovalChain(string timecard_id, CMysql *db) -> string
 
 	if(timecard_id.length())
 	{
+/*
 		result = ApprovalChain(	"SELECT `name`, `nameLast`, `nameMiddle` FROM `users` WHERE `id` IN ("
 									"SELECT DISTINCT(`approver_user_id`) FROM `timecard_approvers` WHERE `id` IN ("
 										"SELECT `approver_id` FROM `timecard_approvals` WHERE `timecard_id`=" + quoted(timecard_id) + " AND `decision`=\"approved\""
+									")"
+								");", db);
+*/
+		result = ApprovalChain(	"SELECT `name`, `nameLast`, `nameMiddle` FROM `users` WHERE `id` IN ("
+									"SELECT DISTINCT(`approver_user_id`) FROM `timecard_approvers` WHERE `id` IN ("
+										+ Get_ApproverIDsByTimecardID_sqlquery(timecard_id) +
 									")"
 								");", db);
 	}
@@ -554,7 +561,36 @@ auto	GetTimecard_ApprovalChain(string timecard_id, CMysql *db) -> string
 	}
 
 
-	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
+	MESSAGE_DEBUG("", "", "finish (error_message is " + error_message+ ")");
+
+	return	result;
+}
+
+auto	GetTimecard_ApprovalChain(const string &timecard_id, string psow_id, CMysql *db) -> string
+{
+	MESSAGE_DEBUG("", "", "start (timecard_id " + timecard_id + ", psow_id " + psow_id + ")");
+
+	auto	result = ""s;
+	auto	error_message = ""s;
+
+
+	if(timecard_id.length())
+	{
+		result = ApprovalChain(	"SELECT `name`, `nameLast`, `nameMiddle` FROM `users` WHERE `id` IN ("
+									"SELECT DISTINCT(`approver_user_id`) FROM `timecard_approvers` WHERE `id` IN ("
+										+ Get_ApproverIDsByTimecardID_sqlquery(timecard_id)
+										+ (psow_id.length() ? " AND `contract_psow_id` IN (" + psow_id + ")" : "") +
+									")"
+								");", db);
+	}
+	else
+	{
+		error_message = gettext("mandatory parameter missed");
+		MESSAGE_ERROR("", "", error_message);
+	}
+
+
+	MESSAGE_DEBUG("", "", "finish (error_message is " + error_message+ ")");
 
 	return	result;
 }
@@ -582,7 +618,7 @@ auto	GetBT_ApprovalChain(string bt_id, CMysql *db) -> string
 	}
 
 
-	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
+	MESSAGE_DEBUG("", "", "finish (error_message is " + error_message+ ")");
 
 	return	result;
 }
