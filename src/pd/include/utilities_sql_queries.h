@@ -92,5 +92,33 @@ inline auto Get_ApproverIDsByTimecardID_sqlquery(const string &timecard_id) -> s
 	return(" SELECT `id` FROM `timecard_approvers` WHERE `contract_psow_id` IN (" + Get_PSoWIDByTimecardID_sqlquery(timecard_id) + ") ");
 }
 
+inline auto Get_ApproverIDsByBTID_sqlquery(const string &bt_id) -> string
+{
+	return(" SELECT `id` FROM `bt_approvers` WHERE `contract_psow_id` IN (" + Get_PSoWIDByBTID_sqlquery(bt_id) + ") ");
+}
+
+inline auto Get_ApprovalIDsByTimecardID_sqlquery(const string &id) -> string
+{
+	return(
+			" SELECT `id` FROM `timecard_approvals` WHERE "
+				" `timecard_id`IN (" + id + ")"
+				" AND "
+				" `decision`=\"approved\""
+				" AND "
+				" `eventTimestamp` > (SELECT `submit_date` FROM `timecards` WHERE `id` IN (" + id + ")) "
+		);
+}
+
+inline auto Get_ApprovalIDsByBTID_sqlquery(const string &id) -> string
+{
+	return(
+			" SELECT `id` FROM `bt_approvals` WHERE "
+				" `bt_id`=(" + id + ")"
+				" AND "
+				" `decision`=\"approved\""
+				" AND "
+				" `eventTimestamp` > (SELECT `submit_date` FROM `bt` WHERE `id`=(" + id + ")) "
+		);
+}
 
 #endif

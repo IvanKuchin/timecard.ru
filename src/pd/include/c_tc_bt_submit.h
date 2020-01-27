@@ -6,7 +6,7 @@
 #include "clog.h"
 #include "localy.h"
 #include "utilities_sql_queries.h"
-// #include "utilities_timecard.h"  --- NO ! cross-reference with utilities_timecard.h
+// #include "utilities_timecard.h"  --- NO!!! cross-reference with utilities_timecard.h
 
 using namespace std;
 
@@ -60,6 +60,11 @@ class C_TC_BT_Submit
 		bool					isItCompletelyApproved();
 		bool					ApproverIDHasAutoApprove(string approver_id);
 
+		string					GetUserIDByApproverID(const string &approver_id);
+		vector<string>			GetApproverIDsByUserID(const string &user_id);
+		bool 					isApprovedByUserID(const string &user_id);
+		bool 					isApprovedByApproverID(const string &approver_id);
+
 
 
 	public:
@@ -67,7 +72,7 @@ class C_TC_BT_Submit
 								C_TC_BT_Submit(CMysql *p1, CUser *p2) : db(p1), user(p2)	{};
 
 		auto					isCompletelyApproved()										{ return completely_approved; };
-		string					Submit(const string tc_bt_type_param, const string &id_param);
+		string					Submit(const string &tc_bt_type_param, const string &id_param);
 
 };
 

@@ -1593,7 +1593,7 @@ vector<string> split(const string& s, const char& c)
 	return v;
 }
 
- string join(const vector<string>& vec, string separator)
+string join(const vector<string>& vec, string separator)
 {
 	string result{""};
 

@@ -1,5 +1,21 @@
 #include "c_tc_bt_submit.h"
 
+// --- define it here to avoid include utilities
+static string join(const vector<string>& vec, string separator)
+{
+	string result{""};
+
+	if(separator.empty()) separator = ",";
+
+	for(auto &item:vec)
+	{
+		if(result.length()) result += separator;
+		result += item;
+	}
+
+	return result;
+}
+
 bool		C_TC_BT_Submit::isOrderedApprovals()
 {
 	return approvers.size() && (approvers[approvers.size() - 1].approver_order != "0");
@@ -91,6 +107,38 @@ string		C_TC_BT_Submit::FetchApprovals()
 	MESSAGE_DEBUG("", "", "finsh");
 
 	return error_message;
+}
+
+vector<string>	C_TC_BT_Submit::GetApproverIDsByUserID(const string &user_id)
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	vector<string>	result;
+
+	for(auto &approver: approvers)
+	{
+		if(approver.approver_user_id == user_id) result.push_back(approver.id);
+	}
+
+	MESSAGE_DEBUG("", "", "finsh (size is " + to_string(result.size()) + ")");
+
+	return result;
+}
+
+string	C_TC_BT_Submit::GetUserIDByApproverID(const string &approver_id)
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	result = ""s;
+
+	for(auto &approver: approvers)
+	{
+		if(approver.id == approver_id) result = approver.approver_user_id;
+	}
+
+	MESSAGE_DEBUG("", "", "finsh (" + result + ")");
+
+	return result;
 }
 
 string		C_TC_BT_Submit::FetchInitialData()
@@ -252,7 +300,8 @@ string		C_TC_BT_Submit::Autoapprove()
 			auto current_approver_id = GetCurrentApproverID();
 			if(current_approver_id.length())
 			{
-				if(ApproverIDHasAutoApprove(current_approver_id))
+// TODO: add here auto-approval if the same user.id already approved smth before
+				if(ApproverIDHasAutoApprove(current_approver_id) || isApprovedByUserID(GetUserIDByApproverID(current_approver_id)))
 				{
 					db->Query("UPDATE `" + type + "_approvals` SET `decision`=\"approved\", `comment`=\"auto-approve\" WHERE `approver_id`=\"" + current_approver_id + "\" AND `" + type + "_id`=\"" + id + "\";");
 					if(db->isError())
@@ -320,6 +369,92 @@ bool C_TC_BT_Submit::ApproverIDHasAutoApprove(string approver_id)
 	return result;
 }
 
+bool C_TC_BT_Submit::isApprovedByApproverID(const string &approver_id)
+{
+	MESSAGE_DEBUG("", "", "start (" + approver_id + ")");
+
+	auto	result = false;
+	auto	sql_query = 
+				(type == "timecard")?	Get_ApprovalIDsByTimecardID_sqlquery(id) + " AND `approver_id`=\"" + approver_id + "\";" :
+				(type == "bt")		?	Get_ApprovalIDsByBTID_sqlquery(id) + " AND `approver_id`=\"" + approver_id + "\";" :
+										"";
+
+	if(sql_query.length())
+	{
+		if(db->Query(sql_query))
+		{
+			result = true;
+		}
+		else
+		{
+			MESSAGE_DEBUG("", "", "approver.id(" + approver_id + ") didn't approve yet");
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "unknown type");
+	}
+
+
+	MESSAGE_DEBUG("", "", "finish(" + to_string(result) + ")");
+
+	return result;
+}
+
+bool C_TC_BT_Submit::isApprovedByUserID(const string &user_id)
+{
+	MESSAGE_DEBUG("", "", "start (" + user_id + ")");
+
+	auto	result = false;
+	auto	approver_ids = GetApproverIDsByUserID(user_id);
+
+	if(approver_ids.size())
+	{
+		auto	sql_query = 
+					(type == "timecard")? 
+											"SELECT `id` FROM `timecard_approvers` WHERE "
+												" `id` IN (" + join(approver_ids, ",") + ")"
+												" AND"
+												" `id` IN ("
+													"SELECT `approver_id` FROM `timecard_approvals` WHERE `id` IN (" + Get_ApprovalIDsByTimecardID_sqlquery(id) + ")"
+												");" :
+					(type == "bt")		?
+											"SELECT `id` FROM `bt_approvers` WHERE "
+												" `id` IN (" + join(approver_ids, ",") + ")"
+												" AND"
+												" `id` IN ("
+													 "SELECT `approver_id` FROM `bt_approvals` WHERE `id` IN (" + Get_ApprovalIDsByBTID_sqlquery(id) + ")"
+												");" :
+											"";
+
+		if(sql_query.length())
+		{
+			if(db->Query(sql_query))
+			{
+				result = true;
+			}
+			else
+			{
+				MESSAGE_DEBUG("", "", "approver with user.id(" + user_id + ") didn't approve yet");
+			}
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "unknown type");
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "approver.id not found by user.id(" + user_id + ")");
+	}
+
+
+	MESSAGE_DEBUG("", "", "finish(" + to_string(result) + ")");
+
+	return result;
+}
+
+/*
 string C_TC_BT_Submit::GetNextApproverID()
 {
 	MESSAGE_DEBUG("", "", "start");
@@ -343,6 +478,28 @@ string C_TC_BT_Submit::GetNextApproverID()
 	for(auto &approver: approvers)
 	{
 		if(approver.approver_order == next_approver_order)
+		{
+			next_approver_id = approver.id;
+			break;
+		}
+	}
+
+	MESSAGE_DEBUG("", "", "finish(" + next_approver_id + ")");
+
+	return next_approver_id;
+}
+*/
+string C_TC_BT_Submit::GetNextApproverID()
+{
+	MESSAGE_DEBUG("", "", "start");
+	auto	next_approver_id = ""s;
+
+	for(auto &approver: approvers)
+	{
+		if(isApprovedByApproverID(approver.id))
+		{
+		}
+		else
 		{
 			next_approver_id = approver.id;
 			break;
@@ -487,7 +644,7 @@ bool		C_TC_BT_Submit::isItCompletelyApproved()
 	return completely_approved;
 }
 
-string		C_TC_BT_Submit::Submit(const string tc_bt_type_param, const string &id_param)
+string		C_TC_BT_Submit::Submit(const string &tc_bt_type_param, const string &id_param)
 {
 	MESSAGE_DEBUG("", "", "start(" + tc_bt_type_param +", " + id_param + ")");
 
