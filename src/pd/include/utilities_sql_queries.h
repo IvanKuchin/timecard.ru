@@ -136,4 +136,16 @@ inline auto	Get_TimecardTaskIDsByTimecardApproverUserID_sqlquery(const string &i
 		);
 }
 
+
+inline auto	Get_AgencyIDByUserID_sqlquery(const string &id)
+{
+	return (
+			"SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id` IN ("
+				+ Get_CompanyIDByUserID_sqlquery(id) +
+			")"
+		);
+}
+
+
+
 #endif

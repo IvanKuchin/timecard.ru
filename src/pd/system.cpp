@@ -365,9 +365,9 @@ int main()
 									// --- 4 cases so far: 
 									// --- 1) text/html expiration 30 secs. (internally found)
 									// ----		1.a) If user open site from bookmark 
-									// ----		1.b) until 30 secs expire close browser and re-open from bookmark again 
+									// ----		1.b) until 30 secs expire close browser(sesison cookies will be removed) and re-open from bookmark again 
 									// ----		1.c) this should take page from cache
-									// ----   Not fixing this because it is unlike event consequences
+									// ----   Not fixing this because it is unlike event sequence
 									// --- 2) bug on iPhone / Safari: cookie doesn't assigned in short time interval up to 5 sec
 									// --- 3) transit state:
 									// ---- 		2.a) network I connected to relayed HTTP requests to Symantec for AV-analysis, Symantec didn't keep cookie in HTTP-requests
@@ -397,7 +397,7 @@ int main()
 										string	remove_flag_timestamp = db.Get(0, "remove_flag_timestamp");
 
 										if(remove_flag == "Y")
-											MESSAGE_ERROR("", action, "session(" + sessidPersistence + ") would be deleted at " + remove_flag_timestamp + " timestamp, but it is re-used. Potential root causes: (1)pressed back-button in browser, (2)refreshed few old tab at the same time, (3)if device switches between (WiFi and cellular netw) or (LAN and Anyconnect) and changes IP(look for \"IP was changed\" in logs), then browser refreshes active page, in this case eventtimestamps must be few seconds apart, use bash date -d@xxxx to convert timestamp to local date).");
+											MESSAGE_ERROR("", action, "session(" + sessidPersistence + ") would be deleted at " + remove_flag_timestamp + " timestamp, but it is re-used. Potential root causes: (1) if device switches between (WiFi/cellular or LAN/Anyconnect) and changes IP(look for \"IP was changed\" in logs), then browser could re-send exact same request from new IP, in this case eventtimestamps must be few seconds apart, use bash date -d@" + remove_flag_timestamp + " to convert timestamp to local date. (2) on previous session end-user double-clicked favorites and send two HTTP-requests at the same time. 1-st request take normal call flow until redirect to the _DefaultActionPage_, 2-nd request has sent instead of _DefaultActionPage_. \"sessid\" won't be saved in LocalStorage due to _DefaultActionPage_ has not been viewed. Current session will be using \"sessid\" saved in LocalStorage from grand-previous session, instead of previous. To find previous request look for CheckSessionPersistence request at date -d@" + remove_flag_timestamp + " if instead _DefaultActionPage_ smth else triggered w/o HTTP_REFERRER, then this is the case");
 
 										if(sessidPersistence == sessidHTTP)
 										{

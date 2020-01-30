@@ -67,7 +67,7 @@ auto 			CreateBTExpenseTemplateAssignmentToSoW(string new_bt_expense_template_id
 auto			GetCostCentersInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetCostCentersAssignmentInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetApproversInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
-auto			GetApproversInJSONFormat(string sqlQuery, CMysql *, CUser *, bool include_sow) -> string;
+auto			GetApproversInJSONFormat(string sqlQuery, CMysql *, CUser *, bool include_psow) -> string;
 auto			GetAbsenceListInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetAbsenceTypesInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 
@@ -96,8 +96,8 @@ auto			GetSpelledBankByID(string id, CMysql *) -> string;
 auto			GetSpelledBTExpenseTemplateByID(string id, CMysql *) -> string;
 auto			GetSpelledBTExpenseTemplateByLineID(string id, CMysql *) -> string;
 auto			GetSpelledBTExpenseTemplateByAssignmentID(string id, CMysql *) -> string;
-auto			GetSpelledBT(string id, CMysql *db) -> string;
-auto			GetSpelledTimecard(string id, CMysql *db) -> string;
+auto			GetSpelledBT(string id, CMysql *) -> string;
+auto			GetSpelledTimecard(string id, CMysql *) -> string;
 
 auto			isValidToReportTime(string timecard_id, string task_id, string timereport, CMysql *, CUser *) -> string;
 auto			isTaskIDValidToRemove(string task_id, CMysql *) -> string;
@@ -185,12 +185,13 @@ auto			isValidToAddAirfareLimitByDirection(string from_id, string to_id, string 
 
 auto			GetAbsenceOverlap(string company_id, string start_date, string end_date, CMysql *, CUser *, string exclude_id = "") -> string;
 
-auto			Update_TimecardBT_ExpectedPayDate(string entity, string id, CMysql *db, CUser *user) -> string;
+auto			Update_TimecardBT_ExpectedPayDate(string entity, string id, CMysql *, CUser *) -> string;
 
 auto			CheckAgreementSoWTitle(string title, string sow_id, CMysql *, CUser *) -> string;
 
-auto			GetDashboardPaymentData(string sow_sql, CMysql *db, CUser *user) -> string;
-auto			GetTimecardList(string where_companies_list, CMysql *db, CUser *user) -> string;
+auto			GetDashboardPaymentData(string sow_sql, CMysql *, CUser *) -> string;
+auto			GetTimecardList(string where_companies_list, CMysql *, CUser *) -> string;
+auto			isTimePeriodInsideSow(string sow_id, string period_start, string period_end, CMysql *, CUser *) -> string; 
 
 auto			isDemoDomain() -> bool;
 

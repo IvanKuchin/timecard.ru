@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-21 14:29-0500\n"
+"POT-Creation-Date: 2020-01-29 15:38-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -332,6 +332,12 @@ msgstr "Подпись"
 
 msgid "SoW"
 msgstr "Договор"
+
+msgid "SoW expired prior to reporting period"
+msgstr "SoW закончился до начала отчетного периода"
+
+msgid "SoW has not been activated yet"
+msgstr "SoW еще не начался"
 
 msgid "SoW not known"
 msgstr "SoW не найден"
@@ -802,6 +808,9 @@ msgid "fail to produce object set"
 msgstr "не удалось собрать внутреннюю структуру"
 
 msgid "fail to submit bt"
+msgstr "ошибка отправки командировки"
+
+msgid "fail to submit timecard"
 msgstr "ошибка отправки таймкарты"
 
 msgid "file not found"
@@ -1151,6 +1160,9 @@ msgstr "не определена дата окончания таймкарты
 
 msgid "timecard id is empty"
 msgstr "таймкарта не найдена"
+
+msgid "timecard requires tasks to report on"
+msgstr "Необходимо ввести задачи и время"
 
 msgid "timecards reported"
 msgstr "таймкарт"

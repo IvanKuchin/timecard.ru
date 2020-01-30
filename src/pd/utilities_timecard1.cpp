@@ -3642,7 +3642,7 @@ string	GetApproversInJSONFormat(string sqlQuery, CMysql *db, CUser *user)
 	return GetApproversInJSONFormat(sqlQuery, db, user, false);
 }
 
-string	GetApproversInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include_sow)
+string	GetApproversInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include_psow)
 {
 	struct ItemClass
 	{
@@ -3688,7 +3688,7 @@ string	GetApproversInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool i
 			result += "\"id\":\"" + item.id + "\",";
 			result += "\"approver_user_id\":\"" + item.approver_user_id + "\",";
 			result += "\"contract_psow_id\":\"" + item.contract_psow_id + "\",";
-			if(include_sow)
+			if(include_psow)
 				result += "\"psow\":[" + GetPSoWInJSONFormat("SELECT * FROM `contracts_psow` WHERE `id`=\"" + item.contract_psow_id + "\";", db, user) + "],";
 			result += "\"users\":[" + user_cache.Get("SELECT * FROM `users` WHERE `id`=\"" + item.approver_user_id + "\";", db, user, GetUserListInJSONFormat) + "],";
 			result += "\"approver_order\":\"" + item.approver_order + "\",";

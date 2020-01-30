@@ -304,7 +304,6 @@ int main(void)
 					else if(user.GetType() == "approver")
 					{
 						// --- check ability to see this timecard
-						// if(db.Query("SELECT `id` FROM `timecards` WHERE `id`=\"" + timecard_id + "\" AND `contract_sow_id` IN (SELECT `contract_sow_id` FROM `timecard_approvers` WHERE `approver_user_id`=\"" + user.GetID() + "\")"))
 						if(db.Query("SELECT `id` FROM `timecards` WHERE `id`=\"" + timecard_id + "\" AND `contract_sow_id` IN (" + Get_SoWIDsByTimecardApproverUserID_sqlquery(user.GetID()) + ")"))
 						{
 							ostResult << "{"
@@ -3903,7 +3902,7 @@ int main(void)
 							if(error_message.empty())
 							{
 								// --- notify before actual removal
-								if(GeneralNotifySoWContractPartiesAboutChanges(action, id, sow_id, "fake_existing_value", "fake_new_value", &db, &user))
+								if(GeneralNotifySoWContractPartiesAboutChanges(action, psow_id, sow_id, id, "fake_new_value", &db, &user))
 								{
 								}
 								else

@@ -2560,117 +2560,6 @@ string GetTimecardLineID(string timecard_id, string task_id, CMysql *db)
 
 	return result;
 }
-/*
-string GetNumberOfTimecardsInPendingState(CMysql *db, CUser *user)
-{
-	struct PendingTimecardClass
-	{
-		string	id;
-		string	contract_sow_id;
-		string	submit_date;
-
-		PendingTimecardClass(string p1, string p2, string p3) : id(p1), contract_sow_id(p2), submit_date(p3) {};
-		PendingTimecardClass() {};
-	};
-	vector<PendingTimecardClass>		timecards_list;
-
-	auto			affected = 0;
-	auto			pending_timecards = 0;
-
-	MESSAGE_DEBUG("", "", "start");
-
-	if(user->GetType() == "agency")
-	{
-		MESSAGE_DEBUG("", "", "user.id(" + user->GetID() + ") is " + user->GetType());
-
-		affected = db->Query("" + Get_CompanyIDByUserID_sqlquery(user->GetID()) + ";");
-		if(affected)
-		{
-			auto	company_id = db->Get(0, "company_id");
-
-			affected = db->Query("SELECT `id`, `contract_sow_id`, `submit_date` FROM `timecards` WHERE "
-										"`status`=\"submit\" "
-										"AND "
-										"`contract_sow_id` IN (SELECT `id` FROM `contracts_sow` WHERE `agency_company_id`=\"" + company_id + "\");");
-			for(auto i = 0; i < affected; ++i)
-			{
-				PendingTimecardClass	item;
-
-				item.id = db->Get(i, "id");
-				item.contract_sow_id = db->Get(i, "contract_sow_id");
-				item.submit_date = db->Get(i, "submit_date");
-
-				timecards_list.push_back(item);
-			}
-		}
-		else
-		{
-			MESSAGE_ERROR("", "", "user.id(" + user->GetID() + ") doesn't belong to any agency");
-		}
-	}
-	else if(user->GetType() == "approver")
-	{
-		MESSAGE_DEBUG("", "", "user.id(" + user->GetID() + ") is " + user->GetType());
-
-
-		affected = db->Query("SELECT `id`, `contract_sow_id`, `submit_date` FROM `timecards` WHERE "
-									"`status`=\"submit\" "
-									"AND "
-									"`contract_sow_id` IN (SELECT `contract_sow_id` FROM `timecard_approvers` WHERE `approver_user_id`=\"" + user->GetID() + "\");");
-		for(auto i = 0; i < affected; ++i)
-		{
-			PendingTimecardClass	item;
-
-			item.id = db->Get(i, "id");
-			item.contract_sow_id = db->Get(i, "contract_sow_id");
-			item.submit_date = db->Get(i, "submit_date");
-
-			timecards_list.push_back(item);
-		}
-	}
-	else
-	{
-		MESSAGE_ERROR("", "", "user.id(" + user->GetID() + ") have unknown type(" + user->GetType() + ")");
-	}
-
-	for(auto &timecard: timecards_list)
-	{
-		if(amIonTheApproverListForSoW("timecard_approvers", timecard.contract_sow_id, db, user))
-		{
-			if(db->Query("SELECT `decision` FROM `timecard_approvals` WHERE "
-							"`timecard_id` = \"" + timecard.id + "\" "
-							"AND "
-							"`eventTimestamp` > \"" + timecard.submit_date + "\" "
-							"AND "
-							"`approver_id` IN (SELECT `id` FROM `timecard_approvers` WHERE `contract_sow_id`=\"" + timecard.contract_sow_id + "\" AND `approver_user_id`=\"" + user->GetID() + "\")"))
-			{
-				string		decision = db->Get(0, "decision");
-
-				if(decision == "approved")
-				{
-					// --- everything ok
-				}
-				else
-				{
-					MESSAGE_ERROR("", "", "check approval workflow for contract(" + timecard.contract_sow_id + ") at this time(" + timecard.submit_date + ") timcard.id(" + timecard.id + ") must have only \"approved\" approvals from user.id(" + user->GetID() + ")");
-				}
-			}
-			else
-			{
-				++pending_timecards;
-			}
-		}
-		else
-		{
-			MESSAGE_DEBUG("", "", "I'm not on the approver list for SoW(" + timecard.contract_sow_id + ")");
-		}
-	}
-
-	MESSAGE_DEBUG("", "", "finish (number of pending_timecards is " + to_string(pending_timecards) + ")");
-
-	return to_string(pending_timecards);
-}
-*/
 
 static auto __Get_NumberOfTimecardsOrBT_InPaymentPendingState(string entity_type, string sow_sql, CMysql *db, CUser *user)
 {
@@ -2917,7 +2806,6 @@ string	GetObjectsSOW_Reusable_InJSONFormat(string object, string filter, CMysql 
 
 					if(user->GetType() == "approver")
 						sql_query_where_statement = "`contract_sow_id` IN ( " + Get_SoWIDsByTimecardApproverUserID_sqlquery(user->GetID()) + " )";
-						// sql_query_where_statement = "`contract_sow_id` IN ( SELECT `contract_sow_id` FROM `timecard_approvers` WHERE `approver_user_id`=\"" + user->GetID() + "\")";
 					else if(user->GetType() == "agency")
 						sql_query_where_statement = "`contract_sow_id` IN ( SELECT `id` FROM `contracts_sow` WHERE `agency_company_id`=(" + Get_CompanyIDByUserID_sqlquery(user->GetID()) + "))";
 					else
@@ -5393,23 +5281,25 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 	if(action == "AJAX_addTimecardApproverToPSoW")
 	{
 		auto	psow_id = id;
-		notification_description = "Данные таймкарты: Добавили нового утвердителя " + GetSpelledUserNameByID(new_value, db) + " (SoW " + GetSpelledPSoWByID(psow_id, db) + ")";
+		notification_description = "Данные таймкарты: Добавили нового утвердителя " + GetSpelledUserNameByID(new_value, db) + " (PSoW " + GetSpelledPSoWByID(psow_id, db) + ")";
 		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 	}
 	if(action == "AJAX_addBTExpenseApproverToPSoW")
 	{
 		auto	psow_id = id;
-		notification_description = "Данные командировки: Добавили нового утвердителя " + GetSpelledUserNameByID(new_value, db) + " (SoW " + GetSpelledPSoWByID(psow_id, db) + ")";
+		notification_description = "Данные командировки: Добавили нового утвердителя " + GetSpelledUserNameByID(new_value, db) + " (PSoW " + GetSpelledPSoWByID(psow_id, db) + ")";
 		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 	}
 	if(action == "AJAX_deleteTimecardApproverFromPSoW")
 	{
-		notification_description = "Данные таймкарты: Удалили утвердителя таймкарт " + GetSpelledTimecardApproverNameByID(id, db) + " (SoW " + GetSpelledSoWByID(sow_id, db) + ")";
+		auto	psow_id = id;
+		notification_description = "Данные таймкарты: Удалили утвердителя таймкарт " + GetSpelledTimecardApproverNameByID(existing_value, db) + " (PSoW " + GetSpelledPSoWByID(psow_id, db) + ")";
 		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 	}
 	if(action == "AJAX_deleteBTExpenseApproverFromPSoW")
 	{
-		notification_description = "Данные командировки: Удалили утвердителя командировочных расходов " + GetSpelledBTExpenseApproverNameByID(id, db) + " (SoW " + GetSpelledSoWByID(sow_id, db) + ")";
+		auto	psow_id = id;
+		notification_description = "Данные командировки: Удалили утвердителя командировочных расходов " + GetSpelledBTExpenseApproverNameByID(existing_value, db) + " (PSoW " + GetSpelledPSoWByID(psow_id, db) + ")";
 		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 	}
 	if(action == "AJAX_updateSubcontractorCreateTasks")
@@ -5882,9 +5772,42 @@ auto NotifyAgencyAboutChanges(string agency_id, string action_type_id, string ac
 	return error_message;	
 }
 
+static vector<string> GetAgencyListFromQuery(const string &sql_query, CMysql *db, CUser *user)
+{
+	MESSAGE_DEBUG("", "", "start (" + sql_query + ")");
+
+	vector<string>		agency_list;
+
+	// --- craft agency list to notify
+	auto affected = db->Query(sql_query);
+
+	for(auto i = 0; i < affected; ++i) 
+		agency_list.push_back(db->Get(i, "agency_company_id"));
+
+	// --- define agency
+	// --- ERROR, if more than one agency. Mean that they have shared CU/proj/task - FORBIDDEN
+	if((user->GetType() == "agency") && (agency_list.size() > 1))
+	{
+		MESSAGE_ERROR("", "", "Two or more agencies are sharing entities (either Customer/Project/Task or BTexpense/line templates) - FORBIDDEN");
+	}
+
+	// --- if agency must be notified but no SoW-s singed, then try to define AgencyID by UserID
+	if((user->GetType() == "agency") && (agency_list.empty()))
+	{
+		auto	agency_id = GetValueFromDB(Get_AgencyIDByUserID_sqlquery(user->GetID()), db);
+
+		if(agency_id.length()) agency_list.push_back(agency_id);
+	}
+
+
+	MESSAGE_DEBUG("", "", "finish (size of agency_list is " + to_string(agency_list.size()) + ")");
+
+	return agency_list;
+}
+
 bool GeneralNotifySoWContractPartiesAboutChanges(string action, string id, string sow_id, string existing_value, string new_value, CMysql *db, CUser *user)
 {
-	bool	result = false;
+	auto	result = false;
 
 	MESSAGE_DEBUG("", "", "start (action=" + action + ")");
 
@@ -5936,6 +5859,7 @@ bool GeneralNotifySoWContractPartiesAboutChanges(string action, string id, strin
 
 				if(agency_list_sql_query.length())
 				{
+/*					// --- craft agency list to notify
 					affected = db->Query(agency_list_sql_query);
 
 					for(auto i = 0; i < affected; ++i) 
@@ -5948,9 +5872,15 @@ bool GeneralNotifySoWContractPartiesAboutChanges(string action, string id, strin
 						MESSAGE_ERROR("", "", "Two or more agencies are sharing entities (either Customer/Project/Task or BTexpense/line templates) (" + action + ":" + id + ") - FORBIDDEN");
 					}
 
-					// --- if agency must be notified but no SoW-s singed, then agency_list will be empty
-					// --- to avoid ERROR-message in logs nad notify agency itself, below W/A applied
-					if((user->GetType() == "agency") && (agency_list.empty())) agency_list.push_back(id);
+					// --- if agency must be notified but no SoW-s singed, then try to define AgencyID by UserID
+					if((user->GetType() == "agency") && (agency_list.empty()))
+					{
+						auto	agency_id = GetValueFromDB(Get_AgencyIDByUserID_sqlquery(user->GetID()), db);
+
+						if(agency_id.length()) agency_list.push_back(agency_id);
+					}
+*/
+					agency_list = GetAgencyListFromQuery(agency_list_sql_query, db, user);
 
 					if(agency_list.size())
 					{

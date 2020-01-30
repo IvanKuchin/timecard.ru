@@ -33,7 +33,7 @@ static auto GetCompanyID(CUser *user, CMysql *db)
 
 	return result;
 }
-
+/*
 static auto	GetTimecardsSOWTaskAssignement_Reusable_InJSONFormat(string date, CMysql *db, CUser *user)
 {
 	auto		result = ""s;
@@ -76,6 +76,78 @@ static auto	GetTimecardsSOWTaskAssignement_Reusable_InJSONFormat(string date, CM
 																"`start_date`<=\"" + date + "\" "
 																"AND "
 																"`end_date`>=\"" + date + "\""
+															");", db, user) + "],"
+						"\"holiday_calendar\":[" + GetHolidayCalendarInJSONFormat(
+								"SELECT * FROM `holiday_calendar` WHERE "
+									"`date`>=(DATE_SUB(" + quoted(date) + ", INTERVAL " + to_string(HOLIDAY_RANGE_FROM_TODAY) + " DAY)) "
+									"AND "
+									"`date`<=(DATE_ADD(" + quoted(date) + ", INTERVAL " + to_string(HOLIDAY_RANGE_FROM_TODAY) + " DAY)) "
+								";", db, user) + "]";
+			}
+			else
+			{
+				MESSAGE_ERROR("", "", "user is empty");
+			}
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "user is empty");
+		}
+	}
+	else
+	{
+		MESSAGE_ERROR("", "", "date is empty");
+	}
+
+
+
+	MESSAGE_DEBUG("", "", "finish (result length is " + to_string(result.length()) + " symbols)");
+
+	return result;
+}
+*/
+static auto	GetTimecardsSOWTaskAssignement_Reusable_InJSONFormat(string date, CMysql *db, CUser *user)
+{
+	auto		result = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(date.length())
+	{
+		if(user)
+		{
+			if(db)
+			{
+				auto	timecard_query = 
+								"FROM `timecards` WHERE "
+									"`contract_sow_id` IN ("
+										"SELECT `id` FROM `contracts_sow` WHERE `subcontractor_company_id` IN ("
+											"SELECT `id` FROM `company` WHERE `admin_userID` = \"" + user->GetID() + "\""
+										")"
+									") "
+									"AND "
+									"`period_start`<=\"" + date + "\" "
+									"AND "
+									"`period_end`>=\"" + date + "\" ";
+
+				result =
+						"\"timecards\":[" + GetTimecardsInJSONFormat("SELECT * " + timecard_query + ";", db, user) + "],"
+						"\"sow\":[" + GetSOWInJSONFormat(
+								"SELECT * FROM `contracts_sow` WHERE "
+									"`subcontractor_company_id` IN (SELECT `id` FROM `company` WHERE `admin_userID` = \"" + user->GetID() + "\") "
+									"AND "
+									"`start_date`<=\"" + date + "\" "
+									"AND "
+									"`end_date`>=(DATE_SUB(" + quoted(date) + ", INTERVAL " + to_string(SOW_EXPIRATION_BUFFER) + " DAY))"
+								";", db, user) + "],"
+						"\"task_assignments\":[" + GetTimecardTaskAssignmentInJSONFormat(
+								"SELECT * FROM `timecard_task_assignment` WHERE "
+									"`contract_sow_id` IN (SELECT `id` FROM `contracts_sow` WHERE "
+																"`subcontractor_company_id` IN (SELECT `id` FROM `company` WHERE `admin_userID` = \"" + user->GetID() + "\") "
+																"AND "
+																"`start_date`<=\"" + date + "\" "
+																"AND "
+																"`end_date`>=(DATE_SUB(" + quoted(date) + ", INTERVAL " + to_string(SOW_EXPIRATION_BUFFER) + " DAY)) "
 															");", db, user) + "],"
 						"\"holiday_calendar\":[" + GetHolidayCalendarInJSONFormat(
 								"SELECT * FROM `holiday_calendar` WHERE "
@@ -722,16 +794,16 @@ int main()
 		}
 		else
 */		{
-			string			template_name = "json_response.htmlt";
+			auto			template_name = "json_response.htmlt"s;
 
-			string			requested_status = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("status"));
-			string			sow_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("sow_id"));
-			string			current_period_start_year = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("current_period_start_year"));
-			string			current_period_start_month = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("current_period_start_month"));
-			string			current_period_start_date = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("current_period_start_date"));
-			string			current_period_finish_year = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("current_period_finish_year"));
-			string			current_period_finish_month = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("current_period_finish_month"));
-			string			current_period_finish_date = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("current_period_finish_date"));
+			auto			requested_status = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("status"));
+			auto			sow_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("sow_id"));
+			auto			current_period_start_year = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("current_period_start_year"));
+			auto			current_period_start_month = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("current_period_start_month"));
+			auto			current_period_start_date = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("current_period_start_date"));
+			auto			current_period_finish_year = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("current_period_finish_year"));
+			auto			current_period_finish_month = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("current_period_finish_month"));
+			auto			current_period_finish_date = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("current_period_finish_date"));
 
 			if(sow_id.length() && requested_status.length() && current_period_start_year.length() && current_period_start_month.length() && current_period_start_date.length() && current_period_finish_year.length() && current_period_finish_month.length() && current_period_finish_date.length())
 			{
@@ -740,34 +812,34 @@ int main()
 
 				if(isUserAssignedToSoW(user.GetID(), sow_id, &db))
 				{
-					string		period_start = current_period_start_year + "-" + current_period_start_month + "-" + current_period_start_date;
-					string		period_end = current_period_finish_year + "-" + current_period_finish_month + "-" + current_period_finish_date;
+					auto		period_start = current_period_start_year + "-" + current_period_start_month + "-" + current_period_start_date;
+					auto		period_end = current_period_finish_year + "-" + current_period_finish_month + "-" + current_period_finish_date;
 					auto		timecard_id = ""s;
 					auto		timecard_status = ""s;
 					auto		agency_id = ""s;
 
-					timecard_id = GetTimecardID(sow_id, period_start, period_end, &db);
-					timecard_status = GetTimecardStatus(timecard_id, &db);
-					agency_id = GetAgencyID(sow_id, &db);
 
-
-					if(timecard_id.length() && timecard_status.length() && agency_id.length())
+					if(error_description.length())
+					{
+					}
+					else
 					{
 						int			i = 0;
 						bool		isAgain;
+						auto		is_time_reported = false;
 
 						// --- task aggregation
 						do
 						{
-							string	task = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("task_" + to_string(i)));
-							string	project = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("project_" + to_string(i)));
-							string	customer = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("customer_" + to_string(i)));
+							auto	task = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("task_" + to_string(i)));
+							auto	project = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("project_" + to_string(i)));
+							auto	customer = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("customer_" + to_string(i)));
 
 							isAgain = false;
 
 							if(task.length() && project.length() && customer.length())
 							{
-								string 		timereports = CheckHTTPParam_Timeentry(indexPage.GetVarsHandler()->Get("timereports_" + to_string(i)));
+								auto 		timereports = CheckHTTPParam_Timeentry(indexPage.GetVarsHandler()->Get("timereports_" + to_string(i)));
 
 								isAgain = true;
 
@@ -796,6 +868,8 @@ int main()
 										item.timereports = timereports;
 
 										itemsList.push_back(item);
+
+										is_time_reported = is_time_reported || (!isTimecardEntryEmpty(item.timereports));
 									}
 								}
 								else
@@ -811,50 +885,93 @@ int main()
 							++i;
 						} while(isAgain);
 
-
-						// --- save timeentries in DB
-						for(auto item: itemsList)
+						if(is_time_reported)
 						{
-							if(isTimecardEntryEmpty(item.timereports))
-							{
-								MESSAGE_DEBUG("", action, "timecard entry (" + item.timereports + ") is empty, don't add it to DB");
-							}
-							else
-							{
-								string		task_id = GetTaskIDFromSOW(item.customer, item.project, item.task, sow_id, &db);
-								string		timecard_line_id;
+							// --- good2go
+						}
+						else
+						{
+							error_description = gettext("timecard requires tasks to report on");
+							MESSAGE_ERROR("", action, error_description);
+						}
+					}
 
-								if(task_id.empty())
+					if(error_description.length())
+					{
+					}
+					else
+					{
+						if((error_description = isTimePeriodInsideSow(sow_id, period_start, period_end, &db, &user)).empty())
+						{
+							timecard_id = GetTimecardID(sow_id, period_start, period_end, &db);
+							timecard_status = GetTimecardStatus(timecard_id, &db);
+							agency_id = GetAgencyID(sow_id, &db);
+						}
+					}
+
+					if(error_description.length())
+					{
+					}
+					else
+					{
+						if(timecard_id.length() && timecard_status.length() && agency_id.length())
+						{
+
+							// --- save timeentries in DB
+							for(auto item: itemsList)
+							{
+								if(isTimecardEntryEmpty(item.timereports))
 								{
-									MESSAGE_DEBUG("", action, "task (" + item.customer + TIMECARD_ENTRY_TITLE_SEPARATOR + item.project + TIMECARD_ENTRY_TITLE_SEPARATOR + item.task + ") doesn't assigned to SoW (" + sow_id + ")");
+									MESSAGE_DEBUG("", action, "timecard entry (" + item.timereports + ") is empty, don't add it to DB");
+								}
+								else
+								{
+									string		task_id = GetTaskIDFromSOW(item.customer, item.project, item.task, sow_id, &db);
+									string		timecard_line_id;
 
-									if(isSoWAllowedToCreateTask(sow_id, &db))
+									if(task_id.empty())
 									{
-										if(db.Query("SELECT `start_date`, `end_date` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";"))
+										MESSAGE_DEBUG("", action, "task (" + item.customer + TIMECARD_ENTRY_TITLE_SEPARATOR + item.project + TIMECARD_ENTRY_TITLE_SEPARATOR + item.task + ") doesn't assigned to SoW (" + sow_id + ")");
+
+										if(isSoWAllowedToCreateTask(sow_id, &db))
 										{
-											string	sow_start_date = db.Get(0, "start_date");
-											string	sow_end_date = db.Get(0, "end_date");
-											string	task_assignment_id = "";
-											bool	notify_about_task_creation = false;
-
-											task_id = GetTaskIDFromAgency(item.customer, item.project, item.task, agency_id, &db);
-											if(task_id.empty())
+											if(db.Query("SELECT `start_date`, `end_date` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";"))
 											{
-												task_id = CreateTaskBelongsToAgency(item.customer, item.project, item.task, agency_id, &db);
-												notify_about_task_creation = true;
-											}
-											else
-											{
-												MESSAGE_DEBUG("", action, "Customer/Project/Task already exists for this agency.id(" + agency_id + ")");
-											}
+												string	sow_start_date = db.Get(0, "start_date");
+												string	sow_end_date = db.Get(0, "end_date");
+												string	task_assignment_id = "";
+												bool	notify_about_task_creation = false;
 
-											task_assignment_id = CreateTaskAssignment(task_id, sow_id, sow_start_date, sow_end_date, &db, &user);
-
-											if(task_assignment_id.length())
-											{
-												if(notify_about_task_creation)
+												task_id = GetTaskIDFromAgency(item.customer, item.project, item.task, agency_id, &db);
+												if(task_id.empty())
 												{
-													if(GeneralNotifySoWContractPartiesAboutChanges("AJAX_addTask", task_id, sow_id, "", item.task, &db, &user))
+													task_id = CreateTaskBelongsToAgency(item.customer, item.project, item.task, agency_id, &db);
+													notify_about_task_creation = true;
+												}
+												else
+												{
+													MESSAGE_DEBUG("", action, "Customer/Project/Task already exists for this agency.id(" + agency_id + ")");
+												}
+
+												task_assignment_id = CreateTaskAssignment(task_id, sow_id, sow_start_date, sow_end_date, &db, &user);
+
+												if(task_assignment_id.length())
+												{
+													if(notify_about_task_creation)
+													{
+														if(GeneralNotifySoWContractPartiesAboutChanges("AJAX_addTask", task_id, sow_id, "", item.task, &db, &user))
+														{
+														}
+														else
+														{
+															MESSAGE_ERROR("", "", "fail to notify SoW parties");
+														}
+													}
+													else
+													{
+														MESSAGE_DEBUG("", "", "no notification about task creation");
+													}
+													if(GeneralNotifySoWContractPartiesAboutChanges("AJAX_addTaskAssignment", task_assignment_id, sow_id, "", item.customer + TIMECARD_ENTRY_TITLE_SEPARATOR + item.project + TIMECARD_ENTRY_TITLE_SEPARATOR + item.task + " ( с " + sow_start_date + " по " + sow_end_date + ")", &db, &user))
 													{
 													}
 													else
@@ -864,104 +981,93 @@ int main()
 												}
 												else
 												{
-													MESSAGE_DEBUG("", "", "no notification about task creation");
-												}
-												if(GeneralNotifySoWContractPartiesAboutChanges("AJAX_addTaskAssignment", task_assignment_id, sow_id, "", item.customer + TIMECARD_ENTRY_TITLE_SEPARATOR + item.project + TIMECARD_ENTRY_TITLE_SEPARATOR + item.task + " ( с " + sow_start_date + " по " + sow_end_date + ")", &db, &user))
-												{
-												}
-												else
-												{
-													MESSAGE_ERROR("", "", "fail to notify SoW parties");
+													MESSAGE_DEBUG("", action, "fail to create assignment sow.id(" + sow_id + ") task.id(" + task_id + ")");
+													error_description = "Неудалось создать назначение";
+													break;
 												}
 											}
 											else
 											{
-												MESSAGE_DEBUG("", action, "fail to create assignment sow.id(" + sow_id + ") task.id(" + task_id + ")");
-												error_description = "Неудалось создать назначение";
+												MESSAGE_ERROR("", action, "sow(" + sow_id + ") start and end period can't be defined");
+												error_description = "Ошибка БД";
 												break;
 											}
 										}
 										else
 										{
-											MESSAGE_ERROR("", action, "sow(" + sow_id + ") start and end period can't be defined");
-											error_description = "Ошибка БД";
+											MESSAGE_ERROR("", action, "SoW(" + sow_id + ") doesn't allows create tasks or consistensy issue");
+											error_description = "SoW не позволяет создавать новые задачи";
 											break;
 										}
 									}
-									else
+
+									if((timecard_status == "saved") || (timecard_status == "rejected"))
 									{
-										MESSAGE_ERROR("", action, "SoW(" + sow_id + ") doesn't allows create tasks or consistensy issue");
-										error_description = "SoW не позволяет создавать новые задачи";
-										break;
-									}
-								}
-
-								if((timecard_status == "saved") || (timecard_status == "rejected"))
-								{
-									error_description = isValidToReportTime(timecard_id, task_id, item.timereports, &db, &user);
-									if(error_description.empty())
-									{
-
-									// --- update DB with timeentries
-										timecard_line_id = GetTimecardLineID(timecard_id, task_id, &db);
-										if(timecard_line_id.length())
+										error_description = isValidToReportTime(timecard_id, task_id, item.timereports, &db, &user);
+										if(error_description.empty())
 										{
-											// --- timeentry exists and need to be updated
-											db.Query("UPDATE `timecard_lines` SET `row`=\"" + item.timereports + "\" WHERE `id`=\"" + timecard_line_id + "\";");
-											if(db.isError())
-											{
-												MESSAGE_ERROR("", action, "DB INSERT issue: (" + db.GetErrorMessage() + ")");
-												error_description = "ошибка БД";
-												break;
-											}
-										}
-										else
-										{
-											// --- timeentry doesn't exists and need to be created
 
-											if(timecard_id.length() && task_id.length())
+										// --- update DB with timeentries
+											timecard_line_id = GetTimecardLineID(timecard_id, task_id, &db);
+											if(timecard_line_id.length())
 											{
-												long int temp;
-
-												temp = db.InsertQuery("INSERT INTO `timecard_lines` SET "
-															"`timecard_id`=\"" + timecard_id + "\","
-															"`timecard_task_id`=\"" + task_id + "\","
-															"`row`=\"" + item.timereports + "\""
-															";");
-												if(!temp)
+												// --- timeentry exists and need to be updated
+												db.Query("UPDATE `timecard_lines` SET `row`=\"" + item.timereports + "\" WHERE `id`=\"" + timecard_line_id + "\";");
+												if(db.isError())
 												{
 													MESSAGE_ERROR("", action, "DB INSERT issue: (" + db.GetErrorMessage() + ")");
 													error_description = "ошибка БД";
 													break;
 												}
 											}
+											else
+											{
+												// --- timeentry doesn't exists and need to be created
+
+												if(timecard_id.length() && task_id.length())
+												{
+													long int temp;
+
+													temp = db.InsertQuery("INSERT INTO `timecard_lines` SET "
+																"`timecard_id`=\"" + timecard_id + "\","
+																"`timecard_task_id`=\"" + task_id + "\","
+																"`row`=\"" + item.timereports + "\""
+																";");
+													if(!temp)
+													{
+														MESSAGE_ERROR("", action, "DB INSERT issue: (" + db.GetErrorMessage() + ")");
+														error_description = "ошибка БД";
+														break;
+													}
+												}
+											}
 										}
+										else
+										{
+											MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") can't report time to task.id(" + task_id + ") in timecard_id(" + timecard_id + "). Timereport validity failed.");
+											break;
+										}
+									}
+									else if((timecard_status == "submit") || (timecard_status == "approved"))
+									{
+										MESSAGE_DEBUG("", action, "timecard_id(" + timecard_id + ") already submit, you can't change it");
+										error_description = "Таймкарта уже отправлена, изменить нельзя";
+										break;
 									}
 									else
 									{
-										MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") can't report time to task.id(" + task_id + ") in timecard_id(" + timecard_id + "). Timereport validity failed.");
+										MESSAGE_ERROR("", action, "unknown timecard_id(" + timecard_id + ") status (" + timecard_status + ")");
+										error_description = "Ошибка таймкарты";
 										break;
 									}
 								}
-								else if((timecard_status == "submit") || (timecard_status == "approved"))
-								{
-									MESSAGE_DEBUG("", action, "timecard_id(" + timecard_id + ") already submit, you can't change it");
-									error_description = "Таймкарта уже отправлена, изменить нельзя";
-									break;
-								}
-								else
-								{
-									MESSAGE_ERROR("", action, "unknown timecard_id(" + timecard_id + ") status (" + timecard_status + ")");
-									error_description = "Ошибка таймкарты";
-									break;
-								}
 							}
 						}
-					}
-					else
-					{
-						error_description = "Таймкарта не найдена";
-						MESSAGE_ERROR("", action, "timecard_id(" + timecard_id + ") or status (" + timecard_status + ") or agency_id(" + agency_id + ") is empty");
+						else
+						{
+							error_description = "Таймкарта не найдена";
+							MESSAGE_ERROR("", action, "timecard_id(" + timecard_id + ") or status (" + timecard_status + ") or agency_id(" + agency_id + ") is empty");
+						}
 					}
 
 					// --- updated timecard
@@ -980,11 +1086,6 @@ int main()
 									db.Query("UPDATE `timecards` SET `status`=\"submit\", `submit_date`=UNIX_TIMESTAMP() WHERE `id`=\"" + timecard_id + "\";");
 									if(!db.isError())
 									{
-/*										// --- auto_approve
-										// --- UNIX_TIMESTAMP() + 1 needed to make visibility that approve been done after submission
-										db.Query("INSERT INTO `timecard_approvals` (`timecard_id`, `approver_id`, `decision`, `comment`, `eventTimestamp`) "
-														"SELECT \"" + timecard_id + "\", `id`, \"approved\", \"auto-approve\",UNIX_TIMESTAMP()+1 FROM `timecard_approvers` WHERE `contract_sow_id`=\"" + sow_id + "\" AND `auto_approve`=\"Y\"");
-*/
 										if(SubmitTimecard(timecard_id, &db, &user))
 										{
 											success_description = GetTimecardsSOWTaskAssignement_Reusable_InJSONFormat(current_period_start_year + "-" + current_period_start_month + "-" + current_period_start_date, &db, &user);
@@ -1781,8 +1882,8 @@ int main()
 	if(action == "AJAX_getCompanyInfo")
 	{
 		ostringstream	ostResult;
-		string			error_message = "";
-		string			template_name = "json_response.htmlt";
+		auto			error_message = ""s;
+		auto			template_name = "json_response.htmlt"s;
 
 		MESSAGE_DEBUG("", action, "start");
 
@@ -1794,13 +1895,13 @@ int main()
 		}
 		else
 		{
-			string			agency_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
+			auto			agency_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
 			auto			include_countries = indexPage.GetVarsHandler()->Get("include_countries") == "true";
 
 			if(db.Query("SELECT `id` FROM `company` WHERE `admin_userID`=\"" + user.GetID() + "\";"))
 			{
-				string	company_id = db.Get(0, "id");
-				string	company_obj = GetCompanyListInJSONFormat("SELECT * FROM `company` WHERE `id`=\"" + company_id + "\";", &db, &user);
+				auto	company_id = db.Get(0, "id");
+				auto	company_obj = GetCompanyListInJSONFormat("SELECT * FROM `company` WHERE `id`=\"" + company_id + "\";", &db, &user);
 
 				if(company_obj.length())
 				{

@@ -722,8 +722,44 @@ auto	GetTimecardList(string where_companies_list, CMysql *db, CUser *user) -> st
 
 // --- stub function: deny all 
 // --- if some users need to be allowed to create BIK, algorithm must be written here
-auto isUserAllowedToCreateBIK(CUser *user, CMysql *sql) -> string 
+auto isUserAllowedToCreateBIK(CUser *user, CMysql *db) -> string 
 {
 	return gettext("you are not authorized to create new BIK");
 }
 
+auto isTimePeriodInsideSow(string sow_id, string period_start, string period_end, CMysql *db, CUser *user) -> string 
+{
+	MESSAGE_DEBUG("", "", "start(" + sow_id + ", " + period_start + ", " + period_end + ")");
+
+	auto	error_message = ""s;
+
+	if(sow_id.length() && period_start.length() && period_end.length() && db)
+	{
+		if(db->Query("SELECT `end_date` FROM `contracts_sow` WHERE `id`=" + quoted(sow_id) + " AND `end_date`<" + quoted(period_start) + ";"))
+		{
+			error_message = gettext("SoW expired prior to reporting period") + " ("s + db->Get(0, 0) + ")";
+			MESSAGE_ERROR("", "", error_message);
+		}
+		else
+		{
+			if(db->Query("SELECT `start_date` FROM `contracts_sow` WHERE `id`=" + quoted(sow_id) + " AND " + quoted(period_end) + "<`start_date`;"))
+			{
+				error_message = gettext("SoW has not been activated yet") + " ("s + db->Get(0, 0) + ")";
+				MESSAGE_ERROR("", "", error_message);
+			}
+			else
+			{
+				// --- good2go	
+			}
+		}
+	}
+	else
+	{
+		error_message = gettext("parameters incorrect");
+		MESSAGE_ERROR("", "", error_message);
+	}
+
+	MESSAGE_DEBUG("", "", "finish(" + error_message + ")");
+
+	return error_message;
+}
