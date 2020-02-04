@@ -42,7 +42,7 @@ bool CVideoConverter::PickUniqPrefix(string srcFileName)
 	do
 	{
 		ostringstream   ost;
-		std::size_t  foundPos;
+		std::size_t	 foundPos;
 
 		tryAgain = false;
 
@@ -85,7 +85,7 @@ bool CVideoConverter::PickUniqPrefix(string srcFileName)
 
 string CVideoConverter::GetFinalFolder()
 {
-	string  result = "";
+	string	result = "";
 	{
 		CLog	log;
 		log.Write(DEBUG, "CVideoConverter::" + string(__func__) + "[" + to_string(__LINE__) + "]: start");
@@ -102,7 +102,7 @@ string CVideoConverter::GetFinalFolder()
 
 string CVideoConverter::GetTempFilename()
 {
-	string  result;
+	string	result;
 
 	result = _filePrefix + _originalFileExtention;
 
@@ -111,7 +111,7 @@ string CVideoConverter::GetTempFilename()
 
 string CVideoConverter::GetPreFinalFilename(unsigned int order)
 {
-	string  result = "";
+	string	result = "";
 
 	if(order < _exts.size())
 		result = _filePrefix + _exts[order];
@@ -126,7 +126,7 @@ string CVideoConverter::GetPreFinalFilename(unsigned int order)
 
 string CVideoConverter::GetFinalFilename(unsigned int order)
 {
-	string  result = "";
+	string	result = "";
 
 	if(order < _exts.size())
 		result = _filePrefix + _exts[order];
@@ -141,7 +141,7 @@ string CVideoConverter::GetFinalFilename(unsigned int order)
 
 string CVideoConverter::GetTempFullFilename()
 {
-	string  result;
+	string	result;
 	{
 		CLog	log;
 		log.Write(DEBUG, "CVideoConverter::" + string(__func__) + "[" + to_string(__LINE__) + "]: start");
@@ -158,7 +158,7 @@ string CVideoConverter::GetTempFullFilename()
 
 string CVideoConverter::GetPreFinalFullFilename(unsigned int order)
 {
-	string  result = "";
+	string	result = "";
 	{
 		CLog	log;
 		log.Write(DEBUG, "CVideoConverter::" + string(__func__) + "[" + to_string(__LINE__) + "]: start");
@@ -181,7 +181,7 @@ string CVideoConverter::GetPreFinalFullFilename(unsigned int order)
 
 string CVideoConverter::GetFinalFullFilename(unsigned int order)
 {
-	string  result = "";
+	string	result = "";
 	{
 		CLog	log;
 		log.Write(DEBUG, "CVideoConverter::" + string(__func__) + "[" + to_string(__LINE__) + "]: start");
@@ -204,7 +204,7 @@ string CVideoConverter::GetFinalFullFilename(unsigned int order)
 
 string CVideoConverter::GetStdoutFullFilename(unsigned int order)
 {
-	string  result = "";
+	string	result = "";
 	{
 		CLog	log;
 		log.Write(DEBUG, "CVideoConverter::" + string(__func__) + "[" + to_string(__LINE__) + "]: start");
@@ -227,7 +227,7 @@ string CVideoConverter::GetStdoutFullFilename(unsigned int order)
 
 string CVideoConverter::GetStderrFullFilename(unsigned int order)
 {
-	string  result = "";
+	string	result = "";
 	{
 		CLog	log;
 		log.Write(DEBUG, "CVideoConverter::" + string(__func__) + "[" + to_string(__LINE__) + "]: start");
@@ -251,8 +251,8 @@ string CVideoConverter::GetStderrFullFilename(unsigned int order)
 bool CVideoConverter::ParseLocationToComponents(string src)
 {
 	bool		result = false;
-	regex	positionRegex(".*([+-][[:digit:]]+\\.[[:digit:]]+)([+-][[:digit:]]+\\.[[:digit:]]+)([+-][[:digit:]]+\\.[[:digit:]]+).*");
-	smatch  matchResult;
+	regex	 positionRegex(".*([+-][[:digit:]]+\\.[[:digit:]]+)([+-][[:digit:]]+\\.[[:digit:]]+)([+-][[:digit:]]+\\.[[:digit:]]+).*");
+	smatch	matchResult;
 
 	{
 		CLog	log;
@@ -286,12 +286,11 @@ bool CVideoConverter::ReadMetadataAndResolution()
 
 #ifndef FFPMPEG_DISABLE
 
-	AVFormatContext  *fmt_ctx = NULL;
+	AVFormatContext	 *fmt_ctx = NULL;
 	AVDictionaryEntry   *tag = NULL;
-	int			  ret;
+	int				 ret;
 
-
-	av_register_all();
+	// av_register_all();
 	ret = avformat_open_input(&fmt_ctx, GetTempFullFilename().c_str(), NULL, NULL);
 	if(ret == 0)
 	{
@@ -302,8 +301,8 @@ bool CVideoConverter::ReadMetadataAndResolution()
 		while ((tag = av_dict_get(fmt_ctx->metadata, "", tag, AV_DICT_IGNORE_SUFFIX)))
 		{
 			// printf("%s=%s\n", tag->key, tag->value);
-			string  key = tag->key;
-			string  value = tag->value;
+			string	key = tag->key;
+			string	value = tag->value;
 
 			if(key.find("creationdate") != string::npos) _metadataDateTime = value;
 			if(key.find("make") != string::npos) _metadataMake = value;
@@ -337,8 +336,8 @@ bool CVideoConverter::ReadMetadataAndResolution()
 				tag = nullptr;
 				while ((tag = av_dict_get(stream->metadata, "", tag, AV_DICT_IGNORE_SUFFIX)))
 				{
-					string  key = tag->key;
-					string  value = tag->value;
+					string	key = tag->key;
+					string	value = tag->value;
 
 					if(key.find("rotate") != string::npos) _rotation = value;
 				}
@@ -382,7 +381,7 @@ bool CVideoConverter::FirstPhase()
 	char	add_overlay_and_blur[512];
 	char	*argv[10];
 
-	string  tmpSrcFile, tmpDstFile;
+	string	tmpSrcFile, tmpDstFile;
 
 	MESSAGE_DEBUG("", "", "start");
 
@@ -397,11 +396,11 @@ bool CVideoConverter::FirstPhase()
 
 			if(_width > _height)
 			{
-				double  videoScaleWidth = _width / FEEDVIDEO_MAX_WIDTH;
-				double  videoScaleHeight = _height / FEEDVIDEO_MAX_HEIGHT;
-				double  videoScaleMax = (videoScaleWidth > videoScaleHeight ? videoScaleWidth : videoScaleHeight);
-				double  videoScaleFinalWidth = _width;
-				double  videoScaleFinalHeight = _height;
+				double	videoScaleWidth = _width / FEEDVIDEO_MAX_WIDTH;
+				double	videoScaleHeight = _height / FEEDVIDEO_MAX_HEIGHT;
+				double	videoScaleMax = (videoScaleWidth > videoScaleHeight ? videoScaleWidth : videoScaleHeight);
+				double	videoScaleFinalWidth = _width;
+				double	videoScaleFinalHeight = _height;
 
 				if(videoScaleMax > 1)
 				{
@@ -484,7 +483,7 @@ bool CVideoConverter::SecondPhase()
 	bool	result = false;
 	char	*argv[10];
 
-	string  tmpSrcFile, tmpDstFile;
+	string	tmpSrcFile, tmpDstFile;
 
 	{
 		CLog	log;
@@ -525,7 +524,7 @@ bool	CVideoConverter::VideoConvert(int dstIndex, char **argv)
 {
 	bool		result = false;
 	void		(*del)(int), (*quit)(int);
-	int	  pid;
+	int		 pid;
 
 	{
 		CLog	log;
@@ -548,7 +547,7 @@ bool	CVideoConverter::VideoConvert(int dstIndex, char **argv)
 		}
 
 		{
-			int  ret;
+			int	 ret;
 			setpriority(PRIO_PROCESS, getpid(), 5);
 			ret = getpriority(PRIO_PROCESS, getpid());
 			if((ret > -20) and (ret < 19))
@@ -632,7 +631,7 @@ bool	CVideoConverter::VideoConvert(int dstIndex, char **argv)
 		CLog	log;
 		log.Write(DEBUG, "CVideoConverter::" + string(__func__) + "[" + to_string(__LINE__) + "]: finish (result = " + to_string(result) + ")");
 	}
-	return result;  
+	return result;	
 }
 
 

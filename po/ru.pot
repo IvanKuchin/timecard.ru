@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-29 15:38-0500\n"
+"POT-Creation-Date: 2020-02-03 21:31-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -813,6 +813,9 @@ msgstr "ошибка отправки командировки"
 msgid "fail to submit timecard"
 msgstr "ошибка отправки таймкарты"
 
+msgid "field is empty"
+msgstr "значение не указано"
+
 msgid "file not found"
 msgstr "фаил не найден"
 
@@ -1156,7 +1159,7 @@ msgid "timecard date finish is empty"
 msgstr "не определена дата окончания таймкарты"
 
 msgid "timecard date start is empty"
-msgstr "не определена дата окончания таймкарты"
+msgstr "не определена дата начала таймкарты"
 
 msgid "timecard id is empty"
 msgstr "таймкарта не найдена"
@@ -1175,6 +1178,12 @@ msgstr "не указан ИНН"
 
 msgid "to"
 msgstr "на"
+
+msgid "token has missed"
+msgstr ""
+
+msgid "token not found"
+msgstr ""
 
 msgid "total amount"
 msgstr "на сумму"

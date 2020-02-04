@@ -113,7 +113,8 @@ class CMailLocal : public CMail
 		string		SetTemplateFile(string fileName);
 
 		// mainly usage function.
-		void		Send(string login, string templID, CVars *v, CMysql *mysql);
+		void		Send(string login, string templID, CVars *, CMysql *);
+		void		SendToEmail(string email, string login, string templID, CVars *, CMysql *);
 };
 
 #endif

@@ -39,7 +39,7 @@ string c_smsc::send_sms (string phones, string message, int translit, string tim
 
     arg =	"cost=3"
     		"&phones="s + urlencode(phones) + 
-    		(message.length() ? "&mes=" + urlencode(message) : "") + 
+    		(message.length() ? "&mes=" + urlencode(message + "\n" + gettext("Sent by") + " " + DOMAIN_NAME) : "") + 
     		"&translit=" + to_string(translit) + 
     		"&id=" + to_string(id) + 
     		(format > 0 ? formats[format - 1] : "") + 

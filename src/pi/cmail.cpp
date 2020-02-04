@@ -791,11 +791,7 @@ string CMailLocal::GetUserLng()
 
 string CMailLocal::SetTemplate(string templID)
 {
-	ostringstream	ost;
-
-	ost << TEMPLATE_PATH << GetUserLng() << "/mails/" << templID << ".htmlt";
-
-	return SetTemplateFile(ost.str());
+	return SetTemplateFile(TEMPLATE_PATH + GetUserLng() + "/mails/" + templID + ".htmlt");
 }
 
 string CMailLocal::SetTemplateFile(string fileName)
@@ -815,48 +811,51 @@ string CMailLocal::SetTemplateFile(string fileName)
     return fileName;
 }
 
-void CMailLocal::Send(string login, string templID, CVars *v, CMysql *mysql)
+void CMailLocal::Send(string login, string templID, CVars *v, CMysql *db)
 {
-	string			message, to, templFileName;
-	ostringstream		ost;
-	CTemplate		templ;
-	string			trySubj;
-	string::size_type	p1;
+	string			email;
 
+	MESSAGE_DEBUG("", "", "start (" + login + ", " + templID + ")");
+
+	if(db->Query("select `email` from `users` where `login`=\"" + login + "\";") == 0)
 	{
-		CLog	log;
-		log.Write(DEBUG, "CMailLocal::" + string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_ERROR("", "", "select email from table return empty result");
+
+		throw CExceptionHTML("user mail failed");
 	}
+
+	if((email = db->Get(0, "email")).empty())
+	{
+		MESSAGE_ERROR("", "", "mail length is zero");
+
+		throw CExceptionHTML("user mail failed");
+	}
+
+	SendToEmail(email, login, templID, v, db);
+
+	MESSAGE_DEBUG("", "", "finish");
+}
+
+void CMailLocal::SendToEmail(string email, string login, string templID, CVars *v, CMysql *mysql)
+{
+	MESSAGE_DEBUG("", "", "start (" + email + ", " + login + ", " + templID + ")");
+
+	auto				message = ""s;
+	auto				trySubj = ""s;
+	CTemplate			templ;
+	string::size_type	p1;
 
 	SetDB(mysql);
 	UserLogin(login);
-	templFileName = SetTemplate(templID);
 	SetVars(v);
 
-	ost << "select `email` from `users` where `login`=\"" << GetUserLogin() << "\";";
-	if(db->Query(ost.str()) == 0)
-	{
-		CLog	log;
-		log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: select email from table return empty result");
-
-		throw CExceptionHTML("user mail failed");
-	}
-	to = db->Get(0, "email");
-	if(to.empty())
-	{
-		CLog	log;
-		log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: mail length is zero");
-
-		throw CExceptionHTML("user mail failed");
-	}
-
-	templ.SetFile(templFileName);
+	templ.SetFile(SetTemplate(templID));
 	templ.SetVars(vars);
 	message = templ.Render();
+
 	if(message.empty())
 	{
-		CLog	log;
-		log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: message length is zero");
+		MESSAGE_ERROR("", "", "message length is zero");
 
 		throw CExceptionHTML("user mail failed");
 	}
@@ -867,15 +866,12 @@ void CMailLocal::Send(string login, string templID, CVars *v, CMysql *mysql)
 		trySubj = message.substr(p1 + 8, message.find("\n") - p1 - 8);
 		message.erase(0, message.find("\n") + 1);
 	}
-	if(!CMail::Send(to, trySubj, message))
+
+	if(!CMail::Send(email, trySubj, message))
 	{
 		throw CExceptionHTML("mail error");
 	}
 
-	{
-		CLog	log;
-		log.Write(DEBUG, "CMailLocal::" + string(__func__) + "[" + to_string(__LINE__) + "]: end");
-	}
-
+	MESSAGE_DEBUG("", "", "finish");
 }
 

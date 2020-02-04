@@ -77,6 +77,25 @@ int main()
 
 	MESSAGE_DEBUG("", "", "pre-condition action = " + action);
 
+	if((action.length() > 10) && (action.compare(action.length() - 9, 9, "_template") == 0))
+	{
+		ostringstream	ost;
+		string			strPageToGet, strFriendsOnSinglePage;
+
+		MESSAGE_DEBUG("", action, "start");
+
+		{
+			string		template_name = action.substr(0, action.length() - 9) + ".htmlt";
+
+			if(!indexPage.SetTemplate(template_name))
+			{
+				MESSAGE_ERROR("", action, "can't find template " + template_name);
+			} // if(!indexPage.SetTemplate("my_network.htmlt"))
+		}
+
+		MESSAGE_DEBUG("", action, "finish");
+	}
+
 	if(action == "AJAX_changeLogin")
 	{
 		ostringstream   ostResult;
@@ -88,18 +107,7 @@ int main()
 		}
 
 		ostResult.str("");
-/*
-		if(user.GetLogin() == "Guest")
-		{
-			{
-				CLog	log;
-				log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]:action == " + action + ": re-login required");
-			}
 
-			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
-		}
-		else
-*/
 		{
 			loginFromUser = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("login"));
 
@@ -1359,448 +1367,108 @@ int main()
 		MESSAGE_DEBUG("", action, "finish");
 	}
 
-	if(action == "AJAX_addAviaBonusNumber")
+	if(action == "AJAX_changeEmail")
 	{
+
+		MESSAGE_DEBUG("", action, "start");
+
 		ostringstream	ostResult;
+		string			template_name = "json_response.htmlt";
+		string			error_message = "";
+		auto			email = CheckHTTPParam_Email(indexPage.GetVarsHandler()->Get("login"));
+
+		ostResult.str("");
+
+		if(email.length())
+		{
+			CMailLocal	mail;
+			string		token = GetRandom(20);
+
+			db.Query("DELETE FROM `email_change_tokens` WHERE `user_id`=" + quoted(user.GetID()) + ";");
+			db.Query("INSERT INTO `email_change_tokens` SET `token`=\"" + token + "\", `new_email`=\"" + email + "\", `user_id`=\"" + user.GetID() + "\", `eventTimestamp`=NOW();");
+			if(db.isError())
+			{
+				MESSAGE_ERROR("", action, "fail to insert activator for user.login(" + user.GetLogin() + ")");
+
+				ostResult.str("");
+				ostResult << "{";
+				ostResult << "\"result\": \"error\",";
+				ostResult << "\"description\": \"Ошибка БД. Мы исправим ее в течение 24 часов.\"";
+				ostResult << "}";
+			}
+			else
+			{
+				indexPage.RegisterVariableForce("login", user.GetLogin());
+				indexPage.RegisterVariableForce("name", user.GetName());
+				indexPage.RegisterVariableForce("nameLast", user.GetNameLast());
+				indexPage.RegisterVariableForce("token", token);
+				mail.SendToEmail(email, user.GetLogin(), "change_password", indexPage.GetVarsHandler(), &db);
+			}
+		}
+		else
+		{
+			error_message = gettext("email is empty");
+			MESSAGE_DEBUG("", action, error_message);
+		}
+
+		ostResult.str("");
+
+		if(error_message.empty())
+		{
+			ostResult << "{\"result\":\"success\"}";
+		}
+		else
+		{
+			MESSAGE_DEBUG("", action, "failed");
+			ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
+		}
+
+		indexPage.RegisterVariableForce("result", ostResult.str());
+
+		if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+
+		MESSAGE_DEBUG("", action, "finish");
+	}
+
+	if(action == "AJAX_activateEmailChangeToken")
+	{
+
+		MESSAGE_DEBUG("", action, "start");
+
+		ostringstream	ostResult;
+		auto			template_name = "json_response.htmlt"s;
+		auto			error_message = ""s;
 		auto			success_message = ""s;
-
-		MESSAGE_DEBUG("", action, "start");
-
-		ostResult.str("");
-		{
-			string			template_name = "json_response.htmlt";
-			string			error_message = "";
-			auto			program_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("program_id"));
-			auto			number = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("number"));
-
-			if(program_id.length() && number.length())
-			{
-				if(db.Query("SELECT `id` FROM `user_bonuses_avia` WHERE `user_id`=\"" + user.GetID() + "\" AND `airline_id`=\"" + program_id + "\";"))
-				{
-					error_message = gettext("already exists");
-					MESSAGE_DEBUG("", action, error_message);
-				}
-				else
-				{
-					auto new_id = db.InsertQuery("INSERT INTO `user_bonuses_avia` (`user_id`, `airline_id`, `number`, `eventTimestamp`) VALUES "
-													"("
-														"\"" + user.GetID() + "\","
-														"\"" + program_id + "\","
-														"\"" + number + "\","
-														"UNIX_TIMESTAMP()"
-													");");
-					if(new_id)
-					{
-						success_message = ",\"bonuses_airlines\":[" + GetUserBonusesAirlinesInJSONFormat("SELECT * FROM `user_bonuses_avia` WHERE `user_id`=\"" + user.GetID() + "\";", &db, &user) + "]";
-					}
-					else
-					{
-						error_message = gettext("SQL syntax error");
-						MESSAGE_ERROR("", "", error_message);
-					}
-				}
-			}
-			else
-			{
-				error_message = gettext("mandatory parameter missed");
-				MESSAGE_DEBUG("", action, error_message);
-			}
-
-			if(error_message.empty())
-			{
-				ostResult << "{\"result\":\"success\"" + success_message + "}";
-			}
-			else
-			{
-				MESSAGE_DEBUG("", action, "failed");
-				ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
-			}
-
-			indexPage.RegisterVariableForce("result", ostResult.str());
-
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
-		}
-
-		MESSAGE_DEBUG("", action, "finish");
-	}
-
-	if(action == "AJAX_addRailroadBonusNumber")
-	{
-		ostringstream	ostResult;
-		auto			success_message = ""s;
-
-		MESSAGE_DEBUG("", action, "start");
-
-		ostResult.str("");
-		{
-			string			template_name = "json_response.htmlt";
-			string			error_message = "";
-			auto			program_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("program_id"));
-			auto			number = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("number"));
-
-			if(program_id.length() && number.length())
-			{
-				if(db.Query("SELECT `id` FROM `user_bonuses_railroads` WHERE `user_id`=\"" + user.GetID() + "\" AND `railroad_id`=\"" + program_id + "\";"))
-				{
-					error_message = gettext("already exists");
-					MESSAGE_DEBUG("", action, error_message);
-				}
-				else
-				{
-					auto new_id = db.InsertQuery("INSERT INTO `user_bonuses_railroads` (`user_id`, `railroad_id`, `number`, `eventTimestamp`) VALUES "
-													"("
-														"\"" + user.GetID() + "\","
-														"\"" + program_id + "\","
-														"\"" + number + "\","
-														"UNIX_TIMESTAMP()"
-													");");
-					if(new_id)
-					{
-						success_message = ",\"bonuses_railroads\":[" + GetUserBonusesRailroadsInJSONFormat("SELECT * FROM `user_bonuses_railroads` WHERE `user_id`=\"" + user.GetID() + "\";", &db, &user) + "]";
-					}
-					else
-					{
-						error_message = gettext("SQL syntax error");
-						MESSAGE_ERROR("", "", error_message);
-					}
-				}
-			}
-			else
-			{
-				error_message = gettext("mandatory parameter missed");
-				MESSAGE_DEBUG("", action, error_message);
-			}
-
-			if(error_message.empty())
-			{
-				ostResult << "{\"result\":\"success\"" + success_message + "}";
-			}
-			else
-			{
-				MESSAGE_DEBUG("", action, "failed");
-				ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
-			}
-
-			indexPage.RegisterVariableForce("result", ostResult.str());
-
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
-		}
-
-		MESSAGE_DEBUG("", action, "finish");
-	}
-
-	if(action == "AJAX_addHotelchainBonusNumber")
-	{
-		ostringstream	ostResult;
-		auto			success_message = ""s;
-
-		MESSAGE_DEBUG("", action, "start");
-
-		ostResult.str("");
-		{
-			string			template_name = "json_response.htmlt";
-			string			error_message = "";
-			auto			program_id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("program_id"));
-			auto			number = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("number"));
-
-			if(program_id.length() && number.length())
-			{
-				if(db.Query("SELECT `id` FROM `user_bonuses_hotels` WHERE `user_id`=\"" + user.GetID() + "\" AND `hotel_chain_id`=\"" + program_id + "\";"))
-				{
-					error_message = gettext("already exists");
-					MESSAGE_DEBUG("", action, error_message);
-				}
-				else
-				{
-					auto new_id = db.InsertQuery("INSERT INTO `user_bonuses_hotels` (`user_id`, `hotel_chain_id`, `number`, `eventTimestamp`) VALUES "
-													"("
-														"\"" + user.GetID() + "\","
-														"\"" + program_id + "\","
-														"\"" + number + "\","
-														"UNIX_TIMESTAMP()"
-													");");
-					if(new_id)
-					{
-						success_message = ",\"bonuses_hotel_chains\":[" + GetUserBonusesHotelchainsInJSONFormat("SELECT * FROM `user_bonuses_hotels` WHERE `user_id`=\"" + user.GetID() + "\";", &db, &user) + "]";
-					}
-					else
-					{
-						error_message = gettext("SQL syntax error");
-						MESSAGE_ERROR("", "", error_message);
-					}
-				}
-			}
-			else
-			{
-				error_message = gettext("mandatory parameter missed");
-				MESSAGE_DEBUG("", action, error_message);
-			}
-
-			if(error_message.empty())
-			{
-				ostResult << "{\"result\":\"success\"" + success_message + "}";
-			}
-			else
-			{
-				MESSAGE_DEBUG("", action, "failed");
-				ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
-			}
-
-			indexPage.RegisterVariableForce("result", ostResult.str());
-
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
-		}
-
-		MESSAGE_DEBUG("", action, "finish");
-	}
-
-	if(action == "AJAX_deleteAirlineBonusNumber")
-	{
-
-		MESSAGE_DEBUG("", action, "start");
-
-		ostringstream	ostResult;
-		string			template_name = "json_response.htmlt";
-		string			error_message = "";
-		auto			id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
+		auto			token = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("token"));
 
 		ostResult.str("");
 
-		if(id.length())
+		if(token.length())
 		{
-			db.Query("DELETE FROM `user_bonuses_avia` WHERE `user_id`=\"" + user.GetID() + "\" AND `id`=\"" + id + "\";");
-		}
-		else
-		{
-			error_message = gettext("mandatory parameter missed");
-			MESSAGE_DEBUG("", action, error_message);
-		}
-
-		if(error_message.empty())
-		{
-			ostResult << "{\"result\":\"success\"}";
-		}
-		else
-		{
-			MESSAGE_DEBUG("", action, "failed");
-			ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
-		}
-
-		indexPage.RegisterVariableForce("result", ostResult.str());
-
-		if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
-
-		MESSAGE_DEBUG("", action, "finish");
-	}
-
-	if(action == "AJAX_deleteRailroadBonusNumber")
-	{
-
-		MESSAGE_DEBUG("", action, "start");
-
-		ostringstream	ostResult;
-		string			template_name = "json_response.htmlt";
-		string			error_message = "";
-		auto			id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
-
-		ostResult.str("");
-
-		if(id.length())
-		{
-			db.Query("DELETE FROM `user_bonuses_railroads` WHERE `user_id`=\"" + user.GetID() + "\" AND `id`=\"" + id + "\";");
-		}
-		else
-		{
-			error_message = gettext("mandatory parameter missed");
-			MESSAGE_DEBUG("", action, error_message);
-		}
-
-		if(error_message.empty())
-		{
-			ostResult << "{\"result\":\"success\"}";
-		}
-		else
-		{
-			MESSAGE_DEBUG("", action, "failed");
-			ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
-		}
-
-		indexPage.RegisterVariableForce("result", ostResult.str());
-
-		if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
-
-		MESSAGE_DEBUG("", action, "finish");
-	}
-
-	if(action == "AJAX_deleteHotelchainBonusNumber")
-	{
-
-		MESSAGE_DEBUG("", action, "start");
-
-		ostringstream	ostResult;
-		string			template_name = "json_response.htmlt";
-		string			error_message = "";
-		auto			id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
-
-		ostResult.str("");
-
-		if(id.length())
-		{
-			db.Query("DELETE FROM `user_bonuses_hotels` WHERE `user_id`=\"" + user.GetID() + "\" AND `id`=\"" + id + "\";");
-		}
-		else
-		{
-			error_message = gettext("mandatory parameter missed");
-			MESSAGE_DEBUG("", action, error_message);
-		}
-
-		if(error_message.empty())
-		{
-			ostResult << "{\"result\":\"success\"}";
-		}
-		else
-		{
-			MESSAGE_DEBUG("", action, "failed");
-			ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
-		}
-
-		indexPage.RegisterVariableForce("result", ostResult.str());
-
-		if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
-
-		MESSAGE_DEBUG("", action, "finish");
-	}
-
-	if(action == "AJAX_updateRailroadBonusNumber")
-	{
-
-		MESSAGE_DEBUG("", action, "start");
-
-		ostringstream	ostResult;
-		string			template_name = "json_response.htmlt";
-		string			error_message = "";
-		auto			id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
-		auto			value = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("value"));
-
-		ostResult.str("");
-
-		if(id.length())
-		{
-			if(id.length())
+			if(db.Query("SELECT * FROM `email_change_tokens` WHERE `token`=" + quoted(token) + " AND `user_id`=" + quoted(user.GetID()) + ";"))
 			{
-				db.Query("UPDATE `user_bonuses_railroads` SET `number`=\"" + value + "\" WHERE `user_id`=\"" + user.GetID() + "\" AND `id`=\"" + id + "\";");
+				auto	new_email = db.Get(0, "new_email");
+
+				success_message = ", \"email\": "s + quoted(new_email);
+
+				db.Query("UPDATE `users` SET `email`=" + quoted(new_email) + " WHERE `id`=" + quoted(user.GetID()) + ";");
+				db.Query("DELETE FROM `email_change_tokens` WHERE `user_id`=" + quoted(user.GetID()) + ";");
 			}
 			else
 			{
-				error_message = gettext("mandatory parameter missed");
+				error_message = gettext("token not found");
 				MESSAGE_DEBUG("", action, error_message);
 			}
 		}
 		else
 		{
-			error_message = gettext("mandatory parameter missed");
+			error_message = gettext("token has missed");
 			MESSAGE_DEBUG("", action, error_message);
 		}
 
 		if(error_message.empty())
 		{
-			ostResult << "{\"result\":\"success\"}";
-		}
-		else
-		{
-			MESSAGE_DEBUG("", action, "failed");
-			ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
-		}
-
-		indexPage.RegisterVariableForce("result", ostResult.str());
-
-		if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
-
-		MESSAGE_DEBUG("", action, "finish");
-	}
-
-	if(action == "AJAX_updateAirlineBonusNumber")
-	{
-
-		MESSAGE_DEBUG("", action, "start");
-
-		ostringstream	ostResult;
-		string			template_name = "json_response.htmlt";
-		string			error_message = "";
-		auto			id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
-		auto			value = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("value"));
-
-		ostResult.str("");
-
-		if(id.length())
-		{
-			if(id.length())
-			{
-				db.Query("UPDATE `user_bonuses_avia` SET `number`=\"" + value + "\" WHERE `user_id`=\"" + user.GetID() + "\" AND `id`=\"" + id + "\";");
-			}
-			else
-			{
-				error_message = gettext("mandatory parameter missed");
-				MESSAGE_DEBUG("", action, error_message);
-			}
-		}
-		else
-		{
-			error_message = gettext("mandatory parameter missed");
-			MESSAGE_DEBUG("", action, error_message);
-		}
-
-		if(error_message.empty())
-		{
-			ostResult << "{\"result\":\"success\"}";
-		}
-		else
-		{
-			MESSAGE_DEBUG("", action, "failed");
-			ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
-		}
-
-		indexPage.RegisterVariableForce("result", ostResult.str());
-
-		if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
-
-		MESSAGE_DEBUG("", action, "finish");
-	}
-
-	if(action == "AJAX_updateHotelchainBonusNumber")
-	{
-
-		MESSAGE_DEBUG("", action, "start");
-
-		ostringstream	ostResult;
-		string			template_name = "json_response.htmlt";
-		string			error_message = "";
-		auto			id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
-		auto			value = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("value"));
-
-		ostResult.str("");
-
-		if(id.length())
-		{
-			if(id.length())
-			{
-				db.Query("UPDATE `user_bonuses_hotels` SET `number`=\"" + value + "\" WHERE `user_id`=\"" + user.GetID() + "\" AND `id`=\"" + id + "\";");
-			}
-			else
-			{
-				error_message = gettext("mandatory parameter missed");
-				MESSAGE_DEBUG("", action, error_message);
-			}
-		}
-		else
-		{
-			error_message = gettext("mandatory parameter missed");
-			MESSAGE_DEBUG("", action, error_message);
-		}
-
-		if(error_message.empty())
-		{
-			ostResult << "{\"result\":\"success\"}";
+			ostResult << "{\"result\":\"success\"" << success_message << "}";
 		}
 		else
 		{
