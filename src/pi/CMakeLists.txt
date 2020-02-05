@@ -4,6 +4,7 @@ set(EXECUTABLE_CGIs
     avataruploader.cgi
     generalimageuploader.cgi
     imageuploader.cgi
+    noauth.cgi
     )
 
 # --- Libraries

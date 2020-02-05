@@ -97,6 +97,7 @@ auto      		GetUserBonusesAirlinesInJSONFormat(string dbQuery, CMysql *, CUser *
 auto      		GetUserBonusesRailroadsInJSONFormat(string dbQuery, CMysql *, CUser *) -> string;
 auto      		GetUserBonusesHotelchainsInJSONFormat(string dbQuery, CMysql *, CUser *) -> string;
 auto			GetBonuseProgramsInJSONFormat(string dbQuery, CMysql *db, CUser *user) -> string;
+auto      		GetGeoCountryListInJSONFormat(string dbQuery, CMysql *, CUser *) -> string;
 auto      		GetGroupListInJSONFormat(string dbQuery, CMysql *, CUser *) -> string;
 auto 			GetBookListInJSONFormat(string dbQuery, CMysql *, bool includeReaders = false) -> string;
 auto 			GetComplainListInJSONFormat(string dbQuery, CMysql *, bool includeReaders = false) -> string;

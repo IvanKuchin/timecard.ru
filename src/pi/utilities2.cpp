@@ -3202,3 +3202,47 @@ bool RmDirRecursive(const char *dirname)
 	return true;
 }
 
+auto	GetGeoCountryListInJSONFormat(string dbQuery, CMysql *db, CUser *user) -> string
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	struct ItemClass
+	{
+		string	id;
+		string	title;
+	};
+	vector<ItemClass>		itemsList;
+	auto					affected = db->Query(dbQuery);
+	auto					result = ""s;
+
+	if(affected)
+	{
+		for(int i = 0; i < affected; i++)
+		{
+			ItemClass	item;
+
+			item.id = db->Get(i, "id");
+			item.title = db->Get(i, "title");
+
+			itemsList.push_back(item);
+		}
+
+		for (const auto& item : itemsList)
+		{
+			if(result.length()) result += ",";
+			result +=	"{";
+
+			result += "\"id\":\"" + item.id + "\",";
+			result += "\"title\":\"" + item.title + "\"";
+			result +=	"}";
+		}
+	}
+	else
+	{
+		MESSAGE_DEBUG("", "", "country list is empty");
+	}
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return result;
+}
