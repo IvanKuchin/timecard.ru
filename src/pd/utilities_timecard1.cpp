@@ -501,7 +501,7 @@ string GetNewsFeedInJSONFormat(string whereStatement, int currPage, int newsOnSi
 				}
 			}
 			else if((feedActionTypeId == "64") || (feedActionTypeId == "65"))
-			{
+			{/*
 				// --- group created / subscribed
 				string  groupID = feedActionId;
 
@@ -549,7 +549,7 @@ string GetNewsFeedInJSONFormat(string whereStatement, int currPage, int newsOnSi
 					CLog	log;
 					log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: `group`.`id` [" + groupID + "] is empty");
 				}
-			}
+			*/}
 			else if(feedActionTypeId == "63")
 			{
 				// --- group created / subscribed
@@ -2438,7 +2438,7 @@ string  GetUserNotificationSpecificDataByType(unsigned long typeID, unsigned lon
 
 	// --- gift thank notification
 	if(typeID == 66)
-	{
+	{/*
 		string   giftThankID = to_string(actionID);
 
 		if(giftThankID.length() && db->Query("select * from `gift_thanks` where `id`='" + giftThankID + "';"))
@@ -2473,11 +2473,11 @@ string  GetUserNotificationSpecificDataByType(unsigned long typeID, unsigned lon
 			CLog log;
 			log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR:typeID=" + to_string(typeID) + ": ERROR selecting from gift_thanks[id = " + giftThankID + "]");
 		}
-	}
+	*/}
 
 	// --- Vacancy Rejected
 	if(typeID == 59)
-	{
+	{/*
 		string   company_candidates_id = to_string(actionID);
 
 		if(company_candidates_id.length() && db->Query("select * from `company_candidates` where `id`='" + company_candidates_id + "';"))
@@ -2505,7 +2505,7 @@ string  GetUserNotificationSpecificDataByType(unsigned long typeID, unsigned lon
 			CLog log;
 			log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR:typeID=" + to_string(typeID) + ": ERROR selecting from company_candidates[id = " + company_candidates_id + "]");
 		}
-	}
+	*/}
 
 	// --- Company Posession Request
 	if(typeID == 60)
@@ -2579,7 +2579,7 @@ string  GetUserNotificationSpecificDataByType(unsigned long typeID, unsigned lon
 	// --- 68 - Event guest added
 	// --- 69 - Guest accepted
 	if((typeID == 67) || (typeID == 68) || (typeID == 69))
-	{
+	{/*
 		string		event_host_id = to_string(actionID);
 		string		host_guest_sql;
 
@@ -2633,11 +2633,11 @@ string  GetUserNotificationSpecificDataByType(unsigned long typeID, unsigned lon
 			CLog log;
 			log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR:typeID=" + to_string(typeID) + ": ERROR selecting from event_hosts/event_guests[id = " + event_host_id + "]");
 		}
-	}
+	*/}
 
 	// --- 70 - 1 day notification about start
 	if(typeID == 70)
-	{
+	{/*
 		string		event_id = to_string(actionID);
 
 		if(event_id.length() && db->Query("SELECT * FROM `events` WHERE `id`=\"" + event_id + "\";"))
@@ -2668,7 +2668,7 @@ string  GetUserNotificationSpecificDataByType(unsigned long typeID, unsigned lon
 			log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR:typeID=" + to_string(typeID) + ": ERROR selecting from event[id = " + event_id + "]");
 		}
 
-	}
+	*/}
 
 	if(typeID == NOTIFICATION_GENERAL_FROM_USER)
 	{

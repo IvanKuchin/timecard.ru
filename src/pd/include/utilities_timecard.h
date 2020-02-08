@@ -12,6 +12,22 @@
 // --- timecard functions
 auto	 		CheckHTTPParam_Timeentry(const string &srcText) -> string;
 
+auto      		GetUserListInJSONFormat(string dbQuery, CMysql *, CUser *) -> string;
+auto      		GetUserBonusesAirlinesInJSONFormat(string dbQuery, CMysql *, CUser *) -> string;
+auto      		GetUserBonusesRailroadsInJSONFormat(string dbQuery, CMysql *, CUser *) -> string;
+auto      		GetUserBonusesHotelchainsInJSONFormat(string dbQuery, CMysql *, CUser *) -> string;
+auto			GetBonuseProgramsInJSONFormat(string dbQuery, CMysql *db, CUser *user) -> string;
+auto      		GetMessageImageList(string imageSetID, CMysql *) -> string;
+auto      		GetMessageLikesUsersList(string messageID, CUser *, CMysql *) -> string;
+auto 			GetCertificationLikesUsersList(string usersCertificationID, CUser *, CMysql *) -> string;
+auto 			GetCourseLikesUsersList(string usersCourseID, CUser *, CMysql *) -> string;
+auto 			GetUniversityDegreeLikesUsersList(string messageID, CUser *, CMysql *) -> string;
+auto 			GetCompanyLikesUsersList(string usersCompanyID, CUser *, CMysql *) -> string;
+auto 			GetLanguageLikesUsersList(string usersLanguageID, CUser *, CMysql *) -> string;
+auto 			GetBookLikesUsersList(string usersBookID, CUser *, CMysql *) -> string;
+auto 			GetBookRatingUsersList(string bookID, CUser *, CMysql *) -> string;
+
+
 auto 			GetNewsFeedInJSONFormat(string whereStatement, int currPage, int newsOnSinglePage, CUser *, CMysql *) -> string;
 // auto      		GetCompanyListInJSONFormat(string dbQuery, CMysql *, CUser *, bool quickSearch = true, bool includeEmployedUsersList = false) -> string;
 auto      		GetCompanyListInJSONFormat(string dbQuery, CMysql *, CUser *, bool quickSearch, bool includeEmployedUsersList) -> string;
@@ -192,7 +208,5 @@ auto			CheckAgreementSoWTitle(string title, string sow_id, CMysql *, CUser *) ->
 auto			GetDashboardPaymentData(string sow_sql, CMysql *, CUser *) -> string;
 auto			GetTimecardList(string where_companies_list, CMysql *, CUser *) -> string;
 auto			isTimePeriodInsideSow(string sow_id, string period_start, string period_end, CMysql *, CUser *) -> string; 
-
-auto			isDemoDomain() -> bool;
 
 #endif

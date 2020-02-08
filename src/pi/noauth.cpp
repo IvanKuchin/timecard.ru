@@ -1,19 +1,5 @@
 #include "noauth.h"
 
-static auto RemovePhoneConfirmationCodes(string sessid, CMysql *db)
-{
-	auto	error_message = ""s;
-
-	MESSAGE_DEBUG("", "", "start");
-
-	db->Query("DELETE FROM `phone_confirmation` WHERE `session`=\"" + sessid + "\";");
-
-	MESSAGE_DEBUG("", "", "finish");
-
-	return error_message;
-}
-
-
 int main()
 {
 	CStatistics		appStat;  // --- CStatistics must be firts statement to measure end2end param's
@@ -106,46 +92,32 @@ int main()
 
 		MESSAGE_DEBUG("", action, "finish");
 	}
-
+/*
 	if(action == "AJAX_sendPhoneConfirmationSMS")
 	{
 		auto			error_message = ""s;
 
+		auto			country_code = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("country_code"));
+		auto			phone_number = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("phone_number"));
+
+		MESSAGE_DEBUG("", action, "start");
+
+		if(country_code.length() && phone_number.length())
 		{
-			auto			country_code = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("country_code"));
-			auto			phone_number = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("phone_number"));
-			auto			confirmation_code = GetRandom(4);
-			c_smsc			smsc(&db);
-
-			MESSAGE_DEBUG("", action, "start");
-
-			if(country_code.length() && phone_number.length())
+			if(GetValueFromDB("SELECT `id` FROM `users` WHERE `country_code`=" + quoted(country_code) + " AND `phone`=" + quoted(phone_number) + ";", &db).length())
 			{
-				auto	phone_confirmation_id = db.InsertQuery("INSERT INTO `phone_confirmation` (`session`, `confirmation_code`, `country_code`, `phone_number`, `eventTimestamp`)"
-								" VALUES ("
-								"\"" + indexPage.SessID_Get_FromHTTP() + "\","
-								"\"" + confirmation_code + "\","
-								"\"" + country_code + "\","
-								"\"" + phone_number + "\","
-								"UNIX_TIMESTAMP()"
-								")"
-								);
-
-				if(phone_confirmation_id)
-				{
-					auto	ret = smsc.send_sms(country_code + phone_number, "Код для привязки телефона " + confirmation_code, 0, "", 0, 0, DOMAIN_NAME, "", "");
-				}
-				else
-				{
-					MESSAGE_ERROR("", action, "fail to insert to db");
-					error_message = gettext("SQL syntax error");
-				}
+				error_message = SendPhoneConfirmationCode(country_code, phone_number, indexPage.SessID_Get_FromHTTP(), &db, &user);
 			}
 			else
 			{
-				error_message = gettext("phone number is incorrect");
-				MESSAGE_ERROR("", action, "country_code(" + country_code + ") or phone_number(" + phone_number + ") is empty");
+				error_message = gettext("phone not registered");
+				MESSAGE_DEBUG("", action, error_message);
 			}
+		}
+		else
+		{
+			error_message = gettext("phone number is incorrect");
+			MESSAGE_ERROR("", action, "country_code(" + country_code + ") or phone_number(" + phone_number + ") is empty");
 		}
 
 		AJAX_ResponseTemplate(&indexPage, "", error_message);
@@ -155,92 +127,16 @@ int main()
 
 	if(action == "AJAX_checkPhoneConfirmationCode")
 	{
-		auto			template_file = "json_response.htmlt"s;
-		auto			error_message = ""s;
-		auto			extra_fields = ""s;
-		ostringstream   ostResult;
+		MESSAGE_DEBUG("", action, "start");
 
-		{
-			auto			confirmation_code = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("confirmation_code"));
+		auto	confirmation_code = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("confirmation_code"));
+		auto	error_message = CheckPhoneConfirmationCode(confirmation_code, indexPage.SessID_Get_FromHTTP(), &db, &user);
 
-			MESSAGE_DEBUG("", action, "start");
-
-			if(db.Query("SELECT * FROM `phone_confirmation` WHERE "
-							"`confirmation_code`=\"" + confirmation_code + "\" AND "
-							"`session`=\"" + indexPage.SessID_Get_FromHTTP() + "\" AND "
-							"`attempt`<=\"3\" AND "
-							"`eventTimestamp`>=(UNIX_TIMESTAMP() - " + to_string(SMSC_EXPIRATION) + ")"
-							";"))
-			{
-				auto	country_code = db.Get(0, "country_code");
-				auto	phone_number = db.Get(0, "phone_number");
-
-				db.Query("UPDATE `users` SET `country_code`=\"" + country_code + "\", `phone`=\"" + phone_number + "\" , `is_phone_confirmed`=\"Y\" WHERE `id`=\"" + user.GetID() + "\";");
-				if(db.isError())
-				{
-					MESSAGE_ERROR("", action, "fail to update db");
-					error_message = gettext("SQL syntax error");
-				}
-				else
-				{
-					RemovePhoneConfirmationCodes(indexPage.SessID_Get_FromHTTP(), &db);
-				}
-			}
-			else
-			{
-				db.Query("UPDATE `phone_confirmation` SET `attempt`=`attempt` + 1 WHERE"
-							"`session`=\"" + indexPage.SessID_Get_FromHTTP() + "\" AND "
-							"`eventTimestamp`>=(UNIX_TIMESTAMP() - " + to_string(SMSC_EXPIRATION) + ")"
-							);
-
-				if(db.Query("SELECT `attempt` FROM `phone_confirmation` WHERE "
-								"`session`=\"" + indexPage.SessID_Get_FromHTTP() + "\" AND "
-								"`eventTimestamp`>=(UNIX_TIMESTAMP() - " + to_string(SMSC_EXPIRATION) + ")"
-								";"))
-				{
-					auto	attempts = db.Get(0, "attempt");
-
-					if(stoi(attempts) >= 3) RemovePhoneConfirmationCodes(indexPage.SessID_Get_FromHTTP(), &db);
-					extra_fields = "\"attempt\":\"" + attempts + "\",";
-				}
-				else
-				{
-					MESSAGE_ERROR("", "", "fail to select data");
-				}
-				error_message = gettext("incorrect confirmation code");
-				MESSAGE_ERROR("", action, "incorrect confirmation code");
-			}
-		}
-
-		ostResult.str("");
-		if(error_message.empty())
-		{
-			ostResult << "{" 
-					  << "\"result\":\"success\""
-					  << "}";
-		}
-		else
-		{
-			MESSAGE_ERROR("", action, "fail to send phone confirmation sms");
-
-			ostResult << "{" 
-					  << "\"result\":\"error\","
-					  << extra_fields
-					  << "\"description\":\"" + error_message + "\""
-					  << "}";
-		}
-
-		indexPage.RegisterVariableForce("result", ostResult.str());
-
-		if(!indexPage.SetTemplate(template_file))
-		{
-			MESSAGE_ERROR("", action, "template file " + template_file + " was missing");
-			throw CException("Template file " + template_file + " was missing");
-		}
+		AJAX_ResponseTemplate(&indexPage, "", error_message);
 
 		MESSAGE_DEBUG("", action, "finish");
 	}
-
+*/
 	MESSAGE_DEBUG("", action, "finish condition")
 
 	indexPage.OutTemplate();

@@ -6,8 +6,9 @@ string	CleanUPData(CMysql *db)
 
 	MESSAGE_DEBUG("", "", "start");
 	
-	db->Query("DELETE FROM `captcha` WHERE `timestamp`<=(NOW()-INTERVAL " + to_string(SESSION_LEN) + " MINUTE)");
-	db->Query("DELETE FROM `sessions` WHERE `time`<=(NOW()-INTERVAL `expire` SECOND) AND `expire`>'0'");
+	db->Query("DELETE FROM `captcha` WHERE `timestamp`<=(NOW()-INTERVAL " + to_string(SESSION_LEN) + " MINUTE);");
+	db->Query("DELETE FROM `sessions` WHERE `time`<=(NOW()-INTERVAL `expire` SECOND) AND `expire`>'0';");
+	db->Query("DELETE FROM `phone_confirmation` WHERE `eventTimestamp`>=(UNIX_TIMESTAMP() - " + to_string(SMSC_EXPIRATION) + ");");
 
 	MESSAGE_DEBUG("", "", "finish (error_message.length = " + to_string(error_message.length()) + ")");
 

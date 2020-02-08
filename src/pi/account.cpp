@@ -1304,6 +1304,74 @@ int main()
 		MESSAGE_DEBUG("", action, "finish");
 	}
 
+	if(action == "AJAX_sendPhoneConfirmationSMS")
+	{
+		auto			error_message = ""s;
+
+		auto			country_code = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("country_code"));
+		auto			phone_number = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("phone_number"));
+
+		MESSAGE_DEBUG("", action, "start");
+
+		if(country_code.length() && phone_number.length())
+		{
+			error_message = SendPhoneConfirmationCode(country_code, phone_number, indexPage.SessID_Get_FromHTTP(), &db, &user);
+		}
+		else
+		{
+			error_message = gettext("phone number is incorrect");
+			MESSAGE_ERROR("", action, "country_code(" + country_code + ") or phone_number(" + phone_number + ") is empty");
+		}
+
+		AJAX_ResponseTemplate(&indexPage, "", error_message);
+
+		MESSAGE_DEBUG("", action, "finish");
+	}
+
+	if(action == "AJAX_confirmPhoneNumber")
+	{
+		MESSAGE_DEBUG("", action, "start");
+
+		auto	confirmation_code = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("confirmation_code"));
+		vector<pair<string, string>>	error_message;
+
+		if(db.Query("SELECT * FROM `phone_confirmation` WHERE `session`=\"" + indexPage.SessID_Get_FromHTTP() + "\";"))
+		{
+			auto	country_code = db.Get(0, "country_code");
+			auto	phone_number = db.Get(0, "phone_number");
+
+			error_message = CheckPhoneConfirmationCode(confirmation_code, indexPage.SessID_Get_FromHTTP(), &db, &user);
+
+			if(error_message.size() == 0)
+			{
+				db.Query("UPDATE `users` SET `country_code`=\"" + country_code + "\", `phone`=\"" + phone_number + "\" , `is_phone_confirmed`=\"Y\" WHERE `id`=\"" + user.GetID() + "\";");
+				if(db.isError())
+				{
+					error_message.push_back(make_pair("description", gettext("SQL syntax error")));
+					MESSAGE_ERROR("", "", error_message[0].second);
+				}
+				else
+				{
+					// --- good2go
+				}
+			}
+			else
+			{
+				MESSAGE_DEBUG("", action, "don't update phone number");
+			}
+		}
+		else
+		{
+			error_message.push_back(make_pair("description", gettext("SQL syntax error")));
+			MESSAGE_ERROR("", "", error_message[0].second);
+		}
+
+		AJAX_ResponseTemplate(&indexPage, "", error_message);
+
+		MESSAGE_DEBUG("", action, "finish");
+	}
+
+	// --- helpdesk
 	if(action == "AJAX_updateHelpdeskSMSSubscription")
 	{
 		MESSAGE_DEBUG("", action, "start");

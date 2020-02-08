@@ -4948,35 +4948,27 @@ int main()
 
 		if(action == "AJAX_loginUser")
 		{
-			string		login, password, lng, sessid, rememberMe;
-			CUser		user;
-			ostringstream	ost1, ostResult;
+			MESSAGE_DEBUG("", action, "start");
 
-			{
-				
-				MESSAGE_DEBUG("", action, "start");
-			}
+			vector<pair<string, string>>	error_message;
+			auto							success_message = ""s;
+			auto							sessid = indexPage.GetCookie("sessid");
 
-			sessid = indexPage.GetCookie("sessid");
 			if(sessid.length() < 5)
 			{
-				
 				MESSAGE_DEBUG("", action, "with session id derived FROM cookies");
 
-				ostResult.str("");
-				ostResult << "{";
-				ostResult << "\"result\": \"error\",";
-				ostResult << "\"description\": \"session ID derived FROM cookie is wrong\",";
-				ostResult << "\"type\": \"redirect\",";
-				ostResult << "\"url\": \"/login?rand=" << GetRandom(10) << "\"";
-				ostResult << "}";
+				error_message.push_back(make_pair("description", "session ID derived FROM cookie is wrong"));
+				error_message.push_back(make_pair("type", "redirect"));
+				error_message.push_back(make_pair("url", "/login?rand=" + GetRandom(10) + ""));
 			}
 			else
 			{
-				login		= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("login"));
-				password	= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("password"));
-				rememberMe	= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("remember"));
-				lng			= CheckHTTPParam_Text(indexPage.GetLanguage());
+				auto	login		= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("login"));
+				auto	password	= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("password"));
+				auto	rememberMe	= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("remember"));
+				auto	lng			= CheckHTTPParam_Text(indexPage.GetLanguage());
+				CUser	user;
 
 				user.SetDB(&db);
 
@@ -4989,13 +4981,8 @@ int main()
 
 					if(!user.isActive())
 					{
+						error_message.push_back(make_pair("description", "пользователь неактивирован, необходима активация"));
 						MESSAGE_ERROR("", action, "user [" + user.GetLogin() + "] not activated");
-
-						ostResult.str("");
-						ostResult << "{"
-									"\"result\": \"error\","
-									"\"description\": \"пользователь неактивирован, необходима активация\""
-									"}";
 					}
 					else
 					{
@@ -5004,24 +4991,14 @@ int main()
 							if(db.Query("SELECT * FROM `users_passwd` WHERE `userID`=\"" + user.GetID() + "\" and `passwd`=\"" + password + "\";"))
 							{
 								// --- earlier password is user for user login
+								error_message.push_back(make_pair("description", "этот пароль был изменен " + GetHumanReadableTimeDifferenceFromNow(db.Get(0, "eventTimestamp"))));
 								MESSAGE_DEBUG("", action, "old password has been used for user [" + user.GetLogin() + "] login");
-
-								ostResult.str("");
-								ostResult << "{";
-								ostResult << "\"result\": \"error\",";
-								ostResult << "\"description\": \"этот пароль был изменен " << GetHumanReadableTimeDifferenceFromNow(db.Get(0, "eventTimestamp")) << "\"";
-								ostResult << "}";
 							}
 							else
 							{
 								// --- password is wrong for user
+								error_message.push_back(make_pair("description", "логин или пароль указаны не верно"));
 								MESSAGE_DEBUG("", action, "user [" + user.GetLogin() + "] failed to login due to passwd error");
-
-								ostResult.str("");
-								ostResult << "{";
-								ostResult << "\"result\": \"error\",";
-								ostResult << "\"description\": \"логин или пароль указаны не верно\"";
-								ostResult << "}";
 							}
 
 						}
@@ -5033,13 +5010,8 @@ int main()
 
 							if(db.isError())
 							{
+								error_message.push_back(make_pair("description", gettext("SQL syntax error")));
 								MESSAGE_ERROR("", action, "updating `sessions` table");
-
-								ostResult.str("");
-								ostResult << "{";
-								ostResult << "\"result\": \"error\",";
-								ostResult << "\"description\": \"ошибка БД\"";
-								ostResult << "}";
 							}
 							else
 							{
@@ -5056,40 +5028,23 @@ int main()
 
 								MESSAGE_DEBUG("", action, "redirect to \"/" + GetDefaultActionFromUserType(&user, &db) + "?rand=xxxxxx\"");
 
-								ostResult.str("");
-								ostResult << "{";
-								ostResult << "\"result\": \"success\",";
-								ostResult << "\"description\": \"\",";
-								ostResult << "\"url\": \"/" + GetDefaultActionFromUserType(&user, &db) + "?rand=" << GetRandom(10) << "\"";
-								ostResult << "}";
+								success_message = 	"\"result\": \"success\","
+													"\"description\": \"\","
+													"\"url\": \"/" + GetDefaultActionFromUserType(&user, &db) + "?rand=" + GetRandom(10) + "\"";
 							}
-						} // if(password != user.GetPasswd())
-					}  // if(!user.isActive())
+						}
+					}
 				}
 				else
 				{
+					error_message.push_back(make_pair("description", "Почта или Пароль указаны не верно."));
 					MESSAGE_DEBUG("", action, "user [" + user.GetLogin() + "] not found");
-
-					ostResult.str("");
-					ostResult << "{";
-					ostResult << "\"result\": \"error\",";
-					ostResult << "\"description\": \"Почта или Пароль указаны не верно.\"";
-					ostResult << "}";
 				}
 			} // if(sessid.length() < 5)
 
-			indexPage.RegisterVariableForce("result", ostResult.str());
+			AJAX_ResponseTemplate(&indexPage, success_message, error_message);
 
-			if(!indexPage.SetTemplate("json_response.htmlt"))
-			{
-				MESSAGE_ERROR("", action, "can't find template json_response.htmlt");
-				throw CExceptionHTML("Template file was missing");
-			}
-
-			{
-				
-				MESSAGE_DEBUG("", action, "finish");
-			}
+			MESSAGE_DEBUG("", action, "finish");
 		}
 
 		if(action == "regNewUser")

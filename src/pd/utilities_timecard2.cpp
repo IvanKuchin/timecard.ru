@@ -2372,22 +2372,6 @@ auto	CheckAgreementSoWTitle(string title, string sow_id, CMysql *db, CUser *user
 	return error_message;
 }
 
-auto isDemoDomain() -> bool
-{
-	auto	result = false;
-	string	domain_name = ""s;
-
-	MESSAGE_DEBUG("", "", "start");
-
-	if(getenv("SERVER_NAME")) domain_name = getenv("SERVER_NAME");
-
-	if(domain_name.find("demo") != string::npos) result = true;
-
-	MESSAGE_DEBUG("", "", "result (" + to_string(result) + ")");
-
-	return result;
-}
-
 auto	GetDBValueByAction(string action, string id, string sow_id, CMysql *db, CUser *user) -> string
 {
 	auto	result = ""s;

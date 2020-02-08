@@ -23,369 +23,24 @@ auto	GetSHA512(const string &src) -> string
 	return result;
 }
 
-string GetCandidatesListAppliedToVacancyInJSONFormat(string dbQuery, CMysql *db)
+auto ReplaceWstringAccordingToMap(const wstring &src, const map<wstring, wstring> &replacements) -> wstring
 {
-	string			result = "";
-	int				itemsCount;
-	ostringstream	ostResult;
+	auto	result(src);
+	auto	pos = result.find(L"1"); // --- fake find to deduct type
 
-	struct ItemClass
-	{
-		string	id;
-		string	vacancy_id;
-		string	user_id;
-		string	answer1;
-		string	answer2;
-		string	answer3;
-		string	language1;
-		string	language2;
-		string	language3;
-		string	skill1;
-		string	skill2;
-		string	skill3;
-		string	description;
-		string	status;
-		string	eventTimestamp;
-	};
-	vector<ItemClass>		itemsList;
+	MESSAGE_DEBUG("", "", "start");
 
+	for(auto &replacement : replacements)
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		pos = 0;
+
+		while((pos = result.find(replacement.first, pos)) != string::npos)
+		{
+			result.replace(pos, replacement.first.length(), replacement.second);
+		}
 	}
 
-	ostResult.str("");
-
-	itemsCount = db->Query(dbQuery);
-	for(int i = 0; i < itemsCount; ++i)
-	{
-		ItemClass	item;
-
-		item.id = db->Get(i, "id");
-		item.vacancy_id = db->Get(i, "vacancy_id");
-		item.user_id = db->Get(i, "user_id");
-		item.answer1 = db->Get(i, "answer1");
-		item.answer2 = db->Get(i, "answer2");
-		item.answer3 = db->Get(i, "answer3");
-		item.language1 = db->Get(i, "language1");
-		item.language2 = db->Get(i, "language2");
-		item.language3 = db->Get(i, "language3");
-		item.skill1 = db->Get(i, "skill1");
-		item.skill2 = db->Get(i, "skill2");
-		item.skill3 = db->Get(i, "skill3");
-		item.description = db->Get(i, "description");
-		item.status = db->Get(i, "status");
-		item.eventTimestamp = db->Get(i, "eventTimestamp");
-
-		itemsList.push_back(item);
-	}
-
-	for(int i = 0; i < itemsCount; ++i)
-	{
-		string	name = "", nameLast = "";
-
-		if(ostResult.str().length()) ostResult << ", ";
-
-		ostResult << "{"
-					  "\"id\":\"" << itemsList[i].id << "\","
-					  "\"vacancy_id\":\"" << itemsList[i].vacancy_id << "\","
-					  "\"user_id\":\"" << itemsList[i].user_id << "\","
-					  "\"user\":" << GetUserListInJSONFormat("SELECT * FROM `users` WHERE `id`=\"" + itemsList[i].user_id + "\" AND `isblocked`=\"N\";", db, NULL) << ","
-					  "\"answer1\":\"" << itemsList[i].answer1 << "\","
-					  "\"answer2\":\"" << itemsList[i].answer2 << "\","
-					  "\"answer3\":\"" << itemsList[i].answer3 << "\","
-					  "\"language1\":\"" << itemsList[i].language1 << "\","
-					  "\"language2\":\"" << itemsList[i].language2 << "\","
-					  "\"language3\":\"" << itemsList[i].language3 << "\","
-					  "\"skill1\":\"" << itemsList[i].skill1 << "\","
-					  "\"skill2\":\"" << itemsList[i].skill2 << "\","
-					  "\"skill3\":\"" << itemsList[i].skill3 << "\","
-					  "\"description\":\"" << itemsList[i].description << "\","
-					  "\"status\":\"" << itemsList[i].status << "\","
-					  "\"eventTimestamp\":\"" << itemsList[i].eventTimestamp << "\""
-					  "}";
-	}
-
-	result = ostResult.str();
-
-	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: finish (result.length() = " + to_string(result.length()) + ")");
-	}
-	return result;
-}
-
-
-// --- input:
-//		dbQuery - example "SELECT * FROM `open_vacancies`;"
-//		isAdminUser:
-//			true - candidates count will be included
-//			false - candidates count will NOT be included
-//		db - pointer to CMysql object
-//		user - pointer to user (if admin_user - return correct answers)
-string GetOpenVacanciesInJSONFormat(string dbQuery, CMysql *db, CUser *user/* = NULL*/)
-{
-	struct ItemClass
-	{
-		string id;
-		string company_id;
-		string company_position_id;
-		string geo_locality_id;
-		string salary_min;
-		string salary_max;
-		string start_month;
-		string work_format;
-		string description;
-		string question1;
-		string question2;
-		string question3;
-		string correct_answer1;
-		string correct_answer2;
-		string correct_answer3;
-		string answer11;
-		string answer12;
-		string answer13;
-		string answer21;
-		string answer22;
-		string answer23;
-		string answer31;
-		string answer32;
-		string answer33;
-		string language1_id;
-		string language2_id;
-		string language3_id;
-		string skill1_id;
-		string skill2_id;
-		string skill3_id;
-		string publish_finish;
-		string publish_period;
-	};
-
-	vector<ItemClass>		itemsList;
-	ostringstream   		ostResult;
-	string		 			result = "";
-	int						itemsCount = 0;
-
-	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
-	}
-
-	ostResult.str("");
-
-	itemsCount = db->Query(dbQuery);
-	for(int i = 0; i < itemsCount; ++i)
-	{
-		ItemClass   item;
-
-		item.id = db->Get(i, "id");
-		item.company_id = db->Get(i, "company_id");
-		item.company_position_id = db->Get(i, "company_position_id");
-		item.geo_locality_id = db->Get(i, "geo_locality_id");
-		item.salary_min = db->Get(i, "salary_min");
-		item.salary_max = db->Get(i, "salary_max");
-		item.start_month = db->Get(i, "start_month");
-		item.work_format = db->Get(i, "work_format");
-		item.description = db->Get(i, "description");
-		item.language1_id = db->Get(i, "language1_id");
-		item.language2_id = db->Get(i, "language2_id");
-		item.language3_id = db->Get(i, "language3_id");
-		item.skill1_id = db->Get(i, "skill1_id");
-		item.skill2_id = db->Get(i, "skill2_id");
-		item.skill3_id = db->Get(i, "skill3_id");
-		item.publish_finish = db->Get(i, "publish_finish");
-		item.publish_period = db->Get(i, "publish_period");
-		item.question1 = db->Get(i, "question1");
-		item.question2 = db->Get(i, "question2");
-		item.question3 = db->Get(i, "question3");
-		item.correct_answer1 = db->Get(i, "correct_answer1");
-		item.correct_answer2 = db->Get(i, "correct_answer2");
-		item.correct_answer3 = db->Get(i, "correct_answer3");
-		item.answer11 = db->Get(i, "answer11");
-		item.answer12 = db->Get(i, "answer12");
-		item.answer13 = db->Get(i, "answer13");
-		item.answer21 = db->Get(i, "answer21");
-		item.answer22 = db->Get(i, "answer22");
-		item.answer23 = db->Get(i, "answer23");
-		item.answer31 = db->Get(i, "answer31");
-		item.answer32 = db->Get(i, "answer32");
-		item.answer33 = db->Get(i, "answer33");
-
-		itemsList.push_back(item);
-	}
-
-	for(int i = 0; i < itemsCount; ++i)
-	{
-		string		company_position_title = "";
-		string		geo_locality_title = "";
-		string		geo_region_id = "";
-		string		geo_region_title = "";
-		string		language1_title = "";
-		string		language2_title = "";
-		string		language3_title = "";
-		string		skill1_title = "";
-		string		skill2_title = "";
-		string		skill3_title = "";
-		string		number_of_applied_candidates = "";
-		string		admin_user_id = "";
-
-		if(db->Query("SELECT * FROM `company_position` WHERE `id`=\"" + itemsList[i].company_position_id + "\";"))
-			company_position_title = db->Get(0, "title");
-		else
-		{
-			CLog			log;
-			log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: fail getting company_position by id");
-		}
-
-		if(db->Query("SELECT * FROM `geo_locality` WHERE `id`=\"" + itemsList[i].geo_locality_id + "\";"))
-		{
-			geo_locality_title = db->Get(0, "title");
-			geo_region_id = db->Get(0, "geo_region_id");
-			if(db->Query("SELECT * FROM `geo_region` WHERE `id`=\"" + geo_region_id + "\";"))
-			{
-				geo_region_title = db->Get(0, "title");
-			}
-			else
-			{
-				CLog			log;
-				log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: fail getting geo_region by id");
-			}
-		}
-		else
-		{
-			CLog			log;
-			log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: fail getting geo_locality by id");
-		}
-
-		if(itemsList[i].language1_id != "0")
-		{
-			if(db->Query("SELECT * FROM `language` WHERE `id`=\"" + itemsList[i].language1_id + "\";"))
-				language1_title = db->Get(0, "title");
-			else
-			{
-				CLog			log;
-				log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: fail getting language1 by id");
-			}
-		}
-
-		if(itemsList[i].language2_id != "0")
-		{
-			if(db->Query("SELECT * FROM `language` WHERE `id`=\"" + itemsList[i].language2_id + "\";"))
-				language2_title = db->Get(0, "title");
-			else
-			{
-				CLog			log;
-				log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: fail getting language2 by id");
-			}
-		}
-
-		if(itemsList[i].language3_id != "0")
-		{
-			if(db->Query("SELECT * FROM `language` WHERE `id`=\"" + itemsList[i].language3_id + "\";"))
-				language3_title = db->Get(0, "title");
-			else
-			{
-				CLog			log;
-				log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: fail getting language3 by id");
-			}
-		}
-
-		if(itemsList[i].skill1_id != "0")
-		{
-			if(db->Query("SELECT * FROM `skill` WHERE `id`=\"" + itemsList[i].skill1_id + "\";"))
-				skill1_title = db->Get(0, "title");
-			else
-			{
-				CLog			log;
-				log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: fail getting skill1 by id");
-			}
-		}
-
-		if(itemsList[i].skill2_id != "0")
-		{
-			if(db->Query("SELECT * FROM `skill` WHERE `id`=\"" + itemsList[i].skill2_id + "\";"))
-				skill2_title = db->Get(0, "title");
-			else
-			{
-				CLog			log;
-				log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: fail getting skill2 by id");
-			}
-		}
-
-		if(itemsList[i].skill3_id != "0")
-		{
-			if(db->Query("SELECT * FROM `skill` WHERE `id`=\"" + itemsList[i].skill3_id + "\";"))
-				skill3_title = db->Get(0, "title");
-			else
-			{
-				CLog			log;
-				log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: fail getting skill3 by id");
-			}
-		}
-
-		if(db->Query("SELECT COUNT(*) as `count` FROM `company_candidates` WHERE vacancy_id=\"" + itemsList[i].id + "\" AND `status`=\"applied\";"))
-			number_of_applied_candidates = db->Get(0, "count");
-		else
-			number_of_applied_candidates = "0";
-
-		if(db->Query("SELECT `admin_userID` FROM `company` WHERE `id`=\"" + itemsList[i].company_id + "\";"))
-			admin_user_id = db->Get(0, "admin_userID");
-
-		if(ostResult.str().length()) ostResult << ", ";
-
-		ostResult	<< "{"
-					<< "\"id\":\"" << itemsList[i].id << "\","
-					<< "\"company_id\":\"" << itemsList[i].company_id << "\","
-					<< "\"company_position_id\":\"" << itemsList[i].company_position_id << "\","
-					<< "\"company_position_title\":\"" << company_position_title << "\","
-					<< "\"geo_locality_id\":\"" << itemsList[i].geo_locality_id << "\","
-					<< "\"geo_locality_title\":\"" << geo_locality_title << "\","
-					<< "\"geo_region_id\":\"" << geo_region_id << "\","
-					<< "\"geo_region_title\":\"" << geo_region_title << "\","
-					<< "\"salary_min\":\"" << itemsList[i].salary_min << "\","
-					<< "\"salary_max\":\"" << itemsList[i].salary_max << "\","
-					<< "\"start_month\":\"" << itemsList[i].start_month << "\","
-					<< "\"work_format\":\"" << itemsList[i].work_format << "\","
-					<< "\"description\":\"" << itemsList[i].description << "\","
-					<< "\"question1\":\"" << itemsList[i].question1 << "\","
-					<< "\"question2\":\"" << itemsList[i].question2 << "\","
-					<< "\"question3\":\"" << itemsList[i].question3 << "\","
-					<< "\"correct_answer1\":\"" << (user && (admin_user_id == user->GetID()) ? itemsList[i].correct_answer1 : "") << "\","
-					<< "\"correct_answer2\":\"" << (user && (admin_user_id == user->GetID()) ? itemsList[i].correct_answer2 : "") << "\","
-					<< "\"correct_answer3\":\"" << (user && (admin_user_id == user->GetID()) ? itemsList[i].correct_answer3 : "") << "\","
-					<< "\"answer11\":\"" << itemsList[i].answer11 << "\","
-					<< "\"answer12\":\"" << itemsList[i].answer12 << "\","
-					<< "\"answer13\":\"" << itemsList[i].answer13 << "\","
-					<< "\"answer21\":\"" << itemsList[i].answer21 << "\","
-					<< "\"answer22\":\"" << itemsList[i].answer22 << "\","
-					<< "\"answer23\":\"" << itemsList[i].answer23 << "\","
-					<< "\"answer31\":\"" << itemsList[i].answer31 << "\","
-					<< "\"answer32\":\"" << itemsList[i].answer32 << "\","
-					<< "\"answer33\":\"" << itemsList[i].answer33 << "\","
-					<< "\"language1_id\":\"" << itemsList[i].language1_id << "\","
-					<< "\"language1_title\":\"" << language1_title << "\","
-					<< "\"language2_id\":\"" << itemsList[i].language2_id << "\","
-					<< "\"language2_title\":\"" << language2_title << "\","
-					<< "\"language3_id\":\"" << itemsList[i].language3_id << "\","
-					<< "\"language3_title\":\"" << language3_title << "\","
-					<< "\"skill1_id\":\"" << itemsList[i].skill1_id << "\","
-					<< "\"skill1_title\":\"" << skill1_title << "\","
-					<< "\"skill2_id\":\"" << itemsList[i].skill2_id << "\","
-					<< "\"skill2_title\":\"" << skill2_title << "\","
-					<< "\"skill3_id\":\"" << itemsList[i].skill3_id << "\","
-					<< "\"skill3_title\":\"" << skill3_title << "\","
-					<< "\"publish_finish\":\"" << itemsList[i].publish_finish << "\","
-					<< "\"publish_period\":\"" << itemsList[i].publish_period << "\","
-					<< "\"number_of_applied_candidates\":\"" << (user && (admin_user_id == user->GetID()) ? number_of_applied_candidates : "") << "\""
-					<<"}";
-	}
-
-	result = ostResult.str();
-
-	{
-		CLog			log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: end (returning string length " + to_string(result.length()) + ")");
-	}
+	MESSAGE_DEBUG("", "", "finish");
 
 	return result;
 }
@@ -395,8 +50,7 @@ bool AmIMessageOwner(string messageID, CUser *user, CMysql *db)
 	bool		result = false;
 	
 	{
-		CLog			log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start (messageID: " + messageID + ")");
+		MESSAGE_DEBUG("", "", "start (messageID: " + messageID + ")");
 	}
 
 	if(messageID.length() && (messageID != "0"))
@@ -418,8 +72,7 @@ bool AmIMessageOwner(string messageID, CUser *user, CMysql *db)
 				}
 				else
 				{
-					CLog			log;
-					log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: user(id:" + user->GetID() + ") not owning company(id:" + messageOwnerID + ")");
+					MESSAGE_ERROR("", "", "user(id:" + user->GetID() + ") not owning company(id:" + messageOwnerID + ")");
 				}
 			}
 			else if(messageOwnerType == "group")
@@ -430,37 +83,32 @@ bool AmIMessageOwner(string messageID, CUser *user, CMysql *db)
 				}
 				else
 				{
-					CLog			log;
-					log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: user(id:" + user->GetID() + ") not owning group(id:" + messageOwnerID + ")");
+					MESSAGE_ERROR("", "", "user(id:" + user->GetID() + ") not owning group(id:" + messageOwnerID + ")");
 				}
 			}
 			else
 			{
 				{
-					CLog			log;
-					log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: unknown message type (id:" + messageID + ", type:" + messageOwnerType + ")");
+					MESSAGE_ERROR("", "", "unknown message type (id:" + messageID + ", type:" + messageOwnerType + ")");
 				}
 			}
 		}
 		else
 		{
 			{
-				CLog			log;
-				log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: message.id(" + messageID + ") not found");
+				MESSAGE_ERROR("", "", "message.id(" + messageID + ") not found");
 			}
 		}
 	}
 	else
 	{
 		{
-			CLog			log;
-			log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: message.id(" + messageID + ") empty or 0");
+			MESSAGE_DEBUG("", "", "message.id(" + messageID + ") empty or 0");
 		}
 	}
 
 	{
-		CLog			log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: end (returning value is " + (result ? "true" : "false") + ")");
+		MESSAGE_DEBUG("", "", "end (returning value is " + (result ? "true" : "false") + ")");
 	}
 
 	return result;	
@@ -472,8 +120,7 @@ pair<string, string> GetMessageOwner(string messageID, CUser *user, CMysql *db)
 	string		messageOwnerType = "";
 	
 	{
-		CLog			log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start (messageID: " + messageID + ")");
+		MESSAGE_DEBUG("", "", "start (messageID: " + messageID + ")");
 	}
 
 	if(db->Query("SELECT `userId`,`srcType` FROM `feed` WHERE `actionTypeId`='11' AND `actionId`=\"" + messageID + "\";"))
@@ -484,14 +131,12 @@ pair<string, string> GetMessageOwner(string messageID, CUser *user, CMysql *db)
 	else
 	{
 		{
-			CLog			log;
-			log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: message.id(" + messageID + ") not found");
+			MESSAGE_ERROR("", "", "message.id(" + messageID + ") not found");
 		}
 	}
 
 	{
-		CLog			log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: end (returning value pair<messageOwnerType, messageOwnerID>(" + messageOwnerType + ", " + messageOwnerID + ")");
+		MESSAGE_DEBUG("", "", "end (returning value pair<messageOwnerType, messageOwnerID>(" + messageOwnerType + ", " + messageOwnerID + ")");
 	}
 
 	return make_pair(messageOwnerType, messageOwnerID);
@@ -502,7 +147,9 @@ string	GetUserSubscriptionsInJSONFormat(string sqlQuery, CMysql *db)
 	int		affected;
 	string	result;
 
-	MESSAGE_DEBUG("", "", "start");
+	{
+		MESSAGE_DEBUG("", "", "start");
+	}
 
 	affected = db->Query(sqlQuery);
 	if(affected)
@@ -520,10 +167,14 @@ string	GetUserSubscriptionsInJSONFormat(string sqlQuery, CMysql *db)
 	}
 	else
 	{
-		MESSAGE_DEBUG("", "", "user have no active subscriptions to any companies or groups");
+		{
+			MESSAGE_DEBUG("", "", "user have no active subscriptions to any company or group");
+		}
 	}
 
-	MESSAGE_DEBUG("", "", "end (returning result length(" + to_string(result.length()) + ")");
+	{
+		MESSAGE_DEBUG("", "", "end (returning result length(" + to_string(result.length()) + ")");
+	}
 
 	return result;
 }
@@ -533,8 +184,7 @@ string	SubscribeToCompany(string companyID, CUser *user, CMysql *db)
 	ostringstream	ostResult;
 
 	{
-		CLog			log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	ostResult.str("");
@@ -544,8 +194,7 @@ string	SubscribeToCompany(string companyID, CUser *user, CMysql *db)
 		if(db->Query("SELECT * FROM `users_subscriptions` WHERE `user_id`=\"" + user->GetID() + "\" AND `entity_type`=\"company\" AND `entity_id`=\"" + companyID + "\";"))
 		{
 			{
-				CLog	log;
-				log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: already subscribed [companyID: " + companyID + ", userID: " + user->GetID() + "]");
+				MESSAGE_ERROR("", "", "already subscribed [companyID: " + companyID + ", userID: " + user->GetID() + "]");
 			}
 
 			ostResult << "\"result\": \"success\", \"description\": \"вы уже подписаны на новости этой компании\"";
@@ -563,8 +212,7 @@ string	SubscribeToCompany(string companyID, CUser *user, CMysql *db)
 				// --- insert notification into feed
 				if(db->Query("SELECT `id` FROM `feed` WHERE `userId`=\"" + user->GetID() + "\" AND `srcType`=\"user\" AND `actionTypeId`=\"63\" AND `actionId`=\"" + companyID + "\";"))
 				{
-					CLog		log;
-					log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: already subscribed [companyID: " + companyID + ", userID: " + user->GetID() + "]");
+					MESSAGE_DEBUG("", "", "already subscribed [companyID: " + companyID + ", userID: " + user->GetID() + "]");
 				}
 				else
 				{
@@ -573,16 +221,14 @@ string	SubscribeToCompany(string companyID, CUser *user, CMysql *db)
 					}
 					else
 					{
-						CLog		log;
-						log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: inserting into `feed` table");
+						MESSAGE_ERROR("", "", "inserting into `feed` table");
 					}
 				}
 			}
 			else
 			{
 				{
-					CLog	log;
-					log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: error inserting into users subscription [companyID: " + companyID + ", userID: " + user->GetID() + "]");
+					MESSAGE_ERROR("", "", "error inserting into users subscription [companyID: " + companyID + ", userID: " + user->GetID() + "]");
 				}
 
 				ostResult << "\"result\": \"error\",\"description\": \"Ошибка БД\"";
@@ -592,8 +238,7 @@ string	SubscribeToCompany(string companyID, CUser *user, CMysql *db)
 	else
 	{
 		{
-			CLog	log;
-			log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: (companyID is empty) || (user == NULL) [companyID: " + companyID + ", userID: " + (user ? "not-NULL" : "NULL") + "]");
+			MESSAGE_ERROR("", "", "(companyID is empty) || (user == NULL) [companyID: " + companyID + ", userID: " + (user ? "not-NULL" : "NULL") + "]");
 		}
 
 		ostResult << "\"result\": \"error\",\"description\": \"Компания не найдена или пользователь неопределен\"";
@@ -601,8 +246,7 @@ string	SubscribeToCompany(string companyID, CUser *user, CMysql *db)
 
 
 	{
-		CLog			log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: end (returning result length(" + to_string(ostResult.str().length()) + ")");
+		MESSAGE_DEBUG("", "", "end (returning result length(" + to_string(ostResult.str().length()) + ")");
 	}
 
 	return ostResult.str();
@@ -613,8 +257,7 @@ string	UnsubscribeFromCompany(string companyID, CUser *user, CMysql *db)
 	ostringstream	ostResult;
 
 	{
-		CLog			log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	ostResult.str("");
@@ -628,8 +271,7 @@ string	UnsubscribeFromCompany(string companyID, CUser *user, CMysql *db)
 			if(db->Query("SELECT `admin_userID` FROM `company` WHERE `id`=\"" + companyID + "\" AND `admin_userID`=\"" + user->GetID() + "\";"))
 			{
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: user can't unsubscribe from own company [companyID: " + companyID + ", userID: " + user->GetID() + "]");
+					MESSAGE_DEBUG("", "", "user can't unsubscribe from own company [companyID: " + companyID + ", userID: " + user->GetID() + "]");
 				}
 
 				ostResult << "\"result\": \"error\",\"description\": \"Вы не можете отписаться от собственной компании\"";
@@ -645,14 +287,12 @@ string	UnsubscribeFromCompany(string companyID, CUser *user, CMysql *db)
 					db->Query("DELETE FROM `feed` WHERE `userId`=\"" + user->GetID() + "\" AND `actionTypeId`=\"63\" AND `actionId`=\"" + companyID + "\";");
 					if(db->isError())
 					{
-						CLog		log;
-						log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: removeing form `feed` table");
+						MESSAGE_ERROR("", "", "removeing form `feed` table");
 					}
 				}
 				else
 				{
-					CLog		log;
-					log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: feed subscription missed [companyID: " + companyID + ", userID: " + user->GetID() + "]");
+					MESSAGE_DEBUG("", "", "feed subscription missed [companyID: " + companyID + ", userID: " + user->GetID() + "]");
 				}
 
 			}
@@ -660,8 +300,7 @@ string	UnsubscribeFromCompany(string companyID, CUser *user, CMysql *db)
 		else
 		{
 			{
-				CLog	log;
-				log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: user not subscribed to company [companyID: " + companyID + ", userID: " + user->GetID() + "]");
+				MESSAGE_ERROR("", "", "user not subscribed to company [companyID: " + companyID + ", userID: " + user->GetID() + "]");
 			}
 
 			ostResult << "\"result\": \"success\", \"description\": \"Вы не подписаны\"";
@@ -670,8 +309,7 @@ string	UnsubscribeFromCompany(string companyID, CUser *user, CMysql *db)
 	else
 	{
 		{
-			CLog	log;
-			log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: (companyID is empty) || (user == NULL) [companyID: " + companyID + ", userID: " + (user ? "not-NULL" : "NULL") + "]");
+			MESSAGE_ERROR("", "", "(companyID is empty) || (user == NULL) [companyID: " + companyID + ", userID: " + (user ? "not-NULL" : "NULL") + "]");
 		}
 
 		ostResult << "\"result\": \"error\",\"description\": \"Компания не найдена или пользователь неопределен\"";
@@ -679,8 +317,7 @@ string	UnsubscribeFromCompany(string companyID, CUser *user, CMysql *db)
 
 
 	{
-		CLog			log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: end (returning result length(" + to_string(ostResult.str().length()) + ")");
+		MESSAGE_DEBUG("", "", "end (returning result length(" + to_string(ostResult.str().length()) + ")");
 	}
 
 	return ostResult.str();
@@ -691,8 +328,7 @@ string	SubscribeToGroup(string groupID, CUser *user, CMysql *db)
 	ostringstream	ostResult;
 
 	{
-		CLog			log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	ostResult.str("");
@@ -702,8 +338,7 @@ string	SubscribeToGroup(string groupID, CUser *user, CMysql *db)
 		if(db->Query("SELECT * FROM `users_subscriptions` WHERE `user_id`=\"" + user->GetID() + "\" AND `entity_type`=\"group\" AND `entity_id`=\"" + groupID + "\";"))
 		{
 			{
-				CLog	log;
-				log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: already subscribed [groupID: " + groupID + ", userID: " + user->GetID() + "]");
+				MESSAGE_ERROR("", "", "already subscribed [groupID: " + groupID + ", userID: " + user->GetID() + "]");
 			}
 
 			ostResult << "\"result\": \"success\", \"description\": \"вы уже подписаны на новости этой группы\"";
@@ -721,8 +356,7 @@ string	SubscribeToGroup(string groupID, CUser *user, CMysql *db)
 				// --- insert notification into feed
 				if(db->Query("SELECT `id` FROM `feed` WHERE `userId`=\"" + user->GetID() + "\" AND `srcType`=\"user\" AND `actionTypeId`=\"64\" AND `actionId`=\"" + groupID + "\";"))
 				{
-					CLog		log;
-					log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: already subscribed [groupID: " + groupID + ", userID: " + user->GetID() + "]");
+					MESSAGE_DEBUG("", "", "already subscribed [groupID: " + groupID + ", userID: " + user->GetID() + "]");
 				}
 				else
 				{
@@ -731,16 +365,14 @@ string	SubscribeToGroup(string groupID, CUser *user, CMysql *db)
 					}
 					else
 					{
-						CLog		log;
-						log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: inserting into `feed` table");
+						MESSAGE_ERROR("", "", "inserting into `feed` table");
 					}
 				}
 			}
 			else
 			{
 				{
-					CLog	log;
-					log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: error inserting into users subscription [groupID: " + groupID + ", userID: " + user->GetID() + "]");
+					MESSAGE_ERROR("", "", "error inserting into users subscription [groupID: " + groupID + ", userID: " + user->GetID() + "]");
 				}
 
 				ostResult << "\"result\": \"error\",\"description\": \"Ошибка БД\"";
@@ -750,8 +382,7 @@ string	SubscribeToGroup(string groupID, CUser *user, CMysql *db)
 	else
 	{
 		{
-			CLog	log;
-			log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: (groupID is empty) || (user == NULL) [groupID: " + groupID + ", userID: " + (user ? "not-NULL" : "NULL") + "]");
+			MESSAGE_ERROR("", "", "(groupID is empty) || (user == NULL) [groupID: " + groupID + ", userID: " + (user ? "not-NULL" : "NULL") + "]");
 		}
 
 		ostResult << "\"result\": \"error\",\"description\": \"Компания не найдена или пользователь неопределен\"";
@@ -759,8 +390,7 @@ string	SubscribeToGroup(string groupID, CUser *user, CMysql *db)
 
 
 	{
-		CLog			log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: end (returning result length(" + to_string(ostResult.str().length()) + ")");
+		MESSAGE_DEBUG("", "", "end (returning result length(" + to_string(ostResult.str().length()) + ")");
 	}
 
 	return ostResult.str();
@@ -771,8 +401,7 @@ string	UnsubscribeFromGroup(string groupID, CUser *user, CMysql *db)
 	ostringstream	ostResult;
 
 	{
-		CLog			log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	ostResult.str("");
@@ -786,8 +415,7 @@ string	UnsubscribeFromGroup(string groupID, CUser *user, CMysql *db)
 			if(db->Query("SELECT `owner_id` FROM `groups` WHERE `id`=\"" + groupID + "\" AND `owner_id`=\"" + user->GetID() + "\";"))
 			{
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: user can't unsubscribe from own group [groupID: " + groupID + ", userID: " + user->GetID() + "]");
+					MESSAGE_DEBUG("", "", "user can't unsubscribe from own group [groupID: " + groupID + ", userID: " + user->GetID() + "]");
 				}
 
 				ostResult << "\"result\": \"error\",\"description\": \"Вы не можете отписаться от собственной группы\"";
@@ -803,22 +431,19 @@ string	UnsubscribeFromGroup(string groupID, CUser *user, CMysql *db)
 					db->Query("DELETE FROM `feed` WHERE `userId`=\"" + user->GetID() + "\" AND `actionTypeId`=\"64\" AND `actionId`=\"" + groupID + "\";");
 					if(db->isError())
 					{
-						CLog		log;
-						log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: removeing form `feed` table");
+						MESSAGE_ERROR("", "", "removeing form `feed` table");
 					}
 				}
 				else
 				{
-					CLog		log;
-					log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: feed subscription missed [groupID: " + groupID + ", userID: " + user->GetID() + "]");
+					MESSAGE_DEBUG("", "", "feed subscription missed [groupID: " + groupID + ", userID: " + user->GetID() + "]");
 				}
 			}
 		}
 		else
 		{
 			{
-				CLog	log;
-				log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: user not subscribed to group [groupID: " + groupID + ", userID: " + user->GetID() + "]");
+				MESSAGE_ERROR("", "", "user not subscribed to group [groupID: " + groupID + ", userID: " + user->GetID() + "]");
 			}
 
 			ostResult << "\"result\": \"success\", \"description\": \"Вы не подписаны\"";
@@ -827,8 +452,7 @@ string	UnsubscribeFromGroup(string groupID, CUser *user, CMysql *db)
 	else
 	{
 		{
-			CLog	log;
-			log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: (groupID is empty) || (user == NULL) [groupID: " + groupID + ", userID: " + (user ? "not-NULL" : "NULL") + "]");
+			MESSAGE_ERROR("", "", "(groupID is empty) || (user == NULL) [groupID: " + groupID + ", userID: " + (user ? "not-NULL" : "NULL") + "]");
 		}
 
 		ostResult << "\"result\": \"error\",\"description\": \"Компания не найдена или пользователь неопределен\"";
@@ -836,102 +460,10 @@ string	UnsubscribeFromGroup(string groupID, CUser *user, CMysql *db)
 
 
 	{
-		CLog			log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: end (returning result length(" + to_string(ostResult.str().length()) + ")");
+		MESSAGE_DEBUG("", "", "end (returning result length(" + to_string(ostResult.str().length()) + ")");
 	}
 
 	return ostResult.str();
-}
-
-string GetGroupListInJSONFormat(string dbQuery, CMysql *db, CUser *user)
-{
-	struct ItemClass
-	{
-		string	id;
-		string	link;
-		string	title;
-		string	description;
-		string	logo_folder;
-		string	logo_filename;
-		string	owner_id;
-		string	isBlocked;
-		string	eventTimestampCreation;
-		string	eventTimestampLastPost;
-	};
-
-	ostringstream			ost, ostFinal;
-	string					sessid, lookForKey;
-	int						affected;
-	vector<ItemClass>		groupsList;
-
-	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
-	}
-
-	ostFinal.str("");
-
-	if((affected = db->Query(dbQuery)) > 0)
-	{
-		int						groupCounter = affected;
-
-		groupsList.reserve(groupCounter);  // --- reserving allows avoid moving vector in memory
-											// --- to fit vector into continous memory piece
-
-		for(int i = 0; i < affected; i++)
-		{
-			ItemClass	group;
-
-			group.id = db->Get(i, "id");
-			group.link = db->Get(i, "link");
-			group.title = db->Get(i, "title");
-			group.description = db->Get(i, "description");
-			group.logo_folder = db->Get(i, "logo_folder");
-			group.logo_filename = db->Get(i, "logo_filename");
-			group.owner_id = db->Get(i, "owner_id");
-			group.isBlocked = db->Get(i, "isBlocked");
-			group.eventTimestampCreation = db->Get(i, "eventTimestampCreation");
-			group.eventTimestampLastPost = db->Get(i, "eventTimestampLastPost");
-
-			groupsList.push_back(group);
-		}
-
-		for(int i = 0; i < groupCounter; i++)
-		{
-				string		numberOfMembers = "0";
-
-				if(ostFinal.str().length()) ostFinal << ", ";
-
-				if(db->Query("SELECT COUNT(*) as numberOfMembers FROM `users_subscriptions` WHERE `entity_type`=\"group\" AND `entity_id`=\"" + groupsList[i].id + "\";"))
-					numberOfMembers = db->Get(0, "numberOfMembers");
-
-				ostFinal << "{";
-				ostFinal << "\"id\": \""				  	<< groupsList[i].id << "\",";
-				ostFinal << "\"link\": \""					<< groupsList[i].link << "\",";
-				ostFinal << "\"title\": \""					<< groupsList[i].title << "\",";
-				ostFinal << "\"description\": \""			<< groupsList[i].description << "\",";
-				ostFinal << "\"logo_folder\": \""			<< groupsList[i].logo_folder << "\",";
-				ostFinal << "\"logo_filename\": \""			<< groupsList[i].logo_filename << "\",";
-				ostFinal << "\"isMine\": \""				<< (user ? groupsList[i].owner_id == user->GetID() : false) << "\",";
-				ostFinal << "\"numberOfMembers\": \""		<< numberOfMembers << "\",";
-				ostFinal << "\"isBlocked\": \""				<< groupsList[i].isBlocked << "\",";
-				ostFinal << "\"eventTimestampCreation\": \""<< groupsList[i].eventTimestampCreation << "\",";
-				ostFinal << "\"eventTimestampLastPost\": \""<< groupsList[i].eventTimestampLastPost << "\"";
-				ostFinal << "}";
-		} // --- for loop through group list
-	} // --- if sql-query on group selection success
-	else
-	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: there are no groups returned by request [", dbQuery, "]");
-	}
-
-	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: end (result length = " + to_string(ostFinal.str().length()) + ")");
-	}
-
-	return ostFinal.str();
 }
 
 bool isBotIP(string ip)
@@ -973,8 +505,7 @@ bool isBotIP(string ip)
 		};
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	if(ip.length())
@@ -991,180 +522,15 @@ bool isBotIP(string ip)
 	else
 	{
 		{
-			CLog	log;
-			log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: IP is empty");
+			MESSAGE_DEBUG("", "", "IP is empty");
 		}
 	}
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: end (result  = " + (result ? "true" : "false") + ")");
+		MESSAGE_DEBUG("", "", "end (result  = " + (result ? "true" : "false") + ")");
 	}
 
 	return result;
-}
-
-string GetGiftListInJSONFormat(string dbQuery, CMysql *db, CUser *user)
-{
-	struct ItemClass
-	{
-		string	id;
-		string	link;
-		string	title;
-		string	description;
-		string	folder;
-		string	filename;
-		string	requested_quantity;
-		string	gained_quantity;
-		string	estimated_price;
-		string	user_id;
-		string	eventTimestamp;
-	};
-
-	ostringstream			ost, ostFinal;
-	string					sessid, lookForKey;
-	int						affected;
-	vector<ItemClass>		groupsList;
-
-	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
-	}
-
-	ostFinal.str("");
-
-	if((affected = db->Query(dbQuery)) > 0)
-	{
-		int			groupCounter = affected;
-
-		groupsList.reserve(groupCounter);  // --- reserving allows avoid moving vector in memory
-											// --- to fit vector into continous memory piece
-
-		for(int i = 0; i < affected; i++)
-		{
-			ItemClass	gift;
-
-			gift.id = db->Get(i, "id");
-			gift.link = db->Get(i, "link");
-			gift.title = db->Get(i, "title");
-			gift.description = db->Get(i, "description");
-			gift.folder = db->Get(i, "logo_folder");
-			gift.filename = db->Get(i, "logo_filename");
-			gift.requested_quantity = db->Get(i, "requested_quantity");
-			gift.gained_quantity = db->Get(i, "gained_quantity");
-			gift.estimated_price = db->Get(i, "estimated_price");
-			gift.user_id = db->Get(i, "user_id");
-			gift.eventTimestamp = db->Get(i, "eventTimestamp");
-
-			groupsList.push_back(gift);
-		}
-
-		for(int i = 0; i < groupCounter; i++)
-		{
-				if(ostFinal.str().length()) ostFinal << ", ";
-
-				ostFinal << "{";
-				ostFinal << "\"id\": \""				  	<< groupsList[i].id << "\",";
-				ostFinal << "\"link\": \""					<< groupsList[i].link << "\",";
-				ostFinal << "\"title\": \""					<< groupsList[i].title << "\",";
-				ostFinal << "\"description\": \""			<< groupsList[i].description << "\",";
-				ostFinal << "\"logo_folder\": \""			<< groupsList[i].folder << "\",";
-				ostFinal << "\"logo_filename\": \""			<< groupsList[i].filename << "\",";
-				ostFinal << "\"requested_quantity\": \""	<< groupsList[i].requested_quantity << "\",";
-				ostFinal << "\"gained_quantity\": \""		<< groupsList[i].gained_quantity << "\",";
-				ostFinal << "\"estimated_price\": \""		<< groupsList[i].estimated_price << "\",";
-				ostFinal << "\"user_id\": \""				<< groupsList[i].user_id << "\",";
-				ostFinal << "\"eventTimestamp\": \""		<< groupsList[i].eventTimestamp << "\"";
-				ostFinal << "}";
-		} // --- for loop through gift list
-
-	} // --- if sql-query on gift selection success
-	else
-	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: there are no gifts returned by request [", dbQuery, "]");
-	}
-
-	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: end (result length = " + to_string(ostFinal.str().length()) + ")");
-	}
-
-	return ostFinal.str();
-}
-
-string GetGiftToGiveListInJSONFormat(string dbQuery, CMysql *db, CUser *user)
-{
-	struct ItemClass
-	{
-		string	id;
-		string	user_id;
-		string	gift_id;
-		string	reserve_period;
-		string	visibility;
-		string	eventTimestamp;
-	};
-
-	ostringstream			ost, ostFinal;
-	string					sessid, lookForKey;
-	int						affected;
-	vector<ItemClass>		gifts_to_give_list;
-
-	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
-	}
-
-	ostFinal.str("");
-
-	if((affected = db->Query(dbQuery)) > 0)
-	{
-		int		groupCounter = affected;
-
-		gifts_to_give_list.reserve(groupCounter);	// --- reserving allows avoid moving vector in memory
-											// --- to fit vector into continous memory piece
-
-		for(int i = 0; i < affected; i++)
-		{
-			ItemClass	gift;
-
-			gift.id = db->Get(i, "id");
-			gift.user_id = db->Get(i, "user_id");
-			gift.gift_id = db->Get(i, "gift_id");
-			gift.reserve_period = db->Get(i, "reserve_period");
-			gift.visibility = db->Get(i, "visibility");
-			gift.eventTimestamp = db->Get(i, "eventTimestamp");
-
-			gifts_to_give_list.push_back(gift);
-		}
-
-		for(int i = 0; i < groupCounter; i++)
-		{
-				if(ostFinal.str().length()) ostFinal << ", ";
-
-				ostFinal << "{";
-				ostFinal << "\"id\": \""				<< gifts_to_give_list[i].id << "\",";
-				ostFinal << "\"user_id\": \""			<< (user && (user->GetID() == gifts_to_give_list[i].user_id) ? user->GetID() : "") << "\",";
-				ostFinal << "\"gift_id\": \""			<< gifts_to_give_list[i].gift_id << "\",";
-				ostFinal << "\"reserve_period\": \""	<< gifts_to_give_list[i].reserve_period << "\",";
-				ostFinal << "\"visibility\": \""		<< gifts_to_give_list[i].visibility << "\",";
-				ostFinal << "\"eventTimestamp\": \""	<< gifts_to_give_list[i].eventTimestamp << "\"";
-				ostFinal << "}";
-		} // --- for loop through gift list
-
-	} // --- if sql-query on gift selection success
-	else
-	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: there are no gifts returned by request [", dbQuery, "]");
-	}
-
-	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: end (result length = " + to_string(ostFinal.str().length()) + ")");
-	}
-
-	return ostFinal.str();
 }
 
 
@@ -1174,8 +540,7 @@ bool isAdverseWordsHere(string text, CMysql *db)
 	int				affected;
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
+		MESSAGE_DEBUG("", "", "start");
 	}
 
 	affected = db->Query("SELECT * FROM `dictionary_adverse`;");
@@ -1190,8 +555,7 @@ bool isAdverseWordsHere(string text, CMysql *db)
 			if(text.find(checkingWord) != string::npos)
 			{
 				{
-					CLog	log;
-					log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: adverse word.id[" + db->Get(i, "id") + "]");
+					MESSAGE_DEBUG("", "", "adverse word.id[" + db->Get(i, "id") + "]");
 				}
 
 				result = true;
@@ -1202,355 +566,17 @@ bool isAdverseWordsHere(string text, CMysql *db)
 	else
 	{
 		{
-			CLog	log;
-			log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: adverse_word table is empty");
+			MESSAGE_DEBUG("", "", "adverse_word table is empty");
 		}
 
 	}
 
 	
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: end (result  = " + (result ? "true" : "false") + ")");
+		MESSAGE_DEBUG("", "", "end (result  = " + (result ? "true" : "false") + ")");
 	}
 	
 	return result;
-}
-
-string GetEventListInJSONFormat(string dbQuery, CMysql *db, CUser *user)
-{
-	struct ItemClass
-	{
-		string	id;
-		string	link;
-		string	title;
-		string	address;
-		string	accessType;
-		string	startTimestamp;
-		string	description;
-		string	logo_folder;
-		string	logo_filename;
-		string	owner_id;
-		string	isBlocked;
-		string	eventTimestampCreation;
-		string	eventTimestampLastPost;
-	};
-
-	ostringstream			ost, ostFinal;
-	string					sessid, lookForKey;
-	int						affected;
-	vector<ItemClass>		eventsList;
-
-	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
-	}
-
-	ostFinal.str("");
-
-	if((affected = db->Query(dbQuery)) > 0)
-	{
-		int						eventCounter = affected;
-
-		eventsList.reserve(eventCounter);  // --- reserving allows avoid moving vector in memory
-											// --- to fit vector into continous memory piece
-
-		for(int i = 0; i < affected; i++)
-		{
-			ItemClass	event;
-
-			event.id = db->Get(i, "id");
-			event.link = db->Get(i, "link");
-			event.title = db->Get(i, "title");
-			event.address = db->Get(i, "address");
-			event.accessType = db->Get(i, "accessType");
-			event.startTimestamp = db->Get(i, "startTimestamp");
-			event.description = db->Get(i, "description");
-			event.logo_folder = db->Get(i, "logo_folder");
-			event.logo_filename = db->Get(i, "logo_filename");
-			event.owner_id = db->Get(i, "owner_id");
-			event.isBlocked = db->Get(i, "isBlocked");
-			event.eventTimestampCreation = db->Get(i, "eventTimestampCreation");
-			event.eventTimestampLastPost = db->Get(i, "eventTimestampLastPost");
-
-			eventsList.push_back(event);
-		}
-
-		for(int i = 0; i < eventCounter; i++)
-		{
-				if(ostFinal.str().length()) ostFinal << ", ";
-
-				ostFinal << "{";
-				ostFinal << "\"id\": \""				  	<< eventsList[i].id << "\",";
-				ostFinal << "\"link\": \""					<< eventsList[i].link << "\",";
-				ostFinal << "\"title\": \""					<< eventsList[i].title << "\",";
-				ostFinal << "\"address\": \""				<< eventsList[i].address << "\",";
-				ostFinal << "\"accessType\": \""			<< eventsList[i].accessType << "\",";
-				ostFinal << "\"startTimestamp\": \""		<< eventsList[i].startTimestamp << "\",";
-				ostFinal << "\"description\": \""			<< eventsList[i].description << "\",";
-				ostFinal << "\"logo_folder\": \""			<< eventsList[i].logo_folder << "\",";
-				ostFinal << "\"logo_filename\": \""			<< eventsList[i].logo_filename << "\",";
-				ostFinal << "\"isMine\": \""				<< (user ? eventsList[i].owner_id == user->GetID() : false) << "\",";
-				ostFinal << "\"hosts\": ["					<< GetEventHostsListInJSONFormat("SELECT * FROM `event_hosts` WHERE `event_id`=\"" + eventsList[i].id + "\";", db, user) << "],";
-				ostFinal << "\"guests\": ["					<< GetEventGuestsListInJSONFormat("SELECT * FROM `event_guests` WHERE `event_id`=\"" + eventsList[i].id + "\";", db, user) << "],";
-				ostFinal << "\"isBlocked\": \""				<< eventsList[i].isBlocked << "\",";
-				ostFinal << "\"eventTimestampCreation\": \""<< eventsList[i].eventTimestampCreation << "\",";
-				ostFinal << "\"eventTimestampLastPost\": \""<< eventsList[i].eventTimestampLastPost << "\"";
-				ostFinal << "}";
-		} // --- for loop through event list
-	} // --- if sql-query on event selection success
-	else
-	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: there are no events returned by request [", dbQuery, "]");
-	}
-
-	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: end (result length = " + to_string(ostFinal.str().length()) + ")");
-	}
-
-	return ostFinal.str();
-}
-
-string GetEventHostsListInJSONFormat(string dbQuery, CMysql *db, CUser *user)
-{
-	struct ItemClass
-	{
-		string	id;
-		string	event_id;
-		string	user_id;
-		string	eventTimestamp;
-	};
-
-	ostringstream			ost, ostFinal;
-	string					sessid, lookForKey;
-	int						affected;
-	vector<ItemClass>		eventHostsList;
-
-	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
-	}
-
-	ostFinal.str("");
-
-	if((affected = db->Query(dbQuery)) > 0)
-	{
-		int		eventHostsCounter = affected;
-
-		eventHostsList.reserve(eventHostsCounter);  // --- reserving allows avoid moving vector in memory
-											// --- to fit vector into continous memory piece
-
-		for(int i = 0; i < eventHostsCounter; i++)
-		{
-			ItemClass	event_host;
-
-			event_host.id = db->Get(i, "id");
-			event_host.event_id = db->Get(i, "event_id");
-			event_host.user_id = db->Get(i, "user_id");
-			event_host.eventTimestamp = db->Get(i, "eventTimestamp");
-
-			eventHostsList.push_back(event_host);
-		}
-
-		for(int i = 0; i < eventHostsCounter; i++)
-		{
-				if(db->Query("SELECT `id`,`name`,`nameLast` FROM `users` WHERE `id`=\"" + eventHostsList[i].user_id + "\";"))
-				{
-					string		userName = db->Get(0, "name");
-					string		userNameLast = db->Get(0, "nameLast");
-					string		avatar = "";
-
-					if(db->Query("SELECT `folder`, `filename` FROM `users_avatars` WHERE `isActive`=\"1\" AND `userid`=\"" + eventHostsList[i].user_id + "\";"))
-						avatar = string("/images/avatars/avatars") + db->Get(0, "folder") + "/" + db->Get(0, "filename");
-
-					if(ostFinal.str().length()) ostFinal << ", ";
-
-					ostFinal << "{";
-					ostFinal << "\"id\": \""				<< eventHostsList[i].id << "\",";
-					ostFinal << "\"user_id\": \""			<< eventHostsList[i].user_id << "\",";
-					ostFinal << "\"name\": \""				<< userName << "\",";
-					ostFinal << "\"nameLast\": \""			<< userNameLast << "\",";
-					ostFinal << "\"avatar\": \""			<< avatar << "\",";
-					ostFinal << "\"status\": \""			<< "accepted\",";
-					ostFinal << "\"gifts\": ["				<< GetGiftListInJSONFormat("SELECT * FROM `gifts` WHERE `user_id`=\"" + eventHostsList[i].user_id + "\";", db, user) << "],";
-					ostFinal << "\"gifts_to_give\": [" 		<< GetGiftToGiveListInJSONFormat("SELECT * FROM `gifts_to_give` WHERE `gift_id` in (SELECT `id` FROM `gifts` WHERE `user_id`=\"" + eventHostsList[i].user_id + "\");", db, user) << "],";
-					ostFinal << "\"eventTimestamp\": \""	<< eventHostsList[i].eventTimestamp << "\"";
-					ostFinal << "}";
-
-				}
-				else
-				{
-					CLog	log;
-					log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: event_id(" + eventHostsList[i].event_id + ") user_id(" + eventHostsList[i].user_id + "), host_user_id not found");
-				}
-		}
-	} // --- if sql-query on event selection success
-	else
-	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: there are no events returned by request [", dbQuery, "]");
-	}
-
-	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: end (result length = " + to_string(ostFinal.str().length()) + ")");
-	}
-
-	return ostFinal.str();
-}
-
-string GetEventGuestsListInJSONFormat(string dbQuery, CMysql *db, CUser *user)
-{
-	struct ItemClass
-	{
-		string	id;
-		string	event_id;
-		string	user_id;
-		string	quick_registration_id;
-		string	status;
-		string	adults;
-		string	kids;
-		string	eventTimestamp;
-	};
-
-	ostringstream			ost, ostFinal;
-	string					sessid, lookForKey;
-	int						affected;
-	vector<ItemClass>		eventGuestsList;
-
-	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start");
-	}
-
-	ostFinal.str("");
-
-	if((affected = db->Query(dbQuery)) > 0)
-	{
-		int		eventGuestsCounter = affected;
-
-		eventGuestsList.reserve(eventGuestsCounter);  // --- reserving allows avoid moving vector in memory
-											// --- to fit vector into continous memory piece
-
-		for(int i = 0; i < eventGuestsCounter; i++)
-		{
-			ItemClass	event_guest;
-
-			event_guest.id = db->Get(i, "id");
-			event_guest.event_id = db->Get(i, "event_id");
-			event_guest.user_id = db->Get(i, "user_id");
-			event_guest.quick_registration_id = db->Get(i, "quick_registration_id");
-			event_guest.status = db->Get(i, "status");
-			event_guest.adults = db->Get(i, "adults");
-			event_guest.kids = db->Get(i, "kids");
-			event_guest.eventTimestamp = db->Get(i, "eventTimestamp");
-
-			eventGuestsList.push_back(event_guest);
-		}
-
-		for(int i = 0; i < eventGuestsCounter; i++)
-		{
-				if(eventGuestsList[i].user_id != "0")
-				{
-					if(db->Query("SELECT `id`,`name`,`nameLast` FROM `users` WHERE `id`=\"" + eventGuestsList[i].user_id + "\";"))
-					{
-						string		userName = db->Get(0, "name");
-						string		userNameLast = db->Get(0, "nameLast");
-						string		avatar = "";
-
-						if(db->Query("SELECT `folder`, `filename` FROM `users_avatars` WHERE `isActive`=\"1\" AND `userid`=\"" + eventGuestsList[i].user_id + "\";"))
-							avatar = string("/images/avatars/avatars") + db->Get(0, "folder") + "/" + db->Get(0, "filename");
-
-						if(ostFinal.str().length()) ostFinal << ", ";
-
-						ostFinal << "{";
-						ostFinal << "\"id\": \""				  	<< eventGuestsList[i].id << "\",";
-						ostFinal << "\"user_id\": \""				<< eventGuestsList[i].user_id << "\",";
-						ostFinal << "\"status\": \""				<< eventGuestsList[i].status << "\",";
-						ostFinal << "\"name\": \""					<< userName << "\",";
-						ostFinal << "\"nameLast\": \""				<< userNameLast << "\",";
-						ostFinal << "\"avatar\": \""				<< avatar << "\",";
-						ostFinal << "\"adults\": \""				<< eventGuestsList[i].adults << "\",";
-						ostFinal << "\"kids\": \""					<< eventGuestsList[i].kids << "\",";
-						ostFinal << "\"gifts\": ["					<< GetGiftListInJSONFormat("SELECT * FROM `gifts` WHERE `user_id`=\"" + eventGuestsList[i].user_id + "\";", db, user) << "],";
-						ostFinal << "\"gifts_to_give\": [" 			<< GetGiftToGiveListInJSONFormat("SELECT * FROM `gifts_to_give` WHERE `gift_id` in (SELECT `id` FROM `gifts` WHERE `user_id`=\"" + eventGuestsList[i].user_id + "\");", db, user) << "],";
-						ostFinal << "\"eventTimestamp\": \""		<< eventGuestsList[i].eventTimestamp << "\"";
-						ostFinal << "}";
-					}
-					else
-					{
-						CLog	log;
-						log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]:  user_id(" + eventGuestsList[i].user_id + ") not found in `users` table)");
-					}
-
-				}
-				else if(eventGuestsList[i].quick_registration_id.length())
-				{
-					if(user)
-					{
-						if(db->Query("SELECT `id` FROM `event_hosts` WHERE `event_id`=\"" + eventGuestsList[i].event_id + "\" AND `user_id`=\"" + user->GetID() + "\";"))
-						{
-							// --- email can be exposed to "event host"
-
-							if(db->Query("SELECT `email` FROM `quick_registration` WHERE `id`=\"" + eventGuestsList[i].quick_registration_id + "\";"))
-							{
-								if(ostFinal.str().length()) ostFinal << ", ";
-
-								ostFinal << "{";
-								ostFinal << "\"id\": \""				  	<< eventGuestsList[i].id << "\",";
-								ostFinal << "\"user_id\": \""				<< eventGuestsList[i].user_id << "\",";
-								ostFinal << "\"status\": \""				<< eventGuestsList[i].status << "\",";
-								ostFinal << "\"name\": \""					<< "" << "\",";
-								ostFinal << "\"nameLast\": \""				<< "" << "\",";
-								ostFinal << "\"avatar\": \""				<< "" << "\",";
-								ostFinal << "\"email\": \""					<< db->Get(0, "email") << "\",";
-								ostFinal << "\"adults\": \""				<< eventGuestsList[i].adults << "\",";
-								ostFinal << "\"kids\": \""					<< eventGuestsList[i].kids << "\",";
-								ostFinal << "\"gifts\": ["					<< "" << "],";
-								ostFinal << "\"gifts_to_give\": [" 			<< "" << "],";
-								ostFinal << "\"eventTimestamp\": \""		<< eventGuestsList[i].eventTimestamp << "\"";
-								ostFinal << "}";
-							}
-							else
-							{
-								CLog	log;
-								log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]: quick_registration_id(" + eventGuestsList[i].quick_registration_id + ") not found");
-							}
-
-						}
-						else
-						{
-							CLog	log;
-							log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: email could be exposed to event host only. You are not event host. (event_id(" + eventGuestsList[i].event_id + ") user_id(" + user->GetID() + "))");
-						}
-					}
-					else
-					{
-						CLog	log;
-						log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: user is not an event host, therefore he have no access to email information");
-					}
-				}
-				else
-				{
-					CLog	log;
-					log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: user_id and email are empty in event_guests table.");
-				}
-		}
-	} // --- if sql-query on event selection success
-	else
-	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: there are no events returned by request [", dbQuery, "]");
-	}
-
-	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: end (result length = " + to_string(ostFinal.str().length()) + ")");
-	}
-
-	return ostFinal.str();
 }
 
 string ParseGPSLongitude(const string longitudeStr)
@@ -1558,14 +584,11 @@ string ParseGPSLongitude(const string longitudeStr)
 	string  result = "";
 	smatch  cm;
 	regex   format1("[-+]?[[:digit:]]+(\\.[[:digit:]]+)?");
-	regex   format2("[EW]\\:[[:space:]]*([[:digit:]]+)((\\/)([[:digit:]]+))?\\,[[:space:]]*([[:digit:]]+)((\\/)([[:digit:]]+))?\\,[[:space:]]*([[:digit:]]+)((\\/)([[:digit:]]+))?");
+	regex   format2("([EW])\\:[[:space:]]*([[:digit:]]+)((\\/)([[:digit:]]+))?\\,[[:space:]]*([[:digit:]]+)((\\/)([[:digit:]]+))?\\,[[:space:]]*([[:digit:]]+)((\\/)([[:digit:]]+))?", regex_constants::ECMAScript | regex_constants::icase);
 	regex   format3(".*unknown.*");
 	regex   format4(".[[:space:]]*");
 
-	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start(" + longitudeStr + ")");
-	}
+	MESSAGE_DEBUG("", "", "start(" + longitudeStr + ")");
 
 	// --- format: +74.56 or 74.56 or 74
 	if(regex_match(longitudeStr, format1))
@@ -1574,12 +597,13 @@ string ParseGPSLongitude(const string longitudeStr)
 	}
 	else if(regex_match(longitudeStr, cm, format2))
 	{
-		string  degreeNumerator = cm[1];
-		string  degreeDivisor = cm[4];
-		string  minutesNumerator = cm[5];
-		string  minutesDivisor = cm[8];
-		string  secondsNumerator = cm[9];
-		string  secondsDivisor = cm[12];
+		string	ref = cm[1];
+		string  degreeNumerator = cm[2];
+		string  degreeDivisor = cm[5];
+		string  minutesNumerator = cm[6];
+		string  minutesDivisor = cm[9];
+		string  secondsNumerator = cm[10];
+		string  secondsDivisor = cm[13];
 		float	temp = 0;
 
 		if(!degreeDivisor.length() || !stof(degreeDivisor)) degreeDivisor = "1";
@@ -1590,22 +614,20 @@ string ParseGPSLongitude(const string longitudeStr)
 		{
 			// --- minutes couldn't be greater than 60
 			{
-				CLog	log;
-				log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]: " + minutesNumerator + "/" + minutesDivisor + " minutes can't be greater 60");
+				MESSAGE_ERROR("", "", " " + minutesNumerator + "/" + minutesDivisor + " minutes can't be greater 60");
 			}
 		}
 		else if(stof(secondsNumerator)/stof(secondsDivisor) > 60)
 		{
 			// --- seconds couldn't be greater than 60
 			{
-				CLog	log;
-				log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]: " + secondsNumerator + "/" + secondsDivisor + " seconds can't be greater 60");
+				MESSAGE_ERROR("", "", " " + secondsNumerator + "/" + secondsDivisor + " seconds can't be greater 60");
 			}
 		}
 		else
 		{
 			temp = stof(degreeNumerator)/stof(degreeDivisor) + stof(minutesNumerator)/stof(minutesDivisor)/60 + stof(secondsNumerator)/stof(secondsDivisor)/3600;
-			result = (temp > 0 ? "+" : "") + to_string(temp);
+			result = (ref.length() && (toupper(ref[0]) == 'W') ? "-" : "+") + to_string(temp);
 		}
 
 	}
@@ -1621,15 +643,11 @@ string ParseGPSLongitude(const string longitudeStr)
 	else
 	{
 		{
-			CLog	log;
-			log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]: longitude(" + longitudeStr + ") didn't match any pattern");
+			MESSAGE_ERROR("", "", " longitude(" + longitudeStr + ") didn't match any pattern");
 		}
 	}
 
-	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: finish (" + result + ")");
-	}
+	MESSAGE_DEBUG("", "", "finish (" + result + ")");
 
 	return result;
 }
@@ -1639,13 +657,12 @@ string ParseGPSLatitude(const string latitudeStr)
 	string  result = "";
 	smatch  cm;
 	regex   format1("[-+]?[[:digit:]]+(\\.[[:digit:]]+)?");
-	regex   format2("[NS]\\:[[:space:]]*([[:digit:]]+)((\\/)([[:digit:]]+))?\\,[[:space:]]*([[:digit:]]+)((\\/)([[:digit:]]+))?\\,[[:space:]]*([[:digit:]]+)((\\/)([[:digit:]]+))?");
+	regex   format2("([NS])\\:[[:space:]]*([[:digit:]]+)((\\/)([[:digit:]]+))?\\,[[:space:]]*([[:digit:]]+)((\\/)([[:digit:]]+))?\\,[[:space:]]*([[:digit:]]+)((\\/)([[:digit:]]+))?", regex_constants::ECMAScript | regex_constants::icase);
 	regex   format3(".*unknown.*");
 	regex   format4(".[[:space:]]*");
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start(" + latitudeStr + ")");
+		MESSAGE_DEBUG("", "", "start(" + latitudeStr + ")");
 	}
 	
 	// --- format: +74.56 or 74.56 or 74
@@ -1655,12 +672,13 @@ string ParseGPSLatitude(const string latitudeStr)
 	}
 	else if(regex_match(latitudeStr, cm, format2))
 	{
-		string  degreeNumerator = cm[1];
-		string  degreeDivisor = cm[4];
-		string  minutesNumerator = cm[5];
-		string  minutesDivisor = cm[8];
-		string  secondsNumerator = cm[9];
-		string  secondsDivisor = cm[12];
+		string	ref = cm[1];
+		string  degreeNumerator = cm[2];
+		string  degreeDivisor = cm[5];
+		string  minutesNumerator = cm[6];
+		string  minutesDivisor = cm[9];
+		string  secondsNumerator = cm[10];
+		string  secondsDivisor = cm[13];
 		float	temp = 0;
 
 		if(!degreeDivisor.length() || !stof(degreeDivisor)) degreeDivisor = "1";
@@ -1671,22 +689,20 @@ string ParseGPSLatitude(const string latitudeStr)
 		{
 			// --- minutes couldn't be greater than 60
 			{
-				CLog	log;
-				log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]: " + minutesNumerator + "/" + minutesDivisor + " minutes can't be greater 60");
+				MESSAGE_ERROR("", "", " " + minutesNumerator + "/" + minutesDivisor + " minutes can't be greater 60");
 			}
 		}
 		else if(stof(secondsNumerator)/stof(secondsDivisor) > 60)
 		{
 			// --- seconds couldn't be greater than 60
 			{
-				CLog	log;
-				log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]: " + secondsNumerator + "/" + secondsDivisor + " seconds can't be greater 60");
+				MESSAGE_ERROR("", "", " " + secondsNumerator + "/" + secondsDivisor + " seconds can't be greater 60");
 			}
 		}
 		else
 		{
 			temp = stof(degreeNumerator)/stof(degreeDivisor) + stof(minutesNumerator)/stof(minutesDivisor)/60 + stof(secondsNumerator)/stof(secondsDivisor)/3600;
-			result = (temp > 0 ? "+" : "") + to_string(temp);
+			result = (ref.length() && (toupper(ref[0]) == 'S') ? "-" : "+") + to_string(temp);
 		}
 
 	}
@@ -1703,14 +719,12 @@ string ParseGPSLatitude(const string latitudeStr)
 	else
 	{
 			{
-				CLog	log;
-				log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]: latitude(" + latitudeStr + ") didn't match any pattern");
+				MESSAGE_ERROR("", "", " latitude(" + latitudeStr + ") didn't match any pattern");
 			}
 	}
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: finish (" + result + ")");
+		MESSAGE_DEBUG("", "", "finish (" + result + ")");
 	}
 
 	return result;
@@ -1774,8 +788,7 @@ string ParseGPSSpeed(const string speedStr)
 	regex   format4(".[[:space:]]*");
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: start(" + speedStr + ")");
+		MESSAGE_DEBUG("", "", "start(" + speedStr + ")");
 	}
 
 	// --- format: +74.56 or 74.56 or 74
@@ -1806,14 +819,12 @@ string ParseGPSSpeed(const string speedStr)
 	else
 	{
 			{
-				CLog	log;
-				log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]: speed(" + speedStr + ") didn't match any pattern");
+				MESSAGE_ERROR("", "", " speed(" + speedStr + ") didn't match any pattern");
 			}
 	}
 
 	{
-		CLog	log;
-		log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: finish (" + result + ")");
+		MESSAGE_DEBUG("", "", "finish (" + result + ")");
 	}
 
 	return result;
@@ -2235,6 +1246,44 @@ auto	MaskSymbols(string src, int first_pos, int last_pos) -> string
 	return src;
 }
 
+auto ConvertHTMLToText(const wstring &src) -> wstring
+{
+
+	auto					result = src;
+	map<wstring, wstring>	map_replacement_1 = {
+		{L"&quot;", L"\""},
+		{L"&gt;", L">"},
+		{L"&lt;", L"<"}
+	};
+
+	MESSAGE_DEBUG("", "", "start");
+
+	result = ReplaceWstringAccordingToMap(result, map_replacement_1);
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return result;
+}
+
+auto ConvertHTMLToText(const string &src) -> string
+{
+	return(wide_to_multibyte(ConvertHTMLToText(multibyte_to_wide(src))));
+}
+
+// Convert UTF-8 byte string to wstring
+auto multibyte_to_wide(std::string const& s) -> wstring
+{
+	std::wstring_convert<std::codecvt_utf8<wchar_t> > conv;
+	return conv.from_bytes(s);
+}
+
+// Convert wstring to UTF-8 byte string
+auto wide_to_multibyte(std::wstring const& s) -> string
+{
+	std::wstring_convert<std::codecvt_utf8<wchar_t> > conv;
+	return conv.to_bytes(s);
+}
+
 auto CutTrailingZeroes(string number) -> string
 {
     size_t   dec_point_place = number.find(".");
@@ -2255,293 +1304,6 @@ auto CutTrailingZeroes(string number) -> string
     }
     
     return number;
-}
-
-auto      		GetUserBonusesAirlinesInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
-{
-	struct ItemClass
-	{
-		string	id;
-		string	user_id;
-		string	program_id;
-		string	number;
-		string	eventTimestamp;
-	};
-	vector<ItemClass>		itemsList;
-	int						affected;
-	auto					result = ""s;
-
-	MESSAGE_DEBUG("", "", "start");
-
-	if(user)
-	{
-		if(db)
-		{
-			affected = db->Query(sqlQuery);
-			if(affected)
-			{
-				for(int i = 0; i < affected; i++)
-				{
-					ItemClass	item;
-
-					item.id							= db->Get(i, "id");
-					item.user_id		 			= db->Get(i, "user_id");
-					item.program_id					= db->Get(i, "airline_id");
-					item.number						= db->Get(i, "number");
-					item.eventTimestamp				= db->Get(i, "eventTimestamp");
-
-					itemsList.push_back(item);
-				}
-
-				for (const auto& item : itemsList)
-				{
-					if(result.length()) result += ",";
-					result +=	"{";
-
-					result += "\"id\":\""						+ item.id + "\",";
-					result += "\"user_id\":\""					+ item.user_id + "\",";
-					result += "\"program_id\":\""				+ item.program_id + "\",";
-					result += "\"number\":\""					+ item.number + "\",";
-					result += "\"programs\":["					+ GetBonuseProgramsInJSONFormat("SELECT * FROM `airlines` WHERE `id`=\"" + item.program_id + "\";", db, user) + "],";
-					result += "\"eventTimestamp\":\""			+ item.eventTimestamp + "\"";
-
-					result +=	"}";
-				}
-			}
-			else
-			{
-				MESSAGE_DEBUG("", "", "user.id(" + user->GetID() + ") doesn't participate in airline bonus programs");
-			}
-		}
-		else
-		{
-			MESSAGE_ERROR("", "", "db not initialized");
-		}
-	}
-	else
-	{
-		MESSAGE_ERROR("", "", "user not initialized");
-	}
-
-
-	MESSAGE_DEBUG("", "", "finish (result length = " + to_string(result.length()) + ")");
-
-	return result;
-}
-
-auto GetUserBonusesRailroadsInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
-{
-	struct ItemClass
-	{
-		string	id;
-		string	user_id;
-		string	program_id;
-		string	number;
-		string	eventTimestamp;
-	};
-	vector<ItemClass>		itemsList;
-	int						affected;
-	auto					result = ""s;
-
-	MESSAGE_DEBUG("", "", "start");
-
-	if(user)
-	{
-		if(db)
-		{
-			affected = db->Query(sqlQuery);
-			if(affected)
-			{
-				for(int i = 0; i < affected; i++)
-				{
-					ItemClass	item;
-
-					item.id							= db->Get(i, "id");
-					item.user_id		 			= db->Get(i, "user_id");
-					item.program_id					= db->Get(i, "railroad_id");
-					item.number						= db->Get(i, "number");
-					item.eventTimestamp				= db->Get(i, "eventTimestamp");
-
-					itemsList.push_back(item);
-				}
-
-				for (const auto& item : itemsList)
-				{
-					if(result.length()) result += ",";
-					result +=	"{";
-
-					result += "\"id\":\""						+ item.id + "\",";
-					result += "\"user_id\":\""					+ item.user_id + "\",";
-					result += "\"program_id\":\""				+ item.program_id + "\",";
-					result += "\"number\":\""					+ item.number + "\",";
-					result += "\"programs\":["					+ GetBonuseProgramsInJSONFormat("SELECT * FROM `railroads` WHERE `id`=\"" + item.program_id + "\";", db, user) + "],";
-					result += "\"eventTimestamp\":\""			+ item.eventTimestamp + "\"";
-
-					result +=	"}";
-				}
-			}
-			else
-			{
-				MESSAGE_DEBUG("", "", "user.id(" + user->GetID() + ") doesn't participate in railroads bonus programs");
-			}
-		}
-		else
-		{
-			MESSAGE_ERROR("", "", "db not initialized");
-		}
-	}
-	else
-	{
-		MESSAGE_ERROR("", "", "user not initialized");
-	}
-
-
-	MESSAGE_DEBUG("", "", "finish (result length = " + to_string(result.length()) + ")");
-
-	return result;
-}
-
-auto GetUserBonusesHotelchainsInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
-{
-	struct ItemClass
-	{
-		string	id;
-		string	user_id;
-		string	program_id;
-		string	number;
-		string	eventTimestamp;
-	};
-	vector<ItemClass>		itemsList;
-	int						affected;
-	auto					result = ""s;
-
-	MESSAGE_DEBUG("", "", "start");
-
-	if(user)
-	{
-		if(db)
-		{
-			affected = db->Query(sqlQuery);
-			if(affected)
-			{
-				for(int i = 0; i < affected; i++)
-				{
-					ItemClass	item;
-
-					item.id							= db->Get(i, "id");
-					item.user_id		 			= db->Get(i, "user_id");
-					item.program_id					= db->Get(i, "hotel_chain_id");
-					item.number						= db->Get(i, "number");
-					item.eventTimestamp				= db->Get(i, "eventTimestamp");
-
-					itemsList.push_back(item);
-				}
-
-				for (const auto& item : itemsList)
-				{
-					if(result.length()) result += ",";
-					result +=	"{";
-
-					result += "\"id\":\""						+ item.id + "\",";
-					result += "\"user_id\":\""					+ item.user_id + "\",";
-					result += "\"program_id\":\""				+ item.program_id + "\",";
-					result += "\"number\":\""					+ item.number + "\",";
-					result += "\"programs\":["					+ GetBonuseProgramsInJSONFormat("SELECT * FROM `hotel_chains` WHERE `id`=\"" + item.program_id + "\";", db, user) + "],";
-					result += "\"eventTimestamp\":\""			+ item.eventTimestamp + "\"";
-
-					result +=	"}";
-				}
-			}
-			else
-			{
-				MESSAGE_DEBUG("", "", "user.id(" + user->GetID() + ") doesn't participate in hotel chain bonus programs");
-			}
-		}
-		else
-		{
-			MESSAGE_ERROR("", "", "db not initialized");
-		}
-	}
-	else
-	{
-		MESSAGE_ERROR("", "", "user not initialized");
-	}
-
-
-	MESSAGE_DEBUG("", "", "finish (result length = " + to_string(result.length()) + ")");
-
-	return result;
-}
-
-auto  GetBonuseProgramsInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
-{
-	struct ItemClass
-	{
-		string	id;
-		string	code;
-		string	description_rus;
-		string	description_eng;
-		string	country;
-	};
-	vector<ItemClass>		itemsList;
-	int						affected;
-	auto					result = ""s;
-
-	MESSAGE_DEBUG("", "", "start");
-
-	if(user)
-	{
-		if(db)
-		{
-			affected = db->Query(sqlQuery);
-			if(affected)
-			{
-				for(int i = 0; i < affected; i++)
-				{
-					ItemClass	item;
-
-					item.id							= db->Get(i, "id");
-					item.code		 				= db->Get(i, "code");
-					item.description_rus			= db->Get(i, "description_rus");
-					item.description_eng			= db->Get(i, "description_eng");
-					item.country					= db->Get(i, "country");
-
-					itemsList.push_back(item);
-				}
-
-				for (const auto& item : itemsList)
-				{
-					if(result.length()) result += ",";
-					result +=	"{";
-
-					result += "\"id\":\""				+ item.id + "\",";
-					result += "\"code\":\""				+ item.code + "\",";
-					result += "\"description_rus\":\""	+ item.description_rus + "\",";
-					result += "\"description_eng\":\""	+ item.description_eng + "\",";
-					result += "\"country\":\""			+ item.country + "\"";
-
-					result +=	"}";
-				}
-			}
-			else
-			{
-				MESSAGE_ERROR("", "", "bonus programs not found");
-			}
-		}
-		else
-		{
-			MESSAGE_ERROR("", "", "db not initialized");
-		}
-	}
-	else
-	{
-		MESSAGE_ERROR("", "", "user not initialized");
-	}
-
-
-	MESSAGE_DEBUG("", "", "finish (result length = " + to_string(result.length()) + ")");
-
-	return result;
 }
 
 auto DateInPast(string date_to_check) -> bool
@@ -2609,7 +1371,7 @@ auto	GetHelpDeskTicketsInJSONFormat(string sqlQuery, CMysql *db, CUser *user) ->
 
 			result += "\"id\":\"" + item.id + "\",";
 			result += "\"customer_user_id\":\"" + item.customer_user_id + "\",";
-			result += "\"users\":[" + GetUserListInJSONFormat("SELECT * FROM `users` WHERE `id`=" + quoted(item.customer_user_id) + ";", db, user) + "],";
+			result += "\"users\":[" + GetBaseUserInfoInJSONFormat("SELECT * FROM `users` WHERE `id`=" + quoted(item.customer_user_id) + ";", db, user) + "],";
 			result += "\"title\":\"" + item.title + "\",";
 			result += "\"history\":[" + GetHelpDeskTicketHistoryInJSONFormat("SELECT * FROM `helpdesk_ticket_history` WHERE `helpdesk_ticket_id`=\"" + item.id + "\";", db, user) + "]";
 			result +=	"}";
@@ -2670,7 +1432,7 @@ auto	GetHelpDeskTicketHistoryInJSONFormat(string sqlQuery, CMysql *db, CUser *us
 
 
 			result += "\"id\":\"" + item.id + "\",";
-			result += "\"users\":[" + GetUserListInJSONFormat("SELECT * FROM `users` WHERE `id`=" + quoted(item.user_id) + ";", db, user) + "],";
+			result += "\"users\":[" + GetBaseUserInfoInJSONFormat("SELECT * FROM `users` WHERE `id`=" + quoted(item.user_id) + ";", db, user) + "],";
 			result += "\"files\":[" + GetHelpDeskTicketAttachInJSONFormat("SELECT * FROM `helpdesk_ticket_attaches` WHERE `helpdesk_ticket_history_id`=" + quoted(item.id) + ";", db, user) + "],";
 			result += "\"state\":\"" + item.state + "\",";
 			result += "\"severity\":\"" + item.severity + "\",";
@@ -3246,3 +2008,302 @@ auto	GetGeoCountryListInJSONFormat(string dbQuery, CMysql *db, CUser *user) -> s
 
 	return result;
 }
+
+auto GetBaseUserInfoInJSONFormat(string dbQuery, CMysql *db, CUser *user) -> string
+{
+	string							result = ""s;
+	unordered_set<unsigned long>	setOfUserID;
+
+	struct	ItemClass
+	{
+		string	userID;
+		string	userLogin;
+		string	userName;
+		string	userNameLast;
+		string	userNameMiddle;
+		string	first_name_en;
+		string	last_name_en;
+		string	middle_name_en;
+		string	country_code;
+		string	phone;
+		string	email;
+		string	userType;
+		string	userSex;
+		string	userBirthday;
+		string	userBirthdayAccess;
+		string	userCurrentCityID;
+		string	passport_series;
+		string	passport_number;
+		string	passport_issue_date;
+		string	passport_issue_authority;
+		string	foreign_passport_number;
+		string	foreign_passport_expiration_date;
+		string	citizenship_code;
+		string	site_theme_id;
+		string	userLastOnline;
+		string	userLastOnlineSecondSinceY2k;
+		string	helpdesk_subscription_S1_sms;
+		string	helpdesk_subscription_S2_sms;
+		string	helpdesk_subscription_S3_sms;
+		string	helpdesk_subscription_S4_sms;
+		string	helpdesk_subscription_S1_email;
+		string	helpdesk_subscription_S2_email;
+		string	helpdesk_subscription_S3_email;
+		string	helpdesk_subscription_S4_email;
+	};
+	vector<ItemClass>		itemsList;
+	auto					itemsCount = 0;
+
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if((itemsCount = db->Query(dbQuery)) > 0)
+	{
+		for(auto i = 0; i < itemsCount; ++i)
+		{
+			ItemClass	item;
+			item.userID								= db->Get(i, "id");
+			item.userLogin							= db->Get(i, "login");
+			item.userName							= db->Get(i, "name");
+			item.userNameLast						= db->Get(i, "nameLast");
+			item.userNameMiddle						= db->Get(i, "nameMiddle");
+			item.country_code						= db->Get(i, "country_code");
+			item.phone								= db->Get(i, "phone");
+			item.email								= db->Get(i, "email");
+			item.userSex							= db->Get(i, "sex");
+			item.userType							= db->Get(i, "type");
+			item.userBirthday						= db->Get(i, "birthday");
+			item.userBirthdayAccess					= db->Get(i, "birthdayAccess");
+			item.userCurrentCityID					= db->Get(i, "geo_locality_id");
+			item.site_theme_id						= db->Get(i, "site_theme_id");
+			item.passport_series					= db->Get(i, "passport_series");
+			item.passport_number					= db->Get(i, "passport_number");
+			item.passport_issue_date				= db->Get(i, "passport_issue_date");
+			item.passport_issue_authority			= db->Get(i, "passport_issue_authority");
+			item.citizenship_code					= db->Get(i, "citizenship_code");
+			item.first_name_en						= db->Get(i, "first_name_en");
+			item.last_name_en						= db->Get(i, "last_name_en");
+			item.middle_name_en						= db->Get(i, "middle_name_en");
+			item.foreign_passport_number			= db->Get(i, "foreign_passport_number");
+			item.foreign_passport_expiration_date	= db->Get(i, "foreign_passport_expiration_date");
+			item.userLastOnline						= db->Get(i, "last_online");
+			item.userLastOnlineSecondSinceY2k		= db->Get(i, "last_onlineSecondsSinceY2k");
+			item.helpdesk_subscription_S1_email		= db->Get(i, "helpdesk_subscription_S1_email");
+			item.helpdesk_subscription_S2_email		= db->Get(i, "helpdesk_subscription_S2_email");
+			item.helpdesk_subscription_S3_email		= db->Get(i, "helpdesk_subscription_S3_email");
+			item.helpdesk_subscription_S4_email		= db->Get(i, "helpdesk_subscription_S4_email");
+			item.helpdesk_subscription_S1_sms		= db->Get(i, "helpdesk_subscription_S1_sms");
+			item.helpdesk_subscription_S2_sms		= db->Get(i, "helpdesk_subscription_S2_sms");
+			item.helpdesk_subscription_S3_sms		= db->Get(i, "helpdesk_subscription_S3_sms");
+			item.helpdesk_subscription_S4_sms		= db->Get(i, "helpdesk_subscription_S4_sms");
+
+			itemsList.push_back(item);
+		}
+
+		for(auto i = 0; i < itemsCount; i++)
+		{
+			// --- if user_list have duplicates(1, 2, 1), avoid duplications
+			if(setOfUserID.find(stol(itemsList[i].userID)) == setOfUserID.end())
+			{
+				auto				userID					= itemsList[i].userID;
+				auto				userBirthday			= itemsList[i].userBirthday;
+				auto				userCurrentCityID		= itemsList[i].userCurrentCityID;
+				auto				userCurrentCity			= ""s;
+				auto				avatarPath				= ""s;
+				auto				userLastOnline			= itemsList[i].userLastOnline;
+				auto				userLastOnlineSecondSinceY2k = itemsList[i].userLastOnlineSecondSinceY2k;
+				ostringstream		ost1;
+
+				setOfUserID.insert(stol(userID));
+
+				// --- Get user avatars
+				avatarPath = "empty";
+				if(db->Query("SELECT * from `users_avatars` WHERE `userid`=" + quoted(userID) + " AND `isActive`=\"1\";"))
+				{
+					avatarPath = "/images/avatars/avatars" + db->Get(0, "folder") + "/" + db->Get(0, "filename");
+				}
+
+				if(userCurrentCityID.length() && db->Query("SELECT `title` FROM `geo_locality` WHERE `id`=\"" + userCurrentCityID + "\";"))
+					userCurrentCity = db->Get(0, "title");
+
+				if(result.length()) result += ", ";
+
+				if(user && (userID == user->GetID()))
+				{
+					// --- user have to be able to see his own bday
+				}
+				else
+				{
+					if(itemsList[i].userBirthdayAccess == "private") userBirthday = "";
+				}
+
+				result += "{"
+						"\"id\": \""							+ itemsList[i].userID + "\", "
+						"\"name\": \""							+ itemsList[i].userName + "\", "
+						"\"nameLast\": \""						+ itemsList[i].userNameLast + "\","
+						"\"nameMiddle\": \""					+ itemsList[i].userNameMiddle + "\","
+						"\"userSex\": \""						+ itemsList[i].userSex + "\","
+						"\"userType\": \""						+ itemsList[i].userType + "\","
+						"\"birthday\": \""						+ userBirthday + "\","
+						"\"birthdayAccess\": \""				+ itemsList[i].userBirthdayAccess + "\","
+						"\"last_online\": \""					+ itemsList[i].userLastOnline + "\","
+						"\"last_online_diff\": \""				+ to_string(GetTimeDifferenceFromNow(userLastOnline)) + "\","
+						"\"last_onlineSecondsSinceY2k\": \""	+ userLastOnlineSecondSinceY2k + "\","
+						"\"avatar\": \""						+ avatarPath + "\","
+						"\"site_theme_id\": \""					+ itemsList[i].site_theme_id + "\","
+						"\"themes\": ["							+ GetSiteThemesInJSONFormat("SELECT * FROM `site_themes`", db, user) + "],"
+						"\"country_code\": \""					+ ((user && (userID == user->GetID())) ? itemsList[i].country_code : "") + "\","
+						"\"phone\": \""							+ ((user && (userID == user->GetID())) ? itemsList[i].phone : "") + "\","
+						"\"email\": \""							+ ((user && (userID == user->GetID())) ? itemsList[i].email : "") + "\","
+						"\"passport_series\": \""				+ ((user && (userID == user->GetID())) ? itemsList[i].passport_series : "") + "\","
+						"\"passport_number\": \""				+ ((user && (userID == user->GetID())) ? itemsList[i].passport_number : "") + "\","
+						"\"passport_issue_date\": \""			+ ((user && (userID == user->GetID())) ? itemsList[i].passport_issue_date : "") + "\","
+						"\"passport_issue_authority\": \""		+ ((user && (userID == user->GetID())) ? itemsList[i].passport_issue_authority : "") + "\","
+						"\"first_name_en\": \""					+ ((user && (userID == user->GetID())) ? itemsList[i].first_name_en : "") + "\","
+						"\"last_name_en\": \""					+ ((user && (userID == user->GetID())) ? itemsList[i].last_name_en : "") + "\","
+						"\"middle_name_en\": \""				+ ((user && (userID == user->GetID())) ? itemsList[i].middle_name_en : "") + "\","
+						"\"foreign_passport_number\": \""		+ ((user && (userID == user->GetID())) ? itemsList[i].foreign_passport_number : "") + "\","
+						"\"foreign_passport_expiration_date\": \"" + ((user && (userID == user->GetID())) ? itemsList[i].foreign_passport_expiration_date : "") + "\","
+						"\"citizenship_code\": \""				+ ((user && (userID == user->GetID())) ? itemsList[i].citizenship_code : "") + "\","
+						"\"helpdesk_subscriptions_sms\": ["		+ ((user && (userID == user->GetID())) ? quoted(itemsList[i].helpdesk_subscription_S1_sms) + "," + quoted(itemsList[i].helpdesk_subscription_S2_sms) + "," + quoted(itemsList[i].helpdesk_subscription_S3_sms) + "," + quoted(itemsList[i].helpdesk_subscription_S4_sms)  : "") + "],"
+						"\"helpdesk_subscriptions_email\": ["	+ ((user && (userID == user->GetID())) ? quoted(itemsList[i].helpdesk_subscription_S1_email) + "," + quoted(itemsList[i].helpdesk_subscription_S2_email) + "," + quoted(itemsList[i].helpdesk_subscription_S3_email) + "," + quoted(itemsList[i].helpdesk_subscription_S4_email)  : "") + "],"
+						"\"isMe\": \""							+ ((user && (userID == user->GetID())) ? "yes" : "no") + "\""
+						"}";
+			}
+		}
+	}
+	else
+	{
+		MESSAGE_DEBUG("", "", "there are users returned by request [" + dbQuery + "]");
+	}
+
+
+	return result;
+}
+
+auto SendPhoneConfirmationCode(const string &country_code, const string &phone_number, const string &session, CMysql *db, CUser *user) -> string
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	error_message = ""s;
+	auto	confirmation_code = GetRandom(4);
+	c_smsc	smsc(db);
+
+	if(country_code.length() && phone_number.length() && session.length())
+	{
+		// --- don't move it behind InsertQuery, 
+		// --- first clean-up, then inser new token
+		RemovePhoneConfirmationCodes(session, db);
+
+		auto	phone_confirmation_id = db->InsertQuery("INSERT INTO `phone_confirmation` (`session`, `confirmation_code`, `country_code`, `phone_number`, `eventTimestamp`)"
+														" VALUES ("
+															"\"" + session + "\","
+															"\"" + confirmation_code + "\","
+															"\"" + country_code + "\","
+															"\"" + phone_number + "\","
+															"UNIX_TIMESTAMP()"
+														")"
+														);
+
+		if(phone_confirmation_id)
+		{
+			auto	ret = smsc.send_sms(country_code + phone_number, "Code " + confirmation_code, 0, "", 0, 0, DOMAIN_NAME, "", "");
+		}
+		else
+		{
+			error_message = gettext("SQL syntax error");
+			MESSAGE_ERROR("", "", error_message);
+		}
+	}
+	else
+	{
+		error_message = gettext("mandatory parameter missed");
+		MESSAGE_ERROR("", "", error_message)
+	}
+
+	return error_message;
+}
+
+auto CheckPhoneConfirmationCode(const string &confirmation_code, const string &session, CMysql *db, CUser *user) -> vector<pair<string, string>>
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	vector<pair<string, string>>	error_message;
+
+	if(confirmation_code.length() && session.length())
+	{
+		auto affected = db->Query("SELECT `id` FROM `phone_confirmation` WHERE "
+									"`confirmation_code`=\"" + confirmation_code + "\" AND "
+									"`session`=\"" + session + "\" AND "
+									"`attempt`<=\"3\";");
+		if(affected == 1)
+		{
+			// --- good2go
+			RemovePhoneConfirmationCodes(session, db);
+		}
+		else if(affected == 0)
+		{
+			db->Query("UPDATE `phone_confirmation` SET `attempt`=`attempt` + 1 WHERE `session`=\"" + session + "\";");
+
+			if(db->Query("SELECT `attempt` FROM `phone_confirmation` WHERE `session`=\"" + session + "\";"))
+			{
+				auto	attempts = db->Get(0, "attempt");
+
+				if(stoi(attempts) >= 3) RemovePhoneConfirmationCodes(session, db);
+
+				error_message.push_back(make_pair("attempt", attempts));
+			}
+			else
+			{
+				MESSAGE_ERROR("", "", "fail to select data");
+			}
+			error_message.push_back(make_pair("description", gettext("incorrect confirmation code")));
+			MESSAGE_ERROR("", "", error_message[0].second);
+		}
+		else
+		{
+			RemovePhoneConfirmationCodes(session, db);
+			error_message.push_back(make_pair("description", gettext("there was created more token than allowed") + ", "s + gettext("please try again")));
+			MESSAGE_ERROR("", "", error_message[0].second);
+		}
+	}
+	else
+	{
+		error_message.push_back(make_pair("description", gettext("mandatory parameter missed")));
+		MESSAGE_ERROR("", "", error_message[0].second)
+	}
+
+	MESSAGE_DEBUG("", "", "result (" + to_string(error_message.size()) + ")");
+
+	return error_message;
+}
+
+auto RemovePhoneConfirmationCodes(string sessid, CMysql *db) -> string
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	error_message = ""s;
+
+	db->Query("DELETE FROM `phone_confirmation` WHERE `session`=\"" + sessid + "\";");
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return error_message;
+}
+
+auto isDemoDomain() -> bool
+{
+	auto	result = false;
+	string	domain_name = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(getenv("SERVER_NAME")) domain_name = getenv("SERVER_NAME");
+
+	if(domain_name.find("demo") != string::npos) result = true;
+
+	MESSAGE_DEBUG("", "", "result (" + to_string(result) + ")");
+
+	return result;
+}
+

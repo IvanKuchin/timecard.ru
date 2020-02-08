@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-03 21:31-0500\n"
+"POT-Creation-Date: 2020-02-05 22:56-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1031,6 +1031,9 @@ msgstr "начало должно быть раньше окончания"
 
 msgid "phone is not confirmed"
 msgstr "телефон не подтвержден"
+
+msgid "phone not registered"
+msgstr "Данный номер не зарегистрирован"
 
 msgid "phone number is incorrect"
 msgstr "некорректный номер телефона"

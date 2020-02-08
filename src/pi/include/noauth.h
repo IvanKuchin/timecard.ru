@@ -3,6 +3,7 @@
 
 #include "ccgi.h"
 #include "cstatistics.h"
+#include "utilities.h"
 #include "utilities_common.h"
 #include "c_smsc.h"
 

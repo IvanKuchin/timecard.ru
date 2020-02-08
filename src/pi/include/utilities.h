@@ -18,6 +18,7 @@
 #include <Magick++.h>
 #include <codecvt>
 
+#include "c_smsc.h"
 #include "c_date_spelling.h"
 #include "cfiles.h"
 #include "cmysql.h"
@@ -55,6 +56,7 @@ auto	      	RemoveSpecialSymbols(string src) -> string;
 auto	      	RemoveSpecialHTMLSymbols(const string &src) -> string;
 auto	      	ReplaceDoubleQuoteToQuote(string src) -> string;
 auto	      	ReplaceCRtoHTML(string src) -> string;
+auto			ReplaceWstringAccordingToMap(const wstring &src, const map<wstring, wstring> &replacements) -> wstring;
 auto	      	CleanUPText(const string messageBody, bool removeBR = true) -> string;
 auto	      	RemoveAllNonAlphabetSymbols(const string &src) -> string;
 auto	      	ConvertTextToHTML(const string &messageBody) -> string;
@@ -89,16 +91,15 @@ auto			GetPasswordAdjectivesList(CMysql *) -> string;
 auto			GetPasswordCharacteristicsList(CMysql *) -> string;
 auto			isAllowed_NoSession_Action(string action) -> bool;
 auto			CutTrailingZeroes(string number) -> string;
+auto			SendPhoneConfirmationCode(const string &country_code, const string &phone_number, const string &session, CMysql *db, CUser *user) -> string;
+auto			CheckPhoneConfirmationCode(const string &confirmation_code, const string &session, CMysql *, CUser *) -> vector<pair<string, string>>;
+auto			RemovePhoneConfirmationCodes(string sessid, CMysql *) -> string;
+
 
 auto      		GetChatMessagesInJSONFormat(string dbQuery, CMysql *) -> string;
 // auto      		GetCompanyListInJSONFormat(string dbQuery, CMysql *, CUser *, bool quickSearch = true, bool includeEmployedUsersList = false) -> string;
-auto      		GetUserListInJSONFormat(string dbQuery, CMysql *, CUser *) -> string;
-auto      		GetUserBonusesAirlinesInJSONFormat(string dbQuery, CMysql *, CUser *) -> string;
-auto      		GetUserBonusesRailroadsInJSONFormat(string dbQuery, CMysql *, CUser *) -> string;
-auto      		GetUserBonusesHotelchainsInJSONFormat(string dbQuery, CMysql *, CUser *) -> string;
-auto			GetBonuseProgramsInJSONFormat(string dbQuery, CMysql *db, CUser *user) -> string;
+auto      		GetBaseUserInfoInJSONFormat(string dbQuery, CMysql *, CUser *) -> string;
 auto      		GetGeoCountryListInJSONFormat(string dbQuery, CMysql *, CUser *) -> string;
-auto      		GetGroupListInJSONFormat(string dbQuery, CMysql *, CUser *) -> string;
 auto 			GetBookListInJSONFormat(string dbQuery, CMysql *, bool includeReaders = false) -> string;
 auto 			GetComplainListInJSONFormat(string dbQuery, CMysql *, bool includeReaders = false) -> string;
 auto 			GetCertificationListInJSONFormat(string dbQuery, CMysql *, bool includeDevoted = false) -> string;
@@ -110,22 +111,9 @@ auto 			GetSchoolListInJSONFormat(string dbQuery, CMysql *, bool includeStudents
 // auto 			GetNewsFeedInJSONFormat(string whereStatement, int currPage, int newsOnSinglePage, CUser *, CMysql *) -> string;
 auto      		GetUnreadChatMessagesInJSONFormat(CUser *, CMysql *) -> string;
 auto			GetGiftListInJSONFormat(string dbQuery, CMysql *, CUser *) -> string;
-auto 			GetGiftToGiveListInJSONFormat(string dbQuery, CMysql *, CUser *) -> string;
-auto			GetEventListInJSONFormat(string dbQuery, CMysql *, CUser *) -> string;
-auto			GetEventHostsListInJSONFormat(string dbQuery, CMysql *, CUser *) -> string;
-auto			GetEventGuestsListInJSONFormat(string dbQuery, CMysql *, CUser *) -> string;
 auto			GetMySQLDateInJSONFormat(string dateString) -> string;
-auto      		GetMessageImageList(string imageSetID, CMysql *) -> string;
-auto      		GetMessageLikesUsersList(string messageID, CUser *, CMysql *) -> string;
-auto 			GetCertificationLikesUsersList(string usersCertificationID, CUser *, CMysql *) -> string;
-auto 			GetCourseLikesUsersList(string usersCourseID, CUser *, CMysql *) -> string;
-auto 			GetUniversityDegreeLikesUsersList(string messageID, CUser *, CMysql *) -> string;
-auto 			GetCompanyLikesUsersList(string usersCompanyID, CUser *, CMysql *) -> string;
-auto 			GetLanguageLikesUsersList(string usersLanguageID, CUser *, CMysql *) -> string;
-auto 			GetBookLikesUsersList(string usersBookID, CUser *, CMysql *) -> string;
 auto 			GetBookRatingList(string bookID, CMysql *) -> string;
 auto 			GetCourseRatingList(string courseID, CMysql *) -> string;
-auto 			GetBookRatingUsersList(string bookID, CUser *, CMysql *) -> string;
 auto      		GetMessageCommentsCount(string messageID, CMysql *) -> string;
 auto 			GetCompanyCommentsCount(string messageID, CMysql *) -> string;
 auto 			GetLanguageCommentsCount(string messageID, CMysql *) -> string;
@@ -137,8 +125,6 @@ auto      		GetMessageSpamUser(string messageID, string userID, CMysql *) -> str
 auto			GetLanguageIDByTitle(string title, CMysql *) -> string;
 auto			GetSkillIDByTitle(string title, CMysql *) -> string;
 auto			GetCompanyPositionIDByTitle(string title, CMysql *) -> string;
-auto 			GetCandidatesListAppliedToVacancyInJSONFormat(string dbQuery, CMysql *) -> string;
-auto 			GetOpenVacanciesInJSONFormat(string companyID, CMysql *, CUser * = NULL) -> string;
 auto			GetGeoLocalityIDByCityAndRegion(string regionName, string cityName, CMysql *) -> string;
 auto        	AllowMessageInNewsFeed(CUser *me, const string messageOwnerID, const string messageAccessRights, vector<string> *messageFriendList) -> bool;
 auto        	isPersistenceRateLimited(string REMOTE_ADDR, CMysql *) -> bool;
@@ -223,14 +209,14 @@ auto 			isCBCurrencyRate(string date, string currency_name, string currency_nomi
 auto			DateInPast(string date_to_check) -> bool;
 
 // --- helpdesk
-auto			GetHelpDeskTicketsInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string;
-auto			GetHelpDeskTicketHistoryInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string;
-auto			GetHelpDeskTicketAttachInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string;
-auto			isHelpdeskTicketOwner(string ticket_id, string user_id, CMysql *db, CUser *user) -> bool;
-auto			isUserAllowedToChangeTicket(string ticket_id, string user_id, CMysql *db, CUser *user) -> string;
+auto			GetHelpDeskTicketsInJSONFormat(string sqlQuery, CMysql *, CUser *user) -> string;
+auto			GetHelpDeskTicketHistoryInJSONFormat(string sqlQuery, CMysql *, CUser *user) -> string;
+auto			GetHelpDeskTicketAttachInJSONFormat(string sqlQuery, CMysql *, CUser *user) -> string;
+auto			isHelpdeskTicketOwner(string ticket_id, string user_id, CMysql *, CUser *user) -> bool;
+auto			isUserAllowedToChangeTicket(string ticket_id, string user_id, CMysql *, CUser *user) -> string;
 
 // --- FAQ
-auto			GetFAQInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string;
+auto			GetFAQInJSONFormat(string sqlQuery, CMysql *, CUser *user) -> string;
 
 // --- UTF8 encoding/decoding
 auto         	convert_utf8_to_windows1251(const char* utf8, char* windows1251, size_t n) -> int;
@@ -310,5 +296,7 @@ auto		ParseGPSLongitude(const string longitudeStr) -> string;
 auto		ParseGPSLatitude(const string latitudeStr) -> string;
 auto		ParseGPSAltitude(const string altitudeStr) -> string;
 auto		ParseGPSSpeed(const string speedStr) -> string;
+
+auto		isDemoDomain() -> bool;
 
 #endif
