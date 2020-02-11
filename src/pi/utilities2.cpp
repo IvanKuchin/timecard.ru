@@ -2291,6 +2291,28 @@ auto RemovePhoneConfirmationCodes(string sessid, CMysql *db) -> string
 	return error_message;
 }
 
+auto	GetCountryCodeAndPhoneNumberBySMSCode(const string &confirmation_code, const string &session, CMysql *db) -> pair<string, string>
+{
+	auto	country_code = ""s;
+	auto	phone_number = ""s;
+
+	MESSAGE_DEBUG("", "", "start (" + confirmation_code + ")");
+
+	if(db->Query ("SELECT * FROM `phone_confirmation` WHERE `confirmation_code`=" + quoted(confirmation_code) + " AND `session` = " + quoted(session) + ";"))
+	{
+		country_code = db->Get(0, "country_code");
+		phone_number = db->Get(0, "phone_number");
+	}
+	else
+	{
+		MESSAGE_DEBUG("", "", "confirmation_code and session");
+	}
+
+	MESSAGE_DEBUG("", "", "finish (" + country_code + "," + phone_number + ")");
+
+	return make_pair(country_code, phone_number);
+}
+
 auto isDemoDomain() -> bool
 {
 	auto	result = false;

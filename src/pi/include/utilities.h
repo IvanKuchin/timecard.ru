@@ -179,6 +179,9 @@ auto			MaskSymbols(string src, int first_pos, int last_pos) -> string;
 auto			GetValueFromDB(string sql, CMysql *) -> string;
 auto			GetValuesFromDB(string sql, CMysql *) -> vector<string>;
 
+// --- login functions
+auto			GetCountryCodeAndPhoneNumberBySMSCode(const string &confirmation_code, const string &session, CMysql *) -> pair<string, string>;
+
 // --- file system functions
 auto			CreateDir(const string &dir) -> bool;
 auto 			RmDirRecursive(const char *dirname) -> bool;

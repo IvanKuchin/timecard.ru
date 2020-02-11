@@ -1283,7 +1283,7 @@ int main()
 		}
 		else
 		{
-			error_message = gettext("token has missed");
+			error_message = gettext("mandatory parameter missed");
 			MESSAGE_DEBUG("", action, error_message);
 		}
 

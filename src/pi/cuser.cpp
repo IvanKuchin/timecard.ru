@@ -446,14 +446,14 @@ auto CUser::PatchRussianPhoneNumber(string number) -> auto
 	return number;
 }
 
-bool CUser::GetFromDBbyPhone(const string &phone)
+bool CUser::GetFromDBbyPhone(const string &country_code, const string &phone)
 {
 	auto	result = false;
 	auto	phone_digits = SymbolReplace_KeepDigitsOnly(phone);
 
 	if(db == NULL) throw CExceptionHTML("error db");
 
-	if(phone_digits.length())
+	if(country_code.length() && phone_digits.length())
 	{
 		phone_digits = PatchRussianPhoneNumber(phone_digits);
 
@@ -463,11 +463,9 @@ bool CUser::GetFromDBbyPhone(const string &phone)
 				"WHERE "
 					"`users_passwd`.`isActive`='true' "
 					"AND "
-					"("
-						"(`users`.`phone`=\"" + phone_digits + "\") "
-						"OR "
-						"(CONCAT(`users`.`country_code`, `users`.`phone`)=\"" + phone_digits + "\") "
-					")"
+					"`users`.`country_code`=\"" + country_code + "\""
+					"AND "
+					"`users`.`phone`=\"" + phone_digits + "\" "
 				";"
 			)) 
 		{

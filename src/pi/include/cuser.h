@@ -132,7 +132,7 @@ class CUser
 		bool		GetFromDBbyLogin(string);
 		bool		GetFromDBbyID(string);
 		bool		GetFromDBbyEmail(string);
-		bool		GetFromDBbyPhone(const string &);
+		bool		GetFromDBbyPhone(const string &country_code, const string &phone);
 		bool		GetFromDBbyEmailNoPassword(string);
 
 		auto		ChangePasswordTo(string) -> string;

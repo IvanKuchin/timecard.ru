@@ -4964,82 +4964,98 @@ int main()
 			}
 			else
 			{
-				auto	login		= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("login"));
-				auto	password	= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("password"));
-				auto	rememberMe	= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("remember"));
-				auto	lng			= CheckHTTPParam_Text(indexPage.GetLanguage());
+				auto	login				= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("login"));
+				auto	password			= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("password"));
+				auto	confirmation_code	= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("confirmation_code"));
+				auto	rememberMe			= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("signinRemember"));
+				auto	country_code		= ""s;
+				auto	phone_number		= ""s;
 				CUser	user;
 
 				user.SetDB(&db);
 
-				if	(
-						((login.find("@") != string::npos) && user.GetFromDBbyEmail(login)) ||
-						((login.find_first_not_of("1234567890+()- ") == string::npos) && user.GetFromDBbyPhone(login)) || 
-						(user.GetFromDBbyLogin(login))
-					)
+				if(confirmation_code.length())
 				{
+					tie(country_code, phone_number) = GetCountryCodeAndPhoneNumberBySMSCode(confirmation_code, indexPage.SessID_Get_FromHTTP() , &db);
+					error_message = CheckPhoneConfirmationCode(confirmation_code, indexPage.SessID_Get_FromHTTP(), &db, &user);
+				}
 
-					if(!user.isActive())
+				if(error_message.empty())
+				{
+					if	(
+							((login.find("@") != string::npos) && user.GetFromDBbyEmail(login)) ||
+							(country_code.length() && phone_number.length() && user.GetFromDBbyPhone(country_code, phone_number)) || 
+							(user.GetFromDBbyLogin(login))
+						)
 					{
-						error_message.push_back(make_pair("description", "пользователь неактивирован, необходима активация"));
-						MESSAGE_ERROR("", action, "user [" + user.GetLogin() + "] not activated");
-					}
-					else
-					{
-						if((password != user.GetPasswd()) || (user.GetPasswd() == ""))
+
+						if(!user.isActive())
 						{
-							if(db.Query("SELECT * FROM `users_passwd` WHERE `userID`=\"" + user.GetID() + "\" and `passwd`=\"" + password + "\";"))
-							{
-								// --- earlier password is user for user login
-								error_message.push_back(make_pair("description", "этот пароль был изменен " + GetHumanReadableTimeDifferenceFromNow(db.Get(0, "eventTimestamp"))));
-								MESSAGE_DEBUG("", action, "old password has been used for user [" + user.GetLogin() + "] login");
-							}
-							else
-							{
-								// --- password is wrong for user
-								error_message.push_back(make_pair("description", "логин или пароль указаны не верно"));
-								MESSAGE_DEBUG("", action, "user [" + user.GetLogin() + "] failed to login due to passwd error");
-							}
-
+							error_message.push_back(make_pair("description", "пользователь неактивирован, необходима активация"));
+							MESSAGE_ERROR("", action, "user [" + user.GetLogin() + "] not activated");
 						}
 						else
 						{
-							MESSAGE_DEBUG("", action, "" + action + ": switching session (" + sessid + ") FROM Guest to user (" + user.GetLogin() + ")");
-
-							db.Query("UPDATE `sessions` SET `user_id`=\"" + user.GetID() + "\", `ip`=\"" + getenv("REMOTE_ADDR") + "\", `expire`=\"" + (rememberMe == "remember-me" ? "0" : to_string(SESSION_LEN * 60)) + "\" WHERE `id`=\"" + sessid + "\";");
-
-							if(db.isError())
+							if((password != user.GetPasswd()) || (user.GetPasswd() == ""))
 							{
-								error_message.push_back(make_pair("description", gettext("SQL syntax error")));
-								MESSAGE_ERROR("", action, "updating `sessions` table");
+								if(db.Query("SELECT * FROM `users_passwd` WHERE `userID`=\"" + user.GetID() + "\" and `passwd`=\"" + password + "\";"))
+								{
+									// --- earlier password is user for user login
+									error_message.push_back(make_pair("description", "этот пароль был изменен " + GetHumanReadableTimeDifferenceFromNow(db.Get(0, "eventTimestamp"))));
+									MESSAGE_DEBUG("", action, "old password has been used for user [" + user.GetLogin() + "] login");
+								}
+								else
+								{
+									// --- password is wrong for user
+									error_message.push_back(make_pair("description", "логин или пароль указаны не верно"));
+									MESSAGE_DEBUG("", action, "user [" + user.GetLogin() + "] failed to login due to passwd error");
+								}
+
 							}
 							else
 							{
-								if(rememberMe == "remember-me")
+								MESSAGE_DEBUG("", action, "" + action + ": switching session (" + sessid + ") FROM Guest to user (" + user.GetLogin() + ")");
+
+								db.Query("UPDATE `sessions` SET `user_id`=\"" + user.GetID() + "\", `ip`=\"" + getenv("REMOTE_ADDR") + "\", `expire`=\"" + (rememberMe == "remember-me" ? "0" : to_string(SESSION_LEN * 60)) + "\" WHERE `id`=\"" + sessid + "\";");
+
+								if(db.isError())
 								{
-									if(!indexPage.CookieUpdateTS("sessid", 0))
-									{
-										MESSAGE_ERROR("", action, "in setting up expiration sessid cookie to infinite");
-									}
+									error_message.push_back(make_pair("description", gettext("SQL syntax error")));
+									MESSAGE_ERROR("", action, "updating `sessions` table");
 								}
+								else
+								{
+									if(rememberMe == "remember-me")
+									{
+										if(!indexPage.CookieUpdateTS("sessid", 0))
+										{
+											MESSAGE_ERROR("", action, "in setting up expiration sessid cookie to infinite");
+										}
+									}
 
-								indexPage.RegisterVariableForce("loginUser", user.GetLogin());
-								indexPage.RegisterVariableForce("menu_main_active", "active");
+									indexPage.RegisterVariableForce("loginUser", user.GetLogin());
+									indexPage.RegisterVariableForce("menu_main_active", "active");
 
-								MESSAGE_DEBUG("", action, "redirect to \"/" + GetDefaultActionFromUserType(&user, &db) + "?rand=xxxxxx\"");
+									MESSAGE_DEBUG("", action, "redirect to \"/" + GetDefaultActionFromUserType(&user, &db) + "?rand=xxxxxx\"");
 
-								success_message = 	"\"result\": \"success\","
-													"\"description\": \"\","
-													"\"url\": \"/" + GetDefaultActionFromUserType(&user, &db) + "?rand=" + GetRandom(10) + "\"";
+									success_message = 	"\"result\": \"success\","
+														"\"description\": \"\","
+														"\"url\": \"/" + GetDefaultActionFromUserType(&user, &db) + "?rand=" + GetRandom(10) + "\"";
+								}
 							}
 						}
+					}
+					else
+					{
+						error_message.push_back(make_pair("description", "Почта или Пароль указаны не верно."));
+						MESSAGE_DEBUG("", action, "user [" + user.GetLogin() + "] not found");
 					}
 				}
 				else
 				{
-					error_message.push_back(make_pair("description", "Почта или Пароль указаны не верно."));
-					MESSAGE_DEBUG("", action, "user [" + user.GetLogin() + "] not found");
+					MESSAGE_DEBUG("", action, "error_message is not empty");
 				}
+
 			} // if(sessid.length() < 5)
 
 			AJAX_ResponseTemplate(&indexPage, success_message, error_message);
@@ -5266,7 +5282,7 @@ int main()
 
 								db.Query("UPDATE `sessions` SET `user_id`='" + user.GetID() + "', `ip`='" + getenv("REMOTE_ADDR") + "', `expire`=" + to_string(rememberMe == "remember-me" ? 0 : SESSION_LEN * 60) + " WHERE `id`='" + sessid + "';");
 
-								if(rememberMe == "remember-me") 
+								if(rememberMe == "remember-me")
 								{
 									if(!indexPage.CookieUpdateTS("sessid", 0))
 									{

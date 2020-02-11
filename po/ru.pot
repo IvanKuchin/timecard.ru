@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-05 22:56-0500\n"
+"POT-Creation-Date: 2020-02-09 08:21-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1038,6 +1038,9 @@ msgstr "Данный номер не зарегистрирован"
 msgid "phone number is incorrect"
 msgstr "некорректный номер телефона"
 
+msgid "please try again"
+msgstr "попробуйте еще раз"
+
 msgid "position changed"
 msgstr "изменили должность"
 
@@ -1146,6 +1149,9 @@ msgstr "шаблон не найден"
 msgid "temporary file doesn't exists"
 msgstr "временный фаил не найден"
 
+msgid "there was created more token than allowed"
+msgstr "создано больше токенов, чем разрешено"
+
 msgid "this booking already exists"
 msgstr "этот букинг уже существует"
 
@@ -1182,11 +1188,8 @@ msgstr "не указан ИНН"
 msgid "to"
 msgstr "на"
 
-msgid "token has missed"
-msgstr ""
-
 msgid "token not found"
-msgstr ""
+msgstr "токен не найден"
 
 msgid "total amount"
 msgstr "на сумму"
