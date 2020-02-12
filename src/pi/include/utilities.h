@@ -180,7 +180,7 @@ auto			GetValueFromDB(string sql, CMysql *) -> string;
 auto			GetValuesFromDB(string sql, CMysql *) -> vector<string>;
 
 // --- login functions
-auto			GetCountryCodeAndPhoneNumberBySMSCode(const string &confirmation_code, const string &session, CMysql *) -> pair<string, string>;
+auto			GetCountryCodeAndPhoneNumberBySMSCode(const string &confirmation_code, const string &session, CMysql *) -> tuple<string, string, string>;
 
 // --- file system functions
 auto			CreateDir(const string &dir) -> bool;

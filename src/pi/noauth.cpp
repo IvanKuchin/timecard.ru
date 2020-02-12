@@ -97,7 +97,7 @@ int main()
 			auto			error_message = ""s;
 
 			auto			country_code = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("country_code"));
-			auto			phone_number = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("phone_number"));
+			auto			phone_number = SymbolReplace_KeepDigitsOnly(CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("phone_number")));
 
 			MESSAGE_DEBUG("", action, "start");
 

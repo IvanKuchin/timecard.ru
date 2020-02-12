@@ -2291,10 +2291,11 @@ auto RemovePhoneConfirmationCodes(string sessid, CMysql *db) -> string
 	return error_message;
 }
 
-auto	GetCountryCodeAndPhoneNumberBySMSCode(const string &confirmation_code, const string &session, CMysql *db) -> pair<string, string>
+auto	GetCountryCodeAndPhoneNumberBySMSCode(const string &confirmation_code, const string &session, CMysql *db) -> tuple<string, string, string>
 {
 	auto	country_code = ""s;
 	auto	phone_number = ""s;
+	auto	password = ""s;
 
 	MESSAGE_DEBUG("", "", "start (" + confirmation_code + ")");
 
@@ -2302,6 +2303,20 @@ auto	GetCountryCodeAndPhoneNumberBySMSCode(const string &confirmation_code, cons
 	{
 		country_code = db->Get(0, "country_code");
 		phone_number = db->Get(0, "phone_number");
+
+		if(db->Query("SELECT `passwd` FROM `users_passwd` WHERE "
+						"`isActive`=\"true\" "
+						"AND "
+						"`userID`=(SELECT `id` FROM `users` WHERE `country_code`=" + quoted(country_code) + " AND `phone`=" + quoted(phone_number) + ")"
+						";")
+			)
+		{
+			password = db->Get(0, "passwd");
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "workflow not suppose to be here (either two or more users got the same phone number or no active password)");
+		}
 	}
 	else
 	{
@@ -2310,7 +2325,7 @@ auto	GetCountryCodeAndPhoneNumberBySMSCode(const string &confirmation_code, cons
 
 	MESSAGE_DEBUG("", "", "finish (" + country_code + "," + phone_number + ")");
 
-	return make_pair(country_code, phone_number);
+	return make_tuple(country_code, phone_number, password);
 }
 
 auto isDemoDomain() -> bool

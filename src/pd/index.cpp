@@ -4976,7 +4976,7 @@ int main()
 
 				if(confirmation_code.length())
 				{
-					tie(country_code, phone_number) = GetCountryCodeAndPhoneNumberBySMSCode(confirmation_code, indexPage.SessID_Get_FromHTTP() , &db);
+					tie(country_code, phone_number, password) = GetCountryCodeAndPhoneNumberBySMSCode(confirmation_code, indexPage.SessID_Get_FromHTTP() , &db);
 					error_message = CheckPhoneConfirmationCode(confirmation_code, indexPage.SessID_Get_FromHTTP(), &db, &user);
 				}
 
@@ -4984,7 +4984,7 @@ int main()
 				{
 					if	(
 							((login.find("@") != string::npos) && user.GetFromDBbyEmail(login)) ||
-							(country_code.length() && phone_number.length() && user.GetFromDBbyPhone(country_code, phone_number)) || 
+							(country_code.length() && phone_number.length() && password.length() && user.GetFromDBbyPhone(country_code, phone_number)) || 
 							(user.GetFromDBbyLogin(login))
 						)
 					{
