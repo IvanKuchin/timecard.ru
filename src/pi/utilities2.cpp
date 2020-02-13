@@ -2258,19 +2258,19 @@ auto CheckPhoneConfirmationCode(const string &confirmation_code, const string &s
 				MESSAGE_ERROR("", "", "fail to select data");
 			}
 			error_message.push_back(make_pair("description", gettext("incorrect confirmation code")));
-			MESSAGE_ERROR("", "", error_message[0].second);
+			MESSAGE_DEBUG("", "", error_message[error_message.size() - 1].second);
 		}
 		else
 		{
 			RemovePhoneConfirmationCodes(session, db);
 			error_message.push_back(make_pair("description", gettext("there was created more token than allowed") + ", "s + gettext("please try again")));
-			MESSAGE_ERROR("", "", error_message[0].second);
+			MESSAGE_ERROR("", "", error_message[error_message.size() - 1].second);
 		}
 	}
 	else
 	{
 		error_message.push_back(make_pair("description", gettext("mandatory parameter missed")));
-		MESSAGE_ERROR("", "", error_message[0].second)
+		MESSAGE_ERROR("", "", error_message[error_message.size() - 1].second)
 	}
 
 	MESSAGE_DEBUG("", "", "result (" + to_string(error_message.size()) + ")");

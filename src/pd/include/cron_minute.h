@@ -5,6 +5,7 @@
 #include <sys/time.h>
 #include <string.h>
 
+#include "cactivator.h"
 #include "ccgi.h"
 #include "cmysql.h"
 #include "cuser.h"

@@ -91,10 +91,6 @@ auto			GetPasswordAdjectivesList(CMysql *) -> string;
 auto			GetPasswordCharacteristicsList(CMysql *) -> string;
 auto			isAllowed_NoSession_Action(string action) -> bool;
 auto			CutTrailingZeroes(string number) -> string;
-auto			SendPhoneConfirmationCode(const string &country_code, const string &phone_number, const string &session, CMysql *db, CUser *user) -> string;
-auto			CheckPhoneConfirmationCode(const string &confirmation_code, const string &session, CMysql *, CUser *) -> vector<pair<string, string>>;
-auto			RemovePhoneConfirmationCodes(string sessid, CMysql *) -> string;
-
 
 auto      		GetChatMessagesInJSONFormat(string dbQuery, CMysql *) -> string;
 // auto      		GetCompanyListInJSONFormat(string dbQuery, CMysql *, CUser *, bool quickSearch = true, bool includeEmployedUsersList = false) -> string;
@@ -155,6 +151,11 @@ auto 			isAdverseWordsHere(string text, CMysql *) -> bool;
 auto			GetCompanyPositionsInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetSiteThemesInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 
+// --- SMS functions
+auto			SendPhoneConfirmationCode(const string &country_code, const string &phone_number, const string &session, CMysql *db, CUser *user) -> string;
+auto			CheckPhoneConfirmationCode(const string &confirmation_code, const string &session, CMysql *, CUser *) -> vector<pair<string, string>>;
+auto			RemovePhoneConfirmationCodes(string sessid, CMysql *) -> string;
+
 // --- date functions
 pair<struct tm, struct tm> GetFirstAndLastMonthDaysByDate(const struct tm &_date);
 pair<struct tm, struct tm> GetFirstAndLastDateOfLastMonth();
@@ -176,6 +177,8 @@ auto			GetZipInJSONFormat(string zip_id, CMysql *, CUser *) -> string;
 auto			GetBankInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			stod_noexcept(const string &) -> double;
 auto			MaskSymbols(string src, int first_pos, int last_pos) -> string;
+
+// --- DB functions
 auto			GetValueFromDB(string sql, CMysql *) -> string;
 auto			GetValuesFromDB(string sql, CMysql *) -> vector<string>;
 

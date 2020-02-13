@@ -35,7 +35,6 @@ void CActivator::SetDB(CMysql *mysql)
 		CLog	log;
 		log.Write(DEBUG, "CActivator::" + string(__func__) + "[" + to_string(__LINE__) + "]: clean-up 'activator' table.");
 	}
-	db->Query("DELETE FROM `activators` WHERE  `date`<=(now() - INTERVAL " + to_string(ACTIVATOR_SESSION_LEN) + " MINUTE)");
 
 	if(db->Query("SELECT `id` FROM `users` WHERE `isactivated`='N' AND `activator_sent` <= (now() - INTERVAL " + to_string(ACTIVATOR_SESSION_LEN) + " MINUTE);"))
 	{

@@ -1,14 +1,40 @@
 #include "cron_minute.h"
 
-string	CleanUPData(CMysql *db)
+auto CleanupActivators(CMysql *db)
 {
-	string		error_message = "";
+	auto		error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	db->Query("DELETE FROM `activators` WHERE  `date`<=(now() - INTERVAL " + to_string(ACTIVATOR_SESSION_LEN) + " MINUTE);");
+	
+	MESSAGE_DEBUG("", "", "finish");
+
+	return error_message;
+}
+
+auto	CleanUPData(CMysql *db)
+{
+	auto		error_message = ""s;
 
 	MESSAGE_DEBUG("", "", "start");
 	
-	db->Query("DELETE FROM `captcha` WHERE `timestamp`<=(NOW()-INTERVAL " + to_string(SESSION_LEN) + " MINUTE);");
-	db->Query("DELETE FROM `sessions` WHERE `time`<=(NOW()-INTERVAL `expire` SECOND) AND `expire`>'0';");
+	db->Query("DELETE FROM `captcha` WHERE `timestamp`<=(NOW()-INTERVAL " + to_string(SESSION_LEN) + " MINUTE)");
+	db->Query("DELETE FROM `sessions` WHERE `time`<=(NOW()-INTERVAL `expire` SECOND) AND `expire`>'0'");
 	db->Query("DELETE FROM `phone_confirmation` WHERE `eventTimestamp`>=(UNIX_TIMESTAMP() - " + to_string(SMSC_EXPIRATION) + ");");
+
+	MESSAGE_DEBUG("", "", "finish (error_message.length = " + to_string(error_message.length()) + ")");
+
+	return error_message;
+}
+
+auto	CleanUPEmailChange(CMysql *db)
+{
+	auto		error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+	
+	db->Query("DELETE FROM `email_change_tokens` WHERE `eventTimestamp` < DATE_SUB(NOW(), INTERVAL " + to_string(ACTIVATOR_EMAIL_CHANGE) + " MINUTE)");
 
 	MESSAGE_DEBUG("", "", "finish (error_message.length = " + to_string(error_message.length()) + ")");
 
@@ -33,19 +59,19 @@ int main()
 
 	try
 	{
-		string	error_message = "";
+		auto	error_message = ""s;
 
 		if(db.Connect(DB_NAME, DB_LOGIN, DB_PASSWORD) < 0)
 		{
-			CLog	log;
-
-			log.Write(ERROR, string(__func__) + string("[") + to_string(__LINE__) + "]:ERROR: Can not connect to mysql database");
+			MESSAGE_ERROR("", "", "can't connect to DB");
 			throw CExceptionHTML("MySql connection");
 		}
 
 		//--- start of minute cron main functionality
 
-		if((error_message = CleanUPData(&db)).length()) MESSAGE_ERROR("", "", error_message);
+		if((error_message = CleanUPData(&db))			.length()) MESSAGE_ERROR("", "", error_message);
+		if((error_message = CleanUPEmailChange(&db))	.length()) MESSAGE_ERROR("", "", error_message);
+		if((error_message = CleanupActivators(&db))		.length()) MESSAGE_ERROR("", "", error_message);
 
 		//--- end of minute cron main functionality
 	}
