@@ -85,36 +85,24 @@ int main()
 
 	if(action == "AJAX_changeLogin")
 	{
-		ostringstream   ostResult;
-		string		    loginFromUser;
+		auto		    loginFromUser = ""s;
+		auto			success_message = ""s;
+		auto			error_message = ""s;
 
+		MESSAGE_DEBUG("", "", "start");
+
+		loginFromUser = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("login"));
+
+		if(loginFromUser.length() >= 8)
 		{
-			CLog	log;
-			log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]:action == " + action + ": start");
-		}
-
-		ostResult.str("");
-
-		{
-			loginFromUser = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("login"));
-
-			if(loginFromUser.length() >= 8)
+			if(loginFromUser.find_first_of(" \\/%?+-,*&^$#!абвгдеёжзийклмнопрстуфхцчшщьыъэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯ") == string::npos)
 			{
-
-				if(loginFromUser.find_first_of(" \\/%?абвгдеёжзийклмнопрстуфхцчшщьыъэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯ") == string::npos)
+				if(loginFromUser.find_first_not_of(" 1234567890") != string::npos)
 				{
-
 					if(db.Query("SELECT `id` FROM `users` WHERE `login`=\"" + loginFromUser + "\" AND `id`!=\"" + user.GetID() + "\";"))
 					{
-						{
-							CLog	log;
-							log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]:action == " + action + ": Login already used");
-						}
-
-						ostResult << "{" 
-								  << "\"result\":\"error\","
-								  << "\"description\":\"Имя уже занято\""
-								  << "}";
+						error_message = gettext("login") + " "s + gettext("already exists");
+						MESSAGE_DEBUG("", action, error_message);
 					}
 					else
 					{
@@ -122,81 +110,44 @@ int main()
 						db.Query("UPDATE `users` SET `login`=\"" + loginFromUser + "\" WHERE `id`=\"" + user.GetID() + "\";");
 						if(!db.isError())
 						{
-							ostResult << "{" 
-									  << "\"result\":\"success\","
-									  << "\"userLogin\":\"" << loginFromUser << "\""
-									  << "}";
+							success_message = "\"userLogin\":\"" + loginFromUser + "\"";
 						}
 						else
 						{
-							{
-								CLog	log;
-								log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:action == " + action + ":ERROR: updating users table [" + db.GetErrorMessage() + "]");
-							}
-
-							ostResult << "{" 
-									  << "\"result\":\"error\","
-									  << "\"description\":\"Внутренняя ошибка БД\""
-									  << "}";
+							error_message = gettext("SQL syntax error");
+							MESSAGE_ERROR("", action, error_message);
 						}
 					}
 				}
 				else
 				{
-					
-					{
-						CLog	log;
-						log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:action == " + action + ":ERROR: login containing symbols \\ or /");
-					}
-
-					ostResult << "{" 
-							  << "\"result\":\"error\","
-							  << "\"description\":\"Нельзя использовать: русские буквы, пробел или символы /%?\""
-							  << "}";
+					error_message = gettext("Login must contain alphabet characters");
+					MESSAGE_DEBUG("", action, error_message);
 				}
 			}
 			else
 			{
-				
-				{
-					CLog	log;
-					log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:action == " + action + ":ERROR: login too short");
-				}
-
-				ostResult << "{" 
-						  << "\"result\":\"error\","
-						  << "\"description\":\"Должен быть 8 и более символов\""
-						  << "}";
+				error_message = gettext("Login contains illegal characters");
+				MESSAGE_DEBUG("", action, error_message);
 			}
-
-		} // --- if(user.GetLogin() == "Guest")
-
-
-		indexPage.RegisterVariableForce("result", ostResult.str());
-
-		if(!indexPage.SetTemplate("json_response.htmlt"))
-		{
-			CLog	log;
-
-			log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: template file json_response.htmlt was missing");
-			throw CException("Template file json_response.htmlt was missing");
-		}  // if(!indexPage.SetTemplate("AJAX_changeLogin.htmlt"))
-
-		{
-			CLog	log;
-			log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]:action == " + action + ": end");
 		}
-	}   // if(action == "AJAX_changeLogin")
+		else
+		{
+			error_message = gettext("Login must be at least 8 characters");
+			MESSAGE_DEBUG("", action, error_message);
+		}
+
+		AJAX_ResponseTemplate(&indexPage, success_message, error_message);
+
+		MESSAGE_DEBUG("", "", "finish");
+	}
 
 	if(action == "AJAX_changeUserSex")
 	{
 		ostringstream   ostResult;
 		string		    userSex;
 
-		{
-			CLog	log;
-			log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]:action == " + action + ": start");
-		}
+		MESSAGE_DEBUG("", "", "start");
 
 		ostResult.str("");
 /*		if(user.GetLogin() == "Guest")
@@ -265,21 +216,15 @@ int main()
 			throw CException("Template file json_response.htmlt was missing");
 		}  // if(!indexPage.SetTemplate("AJAX_changeUserSex.htmlt"))
 
-		{
-			CLog	log;
-			log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]:action == " + action + ": end");
-		}
-	}   // if(action == "AJAX_changeUserSex")
+		MESSAGE_DEBUG("", "", "finish");
+	}
 
 	if(action == "AJAX_changeUserBirthday")
 	{
 		ostringstream   ostResult;
 		string		    userBirthday;
 
-		{
-			CLog	log;
-			log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]:action == " + action + ": start");
-		}
+		MESSAGE_DEBUG("", "", "start");
 
 		ostResult.str("");
 /*		if(user.GetLogin() == "Guest")
@@ -348,21 +293,15 @@ int main()
 			throw CException("Template file json_response.htmlt was missing");
 		}  // if(!indexPage.SetTemplate("AJAX_changeUserBirthday.htmlt"))
 
-		{
-			CLog	log;
-			log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]:action == " + action + ": end");
-		}
-	}   // if(action == "AJAX_changeUserBirthday")
+		MESSAGE_DEBUG("", "", "finish");
+	}
 
 	if(action == "AJAX_updateCity")
 	{
 		ostringstream   ostResult;
 		string		    city;
 
-		{
-			CLog	log;
-			log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]:action == " + action + ": start");
-		}
+		MESSAGE_DEBUG("", "", "start");
 
 		ostResult.str("");
 /*		if(user.GetLogin() == "Guest")
@@ -444,21 +383,15 @@ int main()
 			throw CException("Template file json_response.htmlt was missing");
 		}  // if(!indexPage.SetTemplate("AJAX_updateCity.htmlt"))
 
-		{
-			CLog	log;
-			log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]:action == " + action + ": end");
-		}
-	}   // if(action == "AJAX_updateCity")
+		MESSAGE_DEBUG("", "", "finish");
+	}
 
 	if((action == "AJAX_editProfile_setBirthdayPrivate") || (action == "AJAX_editProfile_setBirthdayPublic"))
 	{
 		ostringstream   ostResult;
 		string		    birthdayAccess = (action == "AJAX_editProfile_setBirthdayPrivate" ? "private" : "public");
 
-		{
-			CLog	log;
-			log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]:action == " + action + ": start");
-		}
+		MESSAGE_DEBUG("", "", "start");
 
 		ostResult.str("");
 /*		if(user.GetLogin() == "Guest")
@@ -506,11 +439,8 @@ int main()
 			throw CException("Template file json_response.htmlt was missing");
 		}  // if(!indexPage.SetTemplate("AJAX_editProfile_setBirthdayPrivate.htmlt"))
 
-		{
-			CLog	log;
-			log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]:action == " + action + ": end");
-		}
-	}   // if(action == "AJAX_editProfile_setBirthdayPrivate")
+		MESSAGE_DEBUG("", "", "finish");
+	}
 
 	if(action == "AJAX_updatePassportSeries")
 	{
