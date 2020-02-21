@@ -37,3 +37,6 @@ echo "SELECT COUNT(*) FROM \`helpdesk_ticket_history_last_case_state_view\` WHER
 echo --------------- ${MAIN_DOMAIN_NAME} log: demos requested
 echo "SELECT COUNT(*) FROM \`demo_requests\`;" | mysql -u ${PROJECT_NAME}RO -p${PROJECT_NAME}RO ${MAIN_DOMAIN_NAME} 2>/dev/null  | tail -1
 
+echo --------------- src repository check
+./health_srcdiff.pl
+

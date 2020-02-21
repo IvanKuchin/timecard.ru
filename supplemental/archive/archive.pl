@@ -270,7 +270,7 @@ if($action =~ /^--backup/)
 
 
 		print "rsync to remote server ....\n";
-		$system_err = system("rsync -alzhe ssh --exclude '*.tar.gz' ./ ".$config{backup_username}."\@".$config{backup_hostname}.":/storage/".$config{backup_username}."/backup/".$domainSuffix."/rsync/");
+		$system_err = system("rsync -rptgoDzhe ssh --exclude '*.tar.gz' ./ ".$config{backup_username}."\@".$config{backup_hostname}.":/storage/".$config{backup_username}."/backup/".$domainSuffix."/rsync/");
 		if($system_err) { print "\n\nrsyncing\t[ERROR]\n"; }
 		else			{ print "rsyncing\t[OK]\n"; }
 
