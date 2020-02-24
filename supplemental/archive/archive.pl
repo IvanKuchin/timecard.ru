@@ -458,34 +458,48 @@ if($action =~ /^--restore/)
 	print "restoring production folders\n";
 	Dirmove_Local_To_Production();
 
-	system("cd ".$folders_to_backup{SRCDIR}."/build && cmake -DCMAKE_BUILD_TYPE=debug ..");
-	#
-	# renice process to provide enough resources to mysql and apache.
-	# don't change it to lowest value (19),
-	# that way c-compiler can spend a lot of time in "CPU-wait" state, rather than use CPU-cycles
-	#
-	system("cd ".$folders_to_backup{SRCDIR}."/build && time nice -10 make -j4");
-	system("cd ".$folders_to_backup{SRCDIR}."/build");
-	system("cd ".$folders_to_backup{SRCDIR}."/build && make install");
-	system("cd ".$folders_to_backup{SRCDIR}."/build && make clean");
-
-	#
-	# change ownership of html and cgi-bin folders
-	#
-	print "fix the owner and access rights ...\n";
-	system("chown -R ".$config{backup_username}.":".$config{backup_username}." ./*");
-	FixOwnerAndAccessRights();
-
-	# system("chown -R www-data:www-data $htmldir");
-	# system("chown -R www-data:www-data $cgidir");
-	# system("chown -R www-data:www-data $realImageDomainDir");
-	# system("chmod -R g+w $htmldir");
-	# system("chmod -R g+w $cgidir");
-	# system("chmod -R g+w $realImageDomainDir");
-	# system("chmod -R o-rw $htmldir");
-	# system("chmod -R o-rw $cgidir");
-	# system("chmod -R o-rw $realImageDomainDir");
+	if(CompileAndInstall())
+	{
+		#
+		# change ownership of html and cgi-bin folders
+		#
+		print "fix the owner and access rights ...\n";
+		system("chown -R ".$config{backup_username}.":".$config{backup_username}." ./*");
+		FixOwnerAndAccessRights();
+	}
+	else
+	{
+		print "[ERROR] during build stage\n";
+	}
 }
+
+sub CompileAndInstall
+{
+	return
+		#
+		# ATTENTION !!!
+		# if you want to move compilation phase up , then RemoveProdFolders and DirmoveLocalToProduction 
+		# has to be split to treat SRCDIR separately from HTMLDIR.
+		# current workflow: 
+		#	RemoveProdDir -> MoveAllDirsToProd -> build
+		# new workflow: 
+		#	RemoveProdSrcDir -> MoveSrcDirsToProd -> compile -> RemoveProdHTMLDir -> MoveHTMLDirsToProd -> build
+		#
+		system("cd ".$folders_to_backup{SRCDIR}."/build && cmake -DCMAKE_BUILD_TYPE=debug ..")
+		and
+		#
+		# renice process to provide enough resources to mysql and apache.
+		# don't change it to lowest value (19),
+		# that way c-compiler can spend a lot of time in "CPU-wait" state, rather than use CPU-cycles
+		#
+		system("cd ".$folders_to_backup{SRCDIR}."/build && time nice -10 make -j4")
+		and
+		system("cd ".$folders_to_backup{SRCDIR}."/build")
+		and
+		system("cd ".$folders_to_backup{SRCDIR}."/build && make install")
+		and
+		system("cd ".$folders_to_backup{SRCDIR}."/build && make clean");
+};
 
 sub activate_htaccess
 {
