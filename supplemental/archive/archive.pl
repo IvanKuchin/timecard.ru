@@ -473,32 +473,32 @@ if($action =~ /^--restore/)
 	}
 }
 
+#
+# No error checks in here.
+# We must do our best to install as much as possible to recover production.
+#
 sub CompileAndInstall
 {
-	return
-		#
-		# ATTENTION !!!
-		# if you want to move compilation phase up , then RemoveProdFolders and DirmoveLocalToProduction 
-		# has to be split to treat SRCDIR separately from HTMLDIR.
-		# current workflow: 
-		#	RemoveProdDir -> MoveAllDirsToProd -> build
-		# new workflow: 
-		#	RemoveProdSrcDir -> MoveSrcDirsToProd -> compile -> RemoveProdHTMLDir -> MoveHTMLDirsToProd -> build
-		#
-		system("cd ".$folders_to_backup{SRCDIR}."/build && cmake -DCMAKE_BUILD_TYPE=debug ..")
-		and
-		#
-		# renice process to provide enough resources to mysql and apache.
-		# don't change it to lowest value (19),
-		# that way c-compiler can spend a lot of time in "CPU-wait" state, rather than use CPU-cycles
-		#
-		system("cd ".$folders_to_backup{SRCDIR}."/build && time nice -10 make -j4")
-		and
-		system("cd ".$folders_to_backup{SRCDIR}."/build")
-		and
-		system("cd ".$folders_to_backup{SRCDIR}."/build && make install")
-		and
-		system("cd ".$folders_to_backup{SRCDIR}."/build && make clean");
+	#
+	# ATTENTION !!!
+	# if you want to move compilation phase up , then RemoveProdFolders and DirmoveLocalToProduction 
+	# has to be split to treat SRCDIR separately from HTMLDIR.
+	# current workflow: 
+	#	RemoveProdDir -> MoveAllDirsToProd -> build
+	# new workflow: 
+	#	RemoveProdSrcDir -> MoveSrcDirsToProd -> compile -> RemoveProdHTMLDir -> MoveHTMLDirsToProd -> build
+	#
+	system("cd ".$folders_to_backup{SRCDIR}."/build && cmake -DCMAKE_BUILD_TYPE=debug ..");
+	#
+	# renice process to provide enough resources to mysql and apache.
+	# don't change it to lowest value (19),
+	# that way c-compiler can spend a lot of time in "CPU-wait" state, rather than use CPU-cycles
+	#
+	system("cd ".$folders_to_backup{SRCDIR}."/build && time nice -10 make -j4");
+	system("cd ".$folders_to_backup{SRCDIR}."/build && make install");
+	system("cd ".$folders_to_backup{SRCDIR}."/build && make clean");
+
+	return 1;
 };
 
 sub activate_htaccess
