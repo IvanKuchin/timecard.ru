@@ -85,6 +85,27 @@ sub DefineRootHTMLDir
     return DefineParentDir($config{ROOTDIR_HTML}, $config{project_domain});
 };
 
+sub IncludeDomain
+{
+	my	$result = 1;
+	my	$curr_domain = shift;
+
+	foreach(@{$config{exclude_domains}})
+	{
+		my	$domain = $_;
+
+		print("check $curr_domain against $domain\n") if($DEBUG);
+
+		if(index($curr_domain, $domain) != -1)
+		{
+			$result = 0;
+			print("domain $curr_domain excluded by the config\n") if($DEBUG);
+		}
+	}
+
+	return $result;
+};
+
 sub GetDomains
 {
     my	@result;
@@ -93,7 +114,7 @@ sub GetDomains
     opendir my($dh), $from_dir or die "ERROR: Could not open dir '$from_dir': $!";
     for my $entry (readdir $dh) 
     {
-        if((-d $from_dir.$entry) and !($entry eq "..") and !($entry eq "."))
+        if((-d $from_dir.$entry) and !($entry eq "..") and !($entry eq ".") and IncludeDomain($entry))
         {
             push(@result, $entry);
         }

@@ -52,6 +52,9 @@ nodiff_files => [
     "health_srcdiff.conf.in",
 ],
 
+exclude_domains => [
+    "checkuuid",
+],
 
 project_source_dir => "${PROJECT_SOURCE_DIR}",
 project_domain => "${MAIN_DOMAIN_NAME}",
