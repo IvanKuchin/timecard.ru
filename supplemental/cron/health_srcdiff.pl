@@ -123,7 +123,7 @@ sub DiffFile
 	    {
 		if($#files + 1)
 		{
-		    PrintError("$file not found in $domain");
+		    PrintError("$curr_file not found in $domain");
 		}
 		else
 		{
@@ -177,5 +177,5 @@ sub FindFile
 {
     my	($folder, $file) = @_;
 
-    return `find $folder -name $file -type f -print`;
+    return `find $folder -name $file -type f -print | grep -v "/build/"`;
 };

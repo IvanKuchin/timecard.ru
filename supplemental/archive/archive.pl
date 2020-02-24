@@ -215,6 +215,8 @@ if($action =~ /^--backup/)
 		Remove_Local_PersistentFolders();
 	}
 
+	Remove_CGI_From_Local_Folders();
+
 	print "mysqldump ....\n";
 	if($action =~ /_structure/)
 	{
@@ -989,6 +991,16 @@ sub Remove_Local_PersistentFolders
 			print "ERROR: folder ".$persistent_folders{$key}." doesn't exist\n";
 		}
 	}
+}
+
+sub Remove_CGI_From_Local_Folders
+{
+	print "removing *.cgi from local folders";
+	foreach my $folder_id(keys %folders_to_backup)
+	{
+		system("find $folder_id -name *.cgi -type f -exec rm -f {} \\;");
+	}
+	print "\t[ok]\n";
 }
 
 sub Remove_Production_Folders

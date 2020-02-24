@@ -46,6 +46,9 @@ nodiff_files => [
     "privacy_policy.htmlt",
     "eula.htmlt",
     "guest_navigation_menu.htmlt",
+
+    "archive.pl",
+    "health_srcdiff.pl",
 ],
 
 
