@@ -25,6 +25,7 @@ nodiff_files => [
 
     "login.css",
 
+    "faq.js",
     "login.js",
     "create_password_block.js",
     "sms_confirmation.js",
@@ -33,6 +34,7 @@ nodiff_files => [
     "domain_replacer.js",
 
 
+    "faq.htmlt",
     "login.htmlt",
     "login_header.htmlt",
     "create_password_block.htmlt",
