@@ -1487,6 +1487,18 @@ int main()
 			MESSAGE_DEBUG("", action, "finish");
 		}
 
+		if(action == "AJAX_sessionHandshake")
+		{
+			MESSAGE_DEBUG("", action, "start");
+
+			auto			success_message = ""s;
+			auto			error_message = ""s;
+
+			AJAX_ResponseTemplate(&indexPage, success_message, error_message);
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
+
 		MESSAGE_DEBUG("", action, "finish condition")
 
 		indexPage.OutTemplate();

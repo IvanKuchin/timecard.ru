@@ -416,7 +416,8 @@ int main()
 										{
 											// --- following lines used to track re-use legacy sessions. 
 											// --- instead of removal, it will be "marked for removal"
-											db.Query("UPDATE `sessions` SET `remove_flag`=\"Y\", `remove_flag_timestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sessidPersistence + "\";");
+											db.Query("UPDATE `sessions` SET `remove_flag`=\"pending\", `remove_flag_timestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sessidPersistence + "\";");
+											db.Query("UPDATE `sessions` SET `previous_sessid`=\"" + sessidPersistence + "\"  WHERE `id`=\"" + indexPage.SessID_Get_FromHTTP() + "\";");
 										}
 
 										mapResult["redirect"] = "/" + GetDefaultActionFromUserType(&user, &db) + "?rand=" + GetRandom(10);
