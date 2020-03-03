@@ -1494,6 +1494,9 @@ int main()
 			auto			success_message = ""s;
 			auto			error_message = ""s;
 
+			db.Query("UPDATE `sessions` SET `remove_flag`=\"Y\", `remove_flag_timestamp`=UNIX_TIMESTAMP() WHERE `id`=(SELECT `previous_sessid` FROM (SELECT `previous_sessid` FROM `sessions` WHERE `id`=\"" + indexPage.SessID_Get_FromHTTP() + "\") as `temp_table`);");
+			if(db.isError()) error_message = db.GetErrorMessage();
+
 			AJAX_ResponseTemplate(&indexPage, success_message, error_message);
 
 			MESSAGE_DEBUG("", action, "finish");
