@@ -2344,3 +2344,14 @@ auto isDemoDomain() -> bool
 	return result;
 }
 
+// return mydomain.org instead www.mydomain.org
+auto GetDomain() -> string
+{
+	auto	fqdn		= string(DOMAIN_NAME);
+    auto    first_dot	= fqdn.rfind(".");
+    auto    second_dot	= first_dot  == string::npos ? string::npos : fqdn.rfind(".", first_dot - 1);
+    auto	result		= second_dot == string::npos ? "" : fqdn.substr(second_dot + 1);
+
+    return result;
+}
+

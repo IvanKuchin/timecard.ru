@@ -49,6 +49,8 @@ nodiff_files => [
     "eula.htmlt",
     "guest_navigation_menu.htmlt",
 
+    "forget.htmlt",
+
     "archive.pl",
     "health_srcdiff.pl",
     "health_srcdiff.conf.in",

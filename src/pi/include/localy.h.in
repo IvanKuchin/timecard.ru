@@ -119,7 +119,6 @@
 
 #define	SMTP_HOST									"127.0.0.1"
 #define	SMTP_PORT									25
-#define	SMTP_MAILFROM								"noreply@" + DOMAIN_NAME + ""
 
 #define	INDEX_PAGE									1
 

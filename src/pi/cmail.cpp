@@ -22,8 +22,8 @@
 
 CMail::CMail() : smtpServer(SMTP_HOST), smtpPort(SMTP_PORT), smtpFlag(false)
 {
-	// "-f \"mydomain.ru <noreply@mydomain.ru>\""
-	mailfrom = "-f <" + string(SMTP_MAILFROM) + ">";
+	// --- this has to be Return Path in the header which must match server hostname and opendkim sign key
+	mailfrom = "-f noreply@conn-me.ru";
 }
 
 unsigned long CMail::Addr2Num (const char *addr)
@@ -521,13 +521,10 @@ void CMail::RedirStderrToFile()
 
 int CMail::SendMailExec(const char *progr, char **av, int inp)
 {
+	MESSAGE_DEBUG("", "", "start (" + progr + ")");
+
 	void (*del)(int), (*quit)(int);
 	int pid;
-
-	{
-		CLog	log;
-		log.Write(DEBUG, "CMail::" + string(__func__) + "[" + to_string(__LINE__) + "]: start");
-	}
 
 	del = signal(SIGINT, SIG_IGN); quit = signal(SIGQUIT, SIG_IGN);
 	if( ! (pid = fork()))
@@ -604,23 +601,17 @@ int CMail::SendMailExec(const char *progr, char **av, int inp)
 	/* восстановить реакции на сигналы от клавиатуры */
 	signal(SIGINT, del); signal(SIGQUIT, quit);
 
-	{
-		CLog	log;
-		log.Write(DEBUG, "CMail::SendMailExec: end");
-	}
+	MESSAGE_DEBUG("", "", "finish");
 
 	return pid;     /* вернуть идентификатор сына */
 }
 
 int CMail::MakeMailFile(string text)
 {
+	MESSAGE_DEBUG("", "", "start");
+
 	int	fd, result;
 	string	fname = GetStdinFname();
-
-	{
-		CLog	log;
-		log.Write(DEBUG, "CMail::MakeMailFile: start");
-	}
 
 	fd = open(fname.c_str(), O_WRONLY | O_CREAT, 0666);
 	if(fd < 0)
@@ -660,25 +651,19 @@ int CMail::MakeMailFile(string text)
 		throw CException("mail error");
 	}
 
-	{
-		CLog	log;
-		log.Write(DEBUG, "CMail::MakeMailFile: end");
-	}
+	MESSAGE_DEBUG("", "", "finish");
 
 	return fd;
 }
 
 bool CMail::SendLocal()
 {
+	MESSAGE_DEBUG("", "", "start");
+
 	char	*argv[6];
 	char	rcpt[64];
 	char	from[64];
 	long long	stderrSize, stdoutSize;
-
-	{
-		CLog	log;
-		log.Write(DEBUG, "CMail::SendLocal: start ");
-	}
 
 	strcpy(rcpt, rcptto.c_str());
 	strcpy(from, mailfrom.c_str());
@@ -687,40 +672,21 @@ bool CMail::SendLocal()
 	argv[2] = rcpt;
 	argv[3] = NULL;
 
-	{
-		CLog	log;
-		ostringstream	ost;
-		ost.str("");
-		ost << "CMail::SendLocal: params from: [" << from << "] to: [" << rcpt << "]";
-		log.Write(DEBUG, ost.str());
-	}
+	MESSAGE_DEBUG("", "", "params from: [" + from + "] to: [" + rcpt + "]");
 
 	BuildUniqPostfix();
 	SendMailExec(SENDMAIL_FILE_NAME, argv, MakeMailFile(message));
 	
 	stderrSize = getFileSize(GetStderrFname());
 	stdoutSize = getFileSize(GetStdoutFname());
-	{
-		CLog	log;
-		ostringstream	ost;
 
-		ost.str("");
-		ost << "CMail::SendLocal: stderr size = " << stderrSize;
-		log.Write(DEBUG, ost.str());
-
-		ost.str("");
-		ost << "CMail::SendLocal: stdout size = " << stdoutSize;
-		log.Write(DEBUG, ost.str());
-	}
+	MESSAGE_DEBUG("", "", "stdout size: " + to_string(stdoutSize) + ", stderr size: " + to_string(stderrSize) + "");
 
 	if(!stdoutSize) unlink((MAIL_STDOUT + GetUniqPostfix()).c_str() );	
 	if(!stderrSize) unlink((MAIL_STDERR + GetUniqPostfix()).c_str() );
 	if(!(stdoutSize || stderrSize)) unlink((MAIL_FILE_NAME + GetUniqPostfix()).c_str() );
 
-	{
-		CLog	log;
-		log.Write(DEBUG, "CMail::SendLocal: end");
-	}
+	MESSAGE_DEBUG("", "", "finish");
 
 	return true;
 }
@@ -737,23 +703,7 @@ void CMail::SetLocal()
 
 bool CMail::Send()
 {
-	bool	result;
-	{
-		CLog	log;
-		log.Write(DEBUG, "CMail::Send: start");
-	}
-
-	if(smtpFlag)
-		result = SendSMTP();
-	else
-		result = SendLocal();
-
-	{
-		CLog	log;
-		log.Write(DEBUG, "CMail::Send: end [result = ", (result ? "true" : "false"), "]");
-	}
-
-	return result;
+	return (smtpFlag ? SendSMTP() : SendLocal());
 }
 
 
@@ -767,10 +717,7 @@ string CMailLocal::GetUserLng()
 {
 	ostringstream	ost;
 
-    {
-		CLog log;
-		log.Write(DEBUG, "CMailLocal::" + string(__func__) + "[" + to_string(__LINE__) + "]: start");
-    }
+	MESSAGE_DEBUG("", "", "start");
 
 	ost.str("");
 
@@ -781,10 +728,7 @@ string CMailLocal::GetUserLng()
 	if(!GetUserID().empty()) ost << "select lng from usere where id=\"" << GetUserID() << "\"";
 	if(db->Query(ost.str()) == 0) throw CExceptionHTML("no user");
 
-    {
-		CLog log;
-		log.Write(DEBUG, "CMailLocal::" + string(__func__) + "[" + to_string(__LINE__) + "]: finish");
-    }
+	MESSAGE_DEBUG("", "", "finish");
 
 	return db->Get(0, "lng");
 }
