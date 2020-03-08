@@ -275,7 +275,7 @@ bool CSession::Load(string id)
 		}
 		else
 		{
-			MESSAGE_ERROR("", "", "ERROR: \"sessid\" got the wrong value (" + id + "). (probably bot, check IP in whois DB)");
+			MESSAGE_ERROR("", "", "ERROR: \"sessid\" got the wrong value WITH COMMA (" + id + "). 1-st reason - bot, check IP in whois DB, 2-nd reason - bad browser, such a behavior has seen on SAMSUNG J3 [" + (getenv("HTTP_USER_AGENT") ? getenv("HTTP_USER_AGENT") : "") + "]");
 		}
 	}
 
