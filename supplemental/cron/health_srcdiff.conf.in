@@ -26,6 +26,7 @@ nodiff_files => [
     "login.css",
 
     "faq.js",
+    "session.js",
     "login.js",
     "create_password_block.js",
     "sms_confirmation.js",
