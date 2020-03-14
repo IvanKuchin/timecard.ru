@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-09 08:21-0500\n"
+"POT-Creation-Date: 2020-03-14 10:44-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -233,6 +233,15 @@ msgstr "Локальные услуги"
 
 msgid "Location"
 msgstr "Место"
+
+msgid "Login contains illegal characters"
+msgstr "Логин содержит запрещенные символы"
+
+msgid "Login must be at least 8 characters"
+msgstr "Логин должен быть более 8-ми символов"
+
+msgid "Login must contain alphabet characters"
+msgstr "Логин должен состоять только из букв"
 
 msgid "March"
 msgstr "Март"
@@ -756,6 +765,9 @@ msgstr "отдел"
 msgid "description updated"
 msgstr "описание изменено"
 
+msgid "email already exists"
+msgstr "такой email уже зарегистрирован"
+
 msgid "email is empty"
 msgstr "не указан email"
 
@@ -947,6 +959,9 @@ msgstr "не указан юр. адрес"
 
 msgid "legal_geo_zip_id is empty"
 msgstr "не указан юр. адрес"
+
+msgid "login"
+msgstr "логин"
 
 msgid "mailing_geo_zip_id is empty"
 msgstr "не указан адрес доставки"

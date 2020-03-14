@@ -13,6 +13,23 @@ bool CleanupActivators(CMysql *db)
 	return result;
 }
 
+bool CleanupNotActivatedUsers(CMysql *db)
+{
+	bool		result = true;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(db->Query("SELECT `id` FROM `users` WHERE `isactivated`='N' AND `activator_sent` <= (now() - INTERVAL " + to_string(ACTIVATOR_SESSION_LEN) + " MINUTE);"))
+	{
+		db->Query("DELETE FROM `users_passwd` WHERE `userID` IN (SELECT `id` FROM `users` WHERE `isactivated`='N' AND `activator_sent` <= (now() - INTERVAL " + to_string(ACTIVATOR_SESSION_LEN) + " MINUTE));");
+		db->Query("DELETE FROM `users` WHERE `isactivated`='N' AND `activator_sent` <= (now() - INTERVAL " + to_string(ACTIVATOR_SESSION_LEN) + " MINUTE);");
+	}
+	
+	MESSAGE_DEBUG("", "", "finish");
+
+	return result;
+}
+
 bool CleanupRemovedSessions(CMysql *db)
 {
 	bool		result = true;
@@ -488,6 +505,7 @@ int main()
 
 		//--- start of daily cron main functionality
 		CleanupActivators(&db);
+		CleanupNotActivatedUsers(&db);
 		CleanupRemovedSessions(&db);
 
 		//--- Remove temporarily media files

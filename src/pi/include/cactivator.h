@@ -24,7 +24,7 @@ class CActivator
 
 		string		GetRandom(int len);
 	public:
-				CActivator();
+					CActivator();
 
 		void		SetUser(const string &u)		{ user = u; }
 		void		SetUser(string &&u) noexcept	{ user = move(u); }
@@ -43,8 +43,8 @@ class CActivator
 		void		SetTime(string &&t) noexcept	{ time = t; }
 		string		GetTime() const					{ return time; }
 
-		void		SetDB(CMysql *mysql);
-		void		SetCgi(CCgi *cgi);
+		void		SetDB(CMysql *param)			{ db = param; }
+		void		SetCgi(CCgi *param)				{ cgi = param; }
 
 		void		Save();
 		bool		Load(string id);
@@ -53,8 +53,6 @@ class CActivator
 		void		Delete();
 
 		void		Activate();
-
-				~CActivator();
 };
 
 #endif

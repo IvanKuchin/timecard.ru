@@ -1120,40 +1120,39 @@ int main()
 
 		if(action == "AJAX_changeEmail")
 		{
-
 			MESSAGE_DEBUG("", action, "start");
 
-			ostringstream	ostResult;
-			string			template_name = "json_response.htmlt";
-			string			error_message = "";
+			auto			success_message = ""s;
+			auto			error_message = ""s;
 			auto			email = CheckHTTPParam_Email(indexPage.GetVarsHandler()->Get("login"));
 
-			ostResult.str("");
 
 			if(email.length())
 			{
-				CMailLocal	mail;
-				string		token = GetRandom(20);
-
-				db.Query("DELETE FROM `email_change_tokens` WHERE `user_id`=" + quoted(user.GetID()) + ";");
-				db.Query("INSERT INTO `email_change_tokens` SET `token`=\"" + token + "\", `new_email`=\"" + email + "\", `user_id`=\"" + user.GetID() + "\", `eventTimestamp`=NOW();");
-				if(db.isError())
+				if(db.Query("SELECT `id` FROM `users` WHERE `email`=" + quoted(email) + ";"))
 				{
-					MESSAGE_ERROR("", action, "fail to insert activator for user.login(" + user.GetLogin() + ")");
-
-					ostResult.str("");
-					ostResult << "{";
-					ostResult << "\"result\": \"error\",";
-					ostResult << "\"description\": \"Ошибка БД. Мы исправим ее в течение 24 часов.\"";
-					ostResult << "}";
+					error_message = gettext("email already exists");
 				}
 				else
 				{
-					indexPage.RegisterVariableForce("login", user.GetLogin());
-					indexPage.RegisterVariableForce("name", user.GetName());
-					indexPage.RegisterVariableForce("nameLast", user.GetNameLast());
-					indexPage.RegisterVariableForce("token", token);
-					mail.SendToEmail(email, user.GetLogin(), "change_password", indexPage.GetVarsHandler(), &db);
+					CMailLocal	mail;
+					string		token = GetRandom(20);
+
+					db.Query("DELETE FROM `email_change_tokens` WHERE `user_id`=" + quoted(user.GetID()) + ";");
+					db.Query("INSERT INTO `email_change_tokens` SET `token`=\"" + token + "\", `new_email`=\"" + email + "\", `user_id`=\"" + user.GetID() + "\", `eventTimestamp`=NOW();");
+					if(db.isError())
+					{
+						error_message = gettext("SQL syntax error");
+						MESSAGE_ERROR("", action, "fail to insert activator for user.login(" + user.GetLogin() + ")");
+					}
+					else
+					{
+						indexPage.RegisterVariableForce("login", user.GetLogin());
+						indexPage.RegisterVariableForce("name", user.GetName());
+						indexPage.RegisterVariableForce("nameLast", user.GetNameLast());
+						indexPage.RegisterVariableForce("token", token);
+						mail.SendToEmail(email, user.GetLogin(), "change_password", indexPage.GetVarsHandler(), &db);
+					}
 				}
 			}
 			else
@@ -1162,21 +1161,7 @@ int main()
 				MESSAGE_DEBUG("", action, error_message);
 			}
 
-			ostResult.str("");
-
-			if(error_message.empty())
-			{
-				ostResult << "{\"result\":\"success\"}";
-			}
-			else
-			{
-				MESSAGE_DEBUG("", action, "failed");
-				ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
-			}
-
-			indexPage.RegisterVariableForce("result", ostResult.str());
-
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			AJAX_ResponseTemplate(&indexPage, success_message, error_message);
 
 			MESSAGE_DEBUG("", action, "finish");
 		}
