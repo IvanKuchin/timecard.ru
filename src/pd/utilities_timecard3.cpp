@@ -1076,6 +1076,7 @@ string GetUserListInJSONFormat(string dbQuery, CMysql *db, CUser *user)
 		string	country_code;
 		string	phone;
 		string	email;
+		string	email_changeable;
 		string	userType;
 		string	userSex;
 		string	userBirthday;
@@ -1122,6 +1123,7 @@ string GetUserListInJSONFormat(string dbQuery, CMysql *db, CUser *user)
 			item.country_code						= db->Get(i, "country_code");
 			item.phone								= db->Get(i, "phone");
 			item.email								= db->Get(i, "email");
+			item.email_changeable					= db->Get(i, "email_changeable");
 			item.userSex							= db->Get(i, "sex");
 			item.userType							= db->Get(i, "type");
 			item.userBirthday						= db->Get(i, "birthday");
@@ -1169,68 +1171,24 @@ string GetUserListInJSONFormat(string dbQuery, CMysql *db, CUser *user)
 				auto				avatarPath				= ""s;
 				auto				userLastOnline			= itemsList[i].userLastOnline;
 				auto				userLastOnlineSecondSinceY2k = itemsList[i].userLastOnlineSecondSinceY2k;
+				auto				isMe					= user && (userID == user->GetID());
 				ostringstream		ost1;
 
 				setOfUserID.insert(stol(userID));
 
-/*
-				// --- Defining title and company of user
-				ost1.str("");
-				ost1 << "SELECT `company_position`.`title` as `users_company_position_title`,  "
-						"`company`.`name` as `company_name`, `company`.`id` as `company_id`  "
-						"FROM `users_company` "
-						"LEFT JOIN  `company_position` ON `company_position`.`id`=`users_company`.`position_title_id` "
-						"LEFT JOIN  `company` ON `company`.`id`=`users_company`.`company_id` "
-						"WHERE `users_company`.`user_id`=\"" << userID << "\" and `users_company`.`current_company`='1' "
-						"ORDER BY  `users_company`.`occupation_start` DESC ";
-
-				affected1 = db->Query(ost1.str());
-				ost1.str("");
-				ost1 << "[";
-				if(affected1 > 0)
-				{
-					for(int j = 0; j < affected1; j++)
-					{
-						ost1 << "{ \
-								\"companyID\": \"" << db->Get(j, "company_id") << "\", \
-								\"company\": \"" << db->Get(j, "company_name") << "\", \
-								\"title\": \"" << db->Get(j, "users_company_position_title") << "\" \
-								}";
-						if(j < (affected1 - 1)) ost1 << ", ";
-					}
-				}
-				ost1 << "]";
-				userCurrentEmployment = ost1.str();
-
-				MESSAGE_DEBUG("", "", "done with building employment list (length is " + to_string(userCurrentEmployment.length()) + ")");
-*/
-
 				// --- Get user avatars
-				ost1.str("");
-				ost1 << "select * from `users_avatars` where `userid`='" << userID << "' and `isActive`='1';";
 				avatarPath = "empty";
-				if(db->Query(ost1.str()))
+				if(db->Query("select * from `users_avatars` where `userid`='" + userID + "' and `isActive`='1';"))
 				{
-					ost1.str("");
-					ost1 << "/images/avatars/avatars" << db->Get(0, "folder") << "/" << db->Get(0, "filename");
-					avatarPath = ost1.str();
+					avatarPath = "/images/avatars/avatars" + db->Get(0, "folder") + "/" + db->Get(0, "filename");
 				}
 
-/*
-				// --- Get friendship status
-				userFriendship = "empty";
-				if(user && db->Query("select * from `users_friends` where `userid`='" + user->GetID() + "' and `friendID`='" + userID + "';"))
-					userFriendship = db->Get(0, "state");
-
-				if(db->Query("select COUNT(*) as `number_unread_messages` from `chat_messages` where `fromType`='fromUser' and `fromID`='" + userID + "' and (`messageStatus`='unread' or `messageStatus`='sent' or `messageStatus`='delivered');"))
-					numberUreadMessages = db->Get(0, "number_unread_messages");
-*/
 				if(userCurrentCityID.length() && db->Query("SELECT `title` FROM `geo_locality` WHERE `id`=\"" + userCurrentCityID + "\";"))
 					userCurrentCity = db->Get(0, "title");
 
 				if(ost.str().length()) ost << ", ";
 
-				if(user && (userID == user->GetID()))
+				if(isMe)
 				{
 					// --- user have to be able to see his own bday
 				}
@@ -1240,20 +1198,20 @@ string GetUserListInJSONFormat(string dbQuery, CMysql *db, CUser *user)
 				}
 
 				ost << "{"
-						"\"id\": \""							<< itemsList[i].userID << "\", "
-						"\"name\": \""							<< itemsList[i].userName << "\", "
-						"\"nameLast\": \""						<< itemsList[i].userNameLast << "\","
-						"\"nameMiddle\": \""					<< itemsList[i].userNameMiddle << "\","
-						"\"userSex\": \""						<< itemsList[i].userSex << "\","
-						"\"userType\": \""						<< itemsList[i].userType << "\","
-						"\"birthday\": \""						<< userBirthday << "\","
-						"\"birthdayAccess\": \""				<< itemsList[i].userBirthdayAccess << "\","
-						"\"last_online\": \""					<< itemsList[i].userLastOnline << "\","
-						"\"last_online_diff\": \""				<< to_string(GetTimeDifferenceFromNow(userLastOnline)) << "\","
-						"\"last_onlineSecondsSinceY2k\": \""	<< userLastOnlineSecondSinceY2k << "\","
-						"\"avatar\": \""						<< avatarPath << "\","
-						"\"site_theme_id\": \""					<< itemsList[i].site_theme_id << "\","
-						"\"themes\": ["							<< GetSiteThemesInJSONFormat("SELECT * FROM `site_themes`", db, user) << "],"
+						"\"id\": \""								<< itemsList[i].userID << "\", "
+						"\"name\": \""								<< itemsList[i].userName << "\", "
+						"\"nameLast\": \""							<< itemsList[i].userNameLast << "\","
+						"\"nameMiddle\": \""						<< itemsList[i].userNameMiddle << "\","
+						"\"userSex\": \""							<< itemsList[i].userSex << "\","
+						"\"userType\": \""							<< itemsList[i].userType << "\","
+						"\"birthday\": \""							<< userBirthday << "\","
+						"\"birthdayAccess\": \""					<< itemsList[i].userBirthdayAccess << "\","
+						"\"last_online\": \""						<< itemsList[i].userLastOnline << "\","
+						"\"last_online_diff\": \""					<< to_string(GetTimeDifferenceFromNow(userLastOnline)) << "\","
+						"\"last_onlineSecondsSinceY2k\": \""		<< userLastOnlineSecondSinceY2k << "\","
+						"\"avatar\": \""							<< avatarPath << "\","
+						"\"site_theme_id\": \""						<< itemsList[i].site_theme_id << "\","
+						"\"themes\": ["								<< GetSiteThemesInJSONFormat("SELECT * FROM `site_themes`", db, user) << "],"
 						// "\"numberUnreadMessages\": \""			<< numberUreadMessages << "\", "
 						// "\"appliedVacanciesRender\": \""		<< userAppliedVacanciesRender << "\","
 						// "\"userFriendship\": \""				<< userFriendship << "\","
@@ -1262,27 +1220,28 @@ string GetUserListInJSONFormat(string dbQuery, CMysql *db, CUser *user)
 						// "\"languages\": ["		 				<< GetLanguageListInJSONFormat("SELECT * FROM `language` WHERE `id` in (SELECT `language_id` FROM `users_language` WHERE `user_id`=\"" + userID + "\");", db) << "], "
 						// "\"skills\": ["		 					<< GetSkillListInJSONFormat("SELECT * FROM `skill` WHERE `id` in (SELECT `skill_id` FROM `users_skill` WHERE `user_id`=\"" + userID + "\");", db) << "], "
 						// "\"subscriptions\":[" 					<< (user && (user->GetID() == userID) ? GetUserSubscriptionsInJSONFormat("SELECT * FROM `users_subscriptions` WHERE `user_id`=\"" + userID + "\";", db) : "") << "],"
-						"\"country_code\": \""					<< ((user && (userID == user->GetID())) ? itemsList[i].country_code : "") << "\","
-						"\"phone\": \""							<< ((user && (userID == user->GetID())) ? itemsList[i].phone : "") << "\","
-						"\"email\": \""							<< ((user && (userID == user->GetID())) ? itemsList[i].email : "") << "\","
-						"\"passport_series\": \""				<< ((user && (userID == user->GetID())) ? itemsList[i].passport_series : "") << "\","
-						"\"passport_number\": \""				<< ((user && (userID == user->GetID())) ? itemsList[i].passport_number : "") << "\","
-						"\"passport_issue_date\": \""			<< ((user && (userID == user->GetID())) ? itemsList[i].passport_issue_date : "") << "\","
-						"\"passport_issue_authority\": \""		<< ((user && (userID == user->GetID())) ? itemsList[i].passport_issue_authority : "") << "\","
-						"\"first_name_en\": \""					<< ((user && (userID == user->GetID())) ? itemsList[i].first_name_en : "") << "\","
-						"\"last_name_en\": \""					<< ((user && (userID == user->GetID())) ? itemsList[i].last_name_en : "") << "\","
-						"\"middle_name_en\": \""				<< ((user && (userID == user->GetID())) ? itemsList[i].middle_name_en : "") << "\","
-						"\"foreign_passport_number\": \""		<< ((user && (userID == user->GetID())) ? itemsList[i].foreign_passport_number : "") << "\","
-						"\"foreign_passport_expiration_date\": \"" << ((user && (userID == user->GetID())) ? itemsList[i].foreign_passport_expiration_date : "") << "\","
-						"\"citizenship_code\": \""				<< ((user && (userID == user->GetID())) ? itemsList[i].citizenship_code : "") << "\","
-						"\"bonuses_airlines\": ["				<< ((user && (userID == user->GetID())) ? GetUserBonusesAirlinesInJSONFormat("SELECT * FROM `user_bonuses_avia` WHERE `user_id`=\"" + itemsList[i].userID + "\";", db, user) : "") << "],"
-						"\"bonuses_railroads\": ["				<< ((user && (userID == user->GetID())) ? GetUserBonusesRailroadsInJSONFormat("SELECT * FROM `user_bonuses_railroads` WHERE `user_id`=\"" + itemsList[i].userID + "\";", db, user) : "") << "],"
-						"\"bonuses_hotel_chains\": ["			<< ((user && (userID == user->GetID())) ? GetUserBonusesHotelchainsInJSONFormat("SELECT * FROM `user_bonuses_hotels` WHERE `user_id`=\"" + itemsList[i].userID + "\";", db, user) : "") << "],"
-						"\"helpdesk_subscriptions_sms\": ["		<< ((user && (userID == user->GetID())) ? quoted(itemsList[i].helpdesk_subscription_S1_sms) + "," + quoted(itemsList[i].helpdesk_subscription_S2_sms) + "," + quoted(itemsList[i].helpdesk_subscription_S3_sms) + "," + quoted(itemsList[i].helpdesk_subscription_S4_sms)  : "") << "],"
-						"\"helpdesk_subscriptions_email\": ["	<< ((user && (userID == user->GetID())) ? quoted(itemsList[i].helpdesk_subscription_S1_email) + "," + quoted(itemsList[i].helpdesk_subscription_S2_email) + "," + quoted(itemsList[i].helpdesk_subscription_S3_email) + "," + quoted(itemsList[i].helpdesk_subscription_S4_email)  : "") << "],"
-						"\"pending_approval_notification_timecard\": \"" << ((user && (userID == user->GetID())) ? itemsList[i].pending_approval_notification_timecard : "") << "\","
-						"\"pending_approval_notification_bt\": \"" << ((user && (userID == user->GetID())) ? itemsList[i].pending_approval_notification_bt : "") << "\","
-						"\"isMe\": \""							<< ((user && (userID == user->GetID())) ? "yes" : "no") << "\""
+						"\"country_code\": \""						<< (isMe ? itemsList[i].country_code : "") << "\","
+						"\"phone\": \""								<< (isMe ? itemsList[i].phone : "") << "\","
+						"\"email\": \""								<< (isMe ? itemsList[i].email : "") << "\","
+						"\"email_changeable\": \""					<< (isMe ? itemsList[i].email_changeable : "") << "\","
+						"\"passport_series\": \""					<< (isMe ? itemsList[i].passport_series : "") << "\","
+						"\"passport_number\": \""					<< (isMe ? itemsList[i].passport_number : "") << "\","
+						"\"passport_issue_date\": \""				<< (isMe ? itemsList[i].passport_issue_date : "") << "\","
+						"\"passport_issue_authority\": \""			<< (isMe ? itemsList[i].passport_issue_authority : "") << "\","
+						"\"first_name_en\": \""						<< (isMe ? itemsList[i].first_name_en : "") << "\","
+						"\"last_name_en\": \""						<< (isMe ? itemsList[i].last_name_en : "") << "\","
+						"\"middle_name_en\": \""					<< (isMe ? itemsList[i].middle_name_en : "") << "\","
+						"\"foreign_passport_number\": \""			<< (isMe ? itemsList[i].foreign_passport_number : "") << "\","
+						"\"foreign_passport_expiration_date\": \""	<< (isMe ? itemsList[i].foreign_passport_expiration_date : "") << "\","
+						"\"citizenship_code\": \""					<< (isMe ? itemsList[i].citizenship_code : "") << "\","
+						"\"bonuses_airlines\": ["					<< (isMe ? GetUserBonusesAirlinesInJSONFormat("SELECT * FROM `user_bonuses_avia` WHERE `user_id`=\"" + itemsList[i].userID + "\";", db, user) : "") << "],"
+						"\"bonuses_railroads\": ["					<< (isMe ? GetUserBonusesRailroadsInJSONFormat("SELECT * FROM `user_bonuses_railroads` WHERE `user_id`=\"" + itemsList[i].userID + "\";", db, user) : "") << "],"
+						"\"bonuses_hotel_chains\": ["				<< (isMe ? GetUserBonusesHotelchainsInJSONFormat("SELECT * FROM `user_bonuses_hotels` WHERE `user_id`=\"" + itemsList[i].userID + "\";", db, user) : "") << "],"
+						"\"helpdesk_subscriptions_sms\": ["			<< (isMe ? quoted(itemsList[i].helpdesk_subscription_S1_sms) + "," + quoted(itemsList[i].helpdesk_subscription_S2_sms) + "," + quoted(itemsList[i].helpdesk_subscription_S3_sms) + "," + quoted(itemsList[i].helpdesk_subscription_S4_sms)  : "") << "],"
+						"\"helpdesk_subscriptions_email\": ["		<< (isMe ? quoted(itemsList[i].helpdesk_subscription_S1_email) + "," + quoted(itemsList[i].helpdesk_subscription_S2_email) + "," + quoted(itemsList[i].helpdesk_subscription_S3_email) + "," + quoted(itemsList[i].helpdesk_subscription_S4_email)  : "") << "],"
+						"\"pending_approval_notification_timecard\": \"" << (isMe ? itemsList[i].pending_approval_notification_timecard : "") << "\","
+						"\"pending_approval_notification_bt\": \""	<< (isMe ? itemsList[i].pending_approval_notification_bt : "") << "\","
+						"\"isMe\": \""								<< (isMe ? "yes" : "no") << "\""
 						"}";
 			} // --- if user is not dupicated
 		} // --- for loop through user list

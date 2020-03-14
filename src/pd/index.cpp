@@ -5515,24 +5515,12 @@ int main()
 		{
 			MESSAGE_DEBUG("", action, "start");
 
-			ostringstream	ostResult;
-			auto			userID = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
+			auto	temp_userID			= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
+			auto	userID				= (temp_userID.length() ? temp_userID : user.GetID());
+			auto	success_message		= "\"users\":[" + GetUserListInJSONFormat("SELECT * FROM `users` WHERE `id`=\"" + userID + "\";", &db, &user) + "]";
+			auto	error_message		= ""s;
 
-			if(userID.empty()) userID = user.GetID();
-
-			ostResult.str("");
-			ostResult	<< "{"
-						<< "\"result\": \"success\","
-						<< "\"users\":[" << GetUserListInJSONFormat("SELECT * FROM `users` WHERE `id`=\"" + userID + "\";", &db, &user) << "]"
-						<< "}";
-
-			indexPage.RegisterVariableForce("result", ostResult.str());
-
-			if(!indexPage.SetTemplate("json_response.htmlt"))
-			{
-				MESSAGE_ERROR("", action, "template file json_response.htmlt was missing");
-				throw CException("Template file json_response.htmlt was missing");
-			}
+			AJAX_ResponseTemplate(&indexPage, success_message, error_message);
 
 			MESSAGE_DEBUG("", action, "finish");
 		}

@@ -2011,6 +2011,9 @@ auto	GetGeoCountryListInJSONFormat(string dbQuery, CMysql *db, CUser *user) -> s
 
 auto GetBaseUserInfoInJSONFormat(string dbQuery, CMysql *db, CUser *user) -> string
 {
+	MESSAGE_DEBUG("", "", "start");
+
+	ostringstream					ost;
 	string							result = ""s;
 	unordered_set<unsigned long>	setOfUserID;
 
@@ -2055,7 +2058,6 @@ auto GetBaseUserInfoInJSONFormat(string dbQuery, CMysql *db, CUser *user) -> str
 	auto					itemsCount = 0;
 
 
-	MESSAGE_DEBUG("", "", "start");
 
 	if((itemsCount = db->Query(dbQuery)) > 0)
 	{
@@ -2177,6 +2179,7 @@ auto GetBaseUserInfoInJSONFormat(string dbQuery, CMysql *db, CUser *user) -> str
 		MESSAGE_DEBUG("", "", "there are users returned by request [" + dbQuery + "]");
 	}
 
+	MESSAGE_DEBUG("", "", "finish [length" + to_string(ost.str().length()) + "]");
 
 	return result;
 }
