@@ -21,11 +21,28 @@ auto	CleanUPData(CMysql *db)
 	
 	db->Query("DELETE FROM `captcha` WHERE `timestamp`<=(NOW()-INTERVAL " + to_string(SESSION_LEN) + " MINUTE)");
 	db->Query("DELETE FROM `sessions` WHERE `time`<=(NOW()-INTERVAL `expire` SECOND) AND `expire`>'0'");
-	db->Query("DELETE FROM `phone_confirmation` WHERE `eventTimestamp`<=(UNIX_TIMESTAMP() - " + to_string(SMSC_EXPIRATION) + ");");
+	db->Query("DELETE FROM `phone_confirmation` WHERE `eventTimestamp`>=(UNIX_TIMESTAMP() - " + to_string(SMSC_EXPIRATION) + ");");
 
 	MESSAGE_DEBUG("", "", "finish (error_message.length = " + to_string(error_message.length()) + ")");
 
 	return error_message;
+}
+
+auto CleanupNotActivatedUsers(CMysql *db)
+{
+	auto		result = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(db->Query("SELECT `id` FROM `users` WHERE `isactivated`='N' AND `activator_sent` <= (now() - INTERVAL " + to_string(ACTIVATOR_SESSION_LEN) + " MINUTE);"))
+	{
+		db->Query("DELETE FROM `users_passwd` WHERE `userID` IN (SELECT `id` FROM `users` WHERE `isactivated`='N' AND `activator_sent` <= (now() - INTERVAL " + to_string(ACTIVATOR_SESSION_LEN) + " MINUTE));");
+		db->Query("DELETE FROM `users` WHERE `isactivated`='N' AND `activator_sent` <= (now() - INTERVAL " + to_string(ACTIVATOR_SESSION_LEN) + " MINUTE);");
+	}
+	
+	MESSAGE_DEBUG("", "", "finish");
+
+	return result;
 }
 
 auto	CleanUPEmailChange(CMysql *db)
@@ -69,9 +86,10 @@ int main()
 
 		//--- start of minute cron main functionality
 
-		if((error_message = CleanUPData(&db))			.length()) MESSAGE_ERROR("", "", error_message);
-		if((error_message = CleanUPEmailChange(&db))	.length()) MESSAGE_ERROR("", "", error_message);
-		if((error_message = CleanupActivators(&db))		.length()) MESSAGE_ERROR("", "", error_message);
+		if((error_message = CleanUPData(&db))				.length()) MESSAGE_ERROR("", "", error_message);
+		if((error_message = CleanupNotActivatedUsers(&db))	.length()) MESSAGE_ERROR("", "", error_message);
+		if((error_message = CleanUPEmailChange(&db))		.length()) MESSAGE_ERROR("", "", error_message);
+		if((error_message = CleanupActivators(&db))			.length()) MESSAGE_ERROR("", "", error_message);
 
 		//--- end of minute cron main functionality
 	}

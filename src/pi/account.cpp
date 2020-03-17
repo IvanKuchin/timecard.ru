@@ -1185,10 +1185,29 @@ int main()
 				{
 					auto	new_email = db.Get(0, "new_email");
 
-					success_message = ", \"email\": "s + quoted(new_email);
+					if(db.Query("SELECT `email`,`login` FROM `users` WHERE `id`=" + quoted(user.GetID()) + ";"))
+					{
+						auto	old_email = db.Get(0, "email");
+						auto	old_login = db.Get(0, "login");
 
-					db.Query("UPDATE `users` SET `email`=" + quoted(new_email) + " WHERE `id`=" + quoted(user.GetID()) + ";");
-					db.Query("DELETE FROM `email_change_tokens` WHERE `user_id`=" + quoted(user.GetID()) + ";");
+						db.Query("UPDATE `users` SET `email`=" + quoted(new_email) + " WHERE `id`=" + quoted(user.GetID()) + ";");
+
+						if(old_login == old_email)
+							db.Query("UPDATE `users` SET `login`=" + quoted(new_email) + " WHERE `id`=" + quoted(user.GetID()) + ";");
+						else
+						{
+							MESSAGE_DEBUG("", action, "login differ from email, don't update login");
+						}
+
+						db.Query("DELETE FROM `email_change_tokens` WHERE `user_id`=" + quoted(user.GetID()) + ";");
+
+						success_message = ", \"email\": "s + quoted(new_email);
+					}
+					else
+					{
+						error_message = gettext("user not found");
+						MESSAGE_DEBUG("", action, error_message);
+					}
 				}
 				else
 				{
