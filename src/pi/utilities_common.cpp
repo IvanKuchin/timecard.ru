@@ -24,6 +24,7 @@ auto RegisterInitialVariables(CCgi *indexPage, CMysql *db, CUser *user) -> bool
 	indexPage->RegisterVariableForce("rand", GetRandom(10));
 	indexPage->RegisterVariableForce("random", GetRandom(10));
 	indexPage->RegisterVariableForce("DOMAIN_NAME", DOMAIN_NAME);
+	indexPage->RegisterVariableForce("EMAIL_FROM_DOMAIN", GetDomain());
 	indexPage->RegisterVariableForce("site_theme", DEFAULT_SITE_THEME);
 
 	if(getenv("REMOTE_ADDR")) indexPage->RegisterVariableForce("REMOTE_ADDR", getenv("REMOTE_ADDR"));

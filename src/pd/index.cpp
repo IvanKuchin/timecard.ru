@@ -367,9 +367,7 @@ int main()
 			ostringstream	ost;
 			string			strPageToGet, strFriendsOnSinglePage;
 
-			{
-				MESSAGE_DEBUG("", action, "start");
-			}
+			MESSAGE_DEBUG("", action, "start");
 
 			string		template_name = action.substr(0, action.length() - 9) + ".htmlt";
 
@@ -378,21 +376,26 @@ int main()
 				MESSAGE_DEBUG("", action, "can't find template " + template_name);
 			} // if(!indexPage.SetTemplate("my_network.htmlt"))
 
-			{
-				MESSAGE_DEBUG("", action, "finish");
-			}
+			MESSAGE_DEBUG("", action, "finish");
 		}
 
-		if(	(action == LOGGEDIN_SUBCONTRACTOR_DEFAULT_ACTION) ||
-			(action == LOGGEDIN_AGENCY_DEFAULT_ACTION) ||
-			(action == LOGGEDIN_HELPDESK_DEFAULT_ACTION) ||
-			(action == LOGGEDIN_APPROVER_DEFAULT_ACTION) ||
+		if(
+			(action == LOGGEDIN_SUBCONTRACTOR_DEFAULT_ACTION)	||
+			(action == LOGGEDIN_AGENCY_DEFAULT_ACTION)			||
+			(action == LOGGEDIN_HELPDESK_DEFAULT_ACTION)		||
+			(action == LOGGEDIN_APPROVER_DEFAULT_ACTION)		||
 			(action == LOGGEDIN_NOROLE_DEFAULT_ACTION)
 		   )
 		{
-			string		template_name = action + ".htmlt";
+			auto		template_name = action + ".htmlt";
 
 			MESSAGE_DEBUG("", action, "start");
+
+			if(user.GetLogin() == "Guest")
+			{
+				MESSAGE_DEBUG("", action, "re-login required");
+				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
+			}
 
 			if(!indexPage.SetTemplate(template_name))
 			{
@@ -404,9 +407,8 @@ int main()
 
 		if(action == "setlang")
 		{
-			string		lng;
+			auto	lng = indexPage.GetVarsHandler()->Get("lng");
 
-			lng = indexPage.GetVarsHandler()->Get("lng");
 			indexPage.AddCookie("lng", lng, nullptr, "", "/");
 
 			if(!indexPage.SetTemplate("index.htmlt"))
@@ -432,23 +434,19 @@ int main()
 		// --- JSON part has started
 	    if(action == "AJAX_getUserWall")
 	    {
-	        ostringstream   ost;
-	        string          strPageToGet, strNewsOnSinglePage;
-	        int             currPage = 0, newsOnSinglePage = 0;
+	        auto			currPage = 0, newsOnSinglePage = 0;
 	        vector<int>     vectorFriendList;
-	        string			userLogin = "", userID = "", result = "";
+	        auto			result = ""s;
+	        auto			userID			    = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("id"));
+	        auto			userLogin		    = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("login"));
+	        auto			strNewsOnSinglePage = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("NewsOnSinglePage"));
+	        auto			strPageToGet        = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("page"));
 
 		    MESSAGE_DEBUG("", action, "start");
 
-	        userID			    = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("id"));
-	        userLogin		    = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("login"));
-	        strNewsOnSinglePage = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("NewsOnSinglePage"));
-	        strPageToGet        = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("page"));
 
 	        if(strPageToGet.empty()) strPageToGet = "0";
-
 	        {
-	            
 	            MESSAGE_DEBUG("", action, "page " + strPageToGet + " requested");
 	        }
 
@@ -489,10 +487,7 @@ int main()
 					userID = db.Get(0, "id");
 				else
 				{
-					{
-						
-						MESSAGE_DEBUG("", action, "attempt to get a wall of unknown/blocked user (" + userLogin + ")");
-					}
+					MESSAGE_DEBUG("", action, "attempt to get a wall of unknown/blocked user (" + userLogin + ")");
 				}
 	        }
 	        else
@@ -704,12 +699,7 @@ int main()
 			{
 				if(user.GetLogin() == "Guest")
 				{
-					ostringstream	ost;
-
-					{
-						
-						MESSAGE_DEBUG("", action, "re-login required");
-					}
+					MESSAGE_DEBUG("", action, "re-login required");
 
 					indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
 				}
@@ -820,12 +810,7 @@ int main()
 			{
 				if(user.GetLogin() == "Guest")
 				{
-					ostringstream	ost;
-
-					{
-						
-						MESSAGE_DEBUG("", action, "re-login required");
-					}
+					MESSAGE_DEBUG("", action, "re-login required");
 
 					indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
 				}
@@ -861,10 +846,7 @@ int main()
 			string		sessid;
 			int			affected;
 
-			{
-				
-				MESSAGE_DEBUG("", action, "start");
-			}
+			MESSAGE_DEBUG("", action, "start");
 
 			ost.str("");
 			ost << "SELECT * FROM `geo_country`;";
@@ -1036,10 +1018,7 @@ int main()
 			CMysql			db1;
 			string			url, imageTempSet;
 
-			{
-				
-				MESSAGE_DEBUG("", action, "start");
-			}
+			MESSAGE_DEBUG("", action, "start");
 
 			url = indexPage.GetVarsHandler()->Get("url");
 			imageTempSet = indexPage.GetVarsHandler()->Get("imageTempSet");
@@ -1081,12 +1060,7 @@ int main()
 			{
 				if(user.GetLogin() == "Guest")
 				{
-					ostringstream	ost;
-
-					{
-						
-						MESSAGE_DEBUG("", action, "re-login required");
-					}
+					MESSAGE_DEBUG("", action, "re-login required");
 
 					ostFinal.str("");
 					ostFinal << "{" << std::endl;
@@ -1290,10 +1264,7 @@ int main()
 				throw CException("Template file was missing");
 			}
 
-			{
-				
-				MESSAGE_DEBUG("", action, "finish");
-			}
+			MESSAGE_DEBUG("", action, "finish");
 		}
 */
 
@@ -1306,19 +1277,11 @@ int main()
 			string		sessid, avatarID;
 			int			affected;
 
-			{
-				
-				MESSAGE_DEBUG("", action, "start");
-			}
+			MESSAGE_DEBUG("", action, "start");
 
 			if(user.GetLogin() == "Guest")
 			{
-				ostringstream	ost;
-
-				{
-					
-					MESSAGE_DEBUG("", action, "re-login required");
-				}
+				MESSAGE_DEBUG("", action, "re-login required");
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
 			}
@@ -1384,9 +1347,7 @@ int main()
 					result.str("");
 					result << "{ \"result\":\"error\", \"description\":\"avatar do not belongs to you\" }";
 
-					{
-						MESSAGE_ERROR("", action, "avatar [id=" + avatarID + "] do not belongs to user " + user.GetLogin());
-					}
+					MESSAGE_ERROR("", action, "avatar [id=" + avatarID + "] do not belongs to user " + user.GetLogin());
 				}
 			}
 			else
@@ -1412,19 +1373,11 @@ int main()
 			ostringstream	ost, result;
 			string			sessid, friendID, currentFriendshipStatus, requestedFriendshipStatus;
 
-			{
-				
-				MESSAGE_DEBUG("", action, "start");
-			}
+			MESSAGE_DEBUG("", action, "start");
 
 			if(user.GetLogin() == "Guest")
 			{
-				ostringstream	ost;
-
-				{
-					
-					MESSAGE_DEBUG("", action, "re-login required");
-				}
+				MESSAGE_DEBUG("", action, "re-login required");
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
 			}
@@ -1606,19 +1559,11 @@ int main()
 		{
 			ostringstream	ost, result;
 
-			{
-				
-				MESSAGE_DEBUG("", action, "start");
-			}
+			MESSAGE_DEBUG("", action, "start");
 
 			if(user.GetLogin() == "Guest")
 			{
-				ostringstream	ost;
-
-				{
-					
-					MESSAGE_DEBUG("", action, "re-login required");
-				}
+				MESSAGE_DEBUG("", action, "re-login required");
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
 			}
@@ -1688,19 +1633,11 @@ int main()
 		{
 			ostringstream	ost, result;
 
-			{
-				
-				MESSAGE_DEBUG("", action, "start");
-			}
+			MESSAGE_DEBUG("", action, "start");
 
 			if(user.GetLogin() == "Guest")
 			{
-				ostringstream	ost;
-
-				{
-					
-					MESSAGE_DEBUG("", action, "re-login required");
-				}
+				MESSAGE_DEBUG("", action, "re-login required");
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
 			}
@@ -1773,18 +1710,13 @@ int main()
 			string			sessid, messageId, messageLikeType, userList = "";
 			string		  failReason = "";
 
-			{
-				MESSAGE_DEBUG("", action, "start");
-			}
+			MESSAGE_DEBUG("", action, "start");
 
 			if(user.GetLogin() == "Guest")
 			{
 				ostringstream   ost;
 
-				{
-					
-					MESSAGE_DEBUG("", action, "re-login required");
-				}
+				MESSAGE_DEBUG("", action, "re-login required");
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
 			}
@@ -1970,10 +1902,7 @@ int main()
 				MESSAGE_ERROR("", action, "template file json_response.htmlt was missing");
 				throw CException("Template file was missing");
 			}
-			{
-				
-				MESSAGE_DEBUG("", action, "finish");
-			}
+			MESSAGE_DEBUG("", action, "finish");
 		}
 
 
@@ -2108,10 +2037,7 @@ int main()
 				throw CException("Template file was missing");
 			}
 
-			{
-				
-				MESSAGE_DEBUG("", action, "finish");
-			}
+			MESSAGE_DEBUG("", action, "finish");
 		}
 
 		// --- JSON FindFriend by ID
@@ -2125,12 +2051,7 @@ int main()
 
 			if(user.GetLogin() == "Guest")
 			{
-				ostringstream	ost;
-
-				{
-					
-					MESSAGE_DEBUG("", action, "re-login required");
-				}
+				MESSAGE_DEBUG("", action, "re-login required");
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
 			}
@@ -2166,10 +2087,7 @@ int main()
 				throw CException("Template file was missing");
 			}
 
-			{
-				
-				MESSAGE_DEBUG("", action, "finish");
-			}
+			MESSAGE_DEBUG("", action, "finish");
 		}
 
 		// --- JSON friend list for autocomplete
@@ -2179,10 +2097,7 @@ int main()
 			string			sessid, lookForKey, userList;
 			vector<string>	searchWords;
 
-			{
-				
-				MESSAGE_DEBUG("", action, "start");
-			}
+			MESSAGE_DEBUG("", action, "start");
 
 			// --- Initialization
 			ostFinal.str("");
@@ -2446,10 +2361,7 @@ int main()
 			{
 				ostringstream   ost;
 
-				{
-					
-					MESSAGE_DEBUG("", action, "re-login required");
-				}
+				MESSAGE_DEBUG("", action, "re-login required");
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
 			}
@@ -2490,19 +2402,11 @@ int main()
 			CMysql			db1;
 			int				affected;
 
-			{
-				
-				MESSAGE_DEBUG("", action, "start");
-			}
+			MESSAGE_DEBUG("", action, "start");
 
 			if(user.GetLogin() == "Guest")
 			{
-				ostringstream	ost;
-
-				{
-					
-					MESSAGE_DEBUG("", action, "re-login required");
-				}
+				MESSAGE_DEBUG("", action, "re-login required");
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
 			}
@@ -2553,19 +2457,11 @@ int main()
 			ostringstream	ost, ostFinal, friendsSqlQuery, chatMessageQuery;
 			string			sessid, lookForKey, userArray = "", messageArray = "";
 
-			{
-				
-				MESSAGE_DEBUG("", action, "start");
-			}
+			MESSAGE_DEBUG("", action, "start");
 
 			if(user.GetLogin() == "Guest")
 			{
-				ostringstream	ost;
-
-				{
-					
-					MESSAGE_DEBUG("", action, "re-login required");
-				}
+				MESSAGE_DEBUG("", action, "re-login required");
 
 				ostFinal << "result: fail";
 			}
@@ -2613,10 +2509,7 @@ int main()
 				throw CException("Template file was missing");
 			}
 
-			{
-				
-				MESSAGE_DEBUG("", action, "finish");
-			}
+			MESSAGE_DEBUG("", action, "finish");
 		}
 
 
@@ -2627,19 +2520,11 @@ int main()
 			string		sessid;
 			int			affected;
 
-			{
-				
-				MESSAGE_DEBUG("", action, "start");
-			}
+			MESSAGE_DEBUG("", action, "start");
 
 			if(user.GetLogin() == "Guest")
 			{
-				ostringstream	ost;
-
-				{
-					
-					MESSAGE_DEBUG("", action, "re-login required");
-				}
+				MESSAGE_DEBUG("", action, "re-login required");
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
 			}
@@ -2678,19 +2563,11 @@ int main()
 			string		sessid;
 			int			affected;
 
-			{
-				
-				MESSAGE_DEBUG("", action, "start");
-			}
+			MESSAGE_DEBUG("", action, "start");
 
 			if(user.GetLogin() == "Guest")
 			{
-				ostringstream	ost;
-
-				{
-					
-					MESSAGE_DEBUG("", action, "re-login required");
-				}
+				MESSAGE_DEBUG("", action, "re-login required");
 
 				ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
 			}
@@ -2729,19 +2606,11 @@ int main()
 			string			messageID;
 			string		  commentType;
 
-			{
-				
-				MESSAGE_DEBUG("", action, "start");
-			}
+			MESSAGE_DEBUG("", action, "start");
 
 			if(user.GetLogin() == "Guest")
 			{
-				ostringstream	ost;
-
-				{
-					
-					MESSAGE_DEBUG("", action, "re-login required");
-				}
+				MESSAGE_DEBUG("", action, "re-login required");
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
 			}
@@ -2832,10 +2701,7 @@ int main()
 				throw CExceptionHTML("template page missing");
 			} // if(!indexPage.SetTemplate("json_response.htmlt"))
 
-			{
-				
-				MESSAGE_DEBUG("", action, "finish");
-			}
+			MESSAGE_DEBUG("", action, "finish");
 		}
 
 		if(action == "AJAX_chatPostMessage")
@@ -2843,19 +2709,11 @@ int main()
 			ostringstream	ost, ostFinal;
 			string			sessid, message = "", toID = "";
 
-			{
-				
-				MESSAGE_DEBUG("", action, "start");
-			}
+			MESSAGE_DEBUG("", action, "start");
 
 			if(user.GetLogin() == "Guest")
 			{
-				ostringstream	ost;
-
-				{
-					
-					MESSAGE_DEBUG("", action, "re-login required");
-				}
+				MESSAGE_DEBUG("", action, "re-login required");
 
 				ostFinal << "result: fail";
 			}
@@ -2961,13 +2819,7 @@ int main()
 					ostFinal << "\"result\": \"error\"," << std::endl;
 					ostFinal << "\"description\": \"сообщение должно содержать текст\"" << std::endl;
 				}
-
-
-
-
-
 			}
-
 
 			indexPage.RegisterVariableForce("result", "{" + ostFinal.str() + "}");
 
@@ -2977,10 +2829,7 @@ int main()
 				throw CException("Template file was missing");
 			}
 
-			{
-				
-				MESSAGE_DEBUG("", action, "finish");
-			}
+			MESSAGE_DEBUG("", action, "finish");
 		}
 
 		if(action == "AJAX_chatMarkMessageReadByMessageID")
@@ -3032,10 +2881,7 @@ int main()
 				throw CException("Template file was missing");
 			}
 
-			{
-				
-				MESSAGE_DEBUG("", action, "finish");
-			}
+			MESSAGE_DEBUG("", action, "finish");
 		}
 
 		if(action == "AJAX_notificationMarkMessageReadByMessageID")
@@ -3098,10 +2944,7 @@ int main()
 				throw CException("Template file was missing");
 			}
 
-			{
-				
-				MESSAGE_DEBUG("", action, "finish");
-			}
+			MESSAGE_DEBUG("", action, "finish");
 		}
 
 		if(action == "AJAX_chatMarkMessageReadByUserID")
@@ -3358,12 +3201,7 @@ int main()
 
 			if(user.GetLogin() == "Guest")
 			{
-				ostringstream	ost;
-
-				{
-					
-					MESSAGE_DEBUG("", action, "re-login required");
-				}
+				MESSAGE_DEBUG("", action, "re-login required");
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
 			}
@@ -3415,19 +3253,11 @@ int main()
 			string			newsFeedMessageImageTempSet;
 			string			newsFeedMessageImageSet;
 
-			{
-				
-				MESSAGE_DEBUG("", action, "start");
-			}
+			MESSAGE_DEBUG("", action, "start");
 
 			if(user.GetLogin() == "Guest")
 			{
-				ostringstream	ost;
-
-				{
-					
-					MESSAGE_DEBUG("", action, "re-login required");
-				}
+				MESSAGE_DEBUG("", action, "re-login required");
 
 				ost.str("");
 				ost << "[{\"result\": \"error\"}, {\"description\": \"session lost. Need to relogin\"}]";
@@ -3642,10 +3472,7 @@ int main()
 				throw CExceptionHTML("user not activated");
 			} // if(!indexPage.SetTemplate("json_response.htmlt"))
 
-			{
-				
-				MESSAGE_DEBUG("", action, "finish");
-			}
+			MESSAGE_DEBUG("", action, "finish");
 		}
 
 		// --- AJAX update message to news feed
@@ -3661,19 +3488,11 @@ int main()
 			string			newsFeedMessageImageTempSet;
 			string			newsFeedMessageImageSet;
 
-			{
-				
-				MESSAGE_DEBUG("", action, "start");
-			}
+			MESSAGE_DEBUG("", action, "start");
 
 			if(user.GetLogin() == "Guest")
 			{
-				ostringstream	ost;
-
-				{
-					
-					MESSAGE_DEBUG("", action, "re-login required");
-				}
+				MESSAGE_DEBUG("", action, "re-login required");
 
 				ost.str("");
 				ost << "[{\"result\": \"error\"}, {\"description\": \"session lost. Need to relogin\"}]";
@@ -3835,10 +3654,7 @@ int main()
 				throw CExceptionHTML("Template file was missing");
 			}
 
-			{
-				
-				MESSAGE_DEBUG("", action, "finish");
-			}
+			MESSAGE_DEBUG("", action, "finish");
 
 		}
 
@@ -3854,19 +3670,13 @@ int main()
 			ostringstream	ost;
 			string			strPageToGet, strNewsOnSinglePage;
 
-			{
-				
-				MESSAGE_DEBUG("", action, "start");
-			}
+			MESSAGE_DEBUG("", action, "start");
 
 			if(user.GetLogin() == "Guest")
 			{
 				ostringstream   ost;
 
-				{
-					
-					MESSAGE_DEBUG("", action, "re-login required");
-				}
+				MESSAGE_DEBUG("", action, "re-login required");
 
 				ost.str("");
 				ost << "{\"result\": \"error\", \"description\": \"session lost. Need to relogin\"}";
@@ -4203,10 +4013,7 @@ int main()
 				throw CExceptionHTML("Template file was missing");
 			}
 
-			{
-				
-				MESSAGE_DEBUG("", action, "finish");
-			}
+			MESSAGE_DEBUG("", action, "finish");
 		}
 
 
@@ -4248,9 +4055,7 @@ int main()
 			string		randomValue = GetRandom(4);
 			string 		userToCheck;
 
-			{
-				MESSAGE_DEBUG("", action, "start");
-			}
+			MESSAGE_DEBUG("", action, "start");
 
 			userToCheck = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("regEmail"));
 
@@ -4281,20 +4086,12 @@ int main()
 			ostringstream	ost;
 			string			sessid, friendID;
 
-			{
-				
-				MESSAGE_DEBUG("", action, "start");
-			}
+			MESSAGE_DEBUG("", action, "start");
 
 /*
 			if(user.GetLogin() == "Guest")
 			{
-				ostringstream	ost;
-
-				{
-					
-					MESSAGE_DEBUG("", action, "re-login required");
-				}
+				MESSAGE_DEBUG("", action, "re-login required");
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
 			}
@@ -4477,10 +4274,7 @@ int main()
 			ostringstream	ost;
 			string			strPageToGet, strNewsOnSinglePage, strFriendList;
 
-			{
-				
-				MESSAGE_DEBUG("", action, "start");
-			}
+			MESSAGE_DEBUG("", action, "start");
 
 			strNewsOnSinglePage	= indexPage.GetVarsHandler()->Get("NewsOnSinglePage");
 			strPageToGet 		= indexPage.GetVarsHandler()->Get("page");
@@ -4492,12 +4286,7 @@ int main()
 
 			if(user.GetLogin() == "Guest")
 			{
-				ostringstream	ost;
-
-				{
-					
-					MESSAGE_DEBUG("", action, "re-login required");
-				}
+				MESSAGE_DEBUG("", action, "re-login required");
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
 			}
@@ -4528,10 +4317,7 @@ int main()
 				throw CExceptionHTML("user not activated");
 			} // if(!indexPage.SetTemplate("json_response.htmlt"))
 
-			{
-				
-				MESSAGE_DEBUG("", action, "finish");
-			}
+			MESSAGE_DEBUG("", action, "finish");
 		}
 
 
@@ -4540,19 +4326,11 @@ int main()
 			ostringstream	ost;
 			string			sessid, activeUserID;
 
-			{
-				
-				MESSAGE_DEBUG("", action, "start");
-			}
+			MESSAGE_DEBUG("", action, "start");
 
 			if(user.GetLogin() == "Guest")
 			{
-				ostringstream	ost;
-
-				{
-					
-					MESSAGE_DEBUG("", action, "re-login required");
-				}
+				MESSAGE_DEBUG("", action, "re-login required");
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
 			}
@@ -4563,10 +4341,7 @@ int main()
 				throw CException("Template file was missing");
 			}
 
-			{
-				
-				MESSAGE_DEBUG("", action, "finish");
-			}
+			MESSAGE_DEBUG("", action, "finish");
 		}
 
 		if(action == "chat")
@@ -4574,19 +4349,11 @@ int main()
 			ostringstream	ost;
 			string			sessid, activeUserID;
 
-			{
-				
-				MESSAGE_DEBUG("", action, "start");
-			}
+			MESSAGE_DEBUG("", action, "start");
 
 			if(user.GetLogin() == "Guest")
 			{
-				ostringstream	ost;
-
-				{
-					
-					MESSAGE_DEBUG("", action, "re-login required");
-				}
+				MESSAGE_DEBUG("", action, "re-login required");
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
 			}
@@ -4597,10 +4364,7 @@ int main()
 				throw CException("Template file was missing");
 			}
 
-			{
-				
-				MESSAGE_DEBUG("", action, "finish");
-			}
+			MESSAGE_DEBUG("", action, "finish");
 		}
 
 		if(action == "login")
@@ -4688,9 +4452,7 @@ int main()
 			ostringstream	ost;
 			string		sessid;
 
-			{
-				MESSAGE_DEBUG("", action, "start");
-			}
+			MESSAGE_DEBUG("", action, "start");
 
 			sessid = indexPage.GetCookie("sessid");
 			if(sessid.length() > 0)
@@ -4716,10 +4478,7 @@ int main()
 
 		if(action == "forget_password_page")
 		{
-			{
-				
-				MESSAGE_DEBUG("", action, "start");
-			}
+			MESSAGE_DEBUG("", action, "start");
 
 			if(!indexPage.SetTemplate("forget_password.htmlt"))
 			{
@@ -4727,10 +4486,7 @@ int main()
 				throw CException("Template file was missing");
 			}
 
-			{
-				
-				MESSAGE_DEBUG("", action, "finish");
-			}
+			MESSAGE_DEBUG("", action, "finish");
 
 		}
 
@@ -4740,10 +4496,7 @@ int main()
 			CUser		user;
 			ostringstream	ost1, ostResult;
 
-			{
-				
-				MESSAGE_DEBUG("", action, "start");
-			}
+			MESSAGE_DEBUG("", action, "start");
 
 			sessid = indexPage.GetCookie("sessid");
 			if(sessid.length() < 5)
@@ -4845,10 +4598,7 @@ int main()
 				throw CExceptionHTML("Template file was missing");
 			}
 
-			{
-				
-				MESSAGE_DEBUG("", action, "finish");
-			}
+			MESSAGE_DEBUG("", action, "finish");
 		}
 
 		if(action == "AJAX_recoverPassword")
@@ -5321,19 +5071,11 @@ int main()
 			int		affected;
 			string		userID, name, nameLast, age, cv, pass, address, phone, email, isBlocked, avatarFileName, avatarFolderName, current_company;
 
-			{
-				
-				MESSAGE_DEBUG("", action, "start");
-			}
+			MESSAGE_DEBUG("", action, "start");
 
 			if(user.GetLogin() == "Guest")
 			{
-				ostringstream	ost;
-
-				{
-					
-					MESSAGE_DEBUG("", action, "re-login required");
-				}
+				MESSAGE_DEBUG("", action, "re-login required");
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
 			}
@@ -5391,10 +5133,7 @@ int main()
 				throw CExceptionHTML("Template file was missing");
 			}
 
-			{
-				
-				MESSAGE_DEBUG("", action, "finish");
-			}
+			MESSAGE_DEBUG("", action, "finish");
 		}
 
 // --- Deprecated item
@@ -5480,19 +5219,11 @@ int main()
 			ostringstream	ost;
 			string		userID, name, nameLast, age, cv, pass, address, phone, email, isBlocked, avatarFileName, avatarFolderName, current_company;
 
-			{
-				
-				MESSAGE_DEBUG("", action, "start");
-			}
+			MESSAGE_DEBUG("", action, "start");
 
 			if(user.GetLogin() == "Guest")
 			{
-				ostringstream	ost;
-
-				{
-					
-					MESSAGE_DEBUG("", action, "re-login required");
-				}
+				MESSAGE_DEBUG("", action, "re-login required");
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
 			}
@@ -5505,10 +5236,7 @@ int main()
 				throw CException("Template file edit_company.htmlt was missing");
 			}  // if(!indexPage.SetTemplate("edit_company.htmlt"))
 
-			{
-				
-				MESSAGE_DEBUG("", action, "finish");
-			}
+			MESSAGE_DEBUG("", action, "finish");
 		} 	// if(action == "edit_company")
 */
 		if(action == "JSON_getUserProfile")
@@ -5808,10 +5536,7 @@ int main()
 				throw CException("Template file was missing");
 			}
 
-			{
-				
-				MESSAGE_DEBUG("", action, "finish");
-			}
+			MESSAGE_DEBUG("", action, "finish");
 
 		}
 
@@ -5889,10 +5614,7 @@ int main()
 				throw CException("Template file was missing");
 			}
 
-			{
-				
-				MESSAGE_DEBUG("", action, "finish");
-			}
+			MESSAGE_DEBUG("", action, "finish");
 		}
 
 		// --- AJAX_updateFirstLastName
@@ -6033,7 +5755,6 @@ int main()
 
 		if(action == "AJAX_updateSiteTheme")
 		{
-			string			strPageToGet, strFriendsOnSinglePage;
 			ostringstream	ostResult;
 
 			MESSAGE_DEBUG("", action, "start");
@@ -6041,9 +5762,7 @@ int main()
 			ostResult.str("");
 			if(user.GetLogin() == "Guest")
 			{
-				{
-					MESSAGE_DEBUG("", action, "re-login required");
-				}
+				MESSAGE_DEBUG("", action, "re-login required");
 
 				ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
 			}
@@ -6109,18 +5828,11 @@ int main()
 			ostringstream	ost;
 			string			strPageToGet, strNewsOnSinglePage;
 
-			{
-				MESSAGE_DEBUG("", action, "start");
-			}
+			MESSAGE_DEBUG("", action, "start");
 
 			if((user.GetLogin() == "Guest") && (action == "news_feed"))
 			{
-				ostringstream	ost;
-
-				{
-					
-					MESSAGE_DEBUG("", action, "re-login required");
-				}
+				MESSAGE_DEBUG("", action, "re-login required");
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
 			}
@@ -6160,18 +5872,11 @@ int main()
 			ostringstream	ost;
 			string			strPageToGet, strFriendsOnSinglePage;
 
-			{
-				MESSAGE_DEBUG("", action, "start");
-			}
+			MESSAGE_DEBUG("", action, "start");
 
 			if(user.GetLogin() == "Guest")
 			{
-				ostringstream	ost;
-
-				{
-					
-					MESSAGE_DEBUG("", action, "re-login required");
-				}
+				MESSAGE_DEBUG("", action, "re-login required");
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
 			}
@@ -6209,12 +5914,7 @@ int main()
 /*
 			if(user.GetLogin() == "Guest")
 			{
-				ostringstream	ost;
-
-				{
-					
-					MESSAGE_DEBUG("", action, "re-login required");
-				}
+				MESSAGE_DEBUG("", action, "re-login required");
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
 			}
@@ -6271,7 +5971,6 @@ int main()
 			{
 				if(db.InsertQuery("INSERT INTO `demo_requests` (`name`, `contact`, `date`) VALUES (" + quoted(name) + "," + quoted(contact) + ", NOW());"))
 				{
-
 				}
 				else
 				{
@@ -6295,9 +5994,7 @@ int main()
 			string		login;
 			CMailLocal	mail;
 
-			{
-				MESSAGE_DEBUG("", action, "start");
-			}
+			MESSAGE_DEBUG("", action, "start");
 
 			login = RemoveQuotas(indexPage.GetVarsHandler()->Get("login"));
 			if(login.length() > 0)
@@ -6325,9 +6022,7 @@ int main()
 			}
 			else
 			{
-				{
-					MESSAGE_ERROR("", action, "login is not defined");
-				}
+				MESSAGE_ERROR("", action, "login is not defined");
 			}
 
 			indexPage.RegisterVariableForce("content", "На ваш почтовый ящик выслан пароль !");

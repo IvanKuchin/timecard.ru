@@ -23,7 +23,7 @@
 CMail::CMail() : smtpServer(SMTP_HOST), smtpPort(SMTP_PORT), smtpFlag(false)
 {
 	// --- this has to be Return Path in the header which must match server hostname and opendkim sign key
-	mailfrom = "-f noreply@conn-me.ru";
+	mailfrom = "-f noreply@" + GetDomain();
 }
 
 unsigned long CMail::Addr2Num (const char *addr)
