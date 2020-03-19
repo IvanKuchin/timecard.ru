@@ -1990,26 +1990,25 @@ int main(void)
 			MESSAGE_DEBUG("", action, "finish");
 		}
 
-
-
-
-
 		if(action == "AJAX_addTask")
 		{
-			ostringstream	ostResult;
-
 			MESSAGE_DEBUG("", action, "start");
 
-			ostResult.str("");
+			auto			template_name = "json_response.htmlt"s;
+			auto			error_message = ""s;
+
+			auto			customer 		= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("customer"));
+			auto			project			= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("project"));
+			auto			task			= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("task"));
+
+
+			if(customer.length() && project.length() && task.length())
 			{
-				string			template_name = "json_response.htmlt";
-				string			error_message = "";
-
-				string			customer 		= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("customer"));
-				string			project			= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("project"));
-				string			task			= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("task"));
-
-				if(customer.length() && project.length() && task.length())
+				if(
+						(GetNumberOfLetters(customer) >= 3) && 
+						(GetNumberOfLetters(project	) >= 3) && 
+						(GetNumberOfLetters(task	) >= 3)
+					)
 				{
 					error_message = isAgencyEmployeeAllowedToChangeAgencyData(&db, &user);
 					if(error_message.empty())
@@ -2023,8 +2022,6 @@ int main(void)
 							if(task_id.empty())
 							{
 								task_id = CreateTaskBelongsToAgency(customer, project, task, agency_id, &db);
-
-								ostResult << "{\"result\":\"success\"}";
 
 								if(GeneralNotifySoWContractPartiesAboutChanges(action, task_id, "", "", task, &db, &user))
 								{
@@ -2053,25 +2050,17 @@ int main(void)
 				}
 				else
 				{
-					MESSAGE_ERROR("", action, "one of mandatory parameters missed");
-					error_message = "Некоторые параметры не заданы";
+					error_message = gettext("number of letters must be at least") + " 3"s;
+					MESSAGE_DEBUG("", action, error_message);
 				}
-
-				if(error_message.empty())
-				{
-				}
-				else
-				{
-					MESSAGE_DEBUG("", action, "failed");
-					ostResult.str("");
-					ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
-				}
-
-				indexPage.RegisterVariableForce("result", ostResult.str());
-
-				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			}
+			else
+			{
+				error_message = gettext("mandatory parameter missed");
+				MESSAGE_ERROR("", action, error_message);
 			}
 
+			AJAX_ResponseTemplate(&indexPage, "", error_message);
 			MESSAGE_DEBUG("", action, "finish");
 		}
 

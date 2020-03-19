@@ -2331,6 +2331,107 @@ auto	GetCountryCodeAndPhoneNumberBySMSCode(const string &confirmation_code, cons
 	return make_tuple(country_code, phone_number, password);
 }
 
+auto GetNumberOfCntrl(const wstring &src) -> unsigned int
+{
+	MESSAGE_DEBUG("", "", "start (" + to_string(src.length()) + ")");
+
+	auto	result = 0u;
+
+	for(auto i = 0u; i < src.length(); ++i)
+	{
+		result += iswcntrl(src[i]) ? 1 : 0;
+	}
+
+	MESSAGE_DEBUG("", "", "finish (" + to_string(result) + ")");
+
+	return result;
+}
+
+auto GetNumberOfCntrl(const string &src) -> unsigned int
+{
+	return GetNumberOfCntrl(multibyte_to_wide(src));
+}
+
+auto GetNumberOfPunct(const wstring &src) -> unsigned int
+{
+	MESSAGE_DEBUG("", "", "start (" + to_string(src.length()) + ")");
+
+	auto	result = 0u;
+
+	for(auto i = 0u; i < src.length(); ++i)
+	{
+		result += iswpunct(src[i]) ? 1 : 0;
+	}
+
+	MESSAGE_DEBUG("", "", "finish (" + to_string(result) + ")");
+
+	return result;
+}
+
+auto GetNumberOfPunct(const string &src) -> unsigned int
+{
+	return GetNumberOfPunct(multibyte_to_wide(src));
+}
+
+auto GetNumberOfSpaces(const wstring &src) -> unsigned int
+{
+	MESSAGE_DEBUG("", "", "start (" + to_string(src.length()) + ")");
+
+	auto	result = 0u;
+
+	for(auto i = 0u; i < src.length(); ++i)
+	{
+		result += iswspace(src[i]) ? 1 : 0;
+	}
+
+	MESSAGE_DEBUG("", "", "finish (" + to_string(result) + ")");
+
+	return result;
+}
+
+auto GetNumberOfSpaces(const string &src) -> unsigned int
+{
+	return GetNumberOfSpaces(multibyte_to_wide(src));
+}
+
+auto GetNumberOfDigits(const wstring &src) -> unsigned int
+{
+	MESSAGE_DEBUG("", "", "start (" + to_string(src.length()) + ")");
+
+	auto	result = 0u;
+
+	for(auto i = 0u; i < src.length(); ++i)
+	{
+		result += iswdigit(src[i]) ? 1 : 0;
+	}
+
+	MESSAGE_DEBUG("", "", "finish (" + to_string(result) + ")");
+
+	return result;
+}
+
+auto GetNumberOfDigits(const string &src) -> unsigned int
+{
+	return GetNumberOfDigits(multibyte_to_wide(src));
+}
+
+auto GetNumberOfLetters(const wstring &src) -> unsigned int
+{
+	MESSAGE_DEBUG("", "", "start (" + to_string(src.length()) + ")");
+
+	auto	src_len = src.length();
+	auto	result = src_len - GetNumberOfDigits(src) - GetNumberOfSpaces(src) - GetNumberOfPunct(src) - GetNumberOfCntrl(src);
+
+	MESSAGE_DEBUG("", "", "finish (" + to_string(result) + ")");
+
+	return result;
+}
+
+auto GetNumberOfLetters(const string &src) -> unsigned int
+{
+	return GetNumberOfLetters(multibyte_to_wide(src));
+}
+
 auto isDemoDomain() -> bool
 {
 	auto	result = false;

@@ -1193,11 +1193,17 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 					}
 					else if(action == "AJAX_updateCustomerTitle")
 					{
-						if(db->Query(
+						if(GetNumberOfLetters(new_value) < 3)
+						{
+							error_message = gettext("number of letters must be at least") + " 3"s;
+							MESSAGE_DEBUG("", "", error_message);
+						}
+						else if(
+							db->Query(
 							"SELECT `id` FROM `timecard_customers` WHERE `title`=\"" + new_value + "\" AND `agency_company_id` = ( "
 								"SELECT `agency_company_id` FROM `timecard_customers` WHERE `id`=\"" + id + "\""
-							");"
-						))
+							");")
+						)
 						{
 							error_message = "Заказчик " + new_value + " уже существует";
 							MESSAGE_DEBUG("", "", "Customer with new_value already exists");
@@ -1205,7 +1211,12 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 					}
 					else if(action == "AJAX_updateProjectTitle")
 					{
-						if(db->Query(
+						if(GetNumberOfLetters(new_value) < 3)
+						{
+							error_message = gettext("number of letters must be at least") + " 3"s;
+							MESSAGE_DEBUG("", "", error_message);
+						}
+						else if(db->Query(
 							"SELECT `id` FROM `timecard_projects` WHERE `title`=\"" + new_value + "\" AND `timecard_customers_id` = ( "
 								"SELECT `timecard_customers_id` FROM `timecard_projects` WHERE `id`=\"" + id + "\""
 							");"
@@ -1221,7 +1232,12 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 					}
 					else if(action == "AJAX_updateTaskTitle")
 					{
-						if(db->Query(
+						if(GetNumberOfLetters(new_value) < 3)
+						{
+							error_message = gettext("number of letters must be at least") + " 3"s;
+							MESSAGE_DEBUG("", "", error_message);
+						}
+						else if(db->Query(
 							"SELECT `id` FROM `timecard_tasks` WHERE `title`=\"" + new_value + "\" AND `timecard_projects_id` = ( "
 								"SELECT `timecard_projects_id` FROM `timecard_tasks` WHERE `id`=\"" + id + "\""
 							");"

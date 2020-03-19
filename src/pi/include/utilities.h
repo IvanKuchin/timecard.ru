@@ -151,6 +151,16 @@ auto 			isAdverseWordsHere(string text, CMysql *) -> bool;
 auto			GetCompanyPositionsInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetSiteThemesInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 
+// --- string counters
+auto			GetNumberOfCntrls (const wstring &src) -> unsigned int;
+auto			GetNumberOfCntrls (const  string &src) -> unsigned int;
+auto			GetNumberOfSpaces (const wstring &src) -> unsigned int;
+auto			GetNumberOfSpaces (const  string &src) -> unsigned int;
+auto			GetNumberOfDigits (const wstring &src) -> unsigned int;
+auto			GetNumberOfDigits (const  string &src) -> unsigned int;
+auto			GetNumberOfLetters(const wstring &src) -> unsigned int;
+auto			GetNumberOfLetters(const  string &src) -> unsigned int;
+
 // --- SMS functions
 auto			SendPhoneConfirmationCode(const string &country_code, const string &phone_number, const string &session, CMysql *db, CUser *user) -> string;
 auto			CheckPhoneConfirmationCode(const string &confirmation_code, const string &session, CMysql *, CUser *) -> vector<pair<string, string>>;
