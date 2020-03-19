@@ -83,7 +83,6 @@ auto	      	SymbolReplace_KeepDigitsOnly(const string &where) -> string;
 auto	        qw(const string src, vector<string> &dst) -> int;
 vector<string>	split(const string& s, const char& c);
 auto			join(const vector<string>& vec, string separator = ",") -> string;
-auto			FilterCP1251Symbols(const string &src) -> string;
 auto      		UniqueUserIDInUserIDLine(string userIDLine) -> string; //-> decltype(static_cast<string>("123"))
 auto      		AutodetectSexByName(string name, CMysql *) -> string;
 auto			GetPasswordNounsList(CMysql *) -> string;

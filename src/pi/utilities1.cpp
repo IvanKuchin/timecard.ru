@@ -965,448 +965,6 @@ string GetHumanReadableTimeDifferenceFromNow (const string timeAgo)
 	return ost.str();
 }
 
-
-/*
-Copyright (c) <YEAR>, <OWNER>
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions a
-re met:
-
-1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-
-2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in th
-e documentation and/or other materials provided with the distribution.
-
-3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from t
-his software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT L
-IMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIG
-HT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AN
-D ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
-int convert_utf8_to_windows1251(const char* utf8, char* windows1251, size_t n)
-{
-		unsigned int i = 0;
-		unsigned int j = 0;
-		unsigned int k = 0;
-
-		typedef struct ConvLetter {
-				char	win1251;
-				int	 unicode;
-		} Letter;
-
-		Letter  g_letters[] = {
-		{(char)0x82, 0x201A}, // SINGLE LOW-9 QUOTATION MARK
-		{(char)0x83, 0x0453}, // CYRILLIC SMALL LETTER GJE
-		{(char)0x84, 0x201E}, // DOUBLE LOW-9 QUOTATION MARK
-		{(char)0x85, 0x2026}, // HORIZONTAL ELLIPSIS
-		{(char)0x86, 0x2020}, // DAGGER
-		{(char)0x87, 0x2021}, // DOUBLE DAGGER
-		{(char)0x88, 0x20AC}, // EURO SIGN
-		{(char)0x89, 0x2030}, // PER MILLE SIGN
-		{(char)0x8A, 0x0409}, // CYRILLIC CAPITAL LETTER LJE
-		{(char)0x8B, 0x2039}, // SINGLE LEFT-POINTING ANGLE QUOTATION MARK
-		{(char)0x8C, 0x040A}, // CYRILLIC CAPITAL LETTER NJE
-		{(char)0x8D, 0x040C}, // CYRILLIC CAPITAL LETTER KJE
-		{(char)0x8E, 0x040B}, // CYRILLIC CAPITAL LETTER TSHE
-		{(char)0x8F, 0x040F}, // CYRILLIC CAPITAL LETTER DZHE
-		{(char)0x90, 0x0452}, // CYRILLIC SMALL LETTER DJE
-		{(char)0x91, 0x2018}, // LEFT SINGLE QUOTATION MARK
-		{(char)0x92, 0x2019}, // RIGHT SINGLE QUOTATION MARK
-		{(char)0x93, 0x201C}, // LEFT DOUBLE QUOTATION MARK
-		{(char)0x94, 0x201D}, // RIGHT DOUBLE QUOTATION MARK
-		{(char)0x95, 0x2022}, // BULLET
-		{(char)0x96, 0x2013}, // EN DASH
-		{(char)0x97, 0x2014}, // EM DASH
-		{(char)0x99, 0x2122}, // TRADE MARK SIGN
-		{(char)0x9A, 0x0459}, // CYRILLIC SMALL LETTER LJE
-		{(char)0x9B, 0x203A}, // SINGLE RIGHT-POINTING ANGLE QUOTATION MARK
-		{(char)0x9C, 0x045A}, // CYRILLIC SMALL LETTER NJE
-		{(char)0x9D, 0x045C}, // CYRILLIC SMALL LETTER KJE
-		{(char)0x9E, 0x045B}, // CYRILLIC SMALL LETTER TSHE
-		{(char)0x9F, 0x045F}, // CYRILLIC SMALL LETTER DZHE
-		{(char)0xA0, 0x00A0}, // NO-BREAK SPACE
-		{(char)0xA1, 0x040E}, // CYRILLIC CAPITAL LETTER SHORT U
-		{(char)0xA2, 0x045E}, // CYRILLIC SMALL LETTER SHORT U
-		{(char)0xA3, 0x0408}, // CYRILLIC CAPITAL LETTER JE
-		{(char)0xA4, 0x00A4}, // CURRENCY SIGN
-		{(char)0xA5, 0x0490}, // CYRILLIC CAPITAL LETTER GHE WITH UPTURN
-		{(char)0xA6, 0x00A6}, // BROKEN BAR
-		{(char)0xA7, 0x00A7}, // SECTION SIGN
-		{(char)0xA8, 0x0401}, // CYRILLIC CAPITAL LETTER IO
-		{(char)0xA9, 0x00A9}, // COPYRIGHT SIGN
-		{(char)0xAA, 0x0404}, // CYRILLIC CAPITAL LETTER UKRAINIAN IE
-		{(char)0xAB, 0x00AB}, // LEFT-POINTING DOUBLE ANGLE QUOTATION MARK
-		{(char)0xAC, 0x00AC}, // NOT SIGN
-		{(char)0xAD, 0x00AD}, // SOFT HYPHEN
-		{(char)0xAE, 0x00AE}, // REGISTERED SIGN
-		{(char)0xAF, 0x0407}, // CYRILLIC CAPITAL LETTER YI
-		{(char)0xB0, 0x00B0}, // DEGREE SIGN
-		{(char)0xB1, 0x00B1}, // PLUS-MINUS SIGN
-		{(char)0xB2, 0x0406}, // CYRILLIC CAPITAL LETTER BYELORUSSIAN-UKRAINIAN I
-		{(char)0xB3, 0x0456}, // CYRILLIC SMALL LETTER BYELORUSSIAN-UKRAINIAN I
-		{(char)0xB4, 0x0491}, // CYRILLIC SMALL LETTER GHE WITH UPTURN
-		{(char)0xB5, 0x00B5}, // MICRO SIGN
-		{(char)0xB6, 0x00B6}, // PILCROW SIGN
-		{(char)0xB7, 0x00B7}, // MIDDLE DOT
-		{(char)0xB8, 0x0451}, // CYRILLIC SMALL LETTER IO
-		{(char)0xB9, 0x2116}, // NUMERO SIGN
-		{(char)0xBA, 0x0454}, // CYRILLIC SMALL LETTER UKRAINIAN IE
-		{(char)0xBB, 0x00BB}, // RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK
-		{(char)0xBC, 0x0458}, // CYRILLIC SMALL LETTER JE
-		{(char)0xBD, 0x0405}, // CYRILLIC CAPITAL LETTER DZE
-		{(char)0xBE, 0x0455}, // CYRILLIC SMALL LETTER DZE
-		{(char)0xBF, 0x0457} // CYRILLIC SMALL LETTER YI
-	};
-
-		typedef struct ConvLetter3Bytes {
-				char	win1251;
-				char	unicode1;
-				char	unicode2;
-				char	unicode3;
-		} Letter3Bytes;
-		Letter3Bytes g_lettersGeneralPunctuation[] = {
-			{'-', (char)0xe2, (char)0x80, (char)0x94}, // EM DASH
-			{'-', (char)0xe2, (char)0x80, (char)0x93}, // EN DASH
-			{'-', (char)0xe2, (char)0x80, (char)0x90}, // HYPHEN
-			{'-', (char)0xe2, (char)0x80, (char)0x91}, // NON-BREAKING HYPHEN
-			{'-', (char)0xe2, (char)0x80, (char)0x92}, // FIGURE DASH
-			{'-', (char)0xe2, (char)0x80, (char)0x93}, // EN DASH
-			{'-', (char)0xe2, (char)0x80, (char)0x94}, // EM DASH
-			{'-', (char)0xe2, (char)0x80, (char)0x95}, // HORIZONTAL BAR
-			{'|', (char)0xe2, (char)0x80, (char)0x96}, // DOUBLE VERTICAL LINE
-			{'_', (char)0xe2, (char)0x80, (char)0x97}, // DOUBLE LOW LINE
-			{',', (char)0xe2, (char)0x80, (char)0x9a}, // SINGLE LOW QUOTATION MARK
-			{'.', (char)0xe2, (char)0x80, (char)0xa4}, // ONE DOT LEADER
-			{'.', (char)0xe2, (char)0x80, (char)0x5}, // TWO DOT LEADER
-			{'.', (char)0xe2, (char)0x80, (char)0x6}, // HORIZONTAL ELLIPSIS
-			{'<', (char)0xe2, (char)0x80, (char)0xb9}, // SINGLE LEFT-POINTING ANGLE QUOTATION MARK
-			{'>', (char)0xe2, (char)0x80, (char)0xba}, // SINGLE RIGHT-POINTING ANGLE QUOTATION MARK
-			{'!', (char)0xe2, (char)0x80, (char)0xbc}, // DOUBLE EXCLAMNATION MARK
-			{'-', (char)0xe2, (char)0x81, (char)0x83}, // HYPHEN BULLET
-			{'/', (char)0xe2, (char)0x81, (char)0x84}, // FRACTION SLASH
-			{'?', (char)0xe2, (char)0x81, (char)0x87}, // DOUBLE QUESTION MARK
-			{'*', (char)0xe2, (char)0x81, (char)0x8e}, // LOW ASTERISK
-			{'|', (char)0xe2, (char)0x83, (char)0x92}, // COMBINING LONG VERTICAL LINE OVERLAY
-			{'\\', (char)0xe2, (char)0x83, (char)0xa5}, //COMBINING REVERSE SOLIDUS OVERLAY
-			{'|', (char)0xe2, (char)0x83, (char)0xa6}, // COMBINING DOUBLE VERTICAL STROKE OVERLAY
-			{'/', (char)0xe2, (char)0x83, (char)0xab}, // COMBINING LONG DOUBLE SOLIDUS OVERLAY
-			{'\'', (char)0xe2, (char)0x80, (char)0x9b}, // SINGLE HIGN-REVERSED-9 QUATATION MARK
-			{'\\', (char)0xe2, (char)0x80, (char)0xb2}, // PRIME
-			{'\\', (char)0xe2, (char)0x80, (char)0xb5}, // REVERSED PRIME
-			{'"', (char)0xe2, (char)0x80, (char)0x9c}, // LEFT DOUBLE QUATATION MARK
-			{'"', (char)0xe2, (char)0x80, (char)0xb3}, // DOUBLE PRIME
-			{'"', (char)0xe2, (char)0x80, (char)0xb6}, // REVERSED DOUBLE PRIME
-			{'"', (char)0xe2, (char)0x80, (char)0x9c}, // RIGHT DOUBLE QUATATION MARK
-			{'"', (char)0xe2, (char)0x80, (char)0x9e}, // DOUBLE LOW-9 QUATATION MARK
-			{'"', (char)0xe2, (char)0x80, (char)0x9f}, // DOUBLE HIGH-REVERSED-9 QUATATION MARK
-			{'*', (char)0xe2, (char)0x80, (char)0xA2}, //  BULLET
-			{'%', (char)0xe2, (char)0x80, (char)0xb0}, // PER MILLE SIGN
-			{'%', (char)0xe2, (char)0x80, (char)0xb1}, // PER TEN THOUSAND SIGN
-			{'*', (char)0xe2, (char)0x80, (char)0xa7}, // HYPHENATION POINT
-			{'~', (char)0xe2, (char)0x81, (char)0x93}, // SWUNG DASH
-			{'*', (char)0xe2, (char)0x81, (char)0x95}, // FLOWER PUNCTION MARK
-			{':', (char)0xe2, (char)0x81, (char)0x9a}, // TWO DOT PUNCTION		};
-			{'|', (char)0xe2, (char)0x83, (char)0x92}, // COMBINING LONG VERTICAL LINE OVERLAY
-			{'\\', (char)0xe2, (char)0x83, (char)0xa5}, // COMBINING REVERSE SOLIDUS OVERLAY
-			{'|', (char)0xe2, (char)0x83, (char)0xa6}, // COMBINING DOUBLE VERTICAL STROKE OVERLAY
-			{'/', (char)0xe2, (char)0x83, (char)0xab}, // COMBINING LONG DOUBLE SOLIDUS OVERLAY
-			{'*', (char)0xe2, (char)0x83, (char)0xb0}, // COMBINING ASTERISK ABOVE
-			{(char)0xB9, (char)0xe2, (char)0x84, (char)0x96}, // number sign
-			{'1', (char)0xe2, (char)0x85, (char)0xa0}, // ROMAN NUMERAL ONE
-			{'2', (char)0xe2, (char)0x85, (char)0xa1}, // ROMAN NUMERAL TWO
-			{'3', (char)0xe2, (char)0x85, (char)0xa2}, // ROMAN NUMERAL THREE
-			{'4', (char)0xe2, (char)0x85, (char)0xa3}, // ROMAN NUMERAL FOUR
-			{'5', (char)0xe2, (char)0x85, (char)0xa4}, // ROMAN NUMERAL FIVE
-			{'6', (char)0xe2, (char)0x85, (char)0xa5}, // ROMAN NUMERAL SIX
-			{'7', (char)0xe2, (char)0x85, (char)0xa6}, // ROMAN NUMERAL SEVEN
-			{'8', (char)0xe2, (char)0x85, (char)0xa7}, // ROMAN NUMERAL EIGHT
-			{'9', (char)0xe2, (char)0x85, (char)0xa8}, // ROMAN NUMERAL NINE
-			{'X', (char)0xe2, (char)0x85, (char)0xa9}, // ROMAN NUMERAL TEN
-			{'L', (char)0xe2, (char)0x85, (char)0xac}, // ROMAN NUMERAL FIFTY
-			{'C', (char)0xe2, (char)0x85, (char)0xad}, // ROMAN NUMERAL ONE HUNDRED
-			{'D', (char)0xe2, (char)0x85, (char)0xae}, // ROMAN NUMERAL FIVE HUNDRED
-			{'M', (char)0xe2, (char)0x85, (char)0xaf} // ROMAN NUMERAL ONE THOUSAND
-		};
-	{
-		CLog	log;
-		log.Write(DEBUG, __func__ + string("[") + to_string(__LINE__) + string("]:") + string(": start"));
-	}
-
-
-		for(; i < (unsigned int)n && utf8[i] != 0; ++i) {
-				char prefix = utf8[i];
-				char suffix = utf8[i+1];
-				if ((prefix & 0x80) == 0)
-				{
-						windows1251[j] = (char)prefix;
-						++j;
-				}
-				else if ((~prefix) & 0x20)
-				{
-						int first5bit = prefix & 0x1F;
-						first5bit <<= 6;
-						int sec6bit = suffix & 0x3F;
-						int unicode_char = first5bit + sec6bit;
-
-
-						if ( unicode_char >= 0x410 && unicode_char <= 0x44F ) {
-								windows1251[j] = (char)(unicode_char - 0x350);
-						} else if (unicode_char >= 0x80 && unicode_char <= 0xFF) {
-								windows1251[j] = (char)(unicode_char);
-						} else if (unicode_char >= 0x402 && unicode_char <= 0x403) {
-								windows1251[j] = (char)(unicode_char - 0x382);
-						} else {
-								unsigned int count = sizeof(g_letters) / sizeof(Letter);
-								for (k = 0; k < count; ++k) {
-										if (unicode_char == g_letters[k].unicode) {
-												windows1251[j] = g_letters[k].win1251;
-												goto NEXT_LETTER;
-										}
-								}
-								// can't convert this char
-								{
-									CLog	log;
-									ostringstream	ost;
-
-									ost.str("");
-									ost << __func__ << "[" << __LINE__ << "]:" << ": symbol at position " << i << " [" << hex << (prefix & 0xFF) << " " << (suffix & 0xFF) << "] doesn't belongs to UTF-8 cyrillic range (U+0400 ... U+04FF)";
-									log.Write(DEBUG, ost.str());
-								}
-								return 0;
-						}
-NEXT_LETTER:
-						++i;
-						++j;
-				}
-				else if((prefix == static_cast<char>(0xf0)) and (suffix == static_cast<char>(0x9f)))
-				{
-					// --- emoji part (f0 9f 98 80 - f0 9f 9b b3) or (U+1F600 - U+1F6FF)
-					// --- 4 bytes long
-					if((i + 3) < n)
-					{
-						{
-							CLog	log;
-							ostringstream   ost;
-
-							ost.str("");
-							ost << __func__ << "[" << __LINE__ << "]:" << ": emojy detected [" << hex << (utf8[i] & 0xFF) << " " << (utf8[i+1] & 0xFF) << " " << (utf8[i+2] & 0xFF) << " " << (utf8[i+3] & 0xFF) << "]";
-							log.Write(DEBUG, ost.str());
-						}
-						i += 3;
-					}
-					else
-					{
-						{
-							CLog	log;
-							ostringstream   ost;
-
-							ost.str("");
-							ost << __func__ << "[" << __LINE__ << "]:" << ": ERROR: emojy detected but dst string not lenghty enough, dst buffer size(" << n << ") < current position (" << i << "+3)";
-							log.Write(ERROR, ost.str());
-						}
-						return 0;
-					}
-				}
-				else if((prefix == static_cast<char>(0xe2)) && ((suffix & 0x80) == 0x80))
-				{
-					// --- general punctuation (e2 80 80 - e2 82 bf) or (U+2000 - U+20FF)
-					// --- 3 bytes long
-					if((i + 2) < n)
-					{
-						unsigned int	count = sizeof(g_lettersGeneralPunctuation) / sizeof(Letter3Bytes);
-						bool			isFound = false;
-
-						for (k = 0; ((k < count) && !isFound); ++k)
-						{
-								char currentSymb1 = prefix;
-								char currentSymb2 = suffix;
-								char currentSymb3 = utf8[i+2];
-
-								if(
-									(currentSymb1 == g_lettersGeneralPunctuation[k].unicode1) &&
-									(currentSymb2 == g_lettersGeneralPunctuation[k].unicode2) &&
-									(currentSymb3 == g_lettersGeneralPunctuation[k].unicode3)
-								  )
-								{
-										windows1251[j] = g_lettersGeneralPunctuation[k].win1251;
-										isFound = true;
-										i += 2;
-										j++;
-								}
-						}
-						if(!isFound)
-						{
-							// --- unknown symbol
-							// --- replace it to space
-							windows1251[j] = ' ';
-							// --- this is 3 bytes length symbol
-							i += 2;
-							j++;
-
-							// can't convert this char
-							CLog	log;
-							ostringstream   ost;
-
-							ost.str("");
-							ost << __func__ << "[" << __LINE__ << "]:" << ": symbol at position " << (i - 2) << " [" << hex << (prefix & 0xFF) << " " << (suffix & 0xFF) << " " << (utf8[i+2 - 2] & 0xFF) << "] not found in mapping table Punctuation range (U+0400 ... U+04FF)";
-							log.Write(DEBUG, ost.str());
-						}
-						else
-						{
-							CLog	log;
-							ostringstream   ost;
-
-							ost.str("");
-							ost << __func__ << "[" << __LINE__ << "]:" << ": general punctuation detected [" << hex << (prefix & 0xFF) << " " << (suffix & 0xFF) << " " << (utf8[i+2 - 2] & 0xFF) << "] at position " << (i - 2);
-							log.Write(DEBUG, ost.str());
-						}
-					}
-					else
-					{
-						{
-							CLog	log;
-							ostringstream   ost;
-
-							ost.str("");
-							ost << __func__ << "[" << __LINE__ << "]:ERROR: general punctuation detected but dst string not lenghty enough, dst buffer size(" << n << ") < current position (" << i << "+2)";
-							log.Write(ERROR, ost.str());
-						}
-						return 0;
-					}
-
-				}
-				else
-				{
-					// can't convert this chars
-					{
-						CLog	log;
-						ostringstream   ost;
-
-						ost.str("");
-						ost << __func__ << "[" << __LINE__ << "]:ERROR: can't convert this " << i << "-rd/th char " << hex << (+prefix & 0xFF) << " " << (+suffix & 0xFF);
-						log.Write(ERROR, ost.str());
-					}
-					return 0;
-				}
-		}
-		windows1251[j] = 0;
-
-		MESSAGE_DEBUG("", "", "finish");
-
-		return 1;
-}
-
-auto	utf8_to_cp1251(const string &src) -> string
-{
-	char	convertBuffer[100 * 1024];
-	auto	result = 0;
-	
-	MESSAGE_DEBUG("", "", "start");
-
-	memset(convertBuffer, 0, sizeof(convertBuffer));
-
-	result = convert_utf8_to_windows1251(src.c_str(), convertBuffer, sizeof(convertBuffer) - 1);
-
-	MESSAGE_DEBUG("", "", "finish (conversation result is " + to_string(result) + ")");
-
-	return convertBuffer;
-}
-
-
-bool convert_cp1251_to_utf8(const char *in, char *out, int size)
-{
-	const char table[129*3] = {
-		"\320\202 \320\203 \342\200\232\321\223 \342\200\236\342\200\246\342\200\240\342\200\241"
-		"\342\202\254\342\200\260\320\211 \342\200\271\320\212 \320\214 \320\213 \320\217 "
-		"\321\222 \342\200\230\342\200\231\342\200\234\342\200\235\342\200\242\342\200\223\342\200\224"
-		"   \342\204\242\321\231 \342\200\272\321\232 \321\234 \321\233 \321\237 "
-		"\302\240 \320\216 \321\236 \320\210 \302\244 \322\220 \302\246 \302\247 "
-		"\320\201 \302\251 \320\204 \302\253 \302\254 \302\255 \302\256 \320\207 "
-		"\302\260 \302\261 \320\206 \321\226 \322\221 \302\265 \302\266 \302\267 "
-		"\321\221 \342\204\226\321\224 \302\273 \321\230 \320\205 \321\225 \321\227 "
-		"\320\220 \320\221 \320\222 \320\223 \320\224 \320\225 \320\226 \320\227 "
-		"\320\230 \320\231 \320\232 \320\233 \320\234 \320\235 \320\236 \320\237 "
-		"\320\240 \320\241 \320\242 \320\243 \320\244 \320\245 \320\246 \320\247 "
-		"\320\250 \320\251 \320\252 \320\253 \320\254 \320\255 \320\256 \320\257 "
-		"\320\260 \320\261 \320\262 \320\263 \320\264 \320\265 \320\266 \320\267 "
-		"\320\270 \320\271 \320\272 \320\273 \320\274 \320\275 \320\276 \320\277 "
-		"\321\200 \321\201 \321\202 \321\203 \321\204 \321\205 \321\206 \321\207 "
-		"\321\210 \321\211 \321\212 \321\213 \321\214 \321\215 \321\216 \321\217 "
-	};
-	int	counter = 0;
-	bool result = true;
-
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
-
-	while (*in)
-		if (*in & 0x80) {
-			const char *p = &table[3 * (0x7f & *in++)];
-			if (*p == ' ')
-				continue;
-			counter += 2;
-			if(counter > size)
-			{
-				result = false;
-				break;
-			}
-			*out++ = *p++;
-			*out++ = *p++;
-
-			if (*p == ' ')
-				continue;
-
-			counter++;
-			if(counter > size)
-			{
-				result = false;
-				break;
-			}
-			*out++ = *p++;
-		}
-		else
-		{
-			counter++;
-			if(counter > size)
-			{
-				result = false;
-				break;
-			}
-			*out++ = *in++;
-		}
-	*out = 0;
-
-	if(!result)
-	{
-		CLog	log;
-		log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]: ERROR: buffer size is not enough");
-	}
-
-	{
-		MESSAGE_DEBUG("", "", "finish");
-	}
-	return result;
-}
-
-string	FilterCP1251Symbols(const string &src)
-{
-	auto	result = ""s;
-
-	for(auto n:src)
-	{
-		if((unsigned int)(n) > 127) result += "_";
-		else result += n;
-	}
-
-	return result;
-}
-
 string SymbolReplace(const string where, const string src, const string dst)
 {
 	auto	  result(where);
@@ -3372,9 +2930,8 @@ string GetUnreadChatMessagesInJSONFormat(CUser *user, CMysql *db)
 		}
 	}
 
-	{
-		MESSAGE_DEBUG("", "", "finish");
-	}
+	MESSAGE_DEBUG("", "", "finish");
+
 
 	return	result.str();
 }
@@ -3687,9 +3244,8 @@ string GetMessageCommentsCount(string messageID, CMysql *db)
 		result = db->Get(0, "counter");
 	}
 
-	{
-		MESSAGE_DEBUG("", "", "finish");
-	}
+	MESSAGE_DEBUG("", "", "finish");
+
 
 	return result;
 }
@@ -3712,9 +3268,8 @@ string GetCompanyCommentsCount(string messageID, CMysql *db)
 		result = db->Get(0, "counter");
 	}
 
-	{
-		MESSAGE_DEBUG("", "", "finish");
-	}
+	MESSAGE_DEBUG("", "", "finish");
+
 
 	return result;
 }
@@ -3737,9 +3292,8 @@ string GetLanguageCommentsCount(string messageID, CMysql *db)
 		result = db->Get(0, "counter");
 	}
 
-	{
-		MESSAGE_DEBUG("", "", "finish");
-	}
+	MESSAGE_DEBUG("", "", "finish");
+
 
 	return result;
 }
@@ -3762,9 +3316,8 @@ string GetBookCommentsCount(string messageID, CMysql *db)
 		result = db->Get(0, "counter");
 	}
 
-	{
-		MESSAGE_DEBUG("", "", "finish");
-	}
+	MESSAGE_DEBUG("", "", "finish");
+
 
 	return result;
 }
@@ -3787,9 +3340,8 @@ string GetCertificateCommentsCount(string messageID, CMysql *db)
 		result = db->Get(0, "counter");
 	}
 
-	{
-		MESSAGE_DEBUG("", "", "finish");
-	}
+	MESSAGE_DEBUG("", "", "finish");
+
 
 	return result;
 }
@@ -3812,9 +3364,8 @@ string GetUniversityDegreeCommentsCount(string messageID, CMysql *db)
 		result = db->Get(0, "counter");
 	}
 
-	{
-		MESSAGE_DEBUG("", "", "finish");
-	}
+	MESSAGE_DEBUG("", "", "finish");
+
 
 	return result;
 }
@@ -3839,9 +3390,8 @@ string GetMessageSpam(string messageID, CMysql *db)
 		result = db->Get(0, "counter");
 	}
 
-	{
-		MESSAGE_DEBUG("", "", "finish");
-	}
+	MESSAGE_DEBUG("", "", "finish");
+
 
 	return result;
 }
@@ -3868,9 +3418,8 @@ string GetMessageSpamUser(string messageID, string userID, CMysql *db)
 	}
 
 
-	{
-		MESSAGE_DEBUG("", "", "finish");
-	}
+	MESSAGE_DEBUG("", "", "finish");
+
 
 	return result;
 }

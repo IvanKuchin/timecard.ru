@@ -2024,7 +2024,7 @@ int main()
 									}
 									else
 									{
-										MESSAGE_DEBUG("", action, "unable to set new value (action/id/value = " + action + "/" + id + "/[" + FilterCP1251Symbols(new_value) + "])");
+										MESSAGE_DEBUG("", action, "unable to set new value (action/id/value = " + action + "/" + id + "/" + new_value + ")");
 									}
 								}
 								else if(action.find("insert"))
@@ -2138,7 +2138,7 @@ int main()
 									}
 									else
 									{
-										MESSAGE_DEBUG("", action, "unable to set new value (action/sow_id/id/value = " + action + "/" + sow_id + "/" + id + "/[" + FilterCP1251Symbols(new_value) + "])");
+										MESSAGE_DEBUG("", action, "unable to set new value (action/sow_id/id/value = " + action + "/" + sow_id + "/" + id + "/" + new_value + ")");
 									}
 								}
 								else if(action.find("insert") != string::npos)
@@ -2156,7 +2156,7 @@ int main()
 									}
 									else
 									{
-										MESSAGE_DEBUG("", action, "unable to remove item (action/sow_id/id/value = " + action + "/" + sow_id + "/" + id + "/[" + FilterCP1251Symbols(new_value) + "])");
+										MESSAGE_DEBUG("", action, "unable to remove item (action/sow_id/id/value = " + action + "/" + sow_id + "/" + id + "/" + new_value + ")");
 									}
 								}
 								else

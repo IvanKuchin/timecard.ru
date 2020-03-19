@@ -1498,8 +1498,18 @@ int main()
 			auto			success_message = ""s;
 			auto			error_message = ""s;
 
-			db.Query("UPDATE `sessions` SET `remove_flag`=\"Y\", `remove_flag_timestamp`=UNIX_TIMESTAMP() WHERE `id`=(SELECT `previous_sessid` FROM (SELECT `previous_sessid` FROM `sessions` WHERE `id`=\"" + indexPage.SessID_Get_FromHTTP() + "\") as `temp_table`);");
-			if(db.isError()) error_message = db.GetErrorMessage();
+			if(db.Query("SELECT `previous_sessid` FROM `sessions` WHERE `id`=\"" + indexPage.SessID_Get_FromHTTP() + "\";"))
+			{
+				auto	previous_sessid = db.Get(0, 0);
+
+				db.Query("UPDATE `sessions` SET `remove_flag`=\"Y\", `remove_flag_timestamp`=UNIX_TIMESTAMP() WHERE `id`=" + quoted(previous_sessid) + ";");
+				if(db.isError()) error_message = db.GetErrorMessage();
+			}
+			else
+			{
+				error_message = gettext("session not found");
+				MESSAGE_ERROR("", action, error_message);
+			}
 
 			AJAX_ResponseTemplate(&indexPage, success_message, error_message);
 
