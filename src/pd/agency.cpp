@@ -2050,7 +2050,7 @@ int main(void)
 				}
 				else
 				{
-					error_message = gettext("number of letters must be at least") + " 3"s;
+					error_message = gettext("number of letters in Customer/Project/Task must be at least") + " 3"s;
 					MESSAGE_DEBUG("", action, error_message);
 				}
 			}

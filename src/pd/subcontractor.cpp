@@ -786,14 +786,8 @@ int main()
 		MESSAGE_DEBUG("", action, "start");
 
 		ostResult.str("");
-/*		if(user.GetLogin() == "Guest")
-		{
-			MESSAGE_DEBUG("", action, "re-login required");
 
-			ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
-		}
-		else
-*/		{
+		{
 			auto			template_name = "json_response.htmlt"s;
 
 			auto			requested_status = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("status"));
@@ -892,7 +886,7 @@ int main()
 						else
 						{
 							error_description = gettext("timecard requires tasks to report on");
-							MESSAGE_ERROR("", action, error_description);
+							MESSAGE_DEBUG("", action, error_description);
 						}
 					}
 

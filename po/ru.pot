@@ -1023,8 +1023,8 @@ msgstr "номер"
 msgid "number is empty"
 msgstr "не указан номер"
 
-msgid "number of letters must be at least"
-msgstr "количество букв должно быть по крайней мере"
+msgid "number of letters in Customer/Project/Task must be at least"
+msgstr "количество букв в Заказчике/Проекте/Задаче должно быть по крайней мере"
 
 msgid "number uploaded images must be 1"
 msgstr "выберите один фаил"
@@ -1195,7 +1195,7 @@ msgid "timecard id is empty"
 msgstr "таймкарта не найдена"
 
 msgid "timecard requires tasks to report on"
-msgstr "Необходимо ввести задачи и время"
+msgstr "необходимо ввести задачи и время"
 
 msgid "timecards reported"
 msgstr "таймкарт"
