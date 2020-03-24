@@ -50,6 +50,7 @@ class C_Invoicing_Vars
 		auto		DocumentSubmissionDate_1C_Index_VarSet(const struct tm &, string index) -> string;
 		auto		SoW_Index_VarSet(string sql_query, string index) -> string;
 		auto		PSoW_Index_VarSet(string sql_query, string index) -> string;
+		auto		SoW_Custom_Fields(string index) -> string;
 		auto		CostCenterPayment_Index_VarSet(c_float cost_center_price, string index) -> string;
 		auto		Subcontractor_Index_VarSet(string subcontractor_company_id, string index) -> string;
 		auto		SubcontractorAddress_Index_VarSet(string index) -> string;

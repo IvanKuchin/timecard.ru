@@ -31,7 +31,8 @@ static size_t WriteMemoryCallback(void *contents, size_t size, size_t nmemb, voi
 
 string c_smsc::send_sms (string phones, string message, int translit, string time, int id, int format, string sender, string query, string files) 
 {
-    auto res=""s, arg=""s;
+    auto    res=""s, arg=""s;
+    auto    error_message = ""s;
     
     char formats[][10] = {"&flash=1", "&push=1", "&hlr=1", "&bin=1", "&bin=2", "&ping=1", "&mms=1", "&mail=1", "&call=1", "&viber=1"};
     
@@ -57,8 +58,8 @@ string c_smsc::send_sms (string phones, string message, int translit, string tim
 
     	if(report.size() == 4)
     	{
-    		auto error_message = TrackSMS(phones, report[0], report[2], report[1], message, report[3]);
-	    	if(error_message.empty())
+    		auto error_message_scoped = TrackSMS(phones, report[0], report[2], report[1], message, report[3]);
+	    	if(error_message_scoped.empty())
 	    	{
 	    	}
 	    	else
@@ -68,17 +69,19 @@ string c_smsc::send_sms (string phones, string message, int translit, string tim
     	}
     	else
     	{
+            error_message = gettext("sms sending error");
             MESSAGE_ERROR("", "", "report.size() must be 4, (" + res + "). Probably sms has _NOT_ been sent.");
     	}
     }
     else
     {
+        error_message = gettext("sms sending error");
     	MESSAGE_ERROR("", "", "sms to pnohe# " + phones + " has not been sent");
     }
 
-	MESSAGE_DEBUG("", "", "finish");
+	MESSAGE_DEBUG("", "", "finish (" + error_message + ")");
 
-    return res;
+    return error_message;
 }
 
 string c_smsc::get_sms_cost(string phones, string mes, int translit, int format, string sender, string query) {

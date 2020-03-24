@@ -2609,7 +2609,12 @@ auto SendPhoneConfirmationCode(const string &country_code, const string &phone_n
 
 		if(phone_confirmation_id)
 		{
-			auto	ret = smsc.send_sms(country_code + phone_number, "Code " + confirmation_code, 0, "", 0, 0, DOMAIN_NAME, "", "");
+			error_message = smsc.send_sms(country_code + phone_number, "Code " + confirmation_code, 0, "", 0, 0, DOMAIN_NAME, "", "");
+
+			if(error_message.length())
+			{
+				MESSAGE_ERROR("", "", error_message);
+			}
 		}
 		else
 		{

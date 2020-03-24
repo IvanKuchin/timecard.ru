@@ -10,6 +10,7 @@ nodiff_files => [
     "utilities2.cpp",
     "cuser.cpp",
     "cactivator.cpp",
+    "helpdesk.cpp",
 
     "account.h",
     "cmail.h",
@@ -20,6 +21,7 @@ nodiff_files => [
     "csession.h",
     "cuser.h",
     "cactivator.h",
+    "helpdesk.h",
 
     "cron_minute.cpp",
     "system.cpp",

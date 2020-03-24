@@ -751,6 +751,7 @@ auto	C_Invoicing_Vars::SoW_Index_VarSet(string sql_query, string index) -> strin
 				};
 			}
 
+/*
 			// --- subcontractor sow custom fields
 			if(error_message.empty())
 			{
@@ -761,6 +762,7 @@ auto	C_Invoicing_Vars::SoW_Index_VarSet(string sql_query, string index) -> strin
 					if(error_message.empty()) error_message = AssignVariableValue(db->Get(j, "var_name") + "_" + index, db->Get(j, "value"), true);
 				}
 			}
+*/
 		}
 		else
 		{
@@ -774,6 +776,41 @@ auto	C_Invoicing_Vars::SoW_Index_VarSet(string sql_query, string index) -> strin
 		MESSAGE_ERROR("", "", error_message);
 	}
 
+
+	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
+
+	return	error_message;
+}
+
+auto	C_Invoicing_Vars::SoW_Custom_Fields(string index) -> string
+{
+	auto	error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(user)
+	{
+		if(db)
+		{
+			// --- subcontractor sow custom fields
+			auto	affected = db->Query("SELECT * FROM `contract_sow_custom_fields` WHERE `contract_sow_id`=\"" + vars.Get("sow_id_" + index) + "\";");
+
+			for(auto j = 0; j < affected; ++j)
+			{
+				if(error_message.empty()) error_message = AssignVariableValue(db->Get(j, "var_name") + "_" + index, db->Get(j, "value"), true);
+			}
+		}
+		else
+		{
+			error_message = gettext("db is not initialized");
+			MESSAGE_ERROR("", "", error_message);
+		}
+	}
+	else
+	{
+		error_message = gettext("user is not initialized");
+		MESSAGE_ERROR("", "", error_message);
+	}
 
 	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
 
@@ -1009,11 +1046,11 @@ auto	C_Invoicing_Vars::Subcontractor_Index_VarSet(string subcontractor_company_i
 			{
 				auto	subcontractor_vat = db->Get(0, "vat");
 
+				if(error_message.empty()) error_message = AssignVariableValue("subcontractor_company_account_" + index, db->Get(0, "account"), true);
 				if(error_message.empty()) error_message = AssignVariableValue("subcontractor_company_short_name_" + index, db->Get(0, "name"), true);
 				if(error_message.empty()) error_message = AssignVariableValue("subcontractor_company_name_" + index, db->Get(0, "name"), true);
 				if(error_message.empty()) error_message = AssignVariableValue("subcontractor_company_bank_id_" + index, db->Get(0, "bank_id"), true);
 				if(error_message.empty()) error_message = AssignVariableValue("subcontractor_company_tin_" + index, db->Get(0, "tin"), true);
-				if(error_message.empty()) error_message = AssignVariableValue("subcontractor_company_account_" + index, db->Get(0, "account"), true);
 				if(error_message.empty()) error_message = AssignVariableValue("subcontractor_company_ogrn_" + index, db->Get(0, "ogrn"), true);
 				if(error_message.empty()) error_message = AssignVariableValue("subcontractor_company_kpp_" + index, db->Get(0, "kpp"), true);
 				if(error_message.empty()) error_message = AssignVariableValue("subcontractor_company_vat_" + index, subcontractor_vat, true);
@@ -1589,6 +1626,13 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet_AgencyToCC() -> string
 						else { MESSAGE_ERROR("", "", "fail returned from SubcontractorPayment_Index_VarSet"); }
 					}
 
+					// --- custom fields comes after Subc_index_varset due to bank details could be overloaded
+					if(error_message.empty())
+					{
+						if((error_message = SoW_Custom_Fields(to_string(i))).empty()) {}
+						else { MESSAGE_ERROR("", "", "fail returned from SoW_Custom_Fields"); }
+					}
+
 					// --- table row description
 					if(error_message.empty())
 					{
@@ -1734,6 +1778,13 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet_SubcToAgency() -> string
 					{
 						if((error_message = SubcontractorAddress_Index_VarSet("1")).empty()) {}
 						else { MESSAGE_ERROR("", "", "fail returned from SubcontractorAddress_Index_VarSet"); }
+					}
+
+					// --- custom fields comes after Subc_index_varset due to bank details could be overloaded
+					if(error_message.empty())
+					{
+						if((error_message = SoW_Custom_Fields(to_string(i))).empty()) {}
+						else { MESSAGE_ERROR("", "", "fail returned from SoW_Custom_Fields"); }
 					}
 
 					// --- subcontractor payment
@@ -1903,6 +1954,13 @@ auto	C_Invoicing_Vars::GenerateBTVariableSet_AgencyToCC() -> string
 						else { MESSAGE_ERROR("", "", "fail returned from SubcontractorPayment_Index_VarSet"); }
 					}
 
+					// --- custom fields comes after Subc_index_varset due to bank details could be overloaded
+					if(error_message.empty())
+					{
+						if((error_message = SoW_Custom_Fields(to_string(i))).empty()) {}
+						else { MESSAGE_ERROR("", "", "fail returned from SoW_Custom_Fields"); }
+					}
+
 					if(error_message.empty())
 					{
 						if((error_message = TableRowDecsriptions_Index_VarSet(Get("subcontractor_position_remote_service_description_" + to_string(i)), to_string(i))).empty()) {}
@@ -2044,7 +2102,14 @@ auto	C_Invoicing_Vars::GenerateBTVariableSet_SubcToAgency() -> string
 					if(error_message.empty())
 					{
 						if((error_message = SubcontractorAddress_Index_VarSet("1")).empty()) {}
-						else { MESSAGE_ERROR("", "", "fail returned from Subcontractor_Index_VarSet"); }
+						else { MESSAGE_ERROR("", "", "fail returned from SubcontractorAddress_Index_VarSet"); }
+					}
+
+					// --- custom fields comes after Subc_index_varset due to bank details could be overloaded
+					if(error_message.empty())
+					{
+						if((error_message = SoW_Custom_Fields(to_string(i))).empty()) {}
+						else { MESSAGE_ERROR("", "", "fail returned from SoW_Custom_Fields"); }
 					}
 
 					// --- subcontractor payment
@@ -2132,7 +2197,14 @@ auto	C_Invoicing_Vars::GenerateSoWVariableSet() -> string
 			if(error_message.empty())
 			{
 				if((error_message = SubcontractorAddress_Index_VarSet("")).empty()) {}
-				else { MESSAGE_ERROR("", "", "fail returned from Subcontractor_Index_VarSet"); }
+				else { MESSAGE_ERROR("", "", "fail returned from SubcontractorAddress_Index_VarSet"); }
+			}
+
+			// --- custom fields comes after Subc_index_varset due to bank details could be overloaded
+			if(error_message.empty())
+			{
+				if((error_message = SoW_Custom_Fields("")).empty()) {}
+				else { MESSAGE_ERROR("", "", "fail returned from SoW_Custom_Fields"); }
 			}
 
 		}

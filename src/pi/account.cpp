@@ -1243,7 +1243,7 @@ int main()
 			auto			error_message = ""s;
 
 			auto			country_code = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("country_code"));
-			auto			phone_number = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("phone_number"));
+			auto			phone_number = SymbolReplace_KeepDigitsOnly(CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("phone_number")));
 
 			MESSAGE_DEBUG("", action, "start");
 
@@ -1296,7 +1296,7 @@ int main()
 			}
 			else
 			{
-				error_message.push_back(make_pair("description", gettext("SQL syntax error")));
+				error_message.push_back(make_pair("description", gettext("token expired")));
 				MESSAGE_ERROR("", "", error_message[0].second);
 			}
 

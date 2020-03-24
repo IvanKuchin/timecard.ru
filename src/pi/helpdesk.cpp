@@ -119,7 +119,15 @@ static auto SendSMSNotification(vector<string> recipients, string message, CCgi 
 
 	for(auto &recipient: recipients)
 	{
-		auto	ret = smsc.send_sms(recipient, message, 0, "", 0, 0, DOMAIN_NAME, "", "");
+		error_message = smsc.send_sms(recipient, message, 0, "", 0, 0, DOMAIN_NAME, "", "");
+
+		if(error_message.length())
+		{
+			MESSAGE_ERROR("", "", "fail to send message to recipient(" + recipient + ")");
+
+			// --- do your best to notify everybody, don't stop in the middle of notfication process.
+			error_message = "";
+		}
 	}
 
 	MESSAGE_DEBUG("", "", "finish(" + error_message + ")");

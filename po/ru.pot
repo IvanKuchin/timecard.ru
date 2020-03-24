@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-19 18:01-0400\n"
+"POT-Creation-Date: 2020-03-23 21:52-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1026,6 +1026,9 @@ msgstr "не указан номер"
 msgid "number of letters in Customer/Project/Task must be at least"
 msgstr "количество букв в Заказчике/Проекте/Задаче должно быть по крайней мере"
 
+msgid "number of letters must be at least"
+msgstr "количество букв должно быть по крайней мере"
+
 msgid "number uploaded images must be 1"
 msgstr "выберите один фаил"
 
@@ -1140,6 +1143,9 @@ msgstr "не указан подписант 1"
 msgid "signature title 2 is empty"
 msgstr "не указан подписант 2"
 
+msgid "sms sending error"
+msgstr "ошибка отправки СМС"
+
 msgid "sow declension"
 msgstr "договора"
 
@@ -1208,6 +1214,9 @@ msgstr "не указан ИНН"
 
 msgid "to"
 msgstr "на"
+
+msgid "token expired"
+msgstr "код устарел"
 
 msgid "token not found"
 msgstr "токен не найден"
