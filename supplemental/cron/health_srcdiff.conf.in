@@ -40,6 +40,10 @@ nodiff_files => [
     "password_recovery.js",
     "domain_replacer.js",
     "user_account_properties.js",
+    "helpdesk_ticket_obj.js",
+    "view_case.js",
+    "cases_list.js",
+    "helpdesk_dashboard.js",
 
     "faq.htmlt",
     "login.htmlt",
@@ -57,6 +61,9 @@ nodiff_files => [
     "eula.htmlt",
     "guest_navigation_menu.htmlt",
     "user_account_properties.htmlt",
+    "view_case.htmlt",
+    "cases_list.htmlt",
+    "helpdesk_dashboard.htmlt",
 
     "forget.htmlt",
     "change_password.htmlt",
