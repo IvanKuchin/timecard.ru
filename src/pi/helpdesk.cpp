@@ -119,7 +119,7 @@ static auto SendSMSNotification(vector<string> recipients, string message, CCgi 
 
 	for(auto &recipient: recipients)
 	{
-		error_message = smsc.send_sms(recipient, message, 0, "", 0, 0, DOMAIN_NAME, "", "");
+		error_message = smsc.send_sms(recipient, message, 0, "", 0, 0, SMSC_SENDER_NAME, "", "");
 
 		if(error_message.length())
 		{

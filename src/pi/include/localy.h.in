@@ -293,6 +293,7 @@
 
 #define	SMSC_LOGIN									"${PROJECT_NAME}"s
 #define	SMSC_PASSWORD								"${PROJECT_NAME}"s
+#define	SMSC_SENDER_NAME							GetDomain()					// --- check sender name in smsc.ru control panel
 #define	SMSC_EXPIRATION								120
 #define	SMSC_CHARSET								"utf-8"s
 

@@ -1,8 +1,10 @@
 nodiff_files => [
     "account.cpp",
+    "avataruploader.cpp",
     "cmail.cpp",
     "c_smsc.cpp",
     "ccgi.cpp",
+    "crequest.cpp",
     "cvars.cpp",
     "noauth.cpp",
     "csession.cpp",
