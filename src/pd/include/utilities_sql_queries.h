@@ -147,5 +147,4 @@ inline auto	Get_AgencyIDByUserID_sqlquery(const string &id)
 }
 
 
-
 #endif

@@ -1,5 +1,27 @@
 #include "helpdesk.h"
 
+// --- try to avoid using this function outside this header
+// --- function naming is confusing, state actually "not"
+inline auto	Get_HelpdeskTicketIDByUserIDAndState_sqlquery(const string &id, const string &state)
+{
+	return (
+			"SELECT `helpdesk_ticket_history_last_case_state_view`.`helpdesk_ticket_id` "
+				"FROM `helpdesk_ticket_history_last_helpdesk_user_update_view` "
+				"INNER JOIN `helpdesk_ticket_history_last_case_state_view` "
+				"ON `helpdesk_ticket_history_last_case_state_view`.`helpdesk_ticket_id`=`helpdesk_ticket_history_last_helpdesk_user_update_view`.`helpdesk_ticket_id` "
+				"WHERE "
+				"`helpdesk_ticket_history_last_helpdesk_user_update_view`.`user_id` IN (" + id + ") "
+				"AND "
+				"`helpdesk_ticket_history_last_case_state_view`.`state`!=\"" + state + "\""
+		);
+}
+
+inline auto	Get_OpenHelpdeskTicketIDByUserID_sqlquery(const string &id)
+{
+	return Get_HelpdeskTicketIDByUserIDAndState_sqlquery(id, "closed");
+}
+
+
 static auto amINewEngineer(string ticket_id, CMysql *db, CUser *user)
 {
 	MESSAGE_DEBUG("", "", "start");
@@ -685,7 +707,7 @@ int main(void)
 			}
 			if(filter_param == "my_open")
 			{
-				filter = "SELECT `helpdesk_ticket_history_last_case_state_view`.`helpdesk_ticket_id` "
+/*				filter = "SELECT `helpdesk_ticket_history_last_case_state_view`.`helpdesk_ticket_id` "
 							"FROM `helpdesk_ticket_history_last_helpdesk_user_update_view` "
 							"INNER JOIN `helpdesk_ticket_history_last_case_state_view` "
 							"ON `helpdesk_ticket_history_last_case_state_view`.`helpdesk_ticket_id`=`helpdesk_ticket_history_last_helpdesk_user_update_view`.`helpdesk_ticket_id`"
@@ -693,7 +715,8 @@ int main(void)
 							"`helpdesk_ticket_history_last_helpdesk_user_update_view`.`user_id`=" + quoted(user.GetID()) + " "
 							"AND "
 							"`helpdesk_ticket_history_last_case_state_view`.`state`!=\"closed\"";
-
+*/
+				filter = Get_OpenHelpdeskTicketIDByUserID_sqlquery(user.GetID());
 				filter = "WHERE `id` IN (" + filter + ")";
 			}
 			if(filter_param == "open")
@@ -779,15 +802,20 @@ int main(void)
 
 			if((user.GetType() == "helpdesk"))
 			{
+				auto affected = db.Query(Get_OpenHelpdeskTicketIDByUserID_sqlquery(user.GetID()));
+
+				if(affected)
+					success_message += (success_message.length() ? "," : "") + quoted("my_active_cases"s) + ":" + to_string(affected) + "";
+
 				if(db.Query("SELECT COUNT(*) FROM `helpdesk_ticket_history_last_case_state_view` WHERE `state`!=" + quoted("closed"s) + ";"))
 					success_message += (success_message.length() ? "," : "") +  quoted("active_cases"s) + ":" + db.Get(0, 0) + "";
 
 				if(db.Query("SELECT COUNT(*) FROM `helpdesk_ticket_history_last_case_state_view` WHERE `state`=" + quoted("new"s) + ";"))
 					success_message += (success_message.length() ? "," : "") + quoted("new_cases"s) + ":" + db.Get(0, 0) + "";
 
-				if(db.Query("SELECT COUNT(*) FROM `helpdesk_ticket_history_last_helpdesk_user_update_view` WHERE `state`!=" + quoted("closed"s) + " AND `user_id`=" + quoted(user.GetID()) + ";"))
+/*				if(db.Query("SELECT COUNT(*) FROM `helpdesk_ticket_history_last_helpdesk_user_update_view` WHERE `state`!=" + quoted("closed"s) + " AND `user_id`=" + quoted(user.GetID()) + ";"))
 					success_message += (success_message.length() ? "," : "") + quoted("my_active_cases"s) + ":" + db.Get(0, 0) + "";
-
+*/
 				if(db.Query("SELECT COUNT(*) FROM `helpdesk_ticket_history_last_case_state_view` WHERE "
 								"`state`=\"company_pending\" "
 								"AND "
