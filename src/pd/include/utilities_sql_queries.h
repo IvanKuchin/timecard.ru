@@ -72,6 +72,49 @@ inline auto Get_SoWIDsByApproverUserID_sqlquery(const string &approver_user_id, 
 */
 }
 
+// --- in case of requirement: get a list of all SoW-s been active in Mar 2020, 
+// --- you may set date to 2020-03-01 and even if SoW starts date is 2020-03-15, it will be captured by this filter
+inline auto Get_SoWDateFilter_sqlquery(const string &date) -> string
+{
+	return (
+			"("
+				"("
+					"`timecard_period`=\"week\" "
+					"AND "
+					"`start_date`<=DATE_ADD(\"" + date + "\", INTERVAL 1 WEEK)  "
+					"AND "
+					"`end_date`>=DATE_SUB(\"" + date + "\", INTERVAL 31 DAY) "
+				") "
+				"OR "
+				"("
+					"`timecard_period`=\"month\" "
+					"AND "
+					"`start_date`<=DATE_ADD(\"" + date + "\", INTERVAL 1 MONTH)  "
+					"AND "
+					"`end_date`>=DATE_SUB(\"" + date + "\", INTERVAL 31 DAY) "
+				")"
+			")"
+		);
+}
+
+inline auto Get_SoWIDsBySubcUserIDAndDate_sqlquery(const string &user_id, const string &date) -> string
+{
+	return (
+		"SELECT `id` FROM `contracts_sow` WHERE "
+			"`subcontractor_company_id` IN (SELECT `id` FROM `company` WHERE `admin_userID` = \"" + user_id + "\") "
+			"AND " + Get_SoWDateFilter_sqlquery(date)
+		);
+}
+
+inline auto Get_TimecardDateFilter_sqlquery(const string &date_start, const string &date_end) -> string
+{
+	return (
+			"\"" + date_start + "\"<=`timecards`.`period_end` "
+			"AND "
+			"`timecards`.`period_end`<=\"" + date_end + "\" "
+		);
+}
+
 inline auto Get_SoWIDsByBTApproverUserID_sqlquery(const string &approver_user_id) -> string
 {
 	return Get_SoWIDsByApproverUserID_sqlquery(approver_user_id, "bt");
@@ -145,6 +188,7 @@ inline auto	Get_AgencyIDByUserID_sqlquery(const string &id)
 			")"
 		);
 }
+
 
 
 #endif

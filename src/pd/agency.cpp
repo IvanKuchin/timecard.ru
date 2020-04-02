@@ -92,9 +92,9 @@ int main(void)
 
 			ostResult.str("");
 			{
-				string			template_name = "json_response.htmlt";
-				string			object = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("object"));;
-				string			filter = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("filter"));;
+				auto			template_name = "json_response.htmlt";
+				auto			object = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("object"));;
+				auto			filter = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("filter"));;
 
 				if((object == "timecard") || (object == "bt"))
 				{
@@ -194,9 +194,10 @@ int main(void)
 		{
 			MESSAGE_DEBUG("", action, "start");
 
-			auto			error_message = ""s;
-			auto			success_message = ""s;
-			auto			affected = db.Query("" + Get_CompanyIDByUserID_sqlquery(user.GetID()) + ";");
+			auto	error_message = ""s;
+			auto	success_message = ""s;
+			auto	affected = db.Query("" + Get_CompanyIDByUserID_sqlquery(user.GetID()) + ";");
+			auto	date = CheckHTTPParam_Date(indexPage.GetVarsHandler()->Get("date"));
 
 			if(affected)
 			{
@@ -208,7 +209,10 @@ int main(void)
 					companies_list += db.Get(i, 0);
 				}
 
-				success_message = GetTimecardList("`agency_company_id` IN (" + companies_list + ")", &db, &user);
+				if(date.length())
+					success_message = GetTimecardList("`agency_company_id` IN (" + companies_list + ")", date, &db, &user);
+				else
+					success_message = GetTimecardList("`agency_company_id` IN (" + companies_list + ")", &db, &user);
 			}
 			else
 			{
@@ -985,13 +989,16 @@ int main(void)
 
 			ostResult.str("");
 			{
-				string			template_name = "json_response.htmlt";
-				string			error_message = "";
+				auto			template_name = "json_response.htmlt"s;
+				auto			error_message = ""s;
 
 				bool			include_tasks 			= indexPage.GetVarsHandler()->Get("include_tasks") == "true";
 				bool			include_bt 				= indexPage.GetVarsHandler()->Get("include_bt") == "true";
 				bool			include_cost_centers 	= indexPage.GetVarsHandler()->Get("include_cost_centers") == "true";
-				string			sow_id 					= indexPage.GetVarsHandler()->Get("sow_id");
+				auto			sow_id 					= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("sow_id"));
+
+				auto			date					= CheckHTTPParam_Date(indexPage.GetVarsHandler()->Get("date"));
+				auto			date_filter				= date.length() ? Get_SoWDateFilter_sqlquery(PrintSQLDate(GetTMObject(date))) + " AND " : "";
 
 				if(sow_id.length())	sow_id = CheckHTTPParam_Number(sow_id);
 
@@ -1000,13 +1007,14 @@ int main(void)
 					if(db.Query("SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id`=(" + Get_CompanyIDByUserID_sqlquery(user.GetID()) + ");"))
 					{
 						auto		include_subc_company	= true;
-						string		agency_id				= db.Get(0, "id");
+						auto		agency_id				= db.Get(0, "id");
 
 						ostResult << "{"
 										"\"result\":\"success\","
 										"\"sow\":[" << GetSOWInJSONFormat(
 												"SELECT * FROM `contracts_sow` WHERE "
-													+ (sow_id.length() ? string("`id`=\"" + sow_id + "\" AND ") : "") +
+													+ (sow_id.length() ? string("`id`=\"" + sow_id + "\" AND ") : "")
+													+ date_filter + 
 													"`agency_company_id`=\"" + agency_id + "\" "
 												";", &db, &user, include_tasks, include_bt, include_cost_centers, include_subc_company) << "]";
 

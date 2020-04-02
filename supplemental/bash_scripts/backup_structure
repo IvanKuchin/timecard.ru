@@ -1,0 +1,40 @@
+#!/bin/bash
+
+dir_mask=dev.
+curr_dir=`pwd`
+
+function remove_old_backups()
+{
+    cd $curr_dir
+
+    find $curr_dir -name "*.tar.gz" -exec rm -f {} \;
+}
+
+function backup_structure_all()
+{
+    cd $curr_dir
+
+    for i in $(ls | grep $dir_mask);
+    do
+        cd /usr/local/share/$i/archive && pwd && ./archive.pl --backup_structure
+        ret_val=$?
+        if [ $ret_val -gt 0 ]
+        then
+            echo [FAIL]
+            exit $ret_val
+        fi
+    done
+}
+
+function copy_to_remote_location()
+{
+    cd $curr_dir
+
+    find $curr_dir -name "*.tar.gz" -exec scp {} ikuchin@conn-me.ru: \;
+}
+
+remove_old_backups
+
+backup_structure_all
+
+copy_to_remote_location

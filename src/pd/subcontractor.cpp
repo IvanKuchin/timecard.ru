@@ -121,9 +121,8 @@ static auto	GetTimecardsSOWTaskAssignement_Reusable_InJSONFormat(string date, CM
 				auto	timecard_query = 
 								"FROM `timecards` WHERE "
 									"`contract_sow_id` IN ("
-										"SELECT `id` FROM `contracts_sow` WHERE `subcontractor_company_id` IN ("
-											"SELECT `id` FROM `company` WHERE `admin_userID` = \"" + user->GetID() + "\""
-										")"
+										"SELECT `id` FROM `contracts_sow` WHERE "
+										"`subcontractor_company_id` IN (SELECT `id` FROM `company` WHERE `admin_userID` = \"" + user->GetID() + "\") "
 									") "
 									"AND "
 									"`period_start`<=\"" + date + "\" "
@@ -133,22 +132,28 @@ static auto	GetTimecardsSOWTaskAssignement_Reusable_InJSONFormat(string date, CM
 				result =
 						"\"timecards\":[" + GetTimecardsInJSONFormat("SELECT * " + timecard_query + ";", db, user) + "],"
 						"\"sow\":[" + GetSOWInJSONFormat(
+								"SELECT * FROM `contracts_sow` WHERE `id` IN (" + Get_SoWIDsBySubcUserIDAndDate_sqlquery(user->GetID(), date) + ");", db, user) + "],"
+						"\"task_assignments\":[" + GetTimecardTaskAssignmentInJSONFormat(
+								"SELECT * FROM `timecard_task_assignment` WHERE `contract_sow_id` IN (" + Get_SoWIDsBySubcUserIDAndDate_sqlquery(user->GetID(), date) + ");", db, user) + "],"
+	/*					"\"sow\":[" + GetSOWInJSONFormat(
 								"SELECT * FROM `contracts_sow` WHERE "
-									"`subcontractor_company_id` IN (SELECT `id` FROM `company` WHERE `admin_userID` = \"" + user->GetID() + "\") "
-									"AND "
-									"`start_date`<=\"" + date + "\" "
-									"AND "
-									"`end_date`>=(DATE_SUB(" + quoted(date) + ", INTERVAL " + to_string(SOW_EXPIRATION_BUFFER) + " DAY))"
+										"`subcontractor_company_id` IN (SELECT `id` FROM `company` WHERE `admin_userID` = \"" + user->GetID() + "\") "
+										"AND "
+										"`start_date`<=\"" + date + "\" "
+										"AND "
+										"`end_date`>=(DATE_SUB(" + quoted(date) + ", INTERVAL " + to_string(SOW_EXPIRATION_BUFFER) + " DAY))"
 								";", db, user) + "],"
 						"\"task_assignments\":[" + GetTimecardTaskAssignmentInJSONFormat(
 								"SELECT * FROM `timecard_task_assignment` WHERE "
-									"`contract_sow_id` IN (SELECT `id` FROM `contracts_sow` WHERE "
-																"`subcontractor_company_id` IN (SELECT `id` FROM `company` WHERE `admin_userID` = \"" + user->GetID() + "\") "
-																"AND "
-																"`start_date`<=\"" + date + "\" "
-																"AND "
-																"`end_date`>=(DATE_SUB(" + quoted(date) + ", INTERVAL " + to_string(SOW_EXPIRATION_BUFFER) + " DAY)) "
-															");", db, user) + "],"
+									"`contract_sow_id` IN ("
+										"SELECT `id` FROM `contracts_sow` WHERE "
+										"`subcontractor_company_id` IN (SELECT `id` FROM `company` WHERE `admin_userID` = \"" + user->GetID() + "\") "
+										"AND "
+										"`start_date`<=\"" + date + "\" "
+										"AND "
+										"`end_date`>=(DATE_SUB(" + quoted(date) + ", INTERVAL " + to_string(SOW_EXPIRATION_BUFFER) + " DAY))"
+									");", db, user) + "],"
+	*/
 						"\"holiday_calendar\":[" + GetHolidayCalendarInJSONFormat(
 								"SELECT * FROM `holiday_calendar` WHERE "
 									"`date`>=(DATE_SUB(" + quoted(date) + ", INTERVAL " + to_string(HOLIDAY_RANGE_FROM_TODAY) + " DAY)) "

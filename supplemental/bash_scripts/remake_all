@@ -1,0 +1,120 @@
+#!/bin/bash
+
+dir_mask=dev.
+curr_dir=`pwd`
+
+function check_consistency()
+{
+    cd $curr_dir
+
+    # --- check that the only copy of files exists in src-folders
+    for fi in ${@%}
+    do
+	for fo in $(ls | grep $dir_mask);
+	do
+    	    arr=(`find ./$fo/ -name $fi`)
+
+    	    if [ ${#arr[@]} != 1 ]
+    	    then
+        	echo [FAILED]: search for $fi return ${#arr[@]} files in $fo
+        	for findings in  ${arr[@]}
+        	do
+            	    echo found file: ${findings}
+        	done
+        	exit 1
+    	    fi
+	done
+    done
+
+    cd $curr_dir
+
+    # --- check that file in src-folders are the same size
+    for fi in ${@%}
+    do
+	file_size_prev=0
+
+	for fo in $(ls | grep $dir_mask);
+	do
+	    arr=(`find ./$fo/ -name $fi`)
+	    file_size_curr=`stat --printf="%s" $arr`
+
+	    if [ $file_size_prev != 0 ]
+	    then
+		if [ $file_size_prev != $file_size_curr ]
+		then
+		    echo [FAIL] $arr file size $file_size_curr bytes differ from same file in folder $folder_name_prev $file_size_prev bytes
+		    exit 1
+		fi
+	    fi
+
+	    file_size_prev=$file_size_curr
+	    folder_name_prev=$fo
+	done
+    done
+}
+
+function copy_files()
+{
+    cd $curr_dir
+    # --- copy files to target dirs
+    for fi in ${@%}
+    do
+	for fo in $(ls | grep $dir_mask);
+        do
+	    arr=(`find ./$fo/ -name $fi`)
+	    echo cp $fi $arr
+	    cp $fi $arr
+	done
+    done
+}
+
+function backup_all()
+{
+    cd $curr_dir
+
+    for i in $(ls | grep $dir_mask);
+    do
+        cd /usr/local/share/$i/archive && pwd && ./archive.pl --backup
+	ret_val=$?
+	if [ $ret_val -gt 0 ]
+	then
+	    echo [FAIL]
+	    exit $ret_val
+	fi
+    done
+}
+
+function rebuild()
+{
+    cd $curr_dir
+
+    for i in $(ls | grep $dir_mask);
+    do
+        cd /home/ikuchin/src/$i/build && pwd && cmake ../ && make clean && make -j4 && ctest -- output-on-failure
+	ret_val=$?
+	if [ $ret_val -gt 0 ]
+	then
+	    echo [FAIL]
+	    exit $ret_val
+	fi
+    done
+}
+
+check_consistency ${@%}
+
+backup_all
+
+copy_files ${@%}
+
+rebuild
+
+#for i in $(ls | grep $dir_mask);
+#do
+#    cd /usr/local/share/$i/archive && pwd && ./archive.pl --backup && cd /home/ikuchin/src/$i/build && pwd && cmake ../ && make clean && make -j4 && ctest -- output-on-failure
+#    ret_val=$?
+#    if [ $ret_val -gt 0 ]
+#    then
+#	echo [FAIL]
+#	exit $ret_val
+#    fi
+#done

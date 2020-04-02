@@ -708,7 +708,7 @@ auto	GetDashboardPaymentData(string sow_sql, CMysql *db, CUser *user) -> string
 		;
 }
 
-auto	GetTimecardList(string where_companies_list, CMysql *db, CUser *user) -> string
+auto	GetTimecardList(const string &where_companies_list, CMysql *db, CUser *user) -> string
 {
 	return
 		"\"sow\":[" + GetSOWInJSONFormat("SELECT * FROM `contracts_sow` WHERE " + where_companies_list + ";", db, user, false, false, false, true) + "],"
@@ -718,6 +718,33 @@ auto	GetTimecardList(string where_companies_list, CMysql *db, CUser *user) -> st
 				";", db, user) + "],"
 		"\"holiday_calendar\":[" + GetHolidayCalendarInJSONFormat("SELECT * FROM `holiday_calendar` WHERE `agency_company_id` IN (SELECT `agency_company_id` FROM `contracts_sow` WHERE " + where_companies_list + ");", db, user) + "]"
 		;
+}
+
+// --- date is suppose to be the first day of period (month or week)
+auto	GetTimecardList(const string &where_companies_list, const string &date, CMysql *db, CUser *user) -> string
+{
+	MESSAGE_DEBUG("", "", "start(" + where_companies_list + ", " + date + ")");
+
+	auto		filter = Get_SoWDateFilter_sqlquery(PrintSQLDate(GetTMObject(date)));
+	struct tm	period_start, period_end;
+	tie(period_start, period_end) = GetFirstAndLastMonthDaysByDate(GetTMObject(date));
+
+	auto	result = 
+		"\"sow\":[" + GetSOWInJSONFormat("SELECT * FROM `contracts_sow` WHERE " + where_companies_list + " AND " + filter + ";", db, user, false, false, false, true) + "],"
+		"\"timecards\":[" + GetTimecardsInJSONFormat(
+				"SELECT * FROM `timecards` WHERE "
+					"`contract_sow_id` IN ( SELECT `id` FROM `contracts_sow` WHERE " + where_companies_list + " AND " + filter + ") "
+					"AND "
+					"(\"" + PrintSQLDate(period_start) + "\" <= `timecards`.`period_end`) "
+					"AND "
+					"(`timecards`.`period_end` <= \"" + PrintSQLDate(period_end) + "\") "
+				";", db, user) + "],"
+		"\"holiday_calendar\":[" + GetHolidayCalendarInJSONFormat("SELECT * FROM `holiday_calendar` WHERE `agency_company_id` IN (SELECT `agency_company_id` FROM `contracts_sow` WHERE " + where_companies_list + ");", db, user) + "]"
+		;
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return result;
 }
 
 // --- stub function: deny all 

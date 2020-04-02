@@ -545,11 +545,9 @@ string CheckHTTPParam_Float(const string &srcText)
 
 string CheckHTTPParam_Date(string srcText)
 {
-	string	result = "";
+	auto	result = ""s;
 
-	{
-		MESSAGE_DEBUG("", "", "start param(" + srcText + ")");
-	}
+	MESSAGE_DEBUG("", "", "start param(" + srcText + ")");
 
 	if(srcText.length())
 	{
@@ -606,9 +604,7 @@ string CheckHTTPParam_Date(string srcText)
 		}
 	}
 
-	{
-		MESSAGE_DEBUG("", "", "finish (result length = " + to_string(result.length()) + ")");
-	}
+	MESSAGE_DEBUG("", "", "finish (result length = " + result + ")");
 
 	return	result;
 }

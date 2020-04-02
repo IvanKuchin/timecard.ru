@@ -206,7 +206,8 @@ auto			Update_TimecardBT_ExpectedPayDate(string entity, string id, CMysql *, CUs
 auto			CheckAgreementSoWTitle(string title, string sow_id, CMysql *, CUser *) -> string;
 
 auto			GetDashboardPaymentData(string sow_sql, CMysql *, CUser *) -> string;
-auto			GetTimecardList(string where_companies_list, CMysql *, CUser *) -> string;
+auto			GetTimecardList(const string &where_companies_list, CMysql *, CUser *) -> string;
+auto			GetTimecardList(const string &where_companies_list, const string &date, CMysql *, CUser *) -> string;
 auto			isTimePeriodInsideSow(string sow_id, string period_start, string period_end, CMysql *, CUser *) -> string; 
 
 #endif
