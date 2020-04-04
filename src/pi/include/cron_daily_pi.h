@@ -1,5 +1,5 @@
-#ifndef __CRON_DAILY__H__
-#define __CRON_DAILY__H__
+#ifndef __CRON_DAILY_PI__H__
+#define __CRON_DAILY_PI__H__
 
 #include <sstream>
 #include <sys/time.h>

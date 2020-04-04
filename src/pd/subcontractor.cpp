@@ -465,13 +465,14 @@ int main()
 
 	if(action == "AJAX_getBTList")
 	{
-		ostringstream	ostResult;
-		auto			template_name = "json_response.htmlt"s;
-		auto			affected = db.Query("SELECT `id` FROM `company` WHERE `admin_userID`=\"" + user.GetID() + "\";");
-
 		MESSAGE_DEBUG("", action, "start");
 
-		ostResult.str("");
+		auto	error_message		= ""s;
+		auto	success_message		= ""s;
+		auto	date				= CheckHTTPParam_Date(indexPage.GetVarsHandler()->Get("date"));
+		auto	isExtended			= indexPage.GetVarsHandler()->Get("extended") == "true";
+		auto	affected			= db.Query("SELECT `id` FROM `company` WHERE `admin_userID`=\"" + user.GetID() + "\";");
+
 
 		if(affected)
 		{
@@ -483,30 +484,30 @@ int main()
 				companies_list += db.Get(i, 0);
 			}
 
-			ostResult << "{"
-							"\"status\":\"success\","
-							"\"sow\":[" << GetSOWInJSONFormat(
-									"SELECT * FROM `contracts_sow` WHERE "
-										"`subcontractor_company_id` IN (" + companies_list + ") "
-									";", &db, &user, true, false, false, true) << "],"
-							"\"bt\":[" << GetBTsInJSONFormat(
-									"SELECT * FROM `bt` WHERE "
-										"`contract_sow_id` IN ( SELECT `id` FROM `contracts_sow` WHERE `subcontractor_company_id` IN (" + companies_list + "))"
-									";", &db, &user, false) << "]"
-						"}";
+			if(date.length())
+				success_message = GetBTList("`subcontractor_company_id` IN (" + companies_list + ")", date, isExtended, &db, &user);
+			else
+				success_message = GetBTList("`subcontractor_company_id` IN (" + companies_list + ")", isExtended, &db, &user);
+
+/*
+			success_message = 
+					"\"sow\":[" + GetSOWInJSONFormat(
+							"SELECT * FROM `contracts_sow` WHERE "
+								"`subcontractor_company_id` IN (" + companies_list + ") "
+							";", &db, &user, true, false, false, true) + "],"
+					"\"bt\":[" + GetBTsInJSONFormat(
+							"SELECT * FROM `bt` WHERE "
+								"`contract_sow_id` IN ( SELECT `id` FROM `contracts_sow` WHERE `subcontractor_company_id` IN (" + companies_list + "))"
+							";", &db, &user, false) + "]";
+*/
 		}
 		else
 		{
-			MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't owns company");
-			ostResult << "{\"status\":\"error\",\"description\":\"Вы не создали компанию\"}";
+			error_message = gettext("you are not authorized");
+			MESSAGE_ERROR("", action, error_message);
 		}
 
-		indexPage.RegisterVariableForce("result", ostResult.str());
-
-		if(!indexPage.SetTemplate(template_name))
-		{
-			MESSAGE_ERROR("", action, "can't find template " + template_name);
-		}
+		AJAX_ResponseTemplate(&indexPage, success_message, error_message);
 
 		MESSAGE_DEBUG("", action, "finish");
 	}

@@ -708,8 +708,92 @@ auto	GetDashboardPaymentData(string sow_sql, CMysql *db, CUser *user) -> string
 		;
 }
 
+
+// --- BT functions part
+
+static auto __GetBTList(const string &sow_where_statement, const string &bt_where_statement, bool isExtended, CMysql *db, CUser *user)
+{
+	return 
+		"\"sow\":[" + GetSOWInJSONFormat("SELECT * FROM `contracts_sow` WHERE " + sow_where_statement + ";", db, user, true, false, false, true) + "],"
+		"\"bt\":[" + GetBTsInJSONFormat(
+				"SELECT * FROM `bt` WHERE "
+					"`contract_sow_id` IN ( SELECT `id` FROM `contracts_sow` WHERE " + sow_where_statement + ")"
+					+ (bt_where_statement.length() ? " AND " + bt_where_statement + " " : "") +
+				";", db, user, isExtended) + "]"
+		;
+}
+
+auto	GetBTList(const string &sow_companies_list, bool isExtended, CMysql *db, CUser *user) -> string
+{
+	
+	return __GetBTList(sow_companies_list, "", isExtended, db, user);
+}
+
+// --- date is suppose to be the first day of a period (month or week)
+auto	GetBTList(const string &where_companies_list, const string &date, bool isExtended, CMysql *db, CUser *user) -> string
+{
+	MESSAGE_DEBUG("", "", "start(" + where_companies_list + ", " + date + ")");
+
+	auto		filter						= Get_SoWDateFilter_sqlquery(PrintSQLDate(GetTMObject(date)));
+
+	struct tm	period_start, period_end;
+	tie			(period_start, period_end)	= GetFirstAndLastMonthDaysByDate(GetTMObject(date));
+
+	auto		sow_where_statement 		= where_companies_list + " AND " + filter;
+	auto		bt_where_statement			= Get_BTDateFilter_sqlquery(PrintSQLDate(period_start), PrintSQLDate(period_end));
+
+	auto		result						=  __GetBTList(sow_where_statement, bt_where_statement, isExtended, db, user);
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return result;
+}
+
+// --- Timecard functions part
+
+static auto __GetTimecardList(const string &sow_where_statement, const string &timecard_where_statement, CMysql *db, CUser *user)
+{
+	return 
+		"\"sow\":[" + GetSOWInJSONFormat("SELECT * FROM `contracts_sow` WHERE " + sow_where_statement + ";", db, user, false, false, false, true) + "],"
+		"\"timecards\":[" + GetTimecardsInJSONFormat(
+				"SELECT * FROM `timecards` WHERE "
+					"`contract_sow_id` IN ( SELECT `id` FROM `contracts_sow` WHERE " + sow_where_statement + ")"
+					+ (timecard_where_statement.length() ? " AND " + timecard_where_statement + " " : "") +
+				";", db, user) + "],"
+		"\"holiday_calendar\":[" + GetHolidayCalendarInJSONFormat("SELECT * FROM `holiday_calendar` WHERE `agency_company_id` IN (SELECT `agency_company_id` FROM `contracts_sow` WHERE " + sow_where_statement + ");", db, user) + "]"
+		;
+}
+
+auto	GetTimecardList(const string &sow_companies_list, CMysql *db, CUser *user) -> string
+{
+	
+	return __GetTimecardList(sow_companies_list, "", db, user);
+}
+
+// --- date is suppose to be the first day of a period (month or week)
+auto	GetTimecardList(const string &where_companies_list, const string &date, CMysql *db, CUser *user) -> string
+{
+	MESSAGE_DEBUG("", "", "start(" + where_companies_list + ", " + date + ")");
+
+	auto		filter						= Get_SoWDateFilter_sqlquery(PrintSQLDate(GetTMObject(date)));
+
+	struct tm	period_start, period_end;
+	tie			(period_start, period_end)	= GetFirstAndLastMonthDaysByDate(GetTMObject(date));
+
+	auto		sow_where_statement 		= where_companies_list + " AND " + filter;
+	auto		timecard_where_statement	= Get_TimecardDateFilter_sqlquery(PrintSQLDate(period_start), PrintSQLDate(period_end));
+
+	auto		result						=  __GetTimecardList(sow_where_statement, timecard_where_statement, db, user);
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return result;
+}
+
+/*
 auto	GetTimecardList(const string &where_companies_list, CMysql *db, CUser *user) -> string
 {
+	
 	return
 		"\"sow\":[" + GetSOWInJSONFormat("SELECT * FROM `contracts_sow` WHERE " + where_companies_list + ";", db, user, false, false, false, true) + "],"
 		"\"timecards\":[" + GetTimecardsInJSONFormat(
@@ -718,9 +802,10 @@ auto	GetTimecardList(const string &where_companies_list, CMysql *db, CUser *user
 				";", db, user) + "],"
 		"\"holiday_calendar\":[" + GetHolidayCalendarInJSONFormat("SELECT * FROM `holiday_calendar` WHERE `agency_company_id` IN (SELECT `agency_company_id` FROM `contracts_sow` WHERE " + where_companies_list + ");", db, user) + "]"
 		;
+
 }
 
-// --- date is suppose to be the first day of period (month or week)
+// --- date is suppose to be the first day of a period (month or week)
 auto	GetTimecardList(const string &where_companies_list, const string &date, CMysql *db, CUser *user) -> string
 {
 	MESSAGE_DEBUG("", "", "start(" + where_companies_list + ", " + date + ")");
@@ -746,6 +831,7 @@ auto	GetTimecardList(const string &where_companies_list, const string &date, CMy
 
 	return result;
 }
+*/
 
 // --- stub function: deny all 
 // --- if some users need to be allowed to create BIK, algorithm must be written here

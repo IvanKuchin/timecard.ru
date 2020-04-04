@@ -774,6 +774,10 @@ void CMailLocal::Send(string login, string templID, CVars *v, CMysql *db)
 
 		throw CExceptionHTML("user mail failed");
 	}
+	else
+	{
+		v->Redefine("RECIPIENT_EMAIL", email);
+	}
 
 	SendToEmail(email, login, templID, v, db);
 

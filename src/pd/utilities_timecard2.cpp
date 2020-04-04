@@ -6114,27 +6114,31 @@ string GetAgencyObjectInJSONFormat(string agency_id, bool include_tasks, bool in
 	return result;	
 }
 
-auto GetNumberOfApprovedTimecardsThisMonth(CMysql *db, CUser *user) -> string
+static auto __GetNumberOfTimecards(const string &timecard_status, const string &period_start, const string &period_end, CMysql *db, CUser *user) -> string
 {
-	auto	result = ""s;
-
 	MESSAGE_DEBUG("", "", "start");
+
+	auto	result = ""s;
 
 	if(user->GetType() == "agency")
 	{
+		if(db->Query("SELECT COUNT(*) AS `counter` FROM `timecards` WHERE "
+							"`status` IN (" + timecard_status + ") "
+							"AND "
+							"`period_end`>=\"" + period_start + "\"  "
+							"AND "
+							"`period_end`<=\"" + period_end + "\" "
+							"AND "
+							"`contract_sow_id` IN ("
+								"SELECT `id` FROM `contracts_sow` WHERE `agency_company_id`=(" + Get_CompanyIDByUserID_sqlquery(user->GetID()) + ""
+							")"
+						");"))
 		{
-			struct tm	period_start, period_end;
-
-			tie(period_start, period_end) = GetFirstAndLastDateOfThisMonth();
-
-			if(db->Query("SELECT COUNT(*) AS `counter` FROM `timecards` WHERE `status`=\"approved\" AND `period_end`>=\"" + PrintSQLDate(period_start) + "\"  AND `period_end`<=\"" + PrintSQLDate(period_end) + "\" AND `contract_sow_id` IN ("
-								"SELECT `id` FROM `contracts_sow` WHERE `agency_company_id`=("
-									"" + Get_CompanyIDByUserID_sqlquery(user->GetID()) + ""
-								")"
-							");"))
-			{
-				result = db->Get(0, "counter");
-			}
+			result = db->Get(0, "counter");
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "SQL syntax error");
 		}
 	}
 	else
@@ -6147,27 +6151,59 @@ auto GetNumberOfApprovedTimecardsThisMonth(CMysql *db, CUser *user) -> string
 	return result;
 }
 
+auto GetNumberOfApprovedTimecardsThisMonth(CMysql *db, CUser *user) -> string
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	struct tm	period_start, period_end;
+
+	tie(period_start, period_end) = GetFirstAndLastDateOfThisMonth();
+
+	auto	result = __GetNumberOfTimecards("\"approved\"", PrintSQLDate(period_start), PrintSQLDate(period_end), db, user);
+
+	MESSAGE_DEBUG("", "", "finish (result is " + result + ")");
+
+	return result;
+}
+
 auto GetNumberOfApprovedTimecardsLastMonth(CMysql *db, CUser *user) -> string
 {
-	auto	result = ""s;
-
 	MESSAGE_DEBUG("", "", "start");
+
+	struct tm	period_start, period_end;
+
+	tie(period_start, period_end) = GetFirstAndLastDateOfLastMonth();
+
+	auto	result = __GetNumberOfTimecards("\"approved\"", PrintSQLDate(period_start), PrintSQLDate(period_end), db, user);
+
+	MESSAGE_DEBUG("", "", "finish (result is " + result + ")");
+
+	return result;
+}
+
+static auto __GetNumberOfSoW(const string &sow_status, const string &period_start, const string &period_end, CMysql *db, CUser *user) -> string
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	result = ""s;
 
 	if(user->GetType() == "agency")
 	{
+		if(db->Query("SELECT COUNT(*) AS `counter` FROM `contracts_sow` WHERE "
+								"`status` IN (" + sow_status + ") "
+								"AND "
+								"`end_date`>=\"" + period_start + "\"  "
+								"AND "
+								"`start_date`<=\"" + period_end + "\" "
+								"AND "
+								"`agency_company_id`=(" + Get_CompanyIDByUserID_sqlquery(user->GetID()) + ")"
+					))
 		{
-			struct tm	period_start, period_end;
-
-			tie(period_start, period_end) = GetFirstAndLastDateOfLastMonth();
-
-			if(db->Query("SELECT COUNT(*) AS `counter` FROM `timecards` WHERE `status`=\"approved\" AND `period_end`>=\"" + PrintSQLDate(period_start) + "\"  AND `period_end`<=\"" + PrintSQLDate(period_end) + "\" AND `contract_sow_id` IN ("
-								"SELECT `id` FROM `contracts_sow` WHERE `agency_company_id`=("
-									"" + Get_CompanyIDByUserID_sqlquery(user->GetID()) + ""
-								")"
-							");"))
-			{
-				result = db->Get(0, "counter");
-			}
+			result = db->Get(0, "counter");
+		}
+		else
+		{
+			MESSAGE_ERROR("", "", "SQL syntax error");
 		}
 	}
 	else
@@ -6182,29 +6218,13 @@ auto GetNumberOfApprovedTimecardsLastMonth(CMysql *db, CUser *user) -> string
 
 auto GetNumberOfSoWActiveThisMonth(CMysql *db, CUser *user) -> string
 {
-	auto	result = ""s;
-
 	MESSAGE_DEBUG("", "", "start");
 
-	if(user->GetType() == "agency")
-	{
-		{
-			struct tm	period_start, period_end;
+	struct tm	period_start, period_end;
 
-			tie(period_start, period_end) = GetFirstAndLastDateOfThisMonth();
+	tie(period_start, period_end) = GetFirstAndLastDateOfThisMonth();
 
-			if(db->Query("SELECT COUNT(*) AS `counter` FROM `contracts_sow` WHERE `status`=\"signed\" AND `end_date`>=\"" + PrintSQLDate(period_start) + "\"  AND `start_date`<=\"" + PrintSQLDate(period_end) + "\" AND `agency_company_id`=("
-									"" + Get_CompanyIDByUserID_sqlquery(user->GetID()) + ""
-								")"))
-			{
-				result = db->Get(0, "counter");
-			}
-		}
-	}
-	else
-	{
-		MESSAGE_ERROR("", "", "user.id(" + user->GetID() + ") have unknown type(" + user->GetType() + ")");
-	}
+	auto	result = __GetNumberOfSoW("\"signed\",\"expired\"", PrintSQLDate(period_start), PrintSQLDate(period_end), db, user);
 
 	MESSAGE_DEBUG("", "", "finish (result is " + result + ")");
 
@@ -6213,33 +6233,19 @@ auto GetNumberOfSoWActiveThisMonth(CMysql *db, CUser *user) -> string
 
 auto GetNumberOfSoWActiveLastMonth(CMysql *db, CUser *user) -> string
 {
-	auto	result = ""s;
 
 	MESSAGE_DEBUG("", "", "start");
 
-	if(user->GetType() == "agency")
-	{
-		{
-			struct tm	period_start, period_end;
+	struct tm	period_start, period_end;
 
-			tie(period_start, period_end) = GetFirstAndLastDateOfLastMonth();
+	tie(period_start, period_end) = GetFirstAndLastDateOfLastMonth();
 
-			if(db->Query("SELECT COUNT(*) AS `counter` FROM `contracts_sow` WHERE `status`=\"signed\" AND `end_date`>=\"" + PrintSQLDate(period_start) + "\"  AND `start_date`<=\"" + PrintSQLDate(period_end) + "\" AND `agency_company_id`=("
-									"" + Get_CompanyIDByUserID_sqlquery(user->GetID()) + ""
-								")"))
-			{
-				result = db->Get(0, "counter");
-			}
-		}
-	}
-	else
-	{
-		MESSAGE_ERROR("", "", "user.id(" + user->GetID() + ") have unknown type(" + user->GetType() + ")");
-	}
+	auto	result = __GetNumberOfSoW("\"signed\",\"expired\"", PrintSQLDate(period_start), PrintSQLDate(period_end), db, user);
 
 	MESSAGE_DEBUG("", "", "finish (result is " + result + ")");
 
 	return result;
+
 }
 
 auto GetPSoWIDByTimecardIDAndCostCenterID(string timecard_id, string cost_center_id, CMysql *db, CUser *user) -> string

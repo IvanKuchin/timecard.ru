@@ -81,19 +81,19 @@ inline auto Get_SoWDateFilter_sqlquery(const string &date) -> string
 				"("
 					"`timecard_period`=\"week\" "
 					"AND "
-					"`start_date`<=DATE_ADD(\"" + date + "\", INTERVAL 1 WEEK)  "
+					"DATE_SUB(\"" + date + "\", INTERVAL 31 DAY)<=`end_date` "
 					"AND "
-					"`end_date`>=DATE_SUB(\"" + date + "\", INTERVAL 31 DAY) "
+					"`start_date`<=DATE_ADD(\"" + date + "\", INTERVAL 1 WEEK)  "
 				") "
 				"OR "
 				"("
 					"`timecard_period`=\"month\" "
 					"AND "
-					"`start_date`<=DATE_ADD(\"" + date + "\", INTERVAL 1 MONTH)  "
+					"DATE_SUB(\"" + date + "\", INTERVAL 31 DAY)<=`end_date` "
 					"AND "
-					"`end_date`>=DATE_SUB(\"" + date + "\", INTERVAL 31 DAY) "
+					"`start_date`<=DATE_ADD(\"" + date + "\", INTERVAL 1 MONTH)  "
 				")"
-			")"
+			") "
 		);
 }
 
@@ -109,9 +109,18 @@ inline auto Get_SoWIDsBySubcUserIDAndDate_sqlquery(const string &user_id, const 
 inline auto Get_TimecardDateFilter_sqlquery(const string &date_start, const string &date_end) -> string
 {
 	return (
-			"\"" + date_start + "\"<=`timecards`.`period_end` "
+			"(\"" + date_start + "\"<=`timecards`.`period_end`) "
 			"AND "
-			"`timecards`.`period_end`<=\"" + date_end + "\" "
+			"(`timecards`.`period_end`<=\"" + date_end + "\") "
+		);
+}
+
+inline auto Get_BTDateFilter_sqlquery(const string &date_start, const string &date_end) -> string
+{
+	return (
+			"(\"" + date_start + "\"<=`bt`.`date_end`) "
+			"AND "
+			"(`bt`.`date_end`<=\"" + date_end + "\") "
 		);
 }
 

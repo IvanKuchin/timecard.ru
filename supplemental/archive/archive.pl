@@ -221,7 +221,7 @@ if($action =~ /^--backup/)
 	if($action =~ /_structure/)
 	{
 		system("mysqldump --no-data -Q -u $mysqllogin -p$mysqlpass -h $mysqlhost $mysqldb > sql");
-		system("mysqldump --add-drop-table -Q -u $mysqllogin -p$mysqlpass -h $mysqlhost $mysqldb ".$config{tables_to_upgrade}." > sql_controltables");
+		system("mysqldump --default-character-set=utf8mb4 --add-drop-table -Q -u $mysqllogin -p$mysqlpass -h $mysqlhost $mysqldb ".$config{tables_to_upgrade}." > sql_controltables");
 	}
 	else
 	{

@@ -1,4 +1,4 @@
-#include "cron_minute.h"
+#include "cron_minute_pi.h"
 
 auto CleanupActivators(CMysql *db)
 {
@@ -86,10 +86,11 @@ int main()
 
 		//--- start of minute cron main functionality
 
-		if((error_message = CleanUPData(&db))				.length()) MESSAGE_ERROR("", "", error_message);
-		if((error_message = CleanupNotActivatedUsers(&db))	.length()) MESSAGE_ERROR("", "", error_message);
-		if((error_message = CleanUPEmailChange(&db))		.length()) MESSAGE_ERROR("", "", error_message);
-		if((error_message = CleanupActivators(&db))			.length()) MESSAGE_ERROR("", "", error_message);
+		if((error_message = CleanUPData(&db))							.length()) MESSAGE_ERROR("", "", error_message);
+		if((error_message = CleanupNotActivatedUsers(&db))				.length()) MESSAGE_ERROR("", "", error_message);
+		if((error_message = CleanUPEmailChange(&db))					.length()) MESSAGE_ERROR("", "", error_message);
+		if((error_message = CleanupActivators(&db))						.length()) MESSAGE_ERROR("", "", error_message);
+
 
 		//--- end of minute cron main functionality
 	}

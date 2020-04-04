@@ -25,7 +25,8 @@ nodiff_files => [
     "cactivator.h",
     "helpdesk.h",
 
-    "cron_minute.cpp",
+    "cron_minute_pi.cpp",
+    "cron_daily_pi.cpp",
     "system.cpp",
 
     "login.css",
@@ -71,6 +72,7 @@ nodiff_files => [
     "archive.pl",
     "health_srcdiff.pl",
     "health_srcdiff.conf.in",
+
 ],
 
 exclude_domains => [
