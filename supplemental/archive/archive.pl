@@ -220,12 +220,12 @@ if($action =~ /^--backup/)
 	print "mysqldump ....\n";
 	if($action =~ /_structure/)
 	{
-		system("mysqldump --no-data -Q -u $mysqllogin -p$mysqlpass -h $mysqlhost $mysqldb > sql");
+		system("mysqldump --default-character-set=utf8mb4 --no-data -Q -u $mysqllogin -p$mysqlpass -h $mysqlhost $mysqldb > sql");
 		system("mysqldump --default-character-set=utf8mb4 --add-drop-table -Q -u $mysqllogin -p$mysqlpass -h $mysqlhost $mysqldb ".$config{tables_to_upgrade}." > sql_controltables");
 	}
 	else
 	{
-		system("mysqldump  -Q -u $mysqllogin -p$mysqlpass -h $mysqlhost $mysqldb > sql");
+		system("mysqldump --default-character-set=utf8mb4 -Q -u $mysqllogin -p$mysqlpass -h $mysqlhost $mysqldb > sql");
 	}
 
 	print "archiving ....\n";
@@ -410,7 +410,7 @@ if($action =~ /^--restore/)
 		# [IMPORTANT] supposed that sql file in current directory having only MySQL tables structure --no-data
 		#
 		print "adding MySQL production data to MySQL backup structure\n";
-		system("mysqldump --no-create-info --skip-add-drop-table -Q -u $mysqllogin -p$mysqlpass -h $mysqlhost $mysqldb >> sql");
+		system("mysqldump --default-character-set=utf8mb4 --no-create-info --skip-add-drop-table -Q -u $mysqllogin -p$mysqlpass -h $mysqlhost $mysqldb >> sql");
 	}
 
 	if(isDevServer())
@@ -1162,7 +1162,7 @@ sub	CreateRecoveryPoint
 		}
 
 		print "\tMySQL backup to $recovery_point_folder/sql\n";
-		system("mysqldump -Q -u $mysqllogin -p$mysqlpass -h $mysqlhost $mysqldb > $recovery_point_folder/sql");
+		system("mysqldump --default-character-set=utf8mb4 -Q -u $mysqllogin -p$mysqlpass -h $mysqlhost $mysqldb > $recovery_point_folder/sql");
 	}
 }
 

@@ -72,6 +72,7 @@ nodiff_files => [
     "archive.pl",
     "health_srcdiff.pl",
     "health_srcdiff.conf.in",
+    "cron_config.in",
 
 ],
 

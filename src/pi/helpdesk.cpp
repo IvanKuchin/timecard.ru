@@ -2,7 +2,7 @@
 
 // --- try to avoid using this function outside this header
 // --- function naming is confusing, state actually "not"
-inline auto	Get_HelpdeskTicketIDByUserIDAndState_sqlquery(const string &id, const string &state)
+inline auto	Get_HelpdeskTicketID_By_UserID_And_NotState_sqlquery(const string &id, const string &state)
 {
 	return (
 			"SELECT `helpdesk_ticket_history_last_case_state_view`.`helpdesk_ticket_id` "
@@ -18,7 +18,7 @@ inline auto	Get_HelpdeskTicketIDByUserIDAndState_sqlquery(const string &id, cons
 
 inline auto	Get_OpenHelpdeskTicketIDByUserID_sqlquery(const string &id)
 {
-	return Get_HelpdeskTicketIDByUserIDAndState_sqlquery(id, "closed");
+	return Get_HelpdeskTicketID_By_UserID_And_NotState_sqlquery(id, "closed");
 }
 
 
@@ -804,8 +804,7 @@ int main(void)
 			{
 				auto affected = db.Query(Get_OpenHelpdeskTicketIDByUserID_sqlquery(user.GetID()));
 
-				if(affected)
-					success_message += (success_message.length() ? "," : "") + quoted("my_active_cases"s) + ":" + to_string(affected) + "";
+				success_message += (success_message.length() ? "," : "") + quoted("my_active_cases"s) + ":" + to_string(affected) + "";
 
 				if(db.Query("SELECT COUNT(*) FROM `helpdesk_ticket_history_last_case_state_view` WHERE `state`!=" + quoted("closed"s) + ";"))
 					success_message += (success_message.length() ? "," : "") +  quoted("active_cases"s) + ":" + db.Get(0, 0) + "";
