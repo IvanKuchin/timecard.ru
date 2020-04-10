@@ -56,7 +56,7 @@ class C_Invoicing_Vars
 		auto		SubcontractorAddress_Index_VarSet(string index) -> string;
 		auto		SubcontractorPayment_Index_VarSet(c_float cost_center_price, string index) -> string;
 		auto		Workperiod_Index_VarSet(struct tm workperiod_start, struct tm workperiod_finish, string index) -> string;
-		auto		Workperiod_vs_PSoWperiod_Index_VarSet(struct tm workperiod_start, struct tm workperiod_finish, string index) -> string;
+		auto		Workperiod_vs_SoWPeriod_vs_PSoWperiod_Index_VarSet(struct tm workperiod_start, struct tm workperiod_finish, string index) -> string;
 		auto		TableRowDecsriptions_Index_VarSet(string local_remote_service_description, string index) -> string;
 
 		auto		ShortenWorkPeriodSpelling(struct tm workperiod_start, struct tm workperiod_finish, string index) -> string;

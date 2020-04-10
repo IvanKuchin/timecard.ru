@@ -1326,7 +1326,7 @@ auto	C_Invoicing_Vars::CurrentTimestamp_1C_VarSet() -> string
 	return	error_message;
 }
 
-auto	C_Invoicing_Vars::Workperiod_vs_PSoWperiod_Index_VarSet(struct tm workperiod_start, struct tm workperiod_finish, string index) -> string
+auto	C_Invoicing_Vars::Workperiod_vs_SoWPeriod_vs_PSoWperiod_Index_VarSet(struct tm workperiod_start, struct tm workperiod_finish, string index) -> string
 {
 	auto	error_message = ""s;
 
@@ -1336,6 +1336,9 @@ auto	C_Invoicing_Vars::Workperiod_vs_PSoWperiod_Index_VarSet(struct tm workperio
 	auto				psow_period_start		= GetTMObject(Get("psow_contract_start_date_" + index));
 	auto				psow_period_finish		= GetTMObject(Get("psow_contract_end_date_" + index));
 	auto				psow_sign_date			= GetTMObject(Get("psow_contract_sign_date_" + index));
+	auto				sow_period_start		= GetTMObject(Get("sow_start_date_" + index));
+	auto				sow_period_finish		= GetTMObject(Get("sow_end_date_" + index));
+	auto				sow_sign_date			= GetTMObject(Get("sow_sign_date_" + index));
 
 	if(psow_period_start <= GetTMObject("2000-01-01"))
 	{
@@ -1352,13 +1355,35 @@ auto	C_Invoicing_Vars::Workperiod_vs_PSoWperiod_Index_VarSet(struct tm workperio
 		error_message = "PSOW("s + Get("psow_contract_number_" + index) + ") " + gettext("sign date") + " " + gettext("must be in 20-th century");
 		MESSAGE_ERROR("", "", error_message);
 	}
+	else if(sow_period_start <= GetTMObject("2000-01-01"))
+	{
+		error_message = "SOW("s + Get("sow_contract_number_" + index) + ") " + gettext("start date") + " " + gettext("must be in 20-th century");
+		MESSAGE_ERROR("", "", error_message);
+	}
+	else if(sow_period_finish <= GetTMObject("2000-01-01"))
+	{
+		error_message = "SOW("s + Get("sow_contract_number_" + index) + ") " + gettext("end date") + " " + gettext("must be in 20-th century");
+		MESSAGE_ERROR("", "", error_message);
+	}
+	else if(sow_sign_date <= GetTMObject("2000-01-01"))
+	{
+		error_message = "SOW("s + Get("sow_contract_number_" + index) + ") " + gettext("sign date") + " " + gettext("must be in 20-th century");
+		MESSAGE_ERROR("", "", error_message);
+	}
 	else
 	{
+		error_message = Workperiod_Index_VarSet(
+													max(max(psow_period_start,  sow_period_start),  workperiod_start),
+													min(min(psow_period_finish, sow_period_finish), workperiod_finish),
+													index
+												);
+/*
 		error_message = Workperiod_Index_VarSet(
 													psow_period_start  > workperiod_start  ? psow_period_start  : workperiod_start,
 													psow_period_finish < workperiod_finish ? psow_period_finish : workperiod_finish,
 													index
 												);
+*/
 	}
 
 	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
@@ -1634,8 +1659,8 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet_AgencyToCC() -> string
 					// --- get report start date and finish date
 					if(error_message.empty())
 					{
-						if((error_message = Workperiod_vs_PSoWperiod_Index_VarSet(GetTMObject(timecard.GetDateStart()), GetTMObject(timecard.GetDateFinish()), to_string(i))).empty()) {}
-						else { MESSAGE_ERROR("", "", "fail returned from Workperiod_vs_PSoWperiod_Index_VarSet"); }
+						if((error_message = Workperiod_vs_SoWPeriod_vs_PSoWperiod_Index_VarSet(GetTMObject(timecard.GetDateStart()), GetTMObject(timecard.GetDateFinish()), to_string(i))).empty()) {}
+						else { MESSAGE_ERROR("", "", "fail returned from Workperiod_vs_SoWPeriod_vs_PSoWperiod_Index_VarSet"); }
 					}
 
 					// --- subcontractor company data
@@ -1964,8 +1989,8 @@ auto	C_Invoicing_Vars::GenerateBTVariableSet_AgencyToCC() -> string
 					// --- get report start date and finish date
 					if(error_message.empty())
 					{
-						if((error_message = Workperiod_vs_PSoWperiod_Index_VarSet(GetTMObject(bt.GetDateStart()), GetTMObject(bt.GetDateFinish()), to_string(i))).empty()) {}
-						else { MESSAGE_ERROR("", "", "fail returned from Workperiod_vs_PSoWperiod_Index_VarSet"); }
+						if((error_message = Workperiod_vs_SoWPeriod_vs_PSoWperiod_Index_VarSet(GetTMObject(bt.GetDateStart()), GetTMObject(bt.GetDateFinish()), to_string(i))).empty()) {}
+						else { MESSAGE_ERROR("", "", "fail returned from Workperiod_vs_SoWPeriod_vs_PSoWperiod_Index_VarSet"); }
 					}
 
 					if(error_message.empty())

@@ -1611,11 +1611,11 @@ auto	stod_noexcept(const string &num) noexcept -> double
 				temp.erase(space_pos, 1);
 			} while((space_pos = temp.find(' ', space_pos)) != string::npos);
 
-			result = stod(temp);
+			if(temp.length()) result = stod(temp);
 		}
 		else
 		{
-			result = stod(num);
+			if(num.length()) result = stod(num);
 		}
 	}
 	catch(...)
