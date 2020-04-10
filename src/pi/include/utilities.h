@@ -184,7 +184,7 @@ auto			PrintDateTime(const struct tm &_tm) -> string;
 auto			PrintTime(const struct tm &_tm, string format) -> string;
 auto			GetZipInJSONFormat(string zip_id, CMysql *, CUser *) -> string;
 auto			GetBankInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
-auto			stod_noexcept(const string &) -> double;
+auto			stod_noexcept(const string &) noexcept -> double;
 auto			MaskSymbols(string src, int first_pos, int last_pos) -> string;
 
 // --- DB functions

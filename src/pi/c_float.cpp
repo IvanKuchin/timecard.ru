@@ -13,13 +13,13 @@ auto c_float::FixRussianLocale(string param) -> string
 {
 	locale	loc;
 
-	MESSAGE_DEBUG("c_float", "", "start (" + param + ")")
+	MESSAGE_DEBUG("", "", "start (" + param + ")")
 
 	if(loc.name().find("ru"))
 		if(param.find(".") != string::npos)
 			param.replace(param.find("."), 1, ",");
 
-	MESSAGE_DEBUG("c_float", "", "finish (" + param + ")")
+	MESSAGE_DEBUG("", "", "finish (" + param + ")")
 
 	return param;
 }
@@ -33,7 +33,7 @@ double c_float::RoundWithPrecision(double num, int precision)
 	multiplier = pow(10, precision);
 	result = round(fma(num, multiplier, 0)) / multiplier;
 
-	// MESSAGE_DEBUG("c_float", "", to_string(num) + " -> " + to_string(result));
+	// MESSAGE_DEBUG("", "", to_string(num) + " -> " + to_string(result));
 	return	result;
 */
 	return	num;
@@ -134,7 +134,7 @@ c_float	c_float::operator+(const c_float &term2)
 
 	result = RoundWithPrecision(fma(1, term2.Get(), Get()));
 
-	MESSAGE_DEBUG("c_float", "", to_string(Get()) + " + " + to_string(term2.Get()) + " = " + to_string(result.Get()));
+	MESSAGE_DEBUG("", "", to_string(Get()) + " + " + to_string(term2.Get()) + " = " + to_string(result.Get()));
 
 	return result;
 }
@@ -145,7 +145,7 @@ c_float	c_float::operator-(const c_float &term2)
 
 	result = RoundWithPrecision(fma(-1, term2.Get(), Get()));
 
-	MESSAGE_DEBUG("c_float", "", to_string(Get()) + " - " + to_string(term2.Get()) + " = " + to_string(result.Get()));
+	MESSAGE_DEBUG("", "", to_string(Get()) + " - " + to_string(term2.Get()) + " = " + to_string(result.Get()));
 
 	return result;
 }
@@ -156,7 +156,7 @@ c_float	c_float::operator*(const c_float &term2)
 
 	result = RoundWithPrecision(fma(Get(), term2.Get(), 0));
 
-	MESSAGE_DEBUG("c_float", "", to_string(Get()) + " * " + to_string(term2.Get()) + " = " + to_string(result.Get()));
+	MESSAGE_DEBUG("", "", to_string(Get()) + " * " + to_string(term2.Get()) + " = " + to_string(result.Get()));
 
 	return result;
 }
@@ -167,7 +167,7 @@ c_float	c_float::operator/(const c_float &term2)
 
 	result = RoundWithPrecision(fma(Get(), 1 / term2.Get(), 0));
 
-	MESSAGE_DEBUG("c_float", "", to_string(Get()) + " / " + to_string(term2.Get()) + " = " + to_string(result.Get()));
+	MESSAGE_DEBUG("", "", to_string(Get()) + " / " + to_string(term2.Get()) + " = " + to_string(result.Get()));
 
 	return result;
 }
@@ -177,7 +177,7 @@ c_float	c_float::operator/(const long int &term2)
 	c_float	result;
 
 	result = RoundWithPrecision(Get() / term2);
-	MESSAGE_DEBUG("c_float", "", to_string(Get()) + " / " + to_string(term2) + " = " + to_string(result.Get()));
+	MESSAGE_DEBUG("", "", to_string(Get()) + " / " + to_string(term2) + " = " + to_string(result.Get()));
 
 	return result;
 }
@@ -186,5 +186,21 @@ ostream& operator<<(ostream& os, const c_float &var)
 {
 	os << string(var);
 	return os;
+}
+
+
+double c_float_with_rounding::RoundWithPrecision(double num, int precision)
+{
+
+	double	result;
+	long	multiplier;
+
+	multiplier = pow(10, precision);
+	result = round(fma(num, multiplier, 0)) / multiplier;
+
+	MESSAGE_DEBUG("", "", to_string(num) + " (prec: " + to_string(precision) + ") -> " + to_string(result));
+	return	result;
+
+	// return	num;
 }
 

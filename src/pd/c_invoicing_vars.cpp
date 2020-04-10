@@ -953,7 +953,31 @@ auto	C_Invoicing_Vars::PSoW_Index_VarSet(string psow_id, string index) -> string
 
 auto	C_Invoicing_Vars::CostCenterPayment_Index_VarSet(c_float cost_center_price, string index) -> string
 {
-	auto		error_message = ""s;
+	MESSAGE_DEBUG("", "", "start");
+
+	auto						error_message = ""s;
+	c_float_with_rounding		cost_center_price_local(cost_center_price);
+	c_float						cost_center_vat;
+	c_float						cost_center_total_payment;
+
+
+	if(Get("agency_vat") == "Y") cost_center_vat = cost_center_price_local * c_float_with_rounding(VAT_PERCENTAGE) / c_float_with_rounding(100);
+	cost_center_total_payment = cost_center_price_local + cost_center_vat;
+
+	if(error_message.empty()) error_message = AssignVariableValue("cost_center_price_" + index, string(cost_center_price_local), true);
+	if(error_message.empty()) error_message = AssignVariableValue("cost_center_vat_" + index, string(cost_center_vat), true);
+	if(error_message.empty()) error_message = AssignVariableValue("cost_center_total_" + index, string(cost_center_total_payment), true);
+
+
+	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
+
+	return	error_message;
+}
+
+/*
+auto	C_Invoicing_Vars::CostCenterPayment_Index_VarSet(c_float cost_center_price, string index) -> string
+{
+	auto						error_message = ""s;
 	c_float		cost_center_vat;
 	c_float		cost_center_total_payment;
 
@@ -971,7 +995,7 @@ auto	C_Invoicing_Vars::CostCenterPayment_Index_VarSet(c_float cost_center_price,
 
 	return	error_message;
 }
-
+*/
 auto	C_Invoicing_Vars::SubcontractorPayment_Index_VarSet(c_float subcontractor_price, string index) -> string
 {
 	auto		error_message = ""s;

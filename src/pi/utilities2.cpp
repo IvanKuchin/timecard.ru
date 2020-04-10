@@ -1584,7 +1584,7 @@ string	GetSpelledBankByID(string id, CMysql *db)
 	return result;	
 }
 
-auto	stod_noexcept(const string &num) -> double
+auto	stod_noexcept(const string &num) noexcept -> double
 {
 	auto	result = 0.0;
 	auto	decimal_point = (localeconv()->decimal_point ? localeconv()->decimal_point[0] : ',');
