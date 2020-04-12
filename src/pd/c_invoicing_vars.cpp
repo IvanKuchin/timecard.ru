@@ -959,6 +959,7 @@ auto	C_Invoicing_Vars::CostCenterPayment_Index_VarSet(c_float cost_center_price,
 	
 	// --- having "enforced rounding" here VERY IMPORTANT !!!. 
 	// --- VAT must be calculated from rounded base-price, otherwise it is easy to loose dime
+	// --- more details could be found in SR 438840
 	c_float_with_rounding		cost_center_price_local(cost_center_price);
 	c_float						cost_center_vat;
 	c_float						cost_center_total_payment;
