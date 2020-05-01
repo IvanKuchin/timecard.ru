@@ -3866,6 +3866,7 @@ string	GetTimecardsInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool i
 		string				eventTimestamp;
 	};
 	vector<ItemClass>		itemsList;
+	c_cache_obj				cache_obj;
 
 	MESSAGE_DEBUG("", "", "start");
 
@@ -3899,7 +3900,8 @@ string	GetTimecardsInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool i
 
 			result += "\"id\":\"" + item.id + "\",";
 			result += "\"contract_sow_id\":\"" + item.contract_sow_id + "\",";
-			result += "\"contract_sow\":[" + GetSOWInJSONFormat("SELECT * FROM `contracts_sow` WHERE `id`=\"" + item.contract_sow_id + "\";", db, user, false, false, false) + "],";
+			// result += "\"contract_sow\":[" + GetSOWInJSONFormat_Short("SELECT * FROM `contracts_sow` WHERE `id`=\"" + item.contract_sow_id + "\";", db, user) + "],";
+			result += "\"contract_sow\":[" + GetSOWInJSONFormat("SELECT * FROM `contracts_sow` WHERE `id`=\"" + item.contract_sow_id + "\";", db, user, false, false, false, true) + "],";
 			result += "\"period_start\":\"" + item.period_start + "\",";
 			result += "\"period_end\":\"" + item.period_end + "\",";
 			result += "\"submit_date\":\"" + item.submit_date + "\",";
@@ -4201,7 +4203,7 @@ auto	GetSOWInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include_t
 		string	eventTimestamp;
 	};
 	vector<ItemClass>		itemsList;
-	c_cache_obj				cache_obj;
+	static c_cache_obj		cache_obj;
 
 
 	affected = db->Query(sqlQuery);
@@ -4233,72 +4235,90 @@ auto	GetSOWInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include_t
 
 		for (const auto& item : itemsList)
 		{
-			if(result.length()) result += ",";
-			result +=	"{";
+			auto	temp_sql_cache_query = "" + to_string(include_bt) + "_" + to_string(include_tasks) + "_" + to_string(include_cost_centers) + "_" + to_string(include_subc_company) + "__ SELECT * FROM `contracts_sow` WHERE `id`=\"" + item.id + "\";";
+			auto	temp_result = cache_obj.GetFromCache(temp_sql_cache_query);
 
-			result += "\"id\":\"" + item.id + "\",";
-			result += "\"subcontractor_company_id\":\"" + item.subcontractor_company_id + "\",";
-			result += "\"subcontractor_company\":[" + (include_subc_company ? cache_obj.Get("SELECT * FROM `company` WHERE `isBlocked`='N' AND `id`=\"" + item.subcontractor_company_id + "\";", db, user, GetCompanyListInJSONFormat) : "") + "],";
-			result += "\"agency_company_id\":[" + cache_obj.Get("SELECT * FROM `company` WHERE `isBlocked`='N' AND `id`=\"" + item.agency_company_id + "\";", db, user, GetCompanyListInJSONFormat) + "],";
-			result += "\"company_position_id\":\"" + item.company_position_id + "\",";
-			result += "\"company_positions\":[" + GetCompanyPositionsInJSONFormat("SELECT * FROM `company_position` WHERE `id`=\"" + item.company_position_id + "\";", db, user) + "],";
-			result += "\"start_date\":\"" + item.start_date + "\",";
-			result += "\"end_date\":\"" + item.end_date + "\",";
-			result += "\"payment_period_service\":\"" + item.payment_period_service + "\",";
-			result += "\"payment_period_bt\":\"" + item.payment_period_bt + "\",";
-			result += "\"number\":\"" + item.number + "\",";
-			result += "\"sign_date\":\"" + item.sign_date + "\",";
-			result += "\"timecard_period\":\"" + item.timecard_period + "\",";
-
-			// --- either BT or timecard tasks (could be changed in future)
-			// --- configured to keep MySQL DB load low
-			result += "\"bt_expense_templates\":[";
-			if(include_bt)
+			if(temp_result.length())
 			{
-				// --- this is used to leverage cache in next SQL-query
-				auto number_of_bt_expense_templates = db->Query("SELECT `bt_expense_template_id` FROM `bt_sow_assignment` WHERE `sow_id`=\"" + item.id + "\" ORDER BY `bt_expense_template_id` ASC;");
-				if(number_of_bt_expense_templates)
-				{
-					vector<string>	bt_expense_templates;
-					for(auto i = 0; i < number_of_bt_expense_templates; ++i) { bt_expense_templates.push_back(db->Get(i, 0)); };
-
-					result += cache_obj.Get("SELECT * FROM `bt_expense_templates` WHERE `id` IN (" + join(bt_expense_templates) + ");", db, user, GetBTExpenseTemplatesInJSONFormat);
-				}
 			}
-			result +=  "],";
+			else
+			{
+				temp_result =	"{";
 
-			result += "\"tasks\":[";
-			if(include_tasks)
-				result += GetTimecardTasksInJSONFormat(     // --- no caching, such as same assignment chances are low
-					"SELECT * FROM `timecard_tasks` WHERE "
-							"`id` IN (SELECT `timecard_tasks_id` FROM `timecard_task_assignment` WHERE `contract_sow_id`=\"" + item.id + "\" "
-									");", db, user);
-			result +=  "],";
+				temp_result += "\"id\":\"" + item.id + "\",";
+				temp_result += "\"subcontractor_company_id\":\"" + item.subcontractor_company_id + "\",";
+				temp_result += "\"subcontractor_company\":[" + (include_subc_company ? cache_obj.Get("SELECT * FROM `company` WHERE `isBlocked`='N' AND `id`=\"" + item.subcontractor_company_id + "\";", db, user, GetCompanyListInJSONFormat) : "") + "],";
+				temp_result += "\"agency_company_id\":[" + cache_obj.Get("SELECT * FROM `company` WHERE `isBlocked`='N' AND `id`=\"" + item.agency_company_id + "\";", db, user, GetCompanyListInJSONFormat) + "],";
+				temp_result += "\"company_position_id\":\"" + item.company_position_id + "\",";
+				temp_result += "\"company_positions\":[" + GetCompanyPositionsInJSONFormat("SELECT * FROM `company_position` WHERE `id`=\"" + item.company_position_id + "\";", db, user) + "],";
+				temp_result += "\"start_date\":\"" + item.start_date + "\",";
+				temp_result += "\"end_date\":\"" + item.end_date + "\",";
+				temp_result += "\"payment_period_service\":\"" + item.payment_period_service + "\",";
+				temp_result += "\"payment_period_bt\":\"" + item.payment_period_bt + "\",";
+				temp_result += "\"number\":\"" + item.number + "\",";
+				temp_result += "\"sign_date\":\"" + item.sign_date + "\",";
+				temp_result += "\"timecard_period\":\"" + item.timecard_period + "\",";
 
-			result += "\"bt_approvers\":[" + cache_obj.Get("SELECT * FROM `bt_approvers` WHERE `contract_psow_id` IN (" + Get_PSoWIDsBySoWID_sqlquery(item.id) + ");", db, user, GetApproversInJSONFormat) + "],";
-			result += "\"timecard_approvers\":[" + cache_obj.Get("SELECT * FROM `timecard_approvers` WHERE `contract_psow_id` IN (" + Get_PSoWIDsBySoWID_sqlquery(item.id) + ");", db, user, GetApproversInJSONFormat) + "],";
-			result += "\"subcontractor_create_tasks\":\"" + item.subcontractor_create_tasks + "\",";
-			result += "\"day_rate\":\"" + (user->GetType() == "agency" || user->GetType() == "subcontractor" ? item.day_rate : "") + "\",";
-			result += "\"status\":\"" + item.status + "\",";
-			result += "\"agreement_filename\":\"" + item.agreement_filename + "\",";
-			result += "\"custom_fields\":[" + GetSoWCustomFieldsInJSONFormat("SELECT * FROM `contract_sow_custom_fields` WHERE `contract_sow_id`=\"" + item.id + "\" "
-						+ (user->GetType() == "subcontractor" ? " AND (`visible_by_subcontractor`=\"Y\" OR `editable_by_subcontractor`=\"Y\") " : "")
-						+ ";", db, user)
-						+ "],";
-			result += "\"cost_centers\":[" + (include_cost_centers ? cache_obj.Get(
-																		"SELECT * FROM `cost_centers` WHERE `id` IN ("
-																			"SELECT `cost_center_id` FROM `cost_center_assignment` WHERE `timecard_customer_id` IN ("
-																				"SELECT `timecard_customers_id` FROM `timecard_projects` WHERE `id` IN ("
-																					"SELECT `timecard_projects_id` FROM `timecard_tasks` WHERE `id` IN ("
-																						"SELECT `timecard_tasks_id` FROM `timecard_task_assignment` WHERE `contract_sow_id`=\"" + item.id + "\""
+				// --- either BT or timecard tasks (could be changed in future)
+				// --- configured to keep MySQL DB load low
+				temp_result += "\"bt_expense_templates\":[";
+				if(include_bt)
+				{
+					// --- this is used to leverage cache in next SQL-query
+					auto number_of_bt_expense_templates = db->Query("SELECT `bt_expense_template_id` FROM `bt_sow_assignment` WHERE `sow_id`=\"" + item.id + "\" ORDER BY `bt_expense_template_id` ASC;");
+					if(number_of_bt_expense_templates)
+					{
+						vector<string>	bt_expense_templates;
+						for(auto i = 0; i < number_of_bt_expense_templates; ++i) { bt_expense_templates.push_back(db->Get(i, 0)); };
+
+						temp_result += cache_obj.Get("SELECT * FROM `bt_expense_templates` WHERE `id` IN (" + join(bt_expense_templates) + ");", db, user, GetBTExpenseTemplatesInJSONFormat);
+					}
+				}
+				temp_result +=  "],";
+
+				temp_result += "\"tasks\":[";
+				if(include_tasks)
+					temp_result += GetTimecardTasksInJSONFormat(     // --- no caching, such as same assignment chances are low
+						"SELECT * FROM `timecard_tasks` WHERE "
+								"`id` IN (SELECT `timecard_tasks_id` FROM `timecard_task_assignment` WHERE `contract_sow_id`=\"" + item.id + "\" "
+										");", db, user);
+				temp_result +=  "],";
+
+				temp_result += "\"bt_approvers\":[" + cache_obj.Get("SELECT * FROM `bt_approvers` WHERE `contract_psow_id` IN (" + Get_PSoWIDsBySoWID_sqlquery(item.id) + ");", db, user, GetApproversInJSONFormat) + "],";
+				temp_result += "\"timecard_approvers\":[" + cache_obj.Get("SELECT * FROM `timecard_approvers` WHERE `contract_psow_id` IN (" + Get_PSoWIDsBySoWID_sqlquery(item.id) + ");", db, user, GetApproversInJSONFormat) + "],";
+				temp_result += "\"subcontractor_create_tasks\":\"" + item.subcontractor_create_tasks + "\",";
+				temp_result += "\"day_rate\":\"" + (user->GetType() == "agency" || user->GetType() == "subcontractor" ? item.day_rate : "") + "\",";
+				temp_result += "\"status\":\"" + item.status + "\",";
+				temp_result += "\"agreement_filename\":\"" + item.agreement_filename + "\",";
+				temp_result += "\"custom_fields\":[" + GetSoWCustomFieldsInJSONFormat("SELECT * FROM `contract_sow_custom_fields` WHERE `contract_sow_id`=\"" + item.id + "\" "
+							+ (user->GetType() == "subcontractor" ? " AND (`visible_by_subcontractor`=\"Y\" OR `editable_by_subcontractor`=\"Y\") " : "")
+							+ ";", db, user)
+							+ "],";
+				temp_result += "\"cost_centers\":[" + (include_cost_centers ? cache_obj.Get(
+																			"SELECT * FROM `cost_centers` WHERE `id` IN ("
+																				"SELECT `cost_center_id` FROM `cost_center_assignment` WHERE `timecard_customer_id` IN ("
+																					"SELECT `timecard_customers_id` FROM `timecard_projects` WHERE `id` IN ("
+																						"SELECT `timecard_projects_id` FROM `timecard_tasks` WHERE `id` IN ("
+																							"SELECT `timecard_tasks_id` FROM `timecard_task_assignment` WHERE `contract_sow_id`=\"" + item.id + "\""
+																						")"
 																					")"
 																				")"
-																			")"
-																		")", db, user, GetCostCentersInJSONFormat) : "") + "],";
-			result += "\"psow\":[" + (include_cost_centers ? GetPSoWInJSONFormat("SELECT * FROM `contracts_psow` WHERE `contract_sow_id`=\"" + item.id + "\";", db, user) : "") + "],";
-			result += "\"eventTimestamp\":\"" + item.eventTimestamp + "\"";
+																			")", db, user, GetCostCentersInJSONFormat) : "") + "],";
+				temp_result += "\"psow\":[" + (include_cost_centers ? GetPSoWInJSONFormat("SELECT * FROM `contracts_psow` WHERE `contract_sow_id`=\"" + item.id + "\";", db, user) : "") + "],";
+				temp_result += "\"eventTimestamp\":\"" + item.eventTimestamp + "\"";
 
-			result +=	"}";
+				temp_result +=	"}";
+
+				// --- update cache object with fake string
+				// --- cache build with additional parameters to avoid wrong pick
+				// --- for example: 
+				// --- 1_1_1_0__ SELECT * FROM `contra..........
+				// --- 1_0_1_1__ SELECT * FROM `contra..........
+				cache_obj.AddToCache(temp_sql_cache_query, temp_result);
+			}
+
+			if(result.length()) result += ",";
+			result += temp_result;
 		}
 	}
 	else
@@ -4717,6 +4737,19 @@ bool isTimecardEntryEmpty(string timereports)
 	}
 
 	return	result;
+}
+
+auto RemoveTimecardLines(string timecard_id, CMysql *db) -> string
+{
+	auto	error_description = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	db->Query("DELETE FROM `timecard_lines` WHERE `timecard_id`=" + quoted(timecard_id) + ";");
+
+	MESSAGE_DEBUG("", "", "finish (error_description = " + error_description + ")");
+
+	return	error_description;
 }
 
 bool isUserAssignedToSoW(string user_id, string sow_id, CMysql *db)

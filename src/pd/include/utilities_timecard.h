@@ -45,6 +45,7 @@ auto			GetTimecardsInJSONFormat(string sqlQuery, CMysql *, CUser *, bool isExten
 auto			GetServiceBTInvoicesInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetSoWCustomFieldsInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetSOWInJSONFormat(string sqlQuery, CMysql *, CUser *, bool include_tasks = true, bool include_bt = false, bool include_cost_centers = false, bool include_subc_company = false) -> string;
+auto			GetSOWInJSONFormat_Short(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetTemplateCompanyAgreementFiles(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetTemplateSoWAgreementFiles(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetCountryListInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
@@ -86,6 +87,7 @@ auto			GetApproversInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetApproversInJSONFormat(string sqlQuery, CMysql *, CUser *, bool include_psow) -> string;
 auto			GetAbsenceListInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetAbsenceTypesInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
+auto			RemoveTimecardLines(string timecard_id, CMysql *) -> string;
 
 // --- notification spellers
 auto			GetSpelledTimecardCustomerByID(string id, CMysql *) -> string;

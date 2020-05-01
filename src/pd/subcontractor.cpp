@@ -916,50 +916,64 @@ int main()
 					{
 						if(timecard_id.length() && timecard_status.length() && agency_id.length())
 						{
-
-							// --- save timeentries in DB
-							for(auto item: itemsList)
+							error_description = RemoveTimecardLines(timecard_id, &db);
+							if(error_description.empty())
 							{
-								if(isTimecardEntryEmpty(item.timereports))
+								// --- save timeentries in DB
+								for(auto item: itemsList)
 								{
-									MESSAGE_DEBUG("", action, "timecard entry (" + item.timereports + ") is empty, don't add it to DB");
-								}
-								else
-								{
-									string		task_id = GetTaskIDFromSOW(item.customer, item.project, item.task, sow_id, &db);
-									string		timecard_line_id;
-
-									if(task_id.empty())
+									if(isTimecardEntryEmpty(item.timereports))
 									{
-										MESSAGE_DEBUG("", action, "task (" + item.customer + TIMECARD_ENTRY_TITLE_SEPARATOR + item.project + TIMECARD_ENTRY_TITLE_SEPARATOR + item.task + ") doesn't assigned to SoW (" + sow_id + ")");
+										MESSAGE_DEBUG("", action, "timecard entry (" + item.timereports + ") is empty, don't add it to DB");
+									}
+									else
+									{
+										string		task_id = GetTaskIDFromSOW(item.customer, item.project, item.task, sow_id, &db);
+										string		timecard_line_id;
 
-										if(isSoWAllowedToCreateTask(sow_id, &db))
+										if(task_id.empty())
 										{
-											if(db.Query("SELECT `start_date`, `end_date` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";"))
+											MESSAGE_DEBUG("", action, "task (" + item.customer + TIMECARD_ENTRY_TITLE_SEPARATOR + item.project + TIMECARD_ENTRY_TITLE_SEPARATOR + item.task + ") doesn't assigned to SoW (" + sow_id + ")");
+
+											if(isSoWAllowedToCreateTask(sow_id, &db))
 											{
-												string	sow_start_date = db.Get(0, "start_date");
-												string	sow_end_date = db.Get(0, "end_date");
-												string	task_assignment_id = "";
-												bool	notify_about_task_creation = false;
-
-												task_id = GetTaskIDFromAgency(item.customer, item.project, item.task, agency_id, &db);
-												if(task_id.empty())
+												if(db.Query("SELECT `start_date`, `end_date` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";"))
 												{
-													task_id = CreateTaskBelongsToAgency(item.customer, item.project, item.task, agency_id, &db);
-													notify_about_task_creation = true;
-												}
-												else
-												{
-													MESSAGE_DEBUG("", action, "Customer/Project/Task already exists for this agency.id(" + agency_id + ")");
-												}
+													string	sow_start_date = db.Get(0, "start_date");
+													string	sow_end_date = db.Get(0, "end_date");
+													string	task_assignment_id = "";
+													bool	notify_about_task_creation = false;
 
-												task_assignment_id = CreateTaskAssignment(task_id, sow_id, sow_start_date, sow_end_date, &db, &user);
-
-												if(task_assignment_id.length())
-												{
-													if(notify_about_task_creation)
+													task_id = GetTaskIDFromAgency(item.customer, item.project, item.task, agency_id, &db);
+													if(task_id.empty())
 													{
-														if(GeneralNotifySoWContractPartiesAboutChanges("AJAX_addTask", task_id, sow_id, "", item.task, &db, &user))
+														task_id = CreateTaskBelongsToAgency(item.customer, item.project, item.task, agency_id, &db);
+														notify_about_task_creation = true;
+													}
+													else
+													{
+														MESSAGE_DEBUG("", action, "Customer/Project/Task already exists for this agency.id(" + agency_id + ")");
+													}
+
+													task_assignment_id = CreateTaskAssignment(task_id, sow_id, sow_start_date, sow_end_date, &db, &user);
+
+													if(task_assignment_id.length())
+													{
+														if(notify_about_task_creation)
+														{
+															if(GeneralNotifySoWContractPartiesAboutChanges("AJAX_addTask", task_id, sow_id, "", item.task, &db, &user))
+															{
+															}
+															else
+															{
+																MESSAGE_ERROR("", "", "fail to notify SoW parties");
+															}
+														}
+														else
+														{
+															MESSAGE_DEBUG("", "", "no notification about task creation");
+														}
+														if(GeneralNotifySoWContractPartiesAboutChanges("AJAX_addTaskAssignment", task_assignment_id, sow_id, "", item.customer + TIMECARD_ENTRY_TITLE_SEPARATOR + item.project + TIMECARD_ENTRY_TITLE_SEPARATOR + item.task + " ( с " + sow_start_date + " по " + sow_end_date + ")", &db, &user))
 														{
 														}
 														else
@@ -969,98 +983,92 @@ int main()
 													}
 													else
 													{
-														MESSAGE_DEBUG("", "", "no notification about task creation");
-													}
-													if(GeneralNotifySoWContractPartiesAboutChanges("AJAX_addTaskAssignment", task_assignment_id, sow_id, "", item.customer + TIMECARD_ENTRY_TITLE_SEPARATOR + item.project + TIMECARD_ENTRY_TITLE_SEPARATOR + item.task + " ( с " + sow_start_date + " по " + sow_end_date + ")", &db, &user))
-													{
-													}
-													else
-													{
-														MESSAGE_ERROR("", "", "fail to notify SoW parties");
+														MESSAGE_DEBUG("", action, "fail to create assignment sow.id(" + sow_id + ") task.id(" + task_id + ")");
+														error_description = "Неудалось создать назначение";
+														break;
 													}
 												}
 												else
 												{
-													MESSAGE_DEBUG("", action, "fail to create assignment sow.id(" + sow_id + ") task.id(" + task_id + ")");
-													error_description = "Неудалось создать назначение";
+													MESSAGE_ERROR("", action, "sow(" + sow_id + ") start and end period can't be defined");
+													error_description = "Ошибка БД";
 													break;
 												}
 											}
 											else
 											{
-												MESSAGE_ERROR("", action, "sow(" + sow_id + ") start and end period can't be defined");
-												error_description = "Ошибка БД";
+												MESSAGE_ERROR("", action, "SoW(" + sow_id + ") doesn't allows create tasks or consistensy issue");
+												error_description = "SoW не позволяет создавать новые задачи";
 												break;
 											}
 										}
-										else
+
+										if((timecard_status == "saved") || (timecard_status == "rejected"))
 										{
-											MESSAGE_ERROR("", action, "SoW(" + sow_id + ") doesn't allows create tasks or consistensy issue");
-											error_description = "SoW не позволяет создавать новые задачи";
-											break;
-										}
-									}
-
-									if((timecard_status == "saved") || (timecard_status == "rejected"))
-									{
-										error_description = isValidToReportTime(timecard_id, task_id, item.timereports, &db, &user);
-										if(error_description.empty())
-										{
-
-										// --- update DB with timeentries
-											timecard_line_id = GetTimecardLineID(timecard_id, task_id, &db);
-											if(timecard_line_id.length())
+											error_description = isValidToReportTime(timecard_id, task_id, item.timereports, &db, &user);
+											if(error_description.empty())
 											{
-												// --- timeentry exists and need to be updated
-												db.Query("UPDATE `timecard_lines` SET `row`=\"" + item.timereports + "\" WHERE `id`=\"" + timecard_line_id + "\";");
-												if(db.isError())
-												{
-													MESSAGE_ERROR("", action, "DB INSERT issue: (" + db.GetErrorMessage() + ")");
-													error_description = "ошибка БД";
-													break;
-												}
-											}
-											else
-											{
-												// --- timeentry doesn't exists and need to be created
 
-												if(timecard_id.length() && task_id.length())
+											// --- update DB with timeentries
+												timecard_line_id = GetTimecardLineID(timecard_id, task_id, &db);
+												if(timecard_line_id.length())
 												{
-													long int temp;
-
-													temp = db.InsertQuery("INSERT INTO `timecard_lines` SET "
-																"`timecard_id`=\"" + timecard_id + "\","
-																"`timecard_task_id`=\"" + task_id + "\","
-																"`row`=\"" + item.timereports + "\""
-																";");
-													if(!temp)
+													// --- timeentry exists and need to be updated
+													db.Query("UPDATE `timecard_lines` SET `row`=\"" + item.timereports + "\" WHERE `id`=\"" + timecard_line_id + "\";");
+													if(db.isError())
 													{
 														MESSAGE_ERROR("", action, "DB INSERT issue: (" + db.GetErrorMessage() + ")");
 														error_description = "ошибка БД";
 														break;
 													}
 												}
+												else
+												{
+													// --- timeentry doesn't exists and need to be created
+
+													if(timecard_id.length() && task_id.length())
+													{
+														long int temp;
+
+														temp = db.InsertQuery("INSERT INTO `timecard_lines` SET "
+																	"`timecard_id`=\"" + timecard_id + "\","
+																	"`timecard_task_id`=\"" + task_id + "\","
+																	"`row`=\"" + item.timereports + "\""
+																	";");
+														if(!temp)
+														{
+															MESSAGE_ERROR("", action, "DB INSERT issue: (" + db.GetErrorMessage() + ")");
+															error_description = "ошибка БД";
+															break;
+														}
+													}
+												}
 											}
+											else
+											{
+												MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") can't report time to task.id(" + task_id + ") in timecard_id(" + timecard_id + "). Timereport validity failed.");
+												break;
+											}
+										}
+										else if((timecard_status == "submit") || (timecard_status == "approved"))
+										{
+											MESSAGE_DEBUG("", action, "timecard_id(" + timecard_id + ") already submit, you can't change it");
+											error_description = "Таймкарта уже отправлена, изменить нельзя";
+											break;
 										}
 										else
 										{
-											MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") can't report time to task.id(" + task_id + ") in timecard_id(" + timecard_id + "). Timereport validity failed.");
+											MESSAGE_ERROR("", action, "unknown timecard_id(" + timecard_id + ") status (" + timecard_status + ")");
+											error_description = "Ошибка таймкарты";
 											break;
 										}
 									}
-									else if((timecard_status == "submit") || (timecard_status == "approved"))
-									{
-										MESSAGE_DEBUG("", action, "timecard_id(" + timecard_id + ") already submit, you can't change it");
-										error_description = "Таймкарта уже отправлена, изменить нельзя";
-										break;
-									}
-									else
-									{
-										MESSAGE_ERROR("", action, "unknown timecard_id(" + timecard_id + ") status (" + timecard_status + ")");
-										error_description = "Ошибка таймкарты";
-										break;
-									}
 								}
+							}
+							else
+							{
+								error_description = gettext("SQL syntax error");
+								MESSAGE_ERROR("", action, "timecard_id(" + timecard_id + ") or status (" + timecard_status + ") or agency_id(" + agency_id + ") is empty");
 							}
 						}
 						else

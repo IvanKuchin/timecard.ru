@@ -1,10 +1,9 @@
 #include "c_cache_obj.h"
 
-auto c_cache_obj::Get(string db_query, CMysql *db, CUser *user, string (*func)(string, CMysql *, CUser *)) -> string
-{
-	auto	result = cache[db_query];
 
-	MESSAGE_DEBUG("", "", "start (" + db_query + ")");
+auto c_cache_obj::GetFromCache(string _key) -> string
+{
+	auto	result = cache[_key];
 
 	if(result.length())
 	{
@@ -12,13 +11,52 @@ auto c_cache_obj::Get(string db_query, CMysql *db, CUser *user, string (*func)(s
 	}
 	else
 	{
+		cache_misses++;
+	}
+
+	return result;
+}
+auto c_cache_obj::InCache(string _key) -> bool
+{
+	auto	result = cache[_key];
+
+	return result.length() > 0;
+}
+
+auto c_cache_obj::AddToCache(string _key, string _value) -> string
+{
+	auto error_message = ""s;
+
+	if(_key.length())
+	{
+		cache[_key] = _value;
+	}
+	else
+	{
+		error_message = "cache key is empty";
+		MESSAGE_ERROR("", "", error_message);
+	}
+
+	return error_message;
+}
+
+auto c_cache_obj::Get(string db_query, CMysql *db, CUser *user, string (*func)(string, CMysql *, CUser *)) -> string
+{
+	MESSAGE_DEBUG("", "", "start (" + db_query + ")");
+
+	auto	result = GetFromCache(db_query);
+
+	if(result.length())
+	{
+	}
+	else
+	{
 		if(db)
 		{
 			if(user)
 			{
-				cache[db_query] = func(db_query, db, user);
-				result = cache[db_query];
-				cache_misses++;
+				result = func(db_query, db, user);
+				AddToCache(db_query, result);
 			}
 			else
 			{

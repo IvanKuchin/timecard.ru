@@ -20,6 +20,10 @@ class c_cache_obj
 		unsigned int					cache_hits = 0;
 
 	public:
+		auto		AddToCache(string _key, string _value) -> string;
+		auto		GetFromCache(string _key) -> string; // --- do not call it randomly, it will increase cache_hits/cache_misses
+		auto		InCache(string _key) -> bool;
+
 		auto		Get(string db_query, CMysql *db, CUser *user, string (*func)(string, CMysql *, CUser *)) -> string;
 
 					~c_cache_obj();
