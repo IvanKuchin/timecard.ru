@@ -28,10 +28,10 @@ echo "select \`id\` from \`feed_images\` where \`setID\`='0';" | mysql -u ${PROJ
 echo --------------- ${MAIN_DOMAIN_NAME} log: unknown business trip localities [need to add those to geo_xxxxxx tables]
 echo "select \`locality\` from \`geo_locality_unknown\`;" | mysql -u ${PROJECT_NAME}RO -p${PROJECT_NAME}RO ${MAIN_DOMAIN_NAME} 2>/dev/null | grep -v id
 
-echo --------------- ${MAIN_DOMAIN_NAME} log: # of open tickets
+echo --------------- ${MAIN_DOMAIN_NAME} log: N of open tickets
 echo "SELECT COUNT(*) FROM \`helpdesk_ticket_history_last_case_state_view\` WHERE \`state\`!=\"closed\";" | mysql -u ${PROJECT_NAME}RO -p${PROJECT_NAME}RO ${MAIN_DOMAIN_NAME} 2>/dev/null  | tail -1
 
-echo --------------- ${MAIN_DOMAIN_NAME} log: # of unassigned tickets
+echo --------------- ${MAIN_DOMAIN_NAME} log: N of unassigned tickets
 echo "SELECT COUNT(*) FROM \`helpdesk_ticket_history_last_case_state_view\` WHERE \`state\`=\"new\";" | mysql -u ${PROJECT_NAME}RO -p${PROJECT_NAME}RO ${MAIN_DOMAIN_NAME} 2>/dev/null  | tail -1
 
 echo --------------- ${MAIN_DOMAIN_NAME} log: demos requested
