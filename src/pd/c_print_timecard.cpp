@@ -707,7 +707,7 @@ auto	C_Print_Timecard::__HPDF_MoveLineDown(int line_decrement) -> string
 	return error_message;
 }
 
-auto	C_Print_Timecard::__HPDF_StartTable() -> string
+auto	C_Print_Timecard::__HPDF_StartTable(int line_decrement) -> string
 {
 	auto	error_message = ""s;
 
@@ -717,7 +717,7 @@ auto	C_Print_Timecard::__HPDF_StartTable() -> string
 
 	if((error_message = __HPDF_DrawTimecardHorizontalLine()).empty())
 	{
-		if((error_message = __HPDF_MoveTableLineDown()).empty())
+		if((error_message = __HPDF_MoveTableLineDown(line_decrement)).empty())
 		{
 		}
 		else
@@ -805,7 +805,7 @@ auto	C_Print_Timecard::__HPDF_MoveTableLineDown(int line_decrement) -> string
 {
 	auto	error_message = ""s;
 
-	MESSAGE_DEBUG("", "", "start");
+	MESSAGE_DEBUG("", "", "start (" + to_string(line_decrement) + ")");
 
 
 	if((__pdf_line - line_decrement) < HPDF_FIELD_BOTTOM)
@@ -816,7 +816,7 @@ auto	C_Print_Timecard::__HPDF_MoveTableLineDown(int line_decrement) -> string
 		{
 			if((error_message = __HPDF_MoveLineDown(line_decrement)).empty())
 			{
-				if((error_message = __HPDF_StartTable()).empty())
+				if((error_message = __HPDF_StartTable(line_decrement)).empty())
 				{
 
 				}

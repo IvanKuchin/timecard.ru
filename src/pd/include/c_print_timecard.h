@@ -116,7 +116,8 @@ class C_Print_Timecard
 		auto		__HPDF_TableGetXOffset() -> HPDF_REAL;
 		auto		__HPDF_TableGetTitleWidth() -> HPDF_REAL;
 		auto		__HPDF_TableDaysGetXOffset() -> HPDF_REAL;
-		auto		__HPDF_StartTable() -> string;
+		auto		__HPDF_StartTable() -> string					{ return __HPDF_StartTable(__pdf_table_line_height); };
+		auto		__HPDF_StartTable(int line_increment) -> string;
 		auto		__HPDF_StopTable() -> string;
 		auto		__HPDF_GetTimecardTableXByPercentage(double percent) -> double;
 		auto		__HPDF_DrawTimecardVerticalLine(double x) -> string;

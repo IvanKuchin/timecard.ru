@@ -7,10 +7,10 @@ string C_Timecard_To_Print::AddTimecardLine(string customer, string project, str
 
 	MESSAGE_DEBUG("", "", "start");
 
-	temp_line.customer = customer;
-	temp_line.project = project;
-	temp_line.task = task;
-	temp_line.hours = hours;
+	temp_line.customer	= customer;
+	temp_line.project	= project;
+	temp_line.task		= task;
+	temp_line.hours		= hours;
 
 	timecard_lines.push_back(temp_line);
 

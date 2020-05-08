@@ -25,7 +25,7 @@ static auto GetTimecardLines_By_TimecardID(string timecard_id, CMysql *db, CUser
 				{
 					for(int i = 0; i < affected; ++i)
 					{
-						auto	temp = make_tuple<string, string, string, string>(db->Get(i, "customer"), db->Get(i, "project"), db->Get(i, "task"), db->Get(i, "hours"));
+						auto	temp = make_tuple<string, string, string, string>(ConvertHTMLToText(db->Get(i, "customer")), ConvertHTMLToText(db->Get(i, "project")), ConvertHTMLToText(db->Get(i, "task")), db->Get(i, "hours"));
 						result.push_back(temp);
 					}
 				}
