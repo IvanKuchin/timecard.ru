@@ -4816,6 +4816,54 @@ pair<struct tm, struct tm> GetFirstAndLastMonthDaysByDate(const struct tm &_date
 	return make_pair(start_of_mon, end_of_mon);
 }
 
+pair<struct tm, struct tm> GetFirstAndLastWeekDaysByDate(const struct tm &_date)
+{
+	struct tm end_of_week, start_of_week;
+
+	MESSAGE_DEBUG("", "", "start(" + to_string(_date.tm_mday) + "/" + to_string(_date.tm_mon + 1) + "/" + to_string(_date.tm_year + 1900) + ")");
+
+	start_of_week.tm_sec	= 0;   // seconds of minutes from 0 to 61
+	start_of_week.tm_min	= 0;   // minutes of hour from 0 to 59
+	start_of_week.tm_hour	= 0;  // hours of day from 0 to 24
+	start_of_week.tm_mday	= 0;  // day of month from 1 to 31
+	start_of_week.tm_mon	= 0;   // month of year from 0 to 11
+	start_of_week.tm_year	= 0;  // year since 1900
+	start_of_week.tm_wday	= 0;  // days since sunday
+	start_of_week.tm_yday	= 0;  // days since January 1st
+	start_of_week.tm_isdst	= 0; // hours of daylight savings time
+
+	end_of_week.tm_sec		= 0;   // seconds of minutes from 0 to 61
+	end_of_week.tm_min		= 0;   // minutes of hour from 0 to 59
+	end_of_week.tm_hour		= 0;  // hours of day from 0 to 24
+	end_of_week.tm_mday		= 0;  // day of month from 1 to 31
+	end_of_week.tm_mon		= 0;   // month of year from 0 to 11
+	end_of_week.tm_year		= 0;  // year since 1900
+	end_of_week.tm_wday		= 0;  // days since sunday
+	end_of_week.tm_yday		= 0;  // days since January 1st
+	end_of_week.tm_isdst	= 0; // hours of daylight savings time
+
+	start_of_week.tm_year	= _date.tm_year;
+	start_of_week.tm_mon	= _date.tm_mon;
+	start_of_week.tm_mday	= _date.tm_mday;
+
+	end_of_week.tm_year		= _date.tm_year;
+	end_of_week.tm_mon		= _date.tm_mon;
+	end_of_week.tm_mday		= _date.tm_mday;
+
+	mktime(&start_of_week);
+	mktime(&end_of_week);
+
+	start_of_week.tm_mday	= start_of_week.tm_mday - start_of_week.tm_wday + 1;
+
+	end_of_week.tm_mday		= end_of_week.tm_mday - end_of_week.tm_wday + 7;
+
+	mktime(&start_of_week);
+	mktime(&end_of_week);
+
+	MESSAGE_DEBUG("", "", "finish (" + to_string(start_of_week.tm_mday) + "/" + to_string(start_of_week.tm_mon + 1) + "/" + to_string(start_of_week.tm_year + 1900) + " - " + to_string(end_of_week.tm_mday) + "/" + to_string(end_of_week.tm_mon + 1) + "/" + to_string(end_of_week.tm_year + 1900) + ")");
+
+	return make_pair(start_of_week, end_of_week);
+}
 
 pair<struct tm, struct tm> GetFirstAndLastDateOfThisMonth()
 {
@@ -4881,6 +4929,72 @@ pair<struct tm, struct tm> GetFirstAndLastDateOfLastMonth()
 	MESSAGE_DEBUG("", "", "finish");
 
 	return GetFirstAndLastMonthDaysByDate(_date);
+}
+
+pair<struct tm, struct tm> GetFirstAndLastDateOfThisWeek()
+{
+	time_t rawtime;
+	struct tm * timeinfo;
+
+	struct tm _date;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	_date.tm_sec	= 0;   // seconds of minutes from 0 to 61
+	_date.tm_min	= 0;   // minutes of hour from 0 to 59
+	_date.tm_hour	= 0;  // hours of day from 0 to 24
+	_date.tm_mday	= 0;  // day of month from 1 to 31
+	_date.tm_mon	= 0;   // month of year from 0 to 11
+	_date.tm_year	= 0;  // year since 1900
+	_date.tm_wday	= 0;  // days since sunday
+	_date.tm_yday	= 0;  // days since January 1st
+	_date.tm_isdst	= 0; // hours of daylight savings time
+
+	time ( &rawtime );
+	timeinfo = localtime ( &rawtime );
+
+	_date.tm_year	= timeinfo->tm_year;
+	_date.tm_mon	= timeinfo->tm_mon;
+	_date.tm_mday	= timeinfo->tm_mday;
+
+	mktime(&_date);
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return GetFirstAndLastWeekDaysByDate(_date);
+}
+
+pair<struct tm, struct tm> GetFirstAndLastDateOfLastWeek()
+{
+	time_t rawtime;
+	struct tm * timeinfo;
+
+	struct tm _date;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	_date.tm_sec	= 0;   // seconds of minutes from 0 to 61
+	_date.tm_min	= 0;   // minutes of hour from 0 to 59
+	_date.tm_hour	= 0;  // hours of day from 0 to 24
+	_date.tm_mday	= 0;  // day of month from 1 to 31
+	_date.tm_mon	= 0;   // month of year from 0 to 11
+	_date.tm_year	= 0;  // year since 1900
+	_date.tm_wday	= 0;  // days since sunday
+	_date.tm_yday	= 0;  // days since January 1st
+	_date.tm_isdst	= 0; // hours of daylight savings time
+
+	time ( &rawtime );
+	timeinfo = localtime ( &rawtime );
+
+	_date.tm_year	= timeinfo->tm_year;
+	_date.tm_mon	= timeinfo->tm_mon;
+	_date.tm_mday	= timeinfo->tm_mday - 7;
+
+	mktime(&_date);
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return GetFirstAndLastWeekDaysByDate(_date);
 }
 
 /*

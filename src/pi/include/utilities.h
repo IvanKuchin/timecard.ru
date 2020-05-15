@@ -167,8 +167,13 @@ auto			RemovePhoneConfirmationCodes(string sessid, CMysql *) -> string;
 
 // --- date functions
 pair<struct tm, struct tm> GetFirstAndLastMonthDaysByDate(const struct tm &_date);
+pair<struct tm, struct tm> GetFirstAndLastWeekDaysByDate (const struct tm &_date);
+
 pair<struct tm, struct tm> GetFirstAndLastDateOfLastMonth();
 pair<struct tm, struct tm> GetFirstAndLastDateOfThisMonth();
+pair<struct tm, struct tm> GetFirstAndLastDateOfLastWeek();
+pair<struct tm, struct tm> GetFirstAndLastDateOfThisWeek();
+
 struct tm		GetTMObject(string date);
 auto			GetSpellingDate(long int seconds_since_epoch) -> string;
 auto			GetSpellingFormattedDate(string date, string format) -> string;

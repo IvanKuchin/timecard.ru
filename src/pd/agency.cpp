@@ -981,6 +981,104 @@ int main(void)
 			MESSAGE_DEBUG("", action, "finish");
 		}
 
+		if(action == "AJAX_getDashboardSubmitTimecardsThisWeek")
+		{
+			string			strPageToGet, strFriendsOnSinglePage;
+			ostringstream	ostResult;
+
+			MESSAGE_DEBUG("", action, "start");
+
+			ostResult.str("");
+			{
+				string		template_name = "json_response.htmlt";
+				int			affected = db.Query("" + Get_CompanyIDByUserID_sqlquery(user.GetID()) + ";");
+
+				if(affected)
+				{
+					string		company_id= db.Get(0, "company_id");
+					bool		successFlag = true;
+					string		pending_timecards = "";
+
+					if(successFlag)
+					{
+						ostResult << "{"
+										"\"result\":\"success\","
+										"\"number_of_submit_timecards\":" << GetNumberOfApprovedTimecardsThisWeek(&db, &user) << ","
+										"\"total_number_of_sow\":" << GetNumberOfSoWActiveThisWeek(&db, &user) << ""
+									"}";
+					}
+					else
+					{
+						MESSAGE_ERROR("", action, "dashboard data not gathered completely");
+						ostResult << "{\"result\":\"error\",\"description\":\"Ошибка построения панели управления\"}";
+					}
+				}
+				else
+				{
+					MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't owns company");
+					ostResult << "{\"result\":\"error\",\"description\":\"Вы не работаете ни в каком агенстве\"}";
+				}
+
+				indexPage.RegisterVariableForce("result", ostResult.str());
+
+				if(!indexPage.SetTemplate(template_name))
+				{
+					MESSAGE_ERROR("", action, "can't find template " + template_name);
+				}
+			}
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
+
+		if(action == "AJAX_getDashboardSubmitTimecardsLastWeek")
+		{
+			string			strPageToGet, strFriendsOnSinglePage;
+			ostringstream	ostResult;
+
+			MESSAGE_DEBUG("", action, "start");
+
+			ostResult.str("");
+			{
+				string		template_name = "json_response.htmlt";
+				int			affected = db.Query("" + Get_CompanyIDByUserID_sqlquery(user.GetID()) + ";");
+
+				if(affected)
+				{
+					string		company_id= db.Get(0, "company_id");
+					bool		successFlag = true;
+					string		pending_timecards = "";
+
+					if(successFlag)
+					{
+						ostResult << "{"
+										"\"result\":\"success\","
+										"\"number_of_submit_timecards\":" << GetNumberOfApprovedTimecardsLastWeek(&db, &user) << ","
+										"\"total_number_of_sow\":" << GetNumberOfSoWActiveLastWeek(&db, &user) << ""
+									"}";
+					}
+					else
+					{
+						MESSAGE_ERROR("", action, "dashboard data not gathered completely");
+						ostResult << "{\"result\":\"error\",\"description\":\"Ошибка построения панели управления\"}";
+					}
+				}
+				else
+				{
+					MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't owns company");
+					ostResult << "{\"result\":\"error\",\"description\":\"Вы не работаете ни в каком агенстве\"}";
+				}
+
+				indexPage.RegisterVariableForce("result", ostResult.str());
+
+				if(!indexPage.SetTemplate(template_name))
+				{
+					MESSAGE_ERROR("", action, "can't find template " + template_name);
+				}
+			}
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
+
 		if(action == "AJAX_getSoWList")
 		{
 			ostringstream	ostResult;

@@ -6114,7 +6114,7 @@ string GetAgencyObjectInJSONFormat(string agency_id, bool include_tasks, bool in
 	return result;	
 }
 
-static auto __GetNumberOfTimecards(const string &timecard_status, const string &period_start, const string &period_end, CMysql *db, CUser *user) -> string
+static auto __GetNumberOfTimecards(const string &timecard_status, const string &period_type, const string &period_start, const string &period_end, CMysql *db, CUser *user) -> string
 {
 	MESSAGE_DEBUG("", "", "start");
 
@@ -6130,7 +6130,10 @@ static auto __GetNumberOfTimecards(const string &timecard_status, const string &
 							"`period_end`<=\"" + period_end + "\" "
 							"AND "
 							"`contract_sow_id` IN ("
-								"SELECT `id` FROM `contracts_sow` WHERE `agency_company_id`=(" + Get_CompanyIDByUserID_sqlquery(user->GetID()) + ""
+								"SELECT `id` FROM `contracts_sow` WHERE "
+									"`timecard_period`=" + quoted(period_type) + " "
+									"AND "
+									"`agency_company_id`=(" + Get_CompanyIDByUserID_sqlquery(user->GetID()) + ""
 							")"
 						");"))
 		{
@@ -6159,7 +6162,7 @@ auto GetNumberOfApprovedTimecardsThisMonth(CMysql *db, CUser *user) -> string
 
 	tie(period_start, period_end) = GetFirstAndLastDateOfThisMonth();
 
-	auto	result = __GetNumberOfTimecards("\"approved\"", PrintSQLDate(period_start), PrintSQLDate(period_end), db, user);
+	auto	result = __GetNumberOfTimecards("\"approved\"", "month", PrintSQLDate(period_start), PrintSQLDate(period_end), db, user);
 
 	MESSAGE_DEBUG("", "", "finish (result is " + result + ")");
 
@@ -6174,14 +6177,44 @@ auto GetNumberOfApprovedTimecardsLastMonth(CMysql *db, CUser *user) -> string
 
 	tie(period_start, period_end) = GetFirstAndLastDateOfLastMonth();
 
-	auto	result = __GetNumberOfTimecards("\"approved\"", PrintSQLDate(period_start), PrintSQLDate(period_end), db, user);
+	auto	result = __GetNumberOfTimecards("\"approved\"", "month", PrintSQLDate(period_start), PrintSQLDate(period_end), db, user);
 
 	MESSAGE_DEBUG("", "", "finish (result is " + result + ")");
 
 	return result;
 }
 
-static auto __GetNumberOfSoW(const string &sow_status, const string &period_start, const string &period_end, CMysql *db, CUser *user) -> string
+auto GetNumberOfApprovedTimecardsThisWeek(CMysql *db, CUser *user) -> string
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	struct tm	period_start, period_end;
+
+	tie(period_start, period_end) = GetFirstAndLastDateOfThisWeek();
+
+	auto	result = __GetNumberOfTimecards("\"approved\"", "week", PrintSQLDate(period_start), PrintSQLDate(period_end), db, user);
+
+	MESSAGE_DEBUG("", "", "finish (result is " + result + ")");
+
+	return result;
+}
+
+auto GetNumberOfApprovedTimecardsLastWeek(CMysql *db, CUser *user) -> string
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	struct tm	period_start, period_end;
+
+	tie(period_start, period_end) = GetFirstAndLastDateOfLastWeek();
+
+	auto	result = __GetNumberOfTimecards("\"approved\"", "week", PrintSQLDate(period_start), PrintSQLDate(period_end), db, user);
+
+	MESSAGE_DEBUG("", "", "finish (result is " + result + ")");
+
+	return result;
+}
+
+static auto __GetNumberOfSoW(const string &sow_status, const string &period_type, const string &period_start, const string &period_end, CMysql *db, CUser *user) -> string
 {
 	MESSAGE_DEBUG("", "", "start");
 
@@ -6191,6 +6224,8 @@ static auto __GetNumberOfSoW(const string &sow_status, const string &period_star
 	{
 		if(db->Query("SELECT COUNT(*) AS `counter` FROM `contracts_sow` WHERE "
 								"`status` IN (" + sow_status + ") "
+								"AND "
+								"`timecard_period`=\"" + period_type + "\"  "
 								"AND "
 								"`end_date`>=\"" + period_start + "\"  "
 								"AND "
@@ -6224,7 +6259,7 @@ auto GetNumberOfSoWActiveThisMonth(CMysql *db, CUser *user) -> string
 
 	tie(period_start, period_end) = GetFirstAndLastDateOfThisMonth();
 
-	auto	result = __GetNumberOfSoW("\"signed\",\"expired\"", PrintSQLDate(period_start), PrintSQLDate(period_end), db, user);
+	auto	result = __GetNumberOfSoW("\"signed\",\"expired\"", "month", PrintSQLDate(period_start), PrintSQLDate(period_end), db, user);
 
 	MESSAGE_DEBUG("", "", "finish (result is " + result + ")");
 
@@ -6240,7 +6275,39 @@ auto GetNumberOfSoWActiveLastMonth(CMysql *db, CUser *user) -> string
 
 	tie(period_start, period_end) = GetFirstAndLastDateOfLastMonth();
 
-	auto	result = __GetNumberOfSoW("\"signed\",\"expired\"", PrintSQLDate(period_start), PrintSQLDate(period_end), db, user);
+	auto	result = __GetNumberOfSoW("\"signed\",\"expired\"", "month", PrintSQLDate(period_start), PrintSQLDate(period_end), db, user);
+
+	MESSAGE_DEBUG("", "", "finish (result is " + result + ")");
+
+	return result;
+
+}
+
+auto GetNumberOfSoWActiveThisWeek(CMysql *db, CUser *user) -> string
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	struct tm	period_start, period_end;
+
+	tie(period_start, period_end) = GetFirstAndLastDateOfThisWeek();
+
+	auto	result = __GetNumberOfSoW("\"signed\",\"expired\"", "week", PrintSQLDate(period_start), PrintSQLDate(period_end), db, user);
+
+	MESSAGE_DEBUG("", "", "finish (result is " + result + ")");
+
+	return result;
+}
+
+auto GetNumberOfSoWActiveLastWeek(CMysql *db, CUser *user) -> string
+{
+
+	MESSAGE_DEBUG("", "", "start");
+
+	struct tm	period_start, period_end;
+
+	tie(period_start, period_end) = GetFirstAndLastDateOfLastWeek();
+
+	auto	result = __GetNumberOfSoW("\"signed\",\"expired\"", "week", PrintSQLDate(period_start), PrintSQLDate(period_end), db, user);
 
 	MESSAGE_DEBUG("", "", "finish (result is " + result + ")");
 

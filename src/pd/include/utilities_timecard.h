@@ -158,10 +158,17 @@ auto			DeleteEntryByAction(string action, string id, CMysql *, CUser *) -> strin
 auto			GetAgencyEmployeesInJSONFormat(string sql_query, CMysql *, CUser *) -> string;
 auto			GetAgencyObjectInJSONFormat(string agency_id, bool include_tasks, bool include_bt, CMysql *, CUser *) -> string;
 auto			GetInfoToReturnByAction(string action, string, string sow_id, string new_value, CMysql *, CUser *) -> string;
+
 auto			GetNumberOfApprovedTimecardsThisMonth(CMysql *, CUser *) -> string;
 auto			GetNumberOfApprovedTimecardsLastMonth(CMysql *, CUser *) -> string;
+auto			GetNumberOfApprovedTimecardsThisWeek(CMysql *, CUser *) -> string;
+auto			GetNumberOfApprovedTimecardsLastWeek(CMysql *, CUser *) -> string;
+
 auto 			GetNumberOfSoWActiveThisMonth(CMysql *, CUser *) -> string;
 auto 			GetNumberOfSoWActiveLastMonth(CMysql *, CUser *) -> string;
+auto 			GetNumberOfSoWActiveThisWeek(CMysql *, CUser *) -> string;
+auto 			GetNumberOfSoWActiveLastWeek(CMysql *, CUser *) -> string;
+
 auto			GetPSoWIDByTimecardIDAndCostCenterID(string timecard_id, string cost_center_id, CMysql *, CUser *) -> string;
 auto			GetSoWIDByPSoWID(string psow_id, CMysql *, CUser *) -> string;
 auto			GetPSoWIDByApprover(string sql_query, CMysql *, CUser *) -> string;
