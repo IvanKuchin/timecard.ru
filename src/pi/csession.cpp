@@ -362,7 +362,7 @@ bool CSession::Update() {
 		return false;
 	}
 
-	if(db->Query("UPDATE `sessions` SET `time`=NOW(),`http_user_agent`=\""s + (getenv("HTTP_USER_AGENT") ? getenv("HTTP_USER_AGENT") : "") + "\" WHERE `id`=\"" + GetID() + "\";")) 
+	if(db->Query("UPDATE `sessions` SET `time`=NOW(),`http_user_agent`=\""s + (getenv("HTTP_USER_AGENT") ? RemoveQuotas(getenv("HTTP_USER_AGENT")) : "") + "\" WHERE `id`=\"" + GetID() + "\";")) 
 	{
 		MESSAGE_ERROR("", "", "ERROR: session [" + GetID() + "] there are more than one session with the same session ID.");
 
