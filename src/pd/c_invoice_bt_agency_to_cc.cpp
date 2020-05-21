@@ -502,6 +502,11 @@ auto C_Invoice_BT_Agency_To_CC::CreateBTObj(string bt_id) -> C_BT_To_Print
 										else
 											MESSAGE_DEBUG("", "", "optional field Department not found for psow.id(" + psow_id + ")");
 
+										if(db->Query("SELECT `value` FROM `contract_psow_custom_fields` WHERE `var_name`=\"purchase_order\" AND `contract_psow_id`=\"" + psow_id + "\" AND `type`=\"input\";"))
+											obj.SetPurchaseOrder(db->Get(0, "value"));
+										else
+											MESSAGE_DEBUG("", "", "optional field PurchaseOrder not found for psow.id(" + psow_id + ")");
+
 										{
 											if(EnrichObjWithExpenseLines(bt_id, &obj))
 											{

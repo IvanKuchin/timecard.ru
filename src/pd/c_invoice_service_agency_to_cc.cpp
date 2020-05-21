@@ -575,6 +575,11 @@ auto C_Invoice_Service_Agency_To_CC::CreateTimecardObj(string timecard_id) -> C_
 										else
 											MESSAGE_DEBUG("", "", "optional field Department not found for psow.id(" + psow_id + ")");
 
+										if(db->Query("SELECT `value` FROM `contract_psow_custom_fields` WHERE `var_name`=\"purchase_order\" AND `contract_psow_id`=\"" + psow_id + "\" AND `type`=\"input\";"))
+											obj.SetPurchaseOrder(db->Get(0, "value"));
+										else
+											MESSAGE_DEBUG("", "", "optional field PurchaseOrder not found for psow.id(" + psow_id + ")");
+
 										{
 											auto		timecard_lines = GetTimecardLines_By_TimecardID_And_CostCenterID(timecard_id, cost_center_id, db, user);
 											

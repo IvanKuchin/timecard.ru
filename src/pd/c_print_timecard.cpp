@@ -1057,13 +1057,46 @@ auto	C_Print_Timecard::__HPDF_DrawTimecardTitle() -> string
 			HPDF_Page_TextRect (__pdf_page, __HPDF_TableDaysGetXOffset(), __pdf_line + __pdf_font_height, __pdf_page_width - HPDF_FIELD_RIGHT, __pdf_line, (utf8_to_cp1251(GetSpelledTitle())).c_str(), HPDF_TALIGN_LEFT, NULL);
 			HPDF_Page_EndText (__pdf_page);
 
-			if((error_message = __HPDF_MoveLineDown()).empty())
+			if(GetSpelledPSoW().length())
 			{
-				HPDF_Page_BeginText (__pdf_page);
-				HPDF_Page_SetFontAndSize (__pdf_page, __pdf_font, HPDF_TIMECARD_FONT_SIZE);
-				HPDF_Page_TextRect (__pdf_page, __HPDF_TableGetXOffset(), __pdf_line + __pdf_font_height, __pdf_page_width - __HPDF_TableGetXOffset() - HPDF_FIELD_RIGHT, __pdf_line, (utf8_to_cp1251(GetSpelledPSoW())).c_str(), HPDF_TALIGN_LEFT, NULL);
-				HPDF_Page_EndText (__pdf_page);
+				if((error_message = __HPDF_MoveLineDown()).empty())
+				{
+					HPDF_Page_BeginText (__pdf_page);
+					HPDF_Page_SetFontAndSize (__pdf_page, __pdf_font, HPDF_TIMECARD_FONT_SIZE);
+					HPDF_Page_TextRect (__pdf_page, __HPDF_TableGetXOffset(), __pdf_line + __pdf_font_height, __pdf_page_width - __HPDF_TableGetXOffset() - HPDF_FIELD_RIGHT, __pdf_line, (utf8_to_cp1251(GetSpelledPSoW())).c_str(), HPDF_TALIGN_LEFT, NULL);
+					HPDF_Page_EndText (__pdf_page);
+				}
+				else
+				{
+					MESSAGE_ERROR("", "", "hpdf: fail to move line down");
+				}
+			}
+			else
+			{
+				MESSAGE_DEBUG("", "", "PSoW is empty");
+			}
 
+			if(GetSpelledPurchaseOrder().length())
+			{
+				if((error_message = __HPDF_MoveLineDown()).empty())
+				{
+					HPDF_Page_BeginText (__pdf_page);
+					HPDF_Page_SetFontAndSize (__pdf_page, __pdf_font, HPDF_TIMECARD_FONT_SIZE);
+					HPDF_Page_TextRect (__pdf_page, __HPDF_TableGetXOffset(), __pdf_line + __pdf_font_height, __pdf_page_width - __HPDF_TableGetXOffset() - HPDF_FIELD_RIGHT, __pdf_line, (utf8_to_cp1251(GetSpelledPurchaseOrder())).c_str(), HPDF_TALIGN_LEFT, NULL);
+					HPDF_Page_EndText (__pdf_page);
+				}
+				else
+				{
+					MESSAGE_ERROR("", "", "hpdf: fail to move line down");
+				}
+			}
+			else
+			{
+				MESSAGE_DEBUG("", "", "purchase order is empty");
+			}
+
+			if(GetSpelledProjectID().length())
+			{
 				if((error_message = __HPDF_MoveLineDown()).empty())
 				{
 					HPDF_Page_BeginText (__pdf_page);
@@ -1078,7 +1111,7 @@ auto	C_Print_Timecard::__HPDF_DrawTimecardTitle() -> string
 			}
 			else
 			{
-				MESSAGE_ERROR("", "", "hpdf: fail to move line down");
+				MESSAGE_DEBUG("", "", "project id is empty");
 			}
 		}
 		else

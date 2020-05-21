@@ -26,11 +26,6 @@ auto	C_Print_BT::GetSpelledPSoW() -> string
 	return vars->Get("PSoW") + " №"s + bt.GetAgreementNumber() + " " + vars->Get("agreement from") + " " + sign_spelling_date;
 }
 
-auto	C_Print_BT::GetSpelledProjectID() -> string
-{
-	return bt.GetProjectNumber().length() ? vars->Get("Project ID") + ": "s + bt.GetProjectNumber() : "";
-}
-
 // TODO: --- spelled position clean-up
 /*
 auto	C_Print_BT::GetSpelledInitials(string idx) -> string
@@ -589,6 +584,11 @@ auto	C_Print_BT::__HPDF_DrawHeader() -> string
 		if(error_message.empty())
 		{
 			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSpelledPSoW()), 0, 100, HPDF_TALIGN_LEFT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, true)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSpelledPurchaseOrder()), 0, 100, HPDF_TALIGN_LEFT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, true)).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
 		if(error_message.empty())

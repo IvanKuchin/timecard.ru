@@ -78,7 +78,8 @@ class C_Print_Timecard
 
 		auto		GetSpelledTitle() -> string;
 		auto		GetSpelledPSoW() -> string;
-		auto		GetSpelledProjectID()							{ return string(timecard.GetProjectNumber().length() ? gettext("Project ID") + ": "s + timecard.GetProjectNumber() : ""); };
+		auto		GetSpelledProjectID()							{ return string(timecard.GetProjectNumber().length() ? gettext("Department") + ": "s + timecard.GetProjectNumber() : ""); };
+		auto		GetSpelledPurchaseOrder()						{ return string(timecard.GetPurchaseOrder().length() ? timecard.GetPurchaseOrder() : ""); };
 		auto		GetSpelledTotalHours()							{ return string(gettext("Total hours on duty") + ": "s); };
 		auto		GetSpelledTotalDays()							{ return string(gettext("Total days on duty") + ": "s); };
 		auto		GetSpelledDayrate()								{ return string(gettext("Dayrate") + ": "s); };

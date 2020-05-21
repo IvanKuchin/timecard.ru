@@ -1165,6 +1165,7 @@ auto	C_Invoicing_Vars::TableRowDecsriptions_Index_VarSet(string local_remote_ser
 			temp +=		Get("from") + " " + Get("subcontractor_work_period_start" + index) + " " + Get("up to") + " " + Get("subcontractor_work_period_finish" + index) + " ";
 
 		temp +=			Get("in scope") + " " + Get("Technical Requirement agreement short") + " " + Get("psow_agreement_" + index) +
+						(Get("psow_contract_" + index + "_purchase_order").length() ? " (" + Get("psow_contract_" + index + "_purchase_order") + ")" : "") +
 						Get("psow_contract_" + index + "_Department_spelling") +
 						".";
 						// --- VAT not required in row description 
