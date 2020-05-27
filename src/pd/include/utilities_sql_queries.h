@@ -36,13 +36,39 @@ inline auto Get_PSoWIDByBTID_sqlquery(const string &bt_id) -> string
 		);
 }
 
+inline auto Get_SubcontractorRecallBySoWID_sqlquery(const string &sow_id) -> string
+{
+	return (
+				"SELECT `recall_by_subcontractor` FROM `contracts_sow` WHERE `id` IN (" + sow_id + ")"
+		);
+}
+
+inline auto Get_AgencyRecallBySoWID_sqlquery(const string &sow_id) -> string
+{
+	return (
+				"SELECT `recall_by_agency` FROM `contracts_sow` WHERE `id` IN (" + sow_id + ")"
+		);
+}
+
+inline auto Get_InvoiceFileByTimecardID_sqlquery(const string &tc_id) -> string
+{
+	return (
+				"SELECT `invoice_filename` FROM `timecards` WHERE `id` IN (" + tc_id + ")"
+		);
+}
+
+inline auto Get_SoWIDByTimecardID_sqlquery(const string &tc_id) -> string
+{
+	return (
+				"SELECT `contract_sow_id` FROM `timecards` WHERE `id` IN (" + tc_id + ")"
+		);
+}
+
 inline auto Get_PSoWIDByTimecardID_sqlquery(const string &tc_id) -> string
 {
 	return (
 			" SELECT `id` FROM `contracts_psow` WHERE "
-			" `contract_sow_id`=( "
-				"SELECT `contract_sow_id` FROM `timecards` WHERE `id` IN (" + tc_id + ")"
-			" )"
+			" `contract_sow_id`=( " + Get_SoWIDByTimecardID_sqlquery(tc_id) + " )"
 			" AND " // --- this part is required in case of there are several PSoW assigned to SoW, 
 					// --- but customers reported in this timecard belong to fewer PSoW(s)
 			" (`cost_center_id` IN ( "

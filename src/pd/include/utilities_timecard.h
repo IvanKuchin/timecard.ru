@@ -222,4 +222,7 @@ auto			GetTimecardList(const string &where_companies_list, CMysql *, CUser *) ->
 auto			GetTimecardList(const string &where_companies_list, const string &date, CMysql *, CUser *) -> string;
 auto			isTimePeriodInsideSow(string sow_id, string period_start, string period_end, CMysql *, CUser *) -> string; 
 
+auto 			DeleteServiceInvoicesSubcToAgency(string timecard_id, CMysql *db, CUser *user) -> string;
+auto			RecallTimecard(string timecard_id, string reason, CMysql *db, CUser *user) -> string;
+
 #endif

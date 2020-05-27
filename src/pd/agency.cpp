@@ -6004,6 +6004,21 @@ int main(void)
 			MESSAGE_DEBUG("", action, "finish");
 		}
 
+		if(action == "AJAX_recallTimecard")
+		{
+			MESSAGE_DEBUG("", action, "start");
+
+			auto			id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("timecard_id"));
+			auto			reason = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("reason"));
+
+			auto			error_message = RecallTimecard(id, reason, &db, &user);
+			auto			success_message = ""s;
+
+			AJAX_ResponseTemplate(&indexPage, success_message, error_message);
+
+			MESSAGE_DEBUG("", action, "finish");
+		}
+
 		MESSAGE_DEBUG("", "", "post-condition if(action == \"" + action + "\")");
 
 		indexPage.OutTemplate();

@@ -1388,9 +1388,7 @@ string GetMessageImageList(string imageSetID, CMysql *db)
 	ostringstream	ost;
 	string		  result = "";
 
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	if(imageSetID != "0")
 	{
@@ -1440,9 +1438,7 @@ string GetMessageLikesUsersList(string messageID, CUser *user, CMysql *db)
 	int			 affected;
 	string		  result = "";
 
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	affected = db->Query("select * from `feed_message_params` where `parameter`='like' and `messageID`='" + messageID + "';");
 	if(affected > 0)
@@ -1476,9 +1472,7 @@ string GetBookLikesUsersList(string usersBookID, CUser *user, CMysql *db)
 	int			 affected;
 	string		  result = "";
 
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	affected = db->Query("select * from `feed_message_params` where `parameter`='likeBook' and `messageID`='" + usersBookID + "';");
 	if(affected > 0)
@@ -1512,9 +1506,7 @@ string GetLanguageLikesUsersList(string usersLanguageID, CUser *user, CMysql *db
 	int			 affected;
 	string		  result = "";
 
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	affected = db->Query("select * from `feed_message_params` where `parameter`='likeLanguage' and `messageID`='" + usersLanguageID + "';");
 	if(affected > 0)
@@ -1548,9 +1540,7 @@ string GetCompanyLikesUsersList(string usersCompanyID, CUser *user, CMysql *db)
 	int			 affected;
 	string		  result = "";
 
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	affected = db->Query("select * from `feed_message_params` where `parameter`='likeCompany' and `messageID`='" + usersCompanyID + "';");
 	if(affected > 0)
@@ -1584,9 +1574,7 @@ string GetCertificationLikesUsersList(string usersCertificationID, CUser *user, 
 	int			 affected;
 	string		  result = "";
 
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	affected = db->Query("select * from `feed_message_params` where `parameter`='likeCertification' and `messageID`='" + usersCertificationID + "';");
 	if(affected > 0)
@@ -1620,9 +1608,7 @@ string GetCourseLikesUsersList(string usersCourseID, CUser *user, CMysql *db)
 	int			 affected;
 	string		  result = "";
 
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	affected = db->Query("select * from `feed_message_params` where `parameter`='likeCourse' and `messageID`='" + usersCourseID + "';");
 	if(affected > 0)
@@ -1656,9 +1642,7 @@ string GetUniversityDegreeLikesUsersList(string universityDegreeID, CUser *user,
 	int			 affected;
 	string		  result = "";
 
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	affected = db->Query("select * from `feed_message_params` where `parameter`='likeUniversityDegree' and `messageID`='" + universityDegreeID + "';");
 	if(affected > 0)
@@ -1692,9 +1676,7 @@ string GetBookRatingUsersList(string bookID, CUser *user, CMysql *db)
 	int			 affected;
 	string		  result = "";
 
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	affected = db->Query("select * from `users_books` where `bookID`=\"" + bookID + "\";");
 	if(affected > 0)
@@ -1716,4 +1698,171 @@ string GetBookRatingUsersList(string bookID, CUser *user, CMysql *db)
 	}
 
 	return result;
+}
+
+static auto __isSoWAllowedToRecallTimecardByAgency(string sow_id, CMysql *db, CUser *user)
+{
+	MESSAGE_DEBUG("", "", "start (sow_id = " + sow_id + ")");
+
+	auto	result = (GetValueFromDB(Get_AgencyRecallBySoWID_sqlquery(sow_id), db) == "Y");
+
+	MESSAGE_DEBUG("", "", "finish (result = " + to_string(result) + ")");
+
+	return (result ? "" : gettext("you are not authorized"));
+}
+
+static auto __isSoWAllowedToRecallTimecardBySubcontractor(string sow_id, CMysql *db, CUser *user)
+{
+	MESSAGE_DEBUG("", "", "start (sow_id = " + sow_id + ")");
+
+	auto	result = (GetValueFromDB(Get_SubcontractorRecallBySoWID_sqlquery(sow_id), db) == "Y");
+
+	MESSAGE_DEBUG("", "", "finish (result = " + to_string(result) + ")");
+
+	return (result ? "" : gettext("you are not authorized"));
+}
+
+auto RecallTimecard(string timecard_id, string reason, CMysql *db, CUser *user) -> string
+{
+	MESSAGE_DEBUG("", "", "start (timecard_id = " + timecard_id + ")");
+
+	auto	error_message	= ""s;
+
+	if(timecard_id.length())
+	{
+		auto	sow_id			= GetValueFromDB(Get_SoWIDByTimecardID_sqlquery(timecard_id), db);
+
+		// --- check if timecard could be recalled
+		if(user->GetType() == "subcontractor")
+		{
+			error_message = __isSoWAllowedToRecallTimecardBySubcontractor(sow_id, db, user);
+			if(error_message.empty())
+			{
+				error_message = isSubcontractorAllowedToChangeSoW(sow_id, db, user);
+				if(error_message.empty())
+				{
+				}
+				else
+				{
+					MESSAGE_DEBUG("", "", error_message);
+				}
+			}
+			else
+			{
+				MESSAGE_DEBUG("", "", error_message);
+			}
+		}
+		else if(user->GetType() == "agency")
+		{
+			error_message = __isSoWAllowedToRecallTimecardByAgency(sow_id, db, user);
+			if(error_message.empty())
+			{
+				error_message = isAgencyEmployeeAllowedToChangeSoW(sow_id, db, user);
+				if(error_message.empty())
+				{
+				}
+				else
+				{
+					MESSAGE_DEBUG("", "", error_message);
+				}
+			}
+			else
+			{
+				MESSAGE_DEBUG("", "", error_message);
+			}
+		}
+		else
+		{
+			error_message = gettext("unknown user type");
+			MESSAGE_ERROR("", "", error_message);
+		}
+
+		if(error_message.empty())
+		{
+			if(db->Query("SELECT `id` FROM `invoice_cost_center_service_details` WHERE `timecard_id`=" + quoted(timecard_id)))
+			{
+				error_message = gettext("recall failure: cost center already invoiced");
+				MESSAGE_DEBUG("", "", error_message);
+			}
+			else
+			{
+				// --- good to go - recall
+			}
+		}
+		else
+		{
+			MESSAGE_DEBUG("", "", error_message);
+		}
+
+		// --- actual timecard recall
+		if(error_message.empty())
+		{
+			error_message = DeleteServiceInvoicesSubcToAgency(timecard_id, db, user);
+			if(error_message.empty())
+			{
+				db->Query("DELETE FROM `timecard_approvals` WHERE `timecard_id`=" + quoted(timecard_id) + ";");
+				db->Query("UPDATE `timecards` SET `submit_date`=\"0\" , `approve_date`=\"0\", `payed_date`=\"0\", `expected_pay_date`=\"0\", `originals_received_date`=\"0\", `invoice_filename`=\"\", `status`=\"saved\" WHERE `id`=" + quoted(timecard_id) + ";");
+				if(db->isError())
+				{
+					error_message = gettext("SQL syntax error");
+					MESSAGE_ERROR("", "", db->GetErrorMessage());
+				}
+				else
+				{
+					// --- good to go
+				}
+			}
+			else
+			{
+				MESSAGE_DEBUG("", "", error_message);
+			}
+		}
+		else
+		{
+			MESSAGE_DEBUG("", "", error_message);
+		}
+
+		// --- notify about timecard recall
+		if(error_message.empty())
+		{
+			if(GeneralNotifySoWContractPartiesAboutChanges("AJAX_recallTimecard", timecard_id, sow_id, "existing_value", reason, db, user))
+			{
+			}
+			else
+			{
+				MESSAGE_DEBUG("", "", "fail to notify agency about changes");
+			}
+		}
+	}
+	else
+	{
+		error_message = gettext("Timecard not found");
+		MESSAGE_ERROR("", "", error_message);
+	}
+
+	MESSAGE_DEBUG("", "", "finish (error_message = " + error_message + ")");
+
+	return error_message;
+}
+
+auto DeleteServiceInvoicesSubcToAgency(string timecard_id, CMysql *db, CUser *user) -> string
+{
+	MESSAGE_DEBUG("", "", "start (timecard_id = " + timecard_id + ")");
+
+	auto	error_message		= ""s;
+	auto	invoice_filename	= GetValueFromDB(Get_InvoiceFileByTimecardID_sqlquery(timecard_id), db);
+
+	if(invoice_filename.length())
+	{
+		unlink((INVOICES_SUBC_DIRECTORY + invoice_filename).c_str());
+	}
+	else
+	{
+		error_message = gettext("invoice not found");
+		MESSAGE_ERROR("", "", error_message);
+	}
+
+	MESSAGE_DEBUG("", "", "finish (error_message = " + error_message + ")");
+
+	return error_message;
 }

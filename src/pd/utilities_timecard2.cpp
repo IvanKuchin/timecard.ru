@@ -5577,6 +5577,11 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 		notification_description = gettext("Cost Center") + " ("s + GetSpelledCostCenterByCustomFieldID(id, db) + "): " + gettext("custom field") + "(" + GetSpelledCostCenterCustomFieldNameByID(id, db) + ") " + gettext("changed") + " " + gettext("from") + " " + existing_value + " " + gettext("to") + " " + new_value;
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
+	if(action == "AJAX_recallTimecard")
+	{
+		notification_description = gettext("Timecard") + " "s + GetSpelledTimecard(id, db) + " " + gettext("in scope") + " " + GetSpelledSoWByID(sow_id, db) + " " + gettext("recalled") + " " + GetSpelledUserNameByID(user->GetID(), db) + ": " + new_value + "";
+		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
+	}
 
 
 
