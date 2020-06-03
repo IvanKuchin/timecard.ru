@@ -4199,6 +4199,8 @@ auto	GetSOWInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include_t
 		string	status;
 		string	payment_period_service;
 		string	payment_period_bt;
+		string	recall_by_agency;
+		string	recall_by_subcontractor;
 		string	agreement_filename;
 		string	eventTimestamp;
 	};
@@ -4226,6 +4228,8 @@ auto	GetSOWInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include_t
 			item.status = db->Get(i, "status");
 			item.payment_period_service = db->Get(i, "payment_period_service");
 			item.payment_period_bt = db->Get(i, "payment_period_bt");
+			item.recall_by_agency = db->Get(i, "recall_by_agency");
+			item.recall_by_subcontractor = db->Get(i, "recall_by_subcontractor");
 			item.agreement_filename = db->Get(i, "agreement_filename");
 			item.day_rate = db->Get(i, "day_rate");
 			item.eventTimestamp = db->Get(i, "eventTimestamp");
@@ -4255,6 +4259,8 @@ auto	GetSOWInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include_t
 				temp_result += "\"end_date\":\"" + item.end_date + "\",";
 				temp_result += "\"payment_period_service\":\"" + item.payment_period_service + "\",";
 				temp_result += "\"payment_period_bt\":\"" + item.payment_period_bt + "\",";
+				temp_result += "\"recall_by_agency\":\"" + item.recall_by_agency + "\",";
+				temp_result += "\"recall_by_subcontractor\":\"" + item.recall_by_subcontractor + "\",";
 				temp_result += "\"number\":\"" + item.number + "\",";
 				temp_result += "\"sign_date\":\"" + item.sign_date + "\",";
 				temp_result += "\"timecard_period\":\"" + item.timecard_period + "\",";

@@ -932,25 +932,25 @@ auto	C_Print_Invoice_Docs_Base::__HPDF_DrawTable() -> string
 			total_table_items = 0;
 			for(auto i = 1; isTableRowExists(i); ++i)
 			{
-				auto	max_lines = max(pdf_obj.__HPDF_GetNumberOfLinesInTable(0, utf8_to_cp1251(GetTableRowIndex(i))		, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE),
-									max(pdf_obj.__HPDF_GetNumberOfLinesInTable(1, utf8_to_cp1251(GetTableRowDescription(i))	, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE),
-									max(pdf_obj.__HPDF_GetNumberOfLinesInTable(2, utf8_to_cp1251(GetTableRowQuantity(i))	, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE),
-									max(pdf_obj.__HPDF_GetNumberOfLinesInTable(3, utf8_to_cp1251(GetTableRowItem(i))		, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE),
-									max(pdf_obj.__HPDF_GetNumberOfLinesInTable(4, utf8_to_cp1251(GetTableRowPrice(i))		, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE),
-										pdf_obj.__HPDF_GetNumberOfLinesInTable(5, utf8_to_cp1251(GetTableRowTotal(i))		, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE)
+				auto	max_lines = max(pdf_obj.__HPDF_GetNumberOfLinesInTable(0, utf8_to_cp1251(GetTableRowIndex(i))		, NORMAL_FONT, HPDF_TIMECARD_TABLE_FONT_SIZE),
+									max(pdf_obj.__HPDF_GetNumberOfLinesInTable(1, utf8_to_cp1251(GetTableRowDescription(i))	, NORMAL_FONT, HPDF_TIMECARD_TABLE_FONT_SIZE),
+									max(pdf_obj.__HPDF_GetNumberOfLinesInTable(2, utf8_to_cp1251(GetTableRowQuantity(i))	, NORMAL_FONT, HPDF_TIMECARD_TABLE_FONT_SIZE),
+									max(pdf_obj.__HPDF_GetNumberOfLinesInTable(3, utf8_to_cp1251(GetTableRowItem(i))		, NORMAL_FONT, HPDF_TIMECARD_TABLE_FONT_SIZE),
+									max(pdf_obj.__HPDF_GetNumberOfLinesInTable(4, utf8_to_cp1251(GetTableRowPrice(i))		, NORMAL_FONT, HPDF_TIMECARD_TABLE_FONT_SIZE),
+										pdf_obj.__HPDF_GetNumberOfLinesInTable(5, utf8_to_cp1251(GetTableRowTotal(i))		, NORMAL_FONT, HPDF_TIMECARD_TABLE_FONT_SIZE)
 									)))));
 
-				if((error_message = pdf_obj.__HPDF_PrintTextTableCell(0, utf8_to_cp1251(GetTableRowIndex(i)), HPDF_TALIGN_CENTER, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).empty())
+				if((error_message = pdf_obj.__HPDF_PrintTextTableCell(0, utf8_to_cp1251(GetTableRowIndex(i)), HPDF_TALIGN_CENTER, NORMAL_FONT, HPDF_TIMECARD_TABLE_FONT_SIZE, false)).empty())
 				{
-					if((error_message = pdf_obj.__HPDF_PrintTextTableCell(1, utf8_to_cp1251(GetTableRowDescription(i)), HPDF_TALIGN_LEFT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).empty())
+					if((error_message = pdf_obj.__HPDF_PrintTextTableCell(1, utf8_to_cp1251(GetTableRowDescription(i)), HPDF_TALIGN_LEFT, NORMAL_FONT, HPDF_TIMECARD_TABLE_FONT_SIZE, false)).empty())
 					{
-						if((error_message = pdf_obj.__HPDF_PrintTextTableCell(2, utf8_to_cp1251(GetTableRowQuantity(i)), HPDF_TALIGN_CENTER, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).empty())
+						if((error_message = pdf_obj.__HPDF_PrintTextTableCell(2, utf8_to_cp1251(GetTableRowQuantity(i)), HPDF_TALIGN_CENTER, NORMAL_FONT, HPDF_TIMECARD_TABLE_FONT_SIZE, false)).empty())
 						{
-							if((error_message = pdf_obj.__HPDF_PrintTextTableCell(3, utf8_to_cp1251(GetTableRowItem(i)), HPDF_TALIGN_CENTER, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).empty())
+							if((error_message = pdf_obj.__HPDF_PrintTextTableCell(3, utf8_to_cp1251(GetTableRowItem(i)), HPDF_TALIGN_CENTER, NORMAL_FONT, HPDF_TIMECARD_TABLE_FONT_SIZE, false)).empty())
 							{
-								if((error_message = pdf_obj.__HPDF_PrintTextTableCell(4, utf8_to_cp1251(GetTableRowPrice(i)), HPDF_TALIGN_RIGHT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).empty())
+								if((error_message = pdf_obj.__HPDF_PrintTextTableCell(4, utf8_to_cp1251(GetTableRowPrice(i)), HPDF_TALIGN_RIGHT, NORMAL_FONT, HPDF_TIMECARD_TABLE_FONT_SIZE, false)).empty())
 								{
-									if((error_message = pdf_obj.__HPDF_PrintTextTableCell(5, utf8_to_cp1251(GetTableRowPrice(i)), HPDF_TALIGN_RIGHT, NORMAL_FONT, HPDF_TIMECARD_FONT_SIZE, false)).empty())
+									if((error_message = pdf_obj.__HPDF_PrintTextTableCell(5, utf8_to_cp1251(GetTableRowPrice(i)), HPDF_TALIGN_RIGHT, NORMAL_FONT, HPDF_TIMECARD_TABLE_FONT_SIZE, false)).empty())
 									{
 										if((error_message = pdf_obj.__HPDF_MoveTableLineDown(max_lines)).empty())
 										{

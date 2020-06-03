@@ -38,7 +38,7 @@ class C_Timecard_To_Print
 		string					initials_2 = "";
 		string					position_1 = "";
 		string					position_2 = "";
-		string					project_number = "";
+		string					department_number = "";
 		string					purchase_order = "";
 		string					cost_center_id = "";
 		string					sow_id = "";
@@ -87,8 +87,8 @@ class C_Timecard_To_Print
 		auto		SetCostCenterID(string &&param1) 			{ cost_center_id = move(param1); };
 		auto		SetApprovers(const string &param1)			{ approvers = param1; };
 		auto		SetApprovers(string &&param1) 				{ approvers = move(param1); };
-		auto		SetProjectNumber(const string &param1)		{ project_number = param1; };
-		auto		SetProjectNumber(string &&param1) 			{ project_number = move(param1); };
+		auto		SetDepartmentNumber(const string &param1)	{ department_number = param1; };
+		auto		SetDepartmentNumber(string &&param1) 		{ department_number = move(param1); };
 		auto		SetPurchaseOrder(const string &param1)		{ purchase_order = param1; };
 		auto		SetPurchaseOrder(string &&param1) 			{ purchase_order = move(param1); };
 		auto		SetDayrate(string param1) 					{ dayrate = param1; };
@@ -109,7 +109,7 @@ class C_Timecard_To_Print
 		auto		GetInitials2()								{ return initials_2; };		
 		auto		GetPosition1()								{ return position_1; };		
 		auto		GetPosition2()								{ return position_2; };		
-		auto		GetProjectNumber()							{ return project_number; };	
+		auto		GetDepartmentNumber()						{ return department_number; };	
 		auto		GetPurchaseOrder()							{ return purchase_order; };	
 		auto		GetCostCenterID()							{ return cost_center_id; };	
 		auto		GetApprovers()								{ return approvers; };	

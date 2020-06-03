@@ -498,7 +498,7 @@ auto C_Invoice_BT_Agency_To_CC::CreateBTObj(string bt_id) -> C_BT_To_Print
 										obj.SetSignRole2(GetValueFromDB("SELECT `value` FROM `cost_center_custom_fields` WHERE `cost_center_id`=" + quoted(cost_center_id) + " AND `var_name`=\"bt_role2\";", db));
 
 										if(db->Query("SELECT `value` FROM `contract_psow_custom_fields` WHERE `var_name`=\"Department\" AND `contract_psow_id`=\"" + psow_id + "\" AND `type`=\"input\";"))
-											obj.SetProjectNumber(db->Get(0, "value"));
+											obj.SetDepartmentNumber(db->Get(0, "value"));
 										else
 											MESSAGE_DEBUG("", "", "optional field Department not found for psow.id(" + psow_id + ")");
 

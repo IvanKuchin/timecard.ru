@@ -72,7 +72,7 @@ class C_Print_BT
 
 		auto		GetSpelledTitle() -> string;
 		auto		GetSpelledPSoW() -> string;
-		auto		GetSpelledProjectID()							{ return bt.GetProjectNumber().length() ? vars->Get("Department") + ": "s + bt.GetProjectNumber() : ""; };
+		auto		GetSpelledProjectID()							{ return bt.GetDepartmentNumber().length() ? vars->Get("Department") + ": "s + bt.GetDepartmentNumber() : ""; };
 		auto		GetSpelledPurchaseOrder()						{ return bt.GetPurchaseOrder().length() ? bt.GetPurchaseOrder() : ""; };
 		auto		GetSpelledLocation()							{ return bt.GetLocation().length() ? vars->Get("Location") + ": "s + bt.GetLocation() : ""; };
 		auto		GetSpelledSumNonTaxable()						{ return vars->Get("Non-taxable sum") + ": "s; };

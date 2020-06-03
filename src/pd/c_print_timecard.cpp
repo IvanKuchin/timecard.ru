@@ -263,7 +263,8 @@ auto	C_Print_Timecard::PrintAsXLS() -> string
 		// --- must be defined before libxl-instantiation
 		auto	spelled_title				= multibyte_to_wide(GetSpelledTitle());
 		auto	spelled_psow				= multibyte_to_wide(GetSpelledPSoW());
-		auto	spelled_projectid			= multibyte_to_wide(GetSpelledProjectID());
+		auto	spelled_department_id		= multibyte_to_wide(GetSpelledDepartmentID());
+		auto	spelled_purchase_order		= multibyte_to_wide(GetSpelledPurchaseOrder());
 		auto	spelled_totalhours			= multibyte_to_wide(GetSpelledTotalHours());
 		auto	spelled_totaldays			= multibyte_to_wide(GetSpelledTotalDays());
 		auto	spelled_dayrate				= multibyte_to_wide(GetSpelledDayrate());
@@ -299,7 +300,7 @@ auto	C_Print_Timecard::PrintAsXLS() -> string
 				auto			start_spelling_date = multibyte_to_wide(GetSpellingFormattedDate(timecard.GetDateStart(), "%d %b %G"));
 				auto			finish_spelling_date = multibyte_to_wide(GetSpellingFormattedDate(timecard.GetDateFinish(), "%d %b %G"));
 				auto			timecard_lines = timecard.GetTimecardLines();
-				auto			row_counter = 6;
+				auto			row_counter = 2;
 				auto			column_counter = 0;
 
 				format_title->setBorder(libxl::BORDERSTYLE_THIN);
@@ -341,22 +342,24 @@ auto	C_Print_Timecard::PrintAsXLS() -> string
 				sheet->setCol(1, 1, 45);
 				sheet->setCol(2, 31 + 2, 5);
 
-				sheet->writeStr(2, 2, spelled_title.c_str());
-				sheet->writeStr(3, 1, spelled_psow.c_str());
-				sheet->writeStr(4, 1, spelled_projectid.c_str());
+				sheet->writeStr(row_counter++, 2, spelled_title.c_str());
+				sheet->writeStr(row_counter++, 1, spelled_psow.c_str());
+				if(spelled_purchase_order.length())	sheet->writeStr(row_counter++, 1, spelled_purchase_order.c_str());
+				if(spelled_department_id.length())		sheet->writeStr(row_counter++, 1, spelled_department_id.c_str());
 
 				// --- table header
 				column_counter = 0;
 				for(auto &single_day: day_summary)
 				{
-					sheet->writeBlank(5, column_counter + 2, format_title);
+					sheet->writeBlank(row_counter, column_counter + 2, format_title);
 
-					sheet->writeNum(5, column_counter + 2, stod(single_day.date),	single_day.is_holiday ? format_holiday
+					sheet->writeNum(row_counter, column_counter + 2, stod(single_day.date),	single_day.is_holiday ? format_holiday
 																					: single_day.is_weekend ? format_weekend
 																					: format_weekday);
 
 					++column_counter;
 				}
+				++row_counter;
 
 				// --- table body
 				for(auto &timcard_line: timecard_lines)
@@ -1095,13 +1098,13 @@ auto	C_Print_Timecard::__HPDF_DrawTimecardTitle() -> string
 				MESSAGE_DEBUG("", "", "purchase order is empty");
 			}
 
-			if(GetSpelledProjectID().length())
+			if(GetSpelledDepartmentID().length())
 			{
 				if((error_message = __HPDF_MoveLineDown()).empty())
 				{
 					HPDF_Page_BeginText (__pdf_page);
 					HPDF_Page_SetFontAndSize (__pdf_page, __pdf_font, HPDF_TIMECARD_FONT_SIZE);
-					HPDF_Page_TextRect (__pdf_page, __HPDF_TableGetXOffset(), __pdf_line + __pdf_font_height, __pdf_page_width - __HPDF_TableGetXOffset() - HPDF_FIELD_RIGHT, __pdf_line, (utf8_to_cp1251(GetSpelledProjectID())).c_str(), HPDF_TALIGN_LEFT, NULL);
+					HPDF_Page_TextRect (__pdf_page, __HPDF_TableGetXOffset(), __pdf_line + __pdf_font_height, __pdf_page_width - __HPDF_TableGetXOffset() - HPDF_FIELD_RIGHT, __pdf_line, (utf8_to_cp1251(GetSpelledDepartmentID())).c_str(), HPDF_TALIGN_LEFT, NULL);
 					HPDF_Page_EndText (__pdf_page);
 				}
 				else

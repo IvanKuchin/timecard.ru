@@ -46,7 +46,7 @@ class C_BT_To_Print
 		string					position_1 = "";
 		string					position_2 = "";
 		string					purchase_order = "";
-		string					project_number = "";
+		string					department_number = "";
 		string					cost_center_id = "";
 		string					location = "";
 		string					markup_type = "";
@@ -101,8 +101,8 @@ class C_BT_To_Print
 		auto		SetPosition2(string &&param1) 				{ position_2 = move(param1); };
 		auto		SetCostCenterID(const string &param1)		{ cost_center_id = param1; };
 		auto		SetCostCenterID(string &&param1) 			{ cost_center_id = move(param1); };
-		auto		SetProjectNumber(const string &param1)		{ project_number = param1; };
-		auto		SetProjectNumber(string &&param1) 			{ project_number = move(param1); };
+		auto		SetDepartmentNumber(const string &param1)	{ department_number = param1; };
+		auto		SetDepartmentNumber(string &&param1) 		{ department_number = move(param1); };
 		auto		SetPurchaseOrder(const string &param1)		{ purchase_order = param1; };
 		auto		SetPurchaseOrder(string &&param1) 			{ purchase_order = move(param1); };
 		auto		SetMarkupType(const string &param1)			{ markup_type = param1; };
@@ -129,7 +129,7 @@ class C_BT_To_Print
 		auto		GetInitials2()								{ return initials_2; };		
 		auto		GetPosition1()								{ return position_1; };		
 		auto		GetPosition2()								{ return position_2; };		
-		auto		GetProjectNumber()							{ return project_number; };	
+		auto		GetDepartmentNumber()						{ return department_number; };	
 		auto		GetPurchaseOrder()							{ return purchase_order; };	
 		auto		GetCostCenterID()							{ return cost_center_id; };	
 		auto		GetMarkupDB()								{ return markup_from_db; };
