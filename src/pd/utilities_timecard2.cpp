@@ -1276,6 +1276,7 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 					else if(action == "AJAX_updateCompanyWebSite")				{ /* --- good to go */ }
 					else if(action == "AJAX_updateCompanyTIN")					{ /* --- good to go */ }
 					else if(action == "AJAX_updateCompanyVAT")					{ /* --- good to go */ }
+					else if(action == "AJAX_updateCompanyVATCalculationType")	{ /* --- good to go */ }
 					else if(action == "AJAX_updateCompanyActNumber")			{ /* --- good to go */ }
 					else if(action == "AJAX_updateCompanyActNumberPrefix")		{ /* --- good to go */ }
 					else if(action == "AJAX_updateCompanyActNumberPostfix")		{ /* --- good to go */ }
@@ -1942,21 +1943,22 @@ string	isActionEntityBelongsToAgency(string action, string id, string agency_id,
 				if(action == "AJAX_updateCompanyCustomField")				sql_query = "SELECT `company_id` AS `agency_id` FROM `company_custom_fields` WHERE `id`=\"" + id + "\";";
 
 				if(
-					(action == "AJAX_updateCompanyTitle")			||
-					(action == "AJAX_updateCompanyDescription")		||
-					(action == "AJAX_updateCompanyWebSite")			||
-					(action == "AJAX_updateCompanyTIN")				||
-					(action == "AJAX_updateCompanyVAT")				||
-					(action == "AJAX_updateCompanyActNumber")		||
-					(action == "AJAX_updateCompanyActNumberPrefix")	||
-					(action == "AJAX_updateCompanyActNumberPostfix")||
-					(action == "AJAX_updateCompanyAccount")			||
-					(action == "AJAX_updateCompanyOGRN")			||
-					(action == "AJAX_updateCompanyKPP")				||
-					(action == "AJAX_updateCompanyLegalAddress")	||
-					(action == "AJAX_updateCompanyMailingAddress")	||
-					(action == "AJAX_updateCompanyMailingZipID")	||
-					(action == "AJAX_updateCompanyLegalZipID")		||
+					(action == "AJAX_updateCompanyTitle")				||
+					(action == "AJAX_updateCompanyDescription")			||
+					(action == "AJAX_updateCompanyWebSite")				||
+					(action == "AJAX_updateCompanyTIN")					||
+					(action == "AJAX_updateCompanyVAT")					||
+					(action == "AJAX_updateCompanyVATCalculationType")	||
+					(action == "AJAX_updateCompanyActNumber")			||
+					(action == "AJAX_updateCompanyActNumberPrefix")		||
+					(action == "AJAX_updateCompanyActNumberPostfix")	||
+					(action == "AJAX_updateCompanyAccount")				||
+					(action == "AJAX_updateCompanyOGRN")				||
+					(action == "AJAX_updateCompanyKPP")					||
+					(action == "AJAX_updateCompanyLegalAddress")		||
+					(action == "AJAX_updateCompanyMailingAddress")		||
+					(action == "AJAX_updateCompanyMailingZipID")		||
+					(action == "AJAX_updateCompanyLegalZipID")			||
 					(action == "AJAX_updateCompanyBankID")
 				)
 				{
@@ -2414,6 +2416,7 @@ auto	GetDBValueByAction(string action, string id, string sow_id, CMysql *db, CUs
 				if(action == "AJAX_updateCompanyActNumberPrefix")			sql_query = "SELECT `act_number_prefix`				FROM `company` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateCompanyActNumberPostfix")			sql_query = "SELECT `act_number_postfix` 			FROM `company` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateCompanyVAT")						sql_query = "SELECT `vat`							FROM `company` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updateCompanyVATCalculationType")		sql_query = "SELECT `vat_calculation_type`			FROM `company` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateCompanyAccount")					sql_query = "SELECT `account`						FROM `company` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateCompanyOGRN")						sql_query = "SELECT `ogrn`							FROM `company` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateCompanyKPP")						sql_query = "SELECT `kpp`							FROM `company` WHERE `id`=\"" + id + "\";";
@@ -4071,6 +4074,7 @@ string	SetNewValueByAction(string action, string id, string sow_id, string new_v
 						if(action == "AJAX_updateCompanyActNumberPrefix")			sql_query = "UPDATE	`company`					SET `act_number_prefix`				=\"" + new_value + "\",`lastActivity`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
 						if(action == "AJAX_updateCompanyActNumberPostfix")			sql_query = "UPDATE	`company`					SET `act_number_postfix`			=\"" + new_value + "\",`lastActivity`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
 						if(action == "AJAX_updateCompanyVAT")						sql_query = "UPDATE	`company`					SET `vat` 							=\"" + new_value + "\",`lastActivity`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
+						if(action == "AJAX_updateCompanyVATCalculationType")		sql_query = "UPDATE	`company`					SET `vat_calculation_type`			=\"" + new_value + "\",`lastActivity`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
 						if(action == "AJAX_updateCompanyAccount")					sql_query = "UPDATE	`company`					SET `account`						=\"" + new_value + "\",`lastActivity`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
 						if(action == "AJAX_updateCompanyOGRN")						sql_query = "UPDATE	`company`					SET `ogrn` 							=\"" + new_value + "\",`lastActivity`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
 						if(action == "AJAX_updateCompanyKPP")						sql_query = "UPDATE	`company`					SET `kpp` 							=\"" + new_value + "\",`lastActivity`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
@@ -5126,6 +5130,18 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 	if(action == "AJAX_updateCompanyVAT")
 	{
 		notification_description = "Данные компании: НДС компании изменился " + existing_value + " -> " + new_value;
+		if(user->GetType() == "agency")
+			sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `agency_company_id`=\"" + id + "\";";
+		else if(user->GetType() == "subcontractor")
+			sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `subcontractor_company_id`=\"" + id + "\";";
+		else
+		{
+			MESSAGE_ERROR("", "", "there is no notification for user type(" + user->GetType() + ")")
+		}
+	}
+	if(action == "AJAX_updateCompanyVATCalculationType")
+	{
+		notification_description = "Данные компании: изменился способ расчета НДС " + existing_value + " -> " + new_value;
 		if(user->GetType() == "agency")
 			sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `agency_company_id`=\"" + id + "\";";
 		else if(user->GetType() == "subcontractor")

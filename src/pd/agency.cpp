@@ -1499,6 +1499,7 @@ int main(void)
 			(action == "AJAX_updateCompanyActNumberPostfix")		||
 			(action == "AJAX_updateCompanyTIN")						||
 			(action == "AJAX_updateCompanyVAT")						||
+			(action == "AJAX_updateCompanyVATCalculationType")		||
 			(action == "AJAX_updateCompanyAccount")					||
 			(action == "AJAX_updateCompanyOGRN")					||
 			(action == "AJAX_updateCompanyKPP")						||
@@ -1578,6 +1579,7 @@ int main(void)
 							if(action == "AJAX_updateCompanyActNumberPostfix")	{				if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
 							if(action == "AJAX_updateCompanyTIN")			{					if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
 							if(action == "AJAX_updateCompanyVAT")			{					if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
+							if(action == "AJAX_updateCompanyVATCalculationType"){ new_value = (new_value == "Y" ? "sum_by_row" : "percentage");	if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
 							if(action == "AJAX_updateCompanyAccount")		{					if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
 							if(action == "AJAX_updateCompanyOGRN")			{					if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
 							if(action == "AJAX_updateCompanyKPP")			{					if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }

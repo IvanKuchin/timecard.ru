@@ -42,8 +42,8 @@ class C_Invoicing_Vars
 		auto		CurrentTimestamp_1C_VarSet() -> string;
 		auto		AgreementNumberSpelling_VarSet(string agreement_number) -> string;
 
-		auto		SubcontractorsTotal_VarSet(string sum, string tax, string total) -> string;
-		auto		CostCenterTotal_VarSet(c_float cost_center_sum) -> string;
+		auto		SubcontractorsTotal_VarSet(c_float sum, c_float tax) -> string;
+		auto		CostCenterTotal_VarSet(c_float cost_center_sum, c_float cost_center_vat) -> string;
 
 		auto		Common_Index_VarSet(string index) -> string;
 		auto		DocumentSubmissionDate_1C_Index_VarSet(string, string index) -> string;

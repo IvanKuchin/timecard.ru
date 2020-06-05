@@ -372,6 +372,7 @@ auto	C_Invoicing_Vars::Agency_VarSet(string __agency_company_id) -> string
 						vars.Add("agency_vat_spelling",			Get("agency_vat") == "N" ? gettext("no VAT") : gettext("VAT") + " "s + to_string(VAT_PERCENTAGE) + "%");
 						vars.Add("agency_vat_spelling_short",	Get("agency_vat") == "N" ? gettext("no VAT short") : gettext("VAT") + " "s + to_string(VAT_PERCENTAGE) + "%");
 						vars.Add("agency_vat_spelling_1C",		Get("agency_vat") == "N" ? gettext("noVAT") : gettext("VAT") + to_string(VAT_PERCENTAGE));
+						vars.Add("agency_vat_calculation_type",	ConvertHTMLToText(db->Get(0, "vat_calculation_type")));
 						vars.Add("agency_link", 				ConvertHTMLToText(db->Get(0, "link")));
 						vars.Add("agency_admin_userID", 		ConvertHTMLToText(db->Get(0, "admin_userID")));
 						vars.Add("agency_isConfirmed", 			ConvertHTMLToText(db->Get(0, "isConfirmed")));
@@ -1086,6 +1087,7 @@ auto	C_Invoicing_Vars::Subcontractor_Index_VarSet(string subcontractor_company_i
 				if(error_message.empty()) error_message = AssignVariableValue("subcontractor_company_vat_spelling_" + index, subcontractor_vat == "N" ? gettext("no VAT") : gettext("VAT") + " "s + to_string(VAT_PERCENTAGE) + "%", true);
 				if(error_message.empty()) error_message = AssignVariableValue("subcontractor_company_vat_spelling_short_" + index, subcontractor_vat == "N" ? gettext("no VAT short") : gettext("VAT") + " "s + to_string(VAT_PERCENTAGE) + "%", true);
 				if(error_message.empty()) error_message = AssignVariableValue("subcontractor_company_vat_spelling_1C_" + index, subcontractor_vat == "N" ? gettext("noVAT") : gettext("VAT") + to_string(VAT_PERCENTAGE), true);
+				if(error_message.empty()) error_message = AssignVariableValue("subcontractor_company_vat_calculation_type_" + index, db->Get(0, "vat_calculation_type"), true);
 
 				if(error_message.empty()) error_message = AssignVariableValue("subcontractor_mailing_geo_zip_id_" + index, db->Get(0, "mailing_geo_zip_id"), true);
 				if(error_message.empty()) error_message = AssignVariableValue("subcontractor_legal_geo_zip_id_" + index, db->Get(0, "legal_geo_zip_id"), true);
@@ -1242,35 +1244,48 @@ auto	C_Invoicing_Vars::DocumentSubmissionDate_1C_Index_VarSet(string date_inside
 	return DocumentSubmissionDate_1C_Index_VarSet(GetTMObject(date_inside_month), index);
 }
 
-auto	C_Invoicing_Vars::SubcontractorsTotal_VarSet(string sum, string tax, string total) -> string
+auto	C_Invoicing_Vars::SubcontractorsTotal_VarSet(c_float sum, c_float vat_sum_by_row) -> string
 {
-	auto	error_message = ""s;
-
 	MESSAGE_DEBUG("", "", "start");
 
+	auto	error_message = ""s;
+	c_float	vat(0);
+
+	// --- index "1" set in stone, due to only "one" subcontractor can report service/bt
+	// --- if this calculations important "per subcontractor", index must be re-engineered
+	if(Get("subcontractor_company_vat_calculation_type_1") == "percentage")
+		vat = sum * c_float(VAT_PERCENTAGE) / c_float(100);
+	else
+		vat = vat_sum_by_row; // --- if variable is not defined , this value will be "by default" 
+
 	// --- not used anywhere
-	if(error_message.empty()) error_message = AssignVariableValue("subcontractors_sum_amount", sum, true);
-	if(error_message.empty()) error_message = AssignVariableValue("subcontractors_vat_amount", tax, true);
-	if(error_message.empty()) error_message = AssignVariableValue("subcontractors_total_payment", total, true);
+	if(error_message.empty()) error_message = AssignVariableValue("subcontractors_sum_amount", sum.PrintPriceTag(), true);
+	if(error_message.empty()) error_message = AssignVariableValue("subcontractors_vat_amount", vat.PrintPriceTag(), true);
+	if(error_message.empty()) error_message = AssignVariableValue("subcontractors_total_payment", (sum + vat).PrintPriceTag(), true);
 
 	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
 
 	return	error_message;
 }
 
-auto	C_Invoicing_Vars::CostCenterTotal_VarSet(c_float cost_center_sum) -> string
+auto	C_Invoicing_Vars::CostCenterTotal_VarSet(c_float sum, c_float vat_sum_by_row) -> string
 {
-	auto	error_message = ""s;
-	c_float	cost_center_vat(0);
-
 	MESSAGE_DEBUG("", "", "start");
 
-	if(Get("agency_vat") == "Y")
-		cost_center_vat = cost_center_sum * c_float(VAT_PERCENTAGE) / c_float(100);
+	auto	error_message = ""s;
+	c_float	vat(0);
 
-	if(error_message.empty()) error_message = AssignVariableValue("cost_center_sum_amount", cost_center_sum.PrintPriceTag(), true);
-	if(error_message.empty()) error_message = AssignVariableValue("cost_center_vat_amount", cost_center_vat.PrintPriceTag(), true);
-	if(error_message.empty()) error_message = AssignVariableValue("cost_center_total_payment", (cost_center_sum + cost_center_vat).PrintPriceTag(), true);
+	if(Get("agency_vat") == "Y")
+	{
+		if(Get("agency_vat_calculation_type") == "percentage")
+			vat = sum * c_float(VAT_PERCENTAGE) / c_float(100);
+		else
+			vat = vat_sum_by_row;
+	}
+
+	if(error_message.empty()) error_message = AssignVariableValue("cost_center_sum_amount", sum.PrintPriceTag(), true);
+	if(error_message.empty()) error_message = AssignVariableValue("cost_center_vat_amount", vat.PrintPriceTag(), true);
+	if(error_message.empty()) error_message = AssignVariableValue("cost_center_total_payment", (sum + vat).PrintPriceTag(), true);
 
 	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
 
@@ -1567,7 +1582,7 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet_AgencyToCC() -> string
 		if(db)
 		{
 			c_float	subcontractors_sum, subcontractors_vat;
-			c_float	cost_center_sum;
+			c_float	cost_center_sum, cost_center_vat;
 
 
 			if(error_message.empty())
@@ -1697,6 +1712,7 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet_AgencyToCC() -> string
 					subcontractors_vat = subcontractors_vat + c_float(Get("timecard_vat_" + to_string(i)));
 					subcontractors_sum = subcontractors_sum + c_float(Get("timecard_price_" + to_string(i)));;
 					cost_center_sum = cost_center_sum + c_float(Get("cost_center_price_" + to_string(i)));
+					cost_center_vat = cost_center_vat + c_float(Get("cost_center_vat_" + to_string(i)));
 
 					// --- loop closure
 					if(error_message.length()) break;
@@ -1705,14 +1721,14 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet_AgencyToCC() -> string
 				// --- timecard calculations scoping
 				if(error_message.empty())
 				{
-					if((error_message = SubcontractorsTotal_VarSet(subcontractors_sum.PrintPriceTag(), subcontractors_vat.PrintPriceTag(), (subcontractors_sum + subcontractors_vat).PrintPriceTag())).empty()) {}
+					if((error_message = SubcontractorsTotal_VarSet(subcontractors_sum, subcontractors_vat)).empty()) {}
 					else { MESSAGE_ERROR("", "", "fail returned from SubcontractorsTotalVarSet"); }
 				}
 
 				// --- cost_center calculations scoping
 				if(error_message.empty())
 				{
-					if((error_message = CostCenterTotal_VarSet(cost_center_sum)).empty()) {}
+					if((error_message = CostCenterTotal_VarSet(cost_center_sum, cost_center_vat)).empty()) {}
 					else { MESSAGE_ERROR("", "", "fail returned from CostCenterTotalVarSet"); }
 				}
 			}
@@ -1867,7 +1883,7 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet_SubcToAgency() -> string
 				// --- timecard calculations scoping
 				if(error_message.empty())
 				{
-					if((error_message = SubcontractorsTotal_VarSet(subcontractors_sum.PrintPriceTag(), subcontractors_vat.PrintPriceTag(), (subcontractors_sum + subcontractors_vat).PrintPriceTag())).empty()) {}
+					if((error_message = SubcontractorsTotal_VarSet(subcontractors_sum, subcontractors_vat)).empty()) {}
 					else { MESSAGE_ERROR("", "", "fail returned from SubcontractorsTotalVarSet"); }
 				}
 			}
@@ -1900,7 +1916,7 @@ auto	C_Invoicing_Vars::GenerateBTVariableSet_AgencyToCC() -> string
 		if(db)
 		{
 			c_float	subcontractors_sum, subcontractors_vat;
-			c_float	cost_center_sum;
+			c_float	cost_center_sum, cost_center_vat;
 
 			if(error_message.empty())
 			{
@@ -2023,6 +2039,7 @@ auto	C_Invoicing_Vars::GenerateBTVariableSet_AgencyToCC() -> string
 
 					subcontractors_vat = subcontractors_vat + c_float(Get("timecard_vat_" + to_string(i)));
 					subcontractors_sum = subcontractors_sum + c_float(Get("timecard_price_" + to_string(i)));;
+					cost_center_vat = cost_center_vat + c_float(Get("cost_center_vat_" + to_string(i)));;
 					cost_center_sum = cost_center_sum + c_float(Get("cost_center_price_" + to_string(i)));;
 
 					// --- loop closure
@@ -2032,14 +2049,14 @@ auto	C_Invoicing_Vars::GenerateBTVariableSet_AgencyToCC() -> string
 				// --- timecard calculations scoping
 				if(error_message.empty())
 				{
-					if((error_message = SubcontractorsTotal_VarSet(subcontractors_sum.PrintPriceTag(), subcontractors_vat.PrintPriceTag(), (subcontractors_sum + subcontractors_vat).PrintPriceTag())).empty()) {}
+					if((error_message = SubcontractorsTotal_VarSet(subcontractors_sum, subcontractors_vat)).empty()) {}
 					else { MESSAGE_ERROR("", "", "fail returned from SubcontractorsTotalVarSet"); }
 				}
 
 				// --- cost_center calculations scoping
 				if(error_message.empty())
 				{
-					if((error_message = CostCenterTotal_VarSet(cost_center_sum)).empty()) {}
+					if((error_message = CostCenterTotal_VarSet(cost_center_sum, cost_center_vat)).empty()) {}
 					else { MESSAGE_ERROR("", "", "fail returned from CostCenterTotalVarSet"); }
 				}
 			}
@@ -2190,7 +2207,7 @@ auto	C_Invoicing_Vars::GenerateBTVariableSet_SubcToAgency() -> string
 				// --- timecard calculations scoping
 				if(error_message.empty())
 				{
-					if((error_message = SubcontractorsTotal_VarSet(subcontractors_sum.PrintPriceTag(), subcontractors_vat.PrintPriceTag(), (subcontractors_sum + subcontractors_vat).PrintPriceTag())).empty()) {}
+					if((error_message = SubcontractorsTotal_VarSet(subcontractors_sum, subcontractors_vat)).empty()) {}
 					else { MESSAGE_ERROR("", "", "fail returned from SubcontractorsTotalVarSet"); }
 				}
 			}

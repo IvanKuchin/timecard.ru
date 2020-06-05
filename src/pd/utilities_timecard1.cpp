@@ -1046,6 +1046,7 @@ string GetCompanyListInJSONFormat(string dbQuery, CMysql *db, CUser *user, bool 
 		string	kpp;
 		string	ogrn;
 		string	vat;
+		string	vat_calculation_type;
 		string	link;
 		string	act_number_prefix;
 		string	act_number;
@@ -1095,6 +1096,7 @@ string GetCompanyListInJSONFormat(string dbQuery, CMysql *db, CUser *user, bool 
 				company.kpp					= db->Get(i, "kpp");
 				company.ogrn				= db->Get(i, "ogrn");
 				company.vat					= db->Get(i, "vat");
+				company.vat_calculation_type= db->Get(i, "vat_calculation_type");
 				company.link				= db->Get(i, "link");
 				company.act_number_prefix	= db->Get(i, "act_number_prefix");
 				company.act_number			= db->Get(i, "act_number");
@@ -1131,6 +1133,7 @@ string GetCompanyListInJSONFormat(string dbQuery, CMysql *db, CUser *user, bool 
 					ostFinal << "\"kpp\": \""				<< companiesList[i].kpp << "\", ";
 					ostFinal << "\"ogrn\": \""				<< companiesList[i].ogrn << "\", ";
 					ostFinal << "\"vat\": \""				<< companiesList[i].vat << "\", ";
+					ostFinal << "\"vat_calculation_type\": \""<< companiesList[i].vat_calculation_type << "\", ";
 					ostFinal << "\"link\": \""				<< companiesList[i].link << "\", ";
 					ostFinal << "\"act_number_prefix\": \""	<< companiesList[i].act_number_prefix << "\", ";
 					ostFinal << "\"act_number\": \""		<< companiesList[i].act_number << "\", ";
