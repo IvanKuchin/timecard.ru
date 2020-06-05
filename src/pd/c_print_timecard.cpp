@@ -167,16 +167,16 @@ auto	C_Print_Timecard::AssignValuesToDaySummaryStruct() -> bool
 
 				for(auto &timcard_line: timecard_lines)
 				{
-					auto		time_entries = SplitTimeentry(timcard_line.hours);
+					auto		reported_hours_list = SplitTimeentry(timcard_line.hours);
 
-					if(time_entries.size())
+					if(reported_hours_list.size())
 					{
 						auto	column_counter = 0;
-						for(auto &time_entry : time_entries)
+						for(auto &reported_hours_item : reported_hours_list)
 						{
-							if(time_entry != "0")
+							if(reported_hours_item != "0")
 							{
-								c_float		tmp(time_entry);
+								c_float		tmp(reported_hours_item);
 
 								day_summary[column_counter].efforts = day_summary[column_counter].efforts + tmp;
 								effort_hours = effort_hours + tmp;
@@ -185,11 +185,12 @@ auto	C_Print_Timecard::AssignValuesToDaySummaryStruct() -> bool
 						}
 
 						effort_days = effort_hours / c_float(8);
+
+
 						effort_cost = timecard.GetDayrate() * GetEffortDays();
 						if(timecard.GetSupplierVAT() == "Y")
 							effort_cost_vat = GetEffortCost() * c_float(VAT_PERCENTAGE) / c_float(100);
 						total_payment = GetEffortCost() + GetEffortCostVAT();
-
 					}
 					else
 					{

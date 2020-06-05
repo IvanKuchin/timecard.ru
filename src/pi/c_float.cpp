@@ -41,12 +41,13 @@ double c_float::RoundWithPrecision(double num, int precision)
 
 long c_float::GetWhole() const
 {
-	double	intpart;
-	long	result;
+	auto	result				= 0l;
+	long	factor				= pow(10, precision);
+	auto	fract_part			= GetFraction();
+	long	factorized_val		= lround(fma(val, factor, 0));
 
-	modf (val , &intpart);
+	result = lround(fma(factorized_val - fract_part, 1/double(factor), 0));
 
-	result = lround(intpart);
 
 	MESSAGE_DEBUG("", "", "finish (result = " + to_string(result) + ")");
 
@@ -55,12 +56,32 @@ long c_float::GetWhole() const
 
 long c_float::GetFraction() const
 {
-	double	fractpart, intpart;
-	long	result;
+	long	factor				= pow(10, precision);
+/*
+	// ---
+	// --- if you'll see fraction == 100 then consider use following code
+	// --- https://stackoverflow.com/questions/3884232/modf-returns-1-as-the-fractional?answertab=active#tab-top
+	// --- 
+	double	inf					= copysign(std::numeric_limits<double>::infinity(), val);
+	double	theNumberAfter		= nextafter(val, inf);
+	double	epsilon				= theNumberAfter - val;
+	double	factorized_epsilon	= fma(epsilon, factor/2,0);
+	double	rounded_val	= lround(fma(val, factor, factorized_epsilon)) / factor;
+*/
+/*
+	// --- former algorithm
+	double	rounded_val			= lround(fma(val, factor, 0)) / factor;
+	double	intpart;
+	double	fractpart			= modf(rounded_val , &intpart);
+	long 	result				= lround(fma(fractpart, factor, 0));
+*/
+	long 	result				= lround(fma(val, factor, 0)) % factor;
 
-	fractpart = modf(val , &intpart);
-
-	result = lround(fma(fractpart, pow(10, precision), 0));
+	if(result == factor)
+	{
+		MESSAGE_ERROR("", "", "fractional part extracting issue from " + to_string(val) + ", fraction part = " + to_string(result) + "");
+		result = 0;
+	}
 
 	MESSAGE_DEBUG("", "", "finish (result = " + to_string(result) + ")");
 
