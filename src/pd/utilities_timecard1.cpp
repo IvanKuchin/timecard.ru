@@ -4247,6 +4247,7 @@ auto	GetSOWInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include_t
 
 			if(temp_result.length())
 			{
+				// --- taken from cache
 			}
 			else
 			{

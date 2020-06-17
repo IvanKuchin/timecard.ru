@@ -518,7 +518,7 @@ int main()
 		{
 			MESSAGE_ERROR("", action, "can't find template json_response.htmlt");
 			throw CExceptionHTML("user not activated");
-		} // if(!indexPage.SetTemplate("AJAX_getNewsFeed.htmlt"))
+		}
 
 		indexPage.OutTemplate();
 

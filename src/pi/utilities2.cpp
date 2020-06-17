@@ -422,6 +422,56 @@ bool convert_cp1251_to_utf8(const char *in, char *out, int size)
 	return result;
 }
 
+// --- basic string operators
+int	qw(const string src, vector<string> &dst)
+{
+	istringstream iss(src);
+
+    do
+    {
+        string word;
+
+        iss >> word;
+        if(word.length()) dst.push_back(word);
+    } while (iss);
+
+	return 1;
+}
+
+vector<string> split(const string& s, const char& c)
+{
+	string buff{""};
+	vector<string> v;
+
+	for(auto n:s)
+	{
+		if(n != c) buff+=n;
+		else if(n == c && buff != "")
+		{
+			v.push_back(buff);
+			buff = "";
+		}
+	}
+	if(buff.length()) v.push_back(buff);
+
+	return v;
+}
+
+string join(const vector<string>& vec, string separator)
+{
+	string result{""};
+
+	if(separator.empty()) separator = ",";
+
+	for(auto &item:vec)
+	{
+		if(result.length()) result += separator;
+		result += item;
+	}
+
+	return result;
+}
+
 auto ReplaceWstringAccordingToMap(const wstring &src, const map<wstring, wstring> &replacements) -> wstring
 {
 	auto	result(src);
@@ -446,11 +496,9 @@ auto ReplaceWstringAccordingToMap(const wstring &src, const map<wstring, wstring
 
 bool AmIMessageOwner(string messageID, CUser *user, CMysql *db)
 {
-	bool		result = false;
+	auto		result = false;
 	
-	{
-		MESSAGE_DEBUG("", "", "start (messageID: " + messageID + ")");
-	}
+	MESSAGE_DEBUG("", "", "start (messageID: " + messageID + ")");
 
 	if(messageID.length() && (messageID != "0"))
 	{
@@ -506,9 +554,7 @@ bool AmIMessageOwner(string messageID, CUser *user, CMysql *db)
 		}
 	}
 
-	{
-		MESSAGE_DEBUG("", "", "end (returning value is " + (result ? "true" : "false") + ")");
-	}
+	MESSAGE_DEBUG("", "", "end (returning value is " + (result ? "true" : "false") + ")");
 
 	return result;	
 }
