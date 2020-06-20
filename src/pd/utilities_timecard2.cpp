@@ -1494,7 +1494,8 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 					{
 						c_float		num(new_value);
 
-						if(string(num) == new_value) { /* --- good to go */ }
+						// --- OR conditiona requires in case num is 10123 (matches by 1-st condition) or 10123.00 (matches by 2-nd condition)
+						if((string(num) == new_value) || (num.PrintPriceTag() == new_value)) { /* --- good to go */ }
 						else
 						{
 							MESSAGE_ERROR("", "", "input DayRate(" + new_value + ") wrongly formatted, needed to be " + string(num));
@@ -1714,7 +1715,8 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 					{
 						c_float		num(new_value);
 
-						if(string(num) == new_value)
+						// --- OR conditiona requires in case num is 10123 (matches by 1-st condition) or 10123.00 (matches by 2-nd condition)
+						if((string(num) == new_value) || (num.PrintPriceTag() == new_value))
 						{
 							/* --- good to go */
 						}
@@ -1727,7 +1729,8 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 					{
 						c_float		num(new_value);
 
-						if(string(num) == new_value)
+						// --- OR conditiona requires in case num is 10123 (matches by 1-st condition) or 10123.00 (matches by 2-nd condition)
+						if((string(num) == new_value) || (num.PrintPriceTag() == new_value))
 						{
 							/* --- good to go */
 						}
