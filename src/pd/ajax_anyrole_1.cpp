@@ -81,7 +81,7 @@ int main(void)
 				if(!indexPage.SetTemplate(template_name))
 				{
 					MESSAGE_ERROR("", action, "can't find template " + template_name);
-				} // if(!indexPage.SetTemplate("my_network.htmlt"))
+				}
 			}
 
 			{

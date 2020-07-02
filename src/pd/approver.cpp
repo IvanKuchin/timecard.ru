@@ -84,7 +84,7 @@ int main()
 				if(!indexPage.SetTemplate(template_name))
 				{
 					MESSAGE_DEBUG("", action, "can't find template " + template_name);
-				} // if(!indexPage.SetTemplate("my_network.htmlt"))
+				}
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
@@ -203,7 +203,7 @@ int main()
 				if(!indexPage.SetTemplate(template_name))
 				{
 					MESSAGE_DEBUG("", action, "can't find template " + template_name);
-				} // if(!indexPage.SetTemplate("my_network.htmlt"))
+				}
 			}
 
 
@@ -250,7 +250,7 @@ int main()
 				if(!indexPage.SetTemplate(template_name))
 				{
 					MESSAGE_DEBUG("", action, "can't find template " + template_name);
-				} // if(!indexPage.SetTemplate("my_network.htmlt"))
+				}
 			}
 
 			MESSAGE_DEBUG("", action, "finish");

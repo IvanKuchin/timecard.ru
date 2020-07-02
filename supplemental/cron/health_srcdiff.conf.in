@@ -52,6 +52,7 @@ nodiff_files => [
 
     "faq.htmlt",
     "login.htmlt",
+    "autologin.htmlt",
     "email_change.htmlt",
     "login_header.htmlt",
     "create_password_block.htmlt",

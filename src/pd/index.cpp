@@ -374,7 +374,7 @@ int main()
 			if(!indexPage.SetTemplate(template_name))
 			{
 				MESSAGE_DEBUG("", action, "can't find template " + template_name);
-			} // if(!indexPage.SetTemplate("my_network.htmlt"))
+			}
 
 			MESSAGE_DEBUG("", action, "finish");
 		}
@@ -4937,7 +4937,7 @@ int main()
 				if(!indexPage.SetTemplate(template_name))
 				{
 					MESSAGE_DEBUG("", action, "can't find template " + template_name);
-				} // if(!indexPage.SetTemplate("my_network.htmlt"))
+				}
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
@@ -5862,9 +5862,7 @@ int main()
 				throw CExceptionHTML("user not activated");
 			} // if(!indexPage.SetTemplate("news_feed.htmlt"))
 
-			{
-				MESSAGE_DEBUG("", action, "" + action + ": finish");
-			}
+			MESSAGE_DEBUG("", action, "" + action + ": finish");
 		}
 
 		if(action == "my_network")
@@ -5898,13 +5896,11 @@ int main()
 
 			if(!indexPage.SetTemplate("my_network.htmlt"))
 			{
-				MESSAGE_ERROR("", action, "can't find template my_network.htmlt");
+				MESSAGE_ERROR("", action, "can't find template");
 				throw CExceptionHTML("user not activated");
-			} // if(!indexPage.SetTemplate("my_network.htmlt"))
-
-			{
-				MESSAGE_DEBUG("", action, "" + action + ": finish");
 			}
+
+			MESSAGE_DEBUG("", action, "" + action + ": finish");
 		}
 
 		if(action == "find_friends")
