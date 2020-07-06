@@ -37,10 +37,8 @@ class C_Print_BT
 
 		C_BT_To_Print					bt;
 
-		c_float							effort_hours = 0;
-		c_float							effort_days = 0;
-		c_float							effort_cost = 0;
-		c_float							effort_cost_vat = 0;
+		c_float_with_rounding			effort_cost = 0;
+		c_float_with_rounding			effort_cost_vat = 0;
 		c_float							total_payment = 0;
 
 		libxl::Book						*__xls_book = nullptr;
@@ -48,24 +46,7 @@ class C_Print_BT
 		int								__xls_row_counter = -1;
 
 		C_PDF							pdf_obj;
-/*
-		HPDF_Doc						__pdf;
-		HPDF_Page						__pdf_page;
-		HPDF_REAL						__pdf_page_width = 0;
-		HPDF_REAL						__pdf_page_height = 0;
-		HPDF_Font						__pdf_font;
-		string							__pdf_font_name = "Helvetica";
-		HPDF_INT						__pdf_font_descent = 0;
-		HPDF_INT						__pdf_font_ascent = 0;
-		HPDF_INT						__pdf_font_height = 0;
-		HPDF_INT						__pdf_font_xheight = 0;
-		HPDF_INT						__pdf_table_line_height = 0;
-		int								__pdf_line = -1;
-		int								__pdf_table_top = -1;
-		int								__pdf_table_bottom = -1;
-*/
-		auto		GetEffortHours()								{ return effort_hours; };
-		auto		GetEffortDays()									{ return effort_days; };
+
 		auto		GetEffortCost()									{ return effort_cost; };
 		auto		GetEffortCostVAT()								{ return effort_cost_vat; };
 		auto		GetNumberOfDaysInTimecard() -> int;

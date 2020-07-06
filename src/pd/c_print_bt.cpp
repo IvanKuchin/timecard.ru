@@ -3,9 +3,8 @@
 auto C_Print_BT::SetBT(const C_BT_To_Print &param1) -> void
 {
 	bt = param1;
-	effort_hours = 0;
-	effort_hours = 0;
-	effort_days = 0;
+	// effort_hours = 0;
+	// effort_days = 0;
 	effort_cost = 0;
 	effort_cost_vat = 0;
 	total_payment = 0;

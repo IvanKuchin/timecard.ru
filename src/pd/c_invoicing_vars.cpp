@@ -961,16 +961,16 @@ auto	C_Invoicing_Vars::CostCenterPayment_Index_VarSet(c_float cost_center_price,
 	// --- having "enforced rounding" here VERY IMPORTANT !!!. 
 	// --- VAT must be calculated from rounded base-price, otherwise it is easy to loose dime
 	// --- more details could be found in SR 438840
-	c_float_with_rounding		cost_center_price_local(cost_center_price);
+	c_float						cost_center_price_local = GetBaseCostFrom(cost_center_price);
 	c_float						cost_center_vat;
 	c_float						cost_center_total_payment;
 
 
-	if(Get("agency_vat") == "Y") cost_center_vat = cost_center_price_local * c_float_with_rounding(VAT_PERCENTAGE) / c_float_with_rounding(100);
-	cost_center_total_payment = cost_center_price_local + cost_center_vat;
+	if(Get("agency_vat") == "Y") cost_center_vat = GetVATFrom(cost_center_price_local);
+	cost_center_total_payment = GetTotalPaymentFrom(cost_center_price_local, cost_center_vat);
 
 	if(error_message.empty()) error_message = AssignVariableValue("cost_center_price_" + index, string(cost_center_price_local), true);
-	if(error_message.empty()) error_message = AssignVariableValue("cost_center_vat_" + index, string(cost_center_vat), true);
+	if(error_message.empty()) error_message = AssignVariableValue("cost_center_vat_" + index,	string(cost_center_vat), true);
 	if(error_message.empty()) error_message = AssignVariableValue("cost_center_total_" + index, string(cost_center_total_payment), true);
 
 
@@ -979,41 +979,20 @@ auto	C_Invoicing_Vars::CostCenterPayment_Index_VarSet(c_float cost_center_price,
 	return	error_message;
 }
 
-/*
-auto	C_Invoicing_Vars::CostCenterPayment_Index_VarSet(c_float cost_center_price, string index) -> string
-{
-	auto						error_message = ""s;
-	c_float		cost_center_vat;
-	c_float		cost_center_total_payment;
-
-	MESSAGE_DEBUG("", "", "start");
-
-	if(Get("agency_vat") == "Y") cost_center_vat = cost_center_price * c_float(VAT_PERCENTAGE) / c_float(100);
-	cost_center_total_payment = cost_center_price + cost_center_vat;
-
-	if(error_message.empty()) error_message = AssignVariableValue("cost_center_price_" + index, string(cost_center_price), true);
-	if(error_message.empty()) error_message = AssignVariableValue("cost_center_vat_" + index, string(cost_center_vat), true);
-	if(error_message.empty()) error_message = AssignVariableValue("cost_center_total_" + index, string(cost_center_total_payment), true);
-
-
-	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
-
-	return	error_message;
-}
-*/
 auto	C_Invoicing_Vars::SubcontractorPayment_Index_VarSet(c_float subcontractor_price, string index) -> string
 {
-	auto		error_message = ""s;
-	c_float		subcontractor_vat;
-	c_float		subcontractor_total_payment;
+	MESSAGE_DEBUG("", "", "start (subcontractor_price: " + string(subcontractor_price) + " (will be rounded))");
 
-	MESSAGE_DEBUG("", "", "start (subcontractor_price: " + string(subcontractor_price) + ")");
+	auto						error_message = ""s;
+	c_float						subcontractor_price_local = GetBaseCostFrom(subcontractor_price);
+	c_float						subcontractor_vat;
+	c_float						subcontractor_total_payment;
 
-	if(Get("subcontractor_company_vat_" + index) == "Y") subcontractor_vat = subcontractor_price * c_float(VAT_PERCENTAGE) / c_float(100);
-	subcontractor_total_payment = subcontractor_price + subcontractor_vat;
+	if(Get("subcontractor_company_vat_" + index) == "Y") subcontractor_vat = GetVATFrom(subcontractor_price_local);
+	subcontractor_total_payment = GetTotalPaymentFrom(subcontractor_price_local, subcontractor_vat);
 
-	if(error_message.empty()) error_message = AssignVariableValue("timecard_price_" + index, subcontractor_price        .PrintPriceTag(), true);
-	if(error_message.empty()) error_message = AssignVariableValue("timecard_vat_"   + index, subcontractor_vat          .PrintPriceTag(), true);
+	if(error_message.empty()) error_message = AssignVariableValue("timecard_price_" + index, subcontractor_price_local	.PrintPriceTag(), true);
+	if(error_message.empty()) error_message = AssignVariableValue("timecard_vat_"   + index, subcontractor_vat			.PrintPriceTag(), true);
 	if(error_message.empty()) error_message = AssignVariableValue("timecard_total_" + index, subcontractor_total_payment.PrintPriceTag(), true);
 
 	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
@@ -1249,19 +1228,23 @@ auto	C_Invoicing_Vars::SubcontractorsTotal_VarSet(c_float sum, c_float vat_sum_b
 	MESSAGE_DEBUG("", "", "start");
 
 	auto	error_message = ""s;
-	c_float	vat(0);
+	c_float	sum_local = GetBaseCostFrom(sum);
+	c_float	vat_local(0);
+	c_float total_local;
 
 	// --- index "1" set in stone, due to only "one" subcontractor can report service/bt
 	// --- if this calculations important "per subcontractor", index must be re-engineered
 	if(Get("subcontractor_company_vat_calculation_type_1") == "percentage")
-		vat = sum * c_float(VAT_PERCENTAGE) / c_float(100);
+		vat_local = GetVATFrom(sum);
 	else
-		vat = vat_sum_by_row; // --- if variable is not defined , this value will be "by default" 
+		vat_local = vat_sum_by_row; // --- if variable is not defined , this value will be "by default" 
+
+	total_local = GetTotalPaymentFrom(sum, vat_local);
 
 	// --- not used anywhere
-	if(error_message.empty()) error_message = AssignVariableValue("subcontractors_sum_amount", sum.PrintPriceTag(), true);
-	if(error_message.empty()) error_message = AssignVariableValue("subcontractors_vat_amount", vat.PrintPriceTag(), true);
-	if(error_message.empty()) error_message = AssignVariableValue("subcontractors_total_payment", (sum + vat).PrintPriceTag(), true);
+	if(error_message.empty()) error_message = AssignVariableValue("subcontractors_sum_amount",		sum_local.PrintPriceTag(), true);
+	if(error_message.empty()) error_message = AssignVariableValue("subcontractors_vat_amount",		vat_local.PrintPriceTag(), true);
+	if(error_message.empty()) error_message = AssignVariableValue("subcontractors_total_payment",	total_local.PrintPriceTag(), true);
 
 	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
 
@@ -1273,19 +1256,23 @@ auto	C_Invoicing_Vars::CostCenterTotal_VarSet(c_float sum, c_float vat_sum_by_ro
 	MESSAGE_DEBUG("", "", "start");
 
 	auto	error_message = ""s;
-	c_float	vat(0);
+	c_float	sum_local = GetBaseCostFrom(sum);
+	c_float	vat_local(0);
+	c_float total_local;
 
 	if(Get("agency_vat") == "Y")
 	{
 		if(Get("agency_vat_calculation_type") == "percentage")
-			vat = sum * c_float(VAT_PERCENTAGE) / c_float(100);
+			vat_local = GetVATFrom(sum);
 		else
-			vat = vat_sum_by_row;
+			vat_local = vat_sum_by_row;
 	}
 
-	if(error_message.empty()) error_message = AssignVariableValue("cost_center_sum_amount", sum.PrintPriceTag(), true);
-	if(error_message.empty()) error_message = AssignVariableValue("cost_center_vat_amount", vat.PrintPriceTag(), true);
-	if(error_message.empty()) error_message = AssignVariableValue("cost_center_total_payment", (sum + vat).PrintPriceTag(), true);
+	total_local = GetTotalPaymentFrom(sum, vat_local);
+
+	if(error_message.empty()) error_message = AssignVariableValue("cost_center_sum_amount",		sum_local.PrintPriceTag(), true);
+	if(error_message.empty()) error_message = AssignVariableValue("cost_center_vat_amount",		vat_local.PrintPriceTag(), true);
+	if(error_message.empty()) error_message = AssignVariableValue("cost_center_total_payment",	total_local.PrintPriceTag(), true);
 
 	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
 

@@ -41,7 +41,6 @@ auto C_Print_Timecard::SetTimecard(const C_Timecard_To_Print &param1) -> void
 {
 	timecard = param1;
 	day_summary = {};
-	effort_hours = 0;
 	__pdf_line = -1;
 	effort_hours = 0;
 	effort_days = 0;
@@ -179,7 +178,6 @@ auto	C_Print_Timecard::AssignValuesToDaySummaryStruct() -> bool
 								c_float		tmp(reported_hours_item);
 
 								day_summary[column_counter].efforts = day_summary[column_counter].efforts + tmp;
-								effort_hours = effort_hours + tmp;
 							}
 							++column_counter;
 						}
@@ -192,12 +190,13 @@ auto	C_Print_Timecard::AssignValuesToDaySummaryStruct() -> bool
 
 				}
 
+				effort_hours = timecard.GetTotalHours();
 				effort_days = effort_hours / c_float(8);
 
-				effort_cost = timecard.GetDayrate() * GetEffortDays();
+				effort_cost = GetBaseCostFrom(timecard.GetDayrate() * GetEffortDays());
 				if(timecard.GetSupplierVAT() == "Y")
-					effort_cost_vat = GetEffortCost() * c_float(VAT_PERCENTAGE) / c_float(100);
-				total_payment = GetEffortCost() + GetEffortCostVAT();
+					effort_cost_vat = GetVATFrom(GetEffortCost());
+				total_payment = GetTotalPaymentFrom(GetEffortCost(), GetEffortCostVAT());
 
 				result = true;
 			}

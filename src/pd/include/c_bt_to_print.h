@@ -54,9 +54,9 @@ class C_BT_To_Print
 		c_float					markup_from_db;
 		c_float					sum_taxable;
 		c_float					sum_non_taxable;
-		c_float					tax;
-		c_float					markup;
-		c_float					total_payment;
+		c_float_with_rounding	tax;
+		c_float_with_rounding	markup;
+		c_float_with_rounding	total_payment;
 
 		// c_float					total_payment;
 

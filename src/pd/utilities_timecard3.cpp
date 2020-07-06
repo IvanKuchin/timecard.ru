@@ -1866,3 +1866,45 @@ auto DeleteServiceInvoicesSubcToAgency(string timecard_id, CMysql *db, CUser *us
 
 	return error_message;
 }
+
+
+
+auto GetBaseCostFrom(c_float amount) -> c_float
+{
+	MESSAGE_DEBUG("", "", "start (amount = " + string(amount) + ")");
+	c_float_with_rounding		rounded_amount(amount);
+
+	MESSAGE_DEBUG("", "", "finish (rounded_amount = " + string(rounded_amount) + ")");
+	return rounded_amount;
+}
+auto GetVATFrom(c_float	amount) -> c_float
+{
+	MESSAGE_DEBUG("", "", "start (amount = " + string(amount) + ")");
+
+	// --- having "enforced rounding" here is VERY IMPORTANT !!!. 
+	// --- VAT must be calculated from rounded base-price, otherwise it is easy to loose dime
+	// --- more details could be found in SR 438840
+	c_float_with_rounding		rounded_amount(amount);
+	c_float_with_rounding		vat = amount * c_float_with_rounding(VAT_PERCENTAGE) / c_float_with_rounding(100);
+
+	MESSAGE_DEBUG("", "", "finish (rounded_amount = " + string(rounded_amount) + ", vat = " + string(vat) + ")");
+
+	return vat;
+}
+
+auto GetTotalPaymentFrom(c_float amount, c_float vat) -> c_float
+{
+	MESSAGE_DEBUG("", "", "start (amount = " + string(amount) + ", vat = " + string(vat) + ")");
+
+	// --- having "enforced rounding" here is VERY IMPORTANT !!!. 
+	// --- VAT must be calculated from rounded base-price, otherwise it is easy to loose dime
+	// --- more details could be found in SR 438840
+	c_float_with_rounding		rounded_amount(amount);
+	c_float_with_rounding		rounded_vat(vat);
+	c_float						total_payment(rounded_amount + rounded_vat);
+
+	MESSAGE_DEBUG("", "", "finish (total_payment = " + string(total_payment) + ")");
+
+	return total_payment;
+}
+
