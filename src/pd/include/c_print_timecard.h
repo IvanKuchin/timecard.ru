@@ -48,8 +48,8 @@ class C_Print_Timecard
 		vector<Day_Summary_Struct>		day_summary = {};
 		c_float							effort_hours = 0;
 		c_float							effort_days = 0;
-		c_float							effort_cost = 0;
-		c_float							effort_cost_vat = 0;
+		c_float_with_rounding			effort_cost = 0;
+		c_float_with_rounding			effort_cost_vat = 0;
 		c_float							total_payment = 0;
 
 		HPDF_Doc						__pdf;

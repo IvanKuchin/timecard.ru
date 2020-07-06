@@ -184,19 +184,20 @@ auto	C_Print_Timecard::AssignValuesToDaySummaryStruct() -> bool
 							++column_counter;
 						}
 
-						effort_days = effort_hours / c_float(8);
-
-
-						effort_cost = timecard.GetDayrate() * GetEffortDays();
-						if(timecard.GetSupplierVAT() == "Y")
-							effort_cost_vat = GetEffortCost() * c_float(VAT_PERCENTAGE) / c_float(100);
-						total_payment = GetEffortCost() + GetEffortCostVAT();
 					}
 					else
 					{
 						MESSAGE_ERROR("", "", "time report(" + timcard_line.hours + ") have no entries. This flow expect to have time entries reported.");
 					}
+
 				}
+
+				effort_days = effort_hours / c_float(8);
+
+				effort_cost = timecard.GetDayrate() * GetEffortDays();
+				if(timecard.GetSupplierVAT() == "Y")
+					effort_cost_vat = GetEffortCost() * c_float(VAT_PERCENTAGE) / c_float(100);
+				total_payment = GetEffortCost() + GetEffortCostVAT();
 
 				result = true;
 			}
