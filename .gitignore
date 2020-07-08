@@ -31,9 +31,6 @@
 *.out
 *.app
 
-# current git commit
-git_commit_id
-
 #Ignore build files
 CMakeCache.txt
 CMakeFiles
