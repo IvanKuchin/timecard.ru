@@ -13,6 +13,36 @@ auto LogEnvVariables() -> void
 	return;
 }
 
+static auto LogGitCommitID()
+{
+	// MESSAGE_DEBUG("", "", "start");
+
+	ifstream	ifs(GIT_COMMIT_ID_FILE_NAME, ifstream::in);
+
+	if(ifs.is_open())
+	{
+		auto		result = ""s;
+		auto		temp = ""s;
+
+		while(getline(ifs, temp))
+		{
+			result += temp;
+		}
+
+		ifs.close();
+
+		MESSAGE_DEBUG("", "", "git commit id: " + result);
+	}
+	else
+	{
+		MESSAGE_DEBUG("", "", "git commit file (" + GIT_COMMIT_ID_FILE_NAME + ") doesn't exists");
+	}
+
+	// MESSAGE_DEBUG("", "", "finish");
+
+	return;
+}
+
 auto RegisterInitialVariables(CCgi *indexPage, CMysql *db, CUser *user) -> bool
 {
 	auto	result = true;
@@ -20,6 +50,7 @@ auto RegisterInitialVariables(CCgi *indexPage, CMysql *db, CUser *user) -> bool
 	MESSAGE_DEBUG("", "", "start");
 
 	LogEnvVariables();
+	LogGitCommitID();
 
 	indexPage->RegisterVariableForce("rand", GetRandom(10));
 	indexPage->RegisterVariableForce("random", GetRandom(10));

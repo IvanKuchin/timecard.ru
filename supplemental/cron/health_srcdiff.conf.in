@@ -74,6 +74,8 @@ nodiff_files => [
     "forget.htmlt",
     "change_password.htmlt",
 
+    "git_commit.pl",
+
     "archive.pl",
     "health_srcdiff.pl",
     "health_srcdiff.conf.in",

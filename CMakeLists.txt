@@ -36,6 +36,7 @@ set(ARCHIVE_PROJECT_DIR		${PROJECT_BINARY_DIR}/share/${MAIN_DOMAIN_NAME}/archive
 set(MAXMIND_PROJECT_DIR		${PROJECT_BINARY_DIR}/share/${MAIN_DOMAIN_NAME}/maxmind)
 set(CI_SCRIPT_PROJECT_DIR	${PROJECT_BINARY_DIR}/share/${MAIN_DOMAIN_NAME}/ci-scripts)
 set(LOCALE_PROJECT_DIR		${PROJECT_BINARY_DIR}/share/${MAIN_DOMAIN_NAME}/locale)
+set(GIT_PROJECT_DIR		${PROJECT_SOURCE_DIR}/supplemental/git)
 set(PDF_FONT_PROJECT_DIR	${PROJECT_SOURCE_DIR}/supplemental/libpdf-font)
 set(LIBXL_PROJECT_DIR		${PROJECT_SOURCE_DIR}/libxl-3.8.4.0/)
 
@@ -51,6 +52,7 @@ set(CRON_INSTALL_DIR		${CMAKE_INSTALL_PREFIX}/share/${MAIN_DOMAIN_NAME}/cron)
 set(ARCHIVE_INSTALL_DIR		${CMAKE_INSTALL_PREFIX}/share/${MAIN_DOMAIN_NAME}/archive)
 set(MAXMIND_INSTALL_DIR		${CMAKE_INSTALL_PREFIX}/share/${MAIN_DOMAIN_NAME}/maxmind)
 set(LOCALE_INSTALL_DIR		${CMAKE_INSTALL_PREFIX}/share/${MAIN_DOMAIN_NAME}/locale)
+set(GIT_INSTALL_DIR		${CMAKE_INSTALL_PREFIX}/share/${MAIN_DOMAIN_NAME}/git)
 set(PDF_FONT_INSTALL_DIR	${CMAKE_INSTALL_PREFIX}/share/${MAIN_DOMAIN_NAME}/libpdf-font)
 set(LIBXL_INSTALL_DIR		${CMAKE_INSTALL_PREFIX}/share/${MAIN_DOMAIN_NAME}/libxl)
 
@@ -72,6 +74,7 @@ add_subdirectory(supplemental/archive/)
 add_subdirectory(supplemental/maxmind/)
 add_subdirectory(supplemental/ci-scripts/)
 add_subdirectory(supplemental/libpdf-font/)
+add_subdirectory(supplemental/git/)
 add_subdirectory(po/)
 
 # --- CTest

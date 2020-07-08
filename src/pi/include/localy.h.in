@@ -306,7 +306,7 @@
 #define	SMARTWAY_PASSWORD							"${PROJECT_NAME}"s
 #define	SMARTWAY_URL								"https://api.test.dev.smartway.today/v2"s
 
-#define	GIT_COMMIT_ID								"${GIT_COMMIT_ID}"s
+#define	GIT_COMMIT_ID_FILE_NAME						"${GIT_INSTALL_DIR}/git_commit_id"s
 
 #endif
 
