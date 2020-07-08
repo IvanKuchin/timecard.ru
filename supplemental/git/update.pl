@@ -13,6 +13,12 @@ $DEBUG = 1;
 if(isCurrentDirProjectRoot()) {} else { die "ERROR: run this script from project root directory\n"; }
 
 AnonimizeFiles(@anonimazition);
+SaveLatestGitCommitID();
+
+sub SaveLatestGitCommitID
+{
+	system("get rev-parse HEAD > git_commit_id");
+}
 
 sub AnonimizeFiles
 {
