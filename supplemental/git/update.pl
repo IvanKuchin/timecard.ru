@@ -17,7 +17,7 @@ SaveLatestGitCommitID();
 
 sub SaveLatestGitCommitID
 {
-	system("get rev-parse HEAD > git_commit_id");
+	system("git rev-parse HEAD > ./supplemental/git/git_commit_id");
 }
 
 sub AnonimizeFiles
