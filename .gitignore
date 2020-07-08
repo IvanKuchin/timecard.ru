@@ -32,7 +32,7 @@
 *.app
 
 # current git commit
-*git_commit_id
+supplemental/git/git_commit_id
 
 #Ignore build files
 CMakeCache.txt
