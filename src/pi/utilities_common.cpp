@@ -31,11 +31,11 @@ static auto LogGitCommitID()
 
 		ifs.close();
 
-		MESSAGE_DEBUG("", "", "git commit id: " + result);
+		MESSAGE_WARNING("", "", "git commit id: " + result);
 	}
 	else
 	{
-		MESSAGE_DEBUG("", "", "git commit file (" + GIT_COMMIT_ID_FILE_NAME + ") doesn't exists");
+		MESSAGE_ERROR("", "", "git commit file (" + GIT_COMMIT_ID_FILE_NAME + ") doesn't exists");
 	}
 
 	// MESSAGE_DEBUG("", "", "finish");

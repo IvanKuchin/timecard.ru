@@ -16,6 +16,7 @@ nodiff_files => [
     "cactivator.cpp",
     "helpdesk.cpp",
 
+    "clog.h",
     "account.h",
     "cmail.h",
     "c_smsc.h",
