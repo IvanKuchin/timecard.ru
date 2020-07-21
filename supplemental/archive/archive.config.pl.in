@@ -10,7 +10,6 @@ replace_dev_to_www_files => [
 	"SRCDIR/CMakeLists.txt",
 	"SRCDIR/build/src/pi/include/localy.h",
 	"ROOTDIR_CGI/admin/templates/domain.htmlt",
-	"ROOTDIR_CGI/admin/templates/admin_domain.htmlt",
 	"ROOTDIR_CGI/admin/templates/admin_chat_get_cnx_list.htmlt",
 	"ROOTDIR_CGI/admin/templates/admin_chat_get_presence_cache.htmlt",
 	"ROOTDIR_HTML/js/pages/chat.js",
