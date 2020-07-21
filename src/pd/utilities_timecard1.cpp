@@ -4208,7 +4208,7 @@ auto	GetSOWInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include_t
 		string	eventTimestamp;
 	};
 	vector<ItemClass>		itemsList;
-	static c_cache_obj		cache_obj;
+	c_cache_obj		cache_obj;
 
 
 	affected = db->Query(sqlQuery);
