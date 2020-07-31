@@ -17,7 +17,7 @@ auto	GetServiceBTInvoicesInJSONFormat(string sqlQuery, CMysql *db, CUser *user) 
 		string		eventTimestamp;
 	};
 	vector<ItemClass>		itemsList;
-	c_cache_obj				user_cache;
+	static c_cache_obj				user_cache;
 
 	affected = db->Query(sqlQuery);
 	if(affected)

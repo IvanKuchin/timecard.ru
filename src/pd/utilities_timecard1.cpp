@@ -3303,7 +3303,7 @@ string	GetTimecardTaskAssignmentInJSONFormat(string sqlQuery, CMysql *db, CUser 
 		string	eventTimestamp;
 	};
 	vector<ItemClass>		itemsList;
-	c_cache_obj				user_cache;
+	static c_cache_obj				user_cache;
 
 	affected = db->Query(sqlQuery);
 	if(affected)
@@ -3366,7 +3366,7 @@ string	GetBTExpenseAssignmentInJSONFormat(string sqlQuery, CMysql *db, CUser *us
 		string	eventTimestamp;
 	};
 	vector<ItemClass>		itemsList;
-	c_cache_obj				user_cache;
+	static c_cache_obj				user_cache;
 
 	MESSAGE_DEBUG("", "", "start");
 
@@ -3661,7 +3661,7 @@ string	GetApproversInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool i
 	int						affected;
 	string					result;
 	vector<ItemClass>		itemsList;
-	c_cache_obj				user_cache;
+	static c_cache_obj				user_cache;
 
 	MESSAGE_DEBUG("", "", "start");
 
@@ -3869,7 +3869,7 @@ string	GetTimecardsInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool i
 		string				eventTimestamp;
 	};
 	vector<ItemClass>		itemsList;
-	c_cache_obj				cache_obj;
+	static c_cache_obj				cache_obj;
 
 	MESSAGE_DEBUG("", "", "start");
 
@@ -4208,7 +4208,7 @@ auto	GetSOWInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include_t
 		string	eventTimestamp;
 	};
 	vector<ItemClass>		itemsList;
-	c_cache_obj		cache_obj;
+	static c_cache_obj		cache_obj;
 
 
 	affected = db->Query(sqlQuery);
