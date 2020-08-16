@@ -257,7 +257,7 @@
 #define	BUSINESS_TRIP_TAX_PERCENTAGE				6.38
 
 // --- actions allowed w/o session cookie
-#define	ALLOWED_NO_SESSION_ACTION					{ "getUserWall" }
+#define	ALLOWED_NO_SESSION_ACTION					{  }
 
 #define	INCLUDE_ADDITIONAL_INFO						true
 
