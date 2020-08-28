@@ -150,7 +150,7 @@ static bool NotifyAboutPendingApprovals(string entity, CMysql *db)
 	MESSAGE_DEBUG("", "", "start");
 
 	bool		result = false;
-	auto		user_ids = GetValuesFromDB(	"SELECT `approver_user_id` FROM `" + entity + "_approvers` WHERE `id` IN ("
+	auto		user_ids = GetValuesFromDB(	"SELECT DISTINCT(`approver_user_id`) FROM `" + entity + "_approvers` WHERE `id` IN ("
 											    "SELECT `approver_id` FROM `" + entity + "_approvals` WHERE `decision`=\"pending\""
 											");", db);
 	CVars		vars;
