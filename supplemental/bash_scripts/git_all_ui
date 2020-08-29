@@ -1,0 +1,47 @@
+#!/bin/bash
+
+dir_mask="^dev\."
+curr_dir=`pwd`
+
+function git_folders()
+{
+    cd $curr_dir
+
+    for i in $(ls | grep $dir_mask);
+    do
+	echo
+	echo
+	echo
+	echo
+	echo ------ $i
+	echo
+        cd $curr_dir/$i && git add .
+
+        ret_val=$?
+        if [ $ret_val -gt 0 ]
+        then
+            echo [ERROR]
+            exit $ret_val
+	else
+	    git commit -m "$commit_message"
+	    ret_val=$?
+	    if [ $ret_val -gt 0 ]
+	    then
+		echo no changes to commit
+	    else
+	        git push
+		ret_val=$?
+		if [ $ret_val -gt 0 ]
+		then
+		    echo [ERROR] git push
+		    exit $ret_val
+		fi
+	    fi
+        fi
+    done
+}
+
+echo git commit message:
+read commit_message
+
+git_folders
