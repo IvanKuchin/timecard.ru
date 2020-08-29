@@ -1,3 +1,3 @@
 # timecard.ru
 
-![Travis (.com) branch](https://img.shields.io/travis/com/IvanKuchin/timecard.su/development.svg)
+![Travis (.com) branch](https://travis-ci.com/IvanKuchin/timecard.ru.svg?branch=development)
