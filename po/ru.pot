@@ -972,6 +972,9 @@ msgstr "не указан адрес доставки"
 msgid "mandatory parameter missed"
 msgstr "пропущен обязательный параметр"
 
+msgid "field should not be empty"
+msgstr "поле не должно быть пустым"
+
 msgid "member has missed"
 msgstr "нет атрибута"
 

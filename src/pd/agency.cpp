@@ -1544,14 +1544,15 @@ int main(void)
 			(action == "AJAX_updateCostCenterDescription")
 		)
 		{
-			ostringstream	ostResult;
-
 			MESSAGE_DEBUG("", action, "start");
+			
+			// ostringstream	ostResult;
 
-			ostResult.str("");
+			// ostResult.str("");
 			{
-				auto			template_name = "json_response.htmlt"s;
-				auto			error_message = ""s;
+				// auto			template_name	= "json_response.htmlt"s;
+				auto			success_message	= ""s;
+				auto			error_message	= ""s;
 
 				auto			company_id		= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("company_id"));
 				auto			id				= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
@@ -1560,6 +1561,7 @@ int main(void)
 				if(
 					new_value.length() 									||
 					(action == "AJAX_updateCompanyCustomField")			||	// --- custom field could be empty
+					(action == "AJAX_updateCompanyKPP")					||	// --- custom field could be empty
 					(action == "AJAX_updateCostCenterCustomField")		||	// --- custom field could be empty
 					(action == "AJAX_updateCompanyActNumberPrefix")		||	// --- ActNumberPrefix could be empty
 					(action == "AJAX_updateCompanyActNumberPostfix")		 // --- ActNumberPostfix could be empty
@@ -1684,10 +1686,12 @@ int main(void)
 				}
 				else
 				{
-					error_message = gettext("parameters incorrect");
-					MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") didn't set new_value");
+					error_message = gettext("field should not be empty");
+					MESSAGE_DEBUG("", action, error_message);
 				}
 
+				AJAX_ResponseTemplate(&indexPage, success_message, error_message);
+/*
 				if(error_message.empty())
 				{
 					ostResult << "{\"result\":\"success\"}";
@@ -1701,6 +1705,7 @@ int main(void)
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
 				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+*/
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
@@ -2075,8 +2080,8 @@ int main(void)
 				}
 				else
 				{
-					MESSAGE_ERROR("", action, "one of mandatory parameters missed");
-					error_message = "Некоторые параметры не заданы";
+					error_message = gettext("mandatory parameter missed");
+					MESSAGE_ERROR("", action, error_message);
 				}
 
 				if(error_message.empty())

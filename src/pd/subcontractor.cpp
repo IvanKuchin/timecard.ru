@@ -1968,20 +1968,22 @@ int main()
 		(action == "AJAX_updateCompanyBankID")
 	)
 	{
-		ostringstream	ostResult;
+		// ostringstream	ostResult;
 
 		MESSAGE_DEBUG("", action, "start");
 
-		ostResult.str("");
+		// ostResult.str("");
 		{
-			string			template_name = "json_response.htmlt";
-			string			error_message = "";
+			// string			template_name = "json_response.htmlt";
+			auto			error_message	= ""s;
+			auto			success_message = ""s;
 
-			string			id				= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
-			string			new_value		= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("value"));
+			auto			id				= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
+			auto			new_value		= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("value"));
 
 			if(
 				new_value.length() 									||
+				(action == "AJAX_updateCompanyKPP")					||	// --- Company KPP could be empty
 				(action == "AJAX_updateCompanyActNumberPrefix")		||	// --- ActNumberPrefix could be empty
 				(action == "AJAX_updateCompanyActNumberPostfix")		 // --- ActNumberPostfix could be empty
 			)
@@ -2020,7 +2022,7 @@ int main()
 									error_message = SetNewValueByAction(action, id, "", new_value, &db, &user);
 									if(error_message.empty())
 									{
-										ostResult << "{\"result\":\"success\"}";
+										// ostResult << "{\"result\":\"success\"}";
 
 										if(GeneralNotifySoWContractPartiesAboutChanges(action, id, "", existing_value, new_value, &db, &user))
 										{
@@ -2065,7 +2067,7 @@ int main()
 					}
 					else
 					{
-						error_message = "Агенство не найдено";
+						error_message = gettext("agency not found");
 						MESSAGE_ERROR("", action, "company.id not found by user.id(" + user.GetID() + ") employment");
 					}
 				}
@@ -2078,10 +2080,13 @@ int main()
 			}
 			else
 			{
-				error_message = "Поле не должно быть пустым";
-				MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") didn't set new_value");
+				error_message = gettext("field should not be empty");
+				MESSAGE_DEBUG("", action, error_message);
 			}
 
+			AJAX_ResponseTemplate(&indexPage, success_message, error_message);
+
+/*
 			if(error_message.empty())
 			{
 			}
@@ -2094,6 +2099,7 @@ int main()
 			indexPage.RegisterVariableForce("result", ostResult.str());
 
 			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+*/
 		}
 
 		MESSAGE_DEBUG("", action, "finish");
