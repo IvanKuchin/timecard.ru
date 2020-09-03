@@ -1545,168 +1545,147 @@ int main(void)
 		)
 		{
 			MESSAGE_DEBUG("", action, "start");
-			
-			// ostringstream	ostResult;
 
-			// ostResult.str("");
+			auto			success_message	= ""s;
+			auto			error_message	= ""s;
+
+			auto			company_id		= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("company_id"));
+			auto			id				= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
+			auto			new_value		= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("value"));
+
+			if(
+				new_value.length() 									||
+				(action == "AJAX_updateCompanyCustomField")			||	// --- custom field could be empty
+				(action == "AJAX_updateCompanyKPP")					||	// --- custom field could be empty
+				(action == "AJAX_updateCostCenterCustomField")		||	// --- custom field could be empty
+				(action == "AJAX_updateCompanyActNumberPrefix")		||	// --- ActNumberPrefix could be empty
+				(action == "AJAX_updateCompanyActNumberPostfix")		 // --- ActNumberPostfix could be empty
+			)
 			{
-				// auto			template_name	= "json_response.htmlt"s;
-				auto			success_message	= ""s;
-				auto			error_message	= ""s;
-
-				auto			company_id		= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("company_id"));
-				auto			id				= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
-				auto			new_value		= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("value"));
-
-				if(
-					new_value.length() 									||
-					(action == "AJAX_updateCompanyCustomField")			||	// --- custom field could be empty
-					(action == "AJAX_updateCompanyKPP")					||	// --- custom field could be empty
-					(action == "AJAX_updateCostCenterCustomField")		||	// --- custom field could be empty
-					(action == "AJAX_updateCompanyActNumberPrefix")		||	// --- ActNumberPrefix could be empty
-					(action == "AJAX_updateCompanyActNumberPostfix")		 // --- ActNumberPostfix could be empty
-				)
+				error_message = isAgencyEmployeeAllowedToChangeAgencyData(&db, &user);
+				if(error_message.empty())
 				{
-					error_message = isAgencyEmployeeAllowedToChangeAgencyData(&db, &user);
-					if(error_message.empty())
+					string	agency_id = GetAgencyID(&user, &db);
+					if(agency_id.length())
 					{
-						string	agency_id = GetAgencyID(&user, &db);
-						if(agency_id.length())
-						{
-							if(action == "AJAX_updateCompanyTitle") 		{					if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
-							if(action == "AJAX_updateCompanyDescription")	{					if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
-							if(action == "AJAX_updateCompanyWebSite")		{					if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
-							if(action == "AJAX_updateCompanyActNumber")		{					if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
-							if(action == "AJAX_updateCompanyActNumberPrefix")	{				if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
-							if(action == "AJAX_updateCompanyActNumberPostfix")	{				if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
-							if(action == "AJAX_updateCompanyTIN")			{					if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
-							if(action == "AJAX_updateCompanyVAT")			{					if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
-							if(action == "AJAX_updateCompanyVATCalculationType"){ new_value = (new_value == "Y" ? "sum_by_row" : "percentage");	if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
-							if(action == "AJAX_updateCompanyAccount")		{					if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
-							if(action == "AJAX_updateCompanyOGRN")			{					if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
-							if(action == "AJAX_updateCompanyKPP")			{					if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
-							if(action == "AJAX_updateCompanyLegalAddress") 	{					if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
-							if(action == "AJAX_updateCompanyMailingAddress"){					if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
-							if(action == "AJAX_updateCompanyMailingZipID") 	{	new_value = id; if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
-							if(action == "AJAX_updateCompanyLegalZipID") 	{	new_value = id; if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
-							if(action == "AJAX_updateCompanyBankID") 		{	new_value = id; if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
+						if(action == "AJAX_updateCompanyTitle") 		{					if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
+						if(action == "AJAX_updateCompanyDescription")	{					if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
+						if(action == "AJAX_updateCompanyWebSite")		{					if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
+						if(action == "AJAX_updateCompanyActNumber")		{					if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
+						if(action == "AJAX_updateCompanyActNumberPrefix")	{				if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
+						if(action == "AJAX_updateCompanyActNumberPostfix")	{				if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
+						if(action == "AJAX_updateCompanyTIN")			{					if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
+						if(action == "AJAX_updateCompanyVAT")			{					if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
+						if(action == "AJAX_updateCompanyVATCalculationType"){ new_value = (new_value == "Y" ? "sum_by_row" : "percentage");	if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
+						if(action == "AJAX_updateCompanyAccount")		{					if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
+						if(action == "AJAX_updateCompanyOGRN")			{					if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
+						if(action == "AJAX_updateCompanyKPP")			{					if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
+						if(action == "AJAX_updateCompanyLegalAddress") 	{					if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
+						if(action == "AJAX_updateCompanyMailingAddress"){					if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
+						if(action == "AJAX_updateCompanyMailingZipID") 	{	new_value = id; if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
+						if(action == "AJAX_updateCompanyLegalZipID") 	{	new_value = id; if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
+						if(action == "AJAX_updateCompanyBankID") 		{	new_value = id; if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
 
+						if(error_message.empty())
+						{
+							error_message = isActionEntityBelongsToAgency(action, id, agency_id, &db, &user);
 							if(error_message.empty())
 							{
-								error_message = isActionEntityBelongsToAgency(action, id, agency_id, &db, &user);
+								error_message = CheckNewValueByAction(action, id, "", new_value, &db, &user);
 								if(error_message.empty())
 								{
-									error_message = CheckNewValueByAction(action, id, "", new_value, &db, &user);
-									if(error_message.empty())
+									if((action.find("update") != string::npos))
 									{
-										if((action.find("update") != string::npos))
-										{
-											string		existing_value = GetDBValueByAction(action, id, "", &db, &user);
+										string		existing_value = GetDBValueByAction(action, id, "", &db, &user);
 
-											if(existing_value != new_value)
-												error_message = SetNewValueByAction(action, id, "", new_value, &db, &user);
-											else
-											{
-												MESSAGE_DEBUG("", action, "existing_value == new_value(" + new_value + "), no need to change DB");
-											}
-											if(error_message.empty())
-											{
-												// --- good finish
-
-												if(GeneralNotifySoWContractPartiesAboutChanges(action, id, "", existing_value, new_value, &db, &user))
-												{
-												}
-												else
-												{
-													MESSAGE_DEBUG("", action, "fail to notify agency about changes");
-												}
-											}
-											else
-											{
-												MESSAGE_DEBUG("", action, "unable to set new value (action/id/value = " + action + "/" + id + "/[" + new_value + "])");
-											}
-										}
-										else if(action.find("insert") != string::npos)
+										if(existing_value != new_value)
+											error_message = SetNewValueByAction(action, id, "", new_value, &db, &user);
+										else
 										{
-											
+											MESSAGE_DEBUG("", action, "existing_value == new_value(" + new_value + "), no need to change DB");
 										}
-										else if(action.find("delete") != string::npos)
+										if(error_message.empty())
 										{
-											string		existing_value = GetDBValueByAction(action, id, "", &db, &user);
+											// --- good finish
 
 											if(GeneralNotifySoWContractPartiesAboutChanges(action, id, "", existing_value, new_value, &db, &user))
 											{
 											}
 											else
 											{
-												MESSAGE_ERROR("", action, "fail to notify agency about changes");
-											}
-
-											error_message = SetNewValueByAction(action, id, "", new_value, &db, &user);
-											if(error_message.empty())
-											{
-												// --- good finish
-											}
-											else
-											{
-												MESSAGE_DEBUG("", action, "unable to set new value (action/id/value = " + action + "/" + id + "/[" + new_value + "])");
+												MESSAGE_DEBUG("", action, "fail to notify agency about changes");
 											}
 										}
 										else
 										{
-											MESSAGE_ERROR("", action, "unsupported action type(" + action + ")");
+											MESSAGE_DEBUG("", action, "unable to set new value (action/id/value = " + action + "/" + id + "/[" + new_value + "])");
+										}
+									}
+									else if(action.find("insert") != string::npos)
+									{
+										
+									}
+									else if(action.find("delete") != string::npos)
+									{
+										string		existing_value = GetDBValueByAction(action, id, "", &db, &user);
+
+										if(GeneralNotifySoWContractPartiesAboutChanges(action, id, "", existing_value, new_value, &db, &user))
+										{
+										}
+										else
+										{
+											MESSAGE_ERROR("", action, "fail to notify agency about changes");
 										}
 
+										error_message = SetNewValueByAction(action, id, "", new_value, &db, &user);
+										if(error_message.empty())
+										{
+											// --- good finish
+										}
+										else
+										{
+											MESSAGE_DEBUG("", action, "unable to set new value (action/id/value = " + action + "/" + id + "/[" + new_value + "])");
+										}
 									}
 									else
 									{
-										MESSAGE_DEBUG("", action, "new value failed to pass validity check");
+										MESSAGE_ERROR("", action, "unsupported action type(" + action + ")");
 									}
+
 								}
 								else
 								{
-									MESSAGE_DEBUG("", action, "action entity id(" + user.GetID() + ") doesn't belongs to agency.id(" + agency_id + ")");
+									MESSAGE_DEBUG("", action, "new value failed to pass validity check");
 								}
 							}
 							else
 							{
-								MESSAGE_ERROR("", action, "company.id not defined")
+								MESSAGE_DEBUG("", action, "action entity id(" + user.GetID() + ") doesn't belongs to agency.id(" + agency_id + ")");
 							}
 						}
 						else
 						{
-							error_message = "Агенство не найдено";
-							MESSAGE_ERROR("", action, "agency.id not found by user.id(" + user.GetID() + ") employment");
+							MESSAGE_ERROR("", action, "company.id not defined")
 						}
 					}
 					else
 					{
-						MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") doesn't allowed to change agency data");
+						error_message = "Агенство не найдено";
+						MESSAGE_ERROR("", action, "agency.id not found by user.id(" + user.GetID() + ") employment");
 					}
 				}
 				else
 				{
-					error_message = gettext("field should not be empty");
-					MESSAGE_DEBUG("", action, error_message);
+					MESSAGE_DEBUG("", action, "user.id(" + user.GetID() + ") doesn't allowed to change agency data");
 				}
-
-				AJAX_ResponseTemplate(&indexPage, success_message, error_message);
-/*
-				if(error_message.empty())
-				{
-					ostResult << "{\"result\":\"success\"}";
-				}
-				else
-				{
-					MESSAGE_DEBUG("", action, "failed");
-					ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
-				}
-
-				indexPage.RegisterVariableForce("result", ostResult.str());
-
-				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
-*/
 			}
+			else
+			{
+				error_message = gettext("field should not be empty");
+				MESSAGE_DEBUG("", action, error_message);
+			}
+
+			AJAX_ResponseTemplate(&indexPage, success_message, error_message);
 
 			MESSAGE_DEBUG("", action, "finish");
 		}

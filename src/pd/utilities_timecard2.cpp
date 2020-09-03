@@ -996,7 +996,7 @@ auto	isActionEntityBelongsToSoW(string action, string id, string sow_id, CMysql 
 
 string	CheckNewValueByAction(string action, string id, string sow_id, string new_value, CMysql *db, CUser *user)
 {
-	string	error_message = "";
+	auto	error_message = ""s;
 
 	MESSAGE_DEBUG("", "", "start");
 
