@@ -1983,87 +1983,86 @@ int main()
 			(action == "AJAX_updateCompanyActNumberPostfix")		 // --- ActNumberPostfix could be empty
 		)
 		{
+			auto	company_id = GetCompanyID(&user, &db);
+			
+			if(company_id.length())
 			{
-				auto	company_id = GetCompanyID(&user, &db);
-				if(company_id.length())
-				{
-					if(action == "AJAX_updateCompanyTitle") 		{	id = company_id; }
-					if(action == "AJAX_updateCompanyDescription")	{	id = company_id; }
-					if(action == "AJAX_updateCompanyWebSite")		{	id = company_id; }
-					if(action == "AJAX_updateCompanyActNumber")		{	id = company_id; }
-					if(action == "AJAX_updateCompanyActNumberPrefix"){	id = company_id; }
-					if(action == "AJAX_updateCompanyActNumberPostfix"){	id = company_id; }
-					if(action == "AJAX_updateCompanyTIN")			{	id = company_id; }
-					if(action == "AJAX_updateCompanyVAT")			{	id = company_id; }
-					if(action == "AJAX_updateCompanyAccount")		{	id = company_id; }
-					if(action == "AJAX_updateCompanyOGRN")			{	id = company_id; }
-					if(action == "AJAX_updateCompanyKPP")			{	id = company_id; }
-					if(action == "AJAX_updateCompanyLegalAddress") 	{	id = company_id; }
-					if(action == "AJAX_updateCompanyMailingAddress"){	id = company_id; }
-					if(action == "AJAX_updateCompanyMailingZipID") 	{	new_value = id; id = company_id; }
-					if(action == "AJAX_updateCompanyLegalZipID") 	{	new_value = id; id = company_id; }
-					if(action == "AJAX_updateCompanyBankID") 		{	new_value = id; id = company_id; }
+				if(action == "AJAX_updateCompanyTitle") 		{	id = company_id; }
+				if(action == "AJAX_updateCompanyDescription")	{	id = company_id; }
+				if(action == "AJAX_updateCompanyWebSite")		{	id = company_id; }
+				if(action == "AJAX_updateCompanyActNumber")		{	id = company_id; }
+				if(action == "AJAX_updateCompanyActNumberPrefix"){	id = company_id; }
+				if(action == "AJAX_updateCompanyActNumberPostfix"){	id = company_id; }
+				if(action == "AJAX_updateCompanyTIN")			{	id = company_id; }
+				if(action == "AJAX_updateCompanyVAT")			{	id = company_id; }
+				if(action == "AJAX_updateCompanyAccount")		{	id = company_id; }
+				if(action == "AJAX_updateCompanyOGRN")			{	id = company_id; }
+				if(action == "AJAX_updateCompanyKPP")			{	id = company_id; }
+				if(action == "AJAX_updateCompanyLegalAddress") 	{	id = company_id; }
+				if(action == "AJAX_updateCompanyMailingAddress"){	id = company_id; }
+				if(action == "AJAX_updateCompanyMailingZipID") 	{	new_value = id; id = company_id; }
+				if(action == "AJAX_updateCompanyLegalZipID") 	{	new_value = id; id = company_id; }
+				if(action == "AJAX_updateCompanyBankID") 		{	new_value = id; id = company_id; }
 
 /*
-					error_message = isActionEntityBelongsToCompany(action, id, company_id, &db, &user);
+				error_message = isActionEntityBelongsToCompany(action, id, company_id, &db, &user);
+				if(error_message.empty())
+				{
+					error_message = CheckNewValueByAction(action, id, "", new_value, &db, &user);
 					if(error_message.empty())
 					{
-						error_message = CheckNewValueByAction(action, id, "", new_value, &db, &user);
-						if(error_message.empty())
-						{
 */
-							if(action.find("update"))
+						if(action.find("update"))
+						{
+							string		existing_value = GetDBValueByAction(action, id, "", &db, &user);
+
+							error_message = SetNewValueByAction(action, id, "", new_value, &db, &user);
+							if(error_message.empty())
 							{
-								string		existing_value = GetDBValueByAction(action, id, "", &db, &user);
+								// ostResult << "{\"result\":\"success\"}";
 
-								error_message = SetNewValueByAction(action, id, "", new_value, &db, &user);
-								if(error_message.empty())
+								if(GeneralNotifySoWContractPartiesAboutChanges(action, id, "", existing_value, new_value, &db, &user))
 								{
-									// ostResult << "{\"result\":\"success\"}";
-
-									if(GeneralNotifySoWContractPartiesAboutChanges(action, id, "", existing_value, new_value, &db, &user))
-									{
-									}
-									else
-									{
-										MESSAGE_DEBUG("", action, "fail to notify subcontractor about changes");
-									}
 								}
 								else
 								{
-									MESSAGE_DEBUG("", action, "unable to set new value (action/id/value = " + action + "/" + id + "/" + new_value + ")");
+									MESSAGE_DEBUG("", action, "fail to notify subcontractor about changes");
 								}
-							}
-							else if(action.find("insert"))
-							{
-								
-							}
-							else if(action.find("delete"))
-							{
-
 							}
 							else
 							{
-								MESSAGE_ERROR("", action, "unsupported action type(" + action + ")");
+								MESSAGE_DEBUG("", action, "unable to set new value (action/id/value = " + action + "/" + id + "/" + new_value + ")");
 							}
-/*
+						}
+						else if(action.find("insert"))
+						{
+							
+						}
+						else if(action.find("delete"))
+						{
+
 						}
 						else
 						{
-							MESSAGE_DEBUG("", action, "new value failed to pass validity check");
+							MESSAGE_ERROR("", action, "unsupported action type(" + action + ")");
 						}
+/*
 					}
 					else
 					{
-						MESSAGE_DEBUG("", action, "action entity id(" + user.GetID() + ") doesn't belongs to agency.id(" + company_id + ")");
+						MESSAGE_DEBUG("", action, "new value failed to pass validity check");
 					}
-*/
 				}
 				else
 				{
-					error_message = gettext("agency not found");
-					MESSAGE_ERROR("", action, "company.id not found by user.id(" + user.GetID() + ") employment");
+					MESSAGE_DEBUG("", action, "action entity id(" + user.GetID() + ") doesn't belongs to agency.id(" + company_id + ")");
 				}
+*/
+			}
+			else
+			{
+				error_message = gettext("agency not found");
+				MESSAGE_ERROR("", action, "company.id not found by user.id(" + user.GetID() + ") employment");
 			}
 		}
 		else
