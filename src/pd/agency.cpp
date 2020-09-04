@@ -1556,7 +1556,6 @@ int main(void)
 			if(
 				new_value.length() 									||
 				(action == "AJAX_updateCompanyCustomField")			||	// --- custom field could be empty
-				(action == "AJAX_updateCompanyKPP")					||	// --- custom field could be empty
 				(action == "AJAX_updateCostCenterCustomField")		||	// --- custom field could be empty
 				(action == "AJAX_updateCompanyActNumberPrefix")		||	// --- ActNumberPrefix could be empty
 				(action == "AJAX_updateCompanyActNumberPostfix")		 // --- ActNumberPostfix could be empty

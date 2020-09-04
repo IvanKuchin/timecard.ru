@@ -1978,7 +1978,6 @@ int main()
 
 		if(
 			new_value.length() 									||
-			(action == "AJAX_updateCompanyKPP")					||	// --- Company KPP could be empty
 			(action == "AJAX_updateCompanyActNumberPrefix")		||	// --- ActNumberPrefix could be empty
 			(action == "AJAX_updateCompanyActNumberPostfix")		 // --- ActNumberPostfix could be empty
 		)

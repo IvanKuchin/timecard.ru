@@ -1007,7 +1007,6 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 			{
 				if(
 					new_value.length()									||
-					(action == "AJAX_updateCompanyKPP")					||	// --- company KPP could be empty
 					(action == "AJAX_updateCompanyCustomField")			||	// --- custom field could be empty
 					(action == "AJAX_updateCostCenterCustomField")		||	// --- custom field could be empty
 					(action == "AJAX_updateSoWCustomField")				||	// --- custom field could be empty
@@ -4044,7 +4043,6 @@ string	SetNewValueByAction(string action, string id, string sow_id, string new_v
 			{
 				if(
 					new_value.length()									||
-					(action == "AJAX_updateCompanyKPP")					||	// --- Company KPP could be empty
 					(action == "AJAX_updateCompanyCustomField")			||	// --- custom field could be empty
 					(action == "AJAX_updateCostCenterCustomField")		||	// --- custom field could be empty
 					(action == "AJAX_updateSoWCustomField")				||	// --- custom field could be empty
