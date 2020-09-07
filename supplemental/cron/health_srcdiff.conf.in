@@ -2,6 +2,7 @@ nodiff_files => [
     "account.cpp",
     "avataruploader.cpp",
     "generalimageuploader.cpp",
+    "cmysql.cpp",
     "cmail.cpp",
     "c_smsc.cpp",
     "c_float.cpp",
@@ -17,6 +18,7 @@ nodiff_files => [
     "cactivator.cpp",
     "helpdesk.cpp",
 
+    "cmysql.h",
     "clog.h",
     "account.h",
     "cmail.h",
