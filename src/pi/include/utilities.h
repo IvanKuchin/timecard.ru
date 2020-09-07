@@ -233,7 +233,6 @@ auto			GetHelpDeskTicketsInJSONFormat(string sqlQuery, CMysql *, CUser *user) ->
 auto			GetHelpDeskTicketHistoryInJSONFormat(string sqlQuery, CMysql *, CUser *user) -> string;
 auto			GetHelpDeskTicketAttachInJSONFormat(string sqlQuery, CMysql *, CUser *user) -> string;
 auto			isHelpdeskTicketOwner(string ticket_id, string user_id, CMysql *, CUser *user) -> bool;
-auto			isUserAllowedToChangeTicket(string ticket_id, string user_id, CMysql *, CUser *user) -> string;
 
 // --- FAQ
 auto			GetFAQInJSONFormat(string sqlQuery, CMysql *, CUser *user) -> string;
