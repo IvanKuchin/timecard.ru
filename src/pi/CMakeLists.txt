@@ -162,12 +162,6 @@ configure_file(
     "${PROJECT_BINARY_DIR}/src/pi/include/localy.h"
     )
 
-configure_file(
-    "${PROJECT_SOURCE_DIR}/src/pi/include/cmysql.h.in"
-    "${PROJECT_BINARY_DIR}/src/pi/include/cmysql.h"
-    )
-
-
 # ---- list of independent libraries
 foreach(INDEPENDENT_LIBRARY_SRC ${INDEPENDENT_LIBRARIES_SRC})
     string(REGEX REPLACE "(^.*/|\\.[^.]*$)" "" file_without_ext ${INDEPENDENT_LIBRARY_SRC})

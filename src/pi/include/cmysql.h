@@ -9,7 +9,6 @@
 using namespace std;
 
 #include "c_config.h"
-#include "localy.h"
 #include "clog.h"
 
 class CMysqlSkel
@@ -55,10 +54,10 @@ class CMysql : public CMysqlSkel
 		const	string			DB_CHARSET				= "utf8mb4"s;
 
 		// --- this should only be used for CI/CD testing
-		const	string			DB_FALLBACK_NAME		= "${MAIN_DOMAIN_NAME}";
-		const	string			DB_FALLBACK_LOGIN		= "${PROJECT_NAME}";
-		const	string			DB_FALLBACK_PASSWORD	= "${PROJECT_NAME}";
-		const	string			DB_FALLBACK_HOST		= "localhost";
+		const	string			__DB_FALLBACK_NAME		= DB_FALLBACK_NAME;
+		const	string			__DB_FALLBACK_LOGIN		= DB_FALLBACK_LOGIN;
+		const	string			__DB_FALLBACK_PASSWORD	= DB_FALLBACK_PASSWORD;
+		const	string			__DB_FALLBACK_HOST		= DB_FALLBACK_HOST;
 
 		map<string, string>		GetCredentialsFromConfigFile(vector<string> param_list);
 

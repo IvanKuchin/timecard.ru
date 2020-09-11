@@ -62,8 +62,6 @@ sub SaveLatestGitCommitID
 
 sub AddAndCommit
 {
-	my	@files = @_;
-
 	system("git add .");
 	if(defined $git_commit_message)
 	{
@@ -87,17 +85,7 @@ sub AnonimizeFiles
 		{
 			if(HideSensitiveInfoInFiles(@files))
 			{
-				system("git add .");
-				if(defined $git_commit_message)
-				{
-					system("git commit -m \"$git_commit_message\"");
-				}
-				else
-				{
-					print("git commit message: ");
-					system("git commit --file -");
-				}
-				system("git push");
+				AddAndCommit();
 
 				if(RestoreFiles(@files)) {}
 				else
