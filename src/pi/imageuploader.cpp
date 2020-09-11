@@ -320,7 +320,7 @@ int main()
 			throw CException("Template file was missing");
 		}
 
-		if(db.Connect(DB_NAME, DB_LOGIN, DB_PASSWORD) < 0)
+		if(db.Connect() < 0)
 		{
 			CLog	log;
 
@@ -786,7 +786,7 @@ int main()
 												// --- create new DB-connection, due to parent will close the old one
 												CMysql  db1;		
 
-												if(db1.Connect(DB_NAME, DB_LOGIN, DB_PASSWORD) < 0)
+												if(db1.Connect() < 0)
 												{
 													CLog	log;
 
@@ -816,10 +816,8 @@ int main()
 												}
 												else
 												{
-													{
-														CLog	log;
-														log.Write(DEBUG, string(__func__) + "[" + to_string(__LINE__) + "]: remove newly converted video [" + videoConverter.GetFinalFullFilename(1) + "] because user canceled message submission");
-													}
+													MESSAGE_DEBUG("", "", "remove newly converted video [" + videoConverter.GetFinalFullFilename(1) + "] because user canceled message submission");
+													
 													unlink(videoConverter.GetFinalFullFilename(1).c_str());
 												}
 

@@ -1,17 +1,21 @@
 #ifndef __C_SMARTWAY__H__
 #define __C_SMARTWAY__H__
 
+#include <fstream>
+
 #include <rapidjson/document.h>
 #include <rapidjson/prettywriter.h>
 
+#include "c_config.h"
 #include "chtml.h"
 #include "clog.h"
 #include "utilities.h"
-#include <fstream>
 #include "localy.h"
 
 using namespace std;
 using namespace rapidjson;
+
+#define	SMARTWAY_URL								"https://api.test.dev.smartway.today/v2"s
 
 struct C_Flight_Route
 {

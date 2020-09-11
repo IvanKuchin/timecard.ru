@@ -31,6 +31,7 @@ set(JOINT_LIBRARY_SRCs
     cstatistics.cpp
     cvideoconverter.cpp
     c_float.cpp
+    c_config.cpp
     c_smsc.cpp
     utilities1.cpp
     utilities2.cpp
@@ -159,6 +160,11 @@ check_function_exists(exp HAVE_EXP)
 configure_file(
     "${PROJECT_SOURCE_DIR}/src/pi/include/localy.h.in"
     "${PROJECT_BINARY_DIR}/src/pi/include/localy.h"
+    )
+
+configure_file(
+    "${PROJECT_SOURCE_DIR}/src/pi/include/cmysql.h.in"
+    "${PROJECT_BINARY_DIR}/src/pi/include/cmysql.h"
     )
 
 

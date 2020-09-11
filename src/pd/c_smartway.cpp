@@ -361,10 +361,28 @@ string C_Smartway_Employees::GetEmployeesJSON(const string &sql_query)
 
 string C_Smartway::GetAuthJSON()
 {
-	return "\"authorization\": {"
-			      "\"username\": \"" + SMARTWAY_LOGIN + "\","
-			      "\"password\": \"" + SMARTWAY_PASSWORD + "\""
-			    "}"s;
+	MESSAGE_DEBUG("", "", "start");
+
+    c_config    config;
+    auto        auth_map        	= config.Read({"SMARTWAY_LOGIN", "SMARTWAY_PASSWORD"});
+    auto        is_auth_valid   	= (auth_map["SMARTWAY_LOGIN"].length() > 0);
+    auto        __SMARTWAY_LOGIN    = (is_auth_valid ? auth_map["SMARTWAY_LOGIN"] : "");
+    auto        __SMARTWAY_PASSWORD = (is_auth_valid ? auth_map["SMARTWAY_PASSWORD"] : "");
+
+	auto		result				=  "\"authorization\": {"
+									      "\"username\": \"" + __SMARTWAY_LOGIN + "\","
+									      "\"password\": \"" + __SMARTWAY_PASSWORD + "\""
+									    "}"s;
+
+	if(is_auth_valid) {}
+	else
+	{
+		MESSAGE_ERROR("", "", gettext("service credentials not found"));
+	}
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return result;
 }
 
 string	C_Smartway::GetPostJSON()

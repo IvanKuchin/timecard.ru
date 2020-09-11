@@ -327,7 +327,7 @@ int main()
 			throw CException("Template file was missing");
 		}
 
-		if(db.Connect(DB_NAME, DB_LOGIN, DB_PASSWORD) < 0)
+		if(db.Connect() < 0)
 		{
 			MESSAGE_ERROR("", action, "can't connect to DB");
 			throw CExceptionHTML("MySql connection");
@@ -677,7 +677,6 @@ int main()
 		if(action == "AJAX_deleteNewsFeedMessage")
 		{
 			ostringstream	ostFinal;
-			CMysql			db1;
 			string			messageID;
 
 			messageID	= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("messageID"));
@@ -788,7 +787,6 @@ int main()
 		if(action == "AJAX_deleteNewsFeedComment")
 		{
 			ostringstream	ost, ostFinal;
-			CMysql			db1;
 			string			commentID;
 
 			commentID	= indexPage.GetVarsHandler()->Get("commentID");
@@ -1015,7 +1013,6 @@ int main()
 		if(action == "AJAX_getURLMetaData")
 		{
 			ostringstream	ost, ostFinal;
-			CMysql			db1;
 			string			url, imageTempSet;
 
 			MESSAGE_DEBUG("", action, "start");
@@ -1915,7 +1912,6 @@ int main()
 			string			sessid, lookForKey;
 			string			user1, user2, handshakeUserStatus = "";
 			string			user1Data, user2Data, hopUserList;
-			CMysql			db1;
 			vector<int>		vectorFriendList1, vectorFriendList2, vectorFriendList3;
 
 			MESSAGE_DEBUG("", action, "start");
@@ -2045,7 +2041,6 @@ int main()
 		{
 			ostringstream	ost, ostFinal;
 			string			sessid, lookForKey, userList;
-			CMysql			db1;
 
 			MESSAGE_DEBUG("", action, "start");
 
@@ -2054,13 +2049,6 @@ int main()
 				MESSAGE_DEBUG("", action, "re-login required");
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
-			}
-
-			if(db1.Connect(DB_NAME, DB_LOGIN, DB_PASSWORD) < 0)
-			{
-				CLog	log;
-				log.Write(ERROR, "Can not connect to mysql database");
-				return(1);
 			}
 
 			lookForKey = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("lookForKey"));
@@ -2399,7 +2387,6 @@ int main()
 		{
 			ostringstream	ost, ostFinal, friendsSqlQuery;
 			string			sessid, lookForKey, userList = "";
-			CMysql			db1;
 			int				affected;
 
 			MESSAGE_DEBUG("", action, "start");
@@ -2409,13 +2396,6 @@ int main()
 				MESSAGE_DEBUG("", action, "re-login required");
 
 				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
-			}
-
-			if(db1.Connect(DB_NAME, DB_LOGIN, DB_PASSWORD) < 0)
-			{
-				CLog	log;
-				log.Write(ERROR, "Can not connect to mysql database");
-				return(1);
 			}
 
 			friendsSqlQuery.str("");
