@@ -150,7 +150,7 @@ int main(void)
 			ostResult.str("");
 
 			string			template_name = "json_response.htmlt";
-			int				affected = db.Query("" + Get_CompanyIDByUserID_sqlquery(user.GetID()) + ";");
+			int				affected = db.Query("" + Get_CompanyIDByCompanyEmployeeUserID_sqlquery(user.GetID()) + ";");
 
 			if(affected)
 			{
@@ -194,25 +194,19 @@ int main(void)
 		{
 			MESSAGE_DEBUG("", action, "start");
 
-			auto	error_message = ""s;
-			auto	success_message = ""s;
-			auto	affected = db.Query("" + Get_CompanyIDByUserID_sqlquery(user.GetID()) + ";");
-			auto	date = CheckHTTPParam_Date(indexPage.GetVarsHandler()->Get("date"));
+			auto	error_message			= ""s;
+			auto	success_message			= ""s;
+			auto	filter_date				= CheckHTTPParam_Date(indexPage.GetVarsHandler()->Get("date"));
+			auto	filter_not_sow_status	= CheckHTTPParam_Date(indexPage.GetVarsHandler()->Get("filter_not_sow_status"));
+			auto	filter_sow_status		= CheckHTTPParam_Date(indexPage.GetVarsHandler()->Get("filter_sow_status"));
+			auto	companies_id			= GetValuesFromDB(Get_CompanyIDByCompanyEmployeeUserID_sqlquery(user.GetID()), &db);
 
-			if(affected)
+			if(companies_id.size())
 			{
-				auto		companies_list= ""s;
-
-				for(int i = 0; i < affected; ++i)
-				{
-					if(companies_list.length()) companies_list += ",";
-					companies_list += db.Get(i, 0);
-				}
-
-				if(date.length())
-					success_message = GetTimecardList("`agency_company_id` IN (" + companies_list + ")", date, &db, &user);
+				if(filter_date.length())
+					success_message = GetTimecardList("`agency_company_id` IN (" + join(companies_id, ",") + ")", filter_date, &db, &user);
 				else
-					success_message = GetTimecardList("`agency_company_id` IN (" + companies_list + ")", &db, &user);
+					success_message = GetTimecardList("`agency_company_id` IN (" + join(companies_id, ",") + ")", &db, &user);
 			}
 			else
 			{
@@ -233,7 +227,7 @@ int main(void)
 			auto	success_message		= ""s;
 			auto	date				= CheckHTTPParam_Date(indexPage.GetVarsHandler()->Get("date"));
 			auto	isExtended			= indexPage.GetVarsHandler()->Get("extended") == "true";
-			auto	affected			= db.Query("" + Get_CompanyIDByUserID_sqlquery(user.GetID()) + ";");
+			auto	affected			= db.Query("" + Get_CompanyIDByCompanyEmployeeUserID_sqlquery(user.GetID()) + ";");
 
 			if(affected)
 			{
@@ -292,7 +286,7 @@ int main(void)
 					if(user.GetType() == "agency")
 					{
 						// --- check ability to see this timecard
-						if(db.Query("SELECT `id` FROM `timecards` WHERE `id`=\"" + timecard_id + "\" AND `contract_sow_id` IN (SELECT `id` FROM `contracts_sow` WHERE `agency_company_id` IN (" + Get_CompanyIDByUserID_sqlquery(user.GetID()) + "))"))
+						if(db.Query("SELECT `id` FROM `timecards` WHERE `id`=\"" + timecard_id + "\" AND `contract_sow_id` IN (SELECT `id` FROM `contracts_sow` WHERE `agency_company_id` IN (" + Get_CompanyIDByCompanyEmployeeUserID_sqlquery(user.GetID()) + "))"))
 						{
 							ostResult << "{"
 											"\"result\":\"success\","
@@ -815,7 +809,7 @@ int main(void)
 			ostResult.str("");
 			{
 				string		template_name = "json_response.htmlt";
-				int			affected = db.Query("" + Get_CompanyIDByUserID_sqlquery(user.GetID()) + ";");
+				int			affected = db.Query("" + Get_CompanyIDByCompanyEmployeeUserID_sqlquery(user.GetID()) + ";");
 
 				if(affected)
 				{
@@ -862,7 +856,7 @@ int main(void)
 			auto		template_name = "json_response.htmlt"s;
 			auto		error_message = ""s;
 			auto		success_message = ""s;
-			auto		affected = db.Query("" + Get_CompanyIDByUserID_sqlquery(user.GetID()) + ";");
+			auto		affected = db.Query("" + Get_CompanyIDByCompanyEmployeeUserID_sqlquery(user.GetID()) + ";");
 
 			if(affected)
 			{
@@ -893,7 +887,7 @@ int main(void)
 			ostResult.str("");
 			{
 				string		template_name = "json_response.htmlt";
-				int			affected = db.Query("" + Get_CompanyIDByUserID_sqlquery(user.GetID()) + ";");
+				int			affected = db.Query("" + Get_CompanyIDByCompanyEmployeeUserID_sqlquery(user.GetID()) + ";");
 
 				if(affected)
 				{
@@ -942,7 +936,7 @@ int main(void)
 			ostResult.str("");
 			{
 				string		template_name = "json_response.htmlt";
-				int			affected = db.Query("" + Get_CompanyIDByUserID_sqlquery(user.GetID()) + ";");
+				int			affected = db.Query("" + Get_CompanyIDByCompanyEmployeeUserID_sqlquery(user.GetID()) + ";");
 
 				if(affected)
 				{
@@ -991,7 +985,7 @@ int main(void)
 			ostResult.str("");
 			{
 				string		template_name = "json_response.htmlt";
-				int			affected = db.Query("" + Get_CompanyIDByUserID_sqlquery(user.GetID()) + ";");
+				int			affected = db.Query("" + Get_CompanyIDByCompanyEmployeeUserID_sqlquery(user.GetID()) + ";");
 
 				if(affected)
 				{
@@ -1040,7 +1034,7 @@ int main(void)
 			ostResult.str("");
 			{
 				string		template_name = "json_response.htmlt";
-				int			affected = db.Query("" + Get_CompanyIDByUserID_sqlquery(user.GetID()) + ";");
+				int			affected = db.Query("" + Get_CompanyIDByCompanyEmployeeUserID_sqlquery(user.GetID()) + ";");
 
 				if(affected)
 				{
@@ -1102,7 +1096,7 @@ int main(void)
 
 				if(user.GetType() == "agency")
 				{
-					if(db.Query("SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id`=(" + Get_CompanyIDByUserID_sqlquery(user.GetID()) + ");"))
+					if(db.Query("SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id`=(" + Get_CompanyIDByCompanyEmployeeUserID_sqlquery(user.GetID()) + ");"))
 					{
 						auto		include_subc_company	= true;
 						auto		agency_id				= db.Get(0, "id");
@@ -1181,7 +1175,7 @@ int main(void)
 
 				if(user.GetType() == "agency")
 				{
-					if(db.Query("SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id`=(" + Get_CompanyIDByUserID_sqlquery(user.GetID()) + ");"))
+					if(db.Query("SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id`=(" + Get_CompanyIDByCompanyEmployeeUserID_sqlquery(user.GetID()) + ");"))
 					{
 						string		agency_id = db.Get(0, "id");
 
@@ -3330,7 +3324,7 @@ int main(void)
 							{
 								if(isCostCenterBelongsToAgency(cost_center_id, &db, &user))
 								{
-									if(db.Query("SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id`=(" + Get_CompanyIDByUserID_sqlquery(user.GetID()) + ");"))
+									if(db.Query("SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id`=(" + Get_CompanyIDByCompanyEmployeeUserID_sqlquery(user.GetID()) + ");"))
 									{
 										string		agency_id = db.Get(0, "id");
 
@@ -3456,7 +3450,7 @@ int main(void)
 							{
 								if(isCostCenterBelongsToAgency(cost_center_id, &db, &user))
 								{
-									if(db.Query("SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id`=(" + Get_CompanyIDByUserID_sqlquery(user.GetID()) + ");"))
+									if(db.Query("SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id`=(" + Get_CompanyIDByCompanyEmployeeUserID_sqlquery(user.GetID()) + ");"))
 									{
 										string		agency_id = db.Get(0, "id");
 
@@ -4053,7 +4047,7 @@ int main(void)
 
 				if(user.GetType() == "agency")
 				{
-					if(db.Query("SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id`=(" + Get_CompanyIDByUserID_sqlquery(user.GetID()) + ");"))
+					if(db.Query("SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id`=(" + Get_CompanyIDByCompanyEmployeeUserID_sqlquery(user.GetID()) + ");"))
 					{
 						string	agency_id = db.Get(0, "id");
 						if(agency_id.length())
@@ -4142,7 +4136,7 @@ int main(void)
 										"\"cost_centers\":[" << GetCostCentersInJSONFormat(
 												"SELECT * FROM `cost_centers` WHERE `agency_company_id`=("
 													"SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id`=("
-														+ Get_CompanyIDByUserID_sqlquery(user.GetID()) + 
+														+ Get_CompanyIDByCompanyEmployeeUserID_sqlquery(user.GetID()) + 
 													")"
 												");", &db, &user) << "]";
 						ostResult << "}";
@@ -4904,7 +4898,7 @@ int main(void)
 						}
 						else if(entity_type == "company")
 						{
-							auto	sql_query = "SELECT * FROM `company_agreement_files` WHERE `company_id`=(" + Get_CompanyIDByUserID_sqlquery(user.GetID()) + ")";
+							auto	sql_query = "SELECT * FROM `company_agreement_files` WHERE `company_id`=(" + Get_CompanyIDByCompanyEmployeeUserID_sqlquery(user.GetID()) + ")";
 							success_message = ",\"template_agreement_files\":[" + GetTemplateCompanyAgreementFiles(sql_query, &db, &user) + "]";
 						}
 						else
@@ -5922,7 +5916,7 @@ int main(void)
 
 			if(id.length())
 			{
-				if(db.Query("SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id`=(" + Get_CompanyIDByUserID_sqlquery(user.GetID()) + ");"))
+				if(db.Query("SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id`=(" + Get_CompanyIDByCompanyEmployeeUserID_sqlquery(user.GetID()) + ");"))
 				{
 					auto			agency_id = db.Get(0, "id");
 					vector<string>	bts = {id};

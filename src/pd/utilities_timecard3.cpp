@@ -770,17 +770,18 @@ auto	GetTimecardList(const string &sow_companies_list, CMysql *db, CUser *user) 
 	return __GetTimecardList(sow_companies_list, "", db, user);
 }
 
-// --- date is suppose to be the first day of a period (month or week)
+// --- INPUTS:
+// --- date - SoW start date is suppose to be the first day of a period (month or week)
 auto	GetTimecardList(const string &where_companies_list, const string &date, CMysql *db, CUser *user) -> string
 {
 	MESSAGE_DEBUG("", "", "start(" + where_companies_list + ", " + date + ")");
 
-	auto		filter						= Get_SoWDateFilter_sqlquery(PrintSQLDate(GetTMObject(date)));
+	auto		filter_sow_active_date		= Get_SoWDateFilter_sqlquery(PrintSQLDate(GetTMObject(date)));
+	auto		sow_where_statement 		= where_companies_list 
+												+ (filter_sow_active_date.length() ? " AND " + filter_sow_active_date : "");
 
 	struct tm	period_start, period_end;
 	tie			(period_start, period_end)	= GetFirstAndLastMonthDaysByDate(GetTMObject(date));
-
-	auto		sow_where_statement 		= where_companies_list + " AND " + filter;
 	auto		timecard_where_statement	= Get_TimecardDateFilter_sqlquery(PrintSQLDate(period_start), PrintSQLDate(period_end));
 
 	auto		result						=  __GetTimecardList(sow_where_statement, timecard_where_statement, db, user);

@@ -229,7 +229,7 @@ auto isServiceInvoiceBelongsToAgency(string service_invoice_id, CMysql *db, CUse
 		{
 			if(db->Query("SELECT `id` FROM `invoice_cost_center_service` WHERE `id`=\"" + service_invoice_id + "\" AND `owner_company_id`=("
 							"SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id`=("
-								"" + Get_CompanyIDByUserID_sqlquery(user->GetID()) + ""
+								"" + Get_CompanyIDByCompanyEmployeeUserID_sqlquery(user->GetID()) + ""
 							")"
 						");"))
 			{
@@ -267,7 +267,7 @@ auto isBTInvoiceBelongsToAgency(string bt_invoice_id, CMysql *db, CUser *user) -
 		{
 			if(db->Query("SELECT `id` FROM `invoice_cost_center_bt` WHERE `id`=\"" + bt_invoice_id + "\" AND `owner_company_id`=("
 							"SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id`=("
-								"" + Get_CompanyIDByUserID_sqlquery(user->GetID()) + ""
+								"" + Get_CompanyIDByCompanyEmployeeUserID_sqlquery(user->GetID()) + ""
 							")"
 						");"))
 			{
@@ -302,7 +302,7 @@ auto GetAgencyIDByUserID(CMysql *db, CUser *user) -> string
 	if(db && user)
 	{
 		if(db->Query("SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id`=("
-						"" + Get_CompanyIDByUserID_sqlquery(user->GetID()) + ""
+						"" + Get_CompanyIDByCompanyEmployeeUserID_sqlquery(user->GetID()) + ""
 						")"))
 		{
 			result = db->Get(0, "id");
@@ -685,7 +685,7 @@ string isAgencyEmployeeAllowedToChangeSoW(string sow_id, CMysql *db, CUser *user
 	{
 		if(user->GetType() == "agency")
 		{
-			if(db->Query("SELECT `id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\" AND `agency_company_id`=(" + Get_CompanyIDByUserID_sqlquery(user->GetID()) + " AND `allowed_change_sow`=\"Y\");"))
+			if(db->Query("SELECT `id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\" AND `agency_company_id`=(" + Get_CompanyIDByCompanyEmployeeUserID_sqlquery(user->GetID()) + " AND `allowed_change_sow`=\"Y\");"))
 			{
 				// --- everything is good
 			}
@@ -762,7 +762,7 @@ string isAgencyEmployeeAllowedToChangePSoW(string sow_id, CMysql *db, CUser *use
 			if(db->Query(	"SELECT `id` FROM `contracts_sow` WHERE `id`=("
 								"SELECT `contract_sow_id` FROM `contracts_psow` WHERE `id`=\"" + sow_id + "\""
 							") AND `agency_company_id`=("
-								"" + Get_CompanyIDByUserID_sqlquery(user->GetID()) + " AND `allowed_change_sow`=\"Y\""
+								"" + Get_CompanyIDByCompanyEmployeeUserID_sqlquery(user->GetID()) + " AND `allowed_change_sow`=\"Y\""
 							")"
 							";"))
 			{
@@ -801,7 +801,7 @@ string isAgencyEmployeeAllowedToChangeAgencyData(CMysql *db, CUser *user)
 	{
 		if(user->GetType() == "agency")
 		{
-			if(db->Query("" + Get_CompanyIDByUserID_sqlquery(user->GetID()) + " AND `allowed_change_agency_data`=\"Y\";"))
+			if(db->Query("" + Get_CompanyIDByCompanyEmployeeUserID_sqlquery(user->GetID()) + " AND `allowed_change_agency_data`=\"Y\";"))
 			{
 				// --- everything is good
 			}
@@ -1369,7 +1369,7 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 					}
 					else if(action == "AJAX_updateTemplateAgreement_company_Title")
 					{
-						// if(db->Query("SELECT `id` FROM `company_agreement_files` WHERE `title`=\"" + new_value + "\" AND `company_id`=(" + Get_CompanyIDByUserID_sqlquery(user->GetID()) + ");"))
+						// if(db->Query("SELECT `id` FROM `company_agreement_files` WHERE `title`=\"" + new_value + "\" AND `company_id`=(" + Get_CompanyIDByCompanyEmployeeUserID_sqlquery(user->GetID()) + ");"))
 						{
 							if((error_message = CheckAgreementSoWTitle(new_value, sow_id, db, user)).empty()) {}
 							else
@@ -2215,7 +2215,7 @@ auto GetPositionByCompanyID(string company_id, CMysql *db, CUser *user) -> strin
 		result = db->Get(0, 0);
 	}
 	else if(db->Query(	"SELECT `company_position_id` FROM `contracts_sow` WHERE `agency_company_id`=("
-							"" + Get_CompanyIDByUserID_sqlquery(user->GetID()) + ""
+							"" + Get_CompanyIDByCompanyEmployeeUserID_sqlquery(user->GetID()) + ""
 						") LIMIT 0,1;"))
 	{
 		result = db->Get(0, 0);
@@ -2367,7 +2367,7 @@ auto	CheckAgreementSoWTitle(string title, string sow_id, CMysql *db, CUser *user
 	}
 	else
 	{
-		sql_query = "SELECT `id` FROM `company_agreement_files` WHERE `title`=\"" + title + "\" AND `company_id`=(" + Get_CompanyIDByUserID_sqlquery(user->GetID()) + ");";
+		sql_query = "SELECT `id` FROM `company_agreement_files` WHERE `title`=\"" + title + "\" AND `company_id`=(" + Get_CompanyIDByCompanyEmployeeUserID_sqlquery(user->GetID()) + ");";
 	}
 
 	if(db->Query(sql_query) == 0)
@@ -2706,7 +2706,7 @@ string GetNumberOfBTInPendingState(CMysql *db, CUser *user)
 	{
 		MESSAGE_DEBUG("", "", "user.id(" + user->GetID() + ") is " + user->GetType());
 
-		affected = db->Query("" + Get_CompanyIDByUserID_sqlquery(user->GetID()) + ";");
+		affected = db->Query("" + Get_CompanyIDByCompanyEmployeeUserID_sqlquery(user->GetID()) + ";");
 		if(affected)
 		{
 			company_id = db->Get(0, "company_id");
@@ -2813,7 +2813,7 @@ string	GetObjectsSOW_Reusable_InJSONFormat(string object, string filter, CMysql 
 					if(user->GetType() == "approver")
 						sql_query_where_statement = "`contract_sow_id` IN ( " + Get_SoWIDsByTimecardApproverUserID_sqlquery(user->GetID()) + " )";
 					else if(user->GetType() == "agency")
-						sql_query_where_statement = "`contract_sow_id` IN ( SELECT `id` FROM `contracts_sow` WHERE `agency_company_id`=(" + Get_CompanyIDByUserID_sqlquery(user->GetID()) + "))";
+						sql_query_where_statement = "`contract_sow_id` IN ( SELECT `id` FROM `contracts_sow` WHERE `agency_company_id`=(" + Get_CompanyIDByCompanyEmployeeUserID_sqlquery(user->GetID()) + "))";
 					else
 					{
 						MESSAGE_ERROR("", "", "unknown user type");
@@ -2829,7 +2829,7 @@ string	GetObjectsSOW_Reusable_InJSONFormat(string object, string filter, CMysql 
 																					") "
 																					"OR "
 																					"`agency_company_id` IN (" // --- this part important if user is not an approver, but agency employee
-																				    	+ Get_CompanyIDByUserID_sqlquery(user->GetID()) +
+																				    	+ Get_CompanyIDByCompanyEmployeeUserID_sqlquery(user->GetID()) +
 																					") "
 																					";", db, user) + "],"
 						"\"sow\":[" + GetSOWInJSONFormat(
@@ -2845,7 +2845,7 @@ string	GetObjectsSOW_Reusable_InJSONFormat(string object, string filter, CMysql 
 						sql_query_where_statement = "`contract_sow_id` IN ( " + Get_SoWIDsByBTApproverUserID_sqlquery(user->GetID()) + " )";
 						// sql_query_where_statement = "`contract_sow_id` IN ( SELECT `contract_sow_id` FROM `bt_approvers` WHERE `approver_user_id`=\"" + user->GetID() + "\")";
 					else if(user->GetType() == "agency")
-						sql_query_where_statement = "`contract_sow_id` IN ( SELECT `id` FROM `contracts_sow` WHERE `agency_company_id`=(" + Get_CompanyIDByUserID_sqlquery(user->GetID()) + "))";
+						sql_query_where_statement = "`contract_sow_id` IN ( SELECT `id` FROM `contracts_sow` WHERE `agency_company_id`=(" + Get_CompanyIDByCompanyEmployeeUserID_sqlquery(user->GetID()) + "))";
 					else
 					{
 						MESSAGE_ERROR("", "", "unknown user type");
@@ -3188,7 +3188,7 @@ auto isCostCenterBelongsToAgency(string cost_center_id, CMysql *db, CUser *user)
 		{
 			if(db->Query("SELECT `id` FROM `cost_centers` WHERE `id`=\"" + cost_center_id + "\" AND `agency_company_id`=("
 							"SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id`=("
-								"" + Get_CompanyIDByUserID_sqlquery(user->GetID()) + ""
+								"" + Get_CompanyIDByCompanyEmployeeUserID_sqlquery(user->GetID()) + ""
 							")"
 						");"))
 			{
@@ -3245,7 +3245,7 @@ string isUserAllowedAccessToBT(string bt_id, CMysql *db, CUser *user)
 			if(db->Query(
 				"SELECT `id` FROM `bt` WHERE `id`=\"" + bt_id + "\" AND `contract_sow_id` IN ("
 					"SELECT `id` FROM `contracts_sow` WHERE `agency_company_id` IN ("
-						"" + Get_CompanyIDByUserID_sqlquery(user->GetID()) + ""
+						"" + Get_CompanyIDByCompanyEmployeeUserID_sqlquery(user->GetID()) + ""
 					")"
 				")"
 			))
@@ -5915,7 +5915,7 @@ bool GeneralNotifySoWContractPartiesAboutChanges(string action, string id, strin
 						if(user->GetType() == "agency")
 						{
 							actionTypeId = to_string(NOTIFICATION_GENERAL_FROM_COMPANY);
-							if(db->Query("" + Get_CompanyIDByUserID_sqlquery(user->GetID()) + ";"))
+							if(db->Query("" + Get_CompanyIDByCompanyEmployeeUserID_sqlquery(user->GetID()) + ";"))
 							{
 								notificator_company_id = db->Get(0, "company_id");
 							}
@@ -6157,7 +6157,7 @@ static auto __GetNumberOfTimecards(const string &timecard_status, const string &
 								"SELECT `id` FROM `contracts_sow` WHERE "
 									"`timecard_period`=" + quoted(period_type) + " "
 									"AND "
-									"`agency_company_id`=(" + Get_CompanyIDByUserID_sqlquery(user->GetID()) + ""
+									"`agency_company_id`=(" + Get_CompanyIDByCompanyEmployeeUserID_sqlquery(user->GetID()) + ""
 							")"
 						");"))
 		{
@@ -6255,7 +6255,7 @@ static auto __GetNumberOfSoW(const string &sow_status, const string &period_type
 								"AND "
 								"`start_date`<=\"" + period_end + "\" "
 								"AND "
-								"`agency_company_id`=(" + Get_CompanyIDByUserID_sqlquery(user->GetID()) + ")"
+								"`agency_company_id`=(" + Get_CompanyIDByCompanyEmployeeUserID_sqlquery(user->GetID()) + ")"
 					))
 		{
 			result = db->Get(0, "counter");

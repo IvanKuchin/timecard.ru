@@ -681,21 +681,13 @@ int main()
 	{
 		MESSAGE_DEBUG("", action, "start");
 
-		auto			error_message = ""s;
-		auto			success_message = ""s;
-		int				affected = db.Query("SELECT `id` FROM `company` WHERE `admin_userID`=\"" + user.GetID() + "\";");
+		auto	error_message	= ""s;
+		auto	success_message	= ""s;
+		auto	companies_id	= GetValuesFromDB(Get_CompanyIDByAdminUserID_sqlquery(user.GetID()), &db);
 
-		if(affected)
+		if(companies_id.size())
 		{
-			auto		companies_list= ""s;
-
-			for(int i = 0; i < affected; ++i)
-			{
-				if(companies_list.length()) companies_list += ",";
-				companies_list += db.Get(i, 0);
-			}
-
-			success_message = GetTimecardList("`subcontractor_company_id` IN (" + companies_list + ")", &db, &user);
+			success_message = GetTimecardList("`subcontractor_company_id` IN (" + join(companies_id, ",") + ")", &db, &user);
 		}
 		else
 		{
