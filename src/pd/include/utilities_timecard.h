@@ -35,8 +35,24 @@ auto 			GetNewsFeedInJSONFormat(string whereStatement, int currPage, int newsOnS
 // auto      		GetCompanyListInJSONFormat(string dbQuery, CMysql *, CUser *, bool quickSearch = true, bool includeEmployedUsersList = false) -> string;
 auto      		GetCompanyListInJSONFormat(string dbQuery, CMysql *, CUser *, bool quickSearch, bool includeEmployedUsersList) -> string;
 auto      		GetCompanyListInJSONFormat(string dbQuery, CMysql *, CUser *) -> string;
+auto			GetCompanyPositionIDByTitle(string title, CMysql *) -> string;
+auto			GetLanguageIDByTitle(string title, CMysql *) -> string;
+auto			GetSkillIDByTitle(string title, CMysql *) -> string;
+auto 			GetBookRatingList(string bookID, CMysql *) -> string;
+auto 			GetCourseRatingList(string courseID, CMysql *) -> string;
+auto      		GetMessageCommentsCount(string messageID, CMysql *) -> string;
+auto 			GetCompanyCommentsCount(string messageID, CMysql *) -> string;
+auto 			GetLanguageCommentsCount(string messageID, CMysql *) -> string;
+auto 			GetBookCommentsCount(string messageID, CMysql *) -> string;
+auto 			GetCertificateCommentsCount(string messageID, CMysql *) -> string;
+auto 			GetUniversityDegreeCommentsCount(string messageID, CMysql *) -> string;
+auto      		GetMessageSpam(string messageID, CMysql *) -> string;
+auto      		GetMessageSpamUser(string messageID, string userID, CMysql *) -> string;
+
 auto      		GetUserNotificationSpecificDataByType(unsigned long typeID, unsigned long actionID, CMysql *, CUser *) -> string;
 auto      		GetUserNotificationInJSONFormat(string sqlRequest, CMysql *, CUser *) -> string;
+
+
 
 auto			GetTimecardCustomersInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetTimecardProjectsInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;

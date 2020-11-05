@@ -135,18 +135,17 @@ auto toLower(const string &src) -> string
 
 string	GetPasswordNounsList(CMysql *db)
 {
-	string 	result = "";
-	int		affected;
-
 	MESSAGE_DEBUG("", "", "start");
 
-	affected = db->Query("SELECT COUNT(*) as `total` FROM `password_dictionary_nouns`;");
+	auto 	result = ""s;
+	auto	affected = db->Query("SELECT COUNT(*) as `total` FROM `password_dictionary_nouns`;");
+
 	if(affected)
 	{
-		int		total_number_of_words = stoi(db->Get(0, "total")) - 1;
+		auto		total_number_of_words = stoi(db->Get(0, "total")) - 1;
 
 		affected = db->Query("SELECT * FROM `password_dictionary_nouns` WHERE `id` in (round(rand()*" + to_string(total_number_of_words) + ") + 1, round(rand()*" + to_string(total_number_of_words) + ") + 1,round(rand()*" + to_string(total_number_of_words) + ") + 1,round(rand()*" + to_string(total_number_of_words) + ") + 1,round(rand()*" + to_string(total_number_of_words) + ") + 1,round(rand()*" + to_string(total_number_of_words) + ") + 1,round(rand()*" + to_string(total_number_of_words) + ") + 1)");
-		for(int i = 0; i < affected; ++i)
+		for(auto i = 0; i < affected; ++i)
 		{
 			if(result.length()) result += ",";
 			result += string("\"") + db->Get(i, "word") + "\"";
@@ -164,18 +163,17 @@ string	GetPasswordNounsList(CMysql *db)
 
 string	GetPasswordCharacteristicsList(CMysql *db)
 {
-	string 	result = "";
-	int		affected;
-
 	MESSAGE_DEBUG("", "", "start");
 
-	affected = db->Query("SELECT COUNT(*) as `total` FROM `password_dictionary_characteristics`;");
+	auto 	result = ""s;
+	auto	affected = db->Query("SELECT COUNT(*) as `total` FROM `password_dictionary_characteristics`;");
+
 	if(affected)
 	{
-		int		total_number_of_words = stoi(db->Get(0, "total"));
+		auto		total_number_of_words = stoi(db->Get(0, "total"));
 
 		affected = db->Query("SELECT * FROM `password_dictionary_characteristics` WHERE `id` in (round(rand()*" + to_string(total_number_of_words) + ") + 1, round(rand()*" + to_string(total_number_of_words) + ") + 1,round(rand()*" + to_string(total_number_of_words) + ") + 1,round(rand()*" + to_string(total_number_of_words) + ") + 1,round(rand()*" + to_string(total_number_of_words) + ") + 1,round(rand()*" + to_string(total_number_of_words) + ") + 1,round(rand()*" + to_string(total_number_of_words) + ") + 1)");
-		for(int i = 0; i < affected; ++i)
+		for(auto i = 0; i < affected; ++i)
 		{
 			if(result.length()) result += ",";
 			result += string("\"") + db->Get(i, "word") + "\"";
@@ -193,18 +191,17 @@ string	GetPasswordCharacteristicsList(CMysql *db)
 
 string	GetPasswordAdjectivesList(CMysql *db)
 {
-	string 	result = "";
-	int		affected;
-
 	MESSAGE_DEBUG("", "", "start");
 
-	affected = db->Query("SELECT COUNT(*) as `total` FROM `password_dictionary_adjectives`;");
+	auto 	result = ""s;
+	auto	affected = db->Query("SELECT COUNT(*) as `total` FROM `password_dictionary_adjectives`;");
+
 	if(affected)
 	{
-		int		total_number_of_words = stoi(db->Get(0, "total"));
+		auto		total_number_of_words = stoi(db->Get(0, "total"));
 
 		affected = db->Query("SELECT * FROM `password_dictionary_adjectives` WHERE `id` in (round(rand()*" + to_string(total_number_of_words) + ") + 1, round(rand()*" + to_string(total_number_of_words) + ") + 1,round(rand()*" + to_string(total_number_of_words) + ") + 1,round(rand()*" + to_string(total_number_of_words) + ") + 1,round(rand()*" + to_string(total_number_of_words) + ") + 1,round(rand()*" + to_string(total_number_of_words) + ") + 1,round(rand()*" + to_string(total_number_of_words) + ") + 1)");
-		for(int i = 0; i < affected; ++i)
+		for(auto i = 0; i < affected; ++i)
 		{
 			if(result.length()) result += ",";
 			result += string("\"") + db->Get(i, "word") + "\"";
@@ -222,10 +219,9 @@ string	GetPasswordAdjectivesList(CMysql *db)
 
 string GetRandom(int len)
 {
-	string	result;
-	int	i;
+	auto	result = ""s;
 
-	for(i = 0; i < len; i++)
+	for(auto i = 0; i < len; i++)
 	{
 		result += (char)('0' + (int)(rand()/(RAND_MAX + 1.0) * 10));
 	}
@@ -414,7 +410,7 @@ auto ReplaceCRtoHTML(string src) -> string
 
 string CleanUPText(const string messageBody, bool removeBR/* = true*/)
 {
-	string	  result = messageBody;
+	auto	  result = messageBody;
 
 	MESSAGE_DEBUG("", "", "start");
 
@@ -486,7 +482,7 @@ auto RemoveAllNonAlphabetSymbols(const string &src) -> string
 
 string ConvertTextToHTML(const string &messageBody)
 {
-	string 		result = messageBody;
+	auto 		result = messageBody;
 
 	MESSAGE_DEBUG("", "", "start");
 
@@ -624,7 +620,7 @@ string CheckHTTPParam_Date(string srcText)
 
 string CheckHTTPParam_Email(const string &srcText)
 {
-	string		result = "";
+	auto		result = ""s;
 
     regex       positionRegex(".*([+-][[:digit:]]+\\.[[:digit:]]+)([+-][[:digit:]]+\\.[[:digit:]]+)([+-][[:digit:]]+\\.[[:digit:]]+).*");
     smatch      matchResult;
@@ -688,7 +684,7 @@ string GetLocalFormattedTimestamp()
 	time_t	  now_t;
 	struct tm   *local_tm;
 	char		buffer[80];
-	string		result = "";
+	auto		result = ""s;
 
 	now_t = time(NULL);
 	local_tm = localtime(&now_t);
@@ -822,7 +818,7 @@ string GetMinutesDeclension(const int value)
 		{3, "минут"}
 	};
 
-	string				result;
+	auto				result = ""s;
 
 	if(value % 10 == 0) 						{ result = mapDeclension.at(3); };
 	if(value % 10 == 1) 						{ result = mapDeclension.at(1); };
@@ -840,7 +836,7 @@ string GetHoursDeclension(const int value)
 		{2, "часа"},
 		{3, "часов"}
 	};
-	string				result;
+	auto				result = ""s;
 
 	if(value % 10 == 0) 						{ result = mapDeclension.at(3); };
 	if(value % 10 == 1) 						{ result = mapDeclension.at(1); };
@@ -857,7 +853,7 @@ string GetDaysDeclension(const int value)
 		{2, "дня"},
 		{3, "дней"}
 	};
-	string				result;
+	auto				result = ""s;
 
 	if(value % 10 == 0) 						{ result = mapDeclension.at(3); };
 	if(value % 10 == 1) 						{ result = mapDeclension.at(1); };
@@ -874,7 +870,7 @@ string GetMonthsDeclension(const int value)
 		{2, "месяца"},
 		{3, "месяцев"}
 	};
-	string				result;
+	auto				result = ""s;
 
 	if(value % 10 == 0) 						{ result = mapDeclension.at(3); };
 	if(value % 10 == 1) 						{ result = mapDeclension.at(1); };
@@ -891,7 +887,7 @@ string GetYearsDeclension(const int value)
 		{2, "года"},
 		{3, "лет"}
 	};
-	string				result;
+	auto				result = ""s;
 
 	if(value % 10 == 0) 						{ result = mapDeclension.at(3); };
 	if(value % 10 == 1) 						{ result = mapDeclension.at(1); };
@@ -987,26 +983,22 @@ auto SymbolReplace_KeepDigitsOnly(const string &where) -> string
 bool CheckUserEmailExisting(string userNameToCheck, CMysql *db) {
 	CUser		user;
 
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	user.SetDB(db);
 	user.SetLogin(userNameToCheck);
 	user.SetEmail(userNameToCheck);
 
-	if(user.isLoginExist() or user.isEmailDuplicate()) {
-		{
-			CLog	log;
-			MESSAGE_DEBUG("", "", "login or email already registered");
-		}
+	if(user.isLoginExist() or user.isEmailDuplicate()) 
+	{
+		MESSAGE_DEBUG("", "", "login or email already registered");
+
 		return true;
 	}
-	else {
-		{
-			CLog	log;
-			MESSAGE_DEBUG("", "", "login or email not yet exists");
-		}
+	else 
+	{
+		MESSAGE_DEBUG("", "", "login or email not yet exists");
+
 		return false;
 	}
 }
@@ -1014,12 +1006,10 @@ bool CheckUserEmailExisting(string userNameToCheck, CMysql *db) {
 string UniqueUserIDInUserIDLine(string userIDLine) //-> decltype(static_cast<string>("123"))
 {
 	list<long int>	listUserID;
-	string			result {""};
+	auto			result = ""s;
 	std::size_t		prevPointer {0}, nextPointer;
 
-	{
-		MESSAGE_DEBUG("", "", "start (" + userIDLine + ")");
-	}
+	MESSAGE_DEBUG("", "", "start (" + userIDLine + ")");
 
 	do
 	{
@@ -1051,7 +1041,7 @@ string UniqueUserIDInUserIDLine(string userIDLine) //-> decltype(static_cast<str
 
 bool	isFilenameImage(const string &filename)
 {
-	bool	result = false;
+	auto	result = false;
 	regex   e1("[.](gif|jpg|jpeg|png)$", regex_constants::icase);
 	{
 		CLog	log;
@@ -1068,7 +1058,7 @@ bool	isFilenameImage(const string &filename)
 
 bool	isFilenameVideo(const string &filename)
 {
-	bool	result = false;
+	auto	result = false;
 	regex   e1("[.](mov|avi|mp4|webm)$", regex_constants::icase);
 	{
 		CLog	log;
@@ -1097,15 +1087,30 @@ string GetFileExtension(const string &filename)
 	return result;
 }
 
+off_t getFileSize(const std::string& name) 
+{
+	off_t			result = -1;
+	struct stat		buffer;
+
+	if(stat(name.c_str(), &buffer) == -1)
+	{
+		MESSAGE_ERROR("", "", "fail to get file size (" + name + "), probably file doesn't exists");
+	}
+	else
+	{
+		result = buffer.st_size;
+	}
+
+	return result;
+}
+
 // --- extrasct all @[[:digit:]] patterns form srcMessage
 vector<string> GetUserTagsFromText(string srcMessage)
 {
 	vector<string>  result;
 	regex		   exp1("@([[:digit:]]+)");
 
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	regex_token_iterator<string::iterator>   rItr(srcMessage.begin(), srcMessage.end(), exp1, 1);
 	regex_token_iterator<string::iterator>   rItrEnd;
@@ -1127,9 +1132,7 @@ string	AutodetectSexByName(string name, CMysql *db)
 {
 	string		result = "";
 
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	if(db->Query("SELECT * FROM `name_sex` WHERE `name`=\"" + name + "\";"))
 		result = db->Get(0, "sex");
@@ -1141,161 +1144,13 @@ string	AutodetectSexByName(string name, CMysql *db)
 	return result;
 }
 
-string GetCompanyPositionIDByTitle(string positionTitle, CMysql *db)
-{
-	ostringstream   ost;
-	string		  	result = "";
-	string			positionID = "";
-
-	MESSAGE_DEBUG("", "", "start");
-
-	if(positionTitle.length())
-	{
-		if(db->Query("SELECT `id` FROM `company_position` WHERE `title`=\"" + positionTitle + "\";"))
-		{
-			positionID = db->Get(0, "id");
-		}
-		else
-		{
-			long int 	tmp;
-
-			MESSAGE_DEBUG("", "", "company position not found. Creating new one.");
-
-			tmp = db->InsertQuery("INSERT INTO `company_position` SET `area`=\"\", `title`=\"" + positionTitle + "\";");
-			if(tmp)
-				positionID = to_string(tmp);
-			else
-			{
-				MESSAGE_ERROR("", "", "fail to insert to company_position table");
-			}
-		}
-	}
-	else
-	{
-		MESSAGE_DEBUG("", "", "positionTitle is empty");
-	}
-
-	result = positionID;
-
-	MESSAGE_DEBUG("", "", "finish (returning string length " + to_string(result.length()) + ")");
-
-	return result;
-}
-
-string GetLanguageIDByTitle(string languageTitle, CMysql *db)
-{
-	ostringstream   ost;
-	string		  	result = "";
-	string			languageID = "0";
-
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
-
-	if(languageTitle.length())
-	{
-		if(db->Query("SELECT `id` FROM `language` WHERE `title`=\"" + languageTitle + "\";"))
-		{
-			languageID = db->Get(0, "id");
-		}
-		else
-		{
-			long int 	tmp;
-			{
-				CLog			log;
-				MESSAGE_DEBUG("", "", "languageTitle [" + languageTitle + "] not found. Creating new one.");
-			}
-
-			tmp = db->InsertQuery("INSERT INTO `language` SET `title`=\"" + languageTitle + "\";");
-			if(tmp)
-				languageID = to_string(tmp);
-			else
-			{
-				CLog			log;
-				log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: insert into language");
-			}
-		}
-	}
-	else
-	{
-		{
-			CLog			log;
-			MESSAGE_DEBUG("", "", "languageTitle is empty");
-		}
-	}
-
-	result = languageID;
-
-	{
-		CLog			log;
-		MESSAGE_DEBUG("", "", "finish (returning string length " + to_string(result.length()) + ")");
-	}
-
-
-	return result;
-}
-
-string GetSkillIDByTitle(string skillTitle, CMysql *db)
-{
-	ostringstream   ost;
-	string		  	result = "";
-	string			languageID = "0";
-
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
-
-	if(skillTitle.length())
-	{
-		if(db->Query("SELECT `id` FROM `skill` WHERE `title`=\"" + skillTitle + "\";"))
-		{
-			languageID = db->Get(0, "id");
-		}
-		else
-		{
-			long int 	tmp;
-			{
-				CLog			log;
-				MESSAGE_DEBUG("", "", "skillTitle [" + skillTitle + "] not found. Creating new one.");
-			}
-
-			tmp = db->InsertQuery("INSERT INTO `skill` SET `title`=\"" + skillTitle + "\";");
-			if(tmp)
-				languageID = to_string(tmp);
-			else
-			{
-				CLog			log;
-				log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: insert into skill");
-			}
-		}
-	}
-	else
-	{
-		{
-			CLog			log;
-			MESSAGE_DEBUG("", "", "skillTitle is empty");
-		}
-	}
-
-	result = languageID;
-
-	{
-		CLog			log;
-		MESSAGE_DEBUG("", "", "finish (returning string length " + to_string(result.length()) + ")");
-	}
-
-	return result;
-}
-
 string GetGeoLocalityIDByCityAndRegion(string regionName, string cityName, CMysql *db)
 {
 	ostringstream   ost;
 	string		 	result = "";
 	string			regionID = "", cityID = "";
 
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
+	MESSAGE_DEBUG("", "", "start");
 
 	if(regionName.length())
 	{
@@ -1306,10 +1161,8 @@ string GetGeoLocalityIDByCityAndRegion(string regionName, string cityName, CMysq
 		else
 		{
 			long int 	tmp;
-			{
-				CLog			log;
-				MESSAGE_DEBUG("", "", "region[" + regionName + "] not found. Creating new one.");
-			}
+
+			MESSAGE_DEBUG("", "", "region[" + regionName + "] not found. Creating new one.");
 
 			tmp = db->InsertQuery("INSERT INTO `geo_region` SET `geo_country_id`=\"0\", `title`=\"" + regionName + "\";");
 			if(tmp)
@@ -1323,10 +1176,7 @@ string GetGeoLocalityIDByCityAndRegion(string regionName, string cityName, CMysq
 	}
 	else
 	{
-		{
-			CLog			log;
-			MESSAGE_DEBUG("", "", "regionName is empty");
-		}
+		MESSAGE_DEBUG("", "", "regionName is empty");
 	}
 
 	if(cityName.length())
@@ -1338,10 +1188,8 @@ string GetGeoLocalityIDByCityAndRegion(string regionName, string cityName, CMysq
 		else
 		{
 			long int 	tmp;
-			{
-				CLog			log;
-				MESSAGE_DEBUG("", "", "region[" + cityName + "] not found. Creating new one.");
-			}
+
+			MESSAGE_DEBUG("", "", "region[" + cityName + "] not found. Creating new one.");
 
 			tmp = db->InsertQuery("INSERT INTO `geo_locality` SET " + (regionID.length() ? "`geo_region_id`=\"" + regionID + "\"," : "") + " `title`=\"" + cityName + "\";");
 			if(tmp)
@@ -1356,274 +1204,10 @@ string GetGeoLocalityIDByCityAndRegion(string regionName, string cityName, CMysq
 	}
 	else
 	{
-		{
-			CLog			log;
-			MESSAGE_DEBUG("", "", "cityName is empty");
-		}
+		MESSAGE_DEBUG("", "", "cityName is empty");
 	}
 
-	{
-		CLog			log;
-		MESSAGE_DEBUG("", "", "finish (returning string length " + to_string(result.length()) + ")");
-	}
-
-	return result;
-}
-
-// --- Function returns array of book rating
-// --- input: bookID, db
-// --- output: book rating array
-string GetBookRatingList(string bookID, CMysql *db)
-{
-	int			 affected;
-	string		  result = "";
-
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
-
-	affected = db->Query("select * from `users_books` where `bookID`=\"" + bookID + "\";");
-	if(affected > 0)
-	{
-		for(int i = 0; i < affected; ++i)
-		{
-			if(i) result += ",";
-			result += db->Get(i, "rating");
-		}
-	}
-
-	{
-		CLog			log;
-		MESSAGE_DEBUG("", "", "finish (returning string length " + to_string(result.length()) + ")");
-	}
-
-	return result;
-}
-
-// --- Function returns array of course rating
-// --- input: courseID, db
-// --- output: course rating array
-string GetCourseRatingList(string courseID, CMysql *db)
-{
-	int				affected;
-	string			result = "";
-
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
-
-	affected = db->Query("select * from `users_courses` where `track_id`=\"" + courseID + "\";");
-	if(affected > 0)
-	{
-		for(int i = 0; i < affected; ++i)
-		{
-			if(i) result += ",";
-			result += db->Get(i, "rating");
-		}
-	}
-
-	{
-		CLog			log;
-		MESSAGE_DEBUG("", "", "finish (returning string length " + to_string(result.length()) + ")");
-	}
-
-	return result;
-}
-
-string GetMessageCommentsCount(string messageID, CMysql *db)
-{
-	ostringstream   ost;
-	int			 affected;
-	string		  result = "0";
-
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
-
-	ost.str("");
-	ost << "select count(*) as `counter` from `feed_message_comment` where `type`=\"message\" and `messageID`='" << messageID << "';";
-	affected = db->Query(ost.str());
-	if(affected > 0)
-	{
-		result = db->Get(0, "counter");
-	}
-
-	MESSAGE_DEBUG("", "", "finish");
-
-
-	return result;
-}
-
-string GetCompanyCommentsCount(string messageID, CMysql *db)
-{
-	ostringstream   ost;
-	int			 affected;
-	string		  result = "0";
-
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
-
-	ost.str("");
-	ost << "select count(*) as `counter` from `feed_message_comment` where `type`=\"company\" and `messageID`='" << messageID << "';";
-	affected = db->Query(ost.str());
-	if(affected > 0)
-	{
-		result = db->Get(0, "counter");
-	}
-
-	MESSAGE_DEBUG("", "", "finish");
-
-
-	return result;
-}
-
-string GetLanguageCommentsCount(string messageID, CMysql *db)
-{
-	ostringstream   ost;
-	int			 affected;
-	string		  result = "0";
-
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
-
-	ost.str("");
-	ost << "select count(*) as `counter` from `feed_message_comment` where `type`=\"language\" and `messageID`='" << messageID << "';";
-	affected = db->Query(ost.str());
-	if(affected > 0)
-	{
-		result = db->Get(0, "counter");
-	}
-
-	MESSAGE_DEBUG("", "", "finish");
-
-
-	return result;
-}
-
-string GetBookCommentsCount(string messageID, CMysql *db)
-{
-	ostringstream   ost;
-	int			 affected;
-	string		  result = "0";
-
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
-
-	ost.str("");
-	ost << "select count(*) as `counter` from `feed_message_comment` where `type`=\"book\" and `messageID`='" << messageID << "';";
-	affected = db->Query(ost.str());
-	if(affected > 0)
-	{
-		result = db->Get(0, "counter");
-	}
-
-	MESSAGE_DEBUG("", "", "finish");
-
-
-	return result;
-}
-
-string GetCertificateCommentsCount(string messageID, CMysql *db)
-{
-	ostringstream   ost;
-	int			 affected;
-	string		  result = "0";
-
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
-
-	ost.str("");
-	ost << "select count(*) as `counter` from `feed_message_comment` where `type` in (\"certification\", \"course\") and `messageID`='" << messageID << "';";
-	affected = db->Query(ost.str());
-	if(affected > 0)
-	{
-		result = db->Get(0, "counter");
-	}
-
-	MESSAGE_DEBUG("", "", "finish");
-
-
-	return result;
-}
-
-string GetUniversityDegreeCommentsCount(string messageID, CMysql *db)
-{
-	ostringstream   ost;
-	int			 affected;
-	string		  result = "0";
-
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
-
-	ost.str("");
-	ost << "select count(*) as `counter` from `feed_message_comment` where `type`=\"university\" and `messageID`='" << messageID << "';";
-	affected = db->Query(ost.str());
-	if(affected > 0)
-	{
-		result = db->Get(0, "counter");
-	}
-
-	MESSAGE_DEBUG("", "", "finish");
-
-
-	return result;
-}
-
-string GetMessageSpam(string messageID, CMysql *db)
-{
-	ostringstream	ost;
-	int				affected;
-	string			result = "0";
-
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
-
-	ost.str("");
-	ost << "select count(*) as `counter` from `feed_message_params` where `parameter`='spam' and messageID='" << messageID << "';";
-	affected = db->Query(ost.str());
-
-
-	if(affected > 0)
-	{
-		result = db->Get(0, "counter");
-	}
-
-	MESSAGE_DEBUG("", "", "finish");
-
-
-	return result;
-}
-
-// --- Function returns true or false depends on userID "spamed" it or not
-// --- input: messageID, userID
-// --- output: was this message "spamed" by particular user or not
-string GetMessageSpamUser(string messageID, string userID, CMysql *db)
-{
-	ostringstream	ost;
-	int				affected;
-	string			result = "0";
-
-	{
-		MESSAGE_DEBUG("", "", "start");
-	}
-
-	ost.str("");
-	ost << "select count(*) as `counter` from `feed_message_params` where `parameter`='spam' and `messageID`='" << messageID << "' and `userID`='" << userID << "' ;";
-	affected = db->Query(ost.str());
-	if(affected > 0)
-	{
-		result = db->Get(0, "counter");
-	}
-
-
-	MESSAGE_DEBUG("", "", "finish");
-
+	MESSAGE_DEBUG("", "", "finish (returning string length " + to_string(result.length()) + ")");
 
 	return result;
 }
@@ -1631,10 +1215,7 @@ string GetMessageSpamUser(string messageID, string userID, CMysql *db)
 bool AllowMessageInNewsFeed(CUser *me, const string messageOwnerID, const string messageAccessRights, vector<string> *messageFriendList)
 {
 
-	{
-		CLog			log;
-		MESSAGE_DEBUG("", "", "parameters (user [" + me->GetID() + "], messageOwnerID [" + messageOwnerID + "], messageAccessRights [" + messageAccessRights + "]): start");
-	}
+	MESSAGE_DEBUG("", "", "parameters (user [" + me->GetID() + "], messageOwnerID [" + messageOwnerID + "], messageAccessRights [" + messageAccessRights + "]): start");
 
 	// --- messages belons to yourself must be shown unconditionally
 	// --- must be checked before message access private
@@ -1754,7 +1335,7 @@ string GetCompanyDuplicates(CMysql *db)
 	ostResult.str("");
 	ost.str("");
 	ost << "select * from `company`;";
-	for(int i = 0; i < db->Query(ost.str()); i++)
+	for(auto i = 0; i < db->Query(ost.str()); i++)
 	{
 		string		companyToTestName, companyToTestID;
 
@@ -1816,7 +1397,7 @@ string GetPicturesWithEmptySet(CMysql *db)
 	ost.str("");
 	ost << "SELECT * FROM `feed_images` where `setID`='0';";
 	affected = db->Query(ost.str());
-	for(int i = 0; i < affected; i++)
+	for(auto i = 0; i < affected; i++)
 	{
 		if(ostResult.str().length()) ostResult << ",";
 		ostResult << "{\"id\":\"" << db->Get(i, "id") << "\",\"srcType\":\"" << db->Get(i, "srcType") << "\",\"userID\":\"" << db->Get(i, "userID") << "\",\"folder\":\"" << db->Get(i, "folder") << "\",\"filename\":\"" << db->Get(i, "filename") << "\"}";
@@ -1855,7 +1436,7 @@ string GetPicturesWithUnknownMessage(CMysql *db)
 	ost.str("");
 	ost << "SELECT `setID` FROM `feed_images`;";
 	affected = db->Query(ost.str());
-	for(int i = 0; i < affected; i++)
+	for(auto i = 0; i < affected; i++)
 	{
 		allImageSets.insert(stol(db->Get(i, "setID")));
 	}
@@ -1876,7 +1457,7 @@ string GetPicturesWithUnknownMessage(CMysql *db)
 	{
 		ost.str("");
 		ost << "select * from `feed_images` where `setID`=\"" << id << "\";";
-		for(int i = 0; i < db->Query(ost.str()); i++, lostCount++)
+		for(auto i = 0; i < db->Query(ost.str()); i++, lostCount++)
 		{
 			if(ostResult.str().length()) ostResult << ",";
 			ostResult << "{\"id\":\"" << db->Get(i, "id") << "\",\"srcType\":\"" << db->Get(i, "srcType") << "\",\"userID\":\"" << db->Get(i, "userID") << "\",\"setID\":\"" << db->Get(i, "setID") << "\",\"folder\":\"" << db->Get(i, "folder") << "\",\"filename\":\"" << db->Get(i, "filename") << "\"}";
@@ -1916,7 +1497,7 @@ string GetPicturesWithUnknownUser(CMysql *db)
 	ost.str("");
 	ost << "SELECT `srcType`,`userID` FROM `feed_images`;";
 	affected = db->Query(ost.str());
-	for(int i = 0; i < affected; i++)
+	for(auto i = 0; i < affected; i++)
 		allImageOwners.insert(string(db->Get(i, "srcType")) + string(db->Get(i, "userID")));
 
 	for(auto &item: allImageOwners)
@@ -1945,7 +1526,7 @@ string GetPicturesWithUnknownUser(CMysql *db)
 	{
 		ost.str("");
 		ost << "select * from `feed_images` where `userID`=\"" << id << "\";";
-		for(int i = 0; i < db->Query(ost.str()); i++, lostCount++)
+		for(auto i = 0; i < db->Query(ost.str()); i++, lostCount++)
 		{
 			if(ostResult.str().length()) ostResult << ",";
 			ostResult << "{\"id\":\"" << db->Get(i, "id") << "\",\"srcType\":\"" << db->Get(i, "srcType") << "\",\"userID\":\"" << db->Get(i, "userID") << "\",\"setID\":\"" << db->Get(i, "setID") << "\",\"folder\":\"" << db->Get(i, "folder") << "\",\"filename\":\"" << db->Get(i, "filename") << "\"}";
@@ -1977,7 +1558,7 @@ string GetRecommendationAdverse(CMysql *db)
 	affected = db->Query(ost.str());
 	if(affected)
 	{
-		for(int i = 0; i < affected; i++)
+		for(auto i = 0; i < affected; i++)
 		{
 			if(i) dictionaryStatement << " or ";
 			dictionaryStatement << "(`title` like \"%" << db->Get(i, "word") << "%\")";
@@ -1989,7 +1570,7 @@ string GetRecommendationAdverse(CMysql *db)
 	affected = db->Query(ost.str());
 	if(affected)
 	{
-		for(int i = 0; i < affected; i++)
+		for(auto i = 0; i < affected; i++)
 		{
 			if(i) ostResult << ",";
 			ostResult << "{";
@@ -2044,7 +1625,7 @@ void	RemoveMessageImages(string sqlWhereStatement, CMysql *db)
 	affected = db->Query(ost.str());
 	if(affected)
 	{
-		for(int i = 0; i < affected; i++)
+		for(auto i = 0; i < affected; i++)
 		{
 			string  filename = "";
 			string  mediaType = db->Get(i, "mediaType");
@@ -2117,7 +1698,7 @@ void	RemoveBookCover(string sqlWhereStatement, CMysql *db)
 	affected = db->Query(ost.str());
 	if(affected)
 	{
-		for(int i = 0; i < affected; i++)
+		for(auto i = 0; i < affected; i++)
 		{
 			string  filename = "";
 			string  mediaType = "image";
@@ -2187,7 +1768,7 @@ bool	RemoveSpecifiedCover(string itemID, string itemType, CMysql *db)
 	affected = db->Query(GetSpecificData_SelectQueryItemByID(itemID, itemType));
 	if(affected)
 	{
-		for(int i = 0; i < affected; i++)
+		for(auto i = 0; i < affected; i++)
 		{
 			string  filename = "";
 			string  mediaType = "image";

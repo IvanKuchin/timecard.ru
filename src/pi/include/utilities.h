@@ -98,19 +98,6 @@ auto      		GetGeoCountryListInJSONFormat(string dbQuery, CMysql *, CUser *) -> 
 // auto 			GetNewsFeedInJSONFormat(string whereStatement, int currPage, int newsOnSinglePage, CUser *, CMysql *) -> string;
 auto			GetGiftListInJSONFormat(string dbQuery, CMysql *, CUser *) -> string;
 auto			GetMySQLDateInJSONFormat(string dateString) -> string;
-auto 			GetBookRatingList(string bookID, CMysql *) -> string;
-auto 			GetCourseRatingList(string courseID, CMysql *) -> string;
-auto      		GetMessageCommentsCount(string messageID, CMysql *) -> string;
-auto 			GetCompanyCommentsCount(string messageID, CMysql *) -> string;
-auto 			GetLanguageCommentsCount(string messageID, CMysql *) -> string;
-auto 			GetBookCommentsCount(string messageID, CMysql *) -> string;
-auto 			GetCertificateCommentsCount(string messageID, CMysql *) -> string;
-auto 			GetUniversityDegreeCommentsCount(string messageID, CMysql *) -> string;
-auto      		GetMessageSpam(string messageID, CMysql *) -> string;
-auto      		GetMessageSpamUser(string messageID, string userID, CMysql *) -> string;
-auto			GetLanguageIDByTitle(string title, CMysql *) -> string;
-auto			GetSkillIDByTitle(string title, CMysql *) -> string;
-auto			GetCompanyPositionIDByTitle(string title, CMysql *) -> string;
 auto			GetGeoLocalityIDByCityAndRegion(string regionName, string cityName, CMysql *) -> string;
 auto        	AllowMessageInNewsFeed(CUser *me, const string messageOwnerID, const string messageAccessRights, vector<string> *messageFriendList) -> bool;
 auto        	isPersistenceRateLimited(string REMOTE_ADDR, CMysql *) -> bool;
@@ -198,6 +185,7 @@ auto        	isFileExists(const std::string& name) -> bool;
 auto			isFilenameImage(const string &filename) -> bool;
 auto			isFilenameVideo(const string &filename) -> bool;
 auto			GetFileExtension(const string &filename) -> string;
+auto 			getFileSize(const std::string& name) -> off_t;
 auto			CleanupFilename(string	filename) -> string;
 auto        	CopyFile(const string src, const string dst) -> void;
 
