@@ -27,6 +27,9 @@ auto 			GetLanguageLikesUsersList(string usersLanguageID, CUser *, CMysql *) -> 
 auto 			GetBookLikesUsersList(string usersBookID, CUser *, CMysql *) -> string;
 auto 			GetBookRatingUsersList(string bookID, CUser *, CMysql *) -> string;
 
+// --- chat messages in status bar
+auto      		GetUnreadChatMessagesInJSONFormat(CUser *, CMysql *) -> string;
+auto      		GetChatMessagesInJSONFormat(string dbQuery, CMysql *) -> string;
 
 auto 			GetNewsFeedInJSONFormat(string whereStatement, int currPage, int newsOnSinglePage, CUser *, CMysql *) -> string;
 // auto      		GetCompanyListInJSONFormat(string dbQuery, CMysql *, CUser *, bool quickSearch = true, bool includeEmployedUsersList = false) -> string;
