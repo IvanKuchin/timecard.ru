@@ -606,57 +606,7 @@ int main()
 			MESSAGE_DEBUG("", action, "finish");
 		}
 	}
-/*
-	if(action == "AJAX_getTimecardList")
-	{
-		ostringstream	ostResult;
 
-		MESSAGE_DEBUG("", action, "start");
-
-		ostResult.str("");
-
-		string			template_name = "json_response.htmlt";
-		int				affected = db.Query("SELECT `id` FROM `company` WHERE `admin_userID`=\"" + user.GetID() + "\";");
-
-		if(affected)
-		{
-			string		companies_list= "";
-
-			for(int i = 0; i < affected; ++i)
-			{
-				if(companies_list.length()) companies_list += ",";
-				companies_list += db.Get(i, 0);
-			}
-
-			ostResult << "{"
-							"\"result\":\"success\","
-							"\"sow\":[" << GetSOWInJSONFormat(
-									"SELECT * FROM `contracts_sow` WHERE "
-										"`subcontractor_company_id` IN (" + companies_list + ") "
-									";", &db, &user, false, false, false, true) << "],"
-							"\"timecards\":[" << GetTimecardsInJSONFormat(
-									"SELECT * FROM `timecards` WHERE "
-										"`contract_sow_id` IN ( SELECT `id` FROM `contracts_sow` WHERE `subcontractor_company_id` IN (" + companies_list + "))"
-									";", &db, &user) << "],"
-							"\"holiday_calendar\":[" + GetHolidayCalendarInJSONFormat("SELECT * FROM `holiday_calendar` WHERE `agency_company_id` IN (SELECT `agency_company_id` FROM `contracts_sow` WHERE `subcontractor_company_id` IN (" + companies_list + "));", &db, &user) + "]"
-						"}";
-		}
-		else
-		{
-			MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't owns company");
-			ostResult << "{\"result\":\"error\",\"description\":\"Вы не создали компанию\"}";
-		}
-
-		indexPage.RegisterVariableForce("result", ostResult.str());
-
-		if(!indexPage.SetTemplate(template_name))
-		{
-			MESSAGE_ERROR("", action, "can't find template " + template_name);
-		}
-
-		MESSAGE_DEBUG("", action, "finish");
-	}
-*/
 	if(action == "AJAX_getTimecardList")
 	{
 		MESSAGE_DEBUG("", action, "start");
