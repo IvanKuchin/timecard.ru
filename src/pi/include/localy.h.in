@@ -121,7 +121,7 @@
 
 #define	INDEX_PAGE									1
 
-#define	CONTRACTS_SOW_PER_PAGE						20
+#define	CONTRACTS_SOW_PER_PAGE						3
 #define	THREADS_PER_PAGE							20
 #define	PHOTO_PER_PAGE								20
 #define	MAX_PHOTO									3

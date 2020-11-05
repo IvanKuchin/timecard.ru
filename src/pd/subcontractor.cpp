@@ -467,39 +467,19 @@ int main()
 	{
 		MESSAGE_DEBUG("", action, "start");
 
-		auto	error_message		= ""s;
-		auto	success_message		= ""s;
-		auto	date				= CheckHTTPParam_Date(indexPage.GetVarsHandler()->Get("date"));
-		auto	isExtended			= indexPage.GetVarsHandler()->Get("extended") == "true";
-		auto	affected			= db.Query("SELECT `id` FROM `company` WHERE `admin_userID`=\"" + user.GetID() + "\";");
+		auto	error_message			= ""s;
+		auto	success_message			= ""s;
+		auto	filter_sow_date			= CheckHTTPParam_Date(indexPage.GetVarsHandler()->Get("date"));
+		auto	filter_not_sow_status	= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("filter_not_sow_status"));
+		auto	filter_sow_status		= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("filter_sow_status"));
+		auto	limit_page				= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("page"));
+		auto	isExtended				= indexPage.GetVarsHandler()->Get("extended") == "true";
+		auto	companies_id			= GetValuesFromDB(Get_CompanyIDByAdminUserID_sqlquery(user.GetID()), &db);
 
 
-		if(affected)
+		if(companies_id.size())
 		{
-			auto		companies_list= ""s;
-
-			for(auto i = 0; i < affected; ++i)
-			{
-				if(companies_list.length()) companies_list += ",";
-				companies_list += db.Get(i, 0);
-			}
-
-			if(date.length())
-				success_message = GetBTList("`subcontractor_company_id` IN (" + companies_list + ")", date, isExtended, &db, &user);
-			else
-				success_message = GetBTList("`subcontractor_company_id` IN (" + companies_list + ")", isExtended, &db, &user);
-
-/*
-			success_message = 
-					"\"sow\":[" + GetSOWInJSONFormat(
-							"SELECT * FROM `contracts_sow` WHERE "
-								"`subcontractor_company_id` IN (" + companies_list + ") "
-							";", &db, &user, true, false, false, true) + "],"
-					"\"bt\":[" + GetBTsInJSONFormat(
-							"SELECT * FROM `bt` WHERE "
-								"`contract_sow_id` IN ( SELECT `id` FROM `contracts_sow` WHERE `subcontractor_company_id` IN (" + companies_list + "))"
-							";", &db, &user, false) + "]";
-*/
+			success_message = GetBTList("`subcontractor_company_id` IN (" + join(companies_id, ",") + ")", filter_sow_date, filter_sow_status, filter_not_sow_status, limit_page, isExtended, &db, &user);
 		}
 		else
 		{
@@ -683,11 +663,15 @@ int main()
 
 		auto	error_message	= ""s;
 		auto	success_message	= ""s;
+		auto	filter_sow_date			= CheckHTTPParam_Date(indexPage.GetVarsHandler()->Get("date"));
+		auto	filter_not_sow_status	= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("filter_not_sow_status"));
+		auto	filter_sow_status		= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("filter_sow_status"));
+		auto	limit_page				= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("page"));
 		auto	companies_id	= GetValuesFromDB(Get_CompanyIDByAdminUserID_sqlquery(user.GetID()), &db);
 
 		if(companies_id.size())
 		{
-			success_message = GetTimecardList("`subcontractor_company_id` IN (" + join(companies_id, ",") + ")", &db, &user);
+			success_message = GetTimecardList("`subcontractor_company_id` IN (" + join(companies_id, ",") + ")", filter_sow_date, filter_sow_status, filter_not_sow_status, limit_page, &db, &user);
 		}
 		else
 		{

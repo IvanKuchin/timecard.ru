@@ -217,9 +217,9 @@ auto			CheckAgreementSoWTitle(string title, string sow_id, CMysql *, CUser *) ->
 auto			GetDashboardPaymentData(string sow_sql, CMysql *, CUser *) -> string;
 
 auto			GetBTList(const string &where_companies_list, bool isExtended, CMysql *, CUser *) -> string;
-auto			GetBTList(const string &where_companies_list, const string &date, bool isExtended, CMysql *, CUser *) -> string;
+auto			GetBTList(const string &where_companies_list, const string &sow_filter_date, const string &filter_sow_status, const string &filter_not_sow_status, const string &limit_page, bool isExtended, CMysql *, CUser *) -> string;
 auto			GetTimecardList(const string &where_companies_list, CMysql *, CUser *) -> string;
-auto			GetTimecardList(const string &where_companies_list, const string &date, CMysql *, CUser *) -> string;
+auto			GetTimecardList(const string &where_companies_list, const string &sow_filter_date, const string &filter_sow_status, const string &filter_not_sow_status, const string &limit_page, CMysql *, CUser *) -> string;
 auto			isTimePeriodInsideSow(string sow_id, string period_start, string period_end, CMysql *, CUser *) -> string; 
 
 auto 			DeleteServiceInvoicesSubcToAgency(string timecard_id, CMysql *db, CUser *user) -> string;

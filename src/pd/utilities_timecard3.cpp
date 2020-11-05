@@ -709,16 +709,45 @@ auto	GetDashboardPaymentData(string sow_sql, CMysql *db, CUser *user) -> string
 }
 
 
+// --- Timecard/BT filters
+static auto __Craft_SoW_WhereStatement(const string &where_companies_list, const string &sow_filter_date, const string &filter_sow_status, const string &filter_not_sow_status, CMysql *db, CUser *user)
+{
+	MESSAGE_DEBUG("", "", "start (companies_list: " + where_companies_list + ", date: " + sow_filter_date + ", sow_status: " + filter_sow_status + ", sow_not_status: " + filter_not_sow_status + ")");
+
+	// --- filtering by date
+	auto		filter_sow_active_date		= sow_filter_date.length() ? Get_SoWDateFilter_sqlquery(PrintSQLDate(GetTMObject(sow_filter_date))) : "";
+
+	// --- filtering by sow status
+	auto		sow_filter_by_status		= filter_sow_status.length() ? "`status` IN (" + quoted(filter_sow_status) + ")" : "";
+
+	// --- filtering by NOT sow status
+	auto		sow_not_filter_by_status	= filter_not_sow_status.length() ? "`status` NOT IN (" + quoted(filter_not_sow_status) + ")" : "";
+
+    // --- put all filters together
+	auto		sow_where_statement 		= where_companies_list 
+												+ (filter_sow_active_date.length()		? " AND (" + filter_sow_active_date + ")" : "")
+												+ (sow_filter_by_status.length() 		? " AND (" + sow_filter_by_status + ")" : "")
+												+ (sow_not_filter_by_status.length()	? " AND (" + sow_not_filter_by_status + ")" : "")
+												;
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return sow_where_statement;
+}
+
 // --- BT functions part
 
-static auto __GetBTList(const string &sow_where_statement, const string &bt_where_statement, bool isExtended, CMysql *db, CUser *user)
+static auto __GetBTList(const string &sow_where_statement, const string &sow_limit_page, const string &bt_where_statement, bool isExtended, CMysql *db, CUser *user)
 {
+	auto	sow_statement	= "SELECT `id` FROM `contracts_sow` WHERE " + sow_where_statement + (sow_limit_page.length() ? " ORDER BY `end_date` DESC LIMIT " + to_string(stol(sow_limit_page) * CONTRACTS_SOW_PER_PAGE) + "," + to_string(CONTRACTS_SOW_PER_PAGE) : "");
+	auto	sow_ids			= GetValuesFromDB(sow_statement, db);
+
 	return 
-		"\"sow\":[" + GetSOWInJSONFormat("SELECT * FROM `contracts_sow` WHERE " + sow_where_statement + ";", db, user, true, false, false, true) + "],"
+		"\"sow\":[" + GetSOWInJSONFormat("SELECT * FROM `contracts_sow` WHERE `id` IN (" + join(sow_ids, ",") + ");", db, user, true, false, false, true) + "],"
 		"\"bt\":[" + GetBTsInJSONFormat(
 				"SELECT * FROM `bt` WHERE "
-					"`contract_sow_id` IN ( SELECT `id` FROM `contracts_sow` WHERE " + sow_where_statement + ")"
-					+ (bt_where_statement.length() ? " AND " + bt_where_statement + " " : "") +
+					"`contract_sow_id` IN (" + join(sow_ids, ",") + ")"
+					+ bt_where_statement +
 				";", db, user, isExtended) + "]"
 		;
 }
@@ -726,23 +755,30 @@ static auto __GetBTList(const string &sow_where_statement, const string &bt_wher
 auto	GetBTList(const string &sow_companies_list, bool isExtended, CMysql *db, CUser *user) -> string
 {
 	
-	return __GetBTList(sow_companies_list, "", isExtended, db, user);
+	return __GetBTList(sow_companies_list, "", "", isExtended, db, user);
 }
 
-// --- date is suppose to be the first day of a period (month or week)
-auto	GetBTList(const string &where_companies_list, const string &date, bool isExtended, CMysql *db, CUser *user) -> string
+// --- INPUTS:
+// --- sow_filter_date - date when SoW is active
+// --- filter_sow_status - take only SoW with status in (...)
+// --- filter_not_sow_status - take only SoW with status not in (...)
+// --- sow_limit_page - limit sow to page X only
+auto	GetBTList(const string &where_companies_list, const string &sow_filter_date, const string &filter_sow_status, const string &filter_not_sow_status, const string &sow_limit_page, bool isExtended, CMysql *db, CUser *user) -> string
 {
-	MESSAGE_DEBUG("", "", "start(" + where_companies_list + ", " + date + ")");
+	MESSAGE_DEBUG("", "", "start (companies_list: " + where_companies_list + ", date: " + sow_filter_date + ", sow_status: " + filter_sow_status + ", sow_not_status: " + filter_not_sow_status + ", page: " + sow_limit_page + ")");
 
-	auto		filter						= Get_SoWDateFilter_sqlquery(PrintSQLDate(GetTMObject(date)));
 
 	struct tm	period_start, period_end;
-	tie			(period_start, period_end)	= GetFirstAndLastMonthDaysByDate(GetTMObject(date));
+	if(sow_filter_date.length()) tie (period_start, period_end)	= GetFirstAndLastMonthDaysByDate(GetTMObject(sow_filter_date));
+	auto		filter_bt_active_date		= sow_filter_date.length() ? Get_BTDateFilter_sqlquery(PrintSQLDate(period_start), PrintSQLDate(period_end)) : "";
 
-	auto		sow_where_statement 		= where_companies_list + " AND " + filter;
-	auto		bt_where_statement			= Get_BTDateFilter_sqlquery(PrintSQLDate(period_start), PrintSQLDate(period_end));
 
-	auto		result						=  __GetBTList(sow_where_statement, bt_where_statement, isExtended, db, user);
+	auto		bt_where_statement			= 
+												(filter_bt_active_date.length() ? " AND (" + filter_bt_active_date + ")": "");
+
+	auto		sow_where_statement			= __Craft_SoW_WhereStatement(where_companies_list, sow_filter_date, filter_sow_status, filter_not_sow_status, db, user);
+
+	auto		result						=  __GetBTList(sow_where_statement, sow_limit_page, bt_where_statement, isExtended, db, user);
 
 	MESSAGE_DEBUG("", "", "finish");
 
@@ -751,40 +787,48 @@ auto	GetBTList(const string &where_companies_list, const string &date, bool isEx
 
 // --- Timecard functions part
 
-static auto __GetTimecardList(const string &sow_where_statement, const string &timecard_where_statement, CMysql *db, CUser *user)
+static auto __GetTimecardList(const string &sow_where_statement, const string &sow_limit_page, const string &timecard_where_statement, CMysql *db, CUser *user)
 {
+	auto	sow_statement	= "SELECT `id` FROM `contracts_sow` WHERE " + sow_where_statement + (sow_limit_page.length() ? " ORDER BY `end_date` DESC LIMIT " + to_string(stol(sow_limit_page) * CONTRACTS_SOW_PER_PAGE) + "," + to_string(CONTRACTS_SOW_PER_PAGE) : "");
+	auto	sow_ids			= GetValuesFromDB(sow_statement, db);
+
 	return 
-		"\"sow\":[" + GetSOWInJSONFormat("SELECT * FROM `contracts_sow` WHERE " + sow_where_statement + ";", db, user, false, false, false, true) + "],"
-		"\"timecards\":[" + GetTimecardsInJSONFormat(
+		"\"sow\":[" + (sow_ids.size() ? GetSOWInJSONFormat("SELECT * FROM `contracts_sow` WHERE `id` IN (" + join(sow_ids, ",") + ");", db, user, false, false, false, true) : "") + "],"
+		"\"timecards\":[" + (sow_ids.size() ? 
+			GetTimecardsInJSONFormat(
 				"SELECT * FROM `timecards` WHERE "
-					"`contract_sow_id` IN ( SELECT `id` FROM `contracts_sow` WHERE " + sow_where_statement + ")"
-					+ (timecard_where_statement.length() ? " AND " + timecard_where_statement + " " : "") +
-				";", db, user) + "],"
-		"\"holiday_calendar\":[" + GetHolidayCalendarInJSONFormat("SELECT * FROM `holiday_calendar` WHERE `agency_company_id` IN (SELECT `agency_company_id` FROM `contracts_sow` WHERE " + sow_where_statement + ");", db, user) + "]"
+					"`contract_sow_id` IN (" + join(sow_ids, ",") + ")"
+					+ timecard_where_statement +
+				";", db, user) 
+			: "") + "],"
+		"\"holiday_calendar\":[" + (sow_ids.size() ? GetHolidayCalendarInJSONFormat("SELECT * FROM `holiday_calendar` WHERE `agency_company_id` IN (SELECT `agency_company_id` FROM `contracts_sow` WHERE " + sow_where_statement + ");", db, user) : "") + "]"
 		;
 }
 
 auto	GetTimecardList(const string &sow_companies_list, CMysql *db, CUser *user) -> string
-{
-	
-	return __GetTimecardList(sow_companies_list, "", db, user);
+{	
+	return __GetTimecardList(sow_companies_list, "", "", db, user);
 }
 
 // --- INPUTS:
-// --- date - SoW start date is suppose to be the first day of a period (month or week)
-auto	GetTimecardList(const string &where_companies_list, const string &date, CMysql *db, CUser *user) -> string
+// --- sow_filter_date - date when SoW is active
+// --- filter_sow_status - take only SoW with status in (...)
+// --- filter_not_sow_status - take only SoW with status not in (...)
+// --- sow_limit_page - limit sow to page X only
+auto	GetTimecardList(const string &where_companies_list, const string &sow_filter_date, const string &filter_sow_status, const string &filter_not_sow_status, const string &sow_limit_page, CMysql *db, CUser *user) -> string
 {
-	MESSAGE_DEBUG("", "", "start(" + where_companies_list + ", " + date + ")");
-
-	auto		filter_sow_active_date		= Get_SoWDateFilter_sqlquery(PrintSQLDate(GetTMObject(date)));
-	auto		sow_where_statement 		= where_companies_list 
-												+ (filter_sow_active_date.length() ? " AND " + filter_sow_active_date : "");
+	MESSAGE_DEBUG("", "", "start (companies_list: " + where_companies_list + ", date: " + sow_filter_date + ", sow_status: " + filter_sow_status + ", sow_not_status: " + filter_not_sow_status + ", page: " + sow_limit_page + ")");
 
 	struct tm	period_start, period_end;
-	tie			(period_start, period_end)	= GetFirstAndLastMonthDaysByDate(GetTMObject(date));
-	auto		timecard_where_statement	= Get_TimecardDateFilter_sqlquery(PrintSQLDate(period_start), PrintSQLDate(period_end));
+	if(sow_filter_date.length()) tie (period_start, period_end)	= GetFirstAndLastMonthDaysByDate(GetTMObject(sow_filter_date));
+	auto		filter_timecard_active_date	= sow_filter_date.length() ? Get_TimecardDateFilter_sqlquery(PrintSQLDate(period_start), PrintSQLDate(period_end)) : "";
 
-	auto		result						=  __GetTimecardList(sow_where_statement, timecard_where_statement, db, user);
+	auto		timecard_where_statement	= 
+												(filter_timecard_active_date.length() ? " AND (" + filter_timecard_active_date + ")": "");
+
+	auto		sow_where_statement			= __Craft_SoW_WhereStatement(where_companies_list, sow_filter_date, filter_sow_status, filter_not_sow_status, db, user);
+
+	auto		result						=  __GetTimecardList(sow_where_statement, sow_limit_page, timecard_where_statement, db, user);
 
 	MESSAGE_DEBUG("", "", "finish");
 

@@ -47,6 +47,7 @@ auto	      	rtrim(string& str) -> string;
 auto	      	ltrim(string& str) -> string;
 auto	      	trim(string& str) -> string;
 auto	      	quoted(string src) -> string;
+auto			quoted(const vector<string> &) -> vector<string>;
 auto	  		toUpper(const string &src) -> string;
 auto	  		toLower(const string &src) -> string;
 auto	      	GetRandom(int len) -> string;
