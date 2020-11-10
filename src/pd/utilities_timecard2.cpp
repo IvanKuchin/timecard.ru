@@ -6121,7 +6121,7 @@ string GetAgencyObjectInJSONFormat(string agency_id, bool include_tasks, bool in
 							"\"cost_center_assignment\":[" + ( include_tasks ? GetCostCentersAssignmentInJSONFormat("SELECT * FROM `cost_center_assignment` WHERE `timecard_customer_id` IN (SELECT `id` FROM `timecard_customers` WHERE `agency_company_id`=\"" + agency_id + "\");", db, user) : "") + "],"
 							
 							"\"bt_expense_templates\":[" + ( include_bt ? GetBTExpenseTemplatesInJSONFormat("SELECT * FROM `bt_expense_templates` WHERE `agency_company_id`=\"" + agency_id + "\";", db, user) : "") + "],"
-							"\"airfare_limitations_by_direction\":[" + ( include_bt ? GetAirfareLimitaionsByDirectionInJSONFormat("SELECT * FROM `airfare_limits_by_direction` WHERE `agency_company_id`=\"" + agency_id + "\";", db, user) : "") + "],"
+							"\"airfare_limitations_by_direction\":[" + ( include_bt ? GetAirfareLimitationsByDirectionInJSONFormat("SELECT * FROM `airfare_limits_by_direction` WHERE `agency_company_id`=\"" + agency_id + "\";", db, user) : "") + "],"
 							"\"allowances\":[" + ( include_bt ? GetBTAllowanceInJSONFormat("SELECT * FROM `bt_allowance` WHERE `agency_company_id`=" + quoted(agency_id) + ";", db, user) : "") + "],"
 							"\"holiday_calendar\":[" + ( include_tasks ? GetHolidayCalendarInJSONFormat("SELECT * FROM `holiday_calendar` WHERE `agency_company_id`=" + quoted(agency_id) + ";", db, user) : "") + "]"
 						"}";

@@ -170,7 +170,7 @@ auto GetAbsenceOverlap(string company_id, string start_date, string end_date, CM
 	return result;
 }
 
-auto	GetAirfareLimitaionsByDirectionInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
+auto	GetAirfareLimitationsByDirectionInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
 {
 	int		affected;
 	auto	result = ""s;

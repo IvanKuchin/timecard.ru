@@ -2510,7 +2510,7 @@ string  GetUserNotificationSpecificDataByType(unsigned long typeID, unsigned lon
 		}
 	*/}
 
-	// --- Company Posession Request
+	// --- Company Possession Request
 	if(typeID == 60)
 	{
 		string   company_possession_request_id = to_string(actionID);
@@ -2531,14 +2531,14 @@ string  GetUserNotificationSpecificDataByType(unsigned long typeID, unsigned lon
 					string  friend_userName = db->Get(0, "name");
 					string  friend_userNameLast = db->Get(0, "nameLast");
 
-					ostResult << "\"notificationCompanyPosessionRequestID\":\"" << company_possession_request_id << "\",";
+					ostResult << "\"notificationCompanyPossessionRequestID\":\"" << company_possession_request_id << "\",";
 					ostResult << "\"notificationDescription\":\"" << description << "\",";
 					ostResult << "\"notificationFriendUserID\":\"" << friendUserID << "\",";
 					ostResult << "\"notificationFriendUserName\":\"" << friend_userName << "\",";
 					ostResult << "\"notificationFriendUserNameLast\":\"" << friend_userNameLast << "\",";
 					ostResult << "\"notificationFriendUserAvatar\":\"" << GetUserAvatarByUserID(friendUserID, db) << "\",";
 					ostResult << "\"notificationRequestedCompany\":[" << GetCompanyListInJSONFormat("SELECT * FROM `company` WHERE `id`=\"" + company_id + "\";", db, NULL) << "],";
-					ostResult << "\"notificationPosessionStatus\":\"" << status << "\",";
+					ostResult << "\"notificationPossessionStatus\":\"" << status << "\",";
 					ostResult << "\"notificationEventTimestamp\":\"" << eventTimestamp << "\"";
 
 				}

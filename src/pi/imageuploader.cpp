@@ -638,7 +638,7 @@ int main()
 								ostJSONResult << "\"jqXHR\": \"\"" << std::endl;
 								ostJSONResult << "}" << std::endl;
 								if(filesCounter == (indexPage.GetFilesHandler()->Count() - 1)) ostJSONResult << "]";
-							} // --- if image successfuly converted and saved to image folder
+							} // --- if image successfully converted and saved to image folder
 						} // --- if uploaded file image 
 						else if( (messageMedia == MESSAGE_HAVENO_MEDIA) && (currFileType == FILETYPE_VIDEO) )
 						{

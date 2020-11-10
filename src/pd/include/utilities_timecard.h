@@ -223,7 +223,7 @@ struct tm 		GetLastDayReportedOnAssignmentID(string sow_id, string task_id, CMys
 auto			isActionEntityBelongsToSoW(string action, string id, string sow_id, CMysql *, CUser *) -> string;
 auto			CheckNewValueByAction(string action, string id, string sow_id, string new_value, CMysql *, CUser *) -> string;
 auto			isActionEntityBelongsToAgency(string action, string id, string agency_id, CMysql *, CUser *) -> string;
-auto			GetAirfareLimitaionsByDirectionInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
+auto			GetAirfareLimitationsByDirectionInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			GetAirportCountryInJSONFormat(string sqlQuery, CMysql *, CUser *) -> string;
 auto			isValidToAddAirfareLimitByDirection(string from_id, string to_id, string agency_id, CMysql *, CUser *) -> string;
 
