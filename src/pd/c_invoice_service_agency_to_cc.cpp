@@ -678,7 +678,7 @@ auto C_Invoice_Service_Agency_To_CC::UpdateDBWithInvoiceData(const string timeca
 				else
 				{
 					MESSAGE_ERROR("", "", "agency not found where user.id(" + user->GetID() + ") working at");
-					error_message = gettext("employeer not found");
+					error_message = gettext("employer not found");
 				}
 
 			}

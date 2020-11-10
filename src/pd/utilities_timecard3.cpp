@@ -215,7 +215,7 @@ auto	GetAirfareLimitaionsByDirectionInJSONFormat(string sqlQuery, CMysql *db, CU
 	}
 	else
 	{
-		MESSAGE_DEBUG("", "", "there are no fare limitaions by direction in DB");
+		MESSAGE_DEBUG("", "", "there are no fare limitations by direction in DB");
 	}
 
 	MESSAGE_DEBUG("", "", "finish");
@@ -266,7 +266,7 @@ auto	GetAirportCountryInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> 
 	}
 	else
 	{
-		MESSAGE_ERROR("", "", "DB returned emtpy response");
+		MESSAGE_ERROR("", "", "DB returned empty response");
 	}
 
 	MESSAGE_DEBUG("", "", "finish");
@@ -635,7 +635,7 @@ auto GetHolidaysSet(string day_around, CMysql *db) -> unordered_set<string>
 		result.emplace(db->Get(i, 0));
 	}
 
-	MESSAGE_DEBUG("", "", "finish (number of hoildays = " + to_string(result.size()) + ")");
+	MESSAGE_DEBUG("", "", "finish (number of holidays = " + to_string(result.size()) + ")");
 
 	return result;
 }
@@ -968,7 +968,7 @@ auto GetUserBonusesAirlinesInJSONFormat(string sqlQuery, CMysql *db, CUser *user
 					result += "\"user_id\":\""					+ item.user_id + "\",";
 					result += "\"program_id\":\""				+ item.program_id + "\",";
 					result += "\"number\":\""					+ item.number + "\",";
-					result += "\"programs\":["					+ GetBonuseProgramsInJSONFormat("SELECT * FROM `airlines` WHERE `id`=\"" + item.program_id + "\";", db, user) + "],";
+					result += "\"programs\":["					+ GetBonusesProgramsInJSONFormat("SELECT * FROM `airlines` WHERE `id`=\"" + item.program_id + "\";", db, user) + "],";
 					result += "\"eventTimestamp\":\""			+ item.eventTimestamp + "\"";
 
 					result +=	"}";
@@ -1040,7 +1040,7 @@ auto GetUserBonusesRailroadsInJSONFormat(string sqlQuery, CMysql *db, CUser *use
 					result += "\"user_id\":\""					+ item.user_id + "\",";
 					result += "\"program_id\":\""				+ item.program_id + "\",";
 					result += "\"number\":\""					+ item.number + "\",";
-					result += "\"programs\":["					+ GetBonuseProgramsInJSONFormat("SELECT * FROM `railroads` WHERE `id`=\"" + item.program_id + "\";", db, user) + "],";
+					result += "\"programs\":["					+ GetBonusesProgramsInJSONFormat("SELECT * FROM `railroads` WHERE `id`=\"" + item.program_id + "\";", db, user) + "],";
 					result += "\"eventTimestamp\":\""			+ item.eventTimestamp + "\"";
 
 					result +=	"}";
@@ -1112,7 +1112,7 @@ auto GetUserBonusesHotelchainsInJSONFormat(string sqlQuery, CMysql *db, CUser *u
 					result += "\"user_id\":\""					+ item.user_id + "\",";
 					result += "\"program_id\":\""				+ item.program_id + "\",";
 					result += "\"number\":\""					+ item.number + "\",";
-					result += "\"programs\":["					+ GetBonuseProgramsInJSONFormat("SELECT * FROM `hotel_chains` WHERE `id`=\"" + item.program_id + "\";", db, user) + "],";
+					result += "\"programs\":["					+ GetBonusesProgramsInJSONFormat("SELECT * FROM `hotel_chains` WHERE `id`=\"" + item.program_id + "\";", db, user) + "],";
 					result += "\"eventTimestamp\":\""			+ item.eventTimestamp + "\"";
 
 					result +=	"}";
@@ -1139,7 +1139,7 @@ auto GetUserBonusesHotelchainsInJSONFormat(string sqlQuery, CMysql *db, CUser *u
 	return result;
 }
 
-auto  GetBonuseProgramsInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
+auto  GetBonusesProgramsInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
 {
 	struct ItemClass
 	{

@@ -237,7 +237,7 @@ auto isServiceInvoiceBelongsToAgency(string service_invoice_id, CMysql *db, CUse
 			}
 			else
 			{
-				MESSAGE_DEBUG("", "", "service_invoice_id(" + service_invoice_id + ") doesn't belongs to company user.id(" + user->GetID() + ") employeed");
+				MESSAGE_DEBUG("", "", "service_invoice_id(" + service_invoice_id + ") doesn't belongs to company user.id(" + user->GetID() + ") employed");
 			}
 		}
 		else
@@ -275,7 +275,7 @@ auto isBTInvoiceBelongsToAgency(string bt_invoice_id, CMysql *db, CUser *user) -
 			}
 			else
 			{
-				MESSAGE_DEBUG("", "", "bt_invoice_id(" + bt_invoice_id + ") doesn't belongs to company user.id(" + user->GetID() + ") employeed");
+				MESSAGE_DEBUG("", "", "bt_invoice_id(" + bt_invoice_id + ") doesn't belongs to company user.id(" + user->GetID() + ") employed");
 			}
 		}
 		else
@@ -309,7 +309,7 @@ auto GetAgencyIDByUserID(CMysql *db, CUser *user) -> string
 		}
 		else
 		{
-			MESSAGE_DEBUG("", "", "agency employeed user.id(" + user->GetID() + ") not found");
+			MESSAGE_DEBUG("", "", "agency employed user.id(" + user->GetID() + ") not found");
 		}
 	}
 	else
@@ -1059,7 +1059,7 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 									else
 									{
 										error_message = "Начало должно быть раньше окончания";
-										MESSAGE_DEBUG("", "", "timecard_task_assignment.id(" + id + ") requsted start(" + PrintTime(new_assignment_start, RU_DATE_FORMAT) + ") must be earlier than existing finish(" + PrintTime(existing_assignment_end, RU_DATE_FORMAT) + ").")
+										MESSAGE_DEBUG("", "", "timecard_task_assignment.id(" + id + ") requested start(" + PrintTime(new_assignment_start, RU_DATE_FORMAT) + ") must be earlier than existing finish(" + PrintTime(existing_assignment_end, RU_DATE_FORMAT) + ").")
 									}
 								}
 								else
@@ -1087,7 +1087,7 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 									else
 									{
 										error_message = gettext("Assignment must be inside SoW") + " ("s + PrintTime(sow_start, RU_DATE_FORMAT) + " - " + PrintTime(sow_end, RU_DATE_FORMAT) + ")";
-										MESSAGE_DEBUG("", "", "timecard_task_assignment.id(" + id + ") requsted start(" + PrintTime(new_assignment_date, RU_DATE_FORMAT) + ")." + error_message);
+										MESSAGE_DEBUG("", "", "timecard_task_assignment.id(" + id + ") requested start(" + PrintTime(new_assignment_date, RU_DATE_FORMAT) + ")." + error_message);
 									}
 								}
 								else
@@ -1145,7 +1145,7 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 									else
 									{
 										error_message = "Окончание должно быть позднее начала";
-										MESSAGE_DEBUG("", "", "timecard_task_assignment.id(" + id + ") requsted finish(" + PrintTime(new_assignment_end, RU_DATE_FORMAT) + ") must be later than existing start(" + PrintTime(existing_assignment_start, RU_DATE_FORMAT) + ").")
+										MESSAGE_DEBUG("", "", "timecard_task_assignment.id(" + id + ") requested finish(" + PrintTime(new_assignment_end, RU_DATE_FORMAT) + ") must be later than existing start(" + PrintTime(existing_assignment_start, RU_DATE_FORMAT) + ").")
 									}
 								}
 								else
@@ -1173,7 +1173,7 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 									else
 									{
 										error_message = gettext("Assignment must be inside SoW") + " ("s + PrintTime(sow_start, RU_DATE_FORMAT) + " - " + PrintTime(sow_end, RU_DATE_FORMAT) + ")";
-										MESSAGE_DEBUG("", "", "timecard_task_assignment.id(" + id + ") requsted start(" + PrintTime(new_assignment_date, RU_DATE_FORMAT) + ")." + error_message);
+										MESSAGE_DEBUG("", "", "timecard_task_assignment.id(" + id + ") requested start(" + PrintTime(new_assignment_date, RU_DATE_FORMAT) + ")." + error_message);
 									}
 								}
 								else
@@ -1494,7 +1494,7 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 					{
 						c_float		num(new_value);
 
-						// --- OR conditiona requires in case num is 10123 (matches by 1-st condition) or 10123.00 (matches by 2-nd condition)
+						// --- OR condition requires in case num is 10123 (matches by 1-st condition) or 10123.00 (matches by 2-nd condition)
 						if((string(num) == new_value) || (num.PrintPriceTag() == new_value)) { /* --- good to go */ }
 						else
 						{
@@ -1715,7 +1715,7 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 					{
 						c_float		num(new_value);
 
-						// --- OR conditiona requires in case num is 10123 (matches by 1-st condition) or 10123.00 (matches by 2-nd condition)
+						// --- OR condition requires in case num is 10123 (matches by 1-st condition) or 10123.00 (matches by 2-nd condition)
 						if((string(num) == new_value) || (num.PrintPriceTag() == new_value))
 						{
 							/* --- good to go */
@@ -1729,7 +1729,7 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 					{
 						c_float		num(new_value);
 
-						// --- OR conditiona requires in case num is 10123 (matches by 1-st condition) or 10123.00 (matches by 2-nd condition)
+						// --- OR condition requires in case num is 10123 (matches by 1-st condition) or 10123.00 (matches by 2-nd condition)
 						if((string(num) == new_value) || (num.PrintPriceTag() == new_value))
 						{
 							/* --- good to go */
@@ -2774,7 +2774,7 @@ string GetNumberOfBTInPendingState(CMysql *db, CUser *user)
 				}
 				else
 				{
-					MESSAGE_ERROR("", "", "check approval workflow for contract(" + bt.contract_sow_id + ") at this time(" + bt.submit_date + ") timcard.id(" + bt.id + ") must have only \"approved\" approvals from user.id(" + user->GetID() + ")");
+					MESSAGE_ERROR("", "", "check approval workflow for contract(" + bt.contract_sow_id + ") at this time(" + bt.submit_date + ") timecard.id(" + bt.id + ") must have only \"approved\" approvals from user.id(" + user->GetID() + ")");
 				}
 			}
 			else
@@ -3196,7 +3196,7 @@ auto isCostCenterBelongsToAgency(string cost_center_id, CMysql *db, CUser *user)
 			}
 			else
 			{
-				MESSAGE_DEBUG("", "", "cost_center_id(" + cost_center_id + ") doesn't belongs to company user.id(" + user->GetID() + ") employeed");
+				MESSAGE_DEBUG("", "", "cost_center_id(" + cost_center_id + ") doesn't belongs to company user.id(" + user->GetID() + ") employed");
 			}
 		}
 		else
@@ -3309,7 +3309,7 @@ auto isExpenseTemplateIDValidToRemove(string bt_expense_template_id, CMysql *db)
 			string	counter = db->Get(0, "counter");
 			if(counter == "0")
 			{
-				// --- task.id valid to remve
+				// --- task.id valid to remove
 			}
 			else
 			{
@@ -3353,7 +3353,7 @@ auto isExpenseTemplateLineIDValidToRemove(string bt_expense_line_template_id, CM
 					string	counter = db->Get(0, "counter");
 					if(counter == "0")
 					{
-						// --- task.id valid to remve
+						// --- task.id valid to remove
 					}
 					else
 					{
@@ -3418,7 +3418,7 @@ auto isTaskIDValidToRemove(string task_id, CMysql *db) -> string
 							auto	counter = stoi(db->Get(0, "counter"));
 							if(counter == 0)
 							{
-								// --- task.id valid to remve
+								// --- task.id valid to remove
 							}
 							else
 							{
@@ -3521,7 +3521,7 @@ bool	isProjectIDValidToRemove(string id, CMysql *db)
 			string	counter = db->Get(0, "counter");
 			if(counter == "0")
 			{
-				// --- project.id valid to remve
+				// --- project.id valid to remove
 				result = true;
 			}
 			else
@@ -3558,7 +3558,7 @@ bool	isCustomerIDValidToRemove(string id, CMysql *db)
 			string	counter = db->Get(0, "counter");
 			if(counter == "0")
 			{
-				// --- customer.id valid to remve
+				// --- customer.id valid to remove
 				result = true;
 			}
 			else
@@ -5248,7 +5248,7 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 	}
 	if(action == "AJAX_updateAgencyPosition")
 	{
-		notification_description = gettext("Employee data") + ": "s + GetSpelledEmployeeByID(id, db) + " " + gettext("promouted from") + " " + existing_value;
+		notification_description = gettext("Employee data") + ": "s + GetSpelledEmployeeByID(id, db) + " " + gettext("promoted from") + " " + existing_value;
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 	if(action == "AJAX_updateAgencyEditCapability")
@@ -5866,7 +5866,7 @@ bool GeneralNotifySoWContractPartiesAboutChanges(string action, string id, strin
 						// --- NOW() can't be used here because NOW()-type is datetime, but CURDATE()-type is date
 						// --- for example SELECT NOW()=CURDATE() gives false, 
 						// --- reason behind is SELECT "YYYY-MM-DD HH:MM:SS" NOT equal "YYYY-MM-DD" due to type inconsistency
-						// --- in comparison opertions "datetime" can't be compared to "date"
+						// --- in comparison operations "datetime" can't be compared to "date"
 						agency_list_sql_query = "SELECT DISTINCT `agency_company_id` FROM `contracts_sow` WHERE `id` IN (" + join(sow_list) + ") AND (`start_date`<=CURDATE()) AND (CURDATE()<=`end_date`);";
 					}
 					else
@@ -6081,7 +6081,7 @@ string GetAgencyEmployeesInJSONFormat(string company_id, CMysql *db, CUser *user
 	}
 	else
 	{
-		MESSAGE_ERROR("", "", "comapny_id is empty");
+		MESSAGE_ERROR("", "", "company_id is empty");
 	}
 	
 	MESSAGE_DEBUG("", "", "finish (result.length is " + to_string(result.length()) + ")");

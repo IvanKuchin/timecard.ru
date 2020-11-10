@@ -51,11 +51,11 @@ bool CVideoConverter::PickUniqPrefix(string srcFileName)
 
 		if((foundPos = srcFileName.rfind(".")) != string::npos) 
 		{
-			_originalFileExtention = toLower(srcFileName.substr(foundPos, srcFileName.length() - foundPos));
+			_originalFileExtension = toLower(srcFileName.substr(foundPos, srcFileName.length() - foundPos));
 		}
 		else
 		{
-			_originalFileExtention = ".avi";
+			_originalFileExtension = ".avi";
 		}
 
 
@@ -72,7 +72,7 @@ bool CVideoConverter::PickUniqPrefix(string srcFileName)
 			if(isFileExists(GetStderrFullFilename(i))) tryAgain = true;
 			
 		} 
-		if(isFileExists("/tmp/tmp_" + _filePrefix + _originalFileExtention)) tryAgain = true;
+		if(isFileExists("/tmp/tmp_" + _filePrefix + _originalFileExtension)) tryAgain = true;
 
 	} while(tryAgain);
 
@@ -104,7 +104,7 @@ string CVideoConverter::GetTempFilename()
 {
 	string	result;
 
-	result = _filePrefix + _originalFileExtention;
+	result = _filePrefix + _originalFileExtension;
 
 	return result;
 }
@@ -332,7 +332,7 @@ bool CVideoConverter::ReadMetadataAndResolution()
 				MESSAGE_DEBUG("", "", "video stream dimensions [" + to_string(_width) + "x" + to_string(_height) + "]");
 
 				// --- check video stream meta data
-				// --- is it roteted dimensions
+				// --- is it rotated dimensions
 				tag = nullptr;
 				while ((tag = av_dict_get(stream->metadata, "", tag, AV_DICT_IGNORE_SUFFIX)))
 				{

@@ -364,7 +364,7 @@ string GetSpecificData_GetDataTypeByItemType(const string &itemType)
 
 // --- Does the owner user allowed to change it ?
 // --- For example:
-// ---	*) university or school logo can be changed by administartor only.
+// ---	*) university or school logo can be changed by administrator only.
 // ---	*) gift image could be changed by owner
 auto GetSpecificData_AllowedToChange(string itemID, string itemType, CMysql *db, CUser *user) -> string
 {
@@ -477,7 +477,7 @@ auto GetSpecificData_AllowedToChange(string itemID, string itemType, CMysql *db,
 		}
 		else
 		{
-			error_message = "user.type(" + user->GetType() + ") not allowerd to change company custom field";
+			error_message = "user.type(" + user->GetType() + ") not allowed to change company custom field";
 			MESSAGE_DEBUG("", "", error_message);
 		}
 		
@@ -499,7 +499,7 @@ auto GetSpecificData_AllowedToChange(string itemID, string itemType, CMysql *db,
 		}
 		else
 		{
-			error_message = "user.type(" + user->GetType() + ") not allowerd to change company agreement files";
+			error_message = "user.type(" + user->GetType() + ") not allowed to change company agreement files";
 			MESSAGE_DEBUG("", "", error_message);
 		}
 	}
@@ -520,7 +520,7 @@ auto GetSpecificData_AllowedToChange(string itemID, string itemType, CMysql *db,
 		}
 		else
 		{
-			error_message = "user.type(" + user->GetType() + ") not allowerd to change contract_sow agreement files";
+			error_message = "user.type(" + user->GetType() + ") not allowed to change contract_sow agreement files";
 			MESSAGE_DEBUG("", "", error_message);
 		}
 	}

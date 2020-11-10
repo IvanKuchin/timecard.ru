@@ -54,7 +54,7 @@ string		C_TC_BT_Submit::FetchApprovers()
 		MESSAGE_ERROR("", "", error_message);
 	}
 
-	MESSAGE_DEBUG("", "", "finsh");
+	MESSAGE_DEBUG("", "", "finish");
 
 	return error_message;
 }
@@ -104,7 +104,7 @@ string		C_TC_BT_Submit::FetchApprovals()
 		MESSAGE_ERROR("", "", error_message);
 	}
 
-	MESSAGE_DEBUG("", "", "finsh");
+	MESSAGE_DEBUG("", "", "finish");
 
 	return error_message;
 }
@@ -120,7 +120,7 @@ vector<string>	C_TC_BT_Submit::GetApproverIDsByUserID(const string &user_id)
 		if(approver.approver_user_id == user_id) result.push_back(approver.id);
 	}
 
-	MESSAGE_DEBUG("", "", "finsh (size is " + to_string(result.size()) + ")");
+	MESSAGE_DEBUG("", "", "finish (size is " + to_string(result.size()) + ")");
 
 	return result;
 }
@@ -136,7 +136,7 @@ string	C_TC_BT_Submit::GetUserIDByApproverID(const string &approver_id)
 		if(approver.id == approver_id) result = approver.approver_user_id;
 	}
 
-	MESSAGE_DEBUG("", "", "finsh (" + result + ")");
+	MESSAGE_DEBUG("", "", "finish (" + result + ")");
 
 	return result;
 }
@@ -156,7 +156,7 @@ string		C_TC_BT_Submit::FetchInitialData()
 		MESSAGE_ERROR("", "", error_message);
 	}
 
-	MESSAGE_DEBUG("", "", "finsh");
+	MESSAGE_DEBUG("", "", "finish");
 
 	return error_message;
 }

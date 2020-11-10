@@ -34,7 +34,7 @@ static auto GetCompanyID(CUser *user, CMysql *db)
 	return result;
 }
 /*
-static auto	GetTimecardsSOWTaskAssignement_Reusable_InJSONFormat(string date, CMysql *db, CUser *user)
+static auto	GetTimecardsSOWTaskAssignment_Reusable_InJSONFormat(string date, CMysql *db, CUser *user)
 {
 	auto		result = ""s;
 
@@ -106,7 +106,7 @@ static auto	GetTimecardsSOWTaskAssignement_Reusable_InJSONFormat(string date, CM
 	return result;
 }
 */
-static auto	GetTimecardsSOWTaskAssignement_Reusable_InJSONFormat(string date, CMysql *db, CUser *user)
+static auto	GetTimecardsSOWTaskAssignment_Reusable_InJSONFormat(string date, CMysql *db, CUser *user)
 {
 	auto		result = ""s;
 
@@ -185,7 +185,7 @@ static auto	GetTimecardsSOWTaskAssignement_Reusable_InJSONFormat(string date, CM
 
 int main()
 {
-	CStatistics		appStat;  // --- CStatistics must be firts statement to measure end2end param's
+	CStatistics		appStat;  // --- CStatistics must be first statement to measure end2end param's
 	CCgi			indexPage(EXTERNAL_TEMPLATE);
 	CUser			user;
 	string			action, partnerID;
@@ -306,7 +306,7 @@ int main()
 			{
 				auto		companies_list= ""s;
 
-				success_message = GetTimecardsSOWTaskAssignement_Reusable_InJSONFormat(period_start_year + "-" + period_start_month + "-" + period_start_date, &db, &user);
+				success_message = GetTimecardsSOWTaskAssignment_Reusable_InJSONFormat(period_start_year + "-" + period_start_month + "-" + period_start_date, &db, &user);
 
 				if(success_message.empty())
 				{
@@ -583,7 +583,7 @@ int main()
 				}
 				else
 				{
-					MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't have accee to bt.id(" + bt_id + ")");
+					MESSAGE_ERROR("", action, "user(" + user.GetID() + ") doesn't have access to bt.id(" + bt_id + ")");
 					ostResult << "{\"status\":\"error\",\"description\":\"У Вас нет доступа\"}";
 				}
 			}
@@ -800,12 +800,12 @@ int main()
 								}
 								else
 								{
-									MESSAGE_DEBUG("", action, "emtpy timereport on step " + to_string(i) + "");
+									MESSAGE_DEBUG("", action, "empty timereport on step " + to_string(i) + "");
 								}
 							}
 							else
 							{
-								MESSAGE_DEBUG("", action, "http post paramters walkthrough: stop on " + to_string(i) + "");
+								MESSAGE_DEBUG("", action, "http post parameters walkthrough: stop on " + to_string(i) + "");
 							}
 
 							++i;
@@ -923,7 +923,7 @@ int main()
 											}
 											else
 											{
-												MESSAGE_ERROR("", action, "SoW(" + sow_id + ") doesn't allows create tasks or consistensy issue");
+												MESSAGE_ERROR("", action, "SoW(" + sow_id + ") doesn't allows create tasks or consistency issue");
 												error_description = "SoW не позволяет создавать новые задачи";
 												break;
 											}
@@ -1022,7 +1022,7 @@ int main()
 									{
 										if(SubmitTimecard(timecard_id, &db, &user))
 										{
-											success_description = GetTimecardsSOWTaskAssignement_Reusable_InJSONFormat(current_period_start_year + "-" + current_period_start_month + "-" + current_period_start_date, &db, &user);
+											success_description = GetTimecardsSOWTaskAssignment_Reusable_InJSONFormat(current_period_start_year + "-" + current_period_start_month + "-" + current_period_start_date, &db, &user);
 										}
 										else
 										{
@@ -1035,7 +1035,7 @@ int main()
 
 										if((error_message = submit_obj.Submit("timecard", timecard_id)).empty())
 										{
-											success_description = GetTimecardsSOWTaskAssignement_Reusable_InJSONFormat(current_period_start_year + "-" + current_period_start_month + "-" + current_period_start_date, &db, &user);
+											success_description = GetTimecardsSOWTaskAssignment_Reusable_InJSONFormat(current_period_start_year + "-" + current_period_start_month + "-" + current_period_start_date, &db, &user);
 										}
 										else
 										{
@@ -1445,7 +1445,7 @@ int main()
 		}
 
 
-		// --- save files to final folders and assign lines to expences
+		// --- save files to final folders and assign lines to expenses
 		// --- NOTE: such as files save to final folders, there is no place for mistake
 		if(error_messages.size() == 0)
 		{

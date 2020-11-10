@@ -2,7 +2,7 @@
 
 int main(void)
 {
-	CStatistics		appStat;  // --- CStatistics must be firts statement to measure end2end param's
+	CStatistics		appStat;  // --- CStatistics must be first statement to measure end2end param's
 	CCgi			indexPage(EXTERNAL_TEMPLATE);
 	CUser			user;
 	CMysql			db;
@@ -1809,21 +1809,21 @@ int main(void)
 								string agency_id				= db.Get(0, "agency_company_id");
 								struct tm sow_start				= GetTMObject(db.Get(0, "start_date"));
 								struct tm sow_end				= GetTMObject(db.Get(0, "end_date"));
-								struct tm new_assignemt_start	= GetTMObject(period_start);
-								struct tm new_assignemt_end		= GetTMObject(period_end);
+								struct tm new_assignment_start	= GetTMObject(period_start);
+								struct tm new_assignment_end	= GetTMObject(period_end);
 
-								if(difftime(mktime(&new_assignemt_start), mktime(&sow_start)) >= 0)
+								if(difftime(mktime(&new_assignment_start), mktime(&sow_start)) >= 0)
 								{
-									if(difftime(mktime(&sow_end), mktime(&new_assignemt_end)) >= 0)
+									if(difftime(mktime(&sow_end), mktime(&new_assignment_end)) >= 0)
 									{
-										if(difftime(mktime(&new_assignemt_end), mktime(&new_assignemt_start)) >= 0)
+										if(difftime(mktime(&new_assignment_end), mktime(&new_assignment_start)) >= 0)
 										{
 											string	task_assignment_id = GetTaskAssignmentID(customer, project, task, sow_id, &db);
 
 											if(task_assignment_id.empty())
 											{
-												string	assignment_start = to_string(1900 + new_assignemt_start.tm_year) + "-" + to_string(1 + new_assignemt_start.tm_mon) + "-" + to_string(new_assignemt_start.tm_mday);
-												string	assignment_end = to_string(1900 + new_assignemt_end.tm_year) + "-" + to_string(1 + new_assignemt_end.tm_mon) + "-" + to_string(new_assignemt_end.tm_mday);
+												string	assignment_start = to_string(1900 + new_assignment_start.tm_year) + "-" + to_string(1 + new_assignment_start.tm_mon) + "-" + to_string(new_assignment_start.tm_mday);
+												string	assignment_end = to_string(1900 + new_assignment_end.tm_year) + "-" + to_string(1 + new_assignment_end.tm_mon) + "-" + to_string(new_assignment_end.tm_mday);
 												string	task_id = GetTaskIDFromAgency(customer, project, task, agency_id, &db);
 												bool	notify_about_task_creation = false;
 
@@ -2227,7 +2227,7 @@ int main(void)
 				}
 				else
 				{
-					MESSAGE_DEBUG("", action, "consistensy check failed");
+					MESSAGE_DEBUG("", action, "consistency check failed");
 				}
 
 				if(error_message.empty())
@@ -2903,7 +2903,7 @@ int main(void)
 								}
 								else
 								{
-									MESSAGE_DEBUG("", action, "expense_template_line_id(" + expense_template_line_id + ") presents in expences, can't remove it");
+									MESSAGE_DEBUG("", action, "expense_template_line_id(" + expense_template_line_id + ") presents in expenses, can't remove it");
 								}
 							}
 							else
@@ -3348,7 +3348,7 @@ int main(void)
 								}
 								else
 								{
-									MESSAGE_ERROR("", action, "cost_center.id(" + cost_center_id + ") doesn't belongs to agency user(" + user.GetID() + ") employeed");
+									MESSAGE_ERROR("", action, "cost_center.id(" + cost_center_id + ") doesn't belongs to agency user(" + user.GetID() + ") employed");
 									error_message = gettext("You are not agency employee");
 								}
 							}
@@ -3475,7 +3475,7 @@ int main(void)
 								}
 								else
 								{
-									MESSAGE_ERROR("", action, "cost_center.id(" + cost_center_id + ") doesn't belongs to agency user(" + user.GetID() + ") employeed");
+									MESSAGE_ERROR("", action, "cost_center.id(" + cost_center_id + ") doesn't belongs to agency user(" + user.GetID() + ") employed");
 									error_message = gettext("You are not agency employee");
 								}
 							}
@@ -3712,7 +3712,7 @@ int main(void)
 			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 		}
 
-		if(action == "AJAX_getUnemployeedAgentAutocompleteList")
+		if(action == "AJAX_getUnemployedAgentAutocompleteList")
 		{
 			auto			name = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("name"));
 			auto			template_name = "json_response.htmlt"s;
@@ -4179,7 +4179,7 @@ int main(void)
 					}
 					else
 					{
-						MESSAGE_ERROR("", action, "cost_center.id(" + cost_center_id + ") doesn't belongs to agency user(" + user.GetID() + ") employeed");
+						MESSAGE_ERROR("", action, "cost_center.id(" + cost_center_id + ") doesn't belongs to agency user(" + user.GetID() + ") employed");
 						error_message = gettext("You are not authorized");
 					}
 				}
@@ -4468,7 +4468,7 @@ int main(void)
 					}
 					else
 					{
-						MESSAGE_ERROR("", action, "cost_center.id(" + cost_center_id + ") doesn't belongs to agency user(" + user.GetID() + ") employeed");
+						MESSAGE_ERROR("", action, "cost_center.id(" + cost_center_id + ") doesn't belongs to agency user(" + user.GetID() + ") employed");
 						error_message = gettext("You are not authorized");
 					}
 				}
@@ -4533,7 +4533,7 @@ int main(void)
 					}
 					else
 					{
-						MESSAGE_ERROR("", action, "cost_center.id(" + cost_center_id + ") doesn't belongs to agency user(" + user.GetID() + ") employeed");
+						MESSAGE_ERROR("", action, "cost_center.id(" + cost_center_id + ") doesn't belongs to agency user(" + user.GetID() + ") employed");
 						error_message = gettext("You are not authorized");
 					}
 				}
@@ -4667,7 +4667,7 @@ int main(void)
 							if(sow_id)
 							{
 								auto	subcontractor_user_id = ""s;
-								auto	temp_error_message = NotifySoWContractPartiesAboutChanges(to_string(NOTIFICATION_AGENGY_INITIATED_SOW), to_string(sow_id), &db, &user);
+								auto	temp_error_message = NotifySoWContractPartiesAboutChanges(to_string(NOTIFICATION_AGENCY_INITIATED_SOW), to_string(sow_id), &db, &user);
 
 								success_message = ",\"sow_id\":\""s + to_string(sow_id) + "\"";
 
@@ -4801,8 +4801,8 @@ int main(void)
 								}
 							}
 
-							db.Query("DELETE FROM `users_notification` WHERE `actionTypeId`=\"" + to_string(NOTIFICATION_AGENGY_GENERATED_AGREEMENTS) + "\" AND `actionId`=\"" + sow_id + "\";");
-							db.Query("DELETE FROM `users_notification` WHERE `actionTypeId`=\"" + to_string(NOTIFICATION_AGENGY_INITIATED_SOW) + "\" AND `actionId`=\"" + sow_id + "\";");
+							db.Query("DELETE FROM `users_notification` WHERE `actionTypeId`=\"" + to_string(NOTIFICATION_AGENCY_GENERATED_AGREEMENTS) + "\" AND `actionId`=\"" + sow_id + "\";");
+							db.Query("DELETE FROM `users_notification` WHERE `actionTypeId`=\"" + to_string(NOTIFICATION_AGENCY_INITIATED_SOW) + "\" AND `actionId`=\"" + sow_id + "\";");
 							db.Query("DELETE FROM `users_notification` WHERE `actionTypeId`=\"" + to_string(NOTIFICATION_SUBCONTRACTOR_SIGNED_SOW) + "\" AND `actionId`=\"" + sow_id + "\";");
 							db.Query("DELETE FROM `contract_sow_agreement_files` WHERE `contract_sow_id`=\"" + sow_id + "\";");
 							db.Query("DELETE FROM `contract_sow_custom_fields` WHERE `contract_sow_id`=\"" + sow_id + "\";");
@@ -5330,7 +5330,7 @@ int main(void)
 									success_message = "\"filename\":\"" + agreements.GetShortFilename() + "\"";
 
 									{
-										auto	temp_error_message = NotifySoWContractPartiesAboutChanges(to_string(NOTIFICATION_AGENGY_GENERATED_AGREEMENTS), sow_id, &db, &user);
+										auto	temp_error_message = NotifySoWContractPartiesAboutChanges(to_string(NOTIFICATION_AGENCY_GENERATED_AGREEMENTS), sow_id, &db, &user);
 
 										if(temp_error_message.length()) MESSAGE_ERROR("", action, temp_error_message);
 									}
@@ -5419,7 +5419,7 @@ int main(void)
 										MESSAGE_ERROR("", action, "sow_id(" + sow_id + ") not found. Workflow must not be here. Investigate reason.");
 									}
 
-									db.Query("DELETE FROM `users_notification` WHERE `actionTypeId`=\"" + to_string(NOTIFICATION_AGENGY_GENERATED_AGREEMENTS) + "\" AND `actionId`=\"" + sow_id + "\";");
+									db.Query("DELETE FROM `users_notification` WHERE `actionTypeId`=\"" + to_string(NOTIFICATION_AGENCY_GENERATED_AGREEMENTS) + "\" AND `actionId`=\"" + sow_id + "\";");
 									db.Query("UPDATE `contracts_sow` SET `agreement_filename`=\"\" WHERE `id`=\"" + sow_id + "\";");
 								}
 								else

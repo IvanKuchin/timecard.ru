@@ -332,7 +332,7 @@ auto	C_Print_Invoice_Docs_Base::PrintAsXLS() -> string
 
 				__row_counter = 1;
 
-				// --- print proerties
+				// --- print properties
 				__sheet->setPaper(libxl::PAPER_A4);
 				__sheet->setLandscape(false);
 				// __sheet->setPrintZoom(50);
@@ -507,7 +507,7 @@ auto	C_Print_Invoice_Docs_Base::PrintAsXLS() -> string
 	else
 	{
 		error_message = gettext("fail to initialize variable set");
-		MESSAGE_ERROR("", "", "set variables before generating documanets. Invoke SetVariableSet before printing.");
+		MESSAGE_ERROR("", "", "set variables before generating documents. Invoke SetVariableSet before printing.");
 	}
 
 	MESSAGE_DEBUG("", "", "finish (error_message.length() = " + to_string(error_message.length()) + ")");

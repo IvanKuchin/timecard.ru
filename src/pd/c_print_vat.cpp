@@ -406,7 +406,7 @@ auto	C_Print_VAT_Base::PrintAsXLS() -> string
 
 				__row_counter = 0;
 
-				// --- print proerties
+				// --- print properties
 				__sheet->setPaper(libxl::PAPER_A4);
 				__sheet->setLandscape(true);
 				// __sheet->setPrintZoom(75);
@@ -448,7 +448,7 @@ auto	C_Print_VAT_Base::PrintAsXLS() -> string
 	else
 	{
 		error_message = gettext("fail to initialize variable set");
-		MESSAGE_ERROR("", "", "set variables before generating documanets. Invoke SetVariableSet before printing.");
+		MESSAGE_ERROR("", "", "set variables before generating documents. Invoke SetVariableSet before printing.");
 	}
 
 	MESSAGE_DEBUG("", "", "finish (error_message.length() = " + to_string(error_message.length()) + ")");

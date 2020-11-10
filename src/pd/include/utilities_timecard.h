@@ -7,7 +7,7 @@
 #include "c_cache_obj.h"
 
 // --- IMPORTANT !!!
-// --- do NOT add any header file with potentialy recursive includes
+// --- do NOT add any header file with potentially recursive includes
 
 // --- timecard functions
 auto	 		CheckHTTPParam_Timeentry(const string &srcText) -> string;
@@ -16,7 +16,7 @@ auto      		GetUserListInJSONFormat(string dbQuery, CMysql *, CUser *) -> string
 auto      		GetUserBonusesAirlinesInJSONFormat(string dbQuery, CMysql *, CUser *) -> string;
 auto      		GetUserBonusesRailroadsInJSONFormat(string dbQuery, CMysql *, CUser *) -> string;
 auto      		GetUserBonusesHotelchainsInJSONFormat(string dbQuery, CMysql *, CUser *) -> string;
-auto			GetBonuseProgramsInJSONFormat(string dbQuery, CMysql *db, CUser *user) -> string;
+auto			GetBonusesProgramsInJSONFormat(string dbQuery, CMysql *db, CUser *user) -> string;
 auto      		GetMessageImageList(string imageSetID, CMysql *) -> string;
 auto      		GetMessageLikesUsersList(string messageID, CUser *, CMysql *) -> string;
 auto 			GetCertificationLikesUsersList(string usersCertificationID, CUser *, CMysql *) -> string;
@@ -244,7 +244,7 @@ auto			isTimePeriodInsideSow(string sow_id, string period_start, string period_e
 auto 			DeleteServiceInvoicesSubcToAgency(string timecard_id, CMysql *db, CUser *user) -> string;
 auto			RecallTimecard(string timecard_id, string reason, CMysql *db, CUser *user) -> string;
 
-// --- IMPORTAN !!! 
+// --- IMPORTANT !!! 
 // --- MUST use VAT and Total payment functions functions instead of direct calculations
 auto			GetBaseCostFrom(c_float amount) -> c_float;
 auto			GetVATFrom(c_float	amount) -> c_float;

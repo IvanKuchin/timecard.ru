@@ -25,7 +25,7 @@ C_Print_Timecard::C_Print_Timecard()
 		}
 		catch(...)
 		{
-			MESSAGE_ERROR("", "", "HPDF trown exception");
+			MESSAGE_ERROR("", "", "HPDF thrown exception");
 		}
 
 	}
@@ -164,9 +164,9 @@ auto	C_Print_Timecard::AssignValuesToDaySummaryStruct() -> bool
 					++today.tm_mday;
 				}
 
-				for(auto &timcard_line: timecard_lines)
+				for(auto &timecard_line: timecard_lines)
 				{
-					auto		reported_hours_list = SplitTimeentry(timcard_line.hours);
+					auto		reported_hours_list = SplitTimeentry(timecard_line.hours);
 
 					if(reported_hours_list.size())
 					{
@@ -185,7 +185,7 @@ auto	C_Print_Timecard::AssignValuesToDaySummaryStruct() -> bool
 					}
 					else
 					{
-						MESSAGE_ERROR("", "", "time report(" + timcard_line.hours + ") have no entries. This flow expect to have time entries reported.");
+						MESSAGE_ERROR("", "", "time report(" + timecard_line.hours + ") have no entries. This flow expect to have time entries reported.");
 					}
 
 				}
@@ -334,7 +334,7 @@ auto	C_Print_Timecard::PrintAsXLS() -> string
 
 				format_number_d2->setNumFormat(libxl::NUMFORMAT_NUMBER_D2);
 
-				// --- print proerties
+				// --- print properties
 				sheet->setPaper(libxl::PAPER_A4);
 				sheet->setLandscape();
 				sheet->setPrintZoom(50);
@@ -363,11 +363,11 @@ auto	C_Print_Timecard::PrintAsXLS() -> string
 				++row_counter;
 
 				// --- table body
-				for(auto &timcard_line: timecard_lines)
+				for(auto &timecard_line: timecard_lines)
 				{
-					wstring		timecard_line_title = multibyte_to_wide(timcard_line.customer + TIMECARD_ENTRY_TITLE_SEPARATOR + timcard_line.project + TIMECARD_ENTRY_TITLE_SEPARATOR + timcard_line.task);
-					wstring		timcard_line_hours = multibyte_to_wide(timcard_line.hours);
-					auto		time_entries = SplitTimeentry(timcard_line.hours);
+					wstring		timecard_line_title = multibyte_to_wide(timecard_line.customer + TIMECARD_ENTRY_TITLE_SEPARATOR + timecard_line.project + TIMECARD_ENTRY_TITLE_SEPARATOR + timecard_line.task);
+					wstring		timecard_line_hours = multibyte_to_wide(timecard_line.hours);
+					auto		time_entries = SplitTimeentry(timecard_line.hours);
 
 					sheet->writeStr(row_counter, 1, timecard_line_title.c_str(), format_title);
 
@@ -390,7 +390,7 @@ auto	C_Print_Timecard::PrintAsXLS() -> string
 					}
 					else
 					{
-						MESSAGE_ERROR("", "", "time report(" + timcard_line.hours + ") have no entries. This flow expect to have time entries reported.");
+						MESSAGE_ERROR("", "", "time report(" + timecard_line.hours + ") have no entries. This flow expect to have time entries reported.");
 					}
 
 					row_counter++;
@@ -665,7 +665,7 @@ auto	C_Print_Timecard::__HPDF_SetDocProps() -> string
 	}
 	catch(...)
 	{
-		MESSAGE_ERROR("", "", "HPDF trown exception");		
+		MESSAGE_ERROR("", "", "HPDF thrown exception");		
 	}
 
 
@@ -1208,10 +1208,10 @@ auto	C_Print_Timecard::__HPDF_DrawTimecardTableBody() -> string
 		{
 			auto	timecard_lines = timecard.GetTimecardLines();
 
-			for(auto &timcard_line : timecard_lines)
+			for(auto &timecard_line : timecard_lines)
 			{
-				auto	time_entries			= SplitTimeentry(timcard_line.hours);
-				auto	timecard_line_title		= timcard_line.customer + TIMECARD_ENTRY_TITLE_SEPARATOR + timcard_line.project + TIMECARD_ENTRY_TITLE_SEPARATOR + timcard_line.task;
+				auto	time_entries			= SplitTimeentry(timecard_line.hours);
+				auto	timecard_line_title		= timecard_line.customer + TIMECARD_ENTRY_TITLE_SEPARATOR + timecard_line.project + TIMECARD_ENTRY_TITLE_SEPARATOR + timecard_line.task;
 				auto	text_width_pdf_struct	= HPDF_Font_TextWidth(__pdf_font, (HPDF_BYTE *)utf8_to_cp1251(timecard_line_title).c_str(), utf8_to_cp1251(timecard_line_title).length());
 				auto	text_width				= text_width_pdf_struct.width * HPDF_TIMECARD_FONT_SIZE / 1000.0;
 				auto	title_cell_width		= __HPDF_GetTimecardTableXByPercentage(HPDF_TIMECARD_TITLE_WIDTH_PERCENT);
@@ -1220,7 +1220,7 @@ auto	C_Print_Timecard::__HPDF_DrawTimecardTableBody() -> string
 				if(number_of_lines) {}
 				else
 				{
-					MESSAGE_ERROR("", "", "number of lines reuired to write cu / proj / task is 0 (probably string is empty)");
+					MESSAGE_ERROR("", "", "number of lines required to write cu / proj / task is 0 (probably string is empty)");
 					number_of_lines = 1;
 				}
 
@@ -1286,7 +1286,7 @@ auto	C_Print_Timecard::__HPDF_DrawTimecardTableBody() -> string
 				}
 				else
 				{
-					MESSAGE_ERROR("", "", "time report(" + timcard_line.hours + ") have no entries. This flow expect to have time entries reported.");
+					MESSAGE_ERROR("", "", "time report(" + timecard_line.hours + ") have no entries. This flow expect to have time entries reported.");
 				}
 			}
 		}

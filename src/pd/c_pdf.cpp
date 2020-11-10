@@ -24,7 +24,7 @@ C_PDF::C_PDF()
 		}
 		catch(...)
 		{
-			MESSAGE_ERROR("", "", "HPDF trown exception");
+			MESSAGE_ERROR("", "", "HPDF thrown exception");
 		}
 
 	}
@@ -369,7 +369,7 @@ auto	C_PDF::__HPDF_SetDocProps() -> string
 	}
 	catch(...)
 	{
-		MESSAGE_ERROR("", "", "HPDF trown exception");		
+		MESSAGE_ERROR("", "", "HPDF thrown exception");		
 	}
 
 

@@ -584,7 +584,7 @@ string GetNewsFeedInJSONFormat(string whereStatement, int currPage, int newsOnSi
 			}
 			else if(feedActionTypeId == "22")
 			{
-				// --- cretificate received
+				// --- certificate received
 
 				if(db->Query("SELECT * FROM `users_certifications` WHERE `id`=\"" + feedActionId + "\";"))
 				{
@@ -1077,7 +1077,7 @@ string GetCompanyListInJSONFormat(string dbQuery, CMysql *db, CUser *user, bool 
 		{
 			companyCounter = affected;
 			companiesList.reserve(companyCounter);  // --- reserving allows avoid moving vector in memory
-													// --- to fit vector into continous memory piece
+													// --- to fit vector into continuous memory piece
 
 			for(int i = 0; i < affected; i++)
 			{
@@ -2513,9 +2513,9 @@ string  GetUserNotificationSpecificDataByType(unsigned long typeID, unsigned lon
 	// --- Company Posession Request
 	if(typeID == 60)
 	{
-		string   company_posesison_request_id = to_string(actionID);
+		string   company_possession_request_id = to_string(actionID);
 
-		if(company_posesison_request_id.length() && db->Query("select * from `company_posession_request` where `id`='" + company_posesison_request_id + "';"))
+		if(company_possession_request_id.length() && db->Query("select * from `company_possession_request` where `id`='" + company_possession_request_id + "';"))
 		{
 			string  friendUserID = db->Get(0, "requester_user_id");
 			string  company_id = db->Get(0, "requested_company_id");
@@ -2531,7 +2531,7 @@ string  GetUserNotificationSpecificDataByType(unsigned long typeID, unsigned lon
 					string  friend_userName = db->Get(0, "name");
 					string  friend_userNameLast = db->Get(0, "nameLast");
 
-					ostResult << "\"notificationCompanyPosessionRequestID\":\"" << company_posesison_request_id << "\",";
+					ostResult << "\"notificationCompanyPosessionRequestID\":\"" << company_possession_request_id << "\",";
 					ostResult << "\"notificationDescription\":\"" << description << "\",";
 					ostResult << "\"notificationFriendUserID\":\"" << friendUserID << "\",";
 					ostResult << "\"notificationFriendUserName\":\"" << friend_userName << "\",";
@@ -2558,11 +2558,11 @@ string  GetUserNotificationSpecificDataByType(unsigned long typeID, unsigned lon
 		else
 		{
 			CLog log;
-			log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR:typeID=" + to_string(typeID) + ": ERROR selecting from company_posession_request[id = " + company_posesison_request_id + "]");
+			log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR:typeID=" + to_string(typeID) + ": ERROR selecting from company_possession_request[id = " + company_possession_request_id + "]");
 		}
 	}
 
-	// --- company posession approved / rejected
+	// --- company possession approved / rejected
 	if((typeID == 61) || (typeID == 62))
 	{
 		string   company_id = to_string(actionID);
@@ -2794,7 +2794,7 @@ string  GetUserNotificationSpecificDataByType(unsigned long typeID, unsigned lon
 		}
 	}
 
-	if(typeID == NOTIFICATION_AGENGY_INITIATED_SOW)
+	if(typeID == NOTIFICATION_AGENCY_INITIATED_SOW)
 	{
 		string		id = to_string(actionID);
 
@@ -2830,7 +2830,7 @@ string  GetUserNotificationSpecificDataByType(unsigned long typeID, unsigned lon
 		}
 	}
 
-	if(typeID == NOTIFICATION_AGENGY_ABOUT_SUBC_REGISTRATION)
+	if(typeID == NOTIFICATION_AGENCY_ABOUT_SUBC_REGISTRATION)
 	{
 		string		id = to_string(actionID);
 
@@ -2845,7 +2845,7 @@ string  GetUserNotificationSpecificDataByType(unsigned long typeID, unsigned lon
 		}
 	}
 
-	if(typeID == NOTIFICATION_AGENGY_ABOUT_APPROVER_REGISTRATION)
+	if(typeID == NOTIFICATION_AGENCY_ABOUT_APPROVER_REGISTRATION)
 	{
 		string		id = to_string(actionID);
 
@@ -2869,7 +2869,7 @@ string  GetUserNotificationSpecificDataByType(unsigned long typeID, unsigned lon
 		}
 	}
 
-	if(typeID == NOTIFICATION_AGENGY_ABOUT_EMPLOYEE_REGISTRATION)
+	if(typeID == NOTIFICATION_AGENCY_ABOUT_EMPLOYEE_REGISTRATION)
 	{
 		string		id = to_string(actionID);
 
@@ -2893,7 +2893,7 @@ string  GetUserNotificationSpecificDataByType(unsigned long typeID, unsigned lon
 		}
 	}
 
-	if(typeID == NOTIFICATION_AGENGY_GENERATED_AGREEMENTS)
+	if(typeID == NOTIFICATION_AGENCY_GENERATED_AGREEMENTS)
 	{
 		string		id = to_string(actionID);
 

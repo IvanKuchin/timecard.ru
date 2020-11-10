@@ -14,7 +14,7 @@ static bool ImageSaveAsJpgToFeedFolder (const string src, const string dst, stru
 	}
 
 #ifndef IMAGEMAGICK_DISABLE
-	// Construct the image object. Seperating image construction FROM the
+	// Construct the image object. Separating image construction FROM the
 	// the read operation ensures that a failure to read the image file
 	// doesn't render the image object useless.
 	try {
@@ -259,7 +259,7 @@ static string GenerateImage(string randStr)
 
 				fileFlagExist = true;
 				do {
-					MESSAGE_DEBUG("", "", "checking captha file existance");
+					MESSAGE_DEBUG("", "", "checking captcha file existence");
 
 					fileResult = "_";
 					fileResult += GetRandom(10);
@@ -299,7 +299,7 @@ static string GenerateImage(string randStr)
 
 int main()
 {
-	CStatistics		appStat;  // --- CStatistics must be firts statement to measure end2end param's
+	CStatistics		appStat;  // --- CStatistics must be first statement to measure end2end param's
 	CCgi			indexPage(EXTERNAL_TEMPLATE);
 	CUser			user;
 	string			action, partnerID;
@@ -1098,10 +1098,10 @@ int main()
 							 feed_mediaType = "youtube_video";
 							 feed_imageURL = html.GetEmbedVideoURL();
 						}
-						else if((!html.GetPreviewImageFolder().empty()) && (!html.GetPreviewImagePrefix().empty()) && (!html.GetPreviewImageExtention().empty()))
+						else if((!html.GetPreviewImageFolder().empty()) && (!html.GetPreviewImagePrefix().empty()) && (!html.GetPreviewImageExtension().empty()))
 						{
 							// --- 1) check that image actually image
-							// --- 2) move it to finalFoldef
+							// --- 2) move it to finalFolder
 							// --- 3) submit to imageTempSet in DB
 							struct ExifInfo exifInfo;
 							string			finalFile, tmpFile2Check, tmpImageJPG;
@@ -1121,7 +1121,7 @@ int main()
 							finalFile = ost.str();
 
 							ost.str("");
-							ost << "/tmp/tmp_" << html.GetPreviewImagePrefix() << html.GetPreviewImageExtention();
+							ost << "/tmp/tmp_" << html.GetPreviewImagePrefix() << html.GetPreviewImageExtension();
 							tmpFile2Check = ost.str();
 
 							ost.str("");
@@ -1132,7 +1132,7 @@ int main()
 							{
 
 								{
-									MESSAGE_DEBUG("", action, "" + action + ": choosen filename for feed image [" + finalFile + "]");
+									MESSAGE_DEBUG("", action, "" + action + ": chosen filename for feed image [" + finalFile + "]");
 								}
 
 								CopyFile(tmpImageJPG, finalFile);
@@ -2192,7 +2192,7 @@ int main()
 						}
 						else
 						{
-							// --- here code will be run only if multiwork search was not sucessfull on previous step
+							// --- here code will be run only if multiwork search was not successful on previous step
 							// --- earlier: user _and_ company is not success
 							// --- here: user _or_ company
 							{
@@ -2266,7 +2266,7 @@ int main()
 						}
 						else
 						{
-							// --- here code will be run only if multiwork search was not sucessfull on previous step
+							// --- here code will be run only if multiwork search was not successful on previous step
 							// --- earlier: user _and_ company is not success
 							// --- here: user _or_ company
 							{
@@ -2333,7 +2333,7 @@ int main()
 			}
 		}
 
-		// --- JSON industy list for autocomplete
+		// --- JSON industry list for autocomplete
 		if(action == "JSON_getIndustryListAutocomplete")
 		{
 			ostringstream   ost, ostFinal;
@@ -3200,7 +3200,7 @@ int main()
 			else
 			{
 				{
-					MESSAGE_DEBUG("", action, "there are no company of current employmant of user " + user.GetID());
+					MESSAGE_DEBUG("", action, "there are no company of current employment of user " + user.GetID());
 				}
 			}
 			indexPage.RegisterVariableForce("result", ost.str());
@@ -4508,7 +4508,7 @@ int main()
 				{
 					MESSAGE_DEBUG("", action, "user [" + user.GetLogin() + "] not found");
 
-					// --- don't alert that user is missing, it make reconaissance attack easier
+					// --- don't alert that user is missing, it make reconnaissance attack easier
 					ostResult.str("");
 					ostResult << "{";
 					ostResult << "\"result\": \"error\",";
@@ -4953,7 +4953,7 @@ int main()
 					// --- account activated
 					act.Activate();
 
-					// --- improve the user expirience by automatically sign-in user
+					// --- improve the user experience by automatically sign-in user
 					// --- automatic sing-in
 					string		sessid, login, rememberMe, lng;
 					CUser		user;
@@ -4996,7 +4996,7 @@ int main()
 								CLog	log;
 								MESSAGE_ERROR("", action, "user [" + user.GetLogin() + "] not activated");
 
-								if(!indexPage.SetTemplate("weberror_user_not_activared.htmlt"))
+								if(!indexPage.SetTemplate("weberror_user_not_activated.htmlt"))
 								{
 									throw CExceptionHTML("template page missing");
 								}
@@ -5361,7 +5361,7 @@ int main()
 				else
 				{
 					{
-						MESSAGE_ERROR("", action, "can't edit message.id(" + messageID + ") such as neighter you(user.id: " + user.GetID() + ") nor your companies are not owning message");
+						MESSAGE_ERROR("", action, "can't edit message.id(" + messageID + ") such as neither you(user.id: " + user.GetID() + ") nor your companies are not owning message");
 					}
 					ostFinal.str("");
 					ostFinal << "{";

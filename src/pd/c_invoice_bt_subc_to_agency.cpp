@@ -513,7 +513,7 @@ auto C_Invoice_BT_Subc_To_Agency::UpdateDBWithInvoiceData(const string bt_id) ->
 
 				if(curr_fname.length())
 				{
-					MESSAGE_DEBUG("", "", "removeing existing invoice(" + curr_fname + ")");
+					MESSAGE_DEBUG("", "", "removing existing invoice(" + curr_fname + ")");
 					unlink((INVOICES_SUBC_DIRECTORY + curr_fname).c_str());
 				}
 				else

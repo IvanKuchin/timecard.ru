@@ -311,7 +311,7 @@ auto	C_Print_BT::PrintAsXLS() -> string
 
 				format_number_d2->setNumFormat(libxl::NUMFORMAT_NUMBER_D2);
 
-				// --- print proerties
+				// --- print properties
 				__xls_sheet->setPaper(libxl::PAPER_A4);
 				__xls_sheet->setLandscape();
 				__xls_sheet->setPrintZoom(75);

@@ -723,7 +723,7 @@ string	C_Expense::CheckValidity(CMysql *db) const
 								// --- otherwise calculated value will be having more precision than PriceDomestic
 	{
 		result = "сумма в рублях не соответствует сумме в валюте";
-		MESSAGE_DEBUG("C_Expense", "", "price in rub.(" + string(GetPriceDomestic()) + ") not equal to foregn price(cost = price / nominal * value is " + string(GetPriceForeign() * GetCurrencyValue() / GetCurrencyNominal()) + " == " + string(GetPriceForeign()) + TIMECARD_ENTRY_TITLE_SEPARATOR + to_string(GetCurrencyNominal()) + TIMECARD_ENTRY_TITLE_SEPARATOR + string(GetCurrencyValue()) + ") in expense (id/random: " + GetID() + "/" + GetRandom() + ")");
+		MESSAGE_DEBUG("C_Expense", "", "price in rub.(" + string(GetPriceDomestic()) + ") not equal to foreign price(cost = price / nominal * value is " + string(GetPriceForeign() * GetCurrencyValue() / GetCurrencyNominal()) + " == " + string(GetPriceForeign()) + TIMECARD_ENTRY_TITLE_SEPARATOR + to_string(GetCurrencyNominal()) + TIMECARD_ENTRY_TITLE_SEPARATOR + string(GetCurrencyValue()) + ") in expense (id/random: " + GetID() + "/" + GetRandom() + ")");
 	}
 	else
 	{
@@ -1100,7 +1100,7 @@ string	C_BT::CheckValidity() const
 	else if(!isCustomerAssignmentInsideBTPeriod())
 	{
 		result = (gettext("customer assignment outside bt travel"));
-		MESSAGE_DEBUG("C_BT", "", "user.id(" + user->GetID() + ") assignment to customer.id(" + GetCustomerID() + ") beyond the business travle period (" + GetStartDate() + " -> " + GetEndDate() + ")");
+		MESSAGE_DEBUG("C_BT", "", "user.id(" + user->GetID() + ") assignment to customer.id(" + GetCustomerID() + ") beyond the business travel period (" + GetStartDate() + " -> " + GetEndDate() + ")");
 	}
 	else
 	{

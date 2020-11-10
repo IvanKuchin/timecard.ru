@@ -771,7 +771,7 @@ msgstr "такой email уже зарегистрирован"
 msgid "email is empty"
 msgstr "не указан email"
 
-msgid "employeer not found"
+msgid "employer not found"
 msgstr "не найден работодатель"
 
 msgid "empty vars list"
@@ -945,7 +945,7 @@ msgstr "не 'истина'"
 msgid "item short"
 msgstr "шт"
 
-msgid "json_obj reponse error"
+msgid "json_obj response error"
 msgstr "ошибка объекта JSON"
 
 msgid "kop."
@@ -1074,7 +1074,7 @@ msgstr "изменили должность"
 msgid "print to XLS not valid"
 msgstr "невозможно сгенерировать XLS"
 
-msgid "promouted from"
+msgid "promoted from"
 msgstr "перешел(шла) с должности"
 
 msgid "re-login required"

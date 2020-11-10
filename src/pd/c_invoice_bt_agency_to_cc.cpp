@@ -662,7 +662,7 @@ auto C_Invoice_BT_Agency_To_CC::UpdateDBWithInvoiceData(const string bt_id) -> s
 				else
 				{
 					MESSAGE_ERROR("", "", "agency not found where user.id(" + user->GetID() + ") working at");
-					error_message = gettext("employeer not found");
+					error_message = gettext("employer not found");
 				}
 
 			}

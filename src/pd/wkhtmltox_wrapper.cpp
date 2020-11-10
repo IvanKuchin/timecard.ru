@@ -33,7 +33,7 @@ auto	wkhtmltox_wrapper::Convert() -> string
 	{
 		if(isFileExists(GetDst()))
 		{
-			MESSAGE_DEBUG("", "", "pdf file is about to render already exists, remove existsing file.");
+			MESSAGE_DEBUG("", "", "pdf file is about to render already exists, remove existing file.");
 			unlink(GetDst().c_str());
 		}
 
@@ -48,7 +48,7 @@ auto	wkhtmltox_wrapper::Convert() -> string
 			 * the converter later, which is then responsible for freeing it
 			 */
 			gs = wkhtmltopdf_create_global_settings();
-			/* We want the result to be storred in the file called test.pdf */
+			/* We want the result to be stored in the file called test.pdf */
 			wkhtmltopdf_set_global_setting(gs, "out", GetDst().c_str());
 
 			// wkhtmltopdf_set_global_setting(gs, "web.defaultEncoding", "utf-8");

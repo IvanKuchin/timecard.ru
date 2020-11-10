@@ -454,7 +454,7 @@ string C_Smartway::ParseResponse_Ping()
 	}
 	else
 	{
-		error_message = gettext("json_obj reponse error");
+		error_message = gettext("json_obj response error");
 		MESSAGE_ERROR("", "", error_message + ", missed result member");
 	}
 
@@ -621,7 +621,7 @@ string C_Smartway::ApplyFilter_ByDirection(const vector<C_Flight_Route> &flight_
 								}
 								else
 								{
-									error_message = gettext("json_obj reponse error");
+									error_message = gettext("json_obj response error");
 									MESSAGE_ERROR("", "", error_message + "(price is not a number or missed)");
 								}
 							}
@@ -629,14 +629,14 @@ string C_Smartway::ApplyFilter_ByDirection(const vector<C_Flight_Route> &flight_
 						}
 						else
 						{
-							error_message = gettext("json_obj reponse error");
+							error_message = gettext("json_obj response error");
 							MESSAGE_ERROR("", "", error_message + "(fares is not an array or missed)");
 						}
 					}
 				}
 				else
 				{
-					error_message = gettext("json_obj reponse error");
+					error_message = gettext("json_obj response error");
 					MESSAGE_ERROR("", "", error_message + "(price is not a number or missed)");
 				}
 
@@ -645,7 +645,7 @@ string C_Smartway::ApplyFilter_ByDirection(const vector<C_Flight_Route> &flight_
 		}
 		else
 		{
-			error_message = gettext("json_obj reponse error");
+			error_message = gettext("json_obj response error");
 			MESSAGE_ERROR("", "", error_message + "(trips is not an array or missed)");
 		}
 	}
@@ -1136,7 +1136,7 @@ string C_Smartway::ParseResponse()
 				MESSAGE_ERROR("", "", "response from server have no error member");
 			}
 
-			error_message = gettext("json_obj reponse error") + " ("s + gettext("code") + ": " + to_string(error_code_from_server) + ", " + gettext("message") + ": " + error_message_from_server + ")";
+			error_message = gettext("json_obj response error") + " ("s + gettext("code") + ": " + to_string(error_code_from_server) + ", " + gettext("message") + ": " + error_message_from_server + ")";
 			MESSAGE_ERROR("", "", error_message + ", missed result member");
 		}
 	}

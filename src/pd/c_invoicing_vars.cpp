@@ -1130,7 +1130,7 @@ auto	C_Invoicing_Vars::Subcontractor_Index_VarSet(string subcontractor_company_i
 	return	error_message;
 }
 
-auto	C_Invoicing_Vars::TableRowDecsriptions_Index_VarSet(string local_remote_service_description, string index) -> string
+auto	C_Invoicing_Vars::TableRowDescriptions_Index_VarSet(string local_remote_service_description, string index) -> string
 {
 	auto	error_message = ""s;
 
@@ -1209,7 +1209,7 @@ auto	C_Invoicing_Vars::DocumentSubmissionDate_1C_Index_VarSet(const struct tm &d
 
 	// --- former implementation:
 	// ---  *) subc_payment and subc_payment_order - will take last month of current item (BT or TC)
-	// ---  *) cost_center - will take latest item (BT or TC) in <vecto> and take the date
+	// ---  *) cost_center - will take latest item (BT or TC) in <vector> and take the date
 
 	if(error_message.empty()) error_message = AssignVariableValue("LastDayOfMonth_Date_1CFormat_" + index, GetSpellingFormattedDate(last_day_of_month, "%F"), true);
 */
@@ -1488,7 +1488,7 @@ auto	C_Invoicing_Vars::AgreementNumberSpelling_VarSet(string agreement_number) -
 				{
 					// --- note that tc_objs are not in sorted order.
 					// --- last in <vector> not necessary will be latest by date
-					// --- if TCs need to be sorted, then have to sort it explicitely
+					// --- if TCs need to be sorted, then have to sort it explicitly
 					auto		last_idx = timecard_obj_list.size() - 1;
 
 					date_obj.SetTMObj(GetTMObject(timecard_obj_list[last_idx].GetDateFinish()));
@@ -1497,7 +1497,7 @@ auto	C_Invoicing_Vars::AgreementNumberSpelling_VarSet(string agreement_number) -
 				{
 					// --- note that bt_objs are not in sorted order.
 					// --- last in <vector> not necessary will be latest by date
-					// --- if BTs need to be sorted, then have to sort it explicitely
+					// --- if BTs need to be sorted, then have to sort it explicitly
 					auto		last_idx = bt_obj_list.size() - 1;
 					struct tm	start_of_mon, end_of_mon;
 
@@ -1692,8 +1692,8 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet_AgencyToCC() -> string
 					// --- table row description
 					if(error_message.empty())
 					{
-						if((error_message = TableRowDecsriptions_Index_VarSet(Get("subcontractor_position_local_service_description_" + to_string(i)), to_string(i))).empty()) {}
-						else { MESSAGE_ERROR("", "", "fail returned from TableRowDecsriptions_Index_VarSet"); }
+						if((error_message = TableRowDescriptions_Index_VarSet(Get("subcontractor_position_local_service_description_" + to_string(i)), to_string(i))).empty()) {}
+						else { MESSAGE_ERROR("", "", "fail returned from TableRowDescriptions_Index_VarSet"); }
 					}
 
 					subcontractors_vat = subcontractors_vat + c_float(Get("timecard_vat_" + to_string(i)));
@@ -1856,8 +1856,8 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet_SubcToAgency() -> string
 					// --- table row description
 					if(error_message.empty())
 					{
-						if((error_message = TableRowDecsriptions_Index_VarSet(Get("subcontractor_position_local_service_description_" + to_string(i)), to_string(i))).empty()) {}
-						else { MESSAGE_ERROR("", "", "fail returned from TableRowDecsriptions_Index_VarSet"); }
+						if((error_message = TableRowDescriptions_Index_VarSet(Get("subcontractor_position_local_service_description_" + to_string(i)), to_string(i))).empty()) {}
+						else { MESSAGE_ERROR("", "", "fail returned from TableRowDescriptions_Index_VarSet"); }
 					}
 
 					subcontractors_vat = subcontractors_vat + c_float(Get("timecard_vat_" + to_string(i)));
@@ -2020,8 +2020,8 @@ auto	C_Invoicing_Vars::GenerateBTVariableSet_AgencyToCC() -> string
 
 					if(error_message.empty())
 					{
-						if((error_message = TableRowDecsriptions_Index_VarSet(Get("subcontractor_position_remote_service_description_" + to_string(i)), to_string(i))).empty()) {}
-						else { MESSAGE_ERROR("", "", "fail returned from TableRowDecsriptions_Index_VarSet"); }
+						if((error_message = TableRowDescriptions_Index_VarSet(Get("subcontractor_position_remote_service_description_" + to_string(i)), to_string(i))).empty()) {}
+						else { MESSAGE_ERROR("", "", "fail returned from TableRowDescriptions_Index_VarSet"); }
 					}
 
 					subcontractors_vat = subcontractors_vat + c_float(Get("timecard_vat_" + to_string(i)));
@@ -2180,8 +2180,8 @@ auto	C_Invoicing_Vars::GenerateBTVariableSet_SubcToAgency() -> string
 					// --- table row description
 					if(error_message.empty())
 					{
-						if((error_message = TableRowDecsriptions_Index_VarSet(Get("subcontractor_position_remote_service_description_" + to_string(i)), to_string(i))).empty()) {}
-						else { MESSAGE_ERROR("", "", "fail returned from TableRowDecsriptions_Index_VarSet"); }
+						if((error_message = TableRowDescriptions_Index_VarSet(Get("subcontractor_position_remote_service_description_" + to_string(i)), to_string(i))).empty()) {}
+						else { MESSAGE_ERROR("", "", "fail returned from TableRowDescriptions_Index_VarSet"); }
 					}
 
 					subcontractors_vat = subcontractors_vat + c_float(Get("timecard_vat_" + to_string(i)));
@@ -2289,7 +2289,7 @@ auto C_Invoicing_Vars::Get(const string &name) -> string
 }
 
 
-// --- helper funcitons
+// --- helper functions
 auto C_Invoicing_Vars::GetIndexByTimecardID(string timecard_id) -> string
 {
 	auto	result = ""s;

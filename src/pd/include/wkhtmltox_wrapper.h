@@ -29,7 +29,7 @@ class wkhtmltox_wrapper
 
 		auto						Convert() -> string;
 
-									~wkhtmltox_wrapper()		{ wkhtmltopdf_deinit(); }; // We will no longer be needing wkhtmltopdf funcionality
+									~wkhtmltox_wrapper()		{ wkhtmltopdf_deinit(); }; // We will no longer be needing wkhtmltopdf functionality
 };
 
 ostream&	operator<<(ostream& os, const wkhtmltox_wrapper &);

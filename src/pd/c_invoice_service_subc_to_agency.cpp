@@ -514,7 +514,7 @@ auto C_Invoice_Service_Subc_To_Agency::UpdateDBWithInvoiceData(const string time
 
 				if(curr_fname.length())
 				{
-					MESSAGE_DEBUG("", "", "removeing existing invoice(" + curr_fname + ")");
+					MESSAGE_DEBUG("", "", "removing existing invoice(" + curr_fname + ")");
 					unlink((INVOICES_SUBC_DIRECTORY + curr_fname).c_str());
 				}
 				else
