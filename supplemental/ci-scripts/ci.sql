@@ -2048,7 +2048,7 @@ CREATE TABLE `timecard_projects` (
   `title` varchar(256) NOT NULL,
   `eventTimestamp` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `timecard_cutomers_id` (`timecard_customers_id`),
+  KEY `timecard_customers_id` (`timecard_customers_id`),
   KEY `title` (`title`),
   CONSTRAINT `timecard_projects_ibfk_1` FOREIGN KEY (`timecard_customers_id`) REFERENCES `timecard_customers` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=cp1251;
