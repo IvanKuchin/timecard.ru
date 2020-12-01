@@ -93,7 +93,7 @@ auto			isAllowed_NoSession_Action(string action) -> bool;
 auto			CutTrailingZeroes(string number) -> string;
 
 // auto      		GetCompanyListInJSONFormat(string dbQuery, CMysql *, CUser *, bool quickSearch = true, bool includeEmployedUsersList = false) -> string;
-auto      		GetBaseUserInfoInJSONFormat(string dbQuery, CMysql *, CUser *) -> string;
+auto      		GetHelpdeskBaseUserInfoInJSONFormat(string dbQuery, CMysql *, CUser *) -> string;
 auto      		GetGeoCountryListInJSONFormat(string dbQuery, CMysql *, CUser *) -> string;
 // auto 			GetNewsFeedInJSONFormat(string whereStatement, int currPage, int newsOnSinglePage, CUser *, CMysql *) -> string;
 auto			GetGiftListInJSONFormat(string dbQuery, CMysql *, CUser *) -> string;
