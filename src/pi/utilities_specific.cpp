@@ -7,12 +7,12 @@ string	GetDefaultActionFromUserType(CUser *user, CMysql *db)
 
 	MESSAGE_DEBUG("", "", "start");
 
-	if(user->GetType() == "guest") result = GUEST_USER_DEFAULT_ACTION;
-	else if(user->GetType() == "subcontractor") result = LOGGEDIN_SUBCONTRACTOR_DEFAULT_ACTION;
-	else if(user->GetType() == "agency") result = LOGGEDIN_AGENCY_DEFAULT_ACTION;
-	else if(user->GetType() == "approver") result = LOGGEDIN_APPROVER_DEFAULT_ACTION;
-	else if(user->GetType() == "helpdesk") result = LOGGEDIN_HELPDESK_DEFAULT_ACTION;
-	else if(user->GetType() == "no role") result = LOGGEDIN_NOROLE_DEFAULT_ACTION;
+	if(user->GetType() == "guest")					result = GUEST_USER_DEFAULT_ACTION;
+	else if(user->GetType() == "subcontractor")		result = LOGGEDIN_SUBCONTRACTOR_DEFAULT_ACTION;
+	else if(user->GetType() == "agency")			result = LOGGEDIN_AGENCY_DEFAULT_ACTION;
+	else if(user->GetType() == "approver")			result = LOGGEDIN_APPROVER_DEFAULT_ACTION;
+	else if(user->GetType() == "helpdesk")			result = LOGGEDIN_HELPDESK_DEFAULT_ACTION;
+	else if(user->GetType() == "no role")			result = LOGGEDIN_NOROLE_DEFAULT_ACTION;
 	else
 	{
 		MESSAGE_ERROR("", "", "unknown user type (" + user->GetType() + ")");
