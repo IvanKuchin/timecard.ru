@@ -208,6 +208,10 @@ int main(void)
 					MESSAGE_ERROR("", action, error_message + " by admin_user.id(" + user.GetID() + ")");
 				}
 			}
+			if(!affected)
+			{
+				MESSAGE_ERROR("", action, "agency not found (" + agency_name + ")");
+			}
 			else
 			{
 				// --- severity must be DEBUG, I set it to ERROR just for trial period 
