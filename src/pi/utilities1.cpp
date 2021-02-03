@@ -2222,7 +2222,6 @@ auto GetSpellingFormattedDate(struct tm date_obj, string format) -> string
 		MESSAGE_ERROR("", "", "strftime returns 0");
 	}
 
-
 	MESSAGE_DEBUG("", "", "finish (" + result + ")");
 
 	return result;
