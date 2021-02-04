@@ -272,6 +272,7 @@
 
 #define	MYSQL_DATE_FORMAT							"%Y-%m-%d"
 #define	RU_DATE_FORMAT								"%d/%m/%Y"
+#define PRINT_DATE_FORMAT							"%d %b %Y"
 
 #define	TEMP_DIRECTORY_PREFIX						"/tmp/"s + DOMAIN_NAME + "_"
 #define	ARCHIVE_FILE_EXTENSION						".zip"s

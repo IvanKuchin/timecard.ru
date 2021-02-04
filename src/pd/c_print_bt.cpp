@@ -12,15 +12,15 @@ auto C_Print_BT::SetBT(const C_BT_To_Print &param1) -> void
 
 auto	C_Print_BT::GetSpelledTitle() -> string
 {
-	auto			start_spelling_date = GetSpellingFormattedDate(bt.GetDateStart(), "%d %b %G");
-	auto			finish_spelling_date = GetSpellingFormattedDate(bt.GetDateFinish(), "%d %b %G");
+	auto			start_spelling_date = GetSpellingFormattedDate(bt.GetDateStart(), PRINT_DATE_FORMAT);
+	auto			finish_spelling_date = GetSpellingFormattedDate(bt.GetDateFinish(), PRINT_DATE_FORMAT);
 
 	return vars->Get("Remote service report over period") + " "s + vars->Get("from") + " " + start_spelling_date + " " + vars->Get("up to") + " " + finish_spelling_date;
 }
 
 auto	C_Print_BT::GetSpelledPSoW() -> string
 {
-	auto			sign_spelling_date = GetSpellingFormattedDate(bt.GetDateSign(), "%d %b %G");
+	auto			sign_spelling_date = GetSpellingFormattedDate(bt.GetDateSign(), PRINT_DATE_FORMAT);
 
 	return vars->Get("PSoW") + " №"s + bt.GetAgreementNumber() + " " + vars->Get("agreement from") + " " + sign_spelling_date;
 }
@@ -281,8 +281,8 @@ auto	C_Print_BT::PrintAsXLS() -> string
 				auto			format_number_d2 = __xls_book->addFormat();
 				auto			font_summary_over = __xls_book->addFont();
 				auto			font_summary_right = __xls_book->addFont();
-				auto			start_spelling_date = multibyte_to_wide(GetSpellingFormattedDate(bt.GetDateStart(), "%d %b %G"));
-				auto			finish_spelling_date = multibyte_to_wide(GetSpellingFormattedDate(bt.GetDateFinish(), "%d %b %G"));
+				auto			start_spelling_date = multibyte_to_wide(GetSpellingFormattedDate(bt.GetDateStart(), PRINT_DATE_FORMAT));
+				auto			finish_spelling_date = multibyte_to_wide(GetSpellingFormattedDate(bt.GetDateFinish(), PRINT_DATE_FORMAT));
 				auto			bt_expenses = bt.GetExpenseLines();
 
 				__xls_row_counter = 1;

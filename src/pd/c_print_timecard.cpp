@@ -51,15 +51,15 @@ auto C_Print_Timecard::SetTimecard(const C_Timecard_To_Print &param1) -> void
 
 auto	C_Print_Timecard::GetSpelledTitle() -> string
 {
-	auto			start_spelling_date = GetSpellingFormattedDate(timecard.GetDateStart(), "%d %b %G");
-	auto			finish_spelling_date = GetSpellingFormattedDate(timecard.GetDateFinish(), "%d %b %G");
+	auto			start_spelling_date = GetSpellingFormattedDate(timecard.GetDateStart(), PRINT_DATE_FORMAT);
+	auto			finish_spelling_date = GetSpellingFormattedDate(timecard.GetDateFinish(), PRINT_DATE_FORMAT);
 
 	return gettext("Service report over period") + " "s + gettext("from") + " " + start_spelling_date + " " + gettext("up to") + " " + finish_spelling_date;
 }
 
 auto	C_Print_Timecard::GetSpelledPSoW() -> string
 {
-	auto			sign_spelling_date = GetSpellingFormattedDate(timecard.GetDateSign(), "%d %b %G");
+	auto			sign_spelling_date = GetSpellingFormattedDate(timecard.GetDateSign(), PRINT_DATE_FORMAT);
 
 	return gettext("PSoW") + " №"s + timecard.GetAgreementNumber() + " " + gettext("agreement from") + " " + sign_spelling_date;
 }
@@ -298,8 +298,8 @@ auto	C_Print_Timecard::PrintAsXLS() -> string
 				auto			format_number_d2 = book->addFormat();
 				auto			font_summary_over = book->addFont();
 				auto			font_summary_right = book->addFont();
-				auto			start_spelling_date = multibyte_to_wide(GetSpellingFormattedDate(timecard.GetDateStart(), "%d %b %G"));
-				auto			finish_spelling_date = multibyte_to_wide(GetSpellingFormattedDate(timecard.GetDateFinish(), "%d %b %G"));
+				auto			start_spelling_date = multibyte_to_wide(GetSpellingFormattedDate(timecard.GetDateStart(), PRINT_DATE_FORMAT));
+				auto			finish_spelling_date = multibyte_to_wide(GetSpellingFormattedDate(timecard.GetDateFinish(), PRINT_DATE_FORMAT));
 				auto			timecard_lines = timecard.GetTimecardLines();
 				auto			row_counter = 2;
 				auto			column_counter = 0;
