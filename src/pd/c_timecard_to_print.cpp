@@ -25,14 +25,15 @@ auto C_Timecard_To_Print::isValid() -> string
 
 	MESSAGE_DEBUG("", "", "start");
 
-	if(GetID().empty())						{ MESSAGE_ERROR("", "", "timecard.id is empty"); 			error_message = gettext("timecard id is empty"); }
-	else if(GetDateStart().empty()) 		{ MESSAGE_ERROR("", "", "timecard date start is empty"); 	error_message = gettext("timecard date start is empty"); }
-	else if(GetDateFinish().empty()) 		{ MESSAGE_ERROR("", "", "timecard date finish is empty"); 	error_message = gettext("timecard date finish is empty"); }
-	else if(GetAgreementNumber().empty()) 	{ MESSAGE_ERROR("", "", "agreement number is empty"); 		error_message = gettext("agreement number is empty"); }
-	else if(GetDateSign().empty())			{ MESSAGE_ERROR("", "", "sign date is empty"); 				error_message = gettext("sign date is empty"); }
-	else if(GetSignatureTitle1().empty())	{ MESSAGE_ERROR("", "", "signature title 1 is empty"); 		error_message = gettext("signature title 1 is empty"); }
-	else if(GetSignatureTitle2().empty())	{ MESSAGE_ERROR("", "", "signature title 2 is empty"); 		error_message = gettext("signature title 2 is empty"); }
-	else if(string(GetDayrate()).empty())	{ MESSAGE_ERROR("", "", "dayrate not set");					error_message = gettext("dayrate not set"); }
+	if(GetID().empty())										{ MESSAGE_ERROR("", "", "timecard.id is empty"); 			error_message = gettext("timecard id is empty"); }
+	else if(GetDateStart().empty()) 						{ MESSAGE_ERROR("", "", "timecard date start is empty"); 	error_message = gettext("timecard date start is empty"); }
+	else if(GetDateFinish().empty()) 						{ MESSAGE_ERROR("", "", "timecard date finish is empty"); 	error_message = gettext("timecard date finish is empty"); }
+	else if(GetAgreementNumber().empty()) 					{ MESSAGE_ERROR("", "", "agreement number is empty"); 		error_message = gettext("agreement number is empty"); }
+	else if(GetDateSign().empty())							{ MESSAGE_ERROR("", "", "sign date is empty"); 				error_message = gettext("sign date is empty"); }
+	else if(GetSignatureTitle1().empty())					{ MESSAGE_ERROR("", "", "signature title 1 is empty"); 		error_message = gettext("signature title 1 is empty"); }
+	else if(GetSignatureTitle2().empty())					{ MESSAGE_ERROR("", "", "signature title 2 is empty"); 		error_message = gettext("signature title 2 is empty"); }
+	else if(string(GetDayrate()).empty())					{ MESSAGE_ERROR("", "", "dayrate not set");					error_message = gettext("dayrate not set"); }
+	else if(stod_noexcept(GetWorkingHoursPerDay()) == 0)	{ MESSAGE_ERROR("", "", "working hours per day not set");	error_message = gettext("working hours per day not set"); }
 
 	MESSAGE_DEBUG("", "", "finish");
 

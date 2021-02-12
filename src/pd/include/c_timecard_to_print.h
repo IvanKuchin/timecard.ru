@@ -43,6 +43,7 @@ class C_Timecard_To_Print
 		string					cost_center_id = "";
 		string					sow_id = "";
 		c_float					dayrate;
+		c_float					working_hours_per_day;
 		c_float					total_payment;
 		string					approvers = ""s;
 		string					sign_role_1 = ""s;
@@ -92,6 +93,7 @@ class C_Timecard_To_Print
 		auto		SetPurchaseOrder(const string &param1)		{ purchase_order = param1; };
 		auto		SetPurchaseOrder(string &&param1) 			{ purchase_order = move(param1); };
 		auto		SetDayrate(string param1) 					{ dayrate = param1; };
+		auto		SetWorkingHoursPerDay(string param1) 		{ working_hours_per_day = param1; };
 		auto		SetTotalPayment(string param1) 				{ total_payment = param1; };
 
 		auto		GetID()										{ return id; };
@@ -114,6 +116,7 @@ class C_Timecard_To_Print
 		auto		GetCostCenterID()							{ return cost_center_id; };	
 		auto		GetApprovers()								{ return approvers; };	
 		auto		GetDayrate()								{ return dayrate; };
+		auto		GetWorkingHoursPerDay()						{ return working_hours_per_day; };
 		auto		GetTotalPayment()							{ return total_payment; };
 		auto		GetTimecardLines()							{ return timecard_lines; }
 

@@ -191,7 +191,7 @@ auto	C_Print_Timecard::AssignValuesToDaySummaryStruct() -> bool
 				}
 
 				effort_hours = timecard.GetTotalHours();
-				effort_days = effort_hours / c_float(8);
+				effort_days = effort_hours / timecard.GetWorkingHoursPerDay();
 
 				effort_cost = GetBaseCostFrom(timecard.GetDayrate() * GetEffortDays());
 				if(timecard.GetSupplierVAT() == "Y")
@@ -408,10 +408,10 @@ auto	C_Print_Timecard::PrintAsXLS() -> string
 
 					if(hours)
 					{
-						if(hours == 8)
+						if(hours == timecard.GetWorkingHoursPerDay())
 							sheet->writeBlank(row_counter, column_counter + 2, format_summary_right);
 						if(	single_day.is_holiday	||
-							(hours > 8) 			|| 
+							(hours > timecard.GetWorkingHoursPerDay()) 			|| 
 							(hours && single_day.is_weekend)
 							)
 							sheet->writeBlank(row_counter, column_counter + 2, format_summary_over);
@@ -1332,13 +1332,13 @@ auto	C_Print_Timecard::__HPDF_DrawTimecardTableFooter() -> string
 
 					if(day_summary[i].efforts)
 					{
-						if(day_summary[i].efforts == 8)
+						if(day_summary[i].efforts == timecard.GetWorkingHoursPerDay())
 						{
 							__HPDF_PaintDay(i, 0.4, 1, 0.4);
 							HPDF_Page_SetRGBFill(__pdf_page, 0.2, 0.4, 0.2);
 						}
 						if(	day_summary[i].is_holiday		||
-							(day_summary[i].efforts > 8)	|| 
+							(day_summary[i].efforts > timecard.GetWorkingHoursPerDay())	|| 
 							(day_summary[i].efforts && day_summary[i].is_weekend))
 						{
 							__HPDF_PaintDay(i, 1, 0.6, 0.8);

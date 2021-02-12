@@ -408,6 +408,7 @@ auto C_Invoice_Service_Subc_To_Agency::CreateTimecardObj(string timecard_id) -> 
 								obj.SetAgreementNumber(db->Get(0, "number"));
 								obj.SetDateSign(db->Get(0, "sign_date"));
 								obj.SetDayrate(db->Get(0, "day_rate"));
+								obj.SetWorkingHoursPerDay(db->Get(0, "working_hours_per_day"));
 
 								if(db->Query("SELECT `name`,`vat` FROM `company` WHERE `id`=("
 												"SELECT `subcontractor_company_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\""

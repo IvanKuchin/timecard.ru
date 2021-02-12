@@ -487,6 +487,7 @@ auto	C_Invoicing_Vars::SoW_Index_VarSet(string sql_query, string index) -> strin
 				auto	sow_end_date = db->Get(0, "end_date");
 				auto	subcontractor_company_id = db->Get(0, "subcontractor_company_id");
 				auto	subcontractor_dayrate = db->Get(0, "day_rate");
+				auto	sow_working_hours_per_day = db->Get(0, "working_hours_per_day");
 				auto	sow_payment_period_service = db->Get(0, "payment_period_service");
 				auto	sow_payment_period_bt = db->Get(0, "payment_period_bt");
 				auto	act_number = ""s;
@@ -593,6 +594,17 @@ auto	C_Invoicing_Vars::SoW_Index_VarSet(string sql_query, string index) -> strin
 					MESSAGE_ERROR("", "", error_message);
 				}
 
+
+				if(stod_noexcept(sow_working_hours_per_day) != 0)
+				{
+					if((error_message = AssignVariableValue("sow_working_hours_per_day_" + index, sow_working_hours_per_day, true)).empty()) {}
+					else { MESSAGE_ERROR("", "", "fail to assign variable"); }
+				}
+				else
+				{
+					error_message = gettext("Agreement") + " "s + sow_number + " " + gettext("agreement from") + " " + sow_date + " " + gettext("dworking hours per day is empty");
+					MESSAGE_ERROR("", "", error_message);
+				}
 
 				if(sow_date.length())
 				{
@@ -1622,7 +1634,7 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet_AgencyToCC() -> string
 				auto	i = 0;
 				for(auto &timecard: timecard_obj_list)
 				{
-					c_float		timecard_days = timecard.GetTotalHours() / c_float(8.0);
+					c_float		timecard_days;
 
 					++i;
 
@@ -1642,7 +1654,10 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet_AgencyToCC() -> string
 					{
 						if((error_message = SoW_Index_VarSet("SELECT * FROM `contracts_sow` WHERE `id`=("
 																"SELECT `contract_sow_id` FROM `timecards` WHERE `id`=\"" + vars.Get("timecard_id_" + to_string(i)) + "\""
-															");", to_string(i))).empty()) {}
+															");", to_string(i))).empty())
+						{
+							timecard_days = timecard.GetTotalHours() / c_float("sow_working_hours_per_day_" + to_string(i));
+						}
 						else { MESSAGE_ERROR("", "", "fail returned from SoW_Index_VarSet"); }
 					}
 
@@ -1799,7 +1814,7 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet_SubcToAgency() -> string
 				auto	i = 0;
 				for(auto &timecard: timecard_obj_list)
 				{
-					c_float		timecard_days = timecard.GetTotalHours() / c_float(8.0);
+					c_float		timecard_days;
 
 					++i;
 
@@ -1814,7 +1829,10 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet_SubcToAgency() -> string
 					{
 						if((error_message = SoW_Index_VarSet("SELECT * FROM `contracts_sow` WHERE `id`=("
 																"SELECT `contract_sow_id` FROM `timecards` WHERE `id`=\"" + vars.Get("timecard_id_" + to_string(i)) + "\""
-															");", to_string(i))).empty()) {}
+															");", to_string(i))).empty()) 
+						{
+							timecard_days = timecard.GetTotalHours() / c_float(Get("sow_working_hours_per_day_" + to_string(i)));
+						}
 						else { MESSAGE_ERROR("", "", "fail returned from SoW_Index_VarSet"); }
 					}
 
