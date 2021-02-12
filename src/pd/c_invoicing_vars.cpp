@@ -602,7 +602,7 @@ auto	C_Invoicing_Vars::SoW_Index_VarSet(string sql_query, string index) -> strin
 				}
 				else
 				{
-					error_message = gettext("Agreement") + " "s + sow_number + " " + gettext("agreement from") + " " + sow_date + " " + gettext("dworking hours per day is empty");
+					error_message = gettext("Agreement") + " "s + sow_number + " " + gettext("agreement from") + " " + sow_date + " " + gettext("working hours per day not set");
 					MESSAGE_ERROR("", "", error_message);
 				}
 
