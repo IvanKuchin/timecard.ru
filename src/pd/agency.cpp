@@ -1199,6 +1199,7 @@ int main(void)
 			(action == "AJAX_updateSoWPaymentPeriodService")	||
 			(action == "AJAX_updateSoWPaymentPeriodBT")			||
 			(action == "AJAX_updateSoWDayRate")					||
+			(action == "AJAX_updateSoWWorkingHoursPerDay")		||
 			(action == "AJAX_updateSoWSignDate")				||
 			(action == "AJAX_updateSoWStartDate")				||
 			(action == "AJAX_updateSoWEndDate")					||
@@ -1332,6 +1333,7 @@ int main(void)
 			(action == "AJAX_updatePSoWAct")					||
 			(action == "AJAX_updatePSoWPosition")				||
 			(action == "AJAX_updatePSoWDayRate")				||
+			(action == "AJAX_updatePSoWWorkingHoursPerDay")		||
 			(action == "AJAX_updatePSoWBTMarkup")				||
 			(action == "AJAX_updatePSoWBTMarkupType")			||
 			(action == "AJAX_updatePSoWSignDate")				||

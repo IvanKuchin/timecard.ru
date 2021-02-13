@@ -4112,6 +4112,7 @@ auto	GetPSoWInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
 		string	end_date;
 		string	number;
 		string	day_rate;
+		string	working_hours_per_day;
 		string	bt_markup;
 		string	bt_markup_type;
 		string	sign_date;
@@ -4136,6 +4137,7 @@ auto	GetPSoWInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
 			item.end_date = db->Get(i, "end_date");
 			item.number = db->Get(i, "number");
 			item.day_rate = db->Get(i, "day_rate");
+			item.working_hours_per_day = db->Get(i, "working_hours_per_day");
 			item.bt_markup = db->Get(i, "bt_markup");
 			item.bt_markup_type = db->Get(i, "bt_markup_type");
 			item.sign_date = db->Get(i, "sign_date");
@@ -4158,6 +4160,7 @@ auto	GetPSoWInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -> string
 			result += "\"end_date\":\"" + item.end_date + "\",";
 			result += "\"number\":\"" + item.number + "\",";
 			result += "\"day_rate\":\"" + item.day_rate + "\",";
+			result += "\"working_hours_per_day\":\"" + item.working_hours_per_day + "\",";
 			result += "\"bt_markup\":\"" + item.bt_markup + "\",";
 			result += "\"bt_markup_type\":\"" + item.bt_markup_type + "\",";
 			result += "\"sign_date\":\"" + item.sign_date + "\",";
@@ -4199,6 +4202,7 @@ auto	GetSOWInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include_t
 		string	timecard_period;
 		string	subcontractor_create_tasks;
 		string	day_rate;
+		string	working_hours_per_day;
 		string	status;
 		string	payment_period_service;
 		string	payment_period_bt;
@@ -4235,6 +4239,7 @@ auto	GetSOWInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include_t
 			item.recall_by_subcontractor = db->Get(i, "recall_by_subcontractor");
 			item.agreement_filename = db->Get(i, "agreement_filename");
 			item.day_rate = db->Get(i, "day_rate");
+			item.working_hours_per_day = db->Get(i, "working_hours_per_day");
 			item.eventTimestamp = db->Get(i, "eventTimestamp");
 
 			itemsList.push_back(item);
@@ -4298,6 +4303,7 @@ auto	GetSOWInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool include_t
 				temp_result += "\"timecard_approvers\":[" + cache_obj.Get("SELECT * FROM `timecard_approvers` WHERE `contract_psow_id` IN (" + Get_PSoWIDsBySoWID_sqlquery(item.id) + ");", db, user, GetApproversInJSONFormat) + "],";
 				temp_result += "\"subcontractor_create_tasks\":\"" + item.subcontractor_create_tasks + "\",";
 				temp_result += "\"day_rate\":\"" + (user->GetType() == "agency" || user->GetType() == "subcontractor" ? item.day_rate : "") + "\",";
+				temp_result += "\"working_hours_per_day\":\"" + (user->GetType() == "agency" || user->GetType() == "subcontractor" ? item.working_hours_per_day : "") + "\",";
 				temp_result += "\"status\":\"" + item.status + "\",";
 				temp_result += "\"agreement_filename\":\"" + item.agreement_filename + "\",";
 				temp_result += "\"custom_fields\":[" + GetSoWCustomFieldsInJSONFormat("SELECT * FROM `contract_sow_custom_fields` WHERE `contract_sow_id`=\"" + item.id + "\" "

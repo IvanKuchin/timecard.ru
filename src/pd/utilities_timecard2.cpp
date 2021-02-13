@@ -925,6 +925,7 @@ auto	isActionEntityBelongsToSoW(string action, string id, string sow_id, CMysql 
 				if(action == "AJAX_updateSoWPaymentPeriodService")	sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
 				if(action == "AJAX_updateSoWPaymentPeriodBT")		sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
 				if(action == "AJAX_updateSoWDayRate")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
+				if(action == "AJAX_updateSoWWorkingHoursPerDay")	sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
 				if(action == "AJAX_updateSoWSignDate")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
 				if(action == "AJAX_updateSoWStartDate")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
 				if(action == "AJAX_updateSoWEndDate")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
@@ -935,6 +936,7 @@ auto	isActionEntityBelongsToSoW(string action, string id, string sow_id, CMysql 
 				if(action == "AJAX_updatePSoWAct")					sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
 				if(action == "AJAX_updatePSoWPosition")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
 				if(action == "AJAX_updatePSoWDayRate")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
+				if(action == "AJAX_updatePSoWWorkingHoursPerDay")	sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
 				if(action == "AJAX_updatePSoWBTMarkup")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
 				if(action == "AJAX_updatePSoWBTMarkupType")			sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
 				if(action == "AJAX_updatePSoWSignDate")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
@@ -1501,6 +1503,18 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 							MESSAGE_ERROR("", "", "input DayRate(" + new_value + ") wrongly formatted, needed to be " + string(num));
 						}
 					}
+					else if(action == "AJAX_updateSoWWorkingHoursPerDay")
+					{
+						c_float		num(new_value);
+
+						// --- OR condition requires in case num is 10123 (matches by 1-st condition) or 10123.00 (matches by 2-nd condition)
+						if(num > 0) { /* --- good to go */ }
+						else
+						{
+							error_message = gettext("working hours per day must be greater than 0");
+							MESSAGE_ERROR("", "", error_message);
+						}
+					}
 					else if(action == "AJAX_deleteCostCenter")
 					{
 						if(db->Query("SELECT COUNT(*) AS `counter` FROM `cost_center_assignment` WHERE `cost_center_id`=\"" + id + "\";"))
@@ -1723,6 +1737,18 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 						else
 						{
 							MESSAGE_ERROR("", "", "input DayRate(" + new_value + ") wrongly formatted, needed to be " + string(num));
+						}
+					}
+					else if(action == "AJAX_updatePSoWWorkingHoursPerDay")
+					{
+						c_float		num(new_value);
+
+						// --- OR condition requires in case num is 10123 (matches by 1-st condition) or 10123.00 (matches by 2-nd condition)
+						if(num > 0) { /* --- good to go */ }
+						else
+						{
+							error_message = gettext("working hours per day must be greater than 0");
+							MESSAGE_ERROR("", "", error_message);
 						}
 					}
 					else if(action == "AJAX_updatePSoWBTMarkup")
@@ -2455,6 +2481,7 @@ auto	GetDBValueByAction(string action, string id, string sow_id, CMysql *db, CUs
 				if(action == "AJAX_updateSoWNumber")						sql_query = "SELECT `number`						FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 				if(action == "AJAX_updateSoWAct")							sql_query = "SELECT `act_number`					FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 				if(action == "AJAX_updateSoWDayRate")						sql_query = "SELECT `day_rate`						FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
+				if(action == "AJAX_updateSoWWorkingHoursPerDay")			sql_query = "SELECT `working_hours_per_day`			FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 				if(action == "AJAX_updateSoWPaymentPeriodService")			sql_query = "SELECT `payment_period_service`		FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 				if(action == "AJAX_updateSoWPaymentPeriodBT")				sql_query = "SELECT `payment_period_bt`				FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 				if(action == "AJAX_updateSoWSignDate")						sql_query = "SELECT `sign_date`						FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
@@ -2466,6 +2493,7 @@ auto	GetDBValueByAction(string action, string id, string sow_id, CMysql *db, CUs
 				if(action == "AJAX_updatePSoWNumber")						sql_query = "SELECT `number`						FROM `contracts_psow` WHERE `id`=\"" + sow_id + "\";";
 				if(action == "AJAX_updatePSoWAct")							sql_query = "SELECT `act_number`					FROM `contracts_psow` WHERE `id`=\"" + sow_id + "\";";
 				if(action == "AJAX_updatePSoWDayRate")						sql_query = "SELECT `day_rate`						FROM `contracts_psow` WHERE `id`=\"" + sow_id + "\";";
+				if(action == "AJAX_updatePSoWWorkingHoursPerDay")			sql_query = "SELECT `working_hours_per_day`			FROM `contracts_psow` WHERE `id`=\"" + sow_id + "\";";
 				if(action == "AJAX_updatePSoWBTMarkup")						sql_query = "SELECT `bt_markup`						FROM `contracts_psow` WHERE `id`=\"" + sow_id + "\";";
 				if(action == "AJAX_updatePSoWBTMarkupType")					sql_query = "SELECT `bt_markup_type`				FROM `contracts_psow` WHERE `id`=\"" + sow_id + "\";";
 				if(action == "AJAX_updatePSoWSignDate")						sql_query = "SELECT `sign_date`						FROM `contracts_psow` WHERE `id`=\"" + sow_id + "\";";
@@ -4102,6 +4130,7 @@ string	SetNewValueByAction(string action, string id, string sow_id, string new_v
 						if(action == "AJAX_updateSoWStartDate")						sql_query = "UPDATE `contracts_sow`				SET `start_date`	=STR_TO_DATE(\"" + new_value + "\",\"%d/%m/%Y\"),`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sow_id + "\";";
 						if(action == "AJAX_updateSoWEndDate")						sql_query = "UPDATE `contracts_sow`				SET `end_date`		=STR_TO_DATE(\"" + new_value + "\",\"%d/%m/%Y\"),`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sow_id + "\";";
 						if(action == "AJAX_updateSoWDayRate") {c_float	num(new_value); sql_query = "UPDATE `contracts_sow` 		SET `day_rate`		=\"" + string(num) + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sow_id + "\";"; }
+						if(action == "AJAX_updateSoWWorkingHoursPerDay") 			sql_query = "UPDATE `contracts_sow` 			SET `working_hours_per_day`	=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sow_id + "\";";
 						if(action == "AJAX_updateSoWPaymentPeriodService")			sql_query = "UPDATE `contracts_sow`				SET `payment_period_service`=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sow_id + "\";";
 						if(action == "AJAX_updateSoWPaymentPeriodBT")				sql_query = "UPDATE `contracts_sow`				SET `payment_period_bt`=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sow_id + "\";";
 
@@ -4113,6 +4142,7 @@ string	SetNewValueByAction(string action, string id, string sow_id, string new_v
 						if(action == "AJAX_updatePSoWEndDate")						sql_query = "UPDATE `contracts_psow`			SET `end_date`		=STR_TO_DATE(\"" + new_value + "\",\"%d/%m/%Y\"),`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sow_id + "\";";
 						if(action == "AJAX_updatePSoWDayRate")  {c_float num(new_value); sql_query = "UPDATE `contracts_psow` 		SET `day_rate`		=\"" + string(num) + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sow_id + "\";"; }
 						if(action == "AJAX_updatePSoWBTMarkup") {c_float num(new_value); sql_query = "UPDATE `contracts_psow` 		SET `bt_markup`		=\"" + string(num) + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sow_id + "\";"; }
+						if(action == "AJAX_updatePSoWWorkingHoursPerDay") 			sql_query = "UPDATE `contracts_psow` 			SET `working_hours_per_day`	=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sow_id + "\";";
 						if(action == "AJAX_updatePSoWBTMarkupType")					sql_query = "UPDATE `contracts_psow` 			SET `bt_markup_type`=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sow_id + "\";";
 
 						if(action == "AJAX_updateCostCenterCustomField")			sql_query = "UPDATE `cost_center_custom_fields` SET `value`			=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
@@ -5464,6 +5494,11 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 		notification_description = gettext("SoW") + " ("s + GetSpelledSoWByID(sow_id, db) + "): " + gettext("dayrate changed") + " " + gettext("from") + " " + existing_value + " " + gettext("to") + " " + new_value;
 		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 	}
+	if(action == "AJAX_updateSoWWorkingHoursPerDay")
+	{
+		notification_description = gettext("SoW") + " ("s + GetSpelledSoWByID(sow_id, db) + "): " + gettext("working hours per day changed") + " " + gettext("from") + " " + existing_value + " " + gettext("to") + " " + new_value;
+		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
+	}
 	if(action == "AJAX_updateSoWSignDate")
 	{
 		notification_description = gettext("SoW") + " ("s + GetSpelledSoWByID(sow_id, db) + "): " + gettext("sign date changed") + " " + gettext("from") + " " + existing_value + " " + gettext("to") + " " + new_value;
@@ -5528,6 +5563,11 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 	if(action == "AJAX_updatePSoWDayRate")
 	{
 		notification_description = gettext("PSoW") + " ("s + GetSpelledPSoWByID(sow_id, db) + "): " + gettext("dayrate changed") + " " + gettext("from") + " " + existing_value + " " + gettext("to") + " " + new_value;
+		sql_query = ""; // --- don't notify subcontractors, only agency
+	}
+	if(action == "AJAX_updatePSoWWorkingHoursPerDay")
+	{
+		notification_description = gettext("PSoW") + " ("s + GetSpelledPSoWByID(sow_id, db) + "): " + gettext("working hours per day changed") + " " + gettext("from") + " " + existing_value + " " + gettext("to") + " " + new_value;
 		sql_query = ""; // --- don't notify subcontractors, only agency
 	}
 	if(action == "AJAX_updatePSoWBTMarkup")
