@@ -47,7 +47,7 @@ auto	C_Invoicing_Vars::AssignVariableValue(const string &var_name, const string 
 {
 	auto	error_message = ""s;
 
-	MESSAGE_DEBUG("", "", "start (variable: " + var_name + ")");
+	MESSAGE_DEBUG("", "", "start (variable: " + var_name + ", value = " + value + ")");
 
 	if(vars.Get(var_name).length())
 	{
@@ -472,7 +472,7 @@ auto	C_Invoicing_Vars::SoW_Index_VarSet(string sql_query, string index) -> strin
 {
 	auto	error_message = ""s;
 
-	MESSAGE_DEBUG("", "", "start");
+	MESSAGE_DEBUG("", "", "start(, index = " + index + ")");
 
 	if(user)
 	{
@@ -1656,7 +1656,7 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet_AgencyToCC() -> string
 																"SELECT `contract_sow_id` FROM `timecards` WHERE `id`=\"" + vars.Get("timecard_id_" + to_string(i)) + "\""
 															");", to_string(i))).empty())
 						{
-							timecard_days = timecard.GetTotalHours() / c_float("sow_working_hours_per_day_" + to_string(i));
+							timecard_days = timecard.GetTotalHours() / c_float(Get("sow_working_hours_per_day_" + to_string(i)));
 						}
 						else { MESSAGE_ERROR("", "", "fail returned from SoW_Index_VarSet"); }
 					}
