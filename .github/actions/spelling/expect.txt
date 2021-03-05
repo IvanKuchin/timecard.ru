@@ -805,3 +805,6 @@ WWorking
 ofs
 DIRS
 executables
+bts
+TCs
+objs
