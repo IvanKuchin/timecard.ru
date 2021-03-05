@@ -801,5 +801,7 @@ XBy
 xheight
 xl
 XOffset
-
 WWorking
+ofs
+DIRS
+executables
