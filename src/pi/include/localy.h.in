@@ -110,9 +110,6 @@
 #define	HELPDESK_STATE_CLOSE_PENDING				"close_pending"s
 #define	HELPDESK_STATE_CLOSED						"closed"s
 
-#define HELPDESK_TICKET_CLOSE_PENDING_TIMEOUT		2			// --- in days
-#define HELPDESK_TICKET_CUSTOMER_PENDING_TIMEOUT	7			// --- in days
-
 #define	HOLIDAY_RANGE_FROM_TODAY					31			// --- +/- days to look for holidays
 #define	SOW_EXPIRATION_BUFFER						31			// --- +   days to look one SoW expired
 
