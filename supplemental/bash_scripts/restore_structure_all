@@ -1,0 +1,60 @@
+#!/bin/bash
+
+projects=( bestbounty.ru connme.ru infomed-stat.ru timecard.ru)
+curr_dir=`pwd`
+
+function remove_old_backups()
+{
+    cd $curr_dir
+
+    for i in "${projects[@]}"
+    do
+	echo -n removing old backup: $i
+	find ./$i -maxdepth 1 -type f -exec rm -f {} \;
+	printf "\t\t[ok]\n"
+    done
+}
+
+function move_new_archives_from_home()
+{
+    cd $curr_dir
+
+    for i in "${projects[@]}"
+    do
+	echo -n move new archive: $i
+	mv /home/ikuchin/*$i*.tar.gz ./$i
+	printf "\t\t[ok]\n"
+    done
+}
+
+function gunzip_new_archives()
+{
+    cd $curr_dir
+
+    for i in "${projects[@]}"
+    do
+	echo -n gunzip: $i
+	cd $curr_dir/$i && tar -zxf *.tar.gz
+	printf "\t\t[ok]\n"
+    done
+}
+
+function install_projects()
+{
+    cd $curr_dir
+
+    for i in "${projects[@]}"
+    do
+	printf "\n\n\n\n\n\n"
+	echo ------------- $i -------------
+	echo
+	cd $curr_dir/$i && sudo ./archive.pl --restore_production_structure
+	printf "\n\n\n\n\n\n\n"
+    done
+}
+
+
+remove_old_backups
+move_new_archives_from_home
+gunzip_new_archives
+install_projects
