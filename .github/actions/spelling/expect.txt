@@ -783,7 +783,7 @@ Wfrom
 WIDBy
 WIDs
 wkhtmltopdf
-wkhtmltox
+Wkhtml
 WList
 WNumber
 workpane
