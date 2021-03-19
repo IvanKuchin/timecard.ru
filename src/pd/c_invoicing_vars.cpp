@@ -1617,9 +1617,6 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet_AgencyToCC() -> string
 				if((error_message = Agency_VarSet(Get("agency_company_id"))).empty()) {}
 				else { MESSAGE_ERROR("", "", "fail returned from AgencyVarSet"); }
 
-// TODO: --- spelled position clean-up
-				// if((error_message = Agency_CustomFields_Agency2CC_VarSet(Get("agency_company_id"))).empty()) {}
-				// else { MESSAGE_ERROR("", "", "fail returned from Agency_CustomFields_Agency2CC_VarSet"); }
 			}
 
 			if(error_message.empty())
@@ -1784,10 +1781,6 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet_SubcToAgency() -> string
 
 				if((error_message = Agency_VarSet(Get("agency_company_id"))).empty()) {}
 				else { MESSAGE_ERROR("", "", "fail returned from AgencyVarSet"); }
-
-// TODO: --- spelled position clean-up
-				// if((error_message = Agency_CustomFields_Subc2Agency_VarSet(Get("agency_company_id"))).empty()) {}
-				// else { MESSAGE_ERROR("", "", "fail returned from Agency_CustomFields_Subc2Agency_VarSet"); }
 			}
 
 			if(error_message.empty())
@@ -1955,10 +1948,6 @@ auto	C_Invoicing_Vars::GenerateBTVariableSet_AgencyToCC() -> string
 
 				if((error_message = Agency_VarSet(Get("agency_company_id"))).empty()) {}
 				else { MESSAGE_ERROR("", "", "fail returned from AgencyVarSet"); }
-
-// TODO: --- spelled position clean-up
-				// if((error_message = Agency_CustomFields_Agency2CC_VarSet(Get("agency_company_id"))).empty()) {}
-				// else { MESSAGE_ERROR("", "", "fail returned from Agency_CustomFields_Agency2CC_VarSet"); }
 			}
 
 			if(error_message.empty())
@@ -2117,9 +2106,6 @@ auto	C_Invoicing_Vars::GenerateBTVariableSet_SubcToAgency() -> string
 				if((error_message = Agency_VarSet(Get("agency_company_id"))).empty()) {}
 				else { MESSAGE_ERROR("", "", "fail returned from AgencyVarSet"); }
 
-// TODO: --- spelled position clean-up
-				// if((error_message = Agency_CustomFields_Subc2Agency_VarSet(Get("agency_company_id"))).empty()) {}
-				// else { MESSAGE_ERROR("", "", "fail returned from Agency_CustomFields_Subc2Agency_VarSet"); }
 			}
 
 			if(error_message.empty())

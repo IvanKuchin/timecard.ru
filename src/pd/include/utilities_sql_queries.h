@@ -13,6 +13,20 @@ inline auto Get_CompanyIDByCompanyEmployeeUserID_sqlquery(const string &user_id)
 	return (" SELECT `company_id` FROM `company_employees` WHERE `user_id` IN (" + user_id + ") ");
 }
 
+inline auto Get_SubcCompanyIDByTimecardID_sqlquery(const string &id) -> string
+{
+	return ("SELECT `subcontractor_company_id` FROM `contracts_sow` WHERE `id`=("
+				"SELECT `contract_sow_id` FROM `timecards` WHERE `id` IN (" + id + ")"
+			")");
+}
+
+inline auto Get_SubcCompanyIDByBTID_sqlquery(const string &id) -> string
+{
+	return ("SELECT `subcontractor_company_id` FROM `contracts_sow` WHERE `id`=("
+				"SELECT `contract_sow_id` FROM `bt` WHERE `id` IN (" + id + ")"
+			")");
+}
+
 inline auto Get_CustomerIDByBTID_sqlquery(const string &bt_id)
 {
 	return (
@@ -229,7 +243,5 @@ inline auto	Get_AgencyIDByUserID_sqlquery(const string &id)
 			")"
 		);
 }
-
-
 
 #endif

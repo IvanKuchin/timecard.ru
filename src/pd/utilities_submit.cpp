@@ -122,11 +122,7 @@ bool SubmitTimecard(string timecard_id, CMysql *db, CUser *user)
 				}
 				else
 				{
-					db->Query	("UPDATE `company` SET `act_number`=`act_number`+1 WHERE `id`=("
-									"SELECT `subcontractor_company_id` FROM `contracts_sow` WHERE `id`=("
-										"SELECT `contract_sow_id` FROM `timecards` WHERE `id`=\"" + timecard_id + "\""
-									")"
-								");");
+					db->Query	("UPDATE `company` SET `act_number`=`act_number`+1 WHERE `id`=(" + Get_SubcCompanyIDByTimecardID_sqlquery(timecard_id) + ");");
 					if(db->isError())
 					{
 						MESSAGE_ERROR("", "", "fail to update contracts_sow table by timecard_id(" + timecard_id + ")");
@@ -189,11 +185,7 @@ bool	SubmitBT(string bt_id, CMysql *db, CUser *user)
 				}
 				else
 				{
-					db->Query	("UPDATE `company` SET `act_number`=`act_number`+1 WHERE `id`=("
-									"SELECT `subcontractor_company_id` FROM `contracts_sow` WHERE `id`=("
-										"SELECT `contract_sow_id` FROM `bt` WHERE `id`=\"" + bt_id + "\""
-									")"
-								");");
+					db->Query	("UPDATE `company` SET `act_number`=`act_number`+1 WHERE `id`=(" + Get_SubcCompanyIDByBTID_sqlquery(bt_id) + ");");
 					if(db->isError())
 					{
 						MESSAGE_ERROR("", "", "fail to update contracts_sow table by bt_id(" + bt_id + ")");

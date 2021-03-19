@@ -64,52 +64,6 @@ auto	C_Print_Timecard::GetSpelledPSoW() -> string
 	return gettext("PSoW") + " №"s + timecard.GetAgreementNumber() + " " + gettext("agreement from") + " " + sign_spelling_date;
 }
 
-// TODO: --- spelled initials clean-up
-/*
-auto	C_Print_Timecard::GetSpelledInitials(string idx) -> string
-{
-	auto	result = GetSpelledInitials();
-
-	if(vars && vars->Get("subc2agency_timecard_signature_name" + idx).length())
-	{
-		result += ": " + vars->Get("subc2agency_timecard_signature_name" + idx);
-	}
-	else if(vars && vars->Get("agency2cc_timecard_signature_name" + idx).length())
-	{
-		result += ": " + vars->Get("agency2cc_timecard_signature_name" + idx);
-	}
-	else
-	{
-		result += ": ___________________________________";
-	}
-
-	return result;
-}
-*/
-
-// TODO: --- spelled position clean-up
-/*
-auto	C_Print_Timecard::GetSpelledPosition(string idx) -> string
-{
-	auto	result = GetSpelledPosition();
-
-	if(vars && vars->Get("subc2agency_timecard_position" + idx).length())
-	{
-		result += ": " + vars->Get("subc2agency_timecard_position" + idx);
-	}
-	else if(vars && vars->Get("agency2cc_timecard_position" + idx).length())
-	{
-		result += ": " + vars->Get("agency2cc_timecard_position" + idx);
-	}
-	else
-	{
-		result += ": _______________________________";
-	}
-
-	return result;
-}
-*/
-
 auto	C_Print_Timecard::isDaySummaryStruct_Filled() -> bool
 {
 	auto	result = false;
