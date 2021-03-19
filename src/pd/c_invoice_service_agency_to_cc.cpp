@@ -525,12 +525,12 @@ auto C_Invoice_Service_Agency_To_CC::CreateTimecardObj(string timecard_id) -> C_
 			
 			if(cost_center_id.length())
 			{
-				string	psow_id = GetPSoWIDByTimecardIDAndCostCenterID(timecard_id, cost_center_id, db, user);
+				auto	psow_id = GetPSoWIDByTimecardIDAndCostCenterID(timecard_id, cost_center_id, db, user);
 
 				if(psow_id.length())
 				{
-					// string	sow_id = GetSoWIDByTimecardID(timecard_id, db, user);
-					string	sow_id = "fake uncomment prev line";
+					// auto	sow_id = GetSoWIDByTimecardID(timecard_id, db, user);
+					auto	sow_id = "fake uncomment prev line"s;
 
 					if(sow_id.length())
 					{
