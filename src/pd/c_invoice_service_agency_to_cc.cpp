@@ -652,28 +652,40 @@ auto C_Invoice_Service_Agency_To_CC::UpdateDBWithInvoiceData(const string timeca
 				
 				if(owner_company_id.length())
 				{
-					// --- new invoice
-					invoice_cost_center_service_id = db->InsertQuery( "INSERT INTO `invoice_cost_center_service` (`cost_center_id`, `file`, `owner_company_id`, `owner_user_id`, `eventTimestamp`)"
-										"VALUES (" + 
-											quoted(cost_center_id) + "," +
-											quoted(archive_folder + "/" + archive_file) + "," +
-											quoted(owner_company_id) + "," +
-											quoted(user->GetID()) + "," +
-											"UNIX_TIMESTAMP()"
-										");");
-					if(invoice_cost_center_service_id)
+					auto	act_id = CreateActInDB("--- full number must be here ---", db, NULL);
+
+					if(act_id)
 					{
-						// --- everything is fine, increase act_number assigned to this cost_center
-						db->Query("UPDATE `company` SET `act_number`=`act_number`+1 WHERE `id`=\"" + owner_company_id + "\";");
-						if(db->isError())
+						// --- new invoice
+						invoice_cost_center_service_id = db->InsertQuery(
+											"INSERT INTO `invoice_cost_center_service` (`cost_center_id`, `file`, `owner_company_id`, `owner_user_id`, `act_id`, `eventTimestamp`) "
+											"VALUES (" + 
+												quoted(cost_center_id) + "," +
+												quoted(archive_folder + "/" + archive_file) + "," +
+												quoted(owner_company_id) + "," +
+												quoted(user->GetID()) + "," +
+												quoted(to_string(act_id)) + "," +
+												"UNIX_TIMESTAMP()"
+											");");
+						if(invoice_cost_center_service_id)
 						{
-							MESSAGE_ERROR("", "", "fail to increase act_number in cost_center table");
+							// --- everything is fine, increase act_number assigned to this cost_center
+							db->Query("UPDATE `company` SET `act_number`=`act_number`+1 WHERE `id`=\"" + owner_company_id + "\";");
+							if(db->isError())
+							{
+								MESSAGE_ERROR("", "", "fail to increase act_number in cost_center table");
+							}
+						}
+						else
+						{
+							error_message = gettext("fail to insert to db");
+							MESSAGE_ERROR("", "", error_message);
 						}
 					}
 					else
 					{
-						MESSAGE_ERROR("", "", "fail to insert to db");
-						error_message = gettext("fail to insert to db");
+						error_message = gettext("fail to create act");
+						MESSAGE_ERROR("", "", error_message);
 					}
 				}
 				else

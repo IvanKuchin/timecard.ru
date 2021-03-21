@@ -61,6 +61,8 @@ class C_Invoicing_Vars
 
 		auto		ShortenWorkPeriodSpelling(struct tm workperiod_start, struct tm workperiod_finish, string index) -> string;
 
+		auto		GetActFullNumberByCompanyID(string id) -> string;
+
 	public:
 					C_Invoicing_Vars()						{};
 					C_Invoicing_Vars(CMysql *param1, CUser *param2) : db(param1), user(param2) {};

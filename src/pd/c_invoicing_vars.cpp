@@ -381,7 +381,7 @@ auto	C_Invoicing_Vars::Agency_VarSet(string __agency_company_id) -> string
 						vars.Add("agency_isBlocked", 			ConvertHTMLToText(db->Get(0, "isBlocked")));
 						vars.Add("agency_logo_folder", 			ConvertHTMLToText(db->Get(0, "logo_folder")));
 						vars.Add("agency_logo_filename", 		ConvertHTMLToText(db->Get(0, "logo_filename")));
-						vars.Add("cost_center_act_number", 		db->Get(0, "act_number_prefix") + db->Get(0, "act_number") + db->Get(0, "act_number_postfix"));
+						vars.Add("cost_center_act_number", 		GetActFullNumberByCompanyID(__agency_company_id));
 					}
 					else
 					{
@@ -490,18 +490,22 @@ auto	C_Invoicing_Vars::SoW_Index_VarSet(string sql_query, string index) -> strin
 				auto	sow_working_hours_per_day = db->Get(0, "working_hours_per_day");
 				auto	sow_payment_period_service = db->Get(0, "payment_period_service");
 				auto	sow_payment_period_bt = db->Get(0, "payment_period_bt");
-				auto	act_number = ""s;
 
+// TODO: cleanup on March 23-rd
+/*
 				if(db->Query("SELECT * FROM `company` WHERE `id`=\"" + subcontractor_company_id + "\";"))
 				{
-					act_number = db->Get(0, "act_number_prefix") + db->Get(0, "act_number") + db->Get(0, "act_number_postfix");
+					auto	act_number = db->Get(0, "act_number_prefix") + db->Get(0, "act_number") + db->Get(0, "act_number_postfix");
+
+					if((error_message = AssignVariableValue("subcontractor_act_number_" + index, act_number, true)).empty()) {}
+					else { MESSAGE_ERROR("", "", "fail to assign variable"); }
 				}
 				else
 				{
-					error_message = gettext("Agreement") + " "s + sow_number + " " + gettext("agreement from") + " " + sow_date + " " + gettext("subcontractor_company_id is unknown");
+					error_message = gettext("Agreement") + " "s + sow_number + " " + gettext("agreement from") + " " + sow_date + " " + gettext("act number is empty");
 					MESSAGE_ERROR("", "", error_message);
 				}
-
+*/
 				if(sow_id.length())
 				{
 					if((error_message = AssignVariableValue("sow_id_" + index, sow_id, true)).empty()) {}
@@ -636,17 +640,6 @@ auto	C_Invoicing_Vars::SoW_Index_VarSet(string sql_query, string index) -> strin
 				else
 				{
 					error_message = gettext("Agreement") + " "s + sow_number + " " + gettext("agreement from") + " " + sow_date + " " + gettext("end date is empty");
-					MESSAGE_ERROR("", "", error_message);
-				}
-
-				if(act_number.length())
-				{
-					if((error_message = AssignVariableValue("subcontractor_act_number_" + index, act_number, true)).empty()) {}
-					else { MESSAGE_ERROR("", "", "fail to assign variable"); }
-				}
-				else
-				{
-					error_message = gettext("Agreement") + " "s + sow_number + " " + gettext("agreement from") + " " + sow_date + " " + gettext("act number is empty");
 					MESSAGE_ERROR("", "", error_message);
 				}
 
@@ -1089,6 +1082,21 @@ auto	C_Invoicing_Vars::Subcontractor_Index_VarSet(string subcontractor_company_i
 			{
 				error_message = gettext("SQL syntax error");
 				MESSAGE_ERROR("", "", error_message);
+			}
+
+			if(error_message.empty())
+			{
+				auto act_full_number = GetActFullNumberByCompanyID(subcontractor_company_id);
+
+				if(act_full_number.length())
+				{
+					error_message = AssignVariableValue("subcontractor_act_number_" + index, act_full_number, true);
+				}
+				else
+				{
+					error_message = gettext("act number is empty");
+					MESSAGE_ERROR("", "", error_message);
+				}
 			}
 
 			if(error_message.empty())
@@ -1649,13 +1657,18 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet_AgencyToCC() -> string
 
 					if(error_message.empty())
 					{
-						if((error_message = SoW_Index_VarSet("SELECT * FROM `contracts_sow` WHERE `id`=("
-																"SELECT `contract_sow_id` FROM `timecards` WHERE `id`=\"" + vars.Get("timecard_id_" + to_string(i)) + "\""
-															");", to_string(i))).empty())
+						if((error_message = SoW_Index_VarSet("SELECT * FROM `contracts_sow` WHERE `id`=(" + Get_SoWIDByTimecardID_sqlquery(vars.Get("timecard_id_" + to_string(i))) + ");", to_string(i))).empty())
 						{
 							timecard_days = timecard.GetTotalHours() / c_float(Get("sow_working_hours_per_day_" + to_string(i)));
 						}
 						else { MESSAGE_ERROR("", "", "fail returned from SoW_Index_VarSet"); }
+					}
+
+					// --- subcontractor company data
+					if(error_message.empty())
+					{
+						if((error_message = Subcontractor_Index_VarSet(Get("subcontractor_company_id_" + to_string(i)), to_string(i))).empty()) {}
+						else { MESSAGE_ERROR("", "", "fail returned from Subcontractor_Index_VarSet"); }
 					}
 
 					if(error_message.empty())
@@ -1679,12 +1692,6 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet_AgencyToCC() -> string
 						else { MESSAGE_ERROR("", "", "fail returned from Workperiod_vs_SoWPeriod_vs_PSoWperiod_Index_VarSet"); }
 					}
 
-					// --- subcontractor company data
-					if(error_message.empty())
-					{
-						if((error_message = Subcontractor_Index_VarSet(Get("subcontractor_company_id_" + to_string(i)), to_string(i))).empty()) {}
-						else { MESSAGE_ERROR("", "", "fail returned from Subcontractor_Index_VarSet"); }
-					}
 					// --- subcontractor payment
 					if(error_message.empty())
 					{
@@ -1787,9 +1794,10 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet_SubcToAgency() -> string
 			{
 				if(timecard_obj_list.size())
 				{
-					if(error_message.empty()) error_message = AssignVariableFromDB("sow_act_number", "SELECT CONCAT(`act_number_prefix`,`act_number`,`act_number_postfix`) FROM `company` WHERE `id`=("
-																											"SELECT `subcontractor_company_id` FROM `contracts_sow` WHERE `id`=\"" + timecard_obj_list[0].GetSoWID() + "\""
-																										");", true);
+					auto	company_id = GetValueFromDB(Get_SubcCompanyIDBySoWID_sqlquery(timecard_obj_list[0].GetSoWID()), db);
+
+					if((error_message = AgreementNumberSpelling_VarSet(GetActFullNumberByCompanyID(company_id))).empty()) {}
+					else { MESSAGE_ERROR("", "", "fail returned from AgreementNumberSpelling_VarSet"); }
 				}
 				else
 				{
@@ -1797,8 +1805,6 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet_SubcToAgency() -> string
 					MESSAGE_ERROR("", "", "timecard_obj_list is empty.");
 				}
 
-				if((error_message = AgreementNumberSpelling_VarSet(Get("sow_act_number"))).empty()) {}
-				else { MESSAGE_ERROR("", "", "fail returned from AgreementNumberSpelling_VarSet"); }
 			}
 
 			// --- define timecards variables
@@ -1829,6 +1835,13 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet_SubcToAgency() -> string
 						else { MESSAGE_ERROR("", "", "fail returned from SoW_Index_VarSet"); }
 					}
 
+					// --- subcontractor company data
+					if(error_message.empty())
+					{
+						if((error_message = Subcontractor_Index_VarSet(Get("subcontractor_company_id_" + to_string(i)), to_string(i))).empty()) {}
+						else { MESSAGE_ERROR("", "", "fail returned from Subcontractor_Index_VarSet"); }
+					}
+
 					// --- get report start date and finish date
 					if(error_message.empty())
 					{
@@ -1836,12 +1849,6 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet_SubcToAgency() -> string
 						else { MESSAGE_ERROR("", "", "fail returned from Workperiod_Index_VarSet"); }
 					}
 
-					// --- subcontractor company data
-					if(error_message.empty())
-					{
-						if((error_message = Subcontractor_Index_VarSet(Get("subcontractor_company_id_" + to_string(i)), to_string(i))).empty()) {}
-						else { MESSAGE_ERROR("", "", "fail returned from Subcontractor_Index_VarSet"); }
-					}
 					if(error_message.empty())
 					{
 						if((error_message = SubcontractorAddress_Index_VarSet("1")).empty()) {}
@@ -1986,16 +1993,16 @@ auto	C_Invoicing_Vars::GenerateBTVariableSet_AgencyToCC() -> string
 
 					if(error_message.empty())
 					{
-						auto	psow_id = GetPSoWIDByBTIDAndCostCenterID(vars.Get("bt_id_" + to_string(i)), vars.Get("cost_center_id"), db, user);
-
-						if((error_message = PSoW_Index_VarSet(psow_id, to_string(i))).empty()) {}
-						else { MESSAGE_ERROR("", "", "fail returned from PSoW_Index_VarSet"); }
+						if((error_message = Subcontractor_Index_VarSet(Get("subcontractor_company_id_" + to_string(i)), to_string(i))).empty()) {}
+						else { MESSAGE_ERROR("", "", "fail returned from Subcontractor_Index_VarSet"); }
 					}
 
 					if(error_message.empty())
 					{
-						if((error_message = Subcontractor_Index_VarSet(Get("subcontractor_company_id_" + to_string(i)), to_string(i))).empty()) {}
-						else { MESSAGE_ERROR("", "", "fail returned from Subcontractor_Index_VarSet"); }
+						auto	psow_id = GetPSoWIDByBTIDAndCostCenterID(vars.Get("bt_id_" + to_string(i)), vars.Get("cost_center_id"), db, user);
+
+						if((error_message = PSoW_Index_VarSet(psow_id, to_string(i))).empty()) {}
+						else { MESSAGE_ERROR("", "", "fail returned from PSoW_Index_VarSet"); }
 					}
 
 					// --- get report start date and finish date
@@ -2112,9 +2119,10 @@ auto	C_Invoicing_Vars::GenerateBTVariableSet_SubcToAgency() -> string
 			{
 				if(bt_obj_list.size())
 				{
-					if(error_message.empty()) error_message = AssignVariableFromDB("sow_act_number", "SELECT CONCAT(`act_number_prefix`,`act_number`,`act_number_postfix`) FROM `company` WHERE `id`=("
-																											"SELECT `subcontractor_company_id` FROM `contracts_sow` WHERE `id`=\"" + bt_obj_list[0].GetSoWID() + "\""
-																										");", true);
+					auto	company_id = GetValueFromDB(Get_SubcCompanyIDBySoWID_sqlquery(bt_obj_list[0].GetSoWID()), db);
+
+					if((error_message = AgreementNumberSpelling_VarSet(GetActFullNumberByCompanyID(company_id))).empty()) {}
+					else { MESSAGE_ERROR("", "", "fail returned from AgreementNumberSpelling_VarSet"); }
 				}
 				else
 				{
@@ -2122,8 +2130,6 @@ auto	C_Invoicing_Vars::GenerateBTVariableSet_SubcToAgency() -> string
 					MESSAGE_ERROR("", "", "bt_obj_list is empty.");
 				}
 
-				if((error_message = AgreementNumberSpelling_VarSet(Get("sow_act_number"))).empty()) {}
-				else { MESSAGE_ERROR("", "", "fail returned from AgreementNumberSpelling_VarSet"); }
 			}
 
 			// --- define timecards variables
@@ -2149,6 +2155,12 @@ auto	C_Invoicing_Vars::GenerateBTVariableSet_SubcToAgency() -> string
 						else { MESSAGE_ERROR("", "", "fail returned from SoW_Index_VarSet"); }
 					}
 
+					if(error_message.empty())
+					{
+						if((error_message = Subcontractor_Index_VarSet(Get("subcontractor_company_id_" + to_string(i)), to_string(i))).empty()) {}
+						else { MESSAGE_ERROR("", "", "fail returned from Subcontractor_Index_VarSet"); }
+					}
+
 					// --- get report start date and finish date
 					if(error_message.empty())
 					{
@@ -2156,11 +2168,6 @@ auto	C_Invoicing_Vars::GenerateBTVariableSet_SubcToAgency() -> string
 						else { MESSAGE_ERROR("", "", "fail returned from Workperiod_Index_VarSet"); }
 					}
 
-					if(error_message.empty())
-					{
-						if((error_message = Subcontractor_Index_VarSet(Get("subcontractor_company_id_" + to_string(i)), to_string(i))).empty()) {}
-						else { MESSAGE_ERROR("", "", "fail returned from Subcontractor_Index_VarSet"); }
-					}
 					if(error_message.empty())
 					{
 						if((error_message = SubcontractorAddress_Index_VarSet("1")).empty()) {}
@@ -2330,6 +2337,18 @@ auto C_Invoicing_Vars::GetIndexByBTID(string bt_id) -> string
 	}
 
 	MESSAGE_DEBUG("", "", "finish (index is " + result + ")");
+
+	return result;
+}
+
+auto C_Invoicing_Vars::GetActFullNumberByCompanyID(string id) -> string
+{
+	MESSAGE_DEBUG("", "", "start (id = " + id + ")");
+
+	auto	act_full_number	= GetActNumberByCompanyID(id, db, user);
+	auto	result = get<0>(act_full_number) + to_string(get<1>(act_full_number)) + get<2>(act_full_number);
+
+	MESSAGE_DEBUG("", "", "finish (" + result + ")");
 
 	return result;
 }

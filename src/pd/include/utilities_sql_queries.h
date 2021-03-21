@@ -13,18 +13,33 @@ inline auto Get_CompanyIDByCompanyEmployeeUserID_sqlquery(const string &user_id)
 	return (" SELECT `company_id` FROM `company_employees` WHERE `user_id` IN (" + user_id + ") ");
 }
 
+inline auto Get_SubcCompanyIDBySoWID_sqlquery(const string &id) -> string
+{
+	return ("SELECT `subcontractor_company_id` FROM `contracts_sow` WHERE `id` IN (" + id + ")");
+}
+
 inline auto Get_SubcCompanyIDByTimecardID_sqlquery(const string &id) -> string
 {
+	return (Get_SubcCompanyIDBySoWID_sqlquery(
+			"SELECT `contract_sow_id` FROM `timecards` WHERE `id` IN (" + id + ")"
+		));
+/*
 	return ("SELECT `subcontractor_company_id` FROM `contracts_sow` WHERE `id`=("
 				"SELECT `contract_sow_id` FROM `timecards` WHERE `id` IN (" + id + ")"
 			")");
+*/
 }
 
 inline auto Get_SubcCompanyIDByBTID_sqlquery(const string &id) -> string
 {
+	return (Get_SubcCompanyIDBySoWID_sqlquery(
+			"SELECT `contract_sow_id` FROM `bt` WHERE `id` IN (" + id + ")"
+		));
+/*
 	return ("SELECT `subcontractor_company_id` FROM `contracts_sow` WHERE `id`=("
 				"SELECT `contract_sow_id` FROM `bt` WHERE `id` IN (" + id + ")"
 			")");
+*/
 }
 
 inline auto Get_CustomerIDByBTID_sqlquery(const string &bt_id)
@@ -157,6 +172,20 @@ inline auto Get_SoWIDsBySubcUserIDAndDate_sqlquery(const string &user_id, const 
 		);
 }
 
+inline auto Get_SoWIDsBySubcCompanyID_sqlquery(const string &id) -> string
+{
+	return (
+		"SELECT `id` FROM `contracts_sow` WHERE `subcontractor_company_id` IN (" + id + ") "
+		);
+}
+
+inline auto Get_SoWIDsByAgencyCompanyID_sqlquery(const string &id) -> string
+{
+	return (
+		"SELECT `id` FROM `contracts_sow` WHERE `agency_company_id` IN (" + id + ") "
+		);
+}
+
 inline auto Get_TimecardDateFilter_sqlquery(const string &date_start, const string &date_end) -> string
 {
 	return (
@@ -234,6 +263,41 @@ inline auto	Get_TimecardTaskIDsByTimecardApproverUserID_sqlquery(const string &i
 		);
 }
 
+inline auto Get_TimecardsIDBySubcCompanyID_sqlquery(const string &id)
+{
+	return (
+			"SELECT `id` FROM `timecards` WHERE `contract_sow_id` IN ("
+				+ Get_SoWIDsBySubcCompanyID_sqlquery(id) +
+			")"
+		);
+}
+
+inline auto Get_TimecardsIDByAgencyCompanyID_sqlquery(const string &id)
+{
+	return (
+			"SELECT `id` FROM `timecards` WHERE `contract_sow_id` IN ("
+				+ Get_SoWIDsByAgencyCompanyID_sqlquery(id) +
+			")"
+		);
+}
+
+inline auto Get_BTsIDBySubcCompanyID_sqlquery(const string &id)
+{
+	return (
+			"SELECT `id` FROM `bt` WHERE `contract_sow_id` IN ("
+				+ Get_SoWIDsBySubcCompanyID_sqlquery(id) +
+			")"
+		);
+}
+
+inline auto Get_BTsIDByAgencyCompanyID_sqlquery(const string &id)
+{
+	return (
+			"SELECT `id` FROM `bt` WHERE `contract_sow_id` IN ("
+				+ Get_SoWIDsByAgencyCompanyID_sqlquery(id) +
+			")"
+		);
+}
 
 inline auto	Get_AgencyIDByUserID_sqlquery(const string &id)
 {
@@ -241,6 +305,40 @@ inline auto	Get_AgencyIDByUserID_sqlquery(const string &id)
 			"SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id` IN ("
 				+ Get_CompanyIDByCompanyEmployeeUserID_sqlquery(id) +
 			")"
+		);
+}
+
+inline auto Get_ActsIDBySubcCompanyID(const string &id)
+{
+	return (
+			"SELECT DISTINCT(`id`) FROM `acts` WHERE "
+				"`id` IN (SELECT `act_id` FROM `timecards` WHERE `id` IN (" + Get_TimecardsIDBySubcCompanyID_sqlquery(id) + ")) "
+				"OR "
+				"`id` IN (SELECT `act_id` FROM `bt` WHERE `id` IN (" + Get_BTsIDBySubcCompanyID_sqlquery(id) + ")) "
+		);
+}
+
+inline auto Get_ActsIDByAgencyCompanyID(const string &id)
+{
+	return (
+			"SELECT DISTINCT(`id`) FROM `acts` WHERE "
+				"`id` IN (SELECT `act_id` FROM `invoice_cost_center_service` WHERE `owner_company_id` IN (" + id + ")) "
+				"OR "
+				"`id` IN (SELECT `act_id` FROM `invoice_cost_center_bt` WHERE `owner_company_id` IN (" + id + ")) "
+		);
+}
+
+inline auto Get_ActIDByTimecardID(const string &id)
+{
+	return (
+			"SELECT `act_id` FROM `timecards` WHERE `id` IN (" + id + ")"
+		);
+}
+
+inline auto Get_ActIDByBTID(const string &id)
+{
+	return (
+			"SELECT `act_id` FROM `bt` WHERE `id` IN (" + id + ")"
 		);
 }
 

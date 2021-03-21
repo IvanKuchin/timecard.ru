@@ -1847,6 +1847,8 @@ auto RecallTimecard(string timecard_id, string reason, CMysql *db, CUser *user) 
 			{
 				db->Query("DELETE FROM `timecard_approvals` WHERE `timecard_id`=" + quoted(timecard_id) + ";");
 				db->Query("UPDATE `timecards` SET `submit_date`=\"0\" , `approve_date`=\"0\", `payed_date`=\"0\", `expected_pay_date`=\"0\", `originals_received_date`=\"0\", `invoice_filename`=\"\", `status`=\"saved\" WHERE `id`=" + quoted(timecard_id) + ";");
+				db->Query("UPDATE `acts` SET `full_number`=\"\" , `eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=(" + Get_ActIDByTimecardID(timecard_id) + ");");
+
 				if(db->isError())
 				{
 					error_message = gettext("SQL syntax error");
@@ -2389,3 +2391,17 @@ string GetMessageSpamUser(string messageID, string userID, CMysql *db)
 	return result;
 }
 
+
+auto CreateActInDB(const string &act_full_number, CMysql *db, CUser *user) -> long int
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	id = db->InsertQuery("INSERT INTO `acts` (`full_number`, `eventTimestamp`) VALUES (" + quoted(act_full_number) + ", UNIX_TIMESTAMP());");
+
+	if(id == 0)
+		MESSAGE_ERROR("", "", "SQL syntax error");
+
+	MESSAGE_DEBUG("", "", "finish (id=" + to_string(id) + ")");
+
+	return id;
+}
