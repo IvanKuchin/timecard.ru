@@ -147,7 +147,7 @@ auto	RecallServiceInvoice(string service_invoice_id, CMysql *db, CUser *user) ->
 					}
 					else
 					{
-						// --- successful completetion
+						// --- successful completion
 					}
 
 				}
@@ -216,7 +216,7 @@ auto	RecallBTInvoice(string bt_invoice_id, CMysql *db, CUser *user) -> string
 					}
 					else
 					{
-						// --- successful completetion
+						// --- successful completion
 					}
 				}
 			}

@@ -670,7 +670,7 @@ auto C_Invoice_Service_Agency_To_CC::UpdateDBWithInvoiceData(const string timeca
 						if(invoice_cost_center_service_id)
 						{
 							// --- everything is fine, increase act_number assigned to this cost_center
-							error_message = AssignCurentCompanyActNumberToActID_And_UpdateCompanyActNumber_by_ActID(to_string(act_id), owner_company_id, db, user);
+							error_message = AssignCurrentCompanyActNumberToActID_And_UpdateCompanyActNumber_by_ActID(to_string(act_id), owner_company_id, db, user);
 							if(error_message.length())
 							{
 								MESSAGE_ERROR("", "", error_message);

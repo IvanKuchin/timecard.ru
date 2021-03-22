@@ -2420,7 +2420,7 @@ auto DeleteActFromDB(const string &id, CMysql *db) -> string
 	}
 	else
 	{
-		// --- successful completetion
+		// --- successful completion
 	}
 
 	MESSAGE_DEBUG("", "", "finish");

@@ -200,7 +200,7 @@ auto GetActNumberByCompanyID(const string &company_id, CMysql *db, CUser *user) 
 										);
 }
 
-auto AssignCurentCompanyActNumberToActID_And_UpdateCompanyActNumber_by_ActID(const string &act_id, const string &company_id, CMysql *db, CUser *user) -> string
+auto AssignCurrentCompanyActNumberToActID_And_UpdateCompanyActNumber_by_ActID(const string &act_id, const string &company_id, CMysql *db, CUser *user) -> string
 {
 	MESSAGE_DEBUG("", "", "start (" + act_id + ", " + company_id + ")");
 
@@ -239,7 +239,7 @@ auto AssignCurentCompanyActNumberToActID_And_UpdateCompanyActNumber_by_ActID(con
 //		stage: (submitted|approved) - not in use currently 
 // outputs:
 //		error_message
-auto AssignCurentCompanyActNumberToActID_And_UpdateCompanyActNumber_by_Entity(const string &entity_id, const string &entity_type, const string &stage, CMysql *db, CUser *user) -> string
+auto AssignCurrentCompanyActNumberToActID_And_UpdateCompanyActNumber_by_Entity(const string &entity_id, const string &entity_type, const string &stage, CMysql *db, CUser *user) -> string
 {
 	MESSAGE_DEBUG("", "", "start (" + entity_id + ", " + entity_type + ", " + stage + ")");
 
@@ -266,7 +266,7 @@ auto AssignCurentCompanyActNumberToActID_And_UpdateCompanyActNumber_by_Entity(co
 
 		if(act_id.length())
 		{
-			error_message = AssignCurentCompanyActNumberToActID_And_UpdateCompanyActNumber_by_ActID(act_id, company_id, db, user);
+			error_message = AssignCurrentCompanyActNumberToActID_And_UpdateCompanyActNumber_by_ActID(act_id, company_id, db, user);
 			if(error_message.length())
 			{
 				MESSAGE_ERROR("", "", error_message);
@@ -318,7 +318,7 @@ auto SubmitTimecard(string timecard_id, CMysql *db, CUser *user) -> bool
 					}
 					else
 					{
-						error_message = AssignCurentCompanyActNumberToActID_And_UpdateCompanyActNumber_by_Entity(timecard_id, "timecard", "submit", db, user);
+						error_message = AssignCurrentCompanyActNumberToActID_And_UpdateCompanyActNumber_by_Entity(timecard_id, "timecard", "submit", db, user);
 
 						if(error_message.empty())
 						{
@@ -381,7 +381,7 @@ auto	SubmitBT(string bt_id, CMysql *db, CUser *user) -> bool
 					}
 					else
 					{
-						error_message = AssignCurentCompanyActNumberToActID_And_UpdateCompanyActNumber_by_Entity(bt_id, "bt", "submit", db, user);
+						error_message = AssignCurrentCompanyActNumberToActID_And_UpdateCompanyActNumber_by_Entity(bt_id, "bt", "submit", db, user);
 
 						if(error_message.empty())
 						{

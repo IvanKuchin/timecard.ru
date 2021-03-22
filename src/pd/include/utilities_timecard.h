@@ -31,8 +31,8 @@ auto			CreateActInDB(const string &act_full_number, CMysql *, CUser *) -> long i
 auto 			DeleteActFromDB(const string &id, CMysql *) -> string;
 auto			GetActNumberByCompanyID(const string &company_id, CMysql *, CUser *) -> tuple<string, int, string>;
 auto			GetAvailableActNumber_StartFrom(int act_number, const string &company_id, CMysql *, CUser *) -> tuple<string, int, string>;
-auto			AssignCurentCompanyActNumberToActID_And_UpdateCompanyActNumber_by_ActID(const string &act_id, const string &company_id, CMysql *, CUser *) -> string;
-auto			AssignCurentCompanyActNumberToActID_And_UpdateCompanyActNumber_by_Entity(const string &entity_id, const string &entity_type, const string &stage, CMysql *, CUser *) -> string;
+auto			AssignCurrentCompanyActNumberToActID_And_UpdateCompanyActNumber_by_ActID(const string &act_id, const string &company_id, CMysql *, CUser *) -> string;
+auto			AssignCurrentCompanyActNumberToActID_And_UpdateCompanyActNumber_by_Entity(const string &entity_id, const string &entity_type, const string &stage, CMysql *, CUser *) -> string;
 
 
 // --- chat messages in status bar
