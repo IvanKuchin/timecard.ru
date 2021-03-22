@@ -2041,6 +2041,21 @@ auto	C_Invoicing_Vars::GenerateBTVariableSet_AgencyToCC() -> string
 						if((error_message = Subcontractor_Index_VarSet(Get("subcontractor_company_id_" + to_string(i)), to_string(i))).empty()) {}
 						else { MESSAGE_ERROR("", "", "fail returned from Subcontractor_Index_VarSet"); }
 					}
+					if(error_message.empty())
+					{
+						auto	act_id	= GetValueFromDB(Get_ActIDByBTID(bt.GetID()), db);
+
+						if(act_id.length())
+						{
+							if((error_message = SubcontractorAct_Index_VarSet(act_id, to_string(i))).empty()) {}
+							else { MESSAGE_ERROR("", "", "fail returned from SubcontractorAct_Index_VarSet"); }
+						}
+						else
+						{
+							error_message = gettext("act not found");
+							MESSAGE_ERROR("", "", error_message);
+						}
+					}
 
 					if(error_message.empty())
 					{
