@@ -104,6 +104,7 @@ static auto __isActNumberAvailable(const string &act_full_number, const string &
 	{
 		auto	company_type	= GetValueFromDB("SELECT `type` FROM `company` WHERE `id`=" + quoted(company_id) + ";", db);
 
+
 		if(company_type == "subcontractor")
 		{
 			auto	affected = db->Query("SELECT `id` FROM `acts` WHERE `full_number`=" + quoted(act_full_number) + " AND `id` IN (" + Get_ActsIDBySubcCompanyID(company_id) + ");");
@@ -199,15 +200,46 @@ auto GetActNumberByCompanyID(const string &company_id, CMysql *db, CUser *user) 
 										);
 }
 
+auto AssignCurentCompanyActNumberToActID_And_UpdateCompanyActNumber_by_ActID(const string &act_id, const string &company_id, CMysql *db, CUser *user) -> string
+{
+	MESSAGE_DEBUG("", "", "start (" + act_id + ", " + company_id + ")");
+
+	auto	error_message	= ""s;
+
+	auto	curr_act_full_number	= GetActNumberByCompanyID(company_id, db, user);
+	auto	next_act_full_number	= GetAvailableActNumber_StartFrom(get<1>(curr_act_full_number) + 1, company_id, db, user);
+
+	db->Query("UPDATE `acts` SET `full_number`=" + quoted(get<0>(curr_act_full_number) + to_string(get<1>(curr_act_full_number)) + get<2>(curr_act_full_number)) + ",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=" + quoted(act_id) + ";");
+	if(db->isError())
+	{
+		error_message = gettext("act not found");
+		MESSAGE_ERROR("", "", error_message);
+	}
+	else
+	{
+		db->Query("UPDATE `company` SET `act_number`=" + quoted(to_string(get<1>(next_act_full_number))) + " WHERE `id`=" + quoted(company_id) + ";");
+
+		if(db->isError())
+		{
+			error_message = gettext("SQL syntax error");
+			MESSAGE_ERROR("", "", error_message);
+		}
+	}
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return error_message;
+}
+
 // update act in DB with current company.act_number and shift company.act_number to the next available
 // IMPORTANT: it assumes that act already exists in DB
 // inputs:
 //		entity_id: (timecard_id|bt_id) 
 //		entity_type: (timecard|bt) 
-//		stage: (submited|approved) - not in use currently 
+//		stage: (submitted|approved) - not in use currently 
 // outputs:
 //		error_message
-auto AssignAndUpdateCompanyActNumber(const string &entity_id, const string &entity_type, const string &stage, CMysql *db, CUser *user) -> string
+auto AssignCurentCompanyActNumberToActID_And_UpdateCompanyActNumber_by_Entity(const string &entity_id, const string &entity_type, const string &stage, CMysql *db, CUser *user) -> string
 {
 	MESSAGE_DEBUG("", "", "start (" + entity_id + ", " + entity_type + ", " + stage + ")");
 
@@ -216,8 +248,7 @@ auto AssignAndUpdateCompanyActNumber(const string &entity_id, const string &enti
 	if(entity_id.length() && entity_type.length() && stage.length() && db)
 	{
 		auto	company_id				= GetValueFromDB(entity_type == "timecard" ? Get_SubcCompanyIDByTimecardID_sqlquery(entity_id) : Get_SubcCompanyIDByBTID_sqlquery(entity_id), db);
-		auto	curr_act_full_number	= GetActNumberByCompanyID(company_id, db, user);
-		auto	act_id				= ""s;
+		auto	act_id					= ""s;
 
 		if(entity_type == "timecard")
 		{
@@ -235,23 +266,10 @@ auto AssignAndUpdateCompanyActNumber(const string &entity_id, const string &enti
 
 		if(act_id.length())
 		{
-			auto	next_act_full_number	= GetAvailableActNumber_StartFrom(get<1>(curr_act_full_number) + 1, company_id, db, user);
-
-			db->Query("UPDATE `acts` SET `full_number`=" + quoted(get<0>(curr_act_full_number) + to_string(get<1>(curr_act_full_number)) + get<2>(curr_act_full_number)) + ",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=" + quoted(act_id) + ";");
-			if(db->isError())
+			error_message = AssignCurentCompanyActNumberToActID_And_UpdateCompanyActNumber_by_ActID(act_id, company_id, db, user);
+			if(error_message.length())
 			{
-				error_message = gettext("act not found");
 				MESSAGE_ERROR("", "", error_message);
-			}
-			else
-			{
-				db->Query("UPDATE `company` SET `act_number`=" + quoted(to_string(get<1>(next_act_full_number))) + " WHERE `id`=" + quoted(company_id) + ";");
-
-				if(db->isError())
-				{
-					error_message = gettext("SQL syntax error");
-					MESSAGE_ERROR("", "", error_message);
-				}
 			}
 		}
 		else
@@ -284,10 +302,7 @@ auto SubmitTimecard(string timecard_id, CMysql *db, CUser *user) -> bool
 		submit_obj.Submit("timecard", timecard_id);
 		if(submit_obj.isCompletelyApproved())
 		{
-			auto	error_message = AssignAndUpdateCompanyActNumber(timecard_id, "timecard", "submit", db, user);
-
-			if(error_message.empty())
-			{
+				auto								error_message = ""s;
 				C_Invoice_Service_Subc_To_Agency	c_invoice(db, user);
 				
 				c_invoice.SetTimecardList({timecard_id});
@@ -303,7 +318,16 @@ auto SubmitTimecard(string timecard_id, CMysql *db, CUser *user) -> bool
 					}
 					else
 					{
-						result = true;
+						error_message = AssignCurentCompanyActNumberToActID_And_UpdateCompanyActNumber_by_Entity(timecard_id, "timecard", "submit", db, user);
+
+						if(error_message.empty())
+						{
+							result = true;
+						}
+						else
+						{
+							MESSAGE_ERROR("", "", error_message);
+						}
 					}
 				}
 				else
@@ -311,11 +335,6 @@ auto SubmitTimecard(string timecard_id, CMysql *db, CUser *user) -> bool
 					error_message = gettext("fail to generate documents set");
 					MESSAGE_ERROR("", "", error_message);
 				}
-			}
-			else
-			{
-				MESSAGE_ERROR("", "", error_message);
-			}
 		}
 		else
 		{
@@ -347,12 +366,8 @@ auto	SubmitBT(string bt_id, CMysql *db, CUser *user) -> bool
 		submit_obj.Submit("bt", bt_id);
 		if(submit_obj.isCompletelyApproved())
 		{
-			auto	error_message = AssignAndUpdateCompanyActNumber(bt_id, "bt", "submit", db, user);
-
-			if(error_message.empty())
-			{
-				auto	error_message = ""s;
-				C_Invoice_BT_Subc_To_Agency	c_invoice(db, user);
+				auto							error_message = ""s;
+				C_Invoice_BT_Subc_To_Agency		c_invoice(db, user);
 
 				c_invoice.SetBTList({bt_id});
 
@@ -366,18 +381,22 @@ auto	SubmitBT(string bt_id, CMysql *db, CUser *user) -> bool
 					}
 					else
 					{
+						error_message = AssignCurentCompanyActNumberToActID_And_UpdateCompanyActNumber_by_Entity(bt_id, "bt", "submit", db, user);
+
+						if(error_message.empty())
+						{
 							result = true;
+						}
+						else
+						{
+							MESSAGE_ERROR("", "", error_message);
+						}
 					}
 				}
 				else
 				{
 					MESSAGE_DEBUG("", "", "fail to generate invoice document archive");
 				}
-			}
-			else
-			{
-				MESSAGE_ERROR("", "", error_message);
-			}
 		}
 		else
 		{

@@ -2405,3 +2405,26 @@ auto CreateActInDB(const string &act_full_number, CMysql *db, CUser *user) -> lo
 
 	return id;
 }
+
+auto DeleteActFromDB(const string &id, CMysql *db) -> string
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	error_message = ""s;
+
+	db->Query("DELETE FROM `acts` WHERE `id` IN (" + id + ");");
+	if(db->isError())
+	{
+		error_message = gettext("SQL syntax error");
+		MESSAGE_ERROR("", "", error_message);
+	}
+	else
+	{
+		// --- successful completetion
+	}
+
+	MESSAGE_DEBUG("", "", "finish");
+
+	return error_message;
+}
+

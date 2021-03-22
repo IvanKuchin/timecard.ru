@@ -1045,6 +1045,36 @@ auto	C_Invoicing_Vars::SubcontractorAddress_Index_VarSet(string index) -> string
 	return	error_message;
 }
 
+auto	C_Invoicing_Vars::SubcontractorAct_Index_VarSet(const string &act_id, string index) -> string
+{
+	auto	error_message = ""s;
+
+	MESSAGE_DEBUG("", "", "start");
+
+	if(user)
+	{
+		if(db)
+		{
+			if(error_message.empty()) error_message = AssignVariableFromDB("subcontractor_act_number_" + index, "SELECT `full_number` FROM `acts` WHERE `id`=" + act_id + ";", true);
+		}
+		else
+		{
+			error_message = gettext("db is not initialized");
+			MESSAGE_ERROR("", "", error_message);
+		}
+	}
+	else
+	{
+		error_message = gettext("user is not initialized");
+		MESSAGE_ERROR("", "", error_message);
+	}
+
+
+	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
+
+	return	error_message;
+}
+
 auto	C_Invoicing_Vars::Subcontractor_Index_VarSet(string subcontractor_company_id, string index) -> string
 {
 	auto	error_message = ""s;
@@ -1083,7 +1113,7 @@ auto	C_Invoicing_Vars::Subcontractor_Index_VarSet(string subcontractor_company_i
 				error_message = gettext("SQL syntax error");
 				MESSAGE_ERROR("", "", error_message);
 			}
-
+/*
 			if(error_message.empty())
 			{
 				auto act_full_number = GetActFullNumberByCompanyID(subcontractor_company_id);
@@ -1098,7 +1128,7 @@ auto	C_Invoicing_Vars::Subcontractor_Index_VarSet(string subcontractor_company_i
 					MESSAGE_ERROR("", "", error_message);
 				}
 			}
-
+*/
 			if(error_message.empty())
 			{
 				auto	affected = db->Query("SELECT * FROM `banks` WHERE `id`=\"" + vars.Get("subcontractor_company_bank_id_" + index) + "\";");
@@ -1669,6 +1699,21 @@ auto	C_Invoicing_Vars::GenerateServiceVariableSet_AgencyToCC() -> string
 					{
 						if((error_message = Subcontractor_Index_VarSet(Get("subcontractor_company_id_" + to_string(i)), to_string(i))).empty()) {}
 						else { MESSAGE_ERROR("", "", "fail returned from Subcontractor_Index_VarSet"); }
+					}
+					if(error_message.empty())
+					{
+						auto	act_id	= GetValueFromDB(Get_ActIDByTimecardID(timecard.GetID()), db);
+
+						if(act_id.length())
+						{
+							if((error_message = SubcontractorAct_Index_VarSet(act_id, to_string(i))).empty()) {}
+							else { MESSAGE_ERROR("", "", "fail returned from SubcontractorAct_Index_VarSet"); }
+						}
+						else
+						{
+							error_message = gettext("act not found");
+							MESSAGE_ERROR("", "", error_message);
+						}
 					}
 
 					if(error_message.empty())

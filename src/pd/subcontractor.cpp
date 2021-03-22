@@ -1737,8 +1737,9 @@ int main()
 						))
 						{
 							{
-								// --- remove expense
+								auto	act_id = GetValueFromDB(Get_ActIDByBTID(bt_id), &db);
 
+								// --- remove expense
 								int affected = db.Query(
 									"SELECT `bt_expense_lines`.`value` as `value`, `bt_expense_line_templates`.`dom_type` as `dom_type` FROM `bt_expense_lines` "
 									"INNER JOIN `bt_expense_line_templates` on `bt_expense_lines`.`bt_expense_line_template_id`=`bt_expense_line_templates`.`id` "
@@ -1764,7 +1765,7 @@ int main()
 								db.Query("DELETE FROM `bt_expenses` WHERE `bt_id`=\"" + bt_id + "\";");
 								db.Query("DELETE FROM `bt` WHERE `id`=\"" + bt_id + "\";");
 								db.Query("DELETE FROM `bt_approvals` WHERE `bt_id`=\"" + bt_id + "\";");
-								db.Query("DELETE FROM `acts` WHERE `id`=(" + Get_ActIDByBTID(bt_id) + ");");
+								db.Query("DELETE FROM `acts` WHERE `id`=(" + act_id + ");");
 							}
 						}
 						else

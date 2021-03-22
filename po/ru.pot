@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-19 19:16-0400\n"
+"POT-Creation-Date: 2021-03-21 23:08-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -537,6 +537,9 @@ msgstr "отсутствие перекрывается"
 msgid "account is empty"
 msgstr "не указан счет"
 
+msgid "act not found"
+msgstr "Акт не найден"
+
 msgid "act number"
 msgstr "номер акта"
 
@@ -794,6 +797,9 @@ msgstr "превышает допустимый размер"
 
 msgid "fail to craft timecard obj"
 msgstr "ошибка создания объекта timecard"
+
+msgid "fail to create act"
+msgstr ""
 
 msgid "fail to create temp directory"
 msgstr "невозможно создать временное хранилище"

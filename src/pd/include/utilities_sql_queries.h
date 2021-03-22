@@ -342,4 +342,18 @@ inline auto Get_ActIDByBTID(const string &id)
 		);
 }
 
+inline auto Get_ActIDByServiceInvoiceIDToCC(const string &id)
+{
+	return (
+			"SELECT `act_id` FROM `invoice_cost_center_service` WHERE `id` IN (" + id + ")"
+		);
+}
+
+inline auto Get_ActIDByBTInvoiceIDToCC(const string &id)
+{
+	return (
+			"SELECT `act_id` FROM `invoice_cost_center_bt` WHERE `id` IN (" + id + ")"
+		);
+}
+
 #endif

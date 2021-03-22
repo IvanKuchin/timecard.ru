@@ -28,9 +28,12 @@ auto 			GetBookLikesUsersList(string usersBookID, CUser *, CMysql *) -> string;
 auto 			GetBookRatingUsersList(string bookID, CUser *, CMysql *) -> string;
 
 auto			CreateActInDB(const string &act_full_number, CMysql *, CUser *) -> long int;
+auto 			DeleteActFromDB(const string &id, CMysql *) -> string;
 auto			GetActNumberByCompanyID(const string &company_id, CMysql *, CUser *) -> tuple<string, int, string>;
 auto			GetAvailableActNumber_StartFrom(int act_number, const string &company_id, CMysql *, CUser *) -> tuple<string, int, string>;
-auto			AssignAndUpdateCompanyActNumber(const string &entity_id, const string &entity_type, const string &stage, CMysql *, CUser *) -> string;
+auto			AssignCurentCompanyActNumberToActID_And_UpdateCompanyActNumber_by_ActID(const string &act_id, const string &company_id, CMysql *, CUser *) -> string;
+auto			AssignCurentCompanyActNumberToActID_And_UpdateCompanyActNumber_by_Entity(const string &entity_id, const string &entity_type, const string &stage, CMysql *, CUser *) -> string;
+
 
 // --- chat messages in status bar
 auto      		GetUnreadChatMessagesInJSONFormat(CUser *, CMysql *) -> string;
