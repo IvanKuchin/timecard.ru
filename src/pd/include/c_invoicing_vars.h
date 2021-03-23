@@ -53,6 +53,7 @@ class C_Invoicing_Vars
 		auto		SoW_Custom_Fields(string index) -> string;
 		auto		CostCenterPayment_Index_VarSet(c_float cost_center_price, string index) -> string;
 		auto		Subcontractor_Index_VarSet(string subcontractor_company_id, string index) -> string;
+		auto		SubcontractorAct_Index_VarSet(const string &act_id, string index) -> string;
 		auto		SubcontractorAddress_Index_VarSet(string index) -> string;
 		auto		SubcontractorPayment_Index_VarSet(c_float cost_center_price, string index) -> string;
 		auto		Workperiod_Index_VarSet(struct tm workperiod_start, struct tm workperiod_finish, string index) -> string;
@@ -60,6 +61,8 @@ class C_Invoicing_Vars
 		auto		TableRowDescriptions_Index_VarSet(string local_remote_service_description, string index) -> string;
 
 		auto		ShortenWorkPeriodSpelling(struct tm workperiod_start, struct tm workperiod_finish, string index) -> string;
+
+		auto		GetActFullNumberByCompanyID(string id) -> string;
 
 	public:
 					C_Invoicing_Vars()						{};

@@ -110,6 +110,8 @@ auto	RecallServiceInvoice(string service_invoice_id, CMysql *db, CUser *user) ->
 
 	if(service_invoice_id.length())
 	{
+		auto	act_id = GetValueFromDB(Get_ActIDByServiceInvoiceIDToCC(service_invoice_id), db);
+
 		if(db->Query("SELECT `file` FROM `invoice_cost_center_service` WHERE `id`=\"" + service_invoice_id + "\";"))
 		{
 			auto	file_name = db->Get(0, 0);
@@ -117,7 +119,7 @@ auto	RecallServiceInvoice(string service_invoice_id, CMysql *db, CUser *user) ->
 			db->Query("DELETE FROM `invoice_cost_center_service_details` WHERE `invoice_cost_center_service_id`=\"" + service_invoice_id + "\";");
 			if(db->isError())
 			{
-				MESSAGE_ERROR("", "", "fail to delete from invoice_cost_center_service_details")
+				MESSAGE_ERROR("", "", "fail to delete from invoice_cost_center_service_details");
 				error_message = gettext("SQL syntax error");
 			}
 			else
@@ -125,7 +127,7 @@ auto	RecallServiceInvoice(string service_invoice_id, CMysql *db, CUser *user) ->
 				db->Query("DELETE FROM `invoice_cost_center_service` WHERE `id`=\"" + service_invoice_id + "\";");
 				if(db->isError())
 				{
-					MESSAGE_ERROR("", "", "fail to delete from invoice_cost_center_service")
+					MESSAGE_ERROR("", "", "fail to delete from invoice_cost_center_service");
 					error_message = gettext("SQL syntax error");
 				}
 				else
@@ -138,6 +140,16 @@ auto	RecallServiceInvoice(string service_invoice_id, CMysql *db, CUser *user) ->
 					{
 						MESSAGE_ERROR("", "", "invoice file doesn't exists");
 					}
+
+					if((error_message = DeleteActFromDB(act_id, db)).length())
+					{
+						MESSAGE_ERROR("", "", error_message);
+					}
+					else
+					{
+						// --- successful completion
+					}
+
 				}
 			}
 		}
@@ -167,6 +179,8 @@ auto	RecallBTInvoice(string bt_invoice_id, CMysql *db, CUser *user) -> string
 
 	if(bt_invoice_id.length())
 	{
+		auto	act_id = GetValueFromDB(Get_ActIDByBTInvoiceIDToCC(bt_invoice_id), db);
+
 		if(db->Query("SELECT `file` FROM `invoice_cost_center_bt` WHERE `id`=\"" + bt_invoice_id + "\";"))
 		{
 			auto	file_name = db->Get(0, 0);
@@ -194,6 +208,15 @@ auto	RecallBTInvoice(string bt_invoice_id, CMysql *db, CUser *user) -> string
 					else
 					{
 						MESSAGE_ERROR("", "", "invoice file doesn't exists");
+					}
+
+					if((error_message = DeleteActFromDB(act_id, db)).length())
+					{
+						MESSAGE_ERROR("", "", error_message);
+					}
+					else
+					{
+						// --- successful completion
 					}
 				}
 			}

@@ -525,12 +525,12 @@ auto C_Invoice_Service_Agency_To_CC::CreateTimecardObj(string timecard_id) -> C_
 			
 			if(cost_center_id.length())
 			{
-				string	psow_id = GetPSoWIDByTimecardIDAndCostCenterID(timecard_id, cost_center_id, db, user);
+				auto	psow_id = GetPSoWIDByTimecardIDAndCostCenterID(timecard_id, cost_center_id, db, user);
 
 				if(psow_id.length())
 				{
-					// string	sow_id = GetSoWIDByTimecardID(timecard_id, db, user);
-					string	sow_id = "fake uncomment prev line";
+					// auto	sow_id = GetSoWIDByTimecardID(timecard_id, db, user);
+					auto	sow_id = "fake uncomment prev line"s;
 
 					if(sow_id.length())
 					{
@@ -652,28 +652,40 @@ auto C_Invoice_Service_Agency_To_CC::UpdateDBWithInvoiceData(const string timeca
 				
 				if(owner_company_id.length())
 				{
-					// --- new invoice
-					invoice_cost_center_service_id = db->InsertQuery( "INSERT INTO `invoice_cost_center_service` (`cost_center_id`, `file`, `owner_company_id`, `owner_user_id`, `eventTimestamp`)"
-										"VALUES (" + 
-											quoted(cost_center_id) + "," +
-											quoted(archive_folder + "/" + archive_file) + "," +
-											quoted(owner_company_id) + "," +
-											quoted(user->GetID()) + "," +
-											"UNIX_TIMESTAMP()"
-										");");
-					if(invoice_cost_center_service_id)
+					auto	act_id = CreateActInDB("--- full number must be here ---", db, NULL);
+
+					if(act_id)
 					{
-						// --- everything is fine, increase act_number assigned to this cost_center
-						db->Query("UPDATE `company` SET `act_number`=`act_number`+1 WHERE `id`=\"" + owner_company_id + "\";");
-						if(db->isError())
+						// --- new invoice
+						invoice_cost_center_service_id = db->InsertQuery(
+											"INSERT INTO `invoice_cost_center_service` (`cost_center_id`, `file`, `owner_company_id`, `owner_user_id`, `act_id`, `eventTimestamp`) "
+											"VALUES (" + 
+												quoted(cost_center_id) + "," +
+												quoted(archive_folder + "/" + archive_file) + "," +
+												quoted(owner_company_id) + "," +
+												quoted(user->GetID()) + "," +
+												quoted(to_string(act_id)) + "," +
+												"UNIX_TIMESTAMP()"
+											");");
+						if(invoice_cost_center_service_id)
 						{
-							MESSAGE_ERROR("", "", "fail to increase act_number in cost_center table");
+							// --- everything is fine, increase act_number assigned to this cost_center
+							error_message = AssignCurrentCompanyActNumberToActID_And_UpdateCompanyActNumber_by_ActID(to_string(act_id), owner_company_id, db, user);
+							if(error_message.length())
+							{
+								MESSAGE_ERROR("", "", error_message);
+							}
+						}
+						else
+						{
+							error_message = gettext("fail to insert to db");
+							MESSAGE_ERROR("", "", error_message);
 						}
 					}
 					else
 					{
-						MESSAGE_ERROR("", "", "fail to insert to db");
-						error_message = gettext("fail to insert to db");
+						error_message = gettext("fail to create act");
+						MESSAGE_ERROR("", "", error_message);
 					}
 				}
 				else

@@ -5243,19 +5243,27 @@ string GetTimecardID(string sow_id, string period_start, string period_end, CMys
 			}
 			else
 			{
-				long int temp;
+				auto	act_id = CreateActInDB("", db, NULL);
 
-				MESSAGE_DEBUG("", "", "timecard(sow_id/period_start/period_end = " + sow_id + "/" + period_start + "/" + period_end + ") not found, create new one");
+				if(act_id)
+				{
+					MESSAGE_DEBUG("", "", "timecard(sow_id/period_start/period_end = " + sow_id + "/" + period_start + "/" + period_end + ") not found, create new one");
 
-				temp = db->InsertQuery("INSERT INTO `timecards` SET "
-												"`contract_sow_id`=\"" + sow_id + "\","
-												"`period_start`=\"" + period_start + "\","
-												"`period_end`=\"" + period_end + "\","
-												"`status`=\"saved\","
-												"`eventTimestamp`=UNIX_TIMESTAMP();");
+					auto	temp = db->InsertQuery("INSERT INTO `timecards` SET "
+													"`contract_sow_id`=\"" + sow_id + "\","
+													"`period_start`=\"" + period_start + "\","
+													"`period_end`=\"" + period_end + "\","
+													"`status`=\"saved\","
+													"`act_id`=\"" + to_string(act_id) + "\","
+													"`eventTimestamp`=UNIX_TIMESTAMP();");
 
-				if(temp) result = to_string(temp);
-				else MESSAGE_ERROR("", "", "DB issue: insert request failed");
+					if(temp) result = to_string(temp);
+					else MESSAGE_ERROR("", "", "DB issue: insert request failed");
+				}
+				else
+				{
+					MESSAGE_ERROR("", "", "fail to create act");
+				}
 			}
 		}
 		else

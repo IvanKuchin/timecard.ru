@@ -16,7 +16,7 @@ auto      		GetUserListInJSONFormat(string dbQuery, CMysql *, CUser *) -> string
 auto      		GetUserBonusesAirlinesInJSONFormat(string dbQuery, CMysql *, CUser *) -> string;
 auto      		GetUserBonusesRailroadsInJSONFormat(string dbQuery, CMysql *, CUser *) -> string;
 auto      		GetUserBonusesHotelchainsInJSONFormat(string dbQuery, CMysql *, CUser *) -> string;
-auto			GetBonusesProgramsInJSONFormat(string dbQuery, CMysql *db, CUser *user) -> string;
+auto			GetBonusesProgramsInJSONFormat(string dbQuery, CMysql *, CUser *) -> string;
 auto      		GetMessageImageList(string imageSetID, CMysql *) -> string;
 auto      		GetMessageLikesUsersList(string messageID, CUser *, CMysql *) -> string;
 auto 			GetCertificationLikesUsersList(string usersCertificationID, CUser *, CMysql *) -> string;
@@ -26,6 +26,14 @@ auto 			GetCompanyLikesUsersList(string usersCompanyID, CUser *, CMysql *) -> st
 auto 			GetLanguageLikesUsersList(string usersLanguageID, CUser *, CMysql *) -> string;
 auto 			GetBookLikesUsersList(string usersBookID, CUser *, CMysql *) -> string;
 auto 			GetBookRatingUsersList(string bookID, CUser *, CMysql *) -> string;
+
+auto			CreateActInDB(const string &act_full_number, CMysql *, CUser *) -> long int;
+auto 			DeleteActFromDB(const string &id, CMysql *) -> string;
+auto			GetActNumberByCompanyID(const string &company_id, CMysql *, CUser *) -> tuple<string, int, string>;
+auto			GetAvailableActNumber_StartFrom(int act_number, const string &company_id, CMysql *, CUser *) -> tuple<string, int, string>;
+auto			AssignCurrentCompanyActNumberToActID_And_UpdateCompanyActNumber_by_ActID(const string &act_id, const string &company_id, CMysql *, CUser *) -> string;
+auto			AssignCurrentCompanyActNumberToActID_And_UpdateCompanyActNumber_by_Entity(const string &entity_id, const string &entity_type, const string &stage, CMysql *, CUser *) -> string;
+
 
 // --- chat messages in status bar
 auto      		GetUnreadChatMessagesInJSONFormat(CUser *, CMysql *) -> string;
@@ -241,8 +249,8 @@ auto			GetTimecardList(const string &where_companies_list, CMysql *, CUser *) ->
 auto			GetTimecardList(const string &where_companies_list, const string &sow_filter_date, const string &filter_sow_status, const string &filter_not_sow_status, const string &limit_page, CMysql *, CUser *) -> string;
 auto			isTimePeriodInsideSow(string sow_id, string period_start, string period_end, CMysql *, CUser *) -> string; 
 
-auto 			DeleteServiceInvoicesSubcToAgency(string timecard_id, CMysql *db, CUser *user) -> string;
-auto			RecallTimecard(string timecard_id, string reason, CMysql *db, CUser *user) -> string;
+auto 			DeleteServiceInvoicesSubcToAgency(string timecard_id, CMysql *, CUser *) -> string;
+auto			RecallTimecard(string timecard_id, string reason, CMysql *, CUser *) -> string;
 
 // --- IMPORTANT !!! 
 // --- MUST use VAT and Total payment functions functions instead of direct calculations

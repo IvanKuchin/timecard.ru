@@ -1169,25 +1169,36 @@ string	C_BT::SaveToDB()
 		}
 		else
 		{
-			long int 	temp = db->InsertQuery("INSERT INTO `bt` SET "
-							"`contract_sow_id`=\"" + GetSowID() + "\", "
-							"`date_start`=STR_TO_DATE(\"" + GetStartDate() + "\", '%d/%m/%Y'), "
-							"`date_end`=STR_TO_DATE(\"" + GetEndDate() + "\", '%d/%m/%Y'), "
-							"`customer_id`=\"" + GetCustomerID() + "\", "
-							"`place`=\"" + GetDestination() + "\", "
-							"`purpose`=\"" + GetPurpose() + "\", "
-							+ (GetAction() == "submit" ? "`status`=\"submit\",`submit_date`=UNIX_TIMESTAMP(), " : "") +
-							"`eventTimestamp`=UNIX_TIMESTAMP() "
-							";"
-					);
-			if(temp)
+			auto	act_id = CreateActInDB("", db, NULL);
+
+			if(act_id)
 			{
-				SetID(to_string(temp));
+				auto 	temp = db->InsertQuery("INSERT INTO `bt` SET "
+								"`contract_sow_id`=\"" + GetSowID() + "\", "
+								"`date_start`=STR_TO_DATE(\"" + GetStartDate() + "\", '%d/%m/%Y'), "
+								"`date_end`=STR_TO_DATE(\"" + GetEndDate() + "\", '%d/%m/%Y'), "
+								"`customer_id`=\"" + GetCustomerID() + "\", "
+								"`place`=\"" + GetDestination() + "\", "
+								"`purpose`=\"" + GetPurpose() + "\", "
+								+ (GetAction() == "submit" ? "`status`=\"submit\",`submit_date`=UNIX_TIMESTAMP(), " : "") +
+								"`act_id`=\"" + to_string(act_id) + "\","
+								"`eventTimestamp`=UNIX_TIMESTAMP() "
+								";"
+						);
+				if(temp)
+				{
+					SetID(to_string(temp));
+				}
+				else
+				{
+					error_message = gettext("SQL syntax error");
+					MESSAGE_ERROR("C_BT", "", "fail to insert into bt table entry (" + db->GetErrorMessage() + ")");
+				}
 			}
 			else
 			{
-				error_message = "Ошибка БД";
-				MESSAGE_ERROR("C_BT", "", "fail to insert into `bt` table entry (" + db->GetErrorMessage() + ")");
+				error_message = gettext("SQL syntax error");
+				MESSAGE_ERROR("", "", error_message);
 			}
 		}
 
