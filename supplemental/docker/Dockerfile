@@ -1,7 +1,7 @@
 FROM ubuntu:xenial
 
 LABEL maintainer="ivan.kuchin@gmail.com"
-LABEL org.opencontainers.image.source=https://github.com/ivankuchin/connme.ru
+LABEL org.opencontainers.image.source=https://github.com/ivankuchin/timecard.ru
 
 
 #RUN debconf-set-selections <<< 'mysql-server mysql-server/root_password password root'
