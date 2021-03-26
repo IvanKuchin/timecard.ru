@@ -799,7 +799,7 @@ msgid "fail to craft timecard obj"
 msgstr "ошибка создания объекта timecard"
 
 msgid "fail to create act"
-msgstr ""
+msgstr "невозможно создать акт"
 
 msgid "fail to create temp directory"
 msgstr "невозможно создать временное хранилище"
