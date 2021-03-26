@@ -182,13 +182,9 @@ int main(void)
 		{
 			MESSAGE_DEBUG("", action, "start");
 
-			ostringstream	ostResult;
-			auto			template_name	= "json_response.htmlt"s;
 			auto			error_message	= ""s;
 			auto			agency_name		= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("agency_to_notify"));
-			auto			affected = db.Query("SELECT `id` FROM `company` WHERE `name` LIKE \"%" + agency_name + "%\" AND `type`=\"agency\";");
-
-			ostResult.str("");
+			auto			affected		= db.Query("SELECT `id` FROM `company` WHERE `name` LIKE \"%" + agency_name + "%\" AND `type`=\"agency\";");
 
 
 			if(affected == 1) // --- single agency found with this name
@@ -210,7 +206,7 @@ int main(void)
 			}
 			if(!affected)
 			{
-				MESSAGE_ERROR("", action, "agency not found (" + agency_name + ")");
+				MESSAGE_DEBUG("", action, "agency not found (" + agency_name + ")");
 			}
 			else
 			{
@@ -218,21 +214,7 @@ int main(void)
 				MESSAGE_ERROR("", action, "found more than 1 agency can't determine which one must be notified");
 			}
 
-
-			if(error_message.empty())
-			{
-				ostResult << "{\"result\":\"success\"}";
-			}
-			else
-			{
-				MESSAGE_DEBUG("", action, "failed");
-				ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
-			}
-
-			indexPage.RegisterVariableForce("result", ostResult.str());
-
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
-
+			AJAX_ResponseTemplate(&indexPage, "", error_message);
 
 			MESSAGE_DEBUG("", action, "finish");
 		}
