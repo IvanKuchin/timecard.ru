@@ -1,5 +1,25 @@
 #include "utilities.h"
 
+static auto __GetMapValueByKey(const map<string, string> &dictionary, string key_value)
+{
+	MESSAGE_DEBUG("", "", "start (" + key_value + ")");
+
+	auto	result	= ""s;
+	auto	it		= dictionary.find(key_value);
+
+	if(it == dictionary.end())
+	{
+		MESSAGE_ERROR("", "", "unknown item " + key_value);
+	}
+	else
+	{
+		result = it->second;
+	}
+
+	MESSAGE_DEBUG("", "", "finish (" + key_value + " -> " + result + ")");
+
+	return result;
+}
 
 string	GetDefaultActionFromUserType(CUser *user, CMysql *db)
 {
@@ -281,10 +301,31 @@ string GetSpecificData_UpdateQueryItemByID(string itemID, string itemType, strin
 
 string GetSpecificData_GetDBCoverPhotoFolderString(string itemType)
 {
-	string	  result = "";
-
 	MESSAGE_DEBUG("", "", "start");
 
+	map<string, string>	dictionary = 
+	{
+		{"certification", "logo_folder"},
+		{"course", "logo_folder"},
+		{"university", "logo_folder"},
+		{"school", "logo_folder"},
+		{"language", "logo_folder"},
+		{"book", "coverPhotoFolder"},
+		{"company", "logo_folder"},
+		{"company_profile_logo", "logo_folder"},
+		{"gift", "logo_folder"},
+		{"event", "logo_folder"},
+		{"template_sow", ""},
+		{"template_psow", ""},
+		{"template_costcenter", ""},
+		{"template_company", ""},
+		{"template_agreement_company", ""},
+		{"template_agreement_sow", ""}
+	};
+
+	auto	  result = __GetMapValueByKey(dictionary, itemType);
+
+/*
 	if(itemType == "certification")	 					result = "logo_folder";
 	else if(itemType == "course")	   					result = "logo_folder";
 	else if(itemType == "university")   				result = "logo_folder";
@@ -305,6 +346,7 @@ string GetSpecificData_GetDBCoverPhotoFolderString(string itemType)
 	{
 		MESSAGE_ERROR("", "", "itemType (" + itemType + ") is unknown");
 	}
+*/
 
 	MESSAGE_DEBUG("", "", "finish (result = " + result + ")");
 
