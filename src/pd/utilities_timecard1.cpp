@@ -5254,7 +5254,7 @@ string GetTimecardID(string sow_id, string period_start, string period_end, CMys
 													"`period_start`=\"" + period_start + "\","
 													"`period_end`=\"" + period_end + "\","
 													"`status`=\"saved\","
-													"`act_id`=\"" + to_string(act_id) + "\","
+													"`invoice_id`=\"" + to_string(act_id) + "\","
 													"`eventTimestamp`=UNIX_TIMESTAMP();");
 
 					if(temp) result = to_string(temp);

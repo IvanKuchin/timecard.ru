@@ -658,7 +658,7 @@ auto C_Invoice_Service_Agency_To_CC::UpdateDBWithInvoiceData(const string timeca
 					{
 						// --- new invoice
 						invoice_cost_center_service_id = db->InsertQuery(
-											"INSERT INTO `invoice_cost_center_service` (`cost_center_id`, `file`, `owner_company_id`, `owner_user_id`, `act_id`, `eventTimestamp`) "
+											"INSERT INTO `invoice_cost_center_service` (`cost_center_id`, `file`, `owner_company_id`, `owner_user_id`, `invoice_id`, `eventTimestamp`) "
 											"VALUES (" + 
 												quoted(cost_center_id) + "," +
 												quoted(archive_folder + "/" + archive_file) + "," +

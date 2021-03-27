@@ -1181,7 +1181,7 @@ string	C_BT::SaveToDB()
 								"`place`=\"" + GetDestination() + "\", "
 								"`purpose`=\"" + GetPurpose() + "\", "
 								+ (GetAction() == "submit" ? "`status`=\"submit\",`submit_date`=UNIX_TIMESTAMP(), " : "") +
-								"`act_id`=\"" + to_string(act_id) + "\","
+								"`invoice_id`=\"" + to_string(act_id) + "\","
 								"`eventTimestamp`=UNIX_TIMESTAMP() "
 								";"
 						);

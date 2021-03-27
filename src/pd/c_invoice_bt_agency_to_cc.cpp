@@ -641,7 +641,7 @@ auto C_Invoice_BT_Agency_To_CC::UpdateDBWithInvoiceData(const string bt_id) -> s
 					{
 						// --- new invoice
 						invoice_cost_center_bt_id = db->InsertQuery( 
-											"INSERT INTO `invoice_cost_center_bt` (`cost_center_id`, `file`, `owner_company_id`, `owner_user_id`, `act_id`, `eventTimestamp`)"
+											"INSERT INTO `invoice_cost_center_bt` (`cost_center_id`, `file`, `owner_company_id`, `owner_user_id`, `invoice_id`, `eventTimestamp`)"
 											"VALUES (" + 
 												quoted(cost_center_id) + "," +
 												quoted(archive_folder + "/" + archive_file) + "," +

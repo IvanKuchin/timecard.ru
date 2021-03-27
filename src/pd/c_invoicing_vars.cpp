@@ -1055,7 +1055,7 @@ auto	C_Invoicing_Vars::SubcontractorAct_Index_VarSet(const string &act_id, strin
 	{
 		if(db)
 		{
-			if(error_message.empty()) error_message = AssignVariableFromDB("subcontractor_act_number_" + index, "SELECT `full_number` FROM `acts` WHERE `id`=" + act_id + ";", true);
+			if(error_message.empty()) error_message = AssignVariableFromDB("subcontractor_act_number_" + index, "SELECT `full_number` FROM `invoices` WHERE `id`=" + act_id + ";", true);
 		}
 		else
 		{

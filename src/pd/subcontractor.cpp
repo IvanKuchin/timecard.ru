@@ -1765,7 +1765,7 @@ int main()
 								db.Query("DELETE FROM `bt_expenses` WHERE `bt_id`=\"" + bt_id + "\";");
 								db.Query("DELETE FROM `bt` WHERE `id`=\"" + bt_id + "\";");
 								db.Query("DELETE FROM `bt_approvals` WHERE `bt_id`=\"" + bt_id + "\";");
-								db.Query("DELETE FROM `acts` WHERE `id`=(" + act_id + ");");
+								db.Query("DELETE FROM `invoices` WHERE `id`=(" + act_id + ");");
 							}
 						}
 						else
