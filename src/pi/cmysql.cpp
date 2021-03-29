@@ -266,7 +266,7 @@ int CMysql::Connect(const string &dbName, const string &login, const string &pas
 
 int CMysql::Connect()
 {
-    c_config    config;
+    c_config    config(SECRET_FNAME);
     auto        credentials = config.Read({"DB_NAME"s, "DB_LOGIN"s, "DB_PASSWORD"s, "DB_HOST"s});
     auto        valid_cred  = (credentials.size() ? true : false);
     auto        db_name     = (valid_cred ? credentials["DB_NAME"]      : __DB_FALLBACK_NAME);

@@ -15,11 +15,12 @@ using namespace std;
 class c_config
 {
 	protected:
-		string					config_file		=	CONFIG_FNAME;
-		tuple<string, string>	ExtractSingleValue(string line, const vector<string> &params);
+		string					config_file		=	""s;
+		tuple<string, string>	ExtractSingleValue(const string &line, const vector<string> &params);
 
 	public:
-		void					SetFile(string param) { config_file = param; };
+								c_config(const string &file) : config_file {file} {};
+		void					SetFile(const string &param) { config_file = param; };
 		map<string, string>		Read(const vector<string> &params);
 };
 

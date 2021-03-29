@@ -62,7 +62,7 @@
 #define	HELPDESK_TICKET_ATTACHES_NUMBER_OF_FOLDERS	2048
 #define	HELPDESK_TICKET_ATTACHES_MAX_FILE_SIZE		10 * 1024 * 1024
 
-#define	CONFIG_FNAME								"${CONFIG_DIR}/config"
+#define	SECRET_FNAME								"${CONFIG_DIR}/secret"
 
 #define	MMDB_fname									"${MAXMIND_INSTALL_DIR}/GeoLite2-City.mmdb"
 

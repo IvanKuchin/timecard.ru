@@ -1,6 +1,6 @@
 #include "c_config.h"
 
-tuple<string, string> c_config::ExtractSingleValue(string line, const vector<string> &params)
+tuple<string, string> c_config::ExtractSingleValue(const string &line, const vector<string> &params)
 {
 	MESSAGE_DEBUG("", "", "start");
 

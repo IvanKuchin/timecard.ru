@@ -363,7 +363,7 @@ string C_Smartway::GetAuthJSON()
 {
 	MESSAGE_DEBUG("", "", "start");
 
-    c_config    config;
+    c_config    config(SECRET_FNAME);
     auto        auth_map        	= config.Read({"SMARTWAY_LOGIN", "SMARTWAY_PASSWORD"});
     auto        is_auth_valid   	= (auth_map["SMARTWAY_LOGIN"].length() > 0);
     auto        __SMARTWAY_LOGIN    = (is_auth_valid ? auth_map["SMARTWAY_LOGIN"] : "");

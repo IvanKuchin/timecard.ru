@@ -186,7 +186,7 @@ string c_smsc::_smsc_send_cmd(string cmd, string arg, string files)
 {
     MESSAGE_DEBUG("", "", "start");
 
-    c_config            config;
+    c_config            config(SECRET_FNAME);
     auto                auth_map        = config.Read({"SMSC_LOGIN", "SMSC_PASSWORD"});
     auto                is_auth_valid   = (auth_map["SMSC_LOGIN"].length() > 0);
     auto                __SMSC_LOGIN    = (is_auth_valid ? auth_map["SMSC_LOGIN"] : "");

@@ -1,10 +1,11 @@
 #include "utilities.h"
 
-static auto __GetMapValueByKey(const map<string, string> &dictionary, string key_value)
+template <class T>
+static auto __GetMapValueByKey(const map<string, T> &dictionary, string key_value)
 {
 	MESSAGE_DEBUG("", "", "start (" + key_value + ")");
 
-	auto	result	= ""s;
+	T		result;
 	auto	it		= dictionary.find(key_value);
 
 	if(it == dictionary.end())
@@ -16,18 +17,31 @@ static auto __GetMapValueByKey(const map<string, string> &dictionary, string key
 		result = it->second;
 	}
 
-	MESSAGE_DEBUG("", "", "finish (" + key_value + " -> " + result + ")");
+	MESSAGE_DEBUG("", "", "finish (" + key_value + ")");
 
 	return result;
 }
 
 string	GetDefaultActionFromUserType(CUser *user, CMysql *db)
 {
-	string	result = GUEST_USER_DEFAULT_ACTION;
-
 	MESSAGE_DEBUG("", "", "start");
 
-	if(user->GetType() == "guest")					result = GUEST_USER_DEFAULT_ACTION;
+	map<string, string>	dictionary = 
+	{
+		{ "guest"							, GUEST_USER_DEFAULT_ACTION },
+		{ "subcontractor"					, LOGGEDIN_SUBCONTRACTOR_DEFAULT_ACTION },
+		{ "agency"							, LOGGEDIN_AGENCY_DEFAULT_ACTION },
+		{ "approver"						, LOGGEDIN_APPROVER_DEFAULT_ACTION },
+		{ "helpdesk"						, LOGGEDIN_HELPDESK_DEFAULT_ACTION },
+		{ "no role"							, LOGGEDIN_NOROLE_DEFAULT_ACTION}
+	};
+
+	auto	  result = __GetMapValueByKey(dictionary, user->GetType());
+/*
+
+	string	result = GUEST_USER_DEFAULT_ACTION;
+
+	if     (user->GetType() == "guest")				result = GUEST_USER_DEFAULT_ACTION;
 	else if(user->GetType() == "subcontractor")		result = LOGGEDIN_SUBCONTRACTOR_DEFAULT_ACTION;
 	else if(user->GetType() == "agency")			result = LOGGEDIN_AGENCY_DEFAULT_ACTION;
 	else if(user->GetType() == "approver")			result = LOGGEDIN_APPROVER_DEFAULT_ACTION;
@@ -37,8 +51,8 @@ string	GetDefaultActionFromUserType(CUser *user, CMysql *db)
 	{
 		MESSAGE_ERROR("", "", "unknown user type (" + user->GetType() + ")");
 	}
-
-	MESSAGE_DEBUG("", "", "finish (result = " + result + ")");
+*/
+	MESSAGE_DEBUG("", "", "finish (" + user->GetType() + " -> " + result + ")");
 
 	return result;
 }
@@ -46,7 +60,38 @@ string	GetDefaultActionFromUserType(CUser *user, CMysql *db)
 
 int GetSpecificData_GetNumberOfFolders(string itemType)
 {
-	int	  result = 0;
+	MESSAGE_DEBUG("", "", "start");
+
+	map<string, int>	dictionary = 
+	{
+
+		{ "certification"				, CERTIFICATIONSLOGO_NUMBER_OF_FOLDERS },
+		{ "course"						, CERTIFICATIONSLOGO_NUMBER_OF_FOLDERS },
+		{ "university"					, UNIVERSITYLOGO_NUMBER_OF_FOLDERS },
+		{ "school"						, SCHOOLLOGO_NUMBER_OF_FOLDERS },
+		{ "language"					, FLAG_NUMBER_OF_FOLDERS },
+		{ "book"						, BOOKCOVER_NUMBER_OF_FOLDERS },
+		{ "company"						, COMPANYLOGO_NUMBER_OF_FOLDERS },
+		{ "company_profile_logo"		, COMPANYLOGO_NUMBER_OF_FOLDERS },
+		{ "gift"						, GIFTIMAGE_NUMBER_OF_FOLDERS },
+		{ "event"						, EVENTIMAGE_NUMBER_OF_FOLDERS },
+		{ "expense_line"				, EXPENSELINE_NUMBER_OF_FOLDERS },
+		{ "template_sow"				, TEMPLATE_SOW_NUMBER_OF_FOLDERS },
+		{ "template_psow"				, TEMPLATE_PSOW_NUMBER_OF_FOLDERS },
+		{ "template_costcenter"			, TEMPLATE_CC_NUMBER_OF_FOLDERS },
+		{ "template_company"			, TEMPLATE_COMPANY_NUMBER_OF_FOLDERS },
+		{ "template_agreement_company"	, TEMPLATE_AGREEMENT_COMPANY_NUMBER_OF_FOLDERS },
+		{ "template_agreement_sow"		, TEMPLATE_AGREEMENT_SOW_NUMBER_OF_FOLDERS },
+		{ "helpdesk_ticket_attach"		, HELPDESK_TICKET_ATTACHES_NUMBER_OF_FOLDERS}
+	};
+
+	auto	  result = __GetMapValueByKey(dictionary, itemType);
+
+	MESSAGE_DEBUG("", "", "finish (" + itemType + " -> " + to_string(result) + ")");
+
+	return result;
+
+/*	int	  result = 0;
 
 	MESSAGE_DEBUG("", "", "start");
 
@@ -76,10 +121,43 @@ int GetSpecificData_GetNumberOfFolders(string itemType)
 	MESSAGE_DEBUG("", "", "finish (result = " + to_string(result) + ")");
 
 	return result;
+*/
 }
 
 int GetSpecificData_GetMaxFileSize(string itemType)
 {
+	MESSAGE_DEBUG("", "", "start");
+
+	map<string, int>	dictionary = 
+	{
+
+		{ "certification"				, CERTIFICATIONSLOGO_MAX_FILE_SIZE },
+		{ "course"						, CERTIFICATIONSLOGO_MAX_FILE_SIZE },
+		{ "university"					, UNIVERSITYLOGO_MAX_FILE_SIZE },
+		{ "school"						, SCHOOLLOGO_MAX_FILE_SIZE },
+		{ "language"					, FLAG_MAX_FILE_SIZE },
+		{ "book"						, BOOKCOVER_MAX_FILE_SIZE },
+		{ "company"						, COMPANYLOGO_MAX_FILE_SIZE },
+		{ "company_profile_logo"		, COMPANYLOGO_MAX_FILE_SIZE },
+		{ "gift"						, GIFTIMAGE_MAX_FILE_SIZE },
+		{ "event"						, EVENTIMAGE_MAX_FILE_SIZE },
+		{ "expense_line"				, EXPENSELINE_MAX_FILE_SIZE },
+		{ "template_sow"				, TEMPLATE_SOW_MAX_FILE_SIZE },
+		{ "template_psow"				, TEMPLATE_PSOW_MAX_FILE_SIZE },
+		{ "template_costcenter"			, TEMPLATE_CC_MAX_FILE_SIZE },
+		{ "template_company"			, TEMPLATE_COMPANY_MAX_FILE_SIZE },
+		{ "template_agreement_company"	, TEMPLATE_AGREEMENT_COMPANY_MAX_FILE_SIZE },
+		{ "template_agreement_sow"		, TEMPLATE_AGREEMENT_SOW_MAX_FILE_SIZE },
+		{ "helpdesk_ticket_attach"		, HELPDESK_TICKET_ATTACHES_MAX_FILE_SIZE}
+	};
+
+	auto	  result = __GetMapValueByKey(dictionary, itemType);
+
+	MESSAGE_DEBUG("", "", "finish (" + itemType + " -> " + to_string(result) + ")");
+
+	return result;
+
+/*
 	int	  result = 0;
 
 	MESSAGE_DEBUG("", "", "start");
@@ -110,10 +188,36 @@ int GetSpecificData_GetMaxFileSize(string itemType)
 	MESSAGE_DEBUG("", "", "finish (result = " + to_string(result) + ")");
 
 	return result;
+*/
 }
 
 unsigned int GetSpecificData_GetMaxWidth(string itemType)
 {
+	MESSAGE_DEBUG("", "", "start");
+
+	map<string, unsigned int>	dictionary = 
+	{
+
+		{ "certification"				, CERTIFICATIONSLOGO_MAX_WIDTH },
+		{ "course"						, CERTIFICATIONSLOGO_MAX_WIDTH },
+		{ "university"					, UNIVERSITYLOGO_MAX_WIDTH },
+		{ "school"						, SCHOOLLOGO_MAX_WIDTH },
+		{ "language"					, FLAG_MAX_WIDTH },
+		{ "book"						, BOOKCOVER_MAX_WIDTH },
+		{ "company"						, COMPANYLOGO_MAX_WIDTH },
+		{ "company_profile_logo"		, COMPANYLOGO_MAX_WIDTH },
+		{ "gift"						, GIFTIMAGE_MAX_WIDTH },
+		{ "event"						, EVENTIMAGE_MAX_WIDTH },
+		{ "expense_line"				, EXPENSELINE_IMAGE_MAX_WIDTH },
+	};
+
+	auto	  result = __GetMapValueByKey(dictionary, itemType);
+
+	MESSAGE_DEBUG("", "", "finish (" + itemType + " -> " + to_string(result) + ")");
+
+	return result;
+
+/*
 	int	  result = 0;
 
 	MESSAGE_DEBUG("", "", "start");
@@ -137,10 +241,36 @@ unsigned int GetSpecificData_GetMaxWidth(string itemType)
 	MESSAGE_DEBUG("", "", "finish (result = " + to_string(result) + ")");
 
 	return result;
+*/
 }
 
 unsigned int GetSpecificData_GetMaxHeight(string itemType)
 {
+	MESSAGE_DEBUG("", "", "start");
+
+	map<string, unsigned int>	dictionary = 
+	{
+
+		{ "certification"				, CERTIFICATIONSLOGO_MAX_HEIGHT },
+		{ "course"						, CERTIFICATIONSLOGO_MAX_HEIGHT },
+		{ "university"					, UNIVERSITYLOGO_MAX_HEIGHT },
+		{ "school"						, SCHOOLLOGO_MAX_HEIGHT },
+		{ "language"					, FLAG_MAX_HEIGHT },
+		{ "book"						, BOOKCOVER_MAX_HEIGHT },
+		{ "company"						, COMPANYLOGO_MAX_HEIGHT },
+		{ "company_profile_logo"		, COMPANYLOGO_MAX_HEIGHT },
+		{ "gift"						, GIFTIMAGE_MAX_HEIGHT },
+		{ "event"						, EVENTIMAGE_MAX_HEIGHT },
+		{ "expense_line"				, EXPENSELINE_IMAGE_MAX_HEIGHT },
+	};
+
+	auto	  result = __GetMapValueByKey(dictionary, itemType);
+
+	MESSAGE_DEBUG("", "", "finish (" + itemType + " -> " + to_string(result) + ")");
+
+	return result;
+
+/*
 	int	  result = 0;
 
 	MESSAGE_DEBUG("", "", "start");
@@ -164,10 +294,43 @@ unsigned int GetSpecificData_GetMaxHeight(string itemType)
 	MESSAGE_DEBUG("", "", "finish (result = " + to_string(result) + ")");
 
 	return result;
+*/
 }
 
 string GetSpecificData_GetBaseDirectory(string itemType)
 {
+	MESSAGE_DEBUG("", "", "start");
+
+	map<string, string>	dictionary = 
+	{
+
+		{ "certification"				, IMAGE_CERTIFICATIONS_DIRECTORY },
+		{ "course"						, IMAGE_CERTIFICATIONS_DIRECTORY },
+		{ "university"					, IMAGE_UNIVERSITIES_DIRECTORY },
+		{ "school"						, IMAGE_SCHOOLS_DIRECTORY },
+		{ "language"					, IMAGE_FLAGS_DIRECTORY },
+		{ "book"						, IMAGE_BOOKS_DIRECTORY },
+		{ "company"						, IMAGE_COMPANIES_DIRECTORY },
+		{ "company_profile_logo"		, IMAGE_COMPANIES_DIRECTORY },
+		{ "gift"						, IMAGE_GIFTS_DIRECTORY },
+		{ "event"						, IMAGE_EVENTS_DIRECTORY },
+		{ "expense_line"				, IMAGE_EXPENSELINES_DIRECTORY },
+		{ "template_sow"				, TEMPLATE_SOW_DIRECTORY },
+		{ "template_psow"				, TEMPLATE_PSOW_DIRECTORY },
+		{ "template_costcenter"			, TEMPLATE_CC_DIRECTORY },
+		{ "template_company"			, TEMPLATE_COMPANY_DIRECTORY },
+		{ "template_agreement_company"	, TEMPLATE_AGREEMENT_COMPANY_DIRECTORY },
+		{ "template_agreement_sow"		, TEMPLATE_AGREEMENT_SOW_DIRECTORY },
+		{ "helpdesk_ticket_attach"		, HELPDESK_TICKET_ATTACHES_DIRECTORY },
+	};
+
+	auto	  result = __GetMapValueByKey(dictionary, itemType);
+
+	MESSAGE_DEBUG("", "", "finish (" + itemType + " -> " + result + ")");
+
+	return result;
+
+/*
 	string	  result = "";
 
 	MESSAGE_DEBUG("", "", "start");
@@ -198,11 +361,42 @@ string GetSpecificData_GetBaseDirectory(string itemType)
 	MESSAGE_DEBUG("", "", "finish (result = " + result + ")");
 
 	return result;
+*/
 }
 
 string GetSpecificData_GetFinalFileExtension(string itemType)
 {
-	string	  result = ".jpg";
+	MESSAGE_DEBUG("", "", "start");
+
+	map<string, string>	dictionary = 
+	{
+
+		{ "certification"				, ".jpg" },
+		{ "course"						, ".jpg" },
+		{ "university"					, ".jpg" },
+		{ "school"						, ".jpg" },
+		{ "language"					, ".jpg" },
+		{ "book"						, ".jpg" },
+		{ "company"						, ".jpg" },
+		{ "company_profile_logo"		, ".jpg" },
+		{ "gift"						, ".jpg" },
+		{ "event"						, ".jpg" },
+		{ "expense_line"				, ".jpg" },
+		{ "template_sow"				, ".txt" },
+		{ "template_psow"				, ".txt" },
+		{ "template_costcenter"			, ".txt" },
+		{ "template_company"			, ".txt" },
+		{ "template_agreement_company"	, ".txt" },
+		{ "template_agreement_sow"		, ".txt" },
+	};
+
+	auto	  result = __GetMapValueByKey(dictionary, itemType);
+
+	MESSAGE_DEBUG("", "", "finish (" + itemType + " -> " + result + ")");
+
+	return result;
+
+/*	string	  result = ".jpg";
 
 	MESSAGE_DEBUG("", "", "start");
 
@@ -220,6 +414,7 @@ string GetSpecificData_GetFinalFileExtension(string itemType)
 	MESSAGE_DEBUG("", "", "finish (result = " + result + ")");
 
 	return result;
+*/
 }
 
 string GetSpecificData_SelectQueryItemByID(string itemID, string itemType)
@@ -305,22 +500,22 @@ string GetSpecificData_GetDBCoverPhotoFolderString(string itemType)
 
 	map<string, string>	dictionary = 
 	{
-		{"certification", "logo_folder"},
-		{"course", "logo_folder"},
-		{"university", "logo_folder"},
-		{"school", "logo_folder"},
-		{"language", "logo_folder"},
-		{"book", "coverPhotoFolder"},
-		{"company", "logo_folder"},
-		{"company_profile_logo", "logo_folder"},
-		{"gift", "logo_folder"},
-		{"event", "logo_folder"},
-		{"template_sow", ""},
-		{"template_psow", ""},
-		{"template_costcenter", ""},
-		{"template_company", ""},
-		{"template_agreement_company", ""},
-		{"template_agreement_sow", ""}
+		{ "certification"					, "logo_folder" },
+		{ "course"							, "logo_folder" },
+		{ "university"						, "logo_folder" },
+		{ "school"							, "logo_folder" },
+		{ "language"						, "logo_folder" },
+		{ "book"							, "coverPhotoFolder" },
+		{ "company"							, "logo_folder" },
+		{ "company_profile_logo"			, "logo_folder" },
+		{ "gift"							, "logo_folder" },
+		{ "event"							, "logo_folder" },
+		{ "template_sow"					, "" },
+		{ "template_psow"					, "" },
+		{ "template_costcenter"				, "" },
+		{ "template_company"				, "" },
+		{ "template_agreement_company"		, "" },
+		{ "template_agreement_sow"			, ""}
 	};
 
 	auto	  result = __GetMapValueByKey(dictionary, itemType);
@@ -355,10 +550,30 @@ string GetSpecificData_GetDBCoverPhotoFolderString(string itemType)
 
 string GetSpecificData_GetDBCoverPhotoFilenameString(string itemType)
 {
-	string	  result = "";
-
 	MESSAGE_DEBUG("", "", "start");
 
+	map<string, string>	dictionary = 
+	{
+		{ "certification"				, "logo_filename" },
+		{ "course"						, "logo_filename" },
+		{ "university"					, "logo_filename" },
+		{ "school"						, "logo_filename" },
+		{ "language"					, "logo_filename" },
+		{ "book"						, "coverPhotoFilename" },
+		{ "company"						, "logo_filename" },
+		{ "company_profile_logo"		, "logo_filename" },
+		{ "gift"						, "logo_filename" },
+		{ "event"						, "logo_filename" },
+		{ "template_sow"				, "value" },
+		{ "template_psow"				, "value" },
+		{ "template_costcenter"			, "value" },
+		{ "template_company"			, "value" },
+		{ "template_agreement_company"	, "filename" },
+		{ "template_agreement_sow"		, "filename" }
+	};
+
+	auto	  result = __GetMapValueByKey(dictionary, itemType);
+/*
 	if(itemType == "certification")						result = "logo_filename";
 	else if(itemType == "course")						result = "logo_filename";
 	else if(itemType == "university")					result = "logo_filename";
@@ -379,7 +594,7 @@ string GetSpecificData_GetDBCoverPhotoFilenameString(string itemType)
 	{
 		MESSAGE_ERROR("", "", "itemType (" + itemType + ") is unknown");
 	}
-
+*/
 	MESSAGE_DEBUG("", "", "finish (result = " + result + ")");
 
 	return result;
@@ -387,7 +602,29 @@ string GetSpecificData_GetDBCoverPhotoFilenameString(string itemType)
 
 string GetSpecificData_GetDataTypeByItemType(const string &itemType)
 {
-	auto	result = "image"s;
+	map<string, string>	dictionary = 
+	{
+		{ "certification"				, "image" },
+		{ "course"						, "image" },
+		{ "university"					, "image" },
+		{ "school"						, "image" },
+		{ "language"					, "image" },
+		{ "book"						, "image" },
+		{ "company"						, "image" },
+		{ "company_profile_logo"		, "image" },
+		{ "gift"						, "image" },
+		{ "event"						, "image" },
+		{ "template_sow"				, "template" },
+		{ "template_psow"				, "template" },
+		{ "template_costcenter"			, "template" },
+		{ "template_company"			, "template" },
+		{ "template_agreement_company"	, "template" },
+		{ "template_agreement_sow"		, "template" }
+	};
+
+	auto	  result = __GetMapValueByKey(dictionary, itemType);
+/*
+	auto	result = ""s;
 
 	MESSAGE_DEBUG("", "", "start");
 
@@ -397,7 +634,7 @@ string GetSpecificData_GetDataTypeByItemType(const string &itemType)
 	if(itemType == "template_company")				result = "template";
 	if(itemType == "template_agreement_company")	result = "template";
 	if(itemType == "template_agreement_sow")		result = "template";
-
+*/
 	MESSAGE_DEBUG("", "", "finish (result = " + result + ")");
 
 	return result;
