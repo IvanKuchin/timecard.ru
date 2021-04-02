@@ -170,7 +170,7 @@ int main(void)
 					MESSAGE_ERROR("", action, error_message + " by admin_user.id(" + user.GetID() + ")");
 				}
 			}
-			if(!affected)
+			else if(!affected)
 			{
 				MESSAGE_DEBUG("", action, "agency not found (" + agency_name + ")");
 			}
