@@ -229,66 +229,14 @@
 // --- admin definitions
 #define	ADMIN_LOG_FILE_NAME							string(LOGDIR) + DOMAIN_NAME + ".admin"
 
-// --- notification types
-#define	NOTIFICATION_GENERAL_FROM_USER					98
-#define	NOTIFICATION_GENERAL_FROM_COMPANY				99
-#define	NOTIFICATION_ADD_TASK_TO_SOW					100
-#define	NOTIFICATION_CHANGE_CUSTOMER_NAME				101
-#define	NOTIFICATION_CHANGE_PROJECT_NAME				102
-#define	NOTIFICATION_CHANGE_TASK_NAME					103
-#define	NOTIFICATION_CHANGE_TASK_DURATION				104
-#define	NOTIFICATION_DELETE_TASK						105
-#define	NOTIFICATION_AGENCY_INITIATED_SOW				106
-#define	NOTIFICATION_SUBCONTRACTOR_SIGNED_SOW			107
-#define	NOTIFICATION_AGENCY_ABOUT_SUBC_REGISTRATION		108
-#define	NOTIFICATION_AGENCY_GENERATED_AGREEMENTS		109
-#define	NOTIFICATION_AGENCY_ABOUT_APPROVER_REGISTRATION	110
-#define	NOTIFICATION_AGENCY_ABOUT_EMPLOYEE_REGISTRATION	111
-#define	NOTIFICATION_SUBC_BUILT_ABSENCE_REQUEST			112
-#define	NOTIFICATION_SUBC_CHANGED_ABSENCE_REQUEST		113
-
 // --- miscellaneous definitions
 #define	DEFAULT_SITE_THEME							".regular"
-
-#define	VAT_PERCENTAGE								20
-#define	BUSINESS_TRIP_TAX_PERCENTAGE				6.38
 
 // --- actions allowed w/o session cookie
 #define	ALLOWED_NO_SESSION_ACTION					{  }
 
-#define	INCLUDE_ADDITIONAL_INFO						true
-
-#define	DO_NOT_INCLUDE_PSOW_INFO					false
-#define	INCLUDE_PSOW_INFO							true
-
-#define	INCLUDE_BT_EXPENSE_TEMPLATES				true
-#define	DO_NOT_INCLUDE_BT							false
-#define	DO_NOT_INCLUDE_TIMECARDS					false
-#define	INCLUDE_TIMECARD_TASKS						true
-#define	DO_NOT_INCLUDE_TIMECARD_TASKS				false
-
-#define	MYSQL_DATE_FORMAT							"%Y-%m-%d"
-#define	RU_DATE_FORMAT								"%d/%m/%Y"
-#define PRINT_DATE_FORMAT							"%d %b %Y"
-
 #define	TEMP_DIRECTORY_PREFIX						"/tmp/"s + DOMAIN_NAME + "_"
 #define	ARCHIVE_FILE_EXTENSION						".zip"s
-
-#define LIBXL_DEFAULT_ROW_HEIGHT					12.75
-
-#define	HPDF_FIELD_TOP								40
-#define	HPDF_FIELD_BOTTOM							40
-#define	HPDF_FIELD_RIGHT							40
-#define	HPDF_FIELD_LEFT								40
-#define	HPDF_TIMECARD_TITLE_WIDTH_PERCENT			35.0
-#define	HPDF_TIMECARD_DAYS_WIDTH_PERCENT			(100 - HPDF_TIMECARD_TITLE_WIDTH_PERCENT)
-#define	HPDF_TIMECARD_DAY_WIDTH_PERCENT				HPDF_TIMECARD_DAYS_WIDTH_PERCENT / 31.0		// --- important to have double here
-#define	HPDF_TIMECARD_FONT_SIZE						8
-#define	HPDF_TIMECARD_TABLE_FONT_SIZE				HPDF_TIMECARD_FONT_SIZE - 1
-#define	HPDF_TIMECARD_TABLE_SPACING					1
-#define	HPDF_TIMECARD_FONT_MULTIPLIER				1.2		// --- font_width calculated by HPDF_Font_TextWidth or HPDF_Page_TextWidth return incorrect width wich is lower than actual space taken by the string. To compensate it space utilization should be corrected with this multiplier.
-
-#define	TIMECARD_ENTRY_TITLE_SEPARATOR				" / "s
 
 #define	GIT_COMMIT_ID_FILE_NAME						"${GIT_INSTALL_DIR}/git_commit_id"s
 

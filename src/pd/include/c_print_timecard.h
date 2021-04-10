@@ -17,6 +17,7 @@
 #include "hpdf.h"
 
 #include "utilities_timecard.h" 
+#include "c_pdf_const.h"
 #include "c_invoicing_vars.h"
 #include "c_timecard_to_print.h"
 #include "c_float.h"

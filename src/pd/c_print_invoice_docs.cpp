@@ -940,9 +940,10 @@ auto	C_Print_Invoice_Docs_Base::__HPDF_DrawTable() -> string
 										pdf_obj.__HPDF_GetNumberOfLinesInTable(5, utf8_to_cp1251(GetTableRowTotal(i))		, NORMAL_FONT, HPDF_TIMECARD_TABLE_FONT_SIZE)
 									)))));
 
-				if((error_message = pdf_obj.__HPDF_PrintTextTableCell(0, utf8_to_cp1251(GetTableRowIndex(i)), HPDF_TALIGN_CENTER, NORMAL_FONT, HPDF_TIMECARD_TABLE_FONT_SIZE, false)).empty())
+				// --- print description before anything else. See case (438875) for more details.
+				if((error_message = pdf_obj.__HPDF_PrintTextTableCell(1, utf8_to_cp1251(GetTableRowDescription(i)), HPDF_TALIGN_LEFT, NORMAL_FONT, HPDF_TIMECARD_TABLE_FONT_SIZE, false)).empty())
 				{
-					if((error_message = pdf_obj.__HPDF_PrintTextTableCell(1, utf8_to_cp1251(GetTableRowDescription(i)), HPDF_TALIGN_LEFT, NORMAL_FONT, HPDF_TIMECARD_TABLE_FONT_SIZE, false)).empty())
+					if((error_message = pdf_obj.__HPDF_PrintTextTableCell(0, utf8_to_cp1251(GetTableRowIndex(i)), HPDF_TALIGN_CENTER, NORMAL_FONT, HPDF_TIMECARD_TABLE_FONT_SIZE, false)).empty())
 					{
 						if((error_message = pdf_obj.__HPDF_PrintTextTableCell(2, utf8_to_cp1251(GetTableRowQuantity(i)), HPDF_TALIGN_CENTER, NORMAL_FONT, HPDF_TIMECARD_TABLE_FONT_SIZE, false)).empty())
 						{
@@ -983,13 +984,12 @@ auto	C_Print_Invoice_Docs_Base::__HPDF_DrawTable() -> string
 					}
 					else
 					{
-						MESSAGE_ERROR("", "", "fail to write table description (" + to_string(i) + ") line");
+						MESSAGE_ERROR("", "", "fail to write table index (" + to_string(i) + ") line");
 					}
-
 				}
 				else
 				{
-					MESSAGE_ERROR("", "", "fail to write table index (" + to_string(i) + ") line");
+					MESSAGE_ERROR("", "", "fail to write table description (" + to_string(i) + ") line");
 				}
 
 				if(error_message.length()) break;

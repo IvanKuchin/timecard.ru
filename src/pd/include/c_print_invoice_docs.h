@@ -25,6 +25,8 @@
 
 using namespace std;
 
+#define LIBXL_DEFAULT_ROW_HEIGHT					12.75
+
 class C_Print_Invoice_Docs_Base
 {
 	protected:
