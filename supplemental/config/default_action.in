@@ -1,0 +1,7 @@
+subcontractor	= subcontractor_dashboard
+agency		= agency_dashboard
+approver	= approver_dashboard
+
+helpdesk	= helpdesk_dashboard
+norole		= initial_wizard
+guest		= autologin

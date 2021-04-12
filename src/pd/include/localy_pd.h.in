@@ -1,0 +1,10 @@
+#ifndef __LOCALY_PD__H__
+#define __LOCALY_PD__H__
+
+#define PDF_FONT_INSTALL_DIR			"${PDF_FONT_INSTALL_DIR}"s
+
+#define SOW_EXPIRATION_BUFFER			31	// --- +   days to look one SoW expired
+
+#define ARCHIVE_FILE_EXTENSION			".zip"s
+
+#endif

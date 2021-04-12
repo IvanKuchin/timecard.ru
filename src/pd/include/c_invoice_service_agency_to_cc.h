@@ -19,6 +19,7 @@ using namespace std;
 class C_Invoice_Service_Agency_To_CC
 {
 	private:
+		c_config						*config = NULL;
 		CMysql							*db = NULL;
 		CUser							*user = NULL;
 		vector<string>					timecard_id_list;
@@ -45,8 +46,7 @@ class C_Invoice_Service_Agency_To_CC
 		auto		CreateTimecardObj(string timecard_id) -> C_Timecard_To_Print;
 
 	public:
-					C_Invoice_Service_Agency_To_CC();
-					C_Invoice_Service_Agency_To_CC(CMysql *, CUser *);
+					C_Invoice_Service_Agency_To_CC(c_config *param1, CMysql *param2, CUser *param3) : config(param1), db(param2), user(param3) {};
 
 		auto		SetTimecardList(const vector<string> &param1)	{ timecard_id_list = param1; };
 

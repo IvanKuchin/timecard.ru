@@ -883,7 +883,7 @@ string C_Smartway::SaveTempFile(const string &content, const string &extension)
 	do
 	{
 		fname = GetRandom(10) + extension;
-		result = TEMP_DIRECTORY_PREFIX + fname;
+		result = config->GetFromFile("image_folders", "TEMP_DIRECTORY_PREFIX") + fname;
 	} while(isFileExists(result));
 
 	ofstream ofs (result, std::ofstream::out);

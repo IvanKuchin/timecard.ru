@@ -21,6 +21,7 @@ using namespace std;
 class C_Invoice_BT_Subc_To_Agency
 {
 	private:
+		c_config						*config = NULL;
 		CMysql							*db = NULL;
 		CUser							*user = NULL;
 		vector<string>					bt_id_list;
@@ -45,8 +46,7 @@ class C_Invoice_BT_Subc_To_Agency
 		auto 		EnrichObjWithExpenseLines(string bt_id, C_BT_To_Print *obj) -> bool;
 
 	public:
-					C_Invoice_BT_Subc_To_Agency()									{};
-					C_Invoice_BT_Subc_To_Agency(CMysql *param1, CUser *param2) : db(param1), user(param2) {};
+					C_Invoice_BT_Subc_To_Agency(c_config *param1, CMysql *param2, CUser *param3) : config(param1), db(param2), user(param3) {};
 
 		auto		SetBTList(const vector<string> &param1)			{ bt_id_list = param1; };
 

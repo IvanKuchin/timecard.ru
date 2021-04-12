@@ -8,10 +8,12 @@
 
 #include "hpdf.h"
 
+#include "localy_pd.h"
 #include "c_pdf_const.h"
 #include "clog.h"
 
 using namespace std;
+
 
 void c_pdf_error_handler (HPDF_STATUS error_no, HPDF_STATUS detail_no, void *user_data);
 

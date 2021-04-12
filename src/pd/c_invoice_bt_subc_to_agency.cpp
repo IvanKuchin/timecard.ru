@@ -42,6 +42,7 @@ auto C_Invoice_BT_Subc_To_Agency::GenerateDocumentArchive() -> string
 	// --- generate variable for invoicing
 	if(error_message.empty())
 	{
+		invoicing_vars.SetConfig(config);
 		invoicing_vars.SetDB(db);
 		invoicing_vars.SetUser(user);
 		invoicing_vars.SetBTs(bt_obj_list);
@@ -265,7 +266,7 @@ auto C_Invoice_BT_Subc_To_Agency::GenerateDocumentArchive() -> string
 		{
 			c_archive	ar;
 
-			ar.SetFilename(INVOICES_SUBC_DIRECTORY + archive_folder + "/" + archive_file);
+			ar.SetFilename(config->GetFromFile("image_folders", "INVOICES_SUBC_DIRECTORY") + archive_folder + "/" + archive_file);
 			ar.SetFolderToArchive(temp_dir);
 			ar.Archive();
 		}
@@ -288,12 +289,12 @@ auto C_Invoice_BT_Subc_To_Agency::CreateTempDirectory() -> bool
 	{
 		auto		__random = GetRandom(15);
 
-		archive_folder = to_string( (int)(rand()/(RAND_MAX + 1.0) * INVOICES_CC_NUMBER_OF_FOLDERS) + 1);
+		archive_folder = to_string( (int)(rand()/(RAND_MAX + 1.0) * stod_noexcept(config->GetFromFile("number_of_folders", "INVOICES_CC_NUMBER_OF_FOLDERS"))) + 1);
 		archive_file = GetRandom(15) + ARCHIVE_FILE_EXTENSION;
 
-		temp_dir = TEMP_DIRECTORY_PREFIX + __random;
-		temp_archive_file = TEMP_DIRECTORY_PREFIX + __random + ARCHIVE_FILE_EXTENSION;
-	} while(isDirExists(temp_dir) || isFileExists(temp_archive_file) || isFileExists(INVOICES_SUBC_DIRECTORY + archive_folder + "/" + archive_file));
+		temp_dir = config->GetFromFile("image_folders", "TEMP_DIRECTORY_PREFIX") + __random;
+		temp_archive_file = config->GetFromFile("image_folders", "TEMP_DIRECTORY_PREFIX") + __random + ARCHIVE_FILE_EXTENSION;
+	} while(isDirExists(temp_dir) || isFileExists(temp_archive_file) || isFileExists(config->GetFromFile("image_folders", "INVOICES_SUBC_DIRECTORY") + archive_folder + "/" + archive_file));
 
 	if(CreateDir(temp_dir))
 	{
@@ -514,7 +515,7 @@ auto C_Invoice_BT_Subc_To_Agency::UpdateDBWithInvoiceData(const string bt_id) ->
 				if(curr_fname.length())
 				{
 					MESSAGE_DEBUG("", "", "removing existing invoice(" + curr_fname + ")");
-					unlink((INVOICES_SUBC_DIRECTORY + curr_fname).c_str());
+					unlink((config->GetFromFile("image_folders", "INVOICES_SUBC_DIRECTORY") + curr_fname).c_str());
 				}
 				else
 				{

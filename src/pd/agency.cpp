@@ -5903,7 +5903,7 @@ int main(void)
 
 					if((error_message = isBTsBelongToAgency(bts, agency_id, &db, &user)).empty())
 					{
-						C_Download_BT_Attachments	bt_attachments(&db, &user);
+						C_Download_BT_Attachments	bt_attachments(&config, &db, &user);
 						bt_attachments.SetBTID(id);
 
 						if((error_message = bt_attachments.GenerateDocumentArchive()).empty())

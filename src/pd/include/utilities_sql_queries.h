@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include "localy_pd.h"
+
 inline auto Get_CompanyIDByAdminUserID_sqlquery(const string &user_id) -> string
 {
 	return (" SELECT `id` FROM `company` WHERE `admin_userID` IN (" + user_id + ") ");

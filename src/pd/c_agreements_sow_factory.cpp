@@ -41,6 +41,7 @@ auto C_Agreements_SoW_Factory::GenerateDocumentArchive() -> string
 	// --- generate variable for invoicing
 	if(error_message.empty())
 	{
+		invoicing_vars.SetConfig(config);
 		invoicing_vars.SetDB(db);
 		invoicing_vars.SetUser(user);
 		invoicing_vars.SetSoWID(sow_id);
@@ -132,7 +133,7 @@ auto C_Agreements_SoW_Factory::GenerateDocumentArchive() -> string
 		{
 			c_archive	ar;
 
-			ar.SetFilename(AGREEMENTS_SOW_DIRECTORY + GetShortFilename());
+			ar.SetFilename(config->GetFromFile("image_folders", "AGREEMENTS_SOW_DIRECTORY") + GetShortFilename());
 			ar.SetFolderToArchive(temp_dir);
 			ar.Archive();
 		}
@@ -155,12 +156,12 @@ auto C_Agreements_SoW_Factory::CreateTempDirectory() -> bool
 	{
 		auto		__random = GetRandom(15);
 
-		archive_folder = to_string( (int)(rand()/(RAND_MAX + 1.0) * AGREEMENTS_SOW_NUMBER_OF_FOLDERS) + 1);
+		archive_folder = to_string( (int)(rand()/(RAND_MAX + 1.0) * stod_noexcept(config->GetFromFile("number_of_folders", "AGREEMENTS_SOW_NUMBER_OF_FOLDERS"))) + 1);
 		archive_file = GetRandom(15) + ARCHIVE_FILE_EXTENSION;
 
-		temp_dir = TEMP_DIRECTORY_PREFIX + __random;
-		temp_archive_file = TEMP_DIRECTORY_PREFIX + __random + ARCHIVE_FILE_EXTENSION;
-	} while(isDirExists(temp_dir) || isFileExists(temp_archive_file) || isFileExists(AGREEMENTS_SOW_DIRECTORY + archive_folder + "/" + archive_file));
+		temp_dir = config->GetFromFile("image_folders", "TEMP_DIRECTORY_PREFIX") + __random;
+		temp_archive_file = config->GetFromFile("image_folders", "TEMP_DIRECTORY_PREFIX") + __random + ARCHIVE_FILE_EXTENSION;
+	} while(isDirExists(temp_dir) || isFileExists(temp_archive_file) || isFileExists(config->GetFromFile("image_folders", "AGREEMENTS_SOW_DIRECTORY") + archive_folder + "/" + archive_file));
 
 	if(CreateDir(temp_dir))
 	{
@@ -233,8 +234,8 @@ auto C_Agreements_SoW_Factory::RemoveExistingAgreementFile() -> string
 
 				if(existing_filename.length())
 				{
-					MESSAGE_DEBUG("", "", "removing: " + AGREEMENTS_SOW_DIRECTORY + existing_filename);
-					unlink((AGREEMENTS_SOW_DIRECTORY + existing_filename).c_str());
+					MESSAGE_DEBUG("", "", "removing: " + config->GetFromFile("image_folders", "AGREEMENTS_SOW_DIRECTORY") + existing_filename);
+					unlink((config->GetFromFile("image_folders", "AGREEMENTS_SOW_DIRECTORY") + existing_filename).c_str());
 				}
 				else
 				{
@@ -281,7 +282,7 @@ auto C_Agreements_SoW_Factory::ProduceObjectVector() -> string
 		temp.SetID(db->Get(i, "id"));
 		temp.SetTitle(db->Get(i, "title"));
 		if(db->Get(i, "filename").length())
-			temp.SetFilename(TEMPLATE_AGREEMENT_SOW_DIRECTORY + "/" + db->Get(i, "filename"));
+			temp.SetFilename(config->GetFromFile("image_folders", "TEMPLATE_AGREEMENT_SOW_DIRECTORY") + "/" + db->Get(i, "filename"));
 
 		agreement_list.push_back(temp);
 	}
@@ -296,7 +297,7 @@ auto C_Agreements_SoW_Factory::ProduceObjectVector() -> string
 		temp.SetID(db->Get(i, "id"));
 		temp.SetTitle(db->Get(i, "title"));
 		if(db->Get(i, "filename").length())
-			temp.SetFilename(TEMPLATE_AGREEMENT_COMPANY_DIRECTORY + "/" + db->Get(i, "filename"));
+			temp.SetFilename(config->GetFromFile("image_folders", "TEMPLATE_AGREEMENT_COMPANY_DIRECTORY") + "/" + db->Get(i, "filename"));
 
 		agreement_list.push_back(temp);
 	}

@@ -310,14 +310,14 @@ auto	C_Invoicing_Vars::CostCenter_VarSet() -> string
 				}
 
 				if(Get("1C_template_invoice_to_cc_service").length())
-					AssignVariableValue("1C_template_invoice_to_cc_service_full_path", TEMPLATE_CC_DIRECTORY + Get("1C_template_invoice_to_cc_service"), true);
+					AssignVariableValue("1C_template_invoice_to_cc_service_full_path", config->GetFromFile("image_folders", "TEMPLATE_CC_DIRECTORY") + Get("1C_template_invoice_to_cc_service"), true);
 				if(Get("1C_template_invoice_to_cc_service_table_row").length())
-					AssignVariableValue("1C_template_invoice_to_cc_service_table_row_full_path", TEMPLATE_CC_DIRECTORY + Get("1C_template_invoice_to_cc_service_table_row"), true);
+					AssignVariableValue("1C_template_invoice_to_cc_service_table_row_full_path", config->GetFromFile("image_folders", "TEMPLATE_CC_DIRECTORY") + Get("1C_template_invoice_to_cc_service_table_row"), true);
 				
 				if(Get("1C_template_invoice_to_cc_bt").length())
-					AssignVariableValue("1C_template_invoice_to_cc_bt_full_path", TEMPLATE_CC_DIRECTORY + Get("1C_template_invoice_to_cc_bt"), true);
+					AssignVariableValue("1C_template_invoice_to_cc_bt_full_path", config->GetFromFile("image_folders", "TEMPLATE_CC_DIRECTORY") + Get("1C_template_invoice_to_cc_bt"), true);
 				if(Get("1C_template_invoice_to_cc_bt_table_row").length())
-					AssignVariableValue("1C_template_invoice_to_cc_bt_table_row_full_path", TEMPLATE_CC_DIRECTORY + Get("1C_template_invoice_to_cc_bt_table_row"), true);
+					AssignVariableValue("1C_template_invoice_to_cc_bt_table_row_full_path", config->GetFromFile("image_folders", "TEMPLATE_CC_DIRECTORY") + Get("1C_template_invoice_to_cc_bt_table_row"), true);
 			}
 		}
 		else
@@ -438,14 +438,14 @@ auto	C_Invoicing_Vars::Agency_VarSet(string __agency_company_id) -> string
 				}
 
 				if(Get("1C_template_payment_to_subcontractor").length())
-					AssignVariableValue("1C_template_payment_to_subcontractor_full_path", TEMPLATE_COMPANY_DIRECTORY + Get("1C_template_payment_to_subcontractor"), true);
+					AssignVariableValue("1C_template_payment_to_subcontractor_full_path", config->GetFromFile("image_folders", "TEMPLATE_COMPANY_DIRECTORY") + Get("1C_template_payment_to_subcontractor"), true);
 				if(Get("1C_template_payment_to_subcontractor_body").length())
-					AssignVariableValue("1C_template_payment_to_subcontractor_body_full_path", TEMPLATE_COMPANY_DIRECTORY + Get("1C_template_payment_to_subcontractor_body"), true);
+					AssignVariableValue("1C_template_payment_to_subcontractor_body_full_path", config->GetFromFile("image_folders", "TEMPLATE_COMPANY_DIRECTORY") + Get("1C_template_payment_to_subcontractor_body"), true);
 				
 				if(Get("1C_template_payment_order_to_subcontractor").length())
-					AssignVariableValue("1C_template_payment_order_to_subcontractor_full_path", TEMPLATE_COMPANY_DIRECTORY + Get("1C_template_payment_order_to_subcontractor"), true);
+					AssignVariableValue("1C_template_payment_order_to_subcontractor_full_path", config->GetFromFile("image_folders", "TEMPLATE_COMPANY_DIRECTORY") + Get("1C_template_payment_order_to_subcontractor"), true);
 				if(Get("1C_template_payment_order_to_subcontractor_body").length())
-					AssignVariableValue("1C_template_payment_order_to_subcontractor_body_full_path", TEMPLATE_COMPANY_DIRECTORY + Get("1C_template_payment_order_to_subcontractor_body"), true);
+					AssignVariableValue("1C_template_payment_order_to_subcontractor_body_full_path", config->GetFromFile("image_folders", "TEMPLATE_COMPANY_DIRECTORY") + Get("1C_template_payment_order_to_subcontractor_body"), true);
 				
 			}
 

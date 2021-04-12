@@ -1901,7 +1901,7 @@ auto DeleteServiceInvoicesSubcToAgency(string timecard_id, CMysql *db, CUser *us
 
 	if(invoice_filename.length())
 	{
-		unlink((INVOICES_SUBC_DIRECTORY + invoice_filename).c_str());
+		unlink((config->GetFromFile("image_folders", "INVOICES_SUBC_DIRECTORY") + invoice_filename).c_str());
 	}
 	else
 	{

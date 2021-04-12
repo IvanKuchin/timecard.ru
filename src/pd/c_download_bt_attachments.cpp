@@ -58,9 +58,9 @@ auto C_Download_BT_Attachments::CreateTempDirectory() -> bool
 
 		archive_file = GetRandom(15) + ARCHIVE_FILE_EXTENSION;
 
-		temp_dir = TEMP_DIRECTORY_PREFIX + __random;
-		temp_archive_file = TEMP_DIRECTORY_PREFIX + __random + ARCHIVE_FILE_EXTENSION;
-	} while(isDirExists(temp_dir) || isFileExists(temp_archive_file) || isFileExists(INVOICES_SUBC_DIRECTORY + archive_folder + "/" + archive_file));
+		temp_dir = config->GetFromFile("image_folders", "TEMP_DIRECTORY_PREFIX") + __random;
+		temp_archive_file = config->GetFromFile("image_folders", "TEMP_DIRECTORY_PREFIX") + __random + ARCHIVE_FILE_EXTENSION;
+	} while(isDirExists(temp_dir) || isFileExists(temp_archive_file) || isFileExists(config->GetFromFile("image_folders", "INVOICES_SUBC_DIRECTORY") + archive_folder + "/" + archive_file));
 
 	if(CreateDir(temp_dir))
 	{

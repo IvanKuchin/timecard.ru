@@ -317,8 +317,8 @@ string GetSpecificData_GetBaseDirectory(string itemType)
 		{ "expense_line"				, IMAGE_EXPENSELINES_DIRECTORY },
 		{ "template_sow"				, TEMPLATE_SOW_DIRECTORY },
 		{ "template_psow"				, TEMPLATE_PSOW_DIRECTORY },
-		{ "template_costcenter"			, TEMPLATE_CC_DIRECTORY },
-		{ "template_company"			, TEMPLATE_COMPANY_DIRECTORY },
+		{ "template_costcenter"			, config->GetFromFile("image_folders", "TEMPLATE_CC_DIRECTORY") },
+		{ "template_company"			, config->GetFromFile("image_folders", "TEMPLATE_COMPANY_DIRECTORY") },
 		{ "template_agreement_company"	, TEMPLATE_AGREEMENT_COMPANY_DIRECTORY },
 		{ "template_agreement_sow"		, TEMPLATE_AGREEMENT_SOW_DIRECTORY },
 		{ "helpdesk_ticket_attach"		, HELPDESK_TICKET_ATTACHES_DIRECTORY },
@@ -348,8 +348,8 @@ string GetSpecificData_GetBaseDirectory(string itemType)
 	else if(itemType == "expense_line")				result = IMAGE_EXPENSELINES_DIRECTORY;
 	else if(itemType == "template_sow")				result = TEMPLATE_SOW_DIRECTORY;
 	else if(itemType == "template_psow")			result = TEMPLATE_PSOW_DIRECTORY;
-	else if(itemType == "template_costcenter")		result = TEMPLATE_CC_DIRECTORY;
-	else if(itemType == "template_company")			result = TEMPLATE_COMPANY_DIRECTORY;
+	else if(itemType == "template_costcenter")		result = config->GetFromFile("image_folders", "TEMPLATE_CC_DIRECTORY");
+	else if(itemType == "template_company")			result = config->GetFromFile("image_folders", "TEMPLATE_COMPANY_DIRECTORY");
 	else if(itemType == "template_agreement_company") result = TEMPLATE_AGREEMENT_COMPANY_DIRECTORY;
 	else if(itemType == "template_agreement_sow")	result = TEMPLATE_AGREEMENT_SOW_DIRECTORY;
 	else if(itemType == "helpdesk_ticket_attach")	result = HELPDESK_TICKET_ATTACHES_DIRECTORY;

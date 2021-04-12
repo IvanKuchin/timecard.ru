@@ -12,12 +12,14 @@
 #include "c_template2pdf_printer.h"
 #include "c_archive.h"
 #include "wkhtmltox_wrapper.h"
+#include "localy_pd.h"
 
 using namespace std;
 
 class C_Agreements_SoW_Factory
 {
 	private:
+		c_config						*config = NULL;
 		CMysql							*db = NULL;
 		CUser							*user = NULL;
 		vector<C_Agreements_SoW_Object>	agreement_list;
@@ -41,7 +43,7 @@ class C_Agreements_SoW_Factory
 
 	public:
 					C_Agreements_SoW_Factory()						{};
-					C_Agreements_SoW_Factory(CMysql *param1, CUser *param2) : db(param1), user(param2) {};
+					C_Agreements_SoW_Factory(c_config *param1, CMysql *param2, CUser *param3) : config(param1), db(param2), user(param3) {};
 
 		auto		SetSoWID(const string &param1)					{ sow_id = param1; };
 		auto		SetSoWID(string &&param1) 						{ sow_id = move(param1); };

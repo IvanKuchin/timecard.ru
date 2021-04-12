@@ -134,7 +134,7 @@ auto	RecallServiceInvoice(string service_invoice_id, CMysql *db, CUser *user) ->
 				{
 					if(file_name.length())
 					{
-						unlink((INVOICES_CC_DIRECTORY + file_name).c_str());
+						unlink((config->GetFromFile("image_folders", "INVOICES_CC_DIRECTORY") + file_name).c_str());
 					}
 					else
 					{
@@ -203,7 +203,7 @@ auto	RecallBTInvoice(string bt_invoice_id, CMysql *db, CUser *user) -> string
 				{
 					if(file_name.length())
 					{
-						unlink((INVOICES_CC_DIRECTORY + file_name).c_str());
+						unlink((config->GetFromFile("image_folders", "INVOICES_CC_DIRECTORY") + file_name).c_str());
 					}
 					else
 					{

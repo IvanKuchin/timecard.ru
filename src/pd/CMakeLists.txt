@@ -65,6 +65,14 @@ macro(set_pd_lib_properties target_lib proj_src proj_inc_list proj_lib_list)
 endmacro()
 
 # --- MACROSes finish ---
+
+include(FindPkgConfig)
+
+find_package(LibHPDF REQUIRED)
+find_package(LibWkhtmlToX REQUIRED)
+find_package(LibXL REQUIRED)
+find_package(LibRapidJSON REQUIRED)
+ 
 GET_DIRECTORY_PROPERTY  (XL_LIBRARY_DIR DIRECTORY       ${PROJECT_SOURCE_DIR}/src/pi/ DEFINITION XL_LIBRARY_DIR)
 
 GET_DIRECTORY_PROPERTY  (PROJECT_PI_INCLUDE_DIRECTORIES DIRECTORY ${PROJECT_SOURCE_DIR}/src/pi/ DEFINITION PROJECT_PI_INCLUDE_DIRECTORIES)
@@ -73,10 +81,26 @@ GET_DIRECTORY_PROPERTY  (PROJECT_EXTERNAL_LIBS          DIRECTORY ${PROJECT_SOUR
 
 set(PROJECT_PD_INCLUDE_DIRECTORIES
     ${PROJECT_SOURCE_DIR}/src/pd/include/
+    ${PROJECT_BINARY_DIR}/src/pd/include/
     ${PROJECT_SOURCE_DIR}/cyrillic-facets/      # --- mbstowcs 
+    ${HPDF_INCLUDE_DIR}
+    ${XL_INCLUDE_DIR}
+    ${WKHTMLTOX_INCLUDE_DIR}
     )
 
 SET(PROJECT_ALL_INCLUDE_DIRECTORIES ${PROJECT_PI_INCLUDE_DIRECTORIES} ${PROJECT_PD_INCLUDE_DIRECTORIES})
+
+set(PROJECT_EXTERNAL_LIBS
+    ${PROJECT_EXTERNAL_LIBS}
+    ${HPDF_LIBRARY}
+    ${XL_LIBRARY}
+    ${WKHTMLTOX_LIBRARY}
+    )
+
+configure_file(
+    "${PROJECT_SOURCE_DIR}/src/pd/include/localy_pd.h.in"
+    "${PROJECT_BINARY_DIR}/src/pd/include/localy_pd.h"
+    )
 
 # --- Build libraries
 # ---- list of independent libraries
