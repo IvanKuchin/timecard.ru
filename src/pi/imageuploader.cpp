@@ -686,7 +686,7 @@ int main()
 
 											if(videoConverter.SecondPhase())
 											{
-												// --- create new db.Connect(&config)ion, due to parent will close the old one
+												// --- create new DB-connection, due to parent will close the old one
 												CMysql  db1;		
 
 												if(db1.Connect(&config) < 0)
