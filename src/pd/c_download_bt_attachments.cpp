@@ -33,7 +33,7 @@ auto C_Download_BT_Attachments::GenerateDocumentArchive() -> string
 		{
 			c_archive	ar;
 
-			ar.SetFilename(IMAGE_TEMP_DAILY_CLEANUPDIRECTORY + "/" + archive_file);
+			ar.SetFilename(config->GetFromFile("image_folders", "IMAGE_TEMP_DAILY_CLEANUPDIRECTORY") + "/" + archive_file);
 			ar.SetFolderToArchive(temp_dir + "/");
 			ar.Archive();
 		}
@@ -150,7 +150,7 @@ auto C_Download_BT_Attachments::SaveBTAttachmentsToTempDirectory() -> string
 						}
 					}
 
-					CopyFile(IMAGE_EXPENSELINES_DIRECTORY + "/"s + item.value, curr_dir + "/" + item.id + "." + GetFileExtension(item.value));
+					CopyFile(config->GetFromFile("image_folders", "expense_line") + "/"s + item.value, curr_dir + "/" + item.id + "." + GetFileExtension(item.value));
 				}
 				else
 				{

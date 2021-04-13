@@ -1021,7 +1021,7 @@ string GetNewsFeedInJSONFormat(string whereStatement, int currPage, int newsOnSi
 
 // --- Returns company list in JSON format grabbed from DB
 // --- Input:   dbQuery 		- SQL format returns users
-//			  db	  			- DB connection
+//			  db	  			- db.Connect(&config)ion
 //			  user				- current user object, used to define company admin
 //			  quickSearch		- owners, founders, openVacancies are not included into result
 //			  include_employees	- used in admin _ONLY_ to get company list + # of users in each company

@@ -1,13 +1,7 @@
-certification		= logo_folder
-course			= logo_folder
-university		= logo_folder
-school			= logo_folder
-language		= logo_folder
-book			= coverPhotoFolder
-company			= logo_folder
-company_profile_logo	= logo_folder
-group			= logo_folder
-ribbon			= 
-
-gift			= logo_folder
-event			= logo_folder
+company_profile_logo       = logo_folder
+template_agreement_company =
+template_sow               =
+template_psow              =
+template_costcenter        =
+template_agreement_sow     =
+template_company           =

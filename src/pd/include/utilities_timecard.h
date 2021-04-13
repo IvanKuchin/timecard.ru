@@ -219,40 +219,40 @@ auto			NotifyAgencyAboutChanges(string agency_id, string action_type_id, string 
 auto			GeneralNotifySoWContractPartiesAboutChanges(string action, string id, string sow_id, string existing_value, string new_value, CMysql *, CUser *) -> bool;
 auto			GetDBValueByAction(string action, string id, string sow_id, CMysql *, CUser *) -> string;
 auto			SetNewValueByAction(string action, string id, string sow_id, string new_value, CMysql *, CUser *) -> string;
-auto			DeleteEntryByAction(string action, string id, CMysql *, CUser *) -> string;
+auto			DeleteEntryByAction(string action, string id, c_config *config, CMysql *, CUser *) -> string;
 // auto			ResubmitEntitiesByAction(string action, string id, string sow_id, string new_value, CMysql *, CUser *) -> string;
 auto			GetAgencyEmployeesInJSONFormat(string sql_query, CMysql *, CUser *) -> string;
 auto			GetAgencyObjectInJSONFormat(string agency_id, bool include_tasks, bool include_bt, CMysql *, CUser *) -> string;
 auto			GetInfoToReturnByAction(string action, string, string sow_id, string new_value, CMysql *, CUser *) -> string;
 
-auto			GetNumberOfApprovedTimecardsThisMonth(CMysql *, CUser *) -> string;
-auto			GetNumberOfApprovedTimecardsLastMonth(CMysql *, CUser *) -> string;
-auto			GetNumberOfApprovedTimecardsThisWeek(CMysql *, CUser *) -> string;
-auto			GetNumberOfApprovedTimecardsLastWeek(CMysql *, CUser *) -> string;
+auto			GetNumberOfApprovedTimecardsThisMonth(CMysql *, CUser *)		-> string;
+auto			GetNumberOfApprovedTimecardsLastMonth(CMysql *, CUser *)		-> string;
+auto			GetNumberOfApprovedTimecardsThisWeek(CMysql *, CUser *)			-> string;
+auto			GetNumberOfApprovedTimecardsLastWeek(CMysql *, CUser *)			-> string;
 
-auto 			GetNumberOfSoWActiveThisMonth(CMysql *, CUser *) -> string;
-auto 			GetNumberOfSoWActiveLastMonth(CMysql *, CUser *) -> string;
-auto 			GetNumberOfSoWActiveThisWeek(CMysql *, CUser *) -> string;
-auto 			GetNumberOfSoWActiveLastWeek(CMysql *, CUser *) -> string;
+auto 			GetNumberOfSoWActiveThisMonth(CMysql *, CUser *)				-> string;
+auto 			GetNumberOfSoWActiveLastMonth(CMysql *, CUser *)				-> string;
+auto 			GetNumberOfSoWActiveThisWeek(CMysql *, CUser *)					-> string;
+auto 			GetNumberOfSoWActiveLastWeek(CMysql *, CUser *)					-> string;
 
 auto			GetPSoWIDByTimecardIDAndCostCenterID(string timecard_id, string cost_center_id, CMysql *, CUser *) -> string;
-auto			GetSoWIDByPSoWID(string psow_id, CMysql *, CUser *) -> string;
-auto			GetPSoWIDByApprover(string sql_query, CMysql *, CUser *) -> string;
-auto			GetSoWIDByTimecardID(string timecard_id, CMysql *, CUser *) -> string;
+auto			GetSoWIDByPSoWID(string psow_id, CMysql *, CUser *)				-> string;
+auto			GetPSoWIDByApprover(string sql_query, CMysql *, CUser *)		-> string;
+auto			GetSoWIDByTimecardID(string timecard_id, CMysql *, CUser *)		-> string;
 auto			GetPSoWIDByBTIDAndCostCenterID(string timecard_id, string cost_center_id, CMysql *, CUser *) -> string;
-auto			GetPositionByCompanyID(string company_id, CMysql *, CUser *) -> string;
+auto			GetPositionByCompanyID(string company_id, CMysql *, CUser *)	-> string;
 
-auto			isUserAllowedToCreateBIK(CUser *, CMysql *) -> string;
+auto			isUserAllowedToCreateBIK(CUser *, CMysql *)						-> string;
 auto			isServiceInvoiceBelongsToUser(string service_invoice_id, CMysql *, CUser *) -> bool;
-auto			RecallServiceInvoice(string service_invoice_id, CMysql *, CUser *) -> string;
+auto			RecallServiceInvoice(string service_invoice_id, c_config *, CMysql *, CUser *) -> string;
 auto			isBTInvoiceBelongsToUser(string service_invoice_id, CMysql *, CUser *) -> bool;
-auto			RecallBTInvoice(string service_invoice_id, CMysql *, CUser *) -> string;
+auto			RecallBTInvoice(string service_invoice_id, c_config *, CMysql *, CUser *) -> string;
 auto			isServiceInvoiceBelongsToAgency(string service_invoice_id, CMysql *, CUser *) -> bool;
 auto			isBTInvoiceBelongsToAgency(string service_invoice_id, CMysql *, CUser *) -> bool;
-auto			GetAgencyIDByUserID(CMysql *, CUser *) -> string;
-auto 			GetCostCenterIDByCustomerID(string customer_id, CMysql *) -> string;
-auto 			GetCostCenterIDByTaskID(string task_id, CMysql *) -> string;
-auto 			GetPositionIDFromSoW(string sow_id, CMysql *) -> string;
+auto			GetAgencyIDByUserID(CMysql *, CUser *)							-> string;
+auto 			GetCostCenterIDByCustomerID(string customer_id, CMysql *)		-> string;
+auto 			GetCostCenterIDByTaskID(string task_id, CMysql *)				-> string;
+auto 			GetPositionIDFromSoW(string sow_id, CMysql *)					-> string;
 auto			CreatePSoWfromTimecardCustomerIDAndCostCenterID(string timecard_customer_id, string cost_center_id, CMysql *, CUser *) -> bool;
 auto			CreatePSoWfromTimecardTaskIDAndSoWID(string timecard_task_id, string sow_id, CMysql *, CUser *) -> bool;
 auto			CreatePSoWfromTimecardCustomerIDAndSoWID(string timecard_customer_id, string sow_id, CMysql *, CUser *) -> bool;
@@ -288,8 +288,8 @@ auto			GetTimecardList(const string &where_companies_list, CMysql *, CUser *) ->
 auto			GetTimecardList(const string &where_companies_list, const string &sow_filter_date, const string &filter_sow_status, const string &filter_not_sow_status, const string &limit_page, CMysql *, CUser *) -> string;
 auto			isTimePeriodInsideSow(string sow_id, string period_start, string period_end, CMysql *, CUser *) -> string; 
 
-auto 			DeleteServiceInvoicesSubcToAgency(string timecard_id, CMysql *, CUser *) -> string;
-auto			RecallTimecard(string timecard_id, string reason, CMysql *, CUser *) -> string;
+auto 			DeleteServiceInvoicesSubcToAgency(string timecard_id, c_config *, CMysql *, CUser *)		-> string;
+auto			RecallTimecard(string timecard_id, string reason, c_config *,CMysql *, CUser *)				-> string;
 
 // --- IMPORTANT !!! 
 // --- MUST use VAT and Total payment functions functions instead of direct calculations

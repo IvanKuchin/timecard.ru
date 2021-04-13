@@ -1,1 +1,9 @@
-__default__ = .jpg
+# __default__ = .jpg
+
+company_profile_logo            = .jpg
+template_agreement_company      = .txt
+template_sow                    = .txt
+template_psow                   = .txt
+template_costcenter             = .txt
+template_agreement_sow          = .txt
+template_company                = .txt

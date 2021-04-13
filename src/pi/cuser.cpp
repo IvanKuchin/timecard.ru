@@ -357,7 +357,7 @@ void CUser::Email(string messageID)
 
 	if(GetDB() == NULL)
 	{
-		MESSAGE_ERROR("", "", "DB-connection must be send to CUser()");
+		MESSAGE_ERROR("", "", "db.Connect(&config)ion must be send to CUser()");
 		throw CExceptionHTML("db error parameter");
 	}
 

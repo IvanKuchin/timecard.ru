@@ -1,12 +1,8 @@
-certification	= UPDATE `certification_tracks`	SET `<<config:db_field_name_photo_folder:<<var:itemType>>>>`= "<<var:folderName>>", `<<config:db_field_name_photo_filename:<<var:itemType>>>>`="<<var:fileName>>" WHERE `id`="<<var:itemID>>";
-course		= UPDATE `certification_tracks`	SET `<<config:db_field_name_photo_folder:<<var:itemType>>>>`= "<<var:folderName>>", `<<config:db_field_name_photo_filename:<<var:itemType>>>>`="<<var:fileName>>" WHERE `id`="<<var:itemID>>";
-university	= UPDATE `university`		SET `<<config:db_field_name_photo_folder:<<var:itemType>>>>`= "<<var:folderName>>", `<<config:db_field_name_photo_filename:<<var:itemType>>>>`="<<var:fileName>>" WHERE `id`="<<var:itemID>>";
-school		= UPDATE `school`		SET `<<config:db_field_name_photo_folder:<<var:itemType>>>>`= "<<var:folderName>>", `<<config:db_field_name_photo_filename:<<var:itemType>>>>`="<<var:fileName>>" WHERE `id`="<<var:itemID>>";
-language	= UPDATE `language`		SET `<<config:db_field_name_photo_folder:<<var:itemType>>>>`= "<<var:folderName>>", `<<config:db_field_name_photo_filename:<<var:itemType>>>>`="<<var:fileName>>" WHERE `id`="<<var:itemID>>";
-book		= UPDATE `book`			SET `<<config:db_field_name_photo_folder:<<var:itemType>>>>`= "<<var:folderName>>", `<<config:db_field_name_photo_filename:<<var:itemType>>>>`="<<var:fileName>>" WHERE `id`="<<var:itemID>>";
-company		= UPDATE `company`		SET `<<config:db_field_name_photo_folder:<<var:itemType>>>>`= "<<var:folderName>>", `<<config:db_field_name_photo_filename:<<var:itemType>>>>`="<<var:fileName>>" WHERE `id`="<<var:itemID>>";
-group		= UPDATE `groups`		SET `<<config:db_field_name_photo_folder:<<var:itemType>>>>`= "<<var:folderName>>", `<<config:db_field_name_photo_filename:<<var:itemType>>>>`="<<var:fileName>>" WHERE `id`="<<var:itemID>>";
-ribbon		= UPDATE `ribbons`		SET `<<config:db_field_name_photo_filename:<<var:itemType>>>>`="<<var:fileName>>" WHERE `id`="<<var:itemID>>";
+company_profile_logo            = UPDATE `company`                      SET `<<config:db_field_name_photo_folder:<<var:itemType>>>>`= "<<var:folderName>>", `<<config:db_field_name_photo_filename:<<var:itemType>>>>`="<<var:fileName>>" WHERE `id`="<<var:itemID>>";
+template_agreement_company      = UPDATE `company_agreement_files`      SET `<<config:db_field_name_photo_filename:<<var:itemType>>>>`="<<var:folderName>>/<<var:fileName>>" WHERE `id`="<<var:itemID>>";
+template_sow                    = UPDATE `contract_sow_custom_fields`   SET `<<config:db_field_name_photo_filename:<<var:itemType>>>>`="<<var:folderName>>/<<var:fileName>>" WHERE `id`="<<var:itemID>>";
+template_psow                   = UPDATE `contract_psow_custom_fields`  SET `<<config:db_field_name_photo_filename:<<var:itemType>>>>`="<<var:folderName>>/<<var:fileName>>" WHERE `id`="<<var:itemID>>";
+template_costcenter             = UPDATE `cost_center_custom_fields`    SET `<<config:db_field_name_photo_filename:<<var:itemType>>>>`="<<var:folderName>>/<<var:fileName>>" WHERE `id`="<<var:itemID>>";
+template_agreement_sow          = UPDATE `contract_sow_agreement_files` SET `<<config:db_field_name_photo_filename:<<var:itemType>>>>`="<<var:folderName>>/<<var:fileName>>" WHERE `id`="<<var:itemID>>";
+template_company                = UPDATE `company_custom_fields`        SET `<<config:db_field_name_photo_filename:<<var:itemType>>>>`="<<var:folderName>>/<<var:fileName>>" WHERE `id`="<<var:itemID>>";
 
-gift		= UPDATE `gifts`		SET `<<config:db_field_name_photo_folder:<<var:itemType>>>>`= "<<var:folderName>>", `<<config:db_field_name_photo_filename:<<var:itemType>>>>`="<<var:fileName>>" WHERE `id`="<<var:itemID>>";
-event		= UPDATE `events`		SET `<<config:db_field_name_photo_folder:<<var:itemType>>>>`= "<<var:folderName>>", `<<config:db_field_name_photo_filename:<<var:itemType>>>>`="<<var:fileName>>" WHERE `id`="<<var:itemID>>";

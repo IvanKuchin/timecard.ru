@@ -13,7 +13,7 @@ string CExceptionHTML::GetReason()
 	}
 	else
 	{
-		MESSAGE_ERROR("CExceptionHTML", "", "DB connection didn't initialized");
+		MESSAGE_ERROR("CExceptionHTML", "", "db.Connect(&config)ion didn't initialized");
 	}
 
 	return result;
@@ -32,7 +32,7 @@ string CExceptionHTML::GetTemplate()
 	}
 	else
 	{
-		MESSAGE_ERROR("CExceptionHTML", "", "DB connection didn't initialized");
+		MESSAGE_ERROR("CExceptionHTML", "", "db.Connect(&config)ion didn't initialized");
 	}
 
 	return result;

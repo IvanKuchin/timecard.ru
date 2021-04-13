@@ -1,6 +1,6 @@
 #include "utilities_submit.h"
 
-string	ResubmitEntitiesByAction(string action, string id, string sow_id, string new_value, CMysql *db, CUser *user)
+string	ResubmitEntitiesByAction(string action, string id, string sow_id, string new_value, c_config *config, CMysql *db, CUser *user)
 {
 	string	error_message = "";
 
@@ -20,7 +20,7 @@ string	ResubmitEntitiesByAction(string action, string id, string sow_id, string 
 
 							for (auto &timecard_id: item_list)
 							{
-								if(SubmitTimecard(timecard_id, db, user))
+								if(SubmitTimecard(timecard_id, config, db, user))
 								{
 
 								}
@@ -45,7 +45,7 @@ string	ResubmitEntitiesByAction(string action, string id, string sow_id, string 
 
 							for (auto &bt_id: item_list)
 							{
-								if(SubmitBT(bt_id, db, user))
+								if(SubmitBT(bt_id, config, db, user))
 								{
 
 								}
@@ -289,7 +289,7 @@ auto AssignCurrentCompanyActNumberToActID_And_UpdateCompanyActNumber_by_Entity(c
 	return error_message;
 }
 
-auto SubmitTimecard(string timecard_id, CMysql *db, CUser *user) -> bool
+auto SubmitTimecard(string timecard_id, c_config *config, CMysql *db, CUser *user) -> bool
 {
 	MESSAGE_DEBUG("", "", "start");
 
@@ -303,7 +303,7 @@ auto SubmitTimecard(string timecard_id, CMysql *db, CUser *user) -> bool
 		if(submit_obj.isCompletelyApproved())
 		{
 				auto								error_message = ""s;
-				C_Invoice_Service_Subc_To_Agency	c_invoice(db, user);
+				C_Invoice_Service_Subc_To_Agency	c_invoice(config, db, user);
 				
 				c_invoice.SetTimecardList({timecard_id});
 				error_message = c_invoice.GenerateDocumentArchive();
@@ -353,7 +353,7 @@ auto SubmitTimecard(string timecard_id, CMysql *db, CUser *user) -> bool
 	return result;
 }
 
-auto	SubmitBT(string bt_id, CMysql *db, CUser *user) -> bool
+auto	SubmitBT(string bt_id, c_config *config, CMysql *db, CUser *user) -> bool
 {
 	auto 	result = false;
 
@@ -367,7 +367,7 @@ auto	SubmitBT(string bt_id, CMysql *db, CUser *user) -> bool
 		if(submit_obj.isCompletelyApproved())
 		{
 				auto							error_message = ""s;
-				C_Invoice_BT_Subc_To_Agency		c_invoice(db, user);
+				C_Invoice_BT_Subc_To_Agency		c_invoice(config, db, user);
 
 				c_invoice.SetBTList({bt_id});
 

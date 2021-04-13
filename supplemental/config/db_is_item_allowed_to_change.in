@@ -1,24 +1,34 @@
-book		= SELECT `id` FROM `book`			WHERE `id`="<<var:itemID>>" AND `<<config:db_field_name_photo_filename:<<var:itemType>>>>`="";
-certification	= SELECT `id` FROM `certification_tracks`	WHERE `id`="<<var:itemID>>" AND `<<config:db_field_name_photo_filename:<<var:itemType>>>>`="";
-company		= SELECT `id` FROM `company`			WHERE `id`="<<var:itemID>>" AND `<<config:db_field_name_photo_filename:<<var:itemType>>>>`="";
-course		= SELECT `id` FROM `certification_tracks`	WHERE `id`="<<var:itemID>>" AND `<<config:db_field_name_photo_filename:<<var:itemType>>>>`="";
-group		= SELECT `id` FROM `groups`			WHERE `id`="<<var:itemID>>" AND `owner_id`="<<var:user_id>>";
-language	= SELECT `id` FROM `language`			WHERE `id`="<<var:itemID>>" AND `<<config:db_field_name_photo_filename:<<var:itemType>>>>`="";
-school		= SELECT `id` FROM `school`			WHERE `id`="<<var:itemID>>" AND `<<config:db_field_name_photo_filename:<<var:itemType>>>>`="";
-university	= SELECT `id` FROM `university`			WHERE `id`="<<var:itemID>>" AND `<<config:db_field_name_photo_filename:<<var:itemType>>>>`="";
-ribbon		= SELECT `id` FROM `ribbons`			WHERE `id`="<<var:itemID>>" AND `<<config:db_field_name_photo_filename:<<var:itemType>>>>`="";
+company_profile_logo	= '''
+			SELECT `id` FROM `company` WHERE `id`="<<var:itemID>>" 
+			AND 
+			(	
+				(`admin_userID`="<<var:user_id>>") 
+				OR 
+				(`id`=(SELECT `company_id` FROM `company_employees` WHERE `user_id`="<<var:user_id>>"))
+			)
+'''
 
-event		= SELECT `id` FROM `event_hosts`		WHERE `event_id`="<<var:itemID>>" AND `user_id`="<<var:user_id>>";
-gift		= SELECT `id` FROM `gift`			WHERE `id`="<<var:itemID>>" AND `user_id`="<<var:user_id>>";
-
-template_sow__agency	= '''
+# --- superset of below item
+# --- agreements between subc and agency defined in scope of agency
+# --- below item agreements between subc and agency defined in scope of SoW
+template_agreement_company	= '''
+			SELECT `id` FROM `company_employees` WHERE `user_id`="<<var:user_id>>" AND `allowed_change_sow`="Y" AND `company_id`=(
+			    SELECT `company_id` FROM `company_agreement_files` WHERE `id`="<<var:itemID>>"
+			);
+'''
+template_agreement_sow	= '''
+			SELECT `id` FROM `company_employees` WHERE `user_id`="<<var:user_id>>" AND `allowed_change_sow`="Y" AND `company_id`=(
+			    SELECT `company_id` FROM `contract_sow_agreement_files` WHERE `id`="<<var:itemID>>"
+			);
+'''
+template_sow		= '''
 			SELECT `id` FROM `company_employees` WHERE `user_id`="<<var:user_id>>" AND `allowed_change_sow`="Y" AND `company_id`=(
 			    SELECT `agency_company_id` FROM `contracts_sow` WHERE `id`=(
 				SELECT `contract_sow_id` FROM `contract_sow_custom_fields` WHERE `id`="<<var:itemID>>"
 			    )
 			);
 '''
-template_psow__agency	= '''
+template_psow		= '''
 			SELECT `id` FROM `company_employees` WHERE `user_id`="<<var:user_id>>" AND `allowed_change_sow`="Y" AND `company_id`=(
 			    SELECT `agency_company_id` FROM `contracts_sow` WHERE `id`=(
 				SELECT `contract_sow_id` FROM `contracts_psow` WHERE `id`=(
@@ -27,40 +37,19 @@ template_psow__agency	= '''
 			    )
 			);
 '''
-template_costcenter__agency	= '''
+template_costcenter	= '''
 			SELECT `id` FROM `company_employees` WHERE `user_id`="<<var:user_id>>" AND `allowed_change_sow`="Y" AND `company_id`=(
 			    SELECT `agency_company_id` FROM `cost_centers` WHERE `id`=(
 				SELECT `cost_center_id` FROM `cost_center_custom_fields` WHERE `id`="<<var:itemID>>"
 			    )
 			);
 '''
-template_company__agency	= '''
-			SELECT `id` FROM `company_employees` WHERE `user_id`="<<var:user_id>>" AND `allowed_change_sow`="Y" AND `company_id`=(
-			    SELECT `company_id` FROM `company_custom_fields` WHERE `id`="<<var:itemID>>"
-			);
-'''
-template_company__subcontractor	= '''
-			SELECT `id` FROM `company` WHERE `admin_userID`="<<var:user_id>>" AND `id`=(
-			    SELECT `company_id` FROM `company_custom_fields` WHERE `id`="<<var:itemID>>"
-			);
-'''
-template_agreement_company__agency	= '''
-			SELECT `id` FROM `company_employees` WHERE `user_id`="<<var:user_id>>" AND `allowed_change_sow`="Y" AND `company_id`=(
-			    SELECT `company_id` FROM `company_agreement_files` WHERE `id`="<<var:itemID>>"
-			);
-'''
-template_agreement_sow__agency	= '''
-			SELECT `id` FROM `company_employees` WHERE `user_id`="<<var:user_id>>" AND `allowed_change_sow`="Y" AND `company_id`=(
-			    SELECT `company_id` FROM `contract_sow_agreement_files` WHERE `id`="<<var:itemID>>"
-			);
-'''
-company_profile_logo__agency	= '''
-			SELECT `id` FROM `company_employees` WHERE `company_id`=(
-			    SELECT `company_id` FROM `company_employees` WHERE `user_id`=(
-				SELECT `admin_userID` FROM `company` WHERE `id`="<<var:itemID>>"
-			    )
-			) AND `user_id`="<<var:user_id>>" AND `allowed_change_agency_data`="Y";
-'''
-company_profile_logo__subcontractor	= '''
-			SELECT `id` FROM `company` WHERE `id`="<<var:itemID>>" AND `admin_userID`="<<var:user_id>>";
+template_company	= '''
+			SELECT `id` FROM `company` WHERE `id`=(SELECT `company_id` FROM `company_custom_fields` WHERE `id`="<<var:itemID>>") 
+			AND 
+			(
+			    (`admin_userID`="<<var:user_id>>")
+			    OR
+			    (`id`=(SELECT `company_id` FROM `company_employees` WHERE `user_id`="<<var:user_id>>"))
+			)
 '''

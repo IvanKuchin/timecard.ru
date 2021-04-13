@@ -1213,7 +1213,7 @@ auto  GetBonusesProgramsInJSONFormat(string sqlQuery, CMysql *db, CUser *user) -
 
 // --- Returns user list in JSON format grabbed from DB
 // --- Input: dbQuery - SQL format returns users
-//			db	  - DB connection
+//			db	  - db.Connect(&config)ion
 //			user	- current user object
 string GetUserListInJSONFormat(string dbQuery, CMysql *db, CUser *user)
 {
@@ -1767,7 +1767,7 @@ static auto __isSoWAllowedToRecallTimecardBySubcontractor(string sow_id, CMysql 
 	return (result ? "" : gettext("you are not authorized"));
 }
 
-auto RecallTimecard(string timecard_id, string reason, CMysql *db, CUser *user) -> string
+auto RecallTimecard(string timecard_id, string reason, c_config *config, CMysql *db, CUser *user) -> string
 {
 	MESSAGE_DEBUG("", "", "start (timecard_id = " + timecard_id + ")");
 
@@ -1842,7 +1842,7 @@ auto RecallTimecard(string timecard_id, string reason, CMysql *db, CUser *user) 
 		// --- actual timecard recall
 		if(error_message.empty())
 		{
-			error_message = DeleteServiceInvoicesSubcToAgency(timecard_id, db, user);
+			error_message = DeleteServiceInvoicesSubcToAgency(timecard_id, config, db, user);
 			if(error_message.empty())
 			{
 				db->Query("DELETE FROM `timecard_approvals` WHERE `timecard_id`=" + quoted(timecard_id) + ";");
@@ -1892,7 +1892,7 @@ auto RecallTimecard(string timecard_id, string reason, CMysql *db, CUser *user) 
 	return error_message;
 }
 
-auto DeleteServiceInvoicesSubcToAgency(string timecard_id, CMysql *db, CUser *user) -> string
+auto DeleteServiceInvoicesSubcToAgency(string timecard_id, c_config *config, CMysql *db, CUser *user) -> string
 {
 	MESSAGE_DEBUG("", "", "start (timecard_id = " + timecard_id + ")");
 

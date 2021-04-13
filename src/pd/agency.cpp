@@ -4,6 +4,7 @@ int main(void)
 {
 	CStatistics		appStat;  // --- CStatistics must be first statement to measure end2end param's
 	CCgi			indexPage(EXTERNAL_TEMPLATE);
+	c_config		config(CONFIG_DIR);
 	CUser			user;
 	CMysql			db;
 	string			action = "";
@@ -31,7 +32,7 @@ int main(void)
 			throw CException("Template file was missing");
 		}
 
-		if(db.Connect() < 0)
+		if(db.Connect(&config) < 0)
 		{
 			MESSAGE_ERROR("", action, "Can not connect to mysql database");
 			throw CExceptionHTML("MySql connection");
@@ -57,8 +58,8 @@ int main(void)
 			}
 
 			//------- Generate session
-			action = GenerateSession(action, &indexPage, &db, &user);
-			action = LogoutIfGuest(action, &indexPage, &db, &user);
+			action = GenerateSession(action, &config, &indexPage, &db, &user);
+			action = LogoutIfGuest(action, &config, &indexPage, &db, &user);
 		}
 	// ------------ end generate common parts
 
@@ -156,7 +157,7 @@ int main(void)
 			{
 				string		companies_list= "";
 
-				for(int i = 0; i < affected; ++i)
+				for(auto i = 0; i < affected; ++i)
 				{
 					if(companies_list.length()) companies_list += ",";
 					companies_list += db.Get(i, 0);
@@ -360,7 +361,7 @@ int main(void)
 											db.Query("UPDATE `timecard_approvals` SET `decision`=\"approved\", `eventTimestamp`=UNIX_TIMESTAMP() WHERE  `approver_id` IN (" + join(approver_ids) + ") AND `decision`=\"pending\" AND `timecard_id`=" + quoted(timecard_id) + ";");
 											if(!db.isError())
 											{
-												if(SubmitTimecard(timecard_id, &db, &user))
+												if(SubmitTimecard(timecard_id, &config, &db, &user))
 												{
 													success_message = GetObjectsSOW_Reusable_InJSONFormat("timecard", "submit", &db, &user);
 
@@ -478,7 +479,7 @@ int main(void)
 											db.Query("UPDATE `timecard_approvals` SET `decision`=\"rejected\",`comment`=" + quoted(comment) + ", `eventTimestamp`=UNIX_TIMESTAMP() WHERE  `approver_id` IN (" + join(approver_ids) + ") AND `decision`=\"pending\" AND `timecard_id`=" + quoted(timecard_id) + ";");
 											if(!db.isError())
 											{
-												if(SubmitTimecard(timecard_id, &db, &user))
+												if(SubmitTimecard(timecard_id, &config, &db, &user))
 												{
 													success_message = GetObjectsSOW_Reusable_InJSONFormat("timecard", "submit", &db, &user);
 
@@ -586,7 +587,7 @@ int main(void)
 												db.Query("UPDATE `bt_approvals` SET `decision`=\"rejected\",`comment`=" + quoted(comment) + ", `eventTimestamp`=UNIX_TIMESTAMP() WHERE  `approver_id`=" + quoted(approver_id) + " AND `decision`=\"pending\" AND `bt_id`=" + quoted(bt_id) + ";");
 												if(!db.isError())
 												{
-													if(SubmitBT(bt_id, &db, &user))
+													if(SubmitBT(bt_id, &config, &db, &user))
 													{
 														success_message = GetObjectsSOW_Reusable_InJSONFormat("bt", "submit", &db, &user);
 
@@ -701,7 +702,7 @@ int main(void)
 											db.Query("UPDATE `bt_approvals` SET `decision`=\"approved\",`comment`=" + quoted(comment) + ", `eventTimestamp`=UNIX_TIMESTAMP() WHERE  `approver_id`=" + quoted(approver_id) + " AND `decision`=\"pending\" AND `bt_id`=" + quoted(bt_id) + ";");
 											if(!db.isError())
 											{
-												if(SubmitBT(bt_id, &db, &user))
+												if(SubmitBT(bt_id, &config, &db, &user))
 												{
 													success_message = GetObjectsSOW_Reusable_InJSONFormat("bt", "submit", &db, &user);
 
@@ -1210,18 +1211,18 @@ int main(void)
 			(action == "AJAX_updateSubcontractorCreateTasks")
 		)
 		{
-			ostringstream	ostResult;
-
 			MESSAGE_DEBUG("", action, "start");
+
+			ostringstream	ostResult;
 
 			ostResult.str("");
 			{
-				string			template_name = "json_response.htmlt";
-				string			error_message = "";
+				auto			template_name	= "json_response.htmlt"s;
+				auto			error_message	= ""s;
 
-				string			sow_id 			= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("sow_id"));
-				string			id				= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
-				string			new_value		= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("value"));
+				auto			sow_id 			= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("sow_id"));
+				auto			id				= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("id"));
+				auto			new_value		= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("value"));
 
 				if(
 					new_value.length()						||
@@ -1262,7 +1263,7 @@ int main(void)
 								{
 									existing_value = GetDBValueByAction(action, id, sow_id, &db, &user);
 
-									error_message = DeleteEntryByAction(action, id, &db, &user);
+									error_message = DeleteEntryByAction(action, id, &config, &db, &user);
 									if(error_message.empty())
 									{
 										ostResult << "{\"result\":\"success\"}";
@@ -1395,7 +1396,7 @@ int main(void)
 								{
 									existing_value = GetDBValueByAction(action, id, sow_id, &db, &user);
 								
-									error_message = DeleteEntryByAction(action, id, &db, &user);
+									error_message = DeleteEntryByAction(action, id, &config, &db, &user);
 									if(error_message.empty())
 									{
 										ostResult << "{\"result\":\"success\"}";
@@ -3314,7 +3315,7 @@ int main(void)
 											error_message = isTimecardsHavePSOWAssigned(timecard_list, cost_center_id, &db, &user);
 											if(error_message.empty())
 											{
-												C_Invoice_Service_Agency_To_CC	c_invoice(&db, &user);
+												C_Invoice_Service_Agency_To_CC	c_invoice(&config, &db, &user);
 
 												c_invoice.SetTimecardList(timecard_list);
 												c_invoice.SetCostCenterID(cost_center_id);
@@ -3440,7 +3441,7 @@ int main(void)
 											error_message = isBTsHavePSOWAssigned(bt_list, cost_center_id, &db, &user);
 											if(error_message.empty())
 											{
-												C_Invoice_BT_Agency_To_CC	c_invoice(&db, &user);
+												C_Invoice_BT_Agency_To_CC	c_invoice(&config, &db, &user);
 
 												c_invoice.SetBTList(bt_list);
 												c_invoice.SetCostCenterID(cost_center_id);
@@ -3734,7 +3735,7 @@ int main(void)
 					if(affected)
 					{
 						success_message = ",\"autocomplete_list\":[";
-						for(int i = 0; i < affected; ++i)
+						for(auto i = 0; i < affected; ++i)
 						{
 							if(i) success_message += ",";
 							success_message += "{\"id\":\"" + db.Get(i, "id") + "\","
@@ -3967,7 +3968,7 @@ int main(void)
 								error_message = SetNewValueByAction(action, id, sow_id, "fake_new_value", &db, &user);
 								if(error_message.empty())
 								{
-									error_message = ResubmitEntitiesByAction(action, "fake", sow_id, "fake_new_value", &db, &user);
+									error_message = ResubmitEntitiesByAction(action, "fake", sow_id, "fake_new_value", &config, &db, &user);
 									if(error_message.empty())
 									{
 										success_message = GetInfoToReturnByAction(action, psow_id, sow_id, "fake_new_value", &db, &user);
@@ -4334,7 +4335,7 @@ int main(void)
 				{
 					if(isServiceInvoiceBelongsToUser(service_invoice_id, &db, &user))
 					{
-						if((error_message = RecallServiceInvoice(service_invoice_id, &db, &user)).empty())
+						if((error_message = RecallServiceInvoice(service_invoice_id, &config, &db, &user)).empty())
 						{
 							ostResult << "{\"result\":\"success\"}";
 						}
@@ -4390,7 +4391,7 @@ int main(void)
 				{
 					if(isBTInvoiceBelongsToUser(bt_invoice_id, &db, &user))
 					{
-						if((error_message = RecallBTInvoice(bt_invoice_id, &db, &user)).empty())
+						if((error_message = RecallBTInvoice(bt_invoice_id, &config, &db, &user)).empty())
 						{
 							ostResult << "{\"result\":\"success\"}";
 						}
@@ -4579,7 +4580,7 @@ int main(void)
 				{
 					int	affected = db.Query("SELECT `id`, `name` FROM `company` WHERE `name` LIKE \"%" + name + "%\" AND `type`=\"subcontractor\" LIMIT 0, 20;");
 
-					for(int i = 0; i < affected; ++i)
+					for(auto i = 0; i < affected; ++i)
 					{
 						if(i) autocomplete_str += ",";
 						autocomplete_str += "{\"id\":\"" + db.Get(i, "id") + "\","
@@ -4768,26 +4769,23 @@ int main(void)
 						else
 						{
 							auto	affected = db.Query("SELECT `value` FROM `contract_sow_custom_fields` WHERE `contract_sow_id`=\"" + sow_id + "\" AND `type`=\"file\";");
-
-							for(int i = 0; i < affected; ++i)
+							for(auto i = 0; i < affected; ++i)
 							{
-								unlink((TEMPLATE_SOW_DIRECTORY + "/" + db.Get(i, "value")).c_str());
+								unlink((config.GetFromFile("image_folders", "template_sow") + "/" + db.Get(i, "value")).c_str());
 							}
 
 							affected = db.Query("SELECT `value` FROM `contract_psow_custom_fields` WHERE `type`=\"file\" AND  `contract_psow_id` IN ("
 													"SELECT `id` FROM `contracts_psow` WHERE `contract_sow_id`=\"" + sow_id + "\""
 												");");
-
-							for(int i = 0; i < affected; ++i)
+							for(auto i = 0; i < affected; ++i)
 							{
-								unlink((TEMPLATE_PSOW_DIRECTORY + "/" + db.Get(i, "value")).c_str());
+								unlink((config.GetFromFile("image_folders", "template_psow") + "/" + db.Get(i, "value")).c_str());
 							}
 
-
 							affected = db.Query("SELECT `filename` FROM `contract_sow_agreement_files` WHERE `contract_sow_id`=\"" + sow_id + "\";");
-							for(int i = 0; i < affected; ++i)
+							for(auto i = 0; i < affected; ++i)
 							{
-								unlink((TEMPLATE_AGREEMENT_SOW_DIRECTORY + "/" + db.Get(i, 0)).c_str());
+								unlink((config.GetFromFile("image_folders", "template_agreement_sow") + "/" + db.Get(i, 0)).c_str());
 							}
 
 							affected = db.Query("SELECT `agreement_filename` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";");
@@ -4795,7 +4793,7 @@ int main(void)
 							{
 								if(db.Get(0, 0).length())
 								{
-									unlink((AGREEMENTS_SOW_DIRECTORY + "/" + db.Get(0, 0)).c_str());
+									unlink((config.GetFromFile("image_folders", "AGREEMENTS_SOW_DIRECTORY") + "/" + db.Get(0, 0)).c_str());
 								}
 								else
 								{
@@ -5089,26 +5087,14 @@ int main(void)
 										}
 										else if(action.find("delete") != string::npos)
 										{
-											if(db.Query("SELECT `filename` FROM `company_agreement_files` WHERE `id`=\"" + id + "\";"))
+											error_message = DeleteEntryByAction(action, id, &config, &db, &user);
+											if(error_message.empty())
 											{
-												auto	filename = db.Get(0, 0);
-
-												if(filename.length()) unlink((TEMPLATE_AGREEMENT_COMPANY_DIRECTORY + "/" + filename).c_str());
-
-												error_message = DeleteEntryByAction(action, id, &db, &user);
-												if(error_message.empty())
-												{
-													// --- good finish
-												}
-												else
-												{
-													MESSAGE_DEBUG("", action, "unable to set new value (action/id/value = " + action + "/" + id + "/[" + new_value + "])");
-												}
+												// --- good finish
 											}
 											else
 											{
-												error_message = gettext("SQL syntax error");
-												MESSAGE_ERROR("", action, "can't find contract_sow_agreement_files.id(" + id + ") in DB")
+												MESSAGE_DEBUG("", action, "unable to set new value (action/id/value = " + action + "/" + id + "/[" + new_value + "])");
 											}
 										}
 										else
@@ -5227,26 +5213,14 @@ int main(void)
 										}
 										else if(action.find("delete") != string::npos)
 										{
-											if(db.Query("SELECT `filename` FROM `contract_sow_agreement_files` WHERE `id`=\"" + id + "\";"))
+											error_message = DeleteEntryByAction(action, id, &config, &db, &user);
+											if(error_message.empty())
 											{
-												auto	filename = db.Get(0, 0);
-
-												if(filename.length()) unlink((TEMPLATE_AGREEMENT_SOW_DIRECTORY + "/" + filename).c_str());
-
-												error_message = DeleteEntryByAction(action, id, &db, &user);
-												if(error_message.empty())
-												{
-													// --- good finish
-												}
-												else
-												{
-													MESSAGE_DEBUG("", action, "unable to set new value (action/id/value = " + action + "/" + id + "/[" + new_value + "])");
-												}
+												// --- good finish
 											}
 											else
 											{
-												error_message = gettext("SQL syntax error");
-												MESSAGE_ERROR("", action, "can't find contract_sow_agreement_files.id(" + id + ") in DB")
+												MESSAGE_DEBUG("", action, "unable to set new value (action/id/value = " + action + "/" + id + "/[" + new_value + "])");
 											}
 										}
 										else
@@ -5323,7 +5297,7 @@ int main(void)
 						{
 							if(db.Get(0, 0) == "negotiating")
 							{
-								C_Agreements_SoW_Factory	agreements(&db, &user);
+								C_Agreements_SoW_Factory	agreements(&config, &db, &user);
 
 								agreements.SetSoWID(sow_id);
 
@@ -5409,7 +5383,7 @@ int main(void)
 									{
 										if(db.Get(0, 0).length())
 										{
-											unlink((AGREEMENTS_SOW_DIRECTORY + "/" + db.Get(0, 0)).c_str());
+											unlink((config.GetFromFile("image_folders", "AGREEMENTS_SOW_DIRECTORY") + "/" + db.Get(0, 0)).c_str());
 										}
 										else
 										{
@@ -5970,7 +5944,7 @@ int main(void)
 			auto			id = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("timecard_id"));
 			auto			reason = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("reason"));
 
-			auto			error_message = RecallTimecard(id, reason, &db, &user);
+			auto			error_message = RecallTimecard(id, reason, &config, &db, &user);
 			auto			success_message = ""s;
 
 			AJAX_ResponseTemplate(&indexPage, success_message, error_message);

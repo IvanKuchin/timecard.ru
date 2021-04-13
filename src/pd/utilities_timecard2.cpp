@@ -102,7 +102,7 @@ auto	isBTInvoiceBelongsToUser(string bt_invoice_id, CMysql *db, CUser *user) -> 
 	return result;
 }
 
-auto	RecallServiceInvoice(string service_invoice_id, CMysql *db, CUser *user) -> string
+auto	RecallServiceInvoice(string service_invoice_id, c_config *config, CMysql *db, CUser *user) -> string
 {
 	auto	error_message = ""s;
 
@@ -171,7 +171,7 @@ auto	RecallServiceInvoice(string service_invoice_id, CMysql *db, CUser *user) ->
 	return error_message;
 }
 
-auto	RecallBTInvoice(string bt_invoice_id, CMysql *db, CUser *user) -> string
+auto	RecallBTInvoice(string bt_invoice_id, c_config *config, CMysql *db, CUser *user) -> string
 {
 	auto	error_message = ""s;
 
@@ -4022,58 +4022,92 @@ string	ResubmitEntitiesByAction(string action, string id, string sow_id, string 
 	return error_message;
 }
 */
-auto DeleteEntryByAction(string action, string id, CMysql *db, CUser *user) -> string
+auto DeleteEntryByAction(string action, string id, c_config *config, CMysql *db, CUser *user) -> string
 {
-	string	error_message = "";
-
 	MESSAGE_DEBUG("", "", "start");
 
+	auto	error_message = ""s;
+
+	if(id.length())
 	{
-		if(id.length())
+		if(action == "AJAX_deleteTemplateAgreement_company")
 		{
-			if(action == "AJAX_deleteTemplateAgreement_company")
+			auto filename = GetValueFromDB("SELECT `filename` FROM `company_agreement_files` WHERE `id`=\"" + id + "\";", db);
+
+			if(filename.length()) 
 			{
-				db->Query("DELETE FROM `company_agreement_files` WHERE `id`=\"" + id + "\";");
-				if(db->isError())
-				{
-					MESSAGE_ERROR("", "", "fail to remove from table company_agreement_files");
-				}
+				filename = config->GetFromFile("image_folders", "template_agreement_company") + "/" + filename;
+				unlink(filename.c_str());
+				MESSAGE_DEBUG("", "", "deleting file " + filename);
 			}
-			else if(action == "AJAX_deleteTemplateAgreement_sow")
+
+			db->Query("DELETE FROM `company_agreement_files` WHERE `id`=\"" + id + "\";");
+			if(db->isError())
 			{
-				db->Query("DELETE FROM `contract_sow_agreement_files` WHERE `id`=\"" + id + "\";");
-				if(db->isError())
-				{
-					MESSAGE_ERROR("", "", "fail to remove from table contract_sow_agreement_files");
-				}
+				MESSAGE_ERROR("", "", "fail to remove from table company_agreement_files");
 			}
-			else if(action == "AJAX_deletePSoWCustomField")
+		}
+		else if(action == "AJAX_deleteTemplateAgreement_sow")
+		{
+			auto filename = GetValueFromDB("SELECT `filename` FROM `contract_sow_agreement_files` WHERE `id`=\"" + id + "\";", db);
+
+			if(filename.length())
 			{
-				db->Query("DELETE FROM `contract_psow_custom_fields` WHERE `id`=\"" + id + "\";");
-				if(db->isError())
-				{
-					MESSAGE_ERROR("", "", "fail to remove from table contract_psow_custom_fields");
-				}
+				filename = config->GetFromFile("image_folders", "template_agreement_sow") + "/" + filename;
+				unlink(filename.c_str());
+				MESSAGE_DEBUG("", "", "deleting file " + filename);
 			}
-			else if(action == "AJAX_deleteSoWCustomField")
+
+			db->Query("DELETE FROM `contract_sow_agreement_files` WHERE `id`=\"" + id + "\";");
+			if(db->isError())
 			{
-				db->Query("DELETE FROM `contract_sow_custom_fields` WHERE `id`=\"" + id + "\";");
-				if(db->isError())
-				{
-					MESSAGE_ERROR("", "", "fail to remove from table contract_sow_custom_fields");
-				}
+				MESSAGE_ERROR("", "", "fail to remove from table contract_sow_agreement_files");
 			}
-			else
+		}
+		else if(action == "AJAX_deletePSoWCustomField")
+		{
+			auto filename = GetValueFromDB("SELECT `value` FROM `contract_psow_custom_fields` WHERE `id`=\"" + id + "\" AND `type`=\"file\";", db);
+
+			if(filename.length())
 			{
-				error_message = "Неизвестное действие";
-				MESSAGE_ERROR("", "", "action is empty");
+				filename = config->GetFromFile("image_folders", "template_psow") + "/" + filename;
+				unlink(filename.c_str());
+				MESSAGE_DEBUG("", "", "deleting file " + filename);
+			}
+
+			db->Query("DELETE FROM `contract_psow_custom_fields` WHERE `id`=\"" + id + "\";");
+			if(db->isError())
+			{
+				MESSAGE_ERROR("", "", "fail to remove from table contract_psow_custom_fields");
+			}
+		}
+		else if(action == "AJAX_deleteSoWCustomField")
+		{
+			auto filename = GetValueFromDB("SELECT `value` FROM `contract_sow_custom_fields` WHERE `id`=\"" + id + "\" AND `type`=\"file\";", db);
+
+			if(filename.length())
+			{
+				filename = config->GetFromFile("image_folders", "template_sow") + "/" + filename;
+				unlink(filename.c_str());
+				MESSAGE_DEBUG("", "", "deleting file " + filename);
+			}
+
+			db->Query("DELETE FROM `contract_sow_custom_fields` WHERE `id`=\"" + id + "\";");
+			if(db->isError())
+			{
+				MESSAGE_ERROR("", "", "fail to remove from table contract_sow_custom_fields");
 			}
 		}
 		else
 		{
-			error_message = "Неизвестный идентификатор поля";
-			MESSAGE_ERROR("", "", "id is empty");
+			error_message = "Неизвестное действие";
+			MESSAGE_ERROR("", "", "action is empty");
 		}
+	}
+	else
+	{
+		error_message = "Неизвестный идентификатор поля";
+		MESSAGE_ERROR("", "", "id is empty");
 	}
 
 	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");

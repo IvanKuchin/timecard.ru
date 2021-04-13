@@ -282,7 +282,7 @@ auto C_Agreements_SoW_Factory::ProduceObjectVector() -> string
 		temp.SetID(db->Get(i, "id"));
 		temp.SetTitle(db->Get(i, "title"));
 		if(db->Get(i, "filename").length())
-			temp.SetFilename(config->GetFromFile("image_folders", "TEMPLATE_AGREEMENT_SOW_DIRECTORY") + "/" + db->Get(i, "filename"));
+			temp.SetFilename(config->GetFromFile("image_folders", "template_agreement_sow") + "/" + db->Get(i, "filename"));
 
 		agreement_list.push_back(temp);
 	}
@@ -297,7 +297,7 @@ auto C_Agreements_SoW_Factory::ProduceObjectVector() -> string
 		temp.SetID(db->Get(i, "id"));
 		temp.SetTitle(db->Get(i, "title"));
 		if(db->Get(i, "filename").length())
-			temp.SetFilename(config->GetFromFile("image_folders", "TEMPLATE_AGREEMENT_COMPANY_DIRECTORY") + "/" + db->Get(i, "filename"));
+			temp.SetFilename(config->GetFromFile("image_folders", "template_agreement_company") + "/" + db->Get(i, "filename"));
 
 		agreement_list.push_back(temp);
 	}
