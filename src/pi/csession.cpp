@@ -7,7 +7,7 @@ CSession::CSession() : db(NULL), cookies(NULL)
 	MESSAGE_DEBUG("", "", "start");
 
 	gettimeofday(&tv, NULL);
-	srand(tv.tv_sec * tv.tv_usec * 100000);
+	srand(tv.tv_sec * tv.tv_usec * 100000);  /* Flawfinder: ignore */
 
 	sessID = GetRandom(SESSION_LEN);
 

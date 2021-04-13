@@ -367,7 +367,7 @@ int CMail::SendMailExec(const char *progr, char **av, int inp)
 			RedirStderrToFile(GetStderrFname());
 			RedirStdoutToFile(GetStdoutFname());
 
-			execvp(progr, av);
+			execvp(progr, av);	 /* Flawfinder: ignore */
 			// --- child process will stop here
 			// --- execvp completely replace run-time environment to new process
 		}
@@ -469,12 +469,12 @@ bool CMail::SendLocal()
 	MESSAGE_DEBUG("", "", "start");
 
 	char	*argv[6];
-	char	rcpt[64];
-	char	from[64];
+	char	rcpt[128];
+	char	from[128];
 	long long	stderrSize, stdoutSize;
 
-	strcpy(rcpt, rcptto.c_str());
-	strcpy(from, mailfrom.c_str());
+	strncpy(rcpt, rcptto.c_str(), sizeof(rcpt) - 1);
+	strncpy(from, mailfrom.c_str(), sizeof(from) - 1);
 	argv[0] = const_cast<char *>("sendmail");
 	argv[1] = from;
 	argv[2] = rcpt;

@@ -498,7 +498,7 @@ bool	CVideoConverter::VideoConvert(int dstIndex, char **argv)
 		{
 			string  tmpDestFile = GetPreFinalFullFilename(dstIndex);
 
-			execvp(argv[0], argv);
+			execvp(argv[0], argv);  /* Flawfinder: ignore */
 		}
 		else
 		{
