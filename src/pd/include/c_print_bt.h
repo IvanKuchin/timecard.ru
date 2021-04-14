@@ -41,6 +41,9 @@ class C_Print_BT
 		c_float_with_rounding			effort_cost_vat = 0;
 		c_float							total_payment = 0;
 
+		string							xl_username = "";
+		string							xl_key = "";
+
 		libxl::Book						*__xls_book = nullptr;
 		libxl::Sheet					*__xls_sheet = nullptr;
 		int								__xls_row_counter = -1;
@@ -114,6 +117,8 @@ class C_Print_BT
 		auto		SetFilename(string &&param1) 					{ filename = move(param1); };
 
 		auto		GetFilename()									{ return filename; }
+
+		auto		xlSetKey(const string &p1, const string &p2)	{ xl_username = p1; xl_key = p2; };
 
 		auto		PrintAsXLS() -> string;
 		auto		PrintAsPDF() -> string;

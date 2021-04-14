@@ -98,6 +98,7 @@ auto C_Invoice_BT_Agency_To_CC::GenerateDocumentArchive() -> string
 			bt_printer.SetVariableSet(&invoicing_vars);
 
 			bt_printer.SetFilename(filename_xls);
+			bt_printer.xlSetKey(config->GetFromFile("secret", "XL_USERNAME"), config->GetFromFile("secret", "XL_KEY"));
 			error_message = bt_printer.PrintAsXLS();
 			if(error_message.length())
 			{
