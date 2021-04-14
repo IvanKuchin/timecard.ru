@@ -75,7 +75,7 @@ auto	C_Template2PDF_Printer::SaveTemporaryFile() -> string
 		if(GetFilename().length())
 		{
 			ofstream ofs;
-			ofs.open (GetFilename() + ".html", std::ofstream::out | std::ofstream::app);
+			ofs.open (GetFilename() + ".html", std::ofstream::out | std::ofstream::app);    /* Flawfinder: ignore */
 
 			ofs << content;
 

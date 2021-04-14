@@ -361,7 +361,7 @@ static auto SaveFilesAndUpdateDB(string ticket_history_id, c_config *config, CCg
 
 			{
 				// --- Save file to "/tmp/" for checking of image validity
-				auto	f = fopen(finalFilename.c_str(), "w");
+				auto	f = fopen(finalFilename.c_str(), "w");   /* Flawfinder: ignore */
 				if(f)
 				{
 					fwrite(indexPage->GetFilesHandler()->Get(filesCounter), indexPage->GetFilesHandler()->GetSize(filesCounter), 1, f);

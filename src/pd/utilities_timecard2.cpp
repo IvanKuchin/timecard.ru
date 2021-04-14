@@ -1547,7 +1547,7 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 							if(counter)
 							{
 
-								char	buffer[50];
+								char	buffer[50];   /* Flawfinder: ignore */
 								snprintf(buffer, strlen(buffer) - 1, ngettext("%d customers", "%d customers", counter), counter);  /* Flawfinder: ignore */
 
 								error_message = gettext("cost center assigned") + " "s + (buffer) + ". " +  gettext("removal prohibited");
@@ -5574,7 +5574,7 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 	}
 	if(action == "AJAX_updateSoWPaymentPeriodService")
 	{
-		char	buffer[50];
+		char	buffer[50];   /* Flawfinder: ignore */
 		snprintf(buffer, strlen(buffer) - 1, ngettext("%d days", "%d days", stoi(new_value)), stoi(new_value));  /* Flawfinder: ignore */
 
 		notification_description = gettext("SoW") + " ("s + GetSpelledSoWByID(sow_id, db) + "): " + gettext("service period payment") + " " + gettext("updated") + " " + gettext("from") + " "s + existing_value + " "  + gettext("to") + " "s + buffer;
@@ -5582,7 +5582,7 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 	}
 	if(action == "AJAX_updateSoWPaymentPeriodBT")
 	{
-		char	buffer[50];
+		char	buffer[50];    /* Flawfinder: ignore */
 		snprintf(buffer, strlen(buffer) - 1, ngettext("%d days", "%d days", stoi(new_value)), stoi(new_value));  /* Flawfinder: ignore */
 
 		notification_description = gettext("SoW") + " ("s + GetSpelledSoWByID(sow_id, db) + "): " + gettext("bt period payment") + " " + gettext("updated") + " " + gettext("from") + " "s + existing_value + " "  + gettext("to") + " "s + buffer;

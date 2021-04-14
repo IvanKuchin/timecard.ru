@@ -71,7 +71,7 @@ bool ImageConvertToJpg (const string src, const string dst, struct ExifInfo &exi
 		Magick::Geometry		imageGeometry;
 
 		// Read a file into image object
-		image.read( src );
+		image.read( src );   /* Flawfinder: ignore */
 
 		imageGeometry = image.size();
 		imageOrientation = image.orientation();
@@ -302,7 +302,7 @@ int main()
 		}
 		messageID = indexPage.GetVarsHandler()->Get("messageID");
 		try { // --- validity check
-			messageID = to_string(atol(messageID.c_str())); 
+			messageID = to_string(stol(messageID)); 
 		} catch (...) {
 			messageID = "";
 		}
@@ -437,7 +437,7 @@ int main()
 							MESSAGE_DEBUG("", "", "Save file to /tmp for checking of image validity [" + tmpFile2Check + "]");
 
 							// --- Save file to "/tmp/" for checking of image validity
-							f = fopen(tmpFile2Check.c_str(), "w");
+							f = fopen(tmpFile2Check.c_str(), "w");   /* Flawfinder: ignore */
 							if(f == NULL)
 							{
 								MESSAGE_ERROR("", "", "writing file:" + tmpFile2Check.c_str());
@@ -581,7 +581,7 @@ int main()
 							MESSAGE_DEBUG("", "", "Save file to /tmp for checking of video validity [" + tmpFile2Check + "]");
 
 							// --- Save file to "/tmp/" for checking of video validity
-							f = fopen(tmpFile2Check.c_str(), "w");
+							f = fopen(tmpFile2Check.c_str(), "w");   /* Flawfinder: ignore */
 							if(f == NULL)
 							{
 								MESSAGE_ERROR("", "", "writing file:" + tmpFile2Check);

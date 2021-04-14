@@ -88,7 +88,7 @@ auto	C_Print_1C_CostCenter_Base::SaveFile() -> string
 		if(GetFilename().length())
 		{
 			ofstream ofs;
-			ofs.open (GetFilename(), std::ofstream::out | std::ofstream::app);
+			ofs.open (GetFilename(), std::ofstream::out | std::ofstream::app);   /* Flawfinder: ignore */
 
 			ofs << content;
 

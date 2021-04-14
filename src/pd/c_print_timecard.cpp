@@ -2,7 +2,7 @@
 
 static void error_handler (HPDF_STATUS error_no, HPDF_STATUS detail_no, void *user_data)
 {
-	char	buffer[512];
+	char	buffer[512];    /* Flawfinder: ignore */
 
     snprintf(buffer, sizeof(buffer) - 1, "error_no=%04X, detail_no=%d\n", (unsigned int) error_no, (int) detail_no);
     MESSAGE_ERROR("", "", "libhpdf: " +  buffer);

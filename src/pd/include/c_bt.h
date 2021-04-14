@@ -105,7 +105,7 @@ class C_ExpenseLine
 		string					GetComment() const									{ return comment; }
 		void					SetRandom(const string &param)						{ random = param; }
 		void					SetRandom(string &&param) noexcept					{ random = move(param); }
-		string					GetRandom() const									{ return random; }
+		string					GetRandom() const									{ return random; }      /* Flawfinder: ignore */
 		void					SetParentRandom(const string &param)				{ parent_random = param; }
 		void					SetParentRandom(string &&param) noexcept			{ parent_random = move(param); }
 		string					GetParentRandom() const								{ return parent_random; }
@@ -171,7 +171,7 @@ class C_Expense
 		string					GetComment() const								{ return comment; }
 		void					SetRandom(const string &param)					{ random = param; }
 		void					SetRandom(string &&param) noexcept				{ random = move(param); }
-		string					GetRandom() const								{ return random; }
+		string					GetRandom() const								{ return random; }      /* Flawfinder: ignore */
 		void					AddExpenseLine(C_ExpenseLine param)				{ expense_lines.push_back(param); }
 		vector<C_ExpenseLine>	GetExpenseLines() const							{ return expense_lines; }
 

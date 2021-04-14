@@ -158,7 +158,7 @@ auto	C_Print_1C_Subcontractor_Base::SaveFile() -> string
 		if(uniq_fname.length())
 		{
 			ofstream ofs;
-			ofs.open (uniq_fname, std::ofstream::out | std::ofstream::app);
+			ofs.open (uniq_fname, std::ofstream::out | std::ofstream::app);    /* Flawfinder: ignore */
 
 			ofs << content;
 
