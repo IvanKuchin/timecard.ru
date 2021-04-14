@@ -36,6 +36,9 @@ class C_Print_Invoice_Docs_Base
 		string							filename = "";
 		string							cost_center_id = "";
 
+		string							xl_username = "";
+		string							xl_key = "";
+
 		libxl::Sheet					*__sheet = nullptr;
 		libxl::Book						*__book = nullptr;
 		int								__row_counter = 1;
@@ -64,6 +67,7 @@ class C_Print_Invoice_Docs_Base
 
 		auto			GetFilename()									{ return filename; }
 
+		auto			xlSetKey(const string &p1, const string &p2)	{ xl_username = p1; xl_key = p2; };
 		auto			PrintAsXLS() -> string;
 		auto			__XLS_DrawBorder(int left, int top, int right, int bottom) -> string;
 		auto			__DrawXLSRowUnderline() -> string;

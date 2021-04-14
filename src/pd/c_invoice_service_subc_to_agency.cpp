@@ -128,6 +128,7 @@ auto C_Invoice_Service_Subc_To_Agency::GenerateDocumentArchive() -> string
 			timecard_printer.SetVariableSet(&invoicing_vars);
 			timecard_printer.SetHolidays(GetHolidaysSet(GetSpellingFormattedDate(timecard.GetDateStart(), "%F"), db));
 
+			timecard_printer.xlSetKey(config->GetFromFile("secret", "XL_USERNAME"), config->GetFromFile("secret", "XL_KEY"));
 			timecard_printer.SetFilename(filename_xls);
 			error_message = timecard_printer.PrintAsXLS();
 			if(error_message.length())
@@ -190,6 +191,7 @@ auto C_Invoice_Service_Subc_To_Agency::GenerateDocumentArchive() -> string
 
 			if(error_message.empty()) 
 			{
+				invoice_printer->xlSetKey(config->GetFromFile("secret", "XL_USERNAME"), config->GetFromFile("secret", "XL_KEY"));
 				invoice_printer->SetFilename(invoice_filename_xls);
 				error_message = invoice_printer->PrintAsXLS();
 				if(error_message.empty()) {}
@@ -224,6 +226,7 @@ auto C_Invoice_Service_Subc_To_Agency::GenerateDocumentArchive() -> string
 
 			if(error_message.empty()) 
 			{
+				act_printer->xlSetKey(config->GetFromFile("secret", "XL_USERNAME"), config->GetFromFile("secret", "XL_KEY"));
 				act_printer->SetFilename(act_filename_xls);
 				error_message = act_printer->PrintAsXLS();
 				if(error_message.empty()) {}
@@ -261,6 +264,7 @@ auto C_Invoice_Service_Subc_To_Agency::GenerateDocumentArchive() -> string
 
 				if(error_message.empty()) 
 				{
+					vat_printer->xlSetKey(config->GetFromFile("secret", "XL_USERNAME"), config->GetFromFile("secret", "XL_KEY"));
 					vat_printer->SetFilename(vat_filename_xls);
 					error_message = vat_printer->PrintAsXLS();
 					if(error_message.empty()) {}

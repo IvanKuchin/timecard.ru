@@ -268,7 +268,6 @@ auto	C_Print_BT::PrintAsXLS() -> string
 		__xls_book = xlCreateBook();
 		if(__xls_book)
 		{
-			// __xls_book->setKey(L"Ivan Kuchin", L"linux-e7d7147298a7a2140508293e47t5j7sf");
 			__xls_book->setKey(multibyte_to_wide(xl_username).c_str(), multibyte_to_wide(xl_key).c_str());
 
 			__xls_sheet = __xls_book->addSheet(L"Sheet1");

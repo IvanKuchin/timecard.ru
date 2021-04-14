@@ -53,6 +53,9 @@ class C_Print_Timecard
 		c_float							effort_cost_vat = 0;
 		c_float							total_payment = 0;
 
+		string							xl_username = "";
+		string							xl_key = "";
+
 		HPDF_Doc						__pdf;
 		HPDF_Page						__pdf_page;
 		HPDF_REAL						__pdf_page_width = 0;
@@ -141,6 +144,8 @@ class C_Print_Timecard
 		auto		SetHolidays(const unordered_set<string> &param1){ holidays = param1; };
 
 		auto		GetFilename() const								{ return filename; }
+
+		auto		xlSetKey(const string &p1, const string &p2)	{ xl_username = p1; xl_key = p2; };
 
 		auto		PrintAsXLS() -> string;
 		auto		PrintAsPDF() -> string;
