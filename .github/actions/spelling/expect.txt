@@ -810,3 +810,4 @@ bts
 TCs
 objs
 multiline
+Flawfinder
