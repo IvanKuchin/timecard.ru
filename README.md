@@ -1,5 +1,7 @@
 # timecard.ru
 
-![Travis (.com) branch](https://travis-ci.com/IvanKuchin/timecard.ru.svg?branch=development)
-![Spell checking](https://github.com/IvanKuchin/timecard.ru/workflows/Spell%20checking/badge.svg)
+Web-site backend to track subcontractor reporting time on a weekly or monthly basis. 
 
+List of implemented integrations
+- air/hotel booking system 
+- 1C reporting
