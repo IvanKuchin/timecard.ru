@@ -11,6 +11,8 @@
 
 using namespace std;
 
+#define	BUSINESS_TRIP_TAX_PERCENTAGE				6.38
+
 class C_BT_To_Print
 {
 

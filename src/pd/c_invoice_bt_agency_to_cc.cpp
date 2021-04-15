@@ -63,6 +63,7 @@ auto C_Invoice_BT_Agency_To_CC::GenerateDocumentArchive() -> string
 	// --- generate variable for invoicing
 	if(error_message.empty())
 	{
+		invoicing_vars.SetConfig(config);
 		invoicing_vars.SetDB(db);
 		invoicing_vars.SetUser(user);
 		invoicing_vars.SetCostCenterID(cost_center_id);
@@ -96,6 +97,7 @@ auto C_Invoice_BT_Agency_To_CC::GenerateDocumentArchive() -> string
 			bt_printer.SetBT(bt);
 			bt_printer.SetVariableSet(&invoicing_vars);
 
+			bt_printer.xlSetKey(config->GetFromFile("secret", "XL_USERNAME"), config->GetFromFile("secret", "XL_KEY"));
 			bt_printer.SetFilename(filename_xls);
 			error_message = bt_printer.PrintAsXLS();
 			if(error_message.length())
@@ -163,6 +165,7 @@ auto C_Invoice_BT_Agency_To_CC::GenerateDocumentArchive() -> string
 
 			if(error_message.empty()) 
 			{
+				invoice_printer->xlSetKey(config->GetFromFile("secret", "XL_USERNAME"), config->GetFromFile("secret", "XL_KEY"));
 				invoice_printer->SetFilename(invoice_filename_xls);
 				error_message = invoice_printer->PrintAsXLS();
 				if(error_message.empty()) {}
@@ -196,6 +199,7 @@ auto C_Invoice_BT_Agency_To_CC::GenerateDocumentArchive() -> string
 
 			if(error_message.empty()) 
 			{
+				act_printer->xlSetKey(config->GetFromFile("secret", "XL_USERNAME"), config->GetFromFile("secret", "XL_KEY"));
 				act_printer->SetFilename(act_filename_xls);
 				error_message = act_printer->PrintAsXLS();
 				if(error_message.empty()) {}
@@ -229,6 +233,7 @@ auto C_Invoice_BT_Agency_To_CC::GenerateDocumentArchive() -> string
 
 			if(error_message.empty()) 
 			{
+				vat_printer->xlSetKey(config->GetFromFile("secret", "XL_USERNAME"), config->GetFromFile("secret", "XL_KEY"));
 				vat_printer->SetFilename(vat_filename_xls);
 				error_message = vat_printer->PrintAsXLS();
 				if(error_message.empty()) {}
@@ -352,7 +357,7 @@ auto C_Invoice_BT_Agency_To_CC::GenerateDocumentArchive() -> string
 		{
 			c_archive	ar;
 
-			ar.SetFilename(INVOICES_CC_DIRECTORY + archive_folder + "/" + archive_file);
+			ar.SetFilename(config->GetFromFile("image_folders", "INVOICES_CC_DIRECTORY") + archive_folder + "/" + archive_file);
 			ar.SetFolderToArchive(temp_dir);
 			ar.Archive();
 		}
@@ -375,12 +380,12 @@ auto C_Invoice_BT_Agency_To_CC::CreateTempDirectory() -> bool
 	{
 		auto		__random = GetRandom(15);
 
-		archive_folder = to_string( (int)(rand()/(RAND_MAX + 1.0) * INVOICES_CC_NUMBER_OF_FOLDERS) + 1);
+		archive_folder = to_string( (int)(rand()/(RAND_MAX + 1.0) * stod_noexcept(config->GetFromFile("number_of_folders", "INVOICES_CC_NUMBER_OF_FOLDERS"))) + 1);
 		archive_file = GetRandom(15) + ARCHIVE_FILE_EXTENSION;
 
-		temp_dir = TEMP_DIRECTORY_PREFIX + __random;
-		temp_archive_file = TEMP_DIRECTORY_PREFIX + __random + ARCHIVE_FILE_EXTENSION;
-	} while(isDirExists(temp_dir) || isFileExists(temp_archive_file) || isFileExists(INVOICES_CC_DIRECTORY + archive_folder + "/" + archive_file));
+		temp_dir = config->GetFromFile("image_folders", "TEMP_DIRECTORY_PREFIX") + __random;
+		temp_archive_file = config->GetFromFile("image_folders", "TEMP_DIRECTORY_PREFIX") + __random + ARCHIVE_FILE_EXTENSION;
+	} while(isDirExists(temp_dir) || isFileExists(temp_archive_file) || isFileExists(config->GetFromFile("image_folders", "INVOICES_CC_DIRECTORY") + archive_folder + "/" + archive_file));
 
 	if(CreateDir(temp_dir))
 	{
@@ -641,7 +646,7 @@ auto C_Invoice_BT_Agency_To_CC::UpdateDBWithInvoiceData(const string bt_id) -> s
 					{
 						// --- new invoice
 						invoice_cost_center_bt_id = db->InsertQuery( 
-											"INSERT INTO `invoice_cost_center_bt` (`cost_center_id`, `file`, `owner_company_id`, `owner_user_id`, `act_id`, `eventTimestamp`)"
+											"INSERT INTO `invoice_cost_center_bt` (`cost_center_id`, `file`, `owner_company_id`, `owner_user_id`, `invoice_id`, `eventTimestamp`)"
 											"VALUES (" + 
 												quoted(cost_center_id) + "," +
 												quoted(archive_folder + "/" + archive_file) + "," +

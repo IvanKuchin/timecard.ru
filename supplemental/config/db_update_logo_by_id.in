@@ -1,0 +1,8 @@
+company_profile_logo            = UPDATE `company`                      SET `<<config:db_field_name_photo_folder:<<var:itemType>>>>`= "<<var:folderName>>", `<<config:db_field_name_photo_filename:<<var:itemType>>>>`="<<var:fileName>>" WHERE `id`="<<var:itemID>>";
+template_agreement_company      = UPDATE `company_agreement_files`      SET `<<config:db_field_name_photo_filename:<<var:itemType>>>>`="<<var:folderName>>/<<var:fileName>>" WHERE `id`="<<var:itemID>>";
+template_sow                    = UPDATE `contract_sow_custom_fields`   SET `<<config:db_field_name_photo_filename:<<var:itemType>>>>`="<<var:folderName>>/<<var:fileName>>" WHERE `id`="<<var:itemID>>";
+template_psow                   = UPDATE `contract_psow_custom_fields`  SET `<<config:db_field_name_photo_filename:<<var:itemType>>>>`="<<var:folderName>>/<<var:fileName>>" WHERE `id`="<<var:itemID>>";
+template_costcenter             = UPDATE `cost_center_custom_fields`    SET `<<config:db_field_name_photo_filename:<<var:itemType>>>>`="<<var:folderName>>/<<var:fileName>>" WHERE `id`="<<var:itemID>>";
+template_agreement_sow          = UPDATE `contract_sow_agreement_files` SET `<<config:db_field_name_photo_filename:<<var:itemType>>>>`="<<var:folderName>>/<<var:fileName>>" WHERE `id`="<<var:itemID>>";
+template_company                = UPDATE `company_custom_fields`        SET `<<config:db_field_name_photo_filename:<<var:itemType>>>>`="<<var:folderName>>/<<var:fileName>>" WHERE `id`="<<var:itemID>>";
+

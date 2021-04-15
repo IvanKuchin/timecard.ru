@@ -84,6 +84,7 @@ class C_Smartway_Employees
 class C_Smartway
 {
 	private: 
+		c_config		*config = nullptr;
 		CMysql			*db = nullptr;
 		CUser			*user = nullptr;
 
@@ -145,8 +146,7 @@ class C_Smartway
 		string			SaveVoucher(const string &content, const string &extension);
 
 	public:
-						C_Smartway()	{};
-						C_Smartway(CMysql *p1, CUser *p2) : db(p1), user(p2) { employees.SetDB(db); employees.SetUser(user);  };
+						C_Smartway(c_config *p1, CMysql *p2, CUser *p3) : config(p1), db(p2), user(p3) { employees.SetDB(db); employees.SetUser(user);  };
 
 		void			SetSoW(const string &param) { sow_id = param; };
 		void			SetSoW(string &&param) { sow_id = move(param); };

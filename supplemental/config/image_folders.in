@@ -1,0 +1,21 @@
+avatar                                  = ${IMAGEROOTDIR}/html/images/avatars
+company_profile_logo                    = ${IMAGEROOTDIR}/html/images/companies
+
+template_agreement_company              = ${IMAGEROOTDIR}/html/templates_agreement_company/
+template_sow                            = ${IMAGEROOTDIR}/html/templates_sow/
+template_psow                           = ${IMAGEROOTDIR}/html/templates_psow/
+template_costcenter                     = ${IMAGEROOTDIR}/html/templates_costcenter/
+template_agreement_sow                  = ${IMAGEROOTDIR}/html/templates_agreement_sow/
+template_company                        = ${IMAGEROOTDIR}/html/templates_company/
+expense_line                            = ${IMAGEROOTDIR}/html/images/expense_lines
+
+AGREEMENTS_SOW_DIRECTORY                = ${IMAGEROOTDIR}/html/agreements_sow/
+INVOICES_SUBC_DIRECTORY                 = ${IMAGEROOTDIR}/html/invoices_subc/
+INVOICES_CC_DIRECTORY                   = ${IMAGEROOTDIR}/html/invoices_cc/
+
+SMARTWAY_VOUCHERS_DIRECTORY             = ${IMAGEROOTDIR}/html/smartway_vouchers/
+
+IMAGE_TEMP_DAILY_CLEANUPDIRECTORY       = ${IMAGEROOTDIR}/html/images/temp_daily_cleanup
+TEMP_DIRECTORY_PREFIX                   = /tmp/${PROJECT_NAME}_
+
+helpdesk_ticket_attach                  = ${IMAGEROOTDIR}/html/helpdesk_ticket_attaches/

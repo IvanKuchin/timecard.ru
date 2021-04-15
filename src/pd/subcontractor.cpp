@@ -187,6 +187,7 @@ int main()
 {
 	CStatistics		appStat;  // --- CStatistics must be first statement to measure end2end param's
 	CCgi			indexPage(EXTERNAL_TEMPLATE);
+	c_config		config(CONFIG_DIR);
 	CUser			user;
 	string			action, partnerID;
 	CMysql			db;
@@ -199,7 +200,7 @@ int main()
 	signal(SIGSEGV, crash_handler);
 
 	gettimeofday(&tv, NULL);
-	srand(tv.tv_sec * tv.tv_usec * 100000);
+	srand(tv.tv_sec * tv.tv_usec * 100000);  /* Flawfinder: ignore */
 
 	try
 	{
@@ -213,7 +214,7 @@ int main()
 		throw CException("Template file was missing");
 	}
 
-	if(db.Connect() < 0)
+	if(db.Connect(&config) < 0)
 	{
 		MESSAGE_DEBUG("", action, "Can not connect to mysql database");
 		throw CExceptionHTML("MySql connection");
@@ -243,8 +244,8 @@ int main()
 		}
 
 		//------- Generate session
-		action = GenerateSession(action, &indexPage, &db, &user);
-		action = LogoutIfGuest(action, &indexPage, &db, &user);
+		action = GenerateSession(action, &config, &indexPage, &db, &user);
+		action = LogoutIfGuest(action, &config, &indexPage, &db, &user);
 	}
 // ------------ end generate common parts
 
@@ -1020,7 +1021,7 @@ int main()
 									db.Query("UPDATE `timecards` SET `status`=\"submit\", `submit_date`=UNIX_TIMESTAMP() WHERE `id`=\"" + timecard_id + "\";");
 									if(!db.isError())
 									{
-										if(SubmitTimecard(timecard_id, &db, &user))
+										if(SubmitTimecard(timecard_id, &config, &db, &user))
 										{
 											success_description = GetTimecardsSOWTaskAssignment_Reusable_InJSONFormat(current_period_start_year + "-" + current_period_start_month + "-" + current_period_start_date, &db, &user);
 										}
@@ -1315,6 +1316,7 @@ int main()
 		}
 
 		// --- craft BT object
+		bt.SetConfig			(&config);
 		bt.SetDB				(&db);
 		bt.SetUser				(&user);
 		bt.SetID				(CheckHTTPParam_Number	(http_params->Get("bt_id")));
@@ -1396,7 +1398,7 @@ int main()
 										// --- take care of an image/pdf file
 										MESSAGE_DEBUG("", action, "expense_item_doc_main_field_" + expense_line_random + file_ext + " file size is " + to_string(file_size));
 
-										auto	error_message = CheckFileFromHandler("expense_item_doc_main_field_" + expense_line_random + file_ext, "expense_line", indexPage.GetFilesHandler(), file_ext);
+										auto	error_message = CheckFileFromHandler("expense_item_doc_main_field_" + expense_line_random + file_ext, "expense_line", indexPage.GetFilesHandler(), file_ext, &config);
 
 										if(error_message.empty())
 										{
@@ -1484,7 +1486,7 @@ int main()
 					{
 						// --- take care of an image/pdf file
 						MESSAGE_DEBUG("", action, "expense_item_doc_main_field_" + expense_line_random + file_ext + " file size is " + to_string(file_size));
-						path_to_file = SaveFileFromHandler("expense_item_doc_main_field_" + expense_line_random + file_ext, "expense_line", indexPage.GetFilesHandler(), file_ext);
+						path_to_file = SaveFileFromHandler("expense_item_doc_main_field_" + expense_line_random + file_ext, "expense_line", indexPage.GetFilesHandler(), file_ext, &config);
 						expense_line.SetValue(path_to_file);
 
 						if(path_to_file.length())
@@ -1630,8 +1632,8 @@ int main()
 
 										if((dom_type == "image") && (value.length()))
 										{
-											MESSAGE_DEBUG("", action, "remove image (" + IMAGE_EXPENSELINES_DIRECTORY + "/" + value + ")");
-											unlink((IMAGE_EXPENSELINES_DIRECTORY + "/" + value).c_str());
+											MESSAGE_DEBUG("", action, "remove image (" + config.GetFromFile("image_folders", "expense_line") + "/" + value + ")");
+											unlink((config.GetFromFile("image_folders", "expense_line") + "/" + value).c_str());
 										}
 									}
 
@@ -1754,8 +1756,8 @@ int main()
 
 									if((dom_type == "image") && (value.length()))
 									{
-										MESSAGE_DEBUG("", action, "remove image (" + IMAGE_EXPENSELINES_DIRECTORY + "/" + value + ")");
-										unlink((IMAGE_EXPENSELINES_DIRECTORY + "/" + value).c_str());
+										MESSAGE_DEBUG("", action, "remove image (" + config.GetFromFile("image_folders", "expense_line") + "/" + value + ")");
+										unlink((config.GetFromFile("image_folders", "expense_line") + "/" + value).c_str());
 									}
 								}
 
@@ -1765,7 +1767,7 @@ int main()
 								db.Query("DELETE FROM `bt_expenses` WHERE `bt_id`=\"" + bt_id + "\";");
 								db.Query("DELETE FROM `bt` WHERE `id`=\"" + bt_id + "\";");
 								db.Query("DELETE FROM `bt_approvals` WHERE `bt_id`=\"" + bt_id + "\";");
-								db.Query("DELETE FROM `acts` WHERE `id`=(" + act_id + ");");
+								db.Query("DELETE FROM `invoices` WHERE `id`=(" + act_id + ");");
 							}
 						}
 						else
@@ -1886,6 +1888,7 @@ int main()
 		(action == "AJAX_updateCompanyActNumberPrefix")			||
 		(action == "AJAX_updateCompanyActNumberPostfix")		||
 		(action == "AJAX_updateCompanyVAT")						||
+		(action == "AJAX_updateCompanyVATCalculationType")		||
 		(action == "AJAX_updateCompanyAccount")					||
 		(action == "AJAX_updateCompanyOGRN")					||
 		(action == "AJAX_updateCompanyKPP")						||
@@ -1922,6 +1925,7 @@ int main()
 				if(action == "AJAX_updateCompanyActNumberPostfix"){	id = company_id; }
 				if(action == "AJAX_updateCompanyTIN")			{	id = company_id; }
 				if(action == "AJAX_updateCompanyVAT")			{	id = company_id; }
+				if(action == "AJAX_updateCompanyVATCalculationType"){ new_value = (new_value == "Y" ? "sum_by_row" : "percentage");	if(company_id.length())	id = company_id; else { error_message = gettext("Company not found"); MESSAGE_ERROR("", action, "Company not defined in HTTP parameters"); } }
 				if(action == "AJAX_updateCompanyAccount")		{	id = company_id; }
 				if(action == "AJAX_updateCompanyOGRN")			{	id = company_id; }
 				if(action == "AJAX_updateCompanyKPP")			{	id = company_id; }
@@ -2061,7 +2065,7 @@ int main()
 								{
 									existing_value = GetDBValueByAction(action, id, sow_id, &db, &user);
 
-									error_message = DeleteEntryByAction(action, id, &db, &user);
+									error_message = DeleteEntryByAction(action, id, &config, &db, &user);
 									if(error_message.empty())
 									{
 										// --- good2go
@@ -2672,7 +2676,7 @@ int main()
 		ostResult.str("");
 
 		{
-			C_Smartway		smartway(&db, &user);
+			C_Smartway		smartway(&config, &db, &user);
 
 			// error_message = smartway.ping();
 			if(error_message.empty())
@@ -2743,7 +2747,7 @@ int main()
 
 			if(flight_routes.size())
 			{
-				C_Smartway		smartway(&db, &user);
+				C_Smartway		smartway(&config, &db, &user);
 
 				// error_message = smartway.ping();
 				if(error_message.empty())
@@ -2817,7 +2821,7 @@ int main()
 			{
 				if(db.Query("SELECT `id` FROM `airline_bookings` WHERE `contract_sow_id`=\"" + sow_id + "\" AND `search_id`=\"" + search_id + "\" AND `search_trip_id`=\"" + trip_id + "\" AND `search_fare_id`=\"" + fare_id + "\" AND `status`=\"done\";") == 0)
 				{
-					C_Smartway		smartway(&db, &user);
+					C_Smartway		smartway(&config, &db, &user);
 
 					smartway.SetSoW(sow_id);
 					error_message = smartway.airline_book(passport_type, search_id, trip_id, fare_id);
@@ -2978,7 +2982,7 @@ int main()
 
 		if(voucher_id.length())
 		{
-			C_Smartway		smartway(&db, &user);
+			C_Smartway		smartway(&config, &db, &user);
 			error_message = smartway.trip_item_voucher(voucher_id);
 		}
 		else

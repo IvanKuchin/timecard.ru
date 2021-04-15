@@ -393,7 +393,7 @@ string	C_ExpenseLine::CheckValidity(C_ExpenseLineTemplate exp_line_template, CMy
 	return result;
 }
 
-string	C_ExpenseLine::RemoveOldImage(CMysql *db)
+string	C_ExpenseLine::RemoveOldImage(c_config *config, CMysql *db)
 {
 	string	error_message = ""; // --- assign smth to error_message only if further actions have to be aborted
 
@@ -416,8 +416,8 @@ string	C_ExpenseLine::RemoveOldImage(CMysql *db)
 
 				if((dom_type == "image") && (value.length()))
 				{
-					MESSAGE_DEBUG("C_ExpenseLine", "", "remove image (" + IMAGE_EXPENSELINES_DIRECTORY + "/" + value + ")");
-					unlink((IMAGE_EXPENSELINES_DIRECTORY + "/" + value).c_str());
+					MESSAGE_DEBUG("C_ExpenseLine", "", "remove image (" + config->GetFromFile("image_folders", "expense_line") + "/" + value + ")");
+					unlink((config->GetFromFile("image_folders", "expense_line") + "/" + value).c_str());
 				}
 			}
 		}
@@ -437,7 +437,7 @@ string	C_ExpenseLine::RemoveOldImage(CMysql *db)
 	return error_message;
 }
 
-string	C_ExpenseLine::SaveToDB(string bt_expense_id, CMysql *db)
+string	C_ExpenseLine::SaveToDB(string bt_expense_id, c_config *config, CMysql *db)
 {
 	string		error_message = "";
 
@@ -448,7 +448,7 @@ string	C_ExpenseLine::SaveToDB(string bt_expense_id, CMysql *db)
 		if(GetID().length() && (GetID() != "0"))
 		{
 			
-			if(GetValue().length()) error_message = RemoveOldImage(db);
+			if(GetValue().length()) error_message = RemoveOldImage(config, db);
 			if(error_message.empty())
 			{
 				string	update_query = "";
@@ -504,7 +504,7 @@ string	C_ExpenseLine::SaveToDB(string bt_expense_id, CMysql *db)
 	return error_message;
 }
 
-bool C_ExpenseLine::RemoveUnsavedLinesImages(CMysql *db) const
+bool C_ExpenseLine::RemoveUnsavedLinesImages(c_config *config, CMysql *db) const
 {
 	bool		result = false;
 
@@ -529,8 +529,8 @@ bool C_ExpenseLine::RemoveUnsavedLinesImages(CMysql *db) const
 
 					if(dom_type == "image")
 					{
-						MESSAGE_DEBUG("C_ExpenseLine", "", "remove (" + IMAGE_EXPENSELINES_DIRECTORY + "/" + GetValue() + ") image");
-						unlink((IMAGE_EXPENSELINES_DIRECTORY + "/" + GetValue()).c_str());
+						MESSAGE_DEBUG("C_ExpenseLine", "", "remove (" + config->GetFromFile("image_folders", "expense_line") + "/" + GetValue() + ") image");
+						unlink((config->GetFromFile("image_folders", "expense_line") + "/" + GetValue()).c_str());
 						result = true;
 					}
 					else
@@ -735,7 +735,7 @@ string	C_Expense::CheckValidity(CMysql *db) const
 	return result;
 }
 
-string	C_Expense::SaveToDB(string bt_id, CMysql *db)
+string	C_Expense::SaveToDB(string bt_id, c_config *config, CMysql *db)
 {
 	string		error_message = "";
 
@@ -795,7 +795,7 @@ string	C_Expense::SaveToDB(string bt_id, CMysql *db)
 		{
 			for(auto &expense_line: expense_lines)
 			{
-				error_message = expense_line.SaveToDB(GetID(), db);
+				error_message = expense_line.SaveToDB(GetID(), config, db);
 
 				if(error_message.length())
 				{
@@ -816,7 +816,7 @@ string	C_Expense::SaveToDB(string bt_id, CMysql *db)
 	return error_message;
 }
 
-bool C_Expense::RemoveUnsavedLinesImages(CMysql *db) const
+bool C_Expense::RemoveUnsavedLinesImages(c_config *config, CMysql *db) const
 {
 	bool		result = true;
 
@@ -824,7 +824,7 @@ bool C_Expense::RemoveUnsavedLinesImages(CMysql *db) const
 
 	for(auto &expense_line: expense_lines)
 	{
-		if(!expense_line.RemoveUnsavedLinesImages(db)) result = false;
+		if(!expense_line.RemoveUnsavedLinesImages(config, db)) result = false;
 	}
 	
 	MESSAGE_DEBUG("C_Expense", "", "finish (result length is " + to_string(result) + ")");
@@ -1181,7 +1181,7 @@ string	C_BT::SaveToDB()
 								"`place`=\"" + GetDestination() + "\", "
 								"`purpose`=\"" + GetPurpose() + "\", "
 								+ (GetAction() == "submit" ? "`status`=\"submit\",`submit_date`=UNIX_TIMESTAMP(), " : "") +
-								"`act_id`=\"" + to_string(act_id) + "\","
+								"`invoice_id`=\"" + to_string(act_id) + "\","
 								"`eventTimestamp`=UNIX_TIMESTAMP() "
 								";"
 						);
@@ -1206,7 +1206,7 @@ string	C_BT::SaveToDB()
 		{
 			for(auto &expense: expenses)
 			{
-				error_message = expense.SaveToDB(GetID(), db);
+				error_message = expense.SaveToDB(GetID(), config, db);
 
 				if(error_message.length())
 				{
@@ -1219,7 +1219,7 @@ string	C_BT::SaveToDB()
 		// --- submit BT, if needed
 		if(error_message.empty() && (GetAction() == "submit"))
 		{
-			if(SubmitBT(GetID(), db, GetUser()))
+			if(SubmitBT(GetID(), config, db, GetUser()))
 			{
 			}
 			else
@@ -1248,7 +1248,7 @@ bool C_BT::RemoveUnsavedLinesImages() const
 
 	for(auto &expense: expenses)
 	{
-		if(!expense.RemoveUnsavedLinesImages(db)) result = false;
+		if(!expense.RemoveUnsavedLinesImages(config, db)) result = false;
 	}
 	
 	MESSAGE_DEBUG("C_BT", "", "finish (result length is " + to_string(result) + ")");

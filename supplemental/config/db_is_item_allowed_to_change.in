@@ -1,0 +1,55 @@
+company_profile_logo	= '''
+			SELECT `id` FROM `company` WHERE `id`="<<var:itemID>>" 
+			AND 
+			(	
+				(`admin_userID`="<<var:user_id>>") 
+				OR 
+				(`id`=(SELECT `company_id` FROM `company_employees` WHERE `user_id`="<<var:user_id>>"))
+			)
+'''
+
+# --- superset of below item
+# --- agreements between subc and agency defined in scope of agency
+# --- below item agreements between subc and agency defined in scope of SoW
+template_agreement_company	= '''
+			SELECT `id` FROM `company_employees` WHERE `user_id`="<<var:user_id>>" AND `allowed_change_sow`="Y" AND `company_id`=(
+			    SELECT `company_id` FROM `company_agreement_files` WHERE `id`="<<var:itemID>>"
+			);
+'''
+template_agreement_sow	= '''
+			SELECT `id` FROM `company_employees` WHERE `user_id`="<<var:user_id>>" AND `allowed_change_sow`="Y" AND `company_id`=(
+			    SELECT `company_id` FROM `contract_sow_agreement_files` WHERE `id`="<<var:itemID>>"
+			);
+'''
+template_sow		= '''
+			SELECT `id` FROM `company_employees` WHERE `user_id`="<<var:user_id>>" AND `allowed_change_sow`="Y" AND `company_id`=(
+			    SELECT `agency_company_id` FROM `contracts_sow` WHERE `id`=(
+				SELECT `contract_sow_id` FROM `contract_sow_custom_fields` WHERE `id`="<<var:itemID>>"
+			    )
+			);
+'''
+template_psow		= '''
+			SELECT `id` FROM `company_employees` WHERE `user_id`="<<var:user_id>>" AND `allowed_change_sow`="Y" AND `company_id`=(
+			    SELECT `agency_company_id` FROM `contracts_sow` WHERE `id`=(
+				SELECT `contract_sow_id` FROM `contracts_psow` WHERE `id`=(
+				    SELECT `contract_psow_id` FROM `contract_psow_custom_fields` WHERE `id`="<<var:itemID>>"
+				)
+			    )
+			);
+'''
+template_costcenter	= '''
+			SELECT `id` FROM `company_employees` WHERE `user_id`="<<var:user_id>>" AND `allowed_change_sow`="Y" AND `company_id`=(
+			    SELECT `agency_company_id` FROM `cost_centers` WHERE `id`=(
+				SELECT `cost_center_id` FROM `cost_center_custom_fields` WHERE `id`="<<var:itemID>>"
+			    )
+			);
+'''
+template_company	= '''
+			SELECT `id` FROM `company` WHERE `id`=(SELECT `company_id` FROM `company_custom_fields` WHERE `id`="<<var:itemID>>") 
+			AND 
+			(
+			    (`admin_userID`="<<var:user_id>>")
+			    OR
+			    (`id`=(SELECT `company_id` FROM `company_employees` WHERE `user_id`="<<var:user_id>>"))
+			)
+'''

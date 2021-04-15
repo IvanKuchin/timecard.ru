@@ -87,7 +87,7 @@ class C_ExpenseLine
 		// --- we need to define actual parent C_Expense
 		string					parent_random = "";
 
-		string					RemoveOldImage(CMysql *);
+		string					RemoveOldImage(c_config *, CMysql *);
 	public:
 								C_ExpenseLine();
 
@@ -105,16 +105,16 @@ class C_ExpenseLine
 		string					GetComment() const									{ return comment; }
 		void					SetRandom(const string &param)						{ random = param; }
 		void					SetRandom(string &&param) noexcept					{ random = move(param); }
-		string					GetRandom() const									{ return random; }
+		string					GetRandom() const									{ return random; }      /* Flawfinder: ignore */
 		void					SetParentRandom(const string &param)				{ parent_random = param; }
 		void					SetParentRandom(string &&param) noexcept			{ parent_random = move(param); }
 		string					GetParentRandom() const								{ return parent_random; }
 
 		string					CheckValidity(C_ExpenseLineTemplate, CMysql *) const;
 		bool					isSavedInDB() const									{ if(GetID().length() && (GetID() != "0")) return true; else return false; };
-		bool					RemoveUnsavedLinesImages(CMysql *) const;
+		bool					RemoveUnsavedLinesImages(c_config *, CMysql *) const;
 
-		string					SaveToDB(string expense_id, CMysql*);
+		string					SaveToDB(string expense_id, c_config *, CMysql*);
 
 								~C_ExpenseLine();
 };
@@ -171,14 +171,14 @@ class C_Expense
 		string					GetComment() const								{ return comment; }
 		void					SetRandom(const string &param)					{ random = param; }
 		void					SetRandom(string &&param) noexcept				{ random = move(param); }
-		string					GetRandom() const								{ return random; }
+		string					GetRandom() const								{ return random; }      /* Flawfinder: ignore */
 		void					AddExpenseLine(C_ExpenseLine param)				{ expense_lines.push_back(param); }
 		vector<C_ExpenseLine>	GetExpenseLines() const							{ return expense_lines; }
 
 		string					CheckValidity(CMysql *) const;
-		bool					RemoveUnsavedLinesImages(CMysql *) const;
+		bool					RemoveUnsavedLinesImages(c_config *, CMysql *) const;
 
-		string					SaveToDB(string bt_id, CMysql*);
+		string					SaveToDB(string bt_id, c_config *, CMysql *);
 
 								~C_Expense();
 };
@@ -186,18 +186,20 @@ class C_Expense
 class C_BT
 {
 	private:
-		string					id = "";
-		string					sow_id = "";
-		string					customer_id = "";
-		string					destination = "";
-		string					start_date = "", end_date = "";
-		string					purpose = "";
-		string					status = "";
+		string					id				= "";
+		string					sow_id			= "";
+		string					customer_id		= "";
+		string					destination		= "";
+		string					start_date		= "";
+		string					end_date		= "";
+		string					purpose			= "";
+		string					status			= "";
+		string					user_id			= "";
+		string					action			= "saved";
+		c_config				*config			= NULL;
+		CMysql					*db				= NULL;
+		CUser					*user			= NULL;
 		vector<C_Expense>		expenses;
-		string					user_id = "";
-		string					action = "saved";
-		CMysql					*db = NULL;
-		CUser					*user = NULL;
 
 		auto					isSubcontractorAssignedToSow() const -> bool;
 		auto					isSubcontractorAssignedToCustomerID() const -> bool;
@@ -207,6 +209,7 @@ class C_BT
 								C_BT();
 
 		void					SetDB(CMysql *param)	 				{ db = param; }
+		void					SetConfig(c_config *param) 				{ config = param; }
 		void					SetID(const string &param) 				{ id = param; }
 		void					SetID(string &&param) noexcept			{ id = move(param); }
 		string					GetID() const 							{ return id; }

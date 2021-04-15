@@ -19,6 +19,7 @@ class C_Invoicing_Vars
 {
 	private:
 		c_cache_obj						cache;
+		c_config						*config = NULL;
 		CMysql							*db = NULL;
 		CUser							*user = NULL;
 		CVars							vars;
@@ -65,9 +66,10 @@ class C_Invoicing_Vars
 		auto		GetActFullNumberByCompanyID(string id) -> string;
 
 	public:
-					C_Invoicing_Vars()						{};
-					C_Invoicing_Vars(CMysql *param1, CUser *param2) : db(param1), user(param2) {};
+					C_Invoicing_Vars() {};
+					C_Invoicing_Vars(c_config *param1, CMysql *param2, CUser *param3) : config(param1), db(param2), user(param3) {};
 
+		auto		SetConfig(c_config *param)				{ config = param; };
 		auto		SetDB(CMysql *param)					{ db = param; };
 		auto		SetUser(CUser *param)					{ user = param; };
 

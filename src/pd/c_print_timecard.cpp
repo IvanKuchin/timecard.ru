@@ -2,7 +2,7 @@
 
 static void error_handler (HPDF_STATUS error_no, HPDF_STATUS detail_no, void *user_data)
 {
-	char	buffer[512];
+	char	buffer[512];    /* Flawfinder: ignore */
 
     snprintf(buffer, sizeof(buffer) - 1, "error_no=%04X, detail_no=%d\n", (unsigned int) error_no, (int) detail_no);
     MESSAGE_ERROR("", "", "libhpdf: " +  buffer);
@@ -238,7 +238,7 @@ auto	C_Print_Timecard::PrintAsXLS() -> string
 		
 		if(book)
 		{
-			book->setKey(L"Ivan Kuchin", L"linux-e7d7147298a7a2140508293e47t5j7sf");
+			book->setKey(multibyte_to_wide(xl_username).c_str(), multibyte_to_wide(xl_key).c_str());
 
 			libxl::Sheet* sheet = book->addSheet(L"Sheet1");
 			if(sheet)

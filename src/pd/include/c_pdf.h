@@ -8,6 +8,8 @@
 
 #include "hpdf.h"
 
+#include "localy_pd.h"
+#include "c_pdf_const.h"
 #include "clog.h"
 
 using namespace std;

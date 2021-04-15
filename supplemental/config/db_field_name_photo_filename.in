@@ -1,0 +1,7 @@
+company_profile_logo       = logo_filename
+template_agreement_company = filename
+template_sow               = value
+template_psow              = value
+template_costcenter        = value
+template_agreement_sow     = filename
+template_company           = value

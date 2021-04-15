@@ -1021,7 +1021,7 @@ string GetNewsFeedInJSONFormat(string whereStatement, int currPage, int newsOnSi
 
 // --- Returns company list in JSON format grabbed from DB
 // --- Input:   dbQuery 		- SQL format returns users
-//			  db	  			- DB connection
+//			  db	  			- db.Connect(&config)ion
 //			  user				- current user object, used to define company admin
 //			  quickSearch		- owners, founders, openVacancies are not included into result
 //			  include_employees	- used in admin _ONLY_ to get company list + # of users in each company
@@ -3048,7 +3048,7 @@ string  GetUserNotificationInJSONFormat(string sqlRequest, CMysql *db, CUser *us
 			ostUserNotifications << "\"notificationTitle\":\"" << it.notification_title << "\",";
 			ostUserNotifications << "\"notificationStatus\":\"" << it.notificationStatus << "\"";
 
-			userNotificationEnrichment = GetUserNotificationSpecificDataByType(atol(it.feed_actionTypeId.c_str()), atol(it.feed_actionId.c_str()), db, user);
+			userNotificationEnrichment = GetUserNotificationSpecificDataByType(stol(it.feed_actionTypeId), stol(it.feed_actionId), db, user);
 			if(userNotificationEnrichment.length()) ostUserNotifications << "," << userNotificationEnrichment;
 
 			ostUserNotifications << "}";
@@ -5254,7 +5254,7 @@ string GetTimecardID(string sow_id, string period_start, string period_end, CMys
 													"`period_start`=\"" + period_start + "\","
 													"`period_end`=\"" + period_end + "\","
 													"`status`=\"saved\","
-													"`act_id`=\"" + to_string(act_id) + "\","
+													"`invoice_id`=\"" + to_string(act_id) + "\","
 													"`eventTimestamp`=UNIX_TIMESTAMP();");
 
 					if(temp) result = to_string(temp);

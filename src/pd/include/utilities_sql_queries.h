@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include "localy_pd.h"
+
 inline auto Get_CompanyIDByAdminUserID_sqlquery(const string &user_id) -> string
 {
 	return (" SELECT `id` FROM `company` WHERE `admin_userID` IN (" + user_id + ") ");
@@ -311,48 +313,48 @@ inline auto	Get_AgencyIDByUserID_sqlquery(const string &id)
 inline auto Get_ActsIDBySubcCompanyID(const string &id)
 {
 	return (
-			"SELECT DISTINCT(`id`) FROM `acts` WHERE "
-				"`id` IN (SELECT `act_id` FROM `timecards` WHERE `id` IN (" + Get_TimecardsIDBySubcCompanyID_sqlquery(id) + ")) "
+			"SELECT DISTINCT(`id`) FROM `invoices` WHERE "
+				"`id` IN (SELECT `invoice_id` FROM `timecards` WHERE `id` IN (" + Get_TimecardsIDBySubcCompanyID_sqlquery(id) + ")) "
 				"OR "
-				"`id` IN (SELECT `act_id` FROM `bt` WHERE `id` IN (" + Get_BTsIDBySubcCompanyID_sqlquery(id) + ")) "
+				"`id` IN (SELECT `invoice_id` FROM `bt` WHERE `id` IN (" + Get_BTsIDBySubcCompanyID_sqlquery(id) + ")) "
 		);
 }
 
 inline auto Get_ActsIDByAgencyCompanyID(const string &id)
 {
 	return (
-			"SELECT DISTINCT(`id`) FROM `acts` WHERE "
-				"`id` IN (SELECT `act_id` FROM `invoice_cost_center_service` WHERE `owner_company_id` IN (" + id + ")) "
+			"SELECT DISTINCT(`id`) FROM `invoices` WHERE "
+				"`id` IN (SELECT `invoice_id` FROM `invoice_cost_center_service` WHERE `owner_company_id` IN (" + id + ")) "
 				"OR "
-				"`id` IN (SELECT `act_id` FROM `invoice_cost_center_bt` WHERE `owner_company_id` IN (" + id + ")) "
+				"`id` IN (SELECT `invoice_id` FROM `invoice_cost_center_bt` WHERE `owner_company_id` IN (" + id + ")) "
 		);
 }
 
 inline auto Get_ActIDByTimecardID(const string &id)
 {
 	return (
-			"SELECT `act_id` FROM `timecards` WHERE `id` IN (" + id + ")"
+			"SELECT `invoice_id` FROM `timecards` WHERE `id` IN (" + id + ")"
 		);
 }
 
 inline auto Get_ActIDByBTID(const string &id)
 {
 	return (
-			"SELECT `act_id` FROM `bt` WHERE `id` IN (" + id + ")"
+			"SELECT `invoice_id` FROM `bt` WHERE `id` IN (" + id + ")"
 		);
 }
 
 inline auto Get_ActIDByServiceInvoiceIDToCC(const string &id)
 {
 	return (
-			"SELECT `act_id` FROM `invoice_cost_center_service` WHERE `id` IN (" + id + ")"
+			"SELECT `invoice_id` FROM `invoice_cost_center_service` WHERE `id` IN (" + id + ")"
 		);
 }
 
 inline auto Get_ActIDByBTInvoiceIDToCC(const string &id)
 {
 	return (
-			"SELECT `act_id` FROM `invoice_cost_center_bt` WHERE `id` IN (" + id + ")"
+			"SELECT `invoice_id` FROM `invoice_cost_center_bt` WHERE `id` IN (" + id + ")"
 		);
 }
 

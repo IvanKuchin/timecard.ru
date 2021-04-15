@@ -6,6 +6,7 @@ int main()
 
 	CStatistics		appStat;  // --- CStatistics must be first statement to measure end2end param's
 	CCgi			indexPage(EXTERNAL_TEMPLATE);
+	c_config		config(CONFIG_DIR);
 	CUser			user;
 	string			action, partnerID;
 	CMysql			db;
@@ -15,7 +16,7 @@ int main()
 	signal(SIGSEGV, crash_handler);
 
 	gettimeofday(&tv, NULL);
-	srand(tv.tv_sec * tv.tv_usec * 100000);
+	srand(tv.tv_sec * tv.tv_usec * 100000);  /* Flawfinder: ignore */
 
 	try
 	{
@@ -29,7 +30,7 @@ int main()
 			throw CException("Template file was missing");
 		}
 
-		if(db.Connect() < 0)
+		if(db.Connect(&config) < 0)
 		{
 			MESSAGE_DEBUG("", action, "Can not connect to mysql database");
 			throw CExceptionHTML("MySql connection");
@@ -56,7 +57,7 @@ int main()
 			}
 
 			//------- Generate session
-			action = GenerateSession(action, &indexPage, &db, &user);
+			action = GenerateSession(action, &config, &indexPage, &db, &user);
 		}
 	// ------------ end generate common parts
 
@@ -71,11 +72,9 @@ int main()
 
 			if(user.GetLogin() == "Guest")
 			{
-				{
-					MESSAGE_DEBUG("", action, "re-login required");
-				}
+				MESSAGE_DEBUG("", action, "re-login required");
 
-				indexPage.Redirect("/" + GUEST_USER_DEFAULT_ACTION + "?rand=" + GetRandom(10));
+				indexPage.Redirect("/" + config.GetFromFile("default_action", "guest") + "?rand=" + GetRandom(10));
 			}
 			else
 			{
@@ -100,9 +99,7 @@ int main()
 			ostResult.str("");
 			if(user.GetLogin() == "Guest")
 			{
-				{
-					MESSAGE_DEBUG("", action, "re-login required");
-				}
+				MESSAGE_DEBUG("", action, "re-login required");
 
 				ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
 			}
@@ -156,9 +153,7 @@ int main()
 			ostResult.str("");
 			if(user.GetLogin() == "Guest")
 			{
-				{
-					MESSAGE_DEBUG("", action, "re-login required");
-				}
+				MESSAGE_DEBUG("", action, "re-login required");
 
 				ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
 			}
@@ -220,9 +215,7 @@ int main()
 			ostResult.str("");
 			if(user.GetLogin() == "Guest")
 			{
-				{
-					MESSAGE_DEBUG("", action, "re-login required");
-				}
+				MESSAGE_DEBUG("", action, "re-login required");
 
 				ostResult << "{\"result\":\"error\",\"description\":\"re-login required\"}";
 			}

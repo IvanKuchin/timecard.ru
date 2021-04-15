@@ -3,6 +3,7 @@
 int main()
 {
 	CStatistics		appStat;  // --- CStatistics must be first statement to measure end2end param's
+	c_config		config(CONFIG_DIR);
 	CCgi			indexPage(EXTERNAL_TEMPLATE);
 	string			act, id, content;
 	struct timeval	tv;
@@ -15,7 +16,7 @@ int main()
 	signal(SIGSEGV, crash_handler); 
 
 	gettimeofday(&tv, NULL);
-	srand(tv.tv_sec * tv.tv_usec * 100000);
+	srand(tv.tv_sec * tv.tv_usec * 100000);  /* Flawfinder: ignore */
 	appStat.SetLogFile(ADMIN_LOG_FILE_NAME);
 
 	try
@@ -33,7 +34,7 @@ int main()
 
  
 		CMysql	db;
-		if(db.Connect() < 0)
+		if(db.Connect(&config) < 0)
 		{
 			CLog	log(ADMIN_LOG_FILE_NAME);
 
@@ -728,7 +729,7 @@ int main()
 			ostResult.str("");
 			if(itemID.length() && itemType.length())
 			{
-				if(RemoveSpecifiedCover(itemID, itemType, &db)) ostResult << "{\"result\":\"success\"}";
+				if(RemoveSpecifiedCover(itemID, itemType, &config, &db)) ostResult << "{\"result\":\"success\"}";
 				else ostResult << "{\"result\":\"error\",\"description\":\"ERROR removing specified cover\"}";
 			}
 			else
@@ -772,7 +773,7 @@ int main()
 					}
 					else
 					{
-						RemoveSpecifiedCover(itemID, "certification", &db);
+						RemoveSpecifiedCover(itemID, "certification", &config, &db);
 						db.Query("delete from `certification_tracks` where `id`=\"" + itemID + "\";");
 						ostResult << "{\"result\":\"success\"}";
 					}
@@ -825,7 +826,7 @@ int main()
 					}
 					else
 					{
-						RemoveSpecifiedCover(itemID, "course", &db);
+						RemoveSpecifiedCover(itemID, "course", &config, &db);
 						db.Query("delete from `certification_tracks` where `id`=\"" + itemID + "\";");
 						ostResult << "{\"result\":\"success\"}";
 					}
@@ -878,7 +879,7 @@ int main()
 					}
 					else
 					{
-						RemoveSpecifiedCover(itemID, "university", &db);
+						RemoveSpecifiedCover(itemID, "university", &config, &db);
 						db.Query("delete from `university` where `id`=\"" + itemID + "\";");
 						ostResult << "{\"result\":\"success\"}";
 					}
@@ -930,7 +931,7 @@ int main()
 					}
 					else
 					{
-						RemoveSpecifiedCover(itemID, "school", &db);
+						RemoveSpecifiedCover(itemID, "school", &config, &db);
 						db.Query("delete from `school` where `id`=\"" + itemID + "\";");
 						ostResult << "{\"result\":\"success\"}";
 					}
@@ -983,7 +984,7 @@ int main()
 					}
 					else
 					{
-						RemoveSpecifiedCover(itemID, "language", &db);
+						RemoveSpecifiedCover(itemID, "language", &config, &db);
 						db.Query("delete from `language` where `id`=\"" + itemID + "\";");
 						ostResult << "{\"result\":\"success\"}";
 					}
@@ -1040,7 +1041,7 @@ int main()
 					else
 					{
 						string 	whereStatement = "`id`=\"" + bookID + "\"";
-						RemoveBookCover(whereStatement, &db);
+						RemoveBookCover(whereStatement, &config, &db);
 						db.Query("delete from `book` where `id`=\"" + bookID + "\";");
 						ostResult << "{\"result\":\"success\"}";
 					}

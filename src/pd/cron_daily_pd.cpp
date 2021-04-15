@@ -233,6 +233,7 @@ auto ExpireOldContracts(CMysql *db)
 int main()
 {
 	CStatistics		appStat;  // --- CStatistics must be first statement to measure end2end param's
+	c_config		config(CONFIG_DIR);
 	CMysql			user;
 	CMysql			db;
 	struct timeval	tv;
@@ -245,7 +246,7 @@ int main()
 	signal(SIGSEGV, crash_handler);
 
 	gettimeofday(&tv, NULL);
-	srand(tv.tv_sec * tv.tv_usec * 100000);
+	srand(tv.tv_sec * tv.tv_usec * 100000);  /* Flawfinder: ignore */
 
 	if(SetLocale(LOCALE_DEFAULT)) {}
 	else
@@ -257,7 +258,7 @@ int main()
 	{
 		auto	error_message = ""s;
 
-		if(db.Connect() < 0)
+		if(db.Connect(&config) < 0)
 		{
 			CLog	log;
 

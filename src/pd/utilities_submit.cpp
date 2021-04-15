@@ -1,6 +1,6 @@
 #include "utilities_submit.h"
 
-string	ResubmitEntitiesByAction(string action, string id, string sow_id, string new_value, CMysql *db, CUser *user)
+string	ResubmitEntitiesByAction(string action, string id, string sow_id, string new_value, c_config *config, CMysql *db, CUser *user)
 {
 	string	error_message = "";
 
@@ -20,7 +20,7 @@ string	ResubmitEntitiesByAction(string action, string id, string sow_id, string 
 
 							for (auto &timecard_id: item_list)
 							{
-								if(SubmitTimecard(timecard_id, db, user))
+								if(SubmitTimecard(timecard_id, config, db, user))
 								{
 
 								}
@@ -45,7 +45,7 @@ string	ResubmitEntitiesByAction(string action, string id, string sow_id, string 
 
 							for (auto &bt_id: item_list)
 							{
-								if(SubmitBT(bt_id, db, user))
+								if(SubmitBT(bt_id, config, db, user))
 								{
 
 								}
@@ -107,7 +107,7 @@ static auto __isActNumberAvailable(const string &act_full_number, const string &
 
 		if(company_type == "subcontractor")
 		{
-			auto	affected = db->Query("SELECT `id` FROM `acts` WHERE `full_number`=" + quoted(act_full_number) + " AND `id` IN (" + Get_ActsIDBySubcCompanyID(company_id) + ");");
+			auto	affected = db->Query("SELECT `id` FROM `invoices` WHERE `full_number`=" + quoted(act_full_number) + " AND `id` IN (" + Get_ActsIDBySubcCompanyID(company_id) + ");");
 
 			if(affected > 0)
 			{
@@ -116,7 +116,7 @@ static auto __isActNumberAvailable(const string &act_full_number, const string &
 		}
 		else if(company_type == "agency")
 		{
-			auto	affected = db->Query("SELECT `id` FROM `acts` WHERE `full_number`=" + quoted(act_full_number) + " AND `id` IN (" + Get_ActsIDByAgencyCompanyID(company_id) + ");");
+			auto	affected = db->Query("SELECT `id` FROM `invoices` WHERE `full_number`=" + quoted(act_full_number) + " AND `id` IN (" + Get_ActsIDByAgencyCompanyID(company_id) + ");");
 
 			if(affected > 0)
 			{
@@ -209,7 +209,7 @@ auto AssignCurrentCompanyActNumberToActID_And_UpdateCompanyActNumber_by_ActID(co
 	auto	curr_act_full_number	= GetActNumberByCompanyID(company_id, db, user);
 	auto	next_act_full_number	= GetAvailableActNumber_StartFrom(get<1>(curr_act_full_number) + 1, company_id, db, user);
 
-	db->Query("UPDATE `acts` SET `full_number`=" + quoted(get<0>(curr_act_full_number) + to_string(get<1>(curr_act_full_number)) + get<2>(curr_act_full_number)) + ",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=" + quoted(act_id) + ";");
+	db->Query("UPDATE `invoices` SET `full_number`=" + quoted(get<0>(curr_act_full_number) + to_string(get<1>(curr_act_full_number)) + get<2>(curr_act_full_number)) + ",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=" + quoted(act_id) + ";");
 	if(db->isError())
 	{
 		error_message = gettext("act not found");
@@ -289,7 +289,7 @@ auto AssignCurrentCompanyActNumberToActID_And_UpdateCompanyActNumber_by_Entity(c
 	return error_message;
 }
 
-auto SubmitTimecard(string timecard_id, CMysql *db, CUser *user) -> bool
+auto SubmitTimecard(string timecard_id, c_config *config, CMysql *db, CUser *user) -> bool
 {
 	MESSAGE_DEBUG("", "", "start");
 
@@ -303,7 +303,7 @@ auto SubmitTimecard(string timecard_id, CMysql *db, CUser *user) -> bool
 		if(submit_obj.isCompletelyApproved())
 		{
 				auto								error_message = ""s;
-				C_Invoice_Service_Subc_To_Agency	c_invoice(db, user);
+				C_Invoice_Service_Subc_To_Agency	c_invoice(config, db, user);
 				
 				c_invoice.SetTimecardList({timecard_id});
 				error_message = c_invoice.GenerateDocumentArchive();
@@ -353,7 +353,7 @@ auto SubmitTimecard(string timecard_id, CMysql *db, CUser *user) -> bool
 	return result;
 }
 
-auto	SubmitBT(string bt_id, CMysql *db, CUser *user) -> bool
+auto	SubmitBT(string bt_id, c_config *config, CMysql *db, CUser *user) -> bool
 {
 	auto 	result = false;
 
@@ -367,7 +367,7 @@ auto	SubmitBT(string bt_id, CMysql *db, CUser *user) -> bool
 		if(submit_obj.isCompletelyApproved())
 		{
 				auto							error_message = ""s;
-				C_Invoice_BT_Subc_To_Agency		c_invoice(db, user);
+				C_Invoice_BT_Subc_To_Agency		c_invoice(config, db, user);
 
 				c_invoice.SetBTList({bt_id});
 

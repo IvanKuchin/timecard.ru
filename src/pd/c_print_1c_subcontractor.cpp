@@ -40,7 +40,7 @@ auto	C_Print_1C_Subcontractor_Base::RenderTemplate() -> string
 								empty_var_list_str += var_name;
 							}
 
-							error_message = gettext("1C generation failed") + "("s + vars->Get("subcontractor_company_name_" + to_string(GetIdx())) + "). " + gettext("empty vars list") + ": "s + empty_var_list_str;
+							error_message = gettext("1C generation failed") + "("s + RemoveQuotas(vars->Get("subcontractor_company_name_" + to_string(GetIdx()))) + "). " + gettext("empty vars list") + ": "s + empty_var_list_str;
 							MESSAGE_ERROR("", "", "following variable must be defined on contract (" + vars->Get("subcontractor_company_name_" + to_string(GetIdx())) + "): " + empty_var_list_str);
 						}
 
@@ -158,7 +158,7 @@ auto	C_Print_1C_Subcontractor_Base::SaveFile() -> string
 		if(uniq_fname.length())
 		{
 			ofstream ofs;
-			ofs.open (uniq_fname, std::ofstream::out | std::ofstream::app);
+			ofs.open (uniq_fname, std::ofstream::out | std::ofstream::app);    /* Flawfinder: ignore */
 
 			ofs << content;
 

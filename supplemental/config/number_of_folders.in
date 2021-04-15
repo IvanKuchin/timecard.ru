@@ -1,0 +1,21 @@
+#__default__                                           = 512
+
+avatar                                                 = 512
+company_profile_logo                                   = 512
+
+template_agreement_company                             = 512
+template_sow                                           = 512
+template_psow                                          = 512
+template_costcenter                                    = 512
+template_agreement_sow                                 = 512
+template_company                                       = 512
+expense_line                                           = 2048
+
+
+AGREEMENTS_SOW_NUMBER_OF_FOLDERS                       = 2048
+INVOICES_SUBC_NUMBER_OF_FOLDERS                        = 2048
+INVOICES_CC_NUMBER_OF_FOLDERS                          = 2048
+SMARTWAY_VOUCHERS_NUMBER_OF_FOLDERS                    = 2048
+TEMPIMAGE_NUMBER_OF_FOLDERS                            = 512
+
+helpdesk_ticket_attach                                 = 2048

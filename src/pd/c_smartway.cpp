@@ -363,16 +363,16 @@ string C_Smartway::GetAuthJSON()
 {
 	MESSAGE_DEBUG("", "", "start");
 
-    c_config    config;
-    auto        auth_map        	= config.Read({"SMARTWAY_LOGIN", "SMARTWAY_PASSWORD"});
-    auto        is_auth_valid   	= (auth_map["SMARTWAY_LOGIN"].length() > 0);
-    auto        __SMARTWAY_LOGIN    = (is_auth_valid ? auth_map["SMARTWAY_LOGIN"] : "");
-    auto        __SMARTWAY_PASSWORD = (is_auth_valid ? auth_map["SMARTWAY_PASSWORD"] : "");
+	vector<string>	config_keys 		= {"SMARTWAY_LOGIN", "SMARTWAY_PASSWORD"};
+    auto	        auth_map        	= config->GetFromFile(CONFIG_SECRET, config_keys);
+    auto	        is_auth_valid   	= (auth_map["SMARTWAY_LOGIN"].length() > 0);
+    auto	        __SMARTWAY_LOGIN    = (is_auth_valid ? auth_map["SMARTWAY_LOGIN"] : "");
+    auto	        __SMARTWAY_PASSWORD = (is_auth_valid ? auth_map["SMARTWAY_PASSWORD"] : "");
 
-	auto		result				=  "\"authorization\": {"
-									      "\"username\": \"" + __SMARTWAY_LOGIN + "\","
-									      "\"password\": \"" + __SMARTWAY_PASSWORD + "\""
-									    "}"s;
+	auto			result				=  "\"authorization\": {"
+																	"\"username\": \"" + __SMARTWAY_LOGIN + "\","
+																	"\"password\": \"" + __SMARTWAY_PASSWORD + "\""
+																"}"s;
 
 	if(is_auth_valid) {}
 	else
@@ -883,7 +883,7 @@ string C_Smartway::SaveTempFile(const string &content, const string &extension)
 	do
 	{
 		fname = GetRandom(10) + extension;
-		result = TEMP_DIRECTORY_PREFIX + fname;
+		result = config->GetFromFile("image_folders", "TEMP_DIRECTORY_PREFIX") + fname;
 	} while(isFileExists(result));
 
 	ofstream ofs (result, std::ofstream::out);
@@ -907,13 +907,13 @@ string C_Smartway::SaveVoucher(const string &content, const string &extension)
 	{
 		do
 		{
-			voucher_folder = to_string( (int)(rand()/(RAND_MAX + 1.0) * SMARTWAY_VOUCHERS_NUMBER_OF_FOLDERS) + 1);
+			voucher_folder = to_string( (int)(rand()/(RAND_MAX + 1.0) * stod_noexcept(config->GetFromFile("image_folders", "SMARTWAY_VOUCHERS_NUMBER_OF_FOLDERS"))) + 1);
 			voucher_file = GetRandom(15) + extension;
 			fname = voucher_folder + "/" + voucher_file;
 
-		} while(isFileExists(SMARTWAY_VOUCHERS_DIRECTORY + fname));
+		} while(isFileExists(config->GetFromFile("image_folders", "SMARTWAY_VOUCHERS_DIRECTORY") + fname));
 
-		ofstream ofs (SMARTWAY_VOUCHERS_DIRECTORY + fname, std::ofstream::out);
+		ofstream ofs (config->GetFromFile("image_folders", "SMARTWAY_VOUCHERS_DIRECTORY") + fname, std::ofstream::out);
 		ofs << content;
 		ofs.close();
 	}

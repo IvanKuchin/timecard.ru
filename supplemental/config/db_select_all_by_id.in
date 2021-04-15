@@ -1,0 +1,7 @@
+company_profile_logo            = SELECT * FROM `company`                 WHERE `id`="<<var:itemID>>";
+template_agreement_company      = SELECT * FROM `company_agreement_files` WHERE `id`="<<var:itemID>>";
+template_sow                    = SELECT * FROM `contract_sow_custom_fields` WHERE `id`="<<var:itemID>>";
+template_psow                   = SELECT * FROM `contract_psow_custom_fields` WHERE `id`="<<var:itemID>>";
+template_costcenter             = SELECT * FROM `cost_center_custom_fields` WHERE `id`="<<var:itemID>>";
+template_agreement_sow          = SELECT * FROM `contract_sow_agreement_files` WHERE `id`="<<var:itemID>>";
+template_company                = SELECT * FROM `company_custom_fields` WHERE `id`="<<var:itemID>>";

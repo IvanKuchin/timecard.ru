@@ -4,6 +4,7 @@ int main(void)
 {
 	CStatistics		appStat;  // --- CStatistics must be first statement to measure end2end param's
 	CCgi			indexPage(EXTERNAL_TEMPLATE);
+	c_config		config(CONFIG_DIR);
 	CUser			user;
 	CMysql			db;
 	string			action = "";
@@ -16,7 +17,7 @@ int main(void)
 	{
 		struct timeval	tv;
 		gettimeofday(&tv, NULL);
-		srand(tv.tv_sec * tv.tv_usec * 100000);
+		srand(tv.tv_sec * tv.tv_usec * 100000);  /* Flawfinder: ignore */
 	}
 
 	try
@@ -30,7 +31,7 @@ int main(void)
 			throw CException("Template file was missing");
 		}
 
-		if(db.Connect() < 0)
+		if(db.Connect(&config) < 0)
 		{
 			MESSAGE_ERROR("", action, "Can not connect to mysql database");
 			throw CExceptionHTML("MySql connection");
@@ -56,8 +57,8 @@ int main(void)
 			}
 
 			//------- Generate session
-			action = GenerateSession(action, &indexPage, &db, &user);
-			action = LogoutIfGuest(action, &indexPage, &db, &user);
+			action = GenerateSession(action, &config, &indexPage, &db, &user);
+			action = LogoutIfGuest(action, &config, &indexPage, &db, &user);
 		}
 	// ------------ end generate common parts
 
@@ -86,15 +87,11 @@ int main(void)
 		{
 			MESSAGE_DEBUG("", action, "start");
 
-			ostringstream	ostResult;
-			auto			template_name	= "json_response.htmlt"s;
 			auto			error_message	= ""s;
 			auto			type			= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("type"));
 			auto			first_name		= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("first_name"));
 			auto			last_name		= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("last_name"));
 			auto			middle_name		= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("middle_name"));
-
-			ostResult.str("");
 
 			if(type == "agency_employee")		type = "agency";
 			else if(type == "agency_owner")		type = "agency";
@@ -121,20 +118,7 @@ int main(void)
 				MESSAGE_ERROR("", action, error_message);
 			}
 
-			if(error_message.empty())
-			{
-				ostResult << "{\"result\":\"success\"}";
-			}
-			else
-			{
-				MESSAGE_DEBUG("", action, "failed");
-				ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
-			}
-
-			indexPage.RegisterVariableForce("result", ostResult.str());
-
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
-
+			AJAX_ResponseTemplate(&indexPage, "", error_message);
 
 			MESSAGE_DEBUG("", action, "finish");
 		}
@@ -143,15 +127,11 @@ int main(void)
 		{
 			MESSAGE_DEBUG("", action, "start");
 
-			ostringstream	ostResult;
-			auto			template_name	= "json_response.htmlt"s;
 			auto			error_message	= ""s;
 			auto			passport_series				= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("passport_series"));
 			auto			passport_number				= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("passport_number"));
 			auto			passport_issue_date			= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("passport_issue_date"));
 			auto			passport_issue_authority	= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("passport_issue_authority"));
-
-			ostResult.str("");
 
 			db.Query("UPDATE `users` SET `passport_series`=\"" + passport_series + "\",`passport_number`=\"" + passport_number + "\",`passport_issue_authority`=\"" + passport_issue_authority + "\",`passport_issue_date`=STR_TO_DATE(\"" + passport_issue_date + "\",\"%d/%m/%Y\") WHERE `id`=\"" + user.GetID() + "\";");
 			if(db.isError())
@@ -160,20 +140,7 @@ int main(void)
 				MESSAGE_ERROR("", action, error_message);
 			}
 
-			if(error_message.empty())
-			{
-				ostResult << "{\"result\":\"success\"}";
-			}
-			else
-			{
-				MESSAGE_DEBUG("", action, "failed");
-				ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
-			}
-
-			indexPage.RegisterVariableForce("result", ostResult.str());
-
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
-
+			AJAX_ResponseTemplate(&indexPage, "", error_message);
 
 			MESSAGE_DEBUG("", action, "finish");
 		}
@@ -182,13 +149,9 @@ int main(void)
 		{
 			MESSAGE_DEBUG("", action, "start");
 
-			ostringstream	ostResult;
-			auto			template_name	= "json_response.htmlt"s;
 			auto			error_message	= ""s;
 			auto			agency_name		= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("agency_to_notify"));
-			auto			affected = db.Query("SELECT `id` FROM `company` WHERE `name` LIKE \"%" + agency_name + "%\" AND `type`=\"agency\";");
-
-			ostResult.str("");
+			auto			affected		= db.Query("SELECT `id` FROM `company` WHERE `name` LIKE \"%" + agency_name + "%\" AND `type`=\"agency\";");
 
 
 			if(affected == 1) // --- single agency found with this name
@@ -208,9 +171,9 @@ int main(void)
 					MESSAGE_ERROR("", action, error_message + " by admin_user.id(" + user.GetID() + ")");
 				}
 			}
-			if(!affected)
+			else if(!affected)
 			{
-				MESSAGE_ERROR("", action, "agency not found (" + agency_name + ")");
+				MESSAGE_DEBUG("", action, "agency not found (" + agency_name + ")");
 			}
 			else
 			{
@@ -218,21 +181,7 @@ int main(void)
 				MESSAGE_ERROR("", action, "found more than 1 agency can't determine which one must be notified");
 			}
 
-
-			if(error_message.empty())
-			{
-				ostResult << "{\"result\":\"success\"}";
-			}
-			else
-			{
-				MESSAGE_DEBUG("", action, "failed");
-				ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
-			}
-
-			indexPage.RegisterVariableForce("result", ostResult.str());
-
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
-
+			AJAX_ResponseTemplate(&indexPage, "", error_message);
 
 			MESSAGE_DEBUG("", action, "finish");
 		}
@@ -241,14 +190,9 @@ int main(void)
 		{
 			MESSAGE_DEBUG("", action, "start");
 
-			ostringstream	ostResult;
-			auto			template_name	= "json_response.htmlt"s;
 			auto			error_message	= ""s;
 			auto			agency_name		= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("agency_to_notify"));
-			auto			affected = db.Query("SELECT `id` FROM `company` WHERE `name` LIKE \"%" + agency_name + "%\" AND `type`=\"agency\";");
-
-			ostResult.str("");
-
+			auto			affected		= db.Query("SELECT `id` FROM `company` WHERE `name` LIKE \"%" + agency_name + "%\" AND `type`=\"agency\";");
 
 			if(affected == 1) // --- single agency found with this name
 			{
@@ -263,21 +207,7 @@ int main(void)
 				MESSAGE_ERROR("", action, "found more than 1 agency can't determine which one must be notified");
 			}
 
-
-			if(error_message.empty())
-			{
-				ostResult << "{\"result\":\"success\"}";
-			}
-			else
-			{
-				MESSAGE_DEBUG("", action, "failed");
-				ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
-			}
-
-			indexPage.RegisterVariableForce("result", ostResult.str());
-
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
-
+			AJAX_ResponseTemplate(&indexPage, "", error_message);
 
 			MESSAGE_DEBUG("", action, "finish");
 		}
@@ -286,14 +216,9 @@ int main(void)
 		{
 			MESSAGE_DEBUG("", action, "start");
 
-			ostringstream	ostResult;
-			auto			template_name	= "json_response.htmlt"s;
 			auto			error_message	= ""s;
 			auto			agency_name		= CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("agency_to_notify"));
-			auto			affected = db.Query("SELECT `id` FROM `company` WHERE `name` LIKE \"%" + agency_name + "%\" AND `type`=\"agency\";");
-
-			ostResult.str("");
-
+			auto			affected 		= db.Query("SELECT `id` FROM `company` WHERE `name` LIKE \"%" + agency_name + "%\" AND `type`=\"agency\";");
 
 			if(affected == 1) // --- single agency found with this name
 			{
@@ -308,21 +233,7 @@ int main(void)
 				MESSAGE_ERROR("", action, "found more than 1 agency can't determine which one must be notified");
 			}
 
-
-			if(error_message.empty())
-			{
-				ostResult << "{\"result\":\"success\"}";
-			}
-			else
-			{
-				MESSAGE_DEBUG("", action, "failed");
-				ostResult << "{\"result\":\"error\",\"description\":\"" + error_message + "\"}";
-			}
-
-			indexPage.RegisterVariableForce("result", ostResult.str());
-
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
-
+			AJAX_ResponseTemplate(&indexPage, "", error_message);
 
 			MESSAGE_DEBUG("", action, "finish");
 		}

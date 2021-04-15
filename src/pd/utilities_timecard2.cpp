@@ -102,7 +102,7 @@ auto	isBTInvoiceBelongsToUser(string bt_invoice_id, CMysql *db, CUser *user) -> 
 	return result;
 }
 
-auto	RecallServiceInvoice(string service_invoice_id, CMysql *db, CUser *user) -> string
+auto	RecallServiceInvoice(string service_invoice_id, c_config *config, CMysql *db, CUser *user) -> string
 {
 	auto	error_message = ""s;
 
@@ -134,7 +134,7 @@ auto	RecallServiceInvoice(string service_invoice_id, CMysql *db, CUser *user) ->
 				{
 					if(file_name.length())
 					{
-						unlink((INVOICES_CC_DIRECTORY + file_name).c_str());
+						unlink((config->GetFromFile("image_folders", "INVOICES_CC_DIRECTORY") + file_name).c_str());
 					}
 					else
 					{
@@ -171,7 +171,7 @@ auto	RecallServiceInvoice(string service_invoice_id, CMysql *db, CUser *user) ->
 	return error_message;
 }
 
-auto	RecallBTInvoice(string bt_invoice_id, CMysql *db, CUser *user) -> string
+auto	RecallBTInvoice(string bt_invoice_id, c_config *config, CMysql *db, CUser *user) -> string
 {
 	auto	error_message = ""s;
 
@@ -203,7 +203,7 @@ auto	RecallBTInvoice(string bt_invoice_id, CMysql *db, CUser *user) -> string
 				{
 					if(file_name.length())
 					{
-						unlink((INVOICES_CC_DIRECTORY + file_name).c_str());
+						unlink((config->GetFromFile("image_folders", "INVOICES_CC_DIRECTORY") + file_name).c_str());
 					}
 					else
 					{
@@ -1546,8 +1546,9 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 
 							if(counter)
 							{
-								char	buffer[50];
-								sprintf(buffer, ngettext("%d customers", "%d customers", counter), counter);
+
+								char	buffer[50];   /* Flawfinder: ignore */
+								snprintf(buffer, strlen(buffer) - 1, ngettext("%d customers", "%d customers", counter), counter);  /* Flawfinder: ignore */
 
 								error_message = gettext("cost center assigned") + " "s + (buffer) + ". " +  gettext("removal prohibited");
 								MESSAGE_DEBUG("", "", "cost_center.id(" + id + ") assigned to " + to_string(counter) + " customers. Removal prohibited.");
@@ -4022,58 +4023,92 @@ string	ResubmitEntitiesByAction(string action, string id, string sow_id, string 
 	return error_message;
 }
 */
-auto DeleteEntryByAction(string action, string id, CMysql *db, CUser *user) -> string
+auto DeleteEntryByAction(string action, string id, c_config *config, CMysql *db, CUser *user) -> string
 {
-	string	error_message = "";
-
 	MESSAGE_DEBUG("", "", "start");
 
+	auto	error_message = ""s;
+
+	if(id.length())
 	{
-		if(id.length())
+		if(action == "AJAX_deleteTemplateAgreement_company")
 		{
-			if(action == "AJAX_deleteTemplateAgreement_company")
+			auto filename = GetValueFromDB("SELECT `filename` FROM `company_agreement_files` WHERE `id`=\"" + id + "\";", db);
+
+			if(filename.length()) 
 			{
-				db->Query("DELETE FROM `company_agreement_files` WHERE `id`=\"" + id + "\";");
-				if(db->isError())
-				{
-					MESSAGE_ERROR("", "", "fail to remove from table company_agreement_files");
-				}
+				filename = config->GetFromFile("image_folders", "template_agreement_company") + "/" + filename;
+				unlink(filename.c_str());
+				MESSAGE_DEBUG("", "", "deleting file " + filename);
 			}
-			else if(action == "AJAX_deleteTemplateAgreement_sow")
+
+			db->Query("DELETE FROM `company_agreement_files` WHERE `id`=\"" + id + "\";");
+			if(db->isError())
 			{
-				db->Query("DELETE FROM `contract_sow_agreement_files` WHERE `id`=\"" + id + "\";");
-				if(db->isError())
-				{
-					MESSAGE_ERROR("", "", "fail to remove from table contract_sow_agreement_files");
-				}
+				MESSAGE_ERROR("", "", "fail to remove from table company_agreement_files");
 			}
-			else if(action == "AJAX_deletePSoWCustomField")
+		}
+		else if(action == "AJAX_deleteTemplateAgreement_sow")
+		{
+			auto filename = GetValueFromDB("SELECT `filename` FROM `contract_sow_agreement_files` WHERE `id`=\"" + id + "\";", db);
+
+			if(filename.length())
 			{
-				db->Query("DELETE FROM `contract_psow_custom_fields` WHERE `id`=\"" + id + "\";");
-				if(db->isError())
-				{
-					MESSAGE_ERROR("", "", "fail to remove from table contract_psow_custom_fields");
-				}
+				filename = config->GetFromFile("image_folders", "template_agreement_sow") + "/" + filename;
+				unlink(filename.c_str());
+				MESSAGE_DEBUG("", "", "deleting file " + filename);
 			}
-			else if(action == "AJAX_deleteSoWCustomField")
+
+			db->Query("DELETE FROM `contract_sow_agreement_files` WHERE `id`=\"" + id + "\";");
+			if(db->isError())
 			{
-				db->Query("DELETE FROM `contract_sow_custom_fields` WHERE `id`=\"" + id + "\";");
-				if(db->isError())
-				{
-					MESSAGE_ERROR("", "", "fail to remove from table contract_sow_custom_fields");
-				}
+				MESSAGE_ERROR("", "", "fail to remove from table contract_sow_agreement_files");
 			}
-			else
+		}
+		else if(action == "AJAX_deletePSoWCustomField")
+		{
+			auto filename = GetValueFromDB("SELECT `value` FROM `contract_psow_custom_fields` WHERE `id`=\"" + id + "\" AND `type`=\"file\";", db);
+
+			if(filename.length())
 			{
-				error_message = "Неизвестное действие";
-				MESSAGE_ERROR("", "", "action is empty");
+				filename = config->GetFromFile("image_folders", "template_psow") + "/" + filename;
+				unlink(filename.c_str());
+				MESSAGE_DEBUG("", "", "deleting file " + filename);
+			}
+
+			db->Query("DELETE FROM `contract_psow_custom_fields` WHERE `id`=\"" + id + "\";");
+			if(db->isError())
+			{
+				MESSAGE_ERROR("", "", "fail to remove from table contract_psow_custom_fields");
+			}
+		}
+		else if(action == "AJAX_deleteSoWCustomField")
+		{
+			auto filename = GetValueFromDB("SELECT `value` FROM `contract_sow_custom_fields` WHERE `id`=\"" + id + "\" AND `type`=\"file\";", db);
+
+			if(filename.length())
+			{
+				filename = config->GetFromFile("image_folders", "template_sow") + "/" + filename;
+				unlink(filename.c_str());
+				MESSAGE_DEBUG("", "", "deleting file " + filename);
+			}
+
+			db->Query("DELETE FROM `contract_sow_custom_fields` WHERE `id`=\"" + id + "\";");
+			if(db->isError())
+			{
+				MESSAGE_ERROR("", "", "fail to remove from table contract_sow_custom_fields");
 			}
 		}
 		else
 		{
-			error_message = "Неизвестный идентификатор поля";
-			MESSAGE_ERROR("", "", "id is empty");
+			error_message = "Неизвестное действие";
+			MESSAGE_ERROR("", "", "action is empty");
 		}
+	}
+	else
+	{
+		error_message = "Неизвестный идентификатор поля";
+		MESSAGE_ERROR("", "", "id is empty");
 	}
 
 	MESSAGE_DEBUG("", "", "finish (error_message length is " + to_string(error_message.length()) + ")");
@@ -5539,16 +5574,16 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 	}
 	if(action == "AJAX_updateSoWPaymentPeriodService")
 	{
-		char	buffer[50];
-		sprintf(buffer, ngettext("%d days", "%d days", stoi(new_value)), stoi(new_value));
+		char	buffer[50];   /* Flawfinder: ignore */
+		snprintf(buffer, strlen(buffer) - 1, ngettext("%d days", "%d days", stoi(new_value)), stoi(new_value));  /* Flawfinder: ignore */
 
 		notification_description = gettext("SoW") + " ("s + GetSpelledSoWByID(sow_id, db) + "): " + gettext("service period payment") + " " + gettext("updated") + " " + gettext("from") + " "s + existing_value + " "  + gettext("to") + " "s + buffer;
 		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 	}
 	if(action == "AJAX_updateSoWPaymentPeriodBT")
 	{
-		char	buffer[50];
-		sprintf(buffer, ngettext("%d days", "%d days", stoi(new_value)), stoi(new_value));
+		char	buffer[50];    /* Flawfinder: ignore */
+		snprintf(buffer, strlen(buffer) - 1, ngettext("%d days", "%d days", stoi(new_value)), stoi(new_value));  /* Flawfinder: ignore */
 
 		notification_description = gettext("SoW") + " ("s + GetSpelledSoWByID(sow_id, db) + "): " + gettext("bt period payment") + " " + gettext("updated") + " " + gettext("from") + " "s + existing_value + " "  + gettext("to") + " "s + buffer;
 		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
