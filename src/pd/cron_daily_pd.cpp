@@ -149,7 +149,7 @@ static bool NotifyAboutPendingApprovals(string entity, CMysql *db)
 {
 	MESSAGE_DEBUG("", "", "start");
 
-	bool		result = false;
+	auto		result = false;
 	auto		user_ids = GetValuesFromDB(	"SELECT DISTINCT(`approver_user_id`) FROM `" + entity + "_approvers` WHERE `id` IN ("
 											    "SELECT `approver_id` FROM `" + entity + "_approvals` WHERE `decision`=\"pending\""
 											");", db);
@@ -263,7 +263,7 @@ int main()
 			CLog	log;
 
 			log.Write(ERROR, string(__func__) + string("[") + to_string(__LINE__) + "]:ERROR: Can not connect to mysql database");
-			throw CExceptionHTML("MySql connection");
+			throw CException("MySql connection");
 		}
 
 		//--- notify about approvals require your attention

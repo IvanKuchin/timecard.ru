@@ -1547,8 +1547,8 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 							if(counter)
 							{
 
-								char	buffer[50];   /* Flawfinder: ignore */
-								snprintf(buffer, strlen(buffer) - 1, ngettext("%d customers", "%d customers", counter), counter);  /* Flawfinder: ignore */
+								char	buffer[64];   /* Flawfinder: ignore */
+								snprintf(buffer, sizeof(buffer) - 1, ngettext("%d customers", "%d customers", counter), counter);  /* Flawfinder: ignore */
 
 								error_message = gettext("cost center assigned") + " "s + (buffer) + ". " +  gettext("removal prohibited");
 								MESSAGE_DEBUG("", "", "cost_center.id(" + id + ") assigned to " + to_string(counter) + " customers. Removal prohibited.");
@@ -5574,16 +5574,16 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 	}
 	if(action == "AJAX_updateSoWPaymentPeriodService")
 	{
-		char	buffer[50];   /* Flawfinder: ignore */
-		snprintf(buffer, strlen(buffer) - 1, ngettext("%d days", "%d days", stoi(new_value)), stoi(new_value));  /* Flawfinder: ignore */
+		char	buffer[64];   /* Flawfinder: ignore */
+		snprintf(buffer, sizeof(buffer) - 1, ngettext("%d days", "%d days", stoi(new_value)), stoi(new_value));  /* Flawfinder: ignore */
 
 		notification_description = gettext("SoW") + " ("s + GetSpelledSoWByID(sow_id, db) + "): " + gettext("service period payment") + " " + gettext("updated") + " " + gettext("from") + " "s + existing_value + " "  + gettext("to") + " "s + buffer;
 		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";
 	}
 	if(action == "AJAX_updateSoWPaymentPeriodBT")
 	{
-		char	buffer[50];    /* Flawfinder: ignore */
-		snprintf(buffer, strlen(buffer) - 1, ngettext("%d days", "%d days", stoi(new_value)), stoi(new_value));  /* Flawfinder: ignore */
+		char	buffer[64];    /* Flawfinder: ignore */
+		snprintf(buffer, sizeof(buffer) - 1, ngettext("%d days", "%d days", stoi(new_value)), stoi(new_value));  /* Flawfinder: ignore */
 
 		notification_description = gettext("SoW") + " ("s + GetSpelledSoWByID(sow_id, db) + "): " + gettext("bt period payment") + " " + gettext("updated") + " " + gettext("from") + " "s + existing_value + " "  + gettext("to") + " "s + buffer;
 		sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";";

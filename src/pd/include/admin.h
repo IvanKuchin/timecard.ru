@@ -21,6 +21,7 @@
 #include "utilities_timecard.h"
 #include "locale.h"
 
-#define	ADMIN_LOG_FILE_NAME							string(LOGDIR) + DOMAIN_NAME + ".admin"
+// #define	ADMIN_LOG_FILE_NAME							string(LOGDIR) + DOMAIN_NAME + ".admin"
+#define	ADMIN_LOG_FILE_NAME							string(LOGDIR) + "admin.log"
 
 #endif
