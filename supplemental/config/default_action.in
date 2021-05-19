@@ -3,5 +3,5 @@ agency		= agency_dashboard
 approver	= approver_dashboard
 
 helpdesk	= helpdesk_dashboard
-norole		= initial_wizard
+no role		= initial_wizard
 guest		= autologin
