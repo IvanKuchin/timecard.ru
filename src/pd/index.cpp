@@ -385,7 +385,7 @@ int main()
 			(action == config.GetFromFile("default_action", "agency"))			||
 			(action == config.GetFromFile("default_action", "helpdesk"))		||
 			(action == config.GetFromFile("default_action", "approver"))		||
-			(action == config.GetFromFile("default_action", "norole"))
+			(action == config.GetFromFile("default_action", "no role"))
 		   )
 		{
 			auto		template_name = action + ".htmlt";
