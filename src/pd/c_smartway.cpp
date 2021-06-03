@@ -364,7 +364,7 @@ string C_Smartway::GetAuthJSON()
 	MESSAGE_DEBUG("", "", "start");
 
 	vector<string>	config_keys 		= {"SMARTWAY_LOGIN", "SMARTWAY_PASSWORD"};
-    auto	        auth_map        	= config->GetFromFile(CONFIG_SECRET, config_keys);
+    auto	        auth_map        	= config->GetFromFullPathFile(SECRET_DIR, SECRET_FILE, config_keys);
     auto	        is_auth_valid   	= (auth_map["SMARTWAY_LOGIN"].length() > 0);
     auto	        __SMARTWAY_LOGIN    = (is_auth_valid ? auth_map["SMARTWAY_LOGIN"] : "");
     auto	        __SMARTWAY_PASSWORD = (is_auth_valid ? auth_map["SMARTWAY_PASSWORD"] : "");
