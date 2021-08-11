@@ -3386,7 +3386,6 @@ int main(void)
 					MESSAGE_ERROR("", action, "failed (" + error_message + ")");
 					ostResult.str("");
 					ostResult << "{\"result\":\"error\",\"description\":\"" + RemoveQuotas(error_message) + "\"}";
-MESSAGE_ERROR("", action, "---" + ostResult.str());
 				}
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
