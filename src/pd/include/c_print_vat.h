@@ -30,6 +30,18 @@ using namespace std;
 class C_Print_VAT_Base
 {
 	protected:
+		const	int						XL_HEADER_COL_1_TITLE				=  0;
+		const	int						XL_HEADER_COL_1_VALUE				=  2;
+		const	int						XL_HEADER_COL_1_SEQUENCE			=  7;
+		const	int						XL_HEADER_COL_1_VALUE_MERGE_START	=  XL_HEADER_COL_1_VALUE;
+		const	int						XL_HEADER_COL_1_VALUE_MERGE_END		=  XL_HEADER_COL_1_SEQUENCE - 1;
+
+		const	int						XL_HEADER_COL_2_TITLE				=  8;
+		const	int						XL_HEADER_COL_2_VALUE				= 11;
+		const	int						XL_HEADER_COL_2_SEQUENCE			= 15;
+		const	int						XL_HEADER_COL_2_VALUE_MERGE_START	=  XL_HEADER_COL_2_VALUE;
+		const	int						XL_HEADER_COL_2_VALUE_MERGE_END		=  XL_HEADER_COL_2_SEQUENCE - 1;
+
 		CMysql							*db = NULL;
 		C_Invoicing_Vars				*vars;
 

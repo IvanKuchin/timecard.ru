@@ -139,12 +139,15 @@ auto	C_Invoicing_Vars::FillStaticDictionary() -> string
 	if(error_message.empty()) error_message = AssignVariableValue("vat_header_3", 			gettext("vat_header_3"), true);
 	if(error_message.empty()) error_message = AssignVariableValue("vat_header_4", 			gettext("vat_header_4"), true);
 	if(error_message.empty()) error_message = AssignVariableValue("vat_header_5", 			gettext("vat_header_5"), true);
-	if(error_message.empty()) error_message = AssignVariableValue("vat_correction", 		gettext("vat_correction"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("vat_correction_1", 		gettext("vat_correction_1"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("vat_correction_2", 		gettext("vat_correction_2"), true);
 	if(error_message.empty()) error_message = AssignVariableValue("vat_header_TIN_KPP_seller", 	gettext("vat_header_TIN_KPP_seller"), true);
 	if(error_message.empty()) error_message = AssignVariableValue("vat_header_TIN_KPP_buyer", 	gettext("vat_header_TIN_KPP_buyer"), true);
 	if(error_message.empty()) error_message = AssignVariableValue("vat_shipper_address",	gettext("vat_shipper_address"), true);
 	if(error_message.empty()) error_message = AssignVariableValue("vat_consignee_address",	gettext("vat_consignee_address"), true);
 	if(error_message.empty()) error_message = AssignVariableValue("vat_doc_accompany",		gettext("vat_doc_accompany"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("vat_shipping_doc",		gettext("vat_shipping_doc"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("VAT title - Payment order number",   gettext("VAT title - Payment order number"), true);
 	if(error_message.empty()) error_message = AssignVariableValue("VAT title - Good name",				gettext("VAT title - Good name"), true);
 	if(error_message.empty()) error_message = AssignVariableValue("VAT title - Good code",				gettext("VAT title - Good code"), true);
 	if(error_message.empty()) error_message = AssignVariableValue("VAT title - Measure unit",			gettext("VAT title - Measure unit"), true);
@@ -163,6 +166,7 @@ auto	C_Invoicing_Vars::FillStaticDictionary() -> string
 	if(error_message.empty()) error_message = AssignVariableValue("VAT comment1",						gettext("VAT comment1"), true);
 	if(error_message.empty()) error_message = AssignVariableValue("VAT comment2",						gettext("VAT comment2"), true);
 	if(error_message.empty()) error_message = AssignVariableValue("VAT comment3",						gettext("VAT comment3"), true);
+	if(error_message.empty()) error_message = AssignVariableValue("VAT comment4",						gettext("VAT comment4"), true);
 	if(error_message.empty()) error_message = AssignVariableValue("VAT sign - CxO",						gettext("VAT sign - CxO"), true);
 	if(error_message.empty()) error_message = AssignVariableValue("VAT sign - Accountant",				gettext("VAT sign - Accountant"), true);
 	if(error_message.empty()) error_message = AssignVariableValue("VAT sign - Authorized person",		gettext("VAT sign - Authorized person"), true);

@@ -32,13 +32,20 @@ auto C_Print_VAT_Base::__PrintXLSHeader() -> string
 
 	auto	font_big					= __book->addFont();
 	auto	font_small 					= __book->addFont();
+	auto	font_mid 					= __book->addFont();
 
+	auto	format_center				= __book->addFormat();
 	auto	format_big					= __book->addFormat();
+	auto	format_mid_center			= __book->addFormat();
+	auto	format_mid_left				= __book->addFormat();
+	auto	format_mid_left_underline	= __book->addFormat();
+	auto	format_small_left_underline	= __book->addFormat();
 	auto	format_top_right			= __book->addFormat();
 	auto	format_border_bottom		= __book->addFormat();
 
 
 	font_small				->setSize(6);
+	font_mid				->setSize(8);
 	font_big				->setSize(12);
 	font_big				->setBold();
 	format_big				->setFont(font_big);
@@ -47,79 +54,148 @@ auto C_Print_VAT_Base::__PrintXLSHeader() -> string
 	format_top_right		->setWrap(false);
 	format_top_right		->setAlignV(libxl::ALIGNV_TOP);
 	format_top_right		->setAlignH(libxl::ALIGNH_RIGHT);
+	format_mid_center		->setFont(font_mid);
+	format_mid_center		->setAlignH(libxl::ALIGNH_CENTER);
+	format_mid_left			->setFont(font_mid);
+	format_mid_left			->setAlignH(libxl::ALIGNH_LEFT);
+	format_small_left_underline->setFont(font_small);
+	format_small_left_underline->setAlignH(libxl::ALIGNH_LEFT);
+	format_small_left_underline->setBorderBottom(libxl::BORDERSTYLE_THIN);
+	format_mid_left_underline->setFont(font_mid);
+	format_mid_left_underline->setAlignH(libxl::ALIGNH_LEFT);
+	format_mid_left_underline->setBorderBottom(libxl::BORDERSTYLE_THIN);
+	format_center			->setAlignH(libxl::ALIGNH_CENTER);
 	format_border_bottom	->setBorderBottom(libxl::BORDERSTYLE_THIN);
 	format_border_bottom	->setAlignH(libxl::ALIGNH_CENTER);
 
-	__sheet->setRow(__row_counter, 8);
-	__sheet->writeStr(__row_counter, 14, multibyte_to_wide(vars->Get("vat_header_1")).c_str(), format_top_right);
-	++__row_counter;
-	__sheet->setRow(__row_counter, 8);
-	__sheet->writeStr(__row_counter, 14, multibyte_to_wide(vars->Get("vat_header_2")).c_str(), format_top_right);
-	++__row_counter;
-	__sheet->setRow(__row_counter, 8);
-	__sheet->writeStr(__row_counter, 14, multibyte_to_wide(vars->Get("vat_header_3")).c_str(), format_top_right);
-	++__row_counter;
-	__sheet->setRow(__row_counter, 8);
-	__sheet->writeStr(__row_counter, 14, multibyte_to_wide(vars->Get("vat_header_4")).c_str(), format_top_right);
-	++__row_counter;
-	__sheet->setRow(__row_counter, 8);
-	__sheet->writeStr(__row_counter, 14, multibyte_to_wide(vars->Get("vat_header_5")).c_str(), format_top_right);
-	++__row_counter;
 
-	__sheet->writeStr(__row_counter, 0, multibyte_to_wide(GetDocumentTitle()).c_str(), format_big);
-	++__row_counter;
-	__sheet->writeStr(__row_counter, 0, multibyte_to_wide(vars->Get("vat_correction")).c_str(), format_big);
-	++__row_counter;
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_1_TITLE, multibyte_to_wide(vars->Get("VAT doc")).c_str(), format_mid_left);
+	MergeApplyFormat(XL_HEADER_COL_1_VALUE_MERGE_START,  XL_HEADER_COL_1_VALUE_MERGE_END, format_mid_left_underline);
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_1_VALUE, multibyte_to_wide(vars->Get("invoice_agreement")).c_str());
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_1_SEQUENCE, multibyte_to_wide("(1)").c_str(), format_mid_center);
+	MergeApplyFormat(8, 15, format_top_right);
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_2_TITLE, multibyte_to_wide(vars->Get("vat_header_1") + vars->Get("vat_header_2") + vars->Get("vat_header_3") + vars->Get("vat_header_4")).c_str(), format_top_right);
 
 	++__row_counter;
-	__sheet->writeStr(__row_counter, 0, multibyte_to_wide(vars->Get("Seller") + ": ").c_str());
-	MergeApplyFormat(3, 11, format_border_bottom);
-	__sheet->writeStr(__row_counter, 3, multibyte_to_wide(GetSupplierName()).c_str(), format_border_bottom);
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_1_TITLE, multibyte_to_wide(vars->Get("vat_correction_1")).c_str(), format_mid_left);
+	MergeApplyFormat(XL_HEADER_COL_1_VALUE_MERGE_START,  XL_HEADER_COL_1_VALUE_MERGE_END, format_mid_left_underline);
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_1_VALUE, multibyte_to_wide(vars->Get("vat_correction_2")).c_str());
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_1_SEQUENCE, multibyte_to_wide("(1a)").c_str(), format_mid_center);
+	MergeApplyFormat(8, 15, format_top_right);
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_2_TITLE, multibyte_to_wide(vars->Get("vat_header_5")).c_str(), format_top_right);
 
 	++__row_counter;
-	__sheet->writeStr(__row_counter, 0, multibyte_to_wide(vars->Get("Address") + ": ").c_str());
-	MergeApplyFormat(3, 11, format_border_bottom);
-	__sheet->writeStr(__row_counter, 3, multibyte_to_wide(GetSupplierFullAddress()).c_str(), format_border_bottom);
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_1_TITLE, multibyte_to_wide(vars->Get("Seller") + ": ").c_str(), format_mid_left);
+	MergeApplyFormat(XL_HEADER_COL_1_VALUE_MERGE_START,  XL_HEADER_COL_1_VALUE_MERGE_END, format_mid_left_underline);
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_1_VALUE, multibyte_to_wide(GetSupplierName()).c_str());
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_1_SEQUENCE, multibyte_to_wide("(2)").c_str(), format_mid_center);
+
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_2_TITLE, multibyte_to_wide(vars->Get("Buyer") + ": ").c_str(), format_mid_left);
+	MergeApplyFormat(XL_HEADER_COL_2_VALUE_MERGE_START, XL_HEADER_COL_2_VALUE_MERGE_END, format_mid_left_underline);
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_2_VALUE, multibyte_to_wide(GetCustomerName()).c_str());
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_2_SEQUENCE, multibyte_to_wide("(6)").c_str(), format_mid_center);
 
 	++__row_counter;
-	__sheet->writeStr(__row_counter, 0, multibyte_to_wide(vars->Get("vat_header_TIN_KPP_seller") + ": ").c_str());
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_1_TITLE, multibyte_to_wide(vars->Get("Address") + ": ").c_str(), format_mid_left);
+	MergeApplyFormat(XL_HEADER_COL_1_VALUE_MERGE_START,  XL_HEADER_COL_1_VALUE_MERGE_END, format_small_left_underline);
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_1_VALUE, multibyte_to_wide(GetSupplierFullAddress()).c_str());
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_1_SEQUENCE, multibyte_to_wide("(2a)").c_str(), format_mid_center);
+
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_2_TITLE, multibyte_to_wide(vars->Get("Address") + ": ").c_str(), format_mid_left);
+	MergeApplyFormat(XL_HEADER_COL_2_VALUE_MERGE_START, XL_HEADER_COL_2_VALUE_MERGE_END, format_small_left_underline);
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_2_VALUE, multibyte_to_wide(GetCustomerFullAddress()).c_str());
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_2_SEQUENCE, multibyte_to_wide("(6a)").c_str(), format_mid_center);
+
+
+	++__row_counter;
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_1_TITLE, multibyte_to_wide(vars->Get("vat_header_TIN_KPP_seller") + ": ").c_str(), format_mid_left);
+	MergeApplyFormat(XL_HEADER_COL_1_VALUE_MERGE_START,  XL_HEADER_COL_1_VALUE_MERGE_END, format_mid_left_underline);
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_1_VALUE, multibyte_to_wide(GetSupplierTIN() + " / " + GetSupplierKPP()).c_str());
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_1_SEQUENCE, multibyte_to_wide("(2б)").c_str(), format_mid_center);
+
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_2_TITLE, multibyte_to_wide(vars->Get("vat_header_TIN_KPP_buyer") + ": ").c_str(), format_mid_left);
+	MergeApplyFormat(XL_HEADER_COL_2_VALUE_MERGE_START, XL_HEADER_COL_2_VALUE_MERGE_END, format_mid_left_underline);
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_2_VALUE, multibyte_to_wide(GetCustomerTIN() + " / " + GetCustomerKPP()).c_str());
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_2_SEQUENCE, multibyte_to_wide("(6б)").c_str(), format_mid_center);
+
+	++__row_counter;
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_1_TITLE, multibyte_to_wide(vars->Get("vat_shipper_address") + ": ").c_str(), format_mid_left);
+	MergeApplyFormat(XL_HEADER_COL_1_VALUE_MERGE_START,  XL_HEADER_COL_1_VALUE_MERGE_END, format_mid_left_underline);
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_1_VALUE, multibyte_to_wide("").c_str());
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_1_SEQUENCE, multibyte_to_wide("(3)").c_str(), format_mid_center);
+
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_2_TITLE, multibyte_to_wide(vars->Get("VAT comment1")).c_str(), format_mid_left);
+	MergeApplyFormat(XL_HEADER_COL_2_VALUE_MERGE_START, XL_HEADER_COL_2_VALUE_MERGE_END, format_mid_left_underline);
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_2_VALUE, multibyte_to_wide(vars->Get("VAT comment2")).c_str());
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_2_SEQUENCE, multibyte_to_wide("(7)").c_str(), format_mid_center);
+
+	++__row_counter;
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_1_TITLE, multibyte_to_wide(vars->Get("vat_consignee_address") + ": ").c_str(), format_mid_left);
+	MergeApplyFormat(XL_HEADER_COL_1_VALUE_MERGE_START,  XL_HEADER_COL_1_VALUE_MERGE_END, format_mid_left_underline);
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_1_VALUE, multibyte_to_wide("").c_str());
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_1_SEQUENCE, multibyte_to_wide("(4)").c_str(), format_mid_center);
+
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_2_TITLE, multibyte_to_wide(vars->Get("VAT comment3")).c_str(), format_mid_left);
+
+	++__row_counter;
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_1_TITLE, multibyte_to_wide(vars->Get("vat_doc_accompany") + ": ").c_str(), format_mid_left);
+	MergeApplyFormat(XL_HEADER_COL_1_VALUE_MERGE_START,  XL_HEADER_COL_1_VALUE_MERGE_END, format_mid_left_underline);
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_1_VALUE, multibyte_to_wide("").c_str());
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_1_SEQUENCE, multibyte_to_wide("(5)").c_str(), format_mid_center);
+
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_2_TITLE, multibyte_to_wide(vars->Get("VAT comment4")).c_str(), format_mid_left);
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_2_SEQUENCE, multibyte_to_wide("(8)").c_str(), format_mid_center);
+
+	++__row_counter;
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_1_TITLE, multibyte_to_wide(vars->Get("vat_shipping_doc") + ": ").c_str(), format_mid_left);
+	MergeApplyFormat(XL_HEADER_COL_1_VALUE_MERGE_START,  XL_HEADER_COL_1_VALUE_MERGE_END, format_mid_left_underline);
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_1_SEQUENCE, multibyte_to_wide("(5a)").c_str(), format_mid_center);
+
+	{
+		auto	number_of_payment_orders = 0;
+		for(number_of_payment_orders = 1; isTableRowExists(number_of_payment_orders); ++number_of_payment_orders) {};
+
+
+		__sheet->writeStr(__row_counter, XL_HEADER_COL_1_VALUE, multibyte_to_wide(vars->Get("VAT title - Payment order number") + " 1-" + to_string(number_of_payment_orders) + " " + vars->Get("invoice_agreement")).c_str(), format_mid_left_underline);
+	}
+
+
+/*
+	++__row_counter;
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_1_TITLE, multibyte_to_wide(vars->Get("vat_header_TIN_KPP_seller") + ": ").c_str());
 	MergeApplyFormat(3, 11, format_border_bottom);
 	__sheet->writeStr(__row_counter, 3, multibyte_to_wide(GetSupplierTIN() + " / " + GetSupplierKPP()).c_str(), format_border_bottom);
 
 	++__row_counter;
-	__sheet->writeStr(__row_counter, 0, multibyte_to_wide(vars->Get("vat_shipper_address") + ": ").c_str());
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_1_TITLE, multibyte_to_wide(vars->Get("vat_shipper_address") + ": ").c_str());
 	MergeApplyFormat(3, 11, format_border_bottom);
 
 	++__row_counter;
-	__sheet->writeStr(__row_counter, 0, multibyte_to_wide(vars->Get("vat_consignee_address") + ": ").c_str());
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_1_TITLE, multibyte_to_wide(vars->Get("vat_consignee_address") + ": ").c_str());
 	MergeApplyFormat(3, 11, format_border_bottom);
 
 	++__row_counter;
-	__sheet->writeStr(__row_counter, 0, multibyte_to_wide(vars->Get("vat_doc_accompany")).c_str());
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_1_TITLE, multibyte_to_wide(vars->Get("vat_doc_accompany")).c_str());
 	MergeApplyFormat(3, 11, format_border_bottom);
 
 	++__row_counter;
-	__sheet->writeStr(__row_counter, 0, multibyte_to_wide(vars->Get("Buyer") + ": ").c_str());
-	MergeApplyFormat(3, 11, format_border_bottom);
-	__sheet->writeStr(__row_counter, 3, multibyte_to_wide(GetCustomerName()).c_str(), format_border_bottom);
-
-	++__row_counter;
-	__sheet->writeStr(__row_counter, 0, multibyte_to_wide(vars->Get("Address") + ": ").c_str());
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_1_TITLE, multibyte_to_wide(vars->Get("Address") + ": ").c_str());
 	MergeApplyFormat(3, 11, format_border_bottom);
 	__sheet->writeStr(__row_counter, 3, multibyte_to_wide(GetCustomerFullAddress()).c_str(), format_border_bottom);
 
 	++__row_counter;
-	__sheet->writeStr(__row_counter, 0, multibyte_to_wide(vars->Get("vat_header_TIN_KPP_seller") + ": ").c_str());
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_1_TITLE, multibyte_to_wide(vars->Get("vat_header_TIN_KPP_seller") + ": ").c_str());
 	MergeApplyFormat(3, 11, format_border_bottom);
 	__sheet->writeStr(__row_counter, 3, multibyte_to_wide(GetCustomerTIN() + " / " + GetCustomerKPP()).c_str(), format_border_bottom);
 
 	++__row_counter;
-	__sheet->writeStr(__row_counter, 0, multibyte_to_wide(vars->Get("VAT comment1")).c_str());
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_1_TITLE, multibyte_to_wide(vars->Get("VAT comment1")).c_str());
 	MergeApplyFormat(3, 11, format_border_bottom);
 	__sheet->writeStr(__row_counter, 3, multibyte_to_wide(vars->Get("VAT comment2")).c_str());
 
 	++__row_counter;
-	__sheet->writeStr(__row_counter, 0, multibyte_to_wide(vars->Get("VAT comment3")).c_str());
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_1_TITLE, multibyte_to_wide(vars->Get("VAT comment3")).c_str());
+*/
 
 	MESSAGE_DEBUG("", "", "finish");
 
@@ -183,52 +259,55 @@ auto C_Print_VAT_Base::__PrintXLSTable() -> string
 	// --- merge cells vertically, but 2, 2a, 10, 10a
 	__sheet->setMerge(__row_counter, __row_counter + 1, 0, 0);
 	__sheet->setMerge(__row_counter, __row_counter + 1, 1, 1);
-	__sheet->setMerge(__row_counter, __row_counter + 1, 5, 5);
+	__sheet->setMerge(__row_counter, __row_counter + 1, 2, 2);
 	__sheet->setMerge(__row_counter, __row_counter + 1, 6, 6);
 	__sheet->setMerge(__row_counter, __row_counter + 1, 7, 7);
 	__sheet->setMerge(__row_counter, __row_counter + 1, 8, 8);
 	__sheet->setMerge(__row_counter, __row_counter + 1, 9, 9);
 	__sheet->setMerge(__row_counter, __row_counter + 1, 10, 10);
 	__sheet->setMerge(__row_counter, __row_counter + 1, 11, 11);
-	__sheet->setMerge(__row_counter, __row_counter + 1, 14, 14);
+	__sheet->setMerge(__row_counter, __row_counter + 1, 12, 12);
+	__sheet->setMerge(__row_counter, __row_counter + 1, 15, 15);
 	// --- merge cells horizontally
-	__sheet->setMerge(__row_counter, __row_counter, 2, 4);
-	__sheet->setMerge(__row_counter + 1, __row_counter + 1, 2, 3);
-	__sheet->setMerge(__row_counter, __row_counter, 12, 13);
+	__sheet->setMerge(__row_counter, __row_counter, 3, 5);
+	__sheet->setMerge(__row_counter + 1, __row_counter + 1, 3, 4);
+	__sheet->setMerge(__row_counter, __row_counter, 13, 14);
 
-	__sheet->writeStr(__row_counter,	  0, multibyte_to_wide(vars->Get("VAT title - Good name")).c_str(), format_small_border);
-	__sheet->writeStr(__row_counter,	  1, multibyte_to_wide(vars->Get("VAT title - Good code")).c_str(), format_small_border);
-	__sheet->writeStr(__row_counter,      2, multibyte_to_wide(vars->Get("VAT title - Measure unit")).c_str(), format_small_border);
-	__sheet->writeStr(__row_counter + 1,  2, multibyte_to_wide(vars->Get("VAT title - Measure unit (code)")).c_str(), format_small_border);
-	__sheet->writeStr(__row_counter + 1,  4, multibyte_to_wide(vars->Get("VAT title - Measure unit (name)")).c_str(), format_small_border);
-	__sheet->writeStr(__row_counter,	  5, multibyte_to_wide(vars->Get("VAT title - Quantity")).c_str(), format_small_border);
-	__sheet->writeStr(__row_counter,	  6, multibyte_to_wide(vars->Get("VAT title - Price per unit")).c_str(), format_small_border);
-	__sheet->writeStr(__row_counter,	  7, multibyte_to_wide(vars->Get("VAT title - Price wo tax")).c_str(), format_small_border);
-	__sheet->writeStr(__row_counter,	  8, multibyte_to_wide(vars->Get("VAT title - Excise")).c_str(), format_small_border);
-	__sheet->writeStr(__row_counter,	  9, multibyte_to_wide(vars->Get("Tax rate")).c_str(), format_small_border);
-	__sheet->writeStr(__row_counter,	 10, multibyte_to_wide(vars->Get("VAT title - Tax amount")).c_str(), format_small_border);
-	__sheet->writeStr(__row_counter,     11, multibyte_to_wide(vars->Get("VAT title - Price w tax")).c_str(), format_small_border);
-	__sheet->writeStr(__row_counter,     12, multibyte_to_wide(vars->Get("VAT title - Country")).c_str(), format_small_border);
-	__sheet->writeStr(__row_counter + 1, 12, multibyte_to_wide(vars->Get("VAT title - Country code")).c_str(), format_small_border);
-	__sheet->writeStr(__row_counter + 1, 13, multibyte_to_wide(vars->Get("VAT title - Country name")).c_str(), format_small_border);
-	__sheet->writeStr(__row_counter,     14, multibyte_to_wide(vars->Get("VAT title - Custom number")).c_str(), format_small_border);
+	__sheet->writeStr(__row_counter,	  0, multibyte_to_wide(vars->Get("VAT title - Payment order number")).c_str(), format_small_border);
+	__sheet->writeStr(__row_counter,	  1, multibyte_to_wide(vars->Get("VAT title - Good name")).c_str(), format_small_border);
+	__sheet->writeStr(__row_counter,	  2, multibyte_to_wide(vars->Get("VAT title - Good code")).c_str(), format_small_border);
+	__sheet->writeStr(__row_counter,      3, multibyte_to_wide(vars->Get("VAT title - Measure unit")).c_str(), format_small_border);
+	__sheet->writeStr(__row_counter + 1,  4, multibyte_to_wide(vars->Get("VAT title - Measure unit (code)")).c_str(), format_small_border);
+	__sheet->writeStr(__row_counter + 1,  5, multibyte_to_wide(vars->Get("VAT title - Measure unit (name)")).c_str(), format_small_border);
+	__sheet->writeStr(__row_counter,	  6, multibyte_to_wide(vars->Get("VAT title - Quantity")).c_str(), format_small_border);
+	__sheet->writeStr(__row_counter,	  7, multibyte_to_wide(vars->Get("VAT title - Price per unit")).c_str(), format_small_border);
+	__sheet->writeStr(__row_counter,	  8, multibyte_to_wide(vars->Get("VAT title - Price wo tax")).c_str(), format_small_border);
+	__sheet->writeStr(__row_counter,	  9, multibyte_to_wide(vars->Get("VAT title - Excise")).c_str(), format_small_border);
+	__sheet->writeStr(__row_counter,	 10, multibyte_to_wide(vars->Get("Tax rate")).c_str(), format_small_border);
+	__sheet->writeStr(__row_counter,	 11, multibyte_to_wide(vars->Get("VAT title - Tax amount")).c_str(), format_small_border);
+	__sheet->writeStr(__row_counter,     12, multibyte_to_wide(vars->Get("VAT title - Price w tax")).c_str(), format_small_border);
+	__sheet->writeStr(__row_counter,     13, multibyte_to_wide(vars->Get("VAT title - Country")).c_str(), format_small_border);
+	__sheet->writeStr(__row_counter + 1, 13, multibyte_to_wide(vars->Get("VAT title - Country code")).c_str(), format_small_border);
+	__sheet->writeStr(__row_counter + 1, 14, multibyte_to_wide(vars->Get("VAT title - Country name")).c_str(), format_small_border);
+	__sheet->writeStr(__row_counter,     15, multibyte_to_wide(vars->Get("VAT title - Custom number")).c_str(), format_small_border);
 	++__row_counter;
 	++__row_counter;
 	__sheet->setMerge(__row_counter, __row_counter, 2, 3);
 	__sheet->writeStr(__row_counter,  0, L"1",	format_table_center);
 	__sheet->writeStr(__row_counter,  1, L"1a",	format_table_center);
-	__sheet->writeStr(__row_counter,  2, L"2",	format_table_center);
-	__sheet->writeStr(__row_counter,  4, L"2a",	format_table_center);
-	__sheet->writeStr(__row_counter,  5, L"3",	format_table_center);
-	__sheet->writeStr(__row_counter,  6, L"4",	format_table_center);
-	__sheet->writeStr(__row_counter,  7, L"5",	format_table_center);
-	__sheet->writeStr(__row_counter,  8, L"6",	format_table_center);
-	__sheet->writeStr(__row_counter,  9, L"7",	format_table_center);
-	__sheet->writeStr(__row_counter, 10, L"8",	format_table_center);
-	__sheet->writeStr(__row_counter, 11, L"9",	format_table_center);
-	__sheet->writeStr(__row_counter, 12, L"10",	format_table_center);
-	__sheet->writeStr(__row_counter, 13, L"10a",format_table_center);
-	__sheet->writeStr(__row_counter, 14, L"11",	format_table_center);
+	__sheet->writeStr(__row_counter,  2, L"1б",	format_table_center);
+	__sheet->writeStr(__row_counter,  3, L"2",	format_table_center);
+	__sheet->writeStr(__row_counter,  5, L"2a",	format_table_center);
+	__sheet->writeStr(__row_counter,  6, L"3",	format_table_center);
+	__sheet->writeStr(__row_counter,  7, L"4",	format_table_center);
+	__sheet->writeStr(__row_counter,  8, L"5",	format_table_center);
+	__sheet->writeStr(__row_counter,  9, L"6",	format_table_center);
+	__sheet->writeStr(__row_counter, 10, L"7",	format_table_center);
+	__sheet->writeStr(__row_counter, 11, L"8",	format_table_center);
+	__sheet->writeStr(__row_counter, 12, L"9",	format_table_center);
+	__sheet->writeStr(__row_counter, 13, L"10",	format_table_center);
+	__sheet->writeStr(__row_counter, 14, L"10a",format_table_center);
+	__sheet->writeStr(__row_counter, 15, L"11",	format_table_center);
 
 	// --- table body
 	for(auto i = 1; isTableRowExists(i); ++i)
@@ -237,37 +316,38 @@ auto C_Print_VAT_Base::__PrintXLSTable() -> string
 
 		++__row_counter;
 
-		__sheet->writeStr(__row_counter,  0, multibyte_to_wide(description).c_str(), format_small_border_left);
-		__sheet->writeStr(__row_counter,  1, L"-", format_table_center);
-		__sheet->writeNum(__row_counter,  2, 796, format_table_center);
-		__sheet->writeStr(__row_counter,  3, L"", format_table_center); // --- assign style
-		__sheet->setMerge(__row_counter, __row_counter, 2, 3);
-		__sheet->writeStr(__row_counter,  4, multibyte_to_wide(GetTableRowItem(i)).c_str(), format_table_center);
-		__sheet->writeNum(__row_counter,  5, stod_noexcept(GetTableRowQuantity(i)), format_table_center);
-		__sheet->writeNum(__row_counter,  6, stod_noexcept(GetTableRowPrice(i)), format_small_border);
-		__sheet->writeNum(__row_counter,  7, stod_noexcept(GetTableRowPrice(i)), format_table_right);
-		__sheet->writeStr(__row_counter,  8, multibyte_to_wide(vars->Get("no excise")).c_str(), format_small_border);
-		__sheet->writeStr(__row_counter,  9, multibyte_to_wide(GetSupplierVATSpellingShort()).c_str(), format_small_border);
-		__sheet->writeNum(__row_counter, 10, stod_noexcept(GetTableRowVAT(i)), format_table_right);
-		__sheet->writeNum(__row_counter, 11, stod_noexcept(GetTableRowTotal(i)), format_table_right);
-		__sheet->writeStr(__row_counter, 12, L"-", format_table_center);
+		__sheet->writeStr(__row_counter,  0, multibyte_to_wide(to_string(i)).c_str(), format_table_center);
+		__sheet->writeStr(__row_counter,  1, multibyte_to_wide(description).c_str(), format_small_border_left);
+		__sheet->writeStr(__row_counter,  2, L"-", format_table_center);
+		__sheet->writeNum(__row_counter,  3, 796, format_table_center);
+		__sheet->writeStr(__row_counter,  4, L"", format_table_center); // --- assign style
+		__sheet->setMerge(__row_counter, __row_counter, 3, 4);
+		__sheet->writeStr(__row_counter,  5, multibyte_to_wide(GetTableRowItem(i)).c_str(), format_table_center);
+		__sheet->writeNum(__row_counter,  6, stod_noexcept(GetTableRowQuantity(i)), format_table_center);
+		__sheet->writeNum(__row_counter,  7, stod_noexcept(GetTableRowPrice(i)), format_small_border);
+		__sheet->writeNum(__row_counter,  8, stod_noexcept(GetTableRowPrice(i)), format_table_right);
+		__sheet->writeStr(__row_counter,  9, multibyte_to_wide(vars->Get("no excise")).c_str(), format_small_border);
+		__sheet->writeStr(__row_counter, 10, multibyte_to_wide(GetSupplierVATSpellingShort()).c_str(), format_small_border);
+		__sheet->writeNum(__row_counter, 11, stod_noexcept(GetTableRowVAT(i)), format_table_right);
+		__sheet->writeNum(__row_counter, 12, stod_noexcept(GetTableRowTotal(i)), format_table_right);
 		__sheet->writeStr(__row_counter, 13, L"-", format_table_center);
 		__sheet->writeStr(__row_counter, 14, L"-", format_table_center);
+		__sheet->writeStr(__row_counter, 15, L"-", format_table_center);
 
 		++total_table_items;
 	}
 
 	++__row_counter;
-	MergeApplyFormat(0, 6, format_table_left);
-	__sheet->writeStr(__row_counter,  0, multibyte_to_wide(vars->Get("Total payment") + ":").c_str(), format_table_left);
+	MergeApplyFormat(0, 7, format_table_left);
+	__sheet->writeStr(__row_counter,  1, multibyte_to_wide(vars->Get("Total payment") + ":").c_str(), format_table_left);
 
-	__sheet->writeNum(__row_counter,  7, stod_noexcept(GetTableSum()), format_table_right);
-	__sheet->writeStr(__row_counter,  8, L"", format_table_left); // --- assign style
+	__sheet->writeNum(__row_counter,  8, stod_noexcept(GetTableSum()), format_table_right);
 	__sheet->writeStr(__row_counter,  9, L"", format_table_left); // --- assign style
-	__sheet->setMerge(__row_counter, __row_counter, 8, 9);
-	__sheet->writeStr(__row_counter,  8, L"X", format_table_center);
-	__sheet->writeNum(__row_counter, 10, stod_noexcept(GetTableVAT()), format_table_right);
-	__sheet->writeNum(__row_counter, 11, stod_noexcept(GetTableTotal()), format_table_right);
+	__sheet->writeStr(__row_counter, 10, L"", format_table_left); // --- assign style
+	__sheet->setMerge(__row_counter, __row_counter, 9, 10);
+	__sheet->writeStr(__row_counter,  9, L"X", format_table_center);
+	__sheet->writeNum(__row_counter, 11, stod_noexcept(GetTableVAT()), format_table_right);
+	__sheet->writeNum(__row_counter, 12, stod_noexcept(GetTableTotal()), format_table_right);
 
 	MESSAGE_DEBUG("", "", "finish");
 
@@ -312,47 +392,47 @@ auto C_Print_VAT_Base::__PrintXLSSignature() -> string
 	format_wrap_small_up->setAlignH(libxl::ALIGNH_CENTER);
 
 	++__row_counter;
-	__sheet->writeStr(__row_counter, 0, multibyte_to_wide(GetSignatureInfo1()).c_str(), format_left_small);
-	__sheet->writeStr(__row_counter, 7, multibyte_to_wide(GetSignatureInfo2()).c_str(), format_left_small);
+	__sheet->writeStr(__row_counter, 1, multibyte_to_wide(GetSignatureInfo1()).c_str(), format_left_small);
+	__sheet->writeStr(__row_counter, 8, multibyte_to_wide(GetSignatureInfo2()).c_str(), format_left_small);
 
 	++__row_counter;
-	__sheet->writeStr(__row_counter, 0, multibyte_to_wide(vars->Get("VAT sign - Authorized person")).c_str(), format_left_small);
-	__sheet->writeStr(__row_counter, 7, multibyte_to_wide(vars->Get("VAT sign - Authorized person")).c_str(), format_left_small);
-	MergeApplyFormat( 1,  2, format_underline);
-	MergeApplyFormat( 4,  5, format_underline);
-	__sheet->writeStr(__row_counter, 4, multibyte_to_wide(GetSignatureName1()).c_str(), format_underline_center_small);
+	__sheet->writeStr(__row_counter, 1, multibyte_to_wide(vars->Get("VAT sign - Authorized person")).c_str(), format_left_small);
+	__sheet->writeStr(__row_counter, 8, multibyte_to_wide(vars->Get("VAT sign - Authorized person")).c_str(), format_left_small);
+	MergeApplyFormat( 2,  3, format_underline);
+	MergeApplyFormat( 5,  6, format_underline);
+	__sheet->writeStr(__row_counter, 5, multibyte_to_wide(GetSignatureName1()).c_str(), format_underline_center_small);
 
-	__sheet->writeStr(__row_counter, 10, L"", format_underline_center_small);
-	MergeApplyFormat(12, 14, format_underline);
-	__sheet->writeStr(__row_counter, 12, multibyte_to_wide(GetSignatureName2()).c_str(), format_underline_center_small);
+	__sheet->writeStr(__row_counter, 11, L"", format_underline_center_small);
+	MergeApplyFormat(13, 15, format_underline);
+	__sheet->writeStr(__row_counter, 13, multibyte_to_wide(GetSignatureName2()).c_str(), format_underline_center_small);
 
 	++__row_counter;
-	MergeApplyFormat( 1,  2, nullptr);
-	__sheet->writeStr(__row_counter, 1, multibyte_to_wide("(" + vars->Get("Signature") + ")").c_str(), format_center_small);
-	MergeApplyFormat( 4,  5, nullptr);
-	__sheet->writeStr(__row_counter, 4, multibyte_to_wide("(" + vars->Get("initials") + ")").c_str(), format_center_small);
-	__sheet->writeStr(__row_counter, 10, multibyte_to_wide("(" + vars->Get("Signature") + ")").c_str(), format_center_small);
-	MergeApplyFormat(12, 14, nullptr);
-	__sheet->writeStr(__row_counter, 12, multibyte_to_wide("(" + vars->Get("initials") + ")").c_str(), format_center_small);
+	MergeApplyFormat( 2,  3, nullptr);
+	__sheet->writeStr(__row_counter, 2, multibyte_to_wide("(" + vars->Get("Signature") + ")").c_str(), format_center_small);
+	MergeApplyFormat( 5,  6, nullptr);
+	__sheet->writeStr(__row_counter, 5, multibyte_to_wide("(" + vars->Get("initials") + ")").c_str(), format_center_small);
+	__sheet->writeStr(__row_counter, 11, multibyte_to_wide("(" + vars->Get("Signature") + ")").c_str(), format_center_small);
+	MergeApplyFormat(13, 15, nullptr);
+	__sheet->writeStr(__row_counter, 13, multibyte_to_wide("(" + vars->Get("initials") + ")").c_str(), format_center_small);
 
 	++__row_counter;
 	__sheet->setRow(__row_counter, 18);
-	__sheet->writeStr(__row_counter, 0, multibyte_to_wide(vars->Get("VAT sign - Entrepreneur")).c_str(), format_left_small);
+	__sheet->writeStr(__row_counter, 1, multibyte_to_wide(vars->Get("VAT sign - Entrepreneur")).c_str(), format_left_small);
 
 	++__row_counter;
-	__sheet->writeStr(__row_counter, 0, multibyte_to_wide(vars->Get("VAT sign - Authorized person")).c_str(), format_left_small);
-	MergeApplyFormat( 1,  2, format_underline);
-	MergeApplyFormat( 4,  5, format_underline);
-	MergeApplyFormat( 7, 14, format_underline);
+	__sheet->writeStr(__row_counter, 1, multibyte_to_wide(vars->Get("VAT sign - Authorized person")).c_str(), format_left_small);
+	MergeApplyFormat( 2,  3, format_underline);
+	MergeApplyFormat( 5,  6, format_underline);
+	MergeApplyFormat( 8, 15, format_underline);
 
 	++__row_counter;
 	__sheet->setRow(__row_counter, 25);
-	MergeApplyFormat( 1,  2, nullptr);
-	__sheet->writeStr(__row_counter, 1, multibyte_to_wide("(" + vars->Get("Signature") + ")").c_str(), format_wrap_small_up);
-	MergeApplyFormat( 4,  5, nullptr);
-	__sheet->writeStr(__row_counter, 4, multibyte_to_wide("(" + vars->Get("initials") + ")").c_str(), format_wrap_small_up);
-	MergeApplyFormat( 7, 14, format_wrap_small_up);
-	__sheet->writeStr(__row_counter, 7, multibyte_to_wide(vars->Get("VAT sign - Entrepreneur registration")).c_str(), format_wrap_small_up);
+	MergeApplyFormat( 2,  3, nullptr);
+	__sheet->writeStr(__row_counter, 2, multibyte_to_wide("(" + vars->Get("Signature") + ")").c_str(), format_wrap_small_up);
+	MergeApplyFormat( 5,  6, nullptr);
+	__sheet->writeStr(__row_counter, 5, multibyte_to_wide("(" + vars->Get("initials") + ")").c_str(), format_wrap_small_up);
+	MergeApplyFormat( 8, 15, format_wrap_small_up);
+	__sheet->writeStr(__row_counter, 8, multibyte_to_wide(vars->Get("VAT sign - Entrepreneur registration")).c_str(), format_wrap_small_up);
 
 
 
@@ -409,24 +489,25 @@ auto	C_Print_VAT_Base::PrintAsXLS() -> string
 				// --- print properties
 				__sheet->setPaper(libxl::PAPER_A4);
 				__sheet->setLandscape(true);
-				// __sheet->setPrintZoom(75);
+				__sheet->setPrintZoom(97);
 
 				// --- set columns width
-				__sheet->setCol(0, 0, 25);
-				__sheet->setCol(1, 1, 5);
-				__sheet->setCol(2, 2, 6);
-				__sheet->setCol(3, 3, 0.67);
-				__sheet->setCol(4, 4, 8);
-				__sheet->setCol(5, 5, 6);
+				__sheet->setCol(0, 0, 5);
+				__sheet->setCol(1, 1, 25);
+				__sheet->setCol(2, 2, 5);
+				__sheet->setCol(3, 3, 6);
+				__sheet->setCol(4, 4, 0.67);
+				__sheet->setCol(5, 5, 8);
 				__sheet->setCol(6, 6, 6);
-				__sheet->setCol(7, 7, 11);
-				__sheet->setCol(8, 8, 5);
-				__sheet->setCol(9, 9, 6);
-				__sheet->setCol(10, 10, 11);
+				__sheet->setCol(7, 7, 6);
+				__sheet->setCol(8, 8, 11);
+				__sheet->setCol(9, 9, 5);
+				__sheet->setCol(10, 10, 6);
 				__sheet->setCol(11, 11, 11);
-				__sheet->setCol(12, 12, 6);
+				__sheet->setCol(12, 12, 11);
 				__sheet->setCol(13, 13, 6);
-				__sheet->setCol(14, 14, 7);
+				__sheet->setCol(14, 14, 6);
+				__sheet->setCol(15, 15, 7);
 
 				PrintXLSHeader();
 
