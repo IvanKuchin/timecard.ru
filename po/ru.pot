@@ -442,8 +442,10 @@ msgid "VAT comment2"
 msgstr "Российский рубль, 643"
 
 msgid "VAT comment3"
-msgstr ""
-"Идентификатор государственного контракта, договора (соглашения) (при наличии)"
+msgstr "Идентификатор государственного контракта,"
+
+msgid "VAT comment4"
+msgstr "договора (соглашения) (при наличии)"
 
 msgid "VAT doc"
 msgstr "Счет-фактура"
@@ -470,6 +472,9 @@ msgstr ""
 
 msgid "VAT sum"
 msgstr "Сумма НДС"
+
+msgid "VAT title - Payment order number"
+msgstr "№ п/п"
 
 msgid "VAT title - Country"
 msgstr "Страна происхождения товара"
@@ -1319,13 +1324,19 @@ msgid "vat"
 msgstr "НДС"
 
 msgid "vat_consignee_address"
-msgstr "Грузополучатель и его адрес: --"
+msgstr "Грузополучатель и его адрес:"
 
-msgid "vat_correction"
-msgstr "Исправление № -- от --"
+msgid "vat_correction_1"
+msgstr "Исправление №"
+
+msgid "vat_correction_2"
+msgstr "-- от --"
 
 msgid "vat_doc_accompany"
 msgstr "К платежно-расчетному документу № от"
+
+msgid "vat_shipping_doc"
+msgstr "Документ об отгрузке:"
 
 msgid "vat_header_1"
 msgstr "Приложение № 1"
@@ -1340,7 +1351,7 @@ msgid "vat_header_4"
 msgstr "от 26 декабря 2011г. № 1137"
 
 msgid "vat_header_5"
-msgstr "(в ред. Постановления Правительства РФ от 19.08.2017 № 981)"
+msgstr "(в редакции постановления Правительства Российской Федерации от 2 апреля 2021 г. № 534)"
 
 msgid "vat_header_TIN_KPP_buyer"
 msgstr "ИНН/КПП покупателя"
@@ -1349,7 +1360,7 @@ msgid "vat_header_TIN_KPP_seller"
 msgstr "ИНН/КПП продавца"
 
 msgid "vat_shipper_address"
-msgstr "Грузоотправитель и его адрес: --"
+msgstr "Грузоотправитель и его адрес:"
 
 msgid "voucher content is empty"
 msgstr "содержимое ваучера пустое"

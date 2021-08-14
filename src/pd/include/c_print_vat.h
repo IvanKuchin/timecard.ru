@@ -30,6 +30,84 @@ using namespace std;
 class C_Print_VAT_Base
 {
 	protected:
+		const	int						XL_HEADER_COL_1_TITLE				=  0;
+		const	int						XL_HEADER_COL_1_VALUE				=  2;
+		const	int						XL_HEADER_COL_1_SEQUENCE			=  7;
+		const	int						XL_HEADER_COL_1_VALUE_MERGE_START	=  XL_HEADER_COL_1_VALUE;
+		const	int						XL_HEADER_COL_1_VALUE_MERGE_END		=  XL_HEADER_COL_1_SEQUENCE - 1;
+
+		const	int						XL_HEADER_COL_2_TITLE				=  8;
+		const	int						XL_HEADER_COL_2_VALUE				= 11;
+		const	int						XL_HEADER_COL_2_SEQUENCE			= 15;
+		const	int						XL_HEADER_COL_2_VALUE_MERGE_START	=  XL_HEADER_COL_2_VALUE;
+		const	int						XL_HEADER_COL_2_VALUE_MERGE_END		=  XL_HEADER_COL_2_SEQUENCE - 1;
+
+		const	int						XL_TABLE_COL_1						= 0;
+		const	int						XL_TABLE_COL_1a						= 1;
+		const	int						XL_TABLE_COL_1b						= 2;
+		const	int						XL_TABLE_COL_2						= 3;
+		const	int						XL_TABLE_COL_2a						= 5;
+		const	int						XL_TABLE_COL_3						= 6;
+		const	int						XL_TABLE_COL_4						= 7;
+		const	int						XL_TABLE_COL_5						= 8;
+		const	int						XL_TABLE_COL_6						= 9;
+		const	int						XL_TABLE_COL_7						= 10;
+		const	int						XL_TABLE_COL_8						= 11;
+		const	int						XL_TABLE_COL_9						= 12;
+		const	int						XL_TABLE_COL_10						= 13;
+		const	int						XL_TABLE_COL_10a					= 14;
+		const	int						XL_TABLE_COL_11						= 15;
+
+		const	int						XL_SIGNATURE_TITLE_1				= 1;
+		const	int						XL_SIGNATURE_SIGN_1_START			= 2;
+		const	int						XL_SIGNATURE_SIGN_1_END				= XL_SIGNATURE_SIGN_1_START + 1;
+		const	int						XL_SIGNATURE_NAME_1_START			= 5;
+		const	int						XL_SIGNATURE_NAME_1_END				= XL_SIGNATURE_NAME_1_START + 1;
+
+		const	int						XL_SIGNATURE_TITLE_2				= XL_HEADER_COL_2_TITLE;
+		const	int						XL_SIGNATURE_SIGN_2_START			= 11;
+		const	int						XL_SIGNATURE_SIGN_2_END				= XL_SIGNATURE_SIGN_2_START + 0;
+		const	int						XL_SIGNATURE_NAME_2_START			= 13;
+		const	int						XL_SIGNATURE_NAME_2_END				= XL_SIGNATURE_NAME_2_START + 2;
+
+		const	int						PDF_HEADER_COL_1_TITLE_START		=  0;
+		const	int						PDF_HEADER_COL_1_TITLE_WIDTH		= 15;
+		const	int						PDF_HEADER_COL_1_TITLE_END			= PDF_HEADER_COL_1_TITLE_START + PDF_HEADER_COL_1_TITLE_WIDTH;
+		const	int						PDF_HEADER_COL_1_VALUE_START		= PDF_HEADER_COL_1_TITLE_END;
+		const	int						PDF_HEADER_COL_1_VALUE_WIDTH		= 30;
+		const	int						PDF_HEADER_COL_1_VALUE_END			= PDF_HEADER_COL_1_VALUE_START + PDF_HEADER_COL_1_VALUE_WIDTH;
+
+		const	int						PDF_HEADER_SEQUENCE_1_START			= PDF_HEADER_COL_1_VALUE_END;
+		const	int						PDF_HEADER_SEQUENCE_1_WIDTH			= 5;
+		const	int						PDF_HEADER_SEQUENCE_1_END			= PDF_HEADER_SEQUENCE_1_START + PDF_HEADER_SEQUENCE_1_WIDTH;
+
+		const	int						PDF_HEADER_COL_2_TITLE_START		= PDF_HEADER_SEQUENCE_1_END;
+		const	int						PDF_HEADER_COL_2_TITLE_WIDTH		= PDF_HEADER_COL_1_TITLE_WIDTH;
+		const	int						PDF_HEADER_COL_2_TITLE_END			= PDF_HEADER_COL_2_TITLE_START + PDF_HEADER_COL_2_TITLE_WIDTH;
+		const	int						PDF_HEADER_COL_2_VALUE_START		= PDF_HEADER_COL_2_TITLE_END;
+		const	int						PDF_HEADER_COL_2_VALUE_WIDTH		= PDF_HEADER_COL_1_VALUE_WIDTH;
+		const	int						PDF_HEADER_COL_2_VALUE_END			= PDF_HEADER_COL_2_VALUE_START + PDF_HEADER_COL_2_VALUE_WIDTH;
+
+		const	int						PDF_HEADER_SEQUENCE_2_START			= PDF_HEADER_COL_2_VALUE_END;
+		const	int						PDF_HEADER_SEQUENCE_2_WIDTH			= PDF_HEADER_SEQUENCE_1_WIDTH;
+		const	int						PDF_HEADER_SEQUENCE_2_END			= PDF_HEADER_SEQUENCE_2_START + PDF_HEADER_SEQUENCE_2_WIDTH;
+
+		const	int						PDF_TABLE_COL_1						= 0;
+		const	int						PDF_TABLE_COL_1a					= 1;
+		const	int						PDF_TABLE_COL_1b					= 2;
+		const	int						PDF_TABLE_COL_2						= 3;
+		const	int						PDF_TABLE_COL_2a					= 4;
+		const	int						PDF_TABLE_COL_3						= 5;
+		const	int						PDF_TABLE_COL_4						= 6;
+		const	int						PDF_TABLE_COL_5						= 7;
+		const	int						PDF_TABLE_COL_6						= 8;
+		const	int						PDF_TABLE_COL_7						= 9;
+		const	int						PDF_TABLE_COL_8						= 10;
+		const	int						PDF_TABLE_COL_9						= 11;
+		const	int						PDF_TABLE_COL_10					= 12;
+		const	int						PDF_TABLE_COL_10a					= 13;
+		const	int						PDF_TABLE_COL_11					= 14;
+
 		CMysql							*db = NULL;
 		C_Invoicing_Vars				*vars;
 

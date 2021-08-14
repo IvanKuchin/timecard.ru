@@ -3330,7 +3330,7 @@ int main(void)
 												}
 												else
 												{
-													MESSAGE_DEBUG("", action, "fail to generate invoice document archive");
+													MESSAGE_ERROR("", action, "fail to generate invoice document archive");
 												}
 											}
 											else
@@ -3383,7 +3383,7 @@ int main(void)
 				}
 				else
 				{
-					MESSAGE_DEBUG("", action, "failed");
+					MESSAGE_ERROR("", action, "failed (" + error_message + ")");
 					ostResult.str("");
 					ostResult << "{\"result\":\"error\",\"description\":\"" + RemoveQuotas(error_message) + "\"}";
 				}

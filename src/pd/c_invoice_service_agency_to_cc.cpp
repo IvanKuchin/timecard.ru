@@ -439,7 +439,7 @@ auto C_Invoice_Service_Agency_To_CC::GenerateDocumentArchive() -> string
 		MESSAGE_ERROR("", "", "archive won't be generated due to previous error");
 	}
 
-	MESSAGE_DEBUG("", "", "finish");
+	MESSAGE_DEBUG("", "", "finish (" + error_message + ")");
 
 	return error_message;
 }
