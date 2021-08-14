@@ -159,44 +159,6 @@ auto C_Print_VAT_Base::__PrintXLSHeader() -> string
 		__sheet->writeStr(__row_counter, XL_HEADER_COL_1_VALUE, multibyte_to_wide(vars->Get("VAT title - Payment order number") + " 1-" + to_string(number_of_payment_orders) + " " + vars->Get("invoice_agreement")).c_str(), format_mid_left_underline);
 	}
 
-
-/*
-	++__row_counter;
-	__sheet->writeStr(__row_counter, XL_HEADER_COL_1_TITLE, multibyte_to_wide(vars->Get("vat_header_TIN_KPP_seller") + ": ").c_str());
-	MergeApplyFormat(3, 11, format_border_bottom);
-	__sheet->writeStr(__row_counter, 3, multibyte_to_wide(GetSupplierTIN() + " / " + GetSupplierKPP()).c_str(), format_border_bottom);
-
-	++__row_counter;
-	__sheet->writeStr(__row_counter, XL_HEADER_COL_1_TITLE, multibyte_to_wide(vars->Get("vat_shipper_address") + ": ").c_str());
-	MergeApplyFormat(3, 11, format_border_bottom);
-
-	++__row_counter;
-	__sheet->writeStr(__row_counter, XL_HEADER_COL_1_TITLE, multibyte_to_wide(vars->Get("vat_consignee_address") + ": ").c_str());
-	MergeApplyFormat(3, 11, format_border_bottom);
-
-	++__row_counter;
-	__sheet->writeStr(__row_counter, XL_HEADER_COL_1_TITLE, multibyte_to_wide(vars->Get("vat_doc_accompany")).c_str());
-	MergeApplyFormat(3, 11, format_border_bottom);
-
-	++__row_counter;
-	__sheet->writeStr(__row_counter, XL_HEADER_COL_1_TITLE, multibyte_to_wide(vars->Get("Address") + ": ").c_str());
-	MergeApplyFormat(3, 11, format_border_bottom);
-	__sheet->writeStr(__row_counter, 3, multibyte_to_wide(GetCustomerFullAddress()).c_str(), format_border_bottom);
-
-	++__row_counter;
-	__sheet->writeStr(__row_counter, XL_HEADER_COL_1_TITLE, multibyte_to_wide(vars->Get("vat_header_TIN_KPP_seller") + ": ").c_str());
-	MergeApplyFormat(3, 11, format_border_bottom);
-	__sheet->writeStr(__row_counter, 3, multibyte_to_wide(GetCustomerTIN() + " / " + GetCustomerKPP()).c_str(), format_border_bottom);
-
-	++__row_counter;
-	__sheet->writeStr(__row_counter, XL_HEADER_COL_1_TITLE, multibyte_to_wide(vars->Get("VAT comment1")).c_str());
-	MergeApplyFormat(3, 11, format_border_bottom);
-	__sheet->writeStr(__row_counter, 3, multibyte_to_wide(vars->Get("VAT comment2")).c_str());
-
-	++__row_counter;
-	__sheet->writeStr(__row_counter, XL_HEADER_COL_1_TITLE, multibyte_to_wide(vars->Get("VAT comment3")).c_str());
-*/
-
 	MESSAGE_DEBUG("", "", "finish");
 
 	return error_message;
@@ -257,57 +219,59 @@ auto C_Print_VAT_Base::__PrintXLSTable() -> string
 	}
 
 	// --- merge cells vertically, but 2, 2a, 10, 10a
-	__sheet->setMerge(__row_counter, __row_counter + 1, 0, 0);
-	__sheet->setMerge(__row_counter, __row_counter + 1, 1, 1);
-	__sheet->setMerge(__row_counter, __row_counter + 1, 2, 2);
-	__sheet->setMerge(__row_counter, __row_counter + 1, 6, 6);
-	__sheet->setMerge(__row_counter, __row_counter + 1, 7, 7);
-	__sheet->setMerge(__row_counter, __row_counter + 1, 8, 8);
-	__sheet->setMerge(__row_counter, __row_counter + 1, 9, 9);
-	__sheet->setMerge(__row_counter, __row_counter + 1, 10, 10);
-	__sheet->setMerge(__row_counter, __row_counter + 1, 11, 11);
-	__sheet->setMerge(__row_counter, __row_counter + 1, 12, 12);
-	__sheet->setMerge(__row_counter, __row_counter + 1, 15, 15);
+	__sheet->setMerge(__row_counter, __row_counter + 1, XL_TABLE_COL_1, XL_TABLE_COL_1);
+	__sheet->setMerge(__row_counter, __row_counter + 1, XL_TABLE_COL_1a, XL_TABLE_COL_1a);
+	__sheet->setMerge(__row_counter, __row_counter + 1, XL_TABLE_COL_1b, XL_TABLE_COL_1b);
+	__sheet->setMerge(__row_counter, __row_counter + 1, XL_TABLE_COL_3, XL_TABLE_COL_3);
+	__sheet->setMerge(__row_counter, __row_counter + 1, XL_TABLE_COL_4, XL_TABLE_COL_4);
+	__sheet->setMerge(__row_counter, __row_counter + 1, XL_TABLE_COL_5, XL_TABLE_COL_5);
+	__sheet->setMerge(__row_counter, __row_counter + 1, XL_TABLE_COL_6, XL_TABLE_COL_6);
+	__sheet->setMerge(__row_counter, __row_counter + 1, XL_TABLE_COL_7, XL_TABLE_COL_7);
+	__sheet->setMerge(__row_counter, __row_counter + 1, XL_TABLE_COL_8, XL_TABLE_COL_8);
+	__sheet->setMerge(__row_counter, __row_counter + 1, XL_TABLE_COL_9, XL_TABLE_COL_9);
+	__sheet->setMerge(__row_counter, __row_counter + 1, XL_TABLE_COL_11, XL_TABLE_COL_11);
 	// --- merge cells horizontally
-	__sheet->setMerge(__row_counter, __row_counter, 3, 5);
-	__sheet->setMerge(__row_counter + 1, __row_counter + 1, 3, 4);
-	__sheet->setMerge(__row_counter, __row_counter, 13, 14);
+	__sheet->setMerge(__row_counter, __row_counter, XL_TABLE_COL_2, XL_TABLE_COL_2a);
+	__sheet->setMerge(__row_counter + 1, __row_counter + 1, XL_TABLE_COL_2, 4);
+	__sheet->setMerge(__row_counter, __row_counter, XL_TABLE_COL_10, XL_TABLE_COL_10a);
 
-	__sheet->writeStr(__row_counter,	  0, multibyte_to_wide(vars->Get("VAT title - Payment order number")).c_str(), format_small_border);
-	__sheet->writeStr(__row_counter,	  1, multibyte_to_wide(vars->Get("VAT title - Good name")).c_str(), format_small_border);
-	__sheet->writeStr(__row_counter,	  2, multibyte_to_wide(vars->Get("VAT title - Good code")).c_str(), format_small_border);
-	__sheet->writeStr(__row_counter,      3, multibyte_to_wide(vars->Get("VAT title - Measure unit")).c_str(), format_small_border);
-	__sheet->writeStr(__row_counter + 1,  4, multibyte_to_wide(vars->Get("VAT title - Measure unit (code)")).c_str(), format_small_border);
-	__sheet->writeStr(__row_counter + 1,  5, multibyte_to_wide(vars->Get("VAT title - Measure unit (name)")).c_str(), format_small_border);
-	__sheet->writeStr(__row_counter,	  6, multibyte_to_wide(vars->Get("VAT title - Quantity")).c_str(), format_small_border);
-	__sheet->writeStr(__row_counter,	  7, multibyte_to_wide(vars->Get("VAT title - Price per unit")).c_str(), format_small_border);
-	__sheet->writeStr(__row_counter,	  8, multibyte_to_wide(vars->Get("VAT title - Price wo tax")).c_str(), format_small_border);
-	__sheet->writeStr(__row_counter,	  9, multibyte_to_wide(vars->Get("VAT title - Excise")).c_str(), format_small_border);
-	__sheet->writeStr(__row_counter,	 10, multibyte_to_wide(vars->Get("Tax rate")).c_str(), format_small_border);
-	__sheet->writeStr(__row_counter,	 11, multibyte_to_wide(vars->Get("VAT title - Tax amount")).c_str(), format_small_border);
-	__sheet->writeStr(__row_counter,     12, multibyte_to_wide(vars->Get("VAT title - Price w tax")).c_str(), format_small_border);
-	__sheet->writeStr(__row_counter,     13, multibyte_to_wide(vars->Get("VAT title - Country")).c_str(), format_small_border);
-	__sheet->writeStr(__row_counter + 1, 13, multibyte_to_wide(vars->Get("VAT title - Country code")).c_str(), format_small_border);
-	__sheet->writeStr(__row_counter + 1, 14, multibyte_to_wide(vars->Get("VAT title - Country name")).c_str(), format_small_border);
-	__sheet->writeStr(__row_counter,     15, multibyte_to_wide(vars->Get("VAT title - Custom number")).c_str(), format_small_border);
+	__sheet->writeStr(__row_counter,	  XL_TABLE_COL_1, multibyte_to_wide(vars->Get("VAT title - Payment order number")).c_str(), format_small_border);
+	__sheet->writeStr(__row_counter,	  XL_TABLE_COL_1a, multibyte_to_wide(vars->Get("VAT title - Good name")).c_str(), format_small_border);
+	__sheet->writeStr(__row_counter,	  XL_TABLE_COL_1b, multibyte_to_wide(vars->Get("VAT title - Good code")).c_str(), format_small_border);
+	__sheet->writeStr(__row_counter,      XL_TABLE_COL_2, multibyte_to_wide(vars->Get("VAT title - Measure unit")).c_str(), format_small_border);
+	__sheet->writeStr(__row_counter + 1,  XL_TABLE_COL_2, multibyte_to_wide(vars->Get("VAT title - Measure unit (code)")).c_str(), format_small_border);
+	__sheet->writeStr(__row_counter + 1,  XL_TABLE_COL_2a, multibyte_to_wide(vars->Get("VAT title - Measure unit (name)")).c_str(), format_small_border);
+	__sheet->writeStr(__row_counter,	  XL_TABLE_COL_3, multibyte_to_wide(vars->Get("VAT title - Quantity")).c_str(), format_small_border);
+	__sheet->writeStr(__row_counter,	  XL_TABLE_COL_4, multibyte_to_wide(vars->Get("VAT title - Price per unit")).c_str(), format_small_border);
+	__sheet->writeStr(__row_counter,	  XL_TABLE_COL_5, multibyte_to_wide(vars->Get("VAT title - Price wo tax")).c_str(), format_small_border);
+	__sheet->writeStr(__row_counter,	  XL_TABLE_COL_6, multibyte_to_wide(vars->Get("VAT title - Excise")).c_str(), format_small_border);
+	__sheet->writeStr(__row_counter,	  XL_TABLE_COL_7, multibyte_to_wide(vars->Get("Tax rate")).c_str(), format_small_border);
+	__sheet->writeStr(__row_counter,	  XL_TABLE_COL_8, multibyte_to_wide(vars->Get("VAT title - Tax amount")).c_str(), format_small_border);
+	__sheet->writeStr(__row_counter,      XL_TABLE_COL_9, multibyte_to_wide(vars->Get("VAT title - Price w tax")).c_str(), format_small_border);
+	__sheet->writeStr(__row_counter,      XL_TABLE_COL_10, multibyte_to_wide(vars->Get("VAT title - Country")).c_str(), format_small_border);
+	__sheet->writeStr(__row_counter + 1,  XL_TABLE_COL_10, multibyte_to_wide(vars->Get("VAT title - Country code")).c_str(), format_small_border);
+	__sheet->writeStr(__row_counter + 1,  XL_TABLE_COL_10a, multibyte_to_wide(vars->Get("VAT title - Country name")).c_str(), format_small_border);
+	__sheet->writeStr(__row_counter,      XL_TABLE_COL_11, multibyte_to_wide(vars->Get("VAT title - Custom number")).c_str(), format_small_border);
+	__sheet->writeStr(__row_counter + 1,  XL_TABLE_COL_11, L"", format_small_border); // --- assign style
 	++__row_counter;
 	++__row_counter;
-	__sheet->setMerge(__row_counter, __row_counter, 2, 3);
-	__sheet->writeStr(__row_counter,  0, L"1",	format_table_center);
-	__sheet->writeStr(__row_counter,  1, L"1a",	format_table_center);
-	__sheet->writeStr(__row_counter,  2, L"1б",	format_table_center);
-	__sheet->writeStr(__row_counter,  3, L"2",	format_table_center);
-	__sheet->writeStr(__row_counter,  5, L"2a",	format_table_center);
-	__sheet->writeStr(__row_counter,  6, L"3",	format_table_center);
-	__sheet->writeStr(__row_counter,  7, L"4",	format_table_center);
-	__sheet->writeStr(__row_counter,  8, L"5",	format_table_center);
-	__sheet->writeStr(__row_counter,  9, L"6",	format_table_center);
-	__sheet->writeStr(__row_counter, 10, L"7",	format_table_center);
-	__sheet->writeStr(__row_counter, 11, L"8",	format_table_center);
-	__sheet->writeStr(__row_counter, 12, L"9",	format_table_center);
-	__sheet->writeStr(__row_counter, 13, L"10",	format_table_center);
-	__sheet->writeStr(__row_counter, 14, L"10a",format_table_center);
-	__sheet->writeStr(__row_counter, 15, L"11",	format_table_center);
+	__sheet->setRow(__row_counter,		10);
+	__sheet->setMerge(__row_counter, __row_counter, 3, 4);
+	__sheet->writeStr(__row_counter, XL_TABLE_COL_1, 	L"1",	format_small_border);
+	__sheet->writeStr(__row_counter, XL_TABLE_COL_1a, 	L"1a",	format_small_border);
+	__sheet->writeStr(__row_counter, XL_TABLE_COL_1b, 	L"1б",	format_small_border);
+	__sheet->writeStr(__row_counter, XL_TABLE_COL_2, 	L"2",	format_small_border);
+	__sheet->writeStr(__row_counter, XL_TABLE_COL_2a, 	L"2a",	format_small_border);
+	__sheet->writeStr(__row_counter, XL_TABLE_COL_3, 	L"3",	format_small_border);
+	__sheet->writeStr(__row_counter, XL_TABLE_COL_4, 	L"4",	format_small_border);
+	__sheet->writeStr(__row_counter, XL_TABLE_COL_5, 	L"5",	format_small_border);
+	__sheet->writeStr(__row_counter, XL_TABLE_COL_6, 	L"6",	format_small_border);
+	__sheet->writeStr(__row_counter, XL_TABLE_COL_7,	L"7",	format_small_border);
+	__sheet->writeStr(__row_counter, XL_TABLE_COL_8,	L"8",	format_small_border);
+	__sheet->writeStr(__row_counter, XL_TABLE_COL_9,	L"9",	format_small_border);
+	__sheet->writeStr(__row_counter, XL_TABLE_COL_10,	L"10",	format_small_border);
+	__sheet->writeStr(__row_counter, XL_TABLE_COL_10a,	L"10a", format_small_border);
+	__sheet->writeStr(__row_counter, XL_TABLE_COL_11,	L"11",	format_small_border);
 
 	// --- table body
 	for(auto i = 1; isTableRowExists(i); ++i)
@@ -316,23 +280,23 @@ auto C_Print_VAT_Base::__PrintXLSTable() -> string
 
 		++__row_counter;
 
-		__sheet->writeStr(__row_counter,  0, multibyte_to_wide(to_string(i)).c_str(), format_table_center);
-		__sheet->writeStr(__row_counter,  1, multibyte_to_wide(description).c_str(), format_small_border_left);
-		__sheet->writeStr(__row_counter,  2, L"-", format_table_center);
-		__sheet->writeNum(__row_counter,  3, 796, format_table_center);
+		__sheet->writeStr(__row_counter, XL_TABLE_COL_1, multibyte_to_wide(to_string(i)).c_str(), format_small_border);
+		__sheet->writeStr(__row_counter, XL_TABLE_COL_1a, multibyte_to_wide(description).c_str(), format_small_border_left);
+		__sheet->writeStr(__row_counter, XL_TABLE_COL_1b, L"-", format_table_center);
+		__sheet->writeNum(__row_counter, XL_TABLE_COL_2, 796, format_table_center);
 		__sheet->writeStr(__row_counter,  4, L"", format_table_center); // --- assign style
 		__sheet->setMerge(__row_counter, __row_counter, 3, 4);
-		__sheet->writeStr(__row_counter,  5, multibyte_to_wide(GetTableRowItem(i)).c_str(), format_table_center);
-		__sheet->writeNum(__row_counter,  6, stod_noexcept(GetTableRowQuantity(i)), format_table_center);
-		__sheet->writeNum(__row_counter,  7, stod_noexcept(GetTableRowPrice(i)), format_small_border);
-		__sheet->writeNum(__row_counter,  8, stod_noexcept(GetTableRowPrice(i)), format_table_right);
-		__sheet->writeStr(__row_counter,  9, multibyte_to_wide(vars->Get("no excise")).c_str(), format_small_border);
-		__sheet->writeStr(__row_counter, 10, multibyte_to_wide(GetSupplierVATSpellingShort()).c_str(), format_small_border);
-		__sheet->writeNum(__row_counter, 11, stod_noexcept(GetTableRowVAT(i)), format_table_right);
-		__sheet->writeNum(__row_counter, 12, stod_noexcept(GetTableRowTotal(i)), format_table_right);
-		__sheet->writeStr(__row_counter, 13, L"-", format_table_center);
-		__sheet->writeStr(__row_counter, 14, L"-", format_table_center);
-		__sheet->writeStr(__row_counter, 15, L"-", format_table_center);
+		__sheet->writeStr(__row_counter, XL_TABLE_COL_2a, multibyte_to_wide(GetTableRowItem(i)).c_str(), format_table_center);
+		__sheet->writeNum(__row_counter, XL_TABLE_COL_3, stod_noexcept(GetTableRowQuantity(i)), format_table_center);
+		__sheet->writeNum(__row_counter, XL_TABLE_COL_4, stod_noexcept(GetTableRowPrice(i)), format_small_border);
+		__sheet->writeNum(__row_counter, XL_TABLE_COL_5, stod_noexcept(GetTableRowPrice(i)), format_table_right);
+		__sheet->writeStr(__row_counter, XL_TABLE_COL_6, multibyte_to_wide(vars->Get("no excise")).c_str(), format_small_border);
+		__sheet->writeStr(__row_counter, XL_TABLE_COL_7, multibyte_to_wide(GetSupplierVATSpellingShort()).c_str(), format_small_border);
+		__sheet->writeNum(__row_counter, XL_TABLE_COL_8, stod_noexcept(GetTableRowVAT(i)), format_table_right);
+		__sheet->writeNum(__row_counter, XL_TABLE_COL_9, stod_noexcept(GetTableRowTotal(i)), format_table_right);
+		__sheet->writeStr(__row_counter, XL_TABLE_COL_10, L"-", format_table_center);
+		__sheet->writeStr(__row_counter, XL_TABLE_COL_10a, L"-", format_table_center);
+		__sheet->writeStr(__row_counter, XL_TABLE_COL_11, L"-", format_table_center);
 
 		++total_table_items;
 	}
@@ -392,47 +356,47 @@ auto C_Print_VAT_Base::__PrintXLSSignature() -> string
 	format_wrap_small_up->setAlignH(libxl::ALIGNH_CENTER);
 
 	++__row_counter;
-	__sheet->writeStr(__row_counter, 1, multibyte_to_wide(GetSignatureInfo1()).c_str(), format_left_small);
-	__sheet->writeStr(__row_counter, 8, multibyte_to_wide(GetSignatureInfo2()).c_str(), format_left_small);
+	__sheet->writeStr(__row_counter, XL_SIGNATURE_TITLE_1, multibyte_to_wide(GetSignatureInfo1()).c_str(), format_left_small);
+	__sheet->writeStr(__row_counter, XL_SIGNATURE_TITLE_2, multibyte_to_wide(GetSignatureInfo2()).c_str(), format_left_small);
 
 	++__row_counter;
-	__sheet->writeStr(__row_counter, 1, multibyte_to_wide(vars->Get("VAT sign - Authorized person")).c_str(), format_left_small);
-	__sheet->writeStr(__row_counter, 8, multibyte_to_wide(vars->Get("VAT sign - Authorized person")).c_str(), format_left_small);
-	MergeApplyFormat( 2,  3, format_underline);
-	MergeApplyFormat( 5,  6, format_underline);
-	__sheet->writeStr(__row_counter, 5, multibyte_to_wide(GetSignatureName1()).c_str(), format_underline_center_small);
+	__sheet->writeStr(__row_counter, XL_SIGNATURE_TITLE_1, multibyte_to_wide(vars->Get("VAT sign - Authorized person")).c_str(), format_left_small);
+	__sheet->writeStr(__row_counter, XL_SIGNATURE_TITLE_2, multibyte_to_wide(vars->Get("VAT sign - Authorized person")).c_str(), format_left_small);
+	MergeApplyFormat(XL_SIGNATURE_SIGN_1_START,  XL_SIGNATURE_SIGN_1_END, format_underline);
+	MergeApplyFormat(XL_SIGNATURE_NAME_1_START,  XL_SIGNATURE_NAME_1_END, format_underline);
+	__sheet->writeStr(__row_counter, XL_SIGNATURE_NAME_1_START, multibyte_to_wide(GetSignatureName1()).c_str(), format_underline_center_small);
 
-	__sheet->writeStr(__row_counter, 11, L"", format_underline_center_small);
-	MergeApplyFormat(13, 15, format_underline);
-	__sheet->writeStr(__row_counter, 13, multibyte_to_wide(GetSignatureName2()).c_str(), format_underline_center_small);
+	__sheet->writeStr(__row_counter, XL_SIGNATURE_SIGN_2_START, L"", format_underline_center_small);
+	MergeApplyFormat(XL_SIGNATURE_NAME_2_START, XL_SIGNATURE_NAME_2_END, format_underline);
+	__sheet->writeStr(__row_counter, XL_SIGNATURE_NAME_2_START, multibyte_to_wide(GetSignatureName2()).c_str(), format_underline_center_small);
 
 	++__row_counter;
-	MergeApplyFormat( 2,  3, nullptr);
-	__sheet->writeStr(__row_counter, 2, multibyte_to_wide("(" + vars->Get("Signature") + ")").c_str(), format_center_small);
-	MergeApplyFormat( 5,  6, nullptr);
-	__sheet->writeStr(__row_counter, 5, multibyte_to_wide("(" + vars->Get("initials") + ")").c_str(), format_center_small);
-	__sheet->writeStr(__row_counter, 11, multibyte_to_wide("(" + vars->Get("Signature") + ")").c_str(), format_center_small);
-	MergeApplyFormat(13, 15, nullptr);
-	__sheet->writeStr(__row_counter, 13, multibyte_to_wide("(" + vars->Get("initials") + ")").c_str(), format_center_small);
+	MergeApplyFormat(XL_SIGNATURE_SIGN_1_START,  XL_SIGNATURE_SIGN_1_END, nullptr);
+	__sheet->writeStr(__row_counter, XL_SIGNATURE_SIGN_1_START, multibyte_to_wide("(" + vars->Get("Signature") + ")").c_str(), format_center_small);
+	MergeApplyFormat(XL_SIGNATURE_NAME_1_START,  XL_SIGNATURE_NAME_1_END, nullptr);
+	__sheet->writeStr(__row_counter, XL_SIGNATURE_NAME_1_START, multibyte_to_wide("(" + vars->Get("initials") + ")").c_str(), format_center_small);
+	__sheet->writeStr(__row_counter, XL_SIGNATURE_SIGN_2_START, multibyte_to_wide("(" + vars->Get("Signature") + ")").c_str(), format_center_small);
+	MergeApplyFormat(XL_SIGNATURE_NAME_2_START, XL_SIGNATURE_NAME_2_END, nullptr);
+	__sheet->writeStr(__row_counter, XL_SIGNATURE_NAME_2_START, multibyte_to_wide("(" + vars->Get("initials") + ")").c_str(), format_center_small);
 
 	++__row_counter;
 	__sheet->setRow(__row_counter, 18);
-	__sheet->writeStr(__row_counter, 1, multibyte_to_wide(vars->Get("VAT sign - Entrepreneur")).c_str(), format_left_small);
+	__sheet->writeStr(__row_counter, XL_SIGNATURE_TITLE_1, multibyte_to_wide(vars->Get("VAT sign - Entrepreneur")).c_str(), format_left_small);
 
 	++__row_counter;
-	__sheet->writeStr(__row_counter, 1, multibyte_to_wide(vars->Get("VAT sign - Authorized person")).c_str(), format_left_small);
-	MergeApplyFormat( 2,  3, format_underline);
-	MergeApplyFormat( 5,  6, format_underline);
+	__sheet->writeStr(__row_counter, XL_SIGNATURE_TITLE_1, multibyte_to_wide(vars->Get("VAT sign - Authorized person")).c_str(), format_left_small);
+	MergeApplyFormat(XL_SIGNATURE_SIGN_1_START,  XL_SIGNATURE_SIGN_1_END, format_underline);
+	MergeApplyFormat(XL_SIGNATURE_NAME_1_START,  XL_SIGNATURE_NAME_1_END, format_underline);
 	MergeApplyFormat( 8, 15, format_underline);
 
 	++__row_counter;
 	__sheet->setRow(__row_counter, 25);
-	MergeApplyFormat( 2,  3, nullptr);
-	__sheet->writeStr(__row_counter, 2, multibyte_to_wide("(" + vars->Get("Signature") + ")").c_str(), format_wrap_small_up);
-	MergeApplyFormat( 5,  6, nullptr);
-	__sheet->writeStr(__row_counter, 5, multibyte_to_wide("(" + vars->Get("initials") + ")").c_str(), format_wrap_small_up);
+	MergeApplyFormat(XL_SIGNATURE_SIGN_1_START,  XL_SIGNATURE_SIGN_1_END, nullptr);
+	__sheet->writeStr(__row_counter, XL_SIGNATURE_SIGN_1_START, multibyte_to_wide("(" + vars->Get("Signature") + ")").c_str(), format_wrap_small_up);
+	MergeApplyFormat(XL_SIGNATURE_NAME_1_START,  XL_SIGNATURE_NAME_1_END, nullptr);
+	__sheet->writeStr(__row_counter, XL_SIGNATURE_NAME_1_START, multibyte_to_wide("(" + vars->Get("initials") + ")").c_str(), format_wrap_small_up);
 	MergeApplyFormat( 8, 15, format_wrap_small_up);
-	__sheet->writeStr(__row_counter, 8, multibyte_to_wide(vars->Get("VAT sign - Entrepreneur registration")).c_str(), format_wrap_small_up);
+	__sheet->writeStr(__row_counter, XL_SIGNATURE_TITLE_2, multibyte_to_wide(vars->Get("VAT sign - Entrepreneur registration")).c_str(), format_wrap_small_up);
 
 
 
@@ -554,187 +518,318 @@ auto	C_Print_VAT_Base::__HPDF_DrawHeader() -> string
 			if((error_message = PrintPDFHeader()).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print header"); }
 		}
+
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("vat_header_1")), 0, 100, HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, true)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("VAT doc")), PDF_HEADER_COL_1_TITLE_START, PDF_HEADER_COL_1_TITLE_END, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("vat_header_2")), 0, 100, HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, true)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("invoice_agreement")), PDF_HEADER_COL_1_VALUE_START, PDF_HEADER_COL_1_VALUE_END, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("vat_header_3")), 0, 100, HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, true)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251("(1)"), PDF_HEADER_SEQUENCE_1_START, PDF_HEADER_SEQUENCE_1_END, HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("vat_header_4")), 0, 100, HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, true)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("vat_header_1") + vars->Get("vat_header_2") + vars->Get("vat_header_3") + vars->Get("vat_header_4")), 0, 100, HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size - 2, true)).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("vat_header_5")), 0, 100, HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, true)).length())
+			if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(PDF_HEADER_COL_1_VALUE_START, PDF_HEADER_COL_1_VALUE_END)).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
 
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetDocumentTitle()), 0, 100, HPDF_TALIGN_LEFT, BOLD_FONT, __pdf_font_size + 2, true)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("vat_correction_1")), PDF_HEADER_COL_1_TITLE_START, PDF_HEADER_COL_1_TITLE_END, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("vat_correction")), 0, 100, HPDF_TALIGN_LEFT, BOLD_FONT, __pdf_font_size + 2, true)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("vat_correction_2")), PDF_HEADER_COL_1_VALUE_START, PDF_HEADER_COL_1_VALUE_END, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_MoveLineDown()).length())
-			{ MESSAGE_ERROR("", "", "hpdf: fail to move line down"); }
-		}
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("Seller") + ": "), 0, 100, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251("(1a)"), PDF_HEADER_SEQUENCE_1_START, PDF_HEADER_SEQUENCE_1_END, HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSupplierName()), 20, 60, HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, true)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("vat_header_5")), 0, 100, HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size - 2, true)).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(20, 60)).length())
-			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
-		}
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("Address") + ": "), 0, 100, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
-			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
-		}
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSupplierFullAddress()), 20, 60, HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, true)).length())
-			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
-		}
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(20, 60)).length())
-			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
-		}
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("vat_header_TIN_KPP_seller") + ": "), 0, 100, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
-			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
-		}
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSupplierTIN() + " / " + GetSupplierKPP()), 20, 60, HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, true)).length())
-			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
-		}
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(20, 60)).length())
-			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
-		}
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("vat_shipper_address") + ": "), 0, 100, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, true)).length())
-			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
-		}
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(20, 60)).length())
-			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
-		}
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("vat_consignee_address") + ": "), 0, 100, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, true)).length())
-			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
-		}
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(20, 60)).length())
-			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
-		}
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("vat_doc_accompany")), 0, 100, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, true)).length())
-			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
-		}
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(20, 60)).length())
+			if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(PDF_HEADER_COL_1_VALUE_START, PDF_HEADER_COL_1_VALUE_END)).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
 
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("Seller") + ": "), PDF_HEADER_COL_1_TITLE_START, PDF_HEADER_COL_1_TITLE_END, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSupplierName()), PDF_HEADER_COL_1_VALUE_START, PDF_HEADER_COL_1_VALUE_END, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251("(2)"), PDF_HEADER_SEQUENCE_1_START, PDF_HEADER_SEQUENCE_1_END, HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("Buyer") + ": "), PDF_HEADER_COL_2_TITLE_START, PDF_HEADER_COL_2_TITLE_END, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetCustomerName()), PDF_HEADER_COL_2_VALUE_START, PDF_HEADER_COL_2_VALUE_END, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251("(6)"), PDF_HEADER_SEQUENCE_2_START, PDF_HEADER_SEQUENCE_2_END, HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, true)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(PDF_HEADER_COL_1_VALUE_START, PDF_HEADER_COL_1_VALUE_END)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(PDF_HEADER_COL_2_VALUE_START, PDF_HEADER_COL_2_VALUE_END)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
 
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("Buyer") + ": "), 0, 100, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("Address") + ": "), PDF_HEADER_COL_1_TITLE_START, PDF_HEADER_COL_1_TITLE_END, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetCustomerName()), 20, 60, HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, true)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSupplierFullAddress()), PDF_HEADER_COL_1_VALUE_START, PDF_HEADER_COL_1_VALUE_END, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(20, 60)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251("(2a)"), PDF_HEADER_SEQUENCE_1_START, PDF_HEADER_SEQUENCE_1_END, HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("Address") + ": "), 0, 100, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("Address") + ": "), PDF_HEADER_COL_2_TITLE_START, PDF_HEADER_COL_2_TITLE_END, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetCustomerFullAddress()), 20, 60, HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, true)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetCustomerFullAddress()), PDF_HEADER_COL_2_VALUE_START, PDF_HEADER_COL_2_VALUE_END, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(20, 60)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251("(6a)"), PDF_HEADER_SEQUENCE_2_START, PDF_HEADER_SEQUENCE_2_END, HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, true)).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("vat_header_TIN_KPP_buyer") + ": "), 0, 100, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
+			if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(PDF_HEADER_COL_1_VALUE_START, PDF_HEADER_COL_1_VALUE_END)).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetCustomerTIN() + " / " + GetCustomerKPP()), 20, 60, HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, true)).length())
+			if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(PDF_HEADER_COL_2_VALUE_START, PDF_HEADER_COL_2_VALUE_END)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("vat_header_TIN_KPP_seller") + ": "), PDF_HEADER_COL_1_TITLE_START, PDF_HEADER_COL_1_TITLE_END, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(20, 60)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSupplierTIN() + " / " + GetSupplierKPP()), PDF_HEADER_COL_1_VALUE_START, PDF_HEADER_COL_1_VALUE_END, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("VAT comment1")), 0, 100, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251("(2б)"), PDF_HEADER_SEQUENCE_1_START, PDF_HEADER_SEQUENCE_1_END, HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("VAT comment2")), 20, 60, HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, true)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("vat_header_TIN_KPP_buyer") + ": "), PDF_HEADER_COL_2_TITLE_START, PDF_HEADER_COL_2_TITLE_END, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(20, 60)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetCustomerTIN() + " / " + GetCustomerKPP()), PDF_HEADER_COL_2_VALUE_START, PDF_HEADER_COL_2_VALUE_END, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("VAT comment3")), 0, 100, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, true)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251("(6б)"), PDF_HEADER_SEQUENCE_2_START, PDF_HEADER_SEQUENCE_2_END, HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, true)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(PDF_HEADER_COL_1_VALUE_START, PDF_HEADER_COL_1_VALUE_END)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(PDF_HEADER_COL_2_VALUE_START, PDF_HEADER_COL_2_VALUE_END)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("vat_shipper_address")), PDF_HEADER_COL_1_TITLE_START, PDF_HEADER_COL_1_TITLE_END, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size - 1, false)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(""), PDF_HEADER_COL_1_VALUE_START, PDF_HEADER_COL_1_VALUE_END, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251("(3)"), PDF_HEADER_SEQUENCE_1_START, PDF_HEADER_SEQUENCE_1_END, HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("VAT comment1") + ": "), PDF_HEADER_COL_2_TITLE_START, PDF_HEADER_COL_2_TITLE_END, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("VAT comment2") + ": "), PDF_HEADER_COL_2_VALUE_START, PDF_HEADER_COL_2_VALUE_END, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251("(7)"), PDF_HEADER_SEQUENCE_2_START, PDF_HEADER_SEQUENCE_2_END, HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, true)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(PDF_HEADER_COL_1_VALUE_START, PDF_HEADER_COL_1_VALUE_END)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(PDF_HEADER_COL_2_VALUE_START, PDF_HEADER_COL_2_VALUE_END)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("vat_consignee_address")), PDF_HEADER_COL_1_TITLE_START, PDF_HEADER_COL_1_TITLE_END, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(""), PDF_HEADER_COL_1_VALUE_START, PDF_HEADER_COL_1_VALUE_END, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251("(4)"), PDF_HEADER_SEQUENCE_1_START, PDF_HEADER_SEQUENCE_1_END, HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("VAT comment3")), PDF_HEADER_COL_2_TITLE_START, PDF_HEADER_COL_2_VALUE_END, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(""), PDF_HEADER_COL_2_VALUE_START, PDF_HEADER_COL_2_VALUE_END, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(" "), PDF_HEADER_SEQUENCE_2_START, PDF_HEADER_SEQUENCE_2_END, HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, true)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(PDF_HEADER_COL_1_VALUE_START, PDF_HEADER_COL_1_VALUE_END)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("vat_doc_accompany")), PDF_HEADER_COL_1_TITLE_START, PDF_HEADER_COL_1_VALUE_END, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size - 1, false)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(""), PDF_HEADER_COL_1_VALUE_START, PDF_HEADER_COL_1_VALUE_END, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251("(5)"), PDF_HEADER_SEQUENCE_1_START, PDF_HEADER_SEQUENCE_1_END, HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("VAT comment4")), PDF_HEADER_COL_2_TITLE_START, PDF_HEADER_COL_2_VALUE_END, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(""), PDF_HEADER_COL_2_VALUE_START, PDF_HEADER_COL_2_VALUE_END, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251("(8)"), PDF_HEADER_SEQUENCE_2_START, PDF_HEADER_SEQUENCE_2_END, HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, true)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(PDF_HEADER_COL_1_VALUE_START, PDF_HEADER_COL_1_VALUE_END)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("vat_shipping_doc") + ": "), PDF_HEADER_COL_1_TITLE_START, PDF_HEADER_COL_1_TITLE_END, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		{
+			auto	number_of_payment_orders = 0;
+			for(number_of_payment_orders = 1; isTableRowExists(number_of_payment_orders); ++number_of_payment_orders) {};
+
+			if(error_message.empty())
+			{
+				if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("VAT title - Payment order number") + " 1-" + to_string(number_of_payment_orders) + " " + vars->Get("invoice_agreement")), PDF_HEADER_COL_1_VALUE_START, PDF_HEADER_COL_1_VALUE_END, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
+				{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+			}
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251("(5a)"), PDF_HEADER_SEQUENCE_1_START, PDF_HEADER_SEQUENCE_1_END, HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, true)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(PDF_HEADER_COL_1_VALUE_START, PDF_HEADER_COL_1_VALUE_END)).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
 	}
@@ -760,72 +855,77 @@ auto	C_Print_VAT_Base::__HPDF_DrawTable_Header() -> string
 	{
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(0, utf8_to_cp1251(vars->Get("VAT title - Good name")), HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size - 2, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_1, utf8_to_cp1251(vars->Get("VAT title - Payment order number")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 2, false)).length())
 			{ MESSAGE_ERROR("", "", "fail to write table title index line"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(1, utf8_to_cp1251(vars->Get("VAT title - Good code")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 2, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_1a, utf8_to_cp1251(vars->Get("VAT title - Good name")), HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size - 2, false)).length())
+			{ MESSAGE_ERROR("", "", "fail to write table title index line"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_1b, utf8_to_cp1251(vars->Get("VAT title - Good code")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 2, false)).length())
 			{ MESSAGE_ERROR("", "", "fail to write table title description line"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(2, " \n \n \n " + utf8_to_cp1251(vars->Get("VAT title - Measure unit (code)")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 2, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_2, " \n \n \n " + utf8_to_cp1251(vars->Get("VAT title - Measure unit (code)")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 2, false)).length())
 			{ MESSAGE_ERROR("", "", "fail to write table title measure unit line"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(3, " \n \n \n " + utf8_to_cp1251(vars->Get("VAT title - Measure unit (name)")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 4, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_2a, " \n \n \n " + utf8_to_cp1251(vars->Get("VAT title - Measure unit (name)")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 4, false)).length())
 			{ MESSAGE_ERROR("", "", "fail to write table title measure unit line"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(4, utf8_to_cp1251(vars->Get("VAT title - Quantity")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 3, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_3, utf8_to_cp1251(vars->Get("VAT title - Quantity")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 3, false)).length())
 			{ MESSAGE_ERROR("", "", "fail to write table title quantity line"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(5, utf8_to_cp1251(vars->Get("VAT title - Price per unit")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 3, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_4, utf8_to_cp1251(vars->Get("VAT title - Price per unit")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 3, false)).length())
 			{ MESSAGE_ERROR("", "", "fail to write table title price per unit"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(6, utf8_to_cp1251(vars->Get("VAT title - Price wo tax")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 3, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_5, utf8_to_cp1251(vars->Get("VAT title - Price wo tax")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 3, false)).length())
 			{ MESSAGE_ERROR("", "", "fail to write table title VAT title - Price wo tax line"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(7, utf8_to_cp1251(vars->Get("VAT title - Excise")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 4, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_6, utf8_to_cp1251(vars->Get("VAT title - Excise")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 4, false)).length())
 			{ MESSAGE_ERROR("", "", "fail to write table title excise line"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(8, utf8_to_cp1251(vars->Get("Tax rate")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 4, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_7, utf8_to_cp1251(vars->Get("Tax rate")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 4, false)).length())
 			{ MESSAGE_ERROR("", "", "fail to write table title tax rate line"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(9, utf8_to_cp1251(vars->Get("VAT title - Tax amount")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 2, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_8, utf8_to_cp1251(vars->Get("VAT title - Tax amount")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 2, false)).length())
 			{ MESSAGE_ERROR("", "", "fail to write table title tax amount line"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(10, utf8_to_cp1251(vars->Get("VAT title - Price w tax")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 4, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_9, utf8_to_cp1251(vars->Get("VAT title - Price w tax")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 4, false)).length())
 			{ MESSAGE_ERROR("", "", "fail to write table title total line"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(11, " \n \n \n " + utf8_to_cp1251(vars->Get("VAT title - Country code")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 3, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_10, " \n \n \n " + utf8_to_cp1251(vars->Get("VAT title - Country code")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 3, false)).length())
 			{ MESSAGE_ERROR("", "", "fail to write table title Country code"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(12, " \n \n \n " + utf8_to_cp1251(vars->Get("VAT title - Country name")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 3, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_10a, " \n \n \n " + utf8_to_cp1251(vars->Get("VAT title - Country name")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 3, false)).length())
 			{ MESSAGE_ERROR("", "", "fail to write table title Country name"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(13, utf8_to_cp1251(vars->Get("VAT title - Custom number")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 4, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_11, utf8_to_cp1251(vars->Get("VAT title - Custom number")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 4, false)).length())
 			{ MESSAGE_ERROR("", "", "fail to write table title total line"); }
 		}
 		if(error_message.empty())
@@ -849,27 +949,27 @@ auto	C_Print_VAT_Base::__HPDF_DrawTable_Header() -> string
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_RemoveTableSeparator(3)).length())
-			{ MESSAGE_ERROR("", "", "fail to move line down"); }
+			if((error_message = pdf_obj.__HPDF_RemoveTableSeparator(PDF_TABLE_COL_2a)).length())
+			{ MESSAGE_ERROR("", "", "fail to remove table separator"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(2, 3, utf8_to_cp1251(vars->Get("VAT title - Measure unit")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 4, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_2, PDF_TABLE_COL_2a, utf8_to_cp1251(vars->Get("VAT title - Measure unit")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 4, false)).length())
 			{ MESSAGE_ERROR("", "", "fail to write table title total line"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_RemoveTableSeparator(12)).length())
-			{ MESSAGE_ERROR("", "", "fail to move line down"); }
+			if((error_message = pdf_obj.__HPDF_RemoveTableSeparator(PDF_TABLE_COL_10a)).length())
+			{ MESSAGE_ERROR("", "", "fail to remove table separator"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(11, 12, utf8_to_cp1251(vars->Get("VAT title - Country")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 4, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_10, PDF_TABLE_COL_10a, utf8_to_cp1251(vars->Get("VAT title - Country")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 4, false)).length())
 			{ MESSAGE_ERROR("", "", "fail to write table title total line"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(10, utf8_to_cp1251(vars->Get("")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 4, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_9, utf8_to_cp1251(vars->Get("")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 4, false)).length())
 			{ MESSAGE_ERROR("", "", "fail to write table title total line"); }
 		}
 		if(error_message.empty())
@@ -879,12 +979,12 @@ auto	C_Print_VAT_Base::__HPDF_DrawTable_Header() -> string
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(24, 35)).length())
+			if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(28, 39)).length())
 			{ MESSAGE_ERROR("", "", "fail to write table title total line"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(81, 91)).length())
+			if((error_message = pdf_obj.__HPDF_DrawHorizontalLine(85, 95)).length())
 			{ MESSAGE_ERROR("", "", "fail to write table title total line"); }
 		}
 		if(error_message.empty())
@@ -902,72 +1002,77 @@ auto	C_Print_VAT_Base::__HPDF_DrawTable_Header() -> string
 		// --- numeration
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(0, utf8_to_cp1251("1"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_1, utf8_to_cp1251("1"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 1, false)).length())
 			{ MESSAGE_ERROR("", "", "fail to print text to table cell"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(1, utf8_to_cp1251("1a"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_1a, utf8_to_cp1251("1a"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 1, false)).length())
 			{ MESSAGE_ERROR("", "", "fail to print text to table cell"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(2, utf8_to_cp1251("2"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_1b, utf8_to_cp1251("1б"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 1, false)).length())
 			{ MESSAGE_ERROR("", "", "fail to print text to table cell"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(3, utf8_to_cp1251("2a"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_2, utf8_to_cp1251("2"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 1, false)).length())
 			{ MESSAGE_ERROR("", "", "fail to print text to table cell"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(4, utf8_to_cp1251("3"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_2a, utf8_to_cp1251("2a"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 1, false)).length())
 			{ MESSAGE_ERROR("", "", "fail to print text to table cell"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(5, utf8_to_cp1251("4"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_3, utf8_to_cp1251("3"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 1, false)).length())
 			{ MESSAGE_ERROR("", "", "fail to print text to table cell"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(6, utf8_to_cp1251("5"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_4, utf8_to_cp1251("4"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 1, false)).length())
 			{ MESSAGE_ERROR("", "", "fail to print text to table cell"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(7, utf8_to_cp1251("6"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_5, utf8_to_cp1251("5"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 1, false)).length())
 			{ MESSAGE_ERROR("", "", "fail to print text to table cell"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(8, utf8_to_cp1251("7"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_6, utf8_to_cp1251("6"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 1, false)).length())
 			{ MESSAGE_ERROR("", "", "fail to print text to table cell"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(9, utf8_to_cp1251("8"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_7, utf8_to_cp1251("7"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 1, false)).length())
 			{ MESSAGE_ERROR("", "", "fail to print text to table cell"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(10, utf8_to_cp1251("9"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_8, utf8_to_cp1251("8"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 1, false)).length())
 			{ MESSAGE_ERROR("", "", "fail to print text to table cell"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(11, utf8_to_cp1251("10"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_9, utf8_to_cp1251("9"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 1, false)).length())
 			{ MESSAGE_ERROR("", "", "fail to print text to table cell"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(12, utf8_to_cp1251("10a"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_10, utf8_to_cp1251("10"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 1, false)).length())
 			{ MESSAGE_ERROR("", "", "fail to print text to table cell"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(13, utf8_to_cp1251("11"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_10a, utf8_to_cp1251("10a"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 1, false)).length())
+			{ MESSAGE_ERROR("", "", "fail to print text to table cell"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_11, utf8_to_cp1251("11"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 1, false)).length())
 			{ MESSAGE_ERROR("", "", "fail to print text to table cell"); }
 		}
 		if(error_message.empty())
@@ -998,27 +1103,27 @@ auto	C_Print_VAT_Base::__HPDF_DrawTable_Footer() -> string
 	{
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(0, utf8_to_cp1251(vars->Get("Total payment") + ":"), HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_1, PDF_TABLE_COL_1a, utf8_to_cp1251(vars->Get("Total payment") + ":"), HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
 			{ MESSAGE_ERROR("", "", "fail to write table footer description line"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(6, utf8_to_cp1251(GetTableSum()), HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_5, utf8_to_cp1251(GetTableSum()), HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, false)).length())
 			{ MESSAGE_ERROR("", "", "fail to write table footer sum_pre_tax line"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(7, utf8_to_cp1251("X"), HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_6, PDF_TABLE_COL_7, utf8_to_cp1251("X"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).length())
 			{ MESSAGE_ERROR("", "", "fail to write table footer excise"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(9, utf8_to_cp1251(GetTableVAT()), HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_8, utf8_to_cp1251(GetTableVAT()), HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, false)).length())
 			{ MESSAGE_ERROR("", "", "fail to write table footer sum_tax line"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(10, utf8_to_cp1251(GetTableTotal()), HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, true)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_9, utf8_to_cp1251(GetTableTotal()), HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, true)).length())
 			{ MESSAGE_ERROR("", "", "fail to write table footer sum_post_tax line"); }
 		}
 		if(error_message.empty())
@@ -1034,32 +1139,37 @@ auto	C_Print_VAT_Base::__HPDF_DrawTable_Footer() -> string
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_RemoveTableSeparator(1)).length())
+			if((error_message = pdf_obj.__HPDF_RemoveTableSeparator(PDF_TABLE_COL_1a)).length())
 			{ MESSAGE_ERROR("", "", "fail to move line down"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_RemoveTableSeparator(2)).length())
+			if((error_message = pdf_obj.__HPDF_RemoveTableSeparator(PDF_TABLE_COL_1b)).length())
 			{ MESSAGE_ERROR("", "", "fail to move line down"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_RemoveTableSeparator(3)).length())
+			if((error_message = pdf_obj.__HPDF_RemoveTableSeparator(PDF_TABLE_COL_2)).length())
 			{ MESSAGE_ERROR("", "", "fail to move line down"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_RemoveTableSeparator(4)).length())
+			if((error_message = pdf_obj.__HPDF_RemoveTableSeparator(PDF_TABLE_COL_2a)).length())
 			{ MESSAGE_ERROR("", "", "fail to move line down"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_RemoveTableSeparator(5)).length())
+			if((error_message = pdf_obj.__HPDF_RemoveTableSeparator(PDF_TABLE_COL_3)).length())
 			{ MESSAGE_ERROR("", "", "fail to move line down"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_RemoveTableSeparator(8)).length())
+			if((error_message = pdf_obj.__HPDF_RemoveTableSeparator(PDF_TABLE_COL_4)).length())
+			{ MESSAGE_ERROR("", "", "fail to move line down"); }
+		}
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_RemoveTableSeparator(PDF_TABLE_COL_7)).length())
 			{ MESSAGE_ERROR("", "", "fail to move line down"); }
 		}
 		if(error_message.empty())
@@ -1099,44 +1209,51 @@ auto	C_Print_VAT_Base::__HPDF_DrawTable_Body() -> string
 			total_table_items = 0;
 			for(auto i = 1; isTableRowExists(i); ++i)
 			{
-				auto	max_lines = pdf_obj.__HPDF_GetNumberOfLinesInTable(0, utf8_to_cp1251(GetTableRowDescription(i))	, NORMAL_FONT, __pdf_font_size - 2);
-
-
-				if((error_message = pdf_obj.__HPDF_PrintTextTableCell(0, utf8_to_cp1251(GetTableRowDescription(i)), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 2, false)).empty())
+				if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_1, utf8_to_cp1251(to_string(i)), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).empty())
 				{
-					if((error_message = pdf_obj.__HPDF_PrintTextTableCell(1, utf8_to_cp1251("-"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).empty())
-					{
-						if((error_message = pdf_obj.__HPDF_PrintTextTableCell(2, utf8_to_cp1251("796"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).empty())
-						{
-							if((error_message = pdf_obj.__HPDF_PrintTextTableCell(3, utf8_to_cp1251(GetTableRowItem(i)), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).empty())
-							{
-								if((error_message = pdf_obj.__HPDF_PrintTextTableCell(4, utf8_to_cp1251(GetTableRowQuantity(i)), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).empty())
-								{
-									if((error_message = pdf_obj.__HPDF_PrintTextTableCell(5, utf8_to_cp1251(GetTableRowPrice(i)), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 2, false)).empty())
-									{
-										if((error_message = pdf_obj.__HPDF_PrintTextTableCell(6, utf8_to_cp1251(GetTableRowPrice(i)), HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, false)).empty())
-										{
-											if((error_message = pdf_obj.__HPDF_PrintTextTableCell(7, utf8_to_cp1251(vars->Get("no excise")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 4, false)).empty())
-											{
-												if((error_message = pdf_obj.__HPDF_PrintTextTableCell(8, utf8_to_cp1251(GetSupplierVATSpellingShort()), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 1, false)).empty())
-												{
-													if((error_message = pdf_obj.__HPDF_PrintTextTableCell(9, utf8_to_cp1251(GetTableRowVAT(i)), HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, false)).empty())
-													{
-														if((error_message = pdf_obj.__HPDF_PrintTextTableCell(10, utf8_to_cp1251(GetTableRowTotal(i)), HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, false)).empty())
-														{
-															if((error_message = pdf_obj.__HPDF_PrintTextTableCell(11, utf8_to_cp1251("-"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).empty())
-															{
-																if((error_message = pdf_obj.__HPDF_PrintTextTableCell(12, utf8_to_cp1251("-"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).empty())
-																{
-																	if((error_message = pdf_obj.__HPDF_PrintTextTableCell(13, utf8_to_cp1251("-"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).empty())
-																	{
-																		if((error_message = pdf_obj.__HPDF_MoveTableLineDown(max_lines)).empty())
-																		{
+					auto	max_lines = pdf_obj.__HPDF_GetNumberOfLinesInTable(PDF_TABLE_COL_1a, utf8_to_cp1251(GetTableRowDescription(i))	, NORMAL_FONT, __pdf_font_size - 2);
 
+
+					if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_1a, utf8_to_cp1251(GetTableRowDescription(i)), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 2, false)).empty())
+					{
+						if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_1b, utf8_to_cp1251("-"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).empty())
+						{
+							if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_2, utf8_to_cp1251("796"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).empty())
+							{
+								if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_2a, utf8_to_cp1251(GetTableRowItem(i)), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).empty())
+								{
+									if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_3, utf8_to_cp1251(GetTableRowQuantity(i)), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).empty())
+									{
+										if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_4, utf8_to_cp1251(GetTableRowPrice(i)), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 2, false)).empty())
+										{
+											if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_5, utf8_to_cp1251(GetTableRowPrice(i)), HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, false)).empty())
+											{
+												if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_6, utf8_to_cp1251(vars->Get("no excise")), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 4, false)).empty())
+												{
+													if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_7, utf8_to_cp1251(GetSupplierVATSpellingShort()), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 1, false)).empty())
+													{
+														if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_8, utf8_to_cp1251(GetTableRowVAT(i)), HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, false)).empty())
+														{
+															if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_9, utf8_to_cp1251(GetTableRowTotal(i)), HPDF_TALIGN_RIGHT, NORMAL_FONT, __pdf_font_size, false)).empty())
+															{
+																if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_10, utf8_to_cp1251("-"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).empty())
+																{
+																	if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_10a, utf8_to_cp1251("-"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).empty())
+																	{
+																		if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_11, utf8_to_cp1251("-"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).empty())
+																		{
+																			if((error_message = pdf_obj.__HPDF_MoveTableLineDown(max_lines)).empty())
+																			{
+
+																			}
+																			else
+																			{
+																				MESSAGE_ERROR("", "", "fail to move table line down " + to_string(max_lines) + " line(s)");
+																			}
 																		}
 																		else
 																		{
-																			MESSAGE_ERROR("", "", "fail to move table line down " + to_string(max_lines) + " line(s)");
+																			MESSAGE_ERROR("", "", "fail to write table text (" + to_string(i) + ") line");
 																		}
 																	}
 																	else
@@ -1151,63 +1268,62 @@ auto	C_Print_VAT_Base::__HPDF_DrawTable_Body() -> string
 															}
 															else
 															{
-																MESSAGE_ERROR("", "", "fail to write table text (" + to_string(i) + ") line");
+																MESSAGE_ERROR("", "", "fail to write table total (" + to_string(i) + ") line");
 															}
 														}
 														else
 														{
-															MESSAGE_ERROR("", "", "fail to write table total (" + to_string(i) + ") line");
+															MESSAGE_ERROR("", "", "fail to write table tax (" + to_string(i) + ") line");
 														}
 													}
 													else
 													{
-														MESSAGE_ERROR("", "", "fail to write table tax (" + to_string(i) + ") line");
+														MESSAGE_ERROR("", "", "fail to write vat percentage (" + to_string(i) + ") line");
 													}
 												}
 												else
 												{
-													MESSAGE_ERROR("", "", "fail to write vat percentage (" + to_string(i) + ") line");
+													MESSAGE_ERROR("", "", "fail to write table excise (" + to_string(i) + ") line");
 												}
 											}
 											else
 											{
-												MESSAGE_ERROR("", "", "fail to write table excise (" + to_string(i) + ") line");
+												MESSAGE_ERROR("", "", "fail to write table price (" + to_string(i) + ") line");
 											}
 										}
 										else
 										{
-											MESSAGE_ERROR("", "", "fail to write table price (" + to_string(i) + ") line");
+											MESSAGE_ERROR("", "", "fail to write table price per unit (" + to_string(i) + ") line");
 										}
 									}
 									else
 									{
-										MESSAGE_ERROR("", "", "fail to write table price per unit (" + to_string(i) + ") line");
+										MESSAGE_ERROR("", "", "fail to write table quantity (" + to_string(i) + ") line");
 									}
 								}
 								else
 								{
-									MESSAGE_ERROR("", "", "fail to write table quantity (" + to_string(i) + ") line");
+									MESSAGE_ERROR("", "", "fail to write table item (" + to_string(i) + ") line");
 								}
 							}
 							else
 							{
-								MESSAGE_ERROR("", "", "fail to write table item (" + to_string(i) + ") line");
+								MESSAGE_ERROR("", "", "fail to write table measure unit (" + to_string(i) + ") line");
 							}
 						}
 						else
 						{
-							MESSAGE_ERROR("", "", "fail to write table measure unit (" + to_string(i) + ") line");
+							MESSAGE_ERROR("", "", "fail to write table description (" + to_string(i) + ") line");
 						}
 					}
 					else
 					{
-						MESSAGE_ERROR("", "", "fail to write table description (" + to_string(i) + ") line");
+						MESSAGE_ERROR("", "", "fail to write table item tittle (" + to_string(i) + ") line");
 					}
-
 				}
 				else
 				{
-					MESSAGE_ERROR("", "", "fail to write table index (" + to_string(i) + ") line");
+					MESSAGE_ERROR("", "", "fail to write table index seq (" + to_string(i) + ") line");
 				}
 
 				if(error_message.length()) break;
@@ -1244,6 +1360,7 @@ auto	C_Print_VAT_Base::__HPDF_DrawTable() -> string
 
 		if(error_message.empty())
 		{
+			pdf_obj.AddColumn(4);
 			pdf_obj.AddColumn(20);
 			pdf_obj.AddColumn(4);
 			pdf_obj.AddColumn(5);
