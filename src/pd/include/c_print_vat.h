@@ -142,6 +142,8 @@ class C_Print_VAT_Base
 		auto			__HPDF_DrawHeader() -> string;
 		auto			__HPDF_DrawTable() -> string;
 		auto			__HPDF_DrawFooter() -> string;
+
+		auto			GetNumberOfLinesInTable() -> unsigned int;
 	public:
 
 		auto			Restart() -> void;

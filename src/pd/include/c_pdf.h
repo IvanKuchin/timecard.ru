@@ -28,7 +28,6 @@ class C_PDF
 		auto			__HPDF_MoveLineDownByPixels(int pixel_lines) -> string;
 		auto			__HPDF_GetPixelSizeByPercentage(double percents) -> double;
 		auto			__HPDF_GetPixelOffsetByPercentage(double percents) -> double;
-		auto			__HPDF_GetNumberOfLines(string text, double left_shift_percent, double right_shift_percent, Font_Type font_type, HPDF_REAL font_size) -> int;
 		auto			__HPDF_GetTableWidthInPercent() { auto sum = 0.0; for(auto temp: grid_widths) sum += temp; return sum; };
 		auto			__HPDF_DrawVerticalLine(double) -> string;
 
@@ -65,6 +64,8 @@ class C_PDF
 		auto			__HPDF_PrintTextRect(string text, double left_shift_percent, double right_shift_percent, HPDF_TextAlignment align, Font_Type font_type, HPDF_REAL font_size, bool move_line_down) -> string;
 		auto			__HPDF_DrawRect(double left_shift_percent, double top_shift_line, double right_shift_percent, double bottom_shift_line) -> string;
 
+		auto			__HPDF_GetNumberOfLines(string text, double left_shift_percent, double right_shift_percent, Font_Type font_type, HPDF_REAL font_size) -> int;
+		
 		auto			__HPDF_StartTable() -> string;
 		auto			__HPDF_GetNumberOfLinesInTable(unsigned int index_col, string text, Font_Type font_type, HPDF_REAL font_size) -> int;
 		auto			__HPDF_PrintTextTableCell(unsigned int index_col, string text, HPDF_TextAlignment text_align, Font_Type font_type, HPDF_REAL font_size, bool move_line_down) -> string;
