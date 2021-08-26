@@ -1,6 +1,21 @@
 #include "c_print_vat.h"
 
 
+auto			C_Print_VAT_Base::GetNumberOfLinesInTable() -> unsigned int
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	result = 0;
+
+	for(; isTableRowExists(result + 1); ++result) {};
+	
+
+	MESSAGE_DEBUG("", "", "finish (" + to_string(result) + ")");
+
+	return result;
+}
+
+
 auto	C_Print_VAT_Base::GetSupplierFullAddress() -> string
 {
 	return GetSupplierLegalZIP() + " " + GetSupplierLegalLocality() + ", " + GetSupplierLegalAddress();
@@ -151,13 +166,7 @@ auto C_Print_VAT_Base::__PrintXLSHeader() -> string
 	MergeApplyFormat(XL_HEADER_COL_1_VALUE_MERGE_START,  XL_HEADER_COL_1_VALUE_MERGE_END, format_mid_left_underline);
 	__sheet->writeStr(__row_counter, XL_HEADER_COL_1_SEQUENCE, multibyte_to_wide("(5a)").c_str(), format_mid_center);
 
-	{
-		auto	number_of_payment_orders = 0;
-		for(number_of_payment_orders = 1; isTableRowExists(number_of_payment_orders); ++number_of_payment_orders) {};
-
-
-		__sheet->writeStr(__row_counter, XL_HEADER_COL_1_VALUE, multibyte_to_wide(vars->Get("VAT title - Payment order number") + " 1-" + to_string(number_of_payment_orders) + " " + vars->Get("invoice_agreement")).c_str(), format_mid_left_underline);
-	}
+	__sheet->writeStr(__row_counter, XL_HEADER_COL_1_VALUE, multibyte_to_wide(vars->Get("VAT title - Payment order number") + " 1-" + to_string(GetNumberOfLinesInTable()) + " " + vars->Get("invoice_agreement")).c_str(), format_mid_left_underline);
 
 	MESSAGE_DEBUG("", "", "finish");
 
@@ -513,6 +522,10 @@ auto	C_Print_VAT_Base::__HPDF_DrawHeader() -> string
 
 	try
 	{
+		auto	number_of_lines_address1			= pdf_obj.__HPDF_GetNumberOfLines(utf8_to_cp1251(GetSupplierFullAddress()), PDF_HEADER_COL_1_VALUE_START, PDF_HEADER_COL_1_VALUE_END, NORMAL_FONT, __pdf_font_size);
+		auto	number_of_lines_address2			= pdf_obj.__HPDF_GetNumberOfLines(utf8_to_cp1251(GetCustomerFullAddress()), PDF_HEADER_COL_1_VALUE_START, PDF_HEADER_COL_1_VALUE_END, NORMAL_FONT, __pdf_font_size);
+		auto	max_number_of_lines_in_addresses	= max(number_of_lines_address1, number_of_lines_address2);
+
 		if(error_message.empty())
 		{
 			if((error_message = PrintPDFHeader()).length())
@@ -612,14 +625,26 @@ auto	C_Print_VAT_Base::__HPDF_DrawHeader() -> string
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
 
+		// --- address
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("Address") + ": "), PDF_HEADER_COL_1_TITLE_START, PDF_HEADER_COL_1_TITLE_END, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSupplierFullAddress()), PDF_HEADER_COL_1_VALUE_START, PDF_HEADER_COL_1_VALUE_END, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetSupplierFullAddress()), PDF_HEADER_COL_1_VALUE_START, PDF_HEADER_COL_1_VALUE_END, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetCustomerFullAddress()), PDF_HEADER_COL_2_VALUE_START, PDF_HEADER_COL_2_VALUE_END, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
+		}
+
+		for(auto i = 1; i < max_number_of_lines_in_addresses; ++i)
+		{
+			pdf_obj.__HPDF_MoveLineDown();
+		}
+
+		if(error_message.empty())
+		{
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("Address") + ": "), PDF_HEADER_COL_1_TITLE_START, PDF_HEADER_COL_1_TITLE_END, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
 		if(error_message.empty())
@@ -630,11 +655,6 @@ auto	C_Print_VAT_Base::__HPDF_DrawHeader() -> string
 		if(error_message.empty())
 		{
 			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("Address") + ": "), PDF_HEADER_COL_2_TITLE_START, PDF_HEADER_COL_2_TITLE_END, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
-			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
-		}
-		if(error_message.empty())
-		{
-			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(GetCustomerFullAddress()), PDF_HEADER_COL_2_VALUE_START, PDF_HEADER_COL_2_VALUE_END, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
 		if(error_message.empty())
@@ -653,6 +673,8 @@ auto	C_Print_VAT_Base::__HPDF_DrawHeader() -> string
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
 
+
+		// --- VAT/KPP
 		if(error_message.empty())
 		{
 			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("vat_header_TIN_KPP_seller") + ": "), PDF_HEADER_COL_1_TITLE_START, PDF_HEADER_COL_1_TITLE_END, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
@@ -812,15 +834,10 @@ auto	C_Print_VAT_Base::__HPDF_DrawHeader() -> string
 			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("vat_shipping_doc") + ": "), PDF_HEADER_COL_1_TITLE_START, PDF_HEADER_COL_1_TITLE_END, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
 			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
+		if(error_message.empty())
 		{
-			auto	number_of_payment_orders = 0;
-			for(number_of_payment_orders = 1; isTableRowExists(number_of_payment_orders); ++number_of_payment_orders) {};
-
-			if(error_message.empty())
-			{
-				if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("VAT title - Payment order number") + " 1-" + to_string(number_of_payment_orders) + " " + vars->Get("invoice_agreement")), PDF_HEADER_COL_1_VALUE_START, PDF_HEADER_COL_1_VALUE_END, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
-				{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
-			}
+			if((error_message = pdf_obj.__HPDF_PrintTextRect(utf8_to_cp1251(vars->Get("VAT title - Payment order number") + " 1-" + to_string(GetNumberOfLinesInTable()) + " " + vars->Get("invoice_agreement")), PDF_HEADER_COL_1_VALUE_START, PDF_HEADER_COL_1_VALUE_END, HPDF_TALIGN_LEFT, NORMAL_FONT, __pdf_font_size, false)).length())
+			{ MESSAGE_ERROR("", "", "hpdf: fail to print text"); }
 		}
 		if(error_message.empty())
 		{
