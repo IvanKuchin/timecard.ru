@@ -947,7 +947,7 @@ auto	C_Print_VAT_Base::__HPDF_DrawTable_Header() -> string
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_MoveTableLineDown(3)).length())
+			if((error_message = pdf_obj.__HPDF_MoveTableLineDown(4)).length())
 			{ MESSAGE_ERROR("", "", "fail to move table line down"); }
 		}
 
@@ -961,7 +961,7 @@ auto	C_Print_VAT_Base::__HPDF_DrawTable_Header() -> string
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_MoveLineDown(-3)).length())
+			if((error_message = pdf_obj.__HPDF_MoveLineDown(-4)).length())
 			{ MESSAGE_ERROR("", "", "fail to move line down"); }
 		}
 		if(error_message.empty())
@@ -1006,7 +1006,7 @@ auto	C_Print_VAT_Base::__HPDF_DrawTable_Header() -> string
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_MoveLineDown(2)).length())
+			if((error_message = pdf_obj.__HPDF_MoveLineDown(3)).length())
 			{ MESSAGE_ERROR("", "", "fail to move line down"); }
 		}
 		if(error_message.empty())
@@ -1226,12 +1226,13 @@ auto	C_Print_VAT_Base::__HPDF_DrawTable_Body() -> string
 			total_table_items = 0;
 			for(auto i = 1; isTableRowExists(i); ++i)
 			{
-				if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_1, utf8_to_cp1251(to_string(i)), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).empty())
+				// --- tallest cell must go first to avoid breaking table content between pages
+				auto	max_lines = pdf_obj.__HPDF_GetNumberOfLinesInTable(PDF_TABLE_COL_1a, utf8_to_cp1251(GetTableRowDescription(i))	, NORMAL_FONT, __pdf_font_size - 2);
+
+
+				if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_1a, utf8_to_cp1251(GetTableRowDescription(i)), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 2, false)).empty())
 				{
-					auto	max_lines = pdf_obj.__HPDF_GetNumberOfLinesInTable(PDF_TABLE_COL_1a, utf8_to_cp1251(GetTableRowDescription(i))	, NORMAL_FONT, __pdf_font_size - 2);
-
-
-					if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_1a, utf8_to_cp1251(GetTableRowDescription(i)), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size - 2, false)).empty())
+					if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_1, utf8_to_cp1251(to_string(i)), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).empty())
 					{
 						if((error_message = pdf_obj.__HPDF_PrintTextTableCell(PDF_TABLE_COL_1b, utf8_to_cp1251("-"), HPDF_TALIGN_CENTER, NORMAL_FONT, __pdf_font_size, false)).empty())
 						{
@@ -1335,12 +1336,12 @@ auto	C_Print_VAT_Base::__HPDF_DrawTable_Body() -> string
 					}
 					else
 					{
-						MESSAGE_ERROR("", "", "fail to write table item tittle (" + to_string(i) + ") line");
+						MESSAGE_ERROR("", "", "fail to write table index seq (" + to_string(i) + ") line");
 					}
 				}
 				else
 				{
-					MESSAGE_ERROR("", "", "fail to write table index seq (" + to_string(i) + ") line");
+					MESSAGE_ERROR("", "", "fail to write table item title (" + to_string(i) + ") line");
 				}
 
 				if(error_message.length()) break;
