@@ -947,7 +947,7 @@ auto	C_Print_VAT_Base::__HPDF_DrawTable_Header() -> string
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_MoveTableLineDown(3)).length())
+			if((error_message = pdf_obj.__HPDF_MoveTableLineDown(4)).length())
 			{ MESSAGE_ERROR("", "", "fail to move table line down"); }
 		}
 
@@ -961,7 +961,7 @@ auto	C_Print_VAT_Base::__HPDF_DrawTable_Header() -> string
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_MoveLineDown(-3)).length())
+			if((error_message = pdf_obj.__HPDF_MoveLineDown(-4)).length())
 			{ MESSAGE_ERROR("", "", "fail to move line down"); }
 		}
 		if(error_message.empty())
@@ -1006,7 +1006,7 @@ auto	C_Print_VAT_Base::__HPDF_DrawTable_Header() -> string
 		}
 		if(error_message.empty())
 		{
-			if((error_message = pdf_obj.__HPDF_MoveLineDown(2)).length())
+			if((error_message = pdf_obj.__HPDF_MoveLineDown(3)).length())
 			{ MESSAGE_ERROR("", "", "fail to move line down"); }
 		}
 		if(error_message.empty())
