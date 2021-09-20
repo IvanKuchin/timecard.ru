@@ -739,7 +739,7 @@ static auto __Craft_SoW_WhereStatement(const string &where_companies_list, const
 
 static auto __GetBTList(const string &sow_where_statement, const string &sow_limit_page, const string &bt_where_statement, bool isExtended, CMysql *db, CUser *user)
 {
-	auto	sow_statement	= "SELECT `id` FROM `contracts_sow` WHERE " + sow_where_statement + (sow_limit_page.length() ? " ORDER BY `end_date` DESC LIMIT " + to_string(stol(sow_limit_page) * CONTRACTS_SOW_PER_PAGE) + "," + to_string(CONTRACTS_SOW_PER_PAGE) : "");
+	auto	sow_statement	= "SELECT `id` FROM `contracts_sow` WHERE " + sow_where_statement + (sow_limit_page.length() ? " ORDER BY `end_date` DESC, `id` DESC LIMIT " + to_string(stol(sow_limit_page) * CONTRACTS_SOW_PER_PAGE) + "," + to_string(CONTRACTS_SOW_PER_PAGE) : "");
 	auto	sow_ids			= GetValuesFromDB(sow_statement, db);
 
 	return 
