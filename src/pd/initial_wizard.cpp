@@ -201,6 +201,10 @@ int main(void)
 
 				if(temp_error_message.length()) MESSAGE_ERROR("", action, "fail to notify agency company.id(" + agency_company_id + ")")
 			}
+			else if(!affected)
+			{
+				MESSAGE_DEBUG("", action, "agency not found (" + agency_name + ")");
+			}
 			else
 			{
 				// --- severity must be DEBUG, I set it to ERROR just for trial period 
@@ -226,6 +230,10 @@ int main(void)
 				auto	temp_error_message = NotifyAgencyAboutChanges(agency_company_id, to_string(NOTIFICATION_AGENCY_ABOUT_EMPLOYEE_REGISTRATION), user.GetID(), &db, &user);
 
 				if(temp_error_message.length()) MESSAGE_ERROR("", action, "fail to notify agency company.id(" + agency_company_id + ")")
+			}
+			else if(!affected)
+			{
+				MESSAGE_DEBUG("", action, "agency not found (" + agency_name + ")");
 			}
 			else
 			{
