@@ -730,7 +730,7 @@ static auto __Craft_SoW_WhereStatement(const string &where_companies_list, const
 												+ (sow_not_filter_by_status.length()	? " AND (" + sow_not_filter_by_status + ")" : "")
 												;
 
-	MESSAGE_DEBUG("", "", "finish");
+	MESSAGE_DEBUG("", "", "finish (" + sow_where_statement + ")");
 
 	return sow_where_statement;
 }
@@ -739,7 +739,7 @@ static auto __Craft_SoW_WhereStatement(const string &where_companies_list, const
 
 static auto __GetBTList(const string &sow_where_statement, const string &sow_limit_page, const string &bt_where_statement, bool isExtended, CMysql *db, CUser *user)
 {
-	auto	sow_statement	= "SELECT `id` FROM `contracts_sow` WHERE " + sow_where_statement + (sow_limit_page.length() ? " ORDER BY `end_date` DESC LIMIT " + to_string(stol(sow_limit_page) * CONTRACTS_SOW_PER_PAGE) + "," + to_string(CONTRACTS_SOW_PER_PAGE) : "");
+	auto	sow_statement	= "SELECT `id` FROM `contracts_sow` WHERE " + sow_where_statement + (sow_limit_page.length() ? " ORDER BY `end_date` DESC, `id` DESC LIMIT " + to_string(stol(sow_limit_page) * CONTRACTS_SOW_PER_PAGE) + "," + to_string(CONTRACTS_SOW_PER_PAGE) : "");
 	auto	sow_ids			= GetValuesFromDB(sow_statement, db);
 
 	return 
@@ -789,7 +789,7 @@ auto	GetBTList(const string &where_companies_list, const string &sow_filter_date
 
 static auto __GetTimecardList(const string &sow_where_statement, const string &sow_limit_page, const string &timecard_where_statement, CMysql *db, CUser *user)
 {
-	auto	sow_statement	= "SELECT `id` FROM `contracts_sow` WHERE " + sow_where_statement + (sow_limit_page.length() ? " ORDER BY `end_date` DESC LIMIT " + to_string(stol(sow_limit_page) * CONTRACTS_SOW_PER_PAGE) + "," + to_string(CONTRACTS_SOW_PER_PAGE) : "");
+	auto	sow_statement	= "SELECT `id` FROM `contracts_sow` WHERE " + sow_where_statement + (sow_limit_page.length() ? " ORDER BY `end_date` DESC, `id` DESC LIMIT " + to_string(stol(sow_limit_page) * CONTRACTS_SOW_PER_PAGE) + "," + to_string(CONTRACTS_SOW_PER_PAGE) : "");
 	auto	sow_ids			= GetValuesFromDB(sow_statement, db);
 
 	return 
