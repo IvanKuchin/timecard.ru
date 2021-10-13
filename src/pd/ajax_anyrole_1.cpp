@@ -738,12 +738,12 @@ int main(void)
 
 		if(action == "AJAX_submitNewGeoZip")
 		{
-			string			country = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("country"));
-			string			region = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("region"));
-			string			locality = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("locality"));
-			string			zip = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("zip"));
-			string			template_name = "json_response.htmlt";
-			string			error_message = "";
+			auto			country = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("country"));
+			auto			region = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("region"));
+			auto			locality = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("locality"));
+			auto			zip = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("zip"));
+			auto			template_name = "json_response.htmlt"s;
+			auto			error_message = ""s;
 			ostringstream	ostResult;
 
 			ostResult.str("");
