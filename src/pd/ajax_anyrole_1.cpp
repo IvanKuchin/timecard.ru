@@ -674,10 +674,10 @@ int main(void)
 
 		if(action == "AJAX_getAirportCountryAutocompleteList")
 		{
-			string			query = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("term"));
-			string			template_name = "json_response.htmlt";
-			string			error_message = "";
-			string			success_message = "";
+			auto			query = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("term"));
+			auto			template_name = "json_response.htmlt"s;
+			auto			error_message = ""s;
+			auto			success_message = ""s;
 			ostringstream	ostResult;
 
 			ostResult.str("");
@@ -706,10 +706,10 @@ int main(void)
 
 		if(action == "AJAX_getCountryAutocompleteList")
 		{
-			string			query = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("term"));
-			string			template_name = "json_response.htmlt";
-			string			error_message = "";
-			string			success_message = "";
+			auto			query = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("term"));
+			auto			template_name = "json_response.htmlt"s;
+			auto			error_message = ""s;
+			auto			success_message = ""s;
 			ostringstream	ostResult;
 
 			ostResult.str("");
