@@ -674,10 +674,10 @@ int main(void)
 
 		if(action == "AJAX_getAirportCountryAutocompleteList")
 		{
-			string			query = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("term"));
-			string			template_name = "json_response.htmlt";
-			string			error_message = "";
-			string			success_message = "";
+			auto			query = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("term"));
+			auto			template_name = "json_response.htmlt"s;
+			auto			error_message = ""s;
+			auto			success_message = ""s;
 			ostringstream	ostResult;
 
 			ostResult.str("");
@@ -706,10 +706,10 @@ int main(void)
 
 		if(action == "AJAX_getCountryAutocompleteList")
 		{
-			string			query = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("term"));
-			string			template_name = "json_response.htmlt";
-			string			error_message = "";
-			string			success_message = "";
+			auto			query = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("term"));
+			auto			template_name = "json_response.htmlt"s;
+			auto			error_message = ""s;
+			auto			success_message = ""s;
 			ostringstream	ostResult;
 
 			ostResult.str("");
@@ -738,135 +738,143 @@ int main(void)
 
 		if(action == "AJAX_submitNewGeoZip")
 		{
-			string			country = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("country"));
-			string			region = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("region"));
-			string			locality = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("locality"));
-			string			zip = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("zip"));
-			string			template_name = "json_response.htmlt";
-			string			error_message = "";
+			auto			country = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("country"));
+			auto			region = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("region"));
+			auto			locality = CheckHTTPParam_Text(indexPage.GetVarsHandler()->Get("locality"));
+			auto			zip = CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("zip"));
+			auto			template_name = "json_response.htmlt"s;
+			auto			error_message = ""s;
 			ostringstream	ostResult;
 
 			ostResult.str("");
 
-			if(country.length() && region.length() && locality.length() && zip.length())
+			if(zip.length())
 			{
-				if(db.Query("SELECT `id` FROM `geo_zip` WHERE `zip`=\"" + zip + "\";") == 0)
+				if(country.length() && region.length() && locality.length())
 				{
-					string	country_id = "";
-
-					if(db.Query("SELECT `id` FROM `geo_country` WHERE `title`=\"" + country + "\";")) country_id = db.Get(0, "id");
-					else
+					if(db.Query("SELECT `id` FROM `geo_zip` WHERE `zip`=\"" + zip + "\";") == 0)
 					{
-						long int temp = db.InsertQuery("INSERT INTO `geo_country` (`title`) VALUES (\"" + country + "\");");
-						if(temp)
-						{
-							country_id = to_string(temp);
-							MESSAGE_ERROR("", action, "new country.id(" + country_id + ") added");
-						}
+						string	country_id = "";
+
+						if(db.Query("SELECT `id` FROM `geo_country` WHERE `title`=\"" + country + "\";")) country_id = db.Get(0, "id");
 						else
 						{
-							MESSAGE_ERROR("", action, "fail to add new country");
-						}
-					}
-
-					if(country_id.length())
-					{
-						string	region_id = "";
-
-						if(db.Query("SELECT `id` FROM `geo_region` WHERE `title`=\"" + region + "\";")) region_id = db.Get(0, "id");
-						else
-						{
-							long int temp = db.InsertQuery("INSERT INTO `geo_region` (`geo_country_id`,`title`) VALUES (\"" + country_id + "\",\"" + region + "\");");
-
+							long int temp = db.InsertQuery("INSERT INTO `geo_country` (`title`) VALUES (\"" + country + "\");");
 							if(temp)
 							{
-								region_id = to_string(temp);
-								MESSAGE_ERROR("", action, "new region.id(" + region_id + ") added");
+								country_id = to_string(temp);
+								MESSAGE_ERROR("", action, "new country.id(" + country_id + ") added");
 							}
 							else
 							{
-								MESSAGE_ERROR("", action, "fail to add new region");
+								MESSAGE_ERROR("", action, "fail to add new country");
 							}
 						}
 
-						if(region_id.length())
+						if(country_id.length())
 						{
-							string	locality_id = "";
+							string	region_id = "";
 
-							if(db.Query("SELECT `id` FROM `geo_locality` WHERE `title`=\"" + locality + "\";")) locality_id = db.Get(0, "id");
+							if(db.Query("SELECT `id` FROM `geo_region` WHERE `title`=\"" + region + "\";")) region_id = db.Get(0, "id");
 							else
 							{
-								long int temp = db.InsertQuery("INSERT INTO `geo_locality` (`geo_region_id`,`title`) VALUES (\"" + region_id + "\",\"" + locality + "\");");
+								long int temp = db.InsertQuery("INSERT INTO `geo_region` (`geo_country_id`,`title`) VALUES (\"" + country_id + "\",\"" + region + "\");");
 
 								if(temp)
 								{
-									locality_id = to_string(temp);
-									MESSAGE_ERROR("", action, "new locality.id(" + locality_id + ") added");
+									region_id = to_string(temp);
+									MESSAGE_ERROR("", action, "new region.id(" + region_id + ") added");
 								}
 								else
 								{
+									MESSAGE_ERROR("", action, "fail to add new region");
+								}
+							}
+
+							if(region_id.length())
+							{
+								string	locality_id = "";
+
+								if(db.Query("SELECT `id` FROM `geo_locality` WHERE `title`=\"" + locality + "\";")) locality_id = db.Get(0, "id");
+								else
+								{
+									long int temp = db.InsertQuery("INSERT INTO `geo_locality` (`geo_region_id`,`title`) VALUES (\"" + region_id + "\",\"" + locality + "\");");
+
+									if(temp)
+									{
+										locality_id = to_string(temp);
+										MESSAGE_ERROR("", action, "new locality.id(" + locality_id + ") added");
+									}
+									else
+									{
+										MESSAGE_ERROR("", action, "fail to add new locality");
+									}
+								}
+
+								if(locality_id.length())
+								{
+									string	zip_id = "";
+									long int temp = db.InsertQuery("INSERT INTO `geo_zip` (`geo_locality_id`,`zip`) VALUES (\"" + locality_id + "\",\"" + zip + "\");");
+
+									if(temp)
+									{
+										zip_id = to_string(temp);
+										MESSAGE_ERROR("", action, "new zip.id(" + zip_id + ") added");
+									}
+									else
+									{
+										MESSAGE_ERROR("", action, "fail to add new zip");
+									}
+
+									if(zip_id.length())
+									{
+										ostResult << "{\"result\":\"success\","
+												  << "\"geo_zip\":[" << GetZipInJSONFormat(zip_id, &db, &user) << "]"
+												  << "}";
+									}
+									else
+									{
+										error_message = "Не удалось добавить индекс";
+										MESSAGE_ERROR("", action, "fail to add new zip");
+									}
+								}
+								else
+								{
+									error_message = "Не удалось добавить город";
 									MESSAGE_ERROR("", action, "fail to add new locality");
 								}
 							}
-
-							if(locality_id.length())
-							{
-								string	zip_id = "";
-								long int temp = db.InsertQuery("INSERT INTO `geo_zip` (`geo_locality_id`,`zip`) VALUES (\"" + locality_id + "\",\"" + zip + "\");");
-
-								if(temp)
-								{
-									zip_id = to_string(temp);
-									MESSAGE_ERROR("", action, "new zip.id(" + zip_id + ") added");
-								}
-								else
-								{
-									MESSAGE_ERROR("", action, "fail to add new zip");
-								}
-
-								if(zip_id.length())
-								{
-									ostResult << "{\"result\":\"success\","
-											  << "\"geo_zip\":[" << GetZipInJSONFormat(zip_id, &db, &user) << "]"
-											  << "}";
-								}
-								else
-								{
-									error_message = "Не удалось добавить индекс";
-									MESSAGE_ERROR("", action, "fail to add new zip");
-								}
-							}
 							else
 							{
-								error_message = "Не удалось добавить город";
-								MESSAGE_ERROR("", action, "fail to add new locality");
+								error_message = "Не удалось добавить регион";
+								MESSAGE_ERROR("", action, "fail to add new region");
 							}
+
 						}
 						else
 						{
-							error_message = "Не удалось добавить регион";
-							MESSAGE_ERROR("", action, "fail to add new region");
+							error_message = "Не удалось добавить страну";
+							MESSAGE_ERROR("", action, "fail to add new country");
 						}
 
 					}
 					else
 					{
-						error_message = "Не удалось добавить страну";
-						MESSAGE_ERROR("", action, "fail to add new country");
-					}
-
+						error_message = "Индекс уже существует в БД";
+						MESSAGE_DEBUG("", "", "zip(" + zip + ") already exists in DB");
+					}	
+						
 				}
 				else
 				{
-					error_message = "Индекс уже существует в БД";
-					MESSAGE_DEBUG("", "", "zip(" + zip + ") already exists in DB");
-				}	
-					
+					error_message = gettext("parameters incorrect");
+					MESSAGE_DEBUG("", "", "mandatory parameter missed");
+				}
 			}
 			else
 			{
-				error_message = gettext("parameters incorrect");
-				MESSAGE_DEBUG("", "", "mandatory parameter missed");
+				error_message = gettext("zip code must be a number");
+				MESSAGE_ERROR("", action, error_message)
 			}
 
 			if(error_message.empty())
