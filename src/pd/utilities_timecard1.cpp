@@ -1051,6 +1051,8 @@ string GetCompanyListInJSONFormat(string dbQuery, CMysql *db, CUser *user, bool 
 		string	act_number_prefix;
 		string	act_number;
 		string	act_number_postfix;
+		string	act_number_unique;
+		string	psow_number_unique;
 		string	foundationDate;
 		string	numberOfEmployee;
 		string	admin_userID;
@@ -1101,6 +1103,8 @@ string GetCompanyListInJSONFormat(string dbQuery, CMysql *db, CUser *user, bool 
 				company.act_number_prefix	= db->Get(i, "act_number_prefix");
 				company.act_number			= db->Get(i, "act_number");
 				company.act_number_postfix	= db->Get(i, "act_number_postfix");
+				company.act_number_unique	= db->Get(i, "act_number_unique");
+				company.psow_number_unique	= db->Get(i, "psow_number_unique");
 				company.admin_userID		= db->Get(i, "admin_userID");
 				company.foundationDate		= db->Get(i, "foundationDate");
 				company.numberOfEmployee	= db->Get(i, "numberOfEmployee");
@@ -1117,36 +1121,38 @@ string GetCompanyListInJSONFormat(string dbQuery, CMysql *db, CUser *user, bool 
 					if(ostFinal.str().length()) ostFinal << ", ";
 
 					ostFinal << "{";
-					ostFinal << "\"id\": \""				<< companiesList[i].id << "\",";
-					ostFinal << "\"type\": \""				<< companiesList[i].type << "\", ";
-					ostFinal << "\"name\": \""				<< companiesList[i].name << "\", ";
-					ostFinal << "\"legal_geo_zip_id\": \""	<< companiesList[i].legal_geo_zip_id << "\", ";
-					ostFinal << "\"legal_geo_zip\": ["		<< GetZipInJSONFormat(companiesList[i].legal_geo_zip_id, db, user) << "], ";
-					ostFinal << "\"legal_address\": \""		<< companiesList[i].legal_address << "\", ";
-					ostFinal << "\"mailing_geo_zip_id\": \""<< companiesList[i].mailing_geo_zip_id << "\", ";
-					ostFinal << "\"mailing_geo_zip\": ["	<< GetZipInJSONFormat(companiesList[i].mailing_geo_zip_id, db, user) << "], ";
-					ostFinal << "\"mailing_address\": \""	<< companiesList[i].mailing_address << "\", ";
-					ostFinal << "\"tin\": \""				<< companiesList[i].tin << "\", ";
-					ostFinal << "\"bank_id\": \""			<< companiesList[i].bank_id << "\", ";
-					ostFinal << "\"banks\": ["				<< GetBankInJSONFormat("SELECT * FROM `banks` WHERE `id`=\"" + companiesList[i].bank_id + "\";", db, user) << "], ";
-					ostFinal << "\"account\": \""			<< companiesList[i].account << "\", ";
-					ostFinal << "\"kpp\": \""				<< companiesList[i].kpp << "\", ";
-					ostFinal << "\"ogrn\": \""				<< companiesList[i].ogrn << "\", ";
-					ostFinal << "\"vat\": \""				<< companiesList[i].vat << "\", ";
-					ostFinal << "\"vat_calculation_type\": \""<< companiesList[i].vat_calculation_type << "\", ";
-					ostFinal << "\"link\": \""				<< companiesList[i].link << "\", ";
-					ostFinal << "\"act_number_prefix\": \""	<< companiesList[i].act_number_prefix << "\", ";
-					ostFinal << "\"act_number\": \""		<< companiesList[i].act_number << "\", ";
-					ostFinal << "\"act_number_postfix\": \""<< companiesList[i].act_number_postfix << "\", ";
-					ostFinal << "\"foundationDate\": \""	<< companiesList[i].foundationDate << "\",";
-					ostFinal << "\"numberOfEmployee\": \""	<< companiesList[i].numberOfEmployee << "\",";
-					ostFinal << "\"webSite\": \""			<< companiesList[i].webSite << "\",";
-					ostFinal << "\"description\": \""		<< companiesList[i].description << "\",";
-					ostFinal << "\"logo_folder\": \""		<< companiesList[i].logo_folder << "\",";
-					ostFinal << "\"logo_filename\": \""	   	<< companiesList[i].logo_filename << "\",";
-					ostFinal << "\"owners\": ["			   	<< (include_employees ? GetUserListInJSONFormat("SELECT * FROM `users` WHERE `id`=\"" + companiesList[i].admin_userID + "\";", db, user) : "") << "],";
-					ostFinal << "\"employees\": ["			<< (include_employees ? GetAgencyEmployeesInJSONFormat(companiesList[i].id, db, user) : "") << "],";
-					ostFinal << "\"custom_fields\":[" 		<< GetCompanyCustomFieldsInJSONFormat("SELECT * FROM `company_custom_fields` WHERE `company_id`=\"" + companiesList[i].id + "\" "
+					ostFinal << "\"id\": \""					<< companiesList[i].id << "\",";
+					ostFinal << "\"type\": \""					<< companiesList[i].type << "\", ";
+					ostFinal << "\"name\": \""					<< companiesList[i].name << "\", ";
+					ostFinal << "\"legal_geo_zip_id\": \""		<< companiesList[i].legal_geo_zip_id << "\", ";
+					ostFinal << "\"legal_geo_zip\": ["			<< GetZipInJSONFormat(companiesList[i].legal_geo_zip_id, db, user) << "], ";
+					ostFinal << "\"legal_address\": \""			<< companiesList[i].legal_address << "\", ";
+					ostFinal << "\"mailing_geo_zip_id\": \""	<< companiesList[i].mailing_geo_zip_id << "\", ";
+					ostFinal << "\"mailing_geo_zip\": ["		<< GetZipInJSONFormat(companiesList[i].mailing_geo_zip_id, db, user) << "], ";
+					ostFinal << "\"mailing_address\": \""		<< companiesList[i].mailing_address << "\", ";
+					ostFinal << "\"tin\": \""					<< companiesList[i].tin << "\", ";
+					ostFinal << "\"bank_id\": \""				<< companiesList[i].bank_id << "\", ";
+					ostFinal << "\"banks\": ["					<< GetBankInJSONFormat("SELECT * FROM `banks` WHERE `id`=\"" + companiesList[i].bank_id + "\";", db, user) << "], ";
+					ostFinal << "\"account\": \""				<< companiesList[i].account << "\", ";
+					ostFinal << "\"kpp\": \""					<< companiesList[i].kpp << "\", ";
+					ostFinal << "\"ogrn\": \""					<< companiesList[i].ogrn << "\", ";
+					ostFinal << "\"vat\": \""					<< companiesList[i].vat << "\", ";
+					ostFinal << "\"vat_calculation_type\": \""	<< companiesList[i].vat_calculation_type << "\", ";
+					ostFinal << "\"link\": \""					<< companiesList[i].link << "\", ";
+					ostFinal << "\"act_number_prefix\": \""		<< companiesList[i].act_number_prefix << "\", ";
+					ostFinal << "\"act_number\": \""			<< companiesList[i].act_number << "\", ";
+					ostFinal << "\"act_number_postfix\": \""	<< companiesList[i].act_number_postfix << "\", ";
+					ostFinal << "\"act_number_unique\": \"" 	<< companiesList[i].act_number_unique << "\", ";
+					ostFinal << "\"psow_number_unique\": \""	<< companiesList[i].psow_number_unique << "\", ";
+					ostFinal << "\"foundationDate\": \""		<< companiesList[i].foundationDate << "\",";
+					ostFinal << "\"numberOfEmployee\": \""		<< companiesList[i].numberOfEmployee << "\",";
+					ostFinal << "\"webSite\": \""				<< companiesList[i].webSite << "\",";
+					ostFinal << "\"description\": \""			<< companiesList[i].description << "\",";
+					ostFinal << "\"logo_folder\": \""			<< companiesList[i].logo_folder << "\",";
+					ostFinal << "\"logo_filename\": \""	   		<< companiesList[i].logo_filename << "\",";
+					ostFinal << "\"owners\": ["			   		<< (include_employees ? GetUserListInJSONFormat("SELECT * FROM `users` WHERE `id`=\"" + companiesList[i].admin_userID + "\";", db, user) : "") << "],";
+					ostFinal << "\"employees\": ["				<< (include_employees ? GetAgencyEmployeesInJSONFormat(companiesList[i].id, db, user) : "") << "],";
+					ostFinal << "\"custom_fields\":[" 			<< GetCompanyCustomFieldsInJSONFormat("SELECT * FROM `company_custom_fields` WHERE `company_id`=\"" + companiesList[i].id + "\" "
 																+	(
 																	user 
 																		? (user->GetType() == "subcontractor")
