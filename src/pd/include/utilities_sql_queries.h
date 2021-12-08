@@ -310,6 +310,25 @@ inline auto	Get_AgencyIDByUserID_sqlquery(const string &id)
 		);
 }
 
+inline auto	Get_SoWIDByPSoWID_sqlquery(const string &id)
+{
+	return (
+			"SELECT `contract_sow_id` FROM `contracts_psow` WHERE `id` IN ("
+				+ id +
+			")"
+		);
+
+}
+
+inline auto	Get_AgencyIDByPSoWID_sqlquery(const string &id)
+{
+	return (
+			"SELECT `agency_company_id` FROM `contracts_sow` WHERE `id` IN ("
+				+ Get_SoWIDByPSoWID_sqlquery(id) +
+			")"
+		);
+}
+
 inline auto Get_ActsIDBySubcCompanyID(const string &id)
 {
 	return (
@@ -357,5 +376,15 @@ inline auto Get_ActIDByBTInvoiceIDToCC(const string &id)
 			"SELECT `invoice_id` FROM `invoice_cost_center_bt` WHERE `id` IN (" + id + ")"
 		);
 }
+
+inline auto Get_PSoWNumberUniqueByPSoWID_sqlquery(const string &id)
+{
+	return (
+			"SELECT `psow_number_unique` FROM `company` WHERE `id` IN("
+				+ Get_AgencyIDByPSoWID_sqlquery(id) +
+			")"
+		);
+}
+
 
 #endif

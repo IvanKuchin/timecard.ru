@@ -1486,6 +1486,7 @@ int main(void)
 			(action == "AJAX_updateCompanyMailingZipID")			||
 			(action == "AJAX_updateCompanyLegalZipID")				||
 			(action == "AJAX_updateCompanyBankID")					||
+			(action == "AJAX_updatePSoWNumberUnique")				||
 			(action == "AJAX_updateExpenseTemplateTitle")			||
 			(action == "AJAX_updateExpenseTemplateTaxable")			||
 			(action == "AJAX_updateExpenseTemplateAgencyComment")	||

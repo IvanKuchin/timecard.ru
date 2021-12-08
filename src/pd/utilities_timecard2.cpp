@@ -956,6 +956,7 @@ auto	isActionEntityBelongsToSoW(string action, string id, string sow_id, CMysql 
 				if(action == "AJAX_deleteSoWCustomField")			sql_query = "SELECT `contract_sow_id` AS `sow_id` FROM `contract_sow_custom_fields` WHERE `id`=\"" + id + "\";";
 
 				if(action == "AJAX_updatePSoWNumber")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
+				if(action == "AJAX_updatePSoWNumberUnique")			sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
 				if(action == "AJAX_updatePSoWAct")					sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
 				if(action == "AJAX_updatePSoWPosition")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
 				if(action == "AJAX_updatePSoWDayRate")				sql_query = "SELECT \"" + sow_id + "\" AS `sow_id`;"; // --- fake request, always true
@@ -1792,16 +1793,29 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 					else if(action == "AJAX_updatePSoWBTMarkupType") { /* --- good to go */ }
 					else if(action == "AJAX_updatePSoWNumber")
 					{
-						if(db->Query("SELECT `id` FROM `contracts_psow` WHERE `number`=\"" + new_value + "\" AND `id`!=\"" + sow_id + "\" AND `cost_center_id`=(SELECT `cost_center_id` FROM `contracts_psow` WHERE `id`=\"" + sow_id + "\");"))
+						auto	psow_id							= sow_id;
+						auto	is_psow_number_must_be_unique	= GetValueFromDB(Get_PSoWNumberUniqueByPSoWID_sqlquery(psow_id), db);
+
+						if(is_psow_number_must_be_unique == "true")
 						{
-							error_message = gettext("PSoW number already exists");
-							MESSAGE_DEBUG("", "", "psow.number already exists in agency.id");
+							if(db->Query("SELECT `id` FROM `contracts_psow` WHERE `number`=\"" + new_value + "\" AND `id`!=\"" + psow_id + "\" AND `cost_center_id`=(SELECT `cost_center_id` FROM `contracts_psow` WHERE `id`=\"" + psow_id + "\");"))
+							{
+								error_message = gettext("PSoW number already exists");
+								MESSAGE_DEBUG("", "", "psow.number already exists in agency.id");
+							}
+							else
+							{
+								// --- good to go
+							}
 						}
 						else
 						{
-							// --- good to go
+							MESSAGE_DEBUG("", "", "PSoW numbers may repeat");
+							// -- good to go
 						}
+
 					}
+					else if(action == "AJAX_updatePSoWNumberUnique") { /* --- good to go */ }
 
 					// --- cost_center part
 					else if(action == "AJAX_updateCostCenterAct")						{ /* --- good to go */ }
@@ -2012,7 +2026,8 @@ string	isActionEntityBelongsToAgency(string action, string id, string agency_id,
 					(action == "AJAX_updateCompanyMailingAddress")		||
 					(action == "AJAX_updateCompanyMailingZipID")		||
 					(action == "AJAX_updateCompanyLegalZipID")			||
-					(action == "AJAX_updateCompanyBankID")
+					(action == "AJAX_updateCompanyBankID")				||
+					(action == "AJAX_updatePSoWNumberUnique")
 				)
 				{
 					sql_query = "SELECT `company_id` AS `agency_id` FROM `company_employees` WHERE "
@@ -2525,6 +2540,7 @@ auto	GetDBValueByAction(string action, string id, string sow_id, CMysql *db, CUs
 				if(action == "AJAX_updatePSoWEndDate")						sql_query = "SELECT `end_date`						FROM `contracts_psow` WHERE `id`=\"" + sow_id + "\";";
 				if(action == "AJAX_updatePSoWCustomField")					sql_query = "SELECT `value`							FROM `contract_psow_custom_fields` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_deletePSoWCustomField")					sql_query = "SELECT `var_name`						FROM `contract_psow_custom_fields` WHERE `id`=\"" + id + "\";";
+				if(action == "AJAX_updatePSoWNumberUnique")					sql_query = "SELECT `psow_number_unique`			FROM `company` WHERE `id`=\"" + id + "\";";
 
 				if(action == "AJAX_updateCostCenterNumber")					sql_query = "SELECT `number`						FROM `cost_centers` WHERE `id`=\"" + id + "\";";
 				if(action == "AJAX_updateCostCenterAct")					sql_query = "SELECT `act_number`					FROM `cost_centers` WHERE `id`=\"" + id + "\";";
@@ -4202,6 +4218,7 @@ string	SetNewValueByAction(string action, string id, string sow_id, string new_v
 						if(action == "AJAX_updatePSoWBTMarkup") {c_float num(new_value); sql_query = "UPDATE `contracts_psow` 		SET `bt_markup`		=\"" + string(num) + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sow_id + "\";"; }
 						if(action == "AJAX_updatePSoWWorkingHoursPerDay") 			sql_query = "UPDATE `contracts_psow` 			SET `working_hours_per_day`	=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sow_id + "\";";
 						if(action == "AJAX_updatePSoWBTMarkupType")					sql_query = "UPDATE `contracts_psow` 			SET `bt_markup_type`=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + sow_id + "\";";
+						if(action == "AJAX_updatePSoWNumberUnique")					sql_query = "UPDATE `company`					SET `psow_number_unique`=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
 
 						if(action == "AJAX_updateCostCenterCustomField")			sql_query = "UPDATE `cost_center_custom_fields` SET `value`			=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
 						if(action == "AJAX_updateCostCenterNumber")					sql_query = "UPDATE `cost_centers`				SET `number`		=\"" + new_value + "\",`eventTimestamp`=UNIX_TIMESTAMP() WHERE `id`=\"" + id + "\";";
@@ -5376,6 +5393,18 @@ static pair<string, string> GetNotificationDescriptionAndSoWQuery(string action,
 	if(action == "AJAX_updateCompanyBankID")
 	{
 		notification_description = "Данные компании: Изменился банк компании с " + GetSpelledBankByID(existing_value, db) + " на " + GetSpelledBankByID(new_value, db);
+		if(user->GetType() == "agency")
+			sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `agency_company_id`=\"" + id + "\";";
+		else if(user->GetType() == "subcontractor")
+			sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `subcontractor_company_id`=\"" + id + "\";";
+		else
+		{
+			MESSAGE_ERROR("", "", "there is no notification for user type(" + user->GetType() + ")")
+		}
+	}
+	if(action == "AJAX_updatePSoWNumberUnique")
+	{
+		notification_description = "Данные компании: Изменился уникальность PSoW компании с " + existing_value + " на " + new_value;
 		if(user->GetType() == "agency")
 			sql_query = "SELECT `id` AS `contract_sow_id` FROM `contracts_sow` WHERE `agency_company_id`=\"" + id + "\";";
 		else if(user->GetType() == "subcontractor")
