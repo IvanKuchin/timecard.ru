@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-21 23:08-0400\n"
+"POT-Creation-Date: 2021-12-24 20:15-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -473,9 +473,6 @@ msgstr ""
 msgid "VAT sum"
 msgstr "Сумма НДС"
 
-msgid "VAT title - Payment order number"
-msgstr "№ п/п"
-
 msgid "VAT title - Country"
 msgstr "Страна происхождения товара"
 
@@ -486,7 +483,9 @@ msgid "VAT title - Country name"
 msgstr "краткое наименование"
 
 msgid "VAT title - Custom number"
-msgstr "Регистрационный номер декларации на товары или регистрационный номер партии товара, подлежащего прослеживаемости"
+msgstr ""
+"Регистрационный номер декларации на товары или регистрационный номер партии "
+"товара, подлежащего прослеживаемости"
 
 msgid "VAT title - Excise"
 msgstr "В том числе сумма акциза"
@@ -507,6 +506,9 @@ msgstr "код"
 
 msgid "VAT title - Measure unit (name)"
 msgstr "условное обозначение (национальное)"
+
+msgid "VAT title - Payment order number"
+msgstr "№ п/п"
 
 msgid "VAT title - Price per unit"
 msgstr "Цена (тариф) за единицу измерения"
@@ -1209,6 +1211,12 @@ msgstr "шаблон не найден"
 msgid "temporary file doesn't exists"
 msgstr "временный фаил не найден"
 
+msgid "there are tasks that end after SoW end"
+msgstr "некоторые назначения заканчиваются позднее SoW"
+
+msgid "there are tasks that start before SoW start"
+msgstr "некоторые назначения начинаются раньше SoW"
+
 msgid "there was created more token than allowed"
 msgstr "создано больше токенов, чем разрешено"
 
@@ -1335,9 +1343,6 @@ msgstr "-- от --"
 msgid "vat_doc_accompany"
 msgstr "К платежно-расчетному документу № от"
 
-msgid "vat_shipping_doc"
-msgstr "Документ об отгрузке:"
-
 msgid "vat_header_1"
 msgstr "Приложение № 1"
 
@@ -1351,7 +1356,9 @@ msgid "vat_header_4"
 msgstr "от 26 декабря 2011г. № 1137"
 
 msgid "vat_header_5"
-msgstr "(в редакции постановления Правительства Российской Федерации от 2 апреля 2021 г. № 534)"
+msgstr ""
+"(в редакции постановления Правительства Российской Федерации от 2 апреля "
+"2021 г. № 534)"
 
 msgid "vat_header_TIN_KPP_buyer"
 msgstr "ИНН/КПП покупателя"
@@ -1361,6 +1368,9 @@ msgstr "ИНН/КПП продавца"
 
 msgid "vat_shipper_address"
 msgstr "Грузоотправитель и его адрес:"
+
+msgid "vat_shipping_doc"
+msgstr "Документ об отгрузке:"
 
 msgid "voucher content is empty"
 msgstr "содержимое ваучера пустое"
@@ -1400,6 +1410,9 @@ msgstr "Ваше подтверждение не требуется"
 
 msgid "za"
 msgstr "за"
+
+msgid "zip code must be a number"
+msgstr "индекс должен состоять из цифр"
 
 msgid "zip not found"
 msgstr "индекс не найден"

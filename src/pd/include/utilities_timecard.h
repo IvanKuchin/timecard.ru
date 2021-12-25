@@ -291,6 +291,8 @@ auto			isTimePeriodInsideSow(string sow_id, string period_start, string period_e
 auto 			DeleteServiceInvoicesSubcToAgency(string timecard_id, c_config *, CMysql *, CUser *)		-> string;
 auto			RecallTimecard(string timecard_id, string reason, c_config *,CMysql *, CUser *)				-> string;
 
+auto			isThereAreSowTasksOutsideOfDates(const string &sow_id, const string &sow_start, const string &sow_end, CMysql *) -> string;
+
 // --- IMPORTANT !!! 
 // --- MUST use VAT and Total payment functions functions instead of direct calculations
 auto			GetBaseCostFrom(c_float amount) -> c_float;

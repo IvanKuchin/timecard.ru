@@ -2428,3 +2428,38 @@ auto DeleteActFromDB(const string &id, CMysql *db) -> string
 	return error_message;
 }
 
+auto isThereAreSowTasksOutsideOfDates(const string &sow_id, const string &sow_start, const string &sow_end, CMysql *db) -> string
+{
+	MESSAGE_DEBUG("", "", "start");
+
+	auto	error_message = ""s;
+
+	if(error_message.empty())
+	{
+		auto	tasks_start_earlier = GetValuesFromDB("SELECT `timecard_tasks_id` FROM `timecard_task_assignment` WHERE `contract_sow_id`=\"" + sow_id + "\" AND `period_start` < \"" + sow_start + "\";", db);
+
+		if(tasks_start_earlier.size())
+		{
+			auto task_names = GetValuesFromDB("SELECT `title` FROM `timecard_tasks` WHERE `id` IN (" + join(tasks_start_earlier) + ")", db);
+
+			error_message = gettext("there are tasks that start before SoW start") + " ("s + join(task_names) + ")";
+		}
+	}
+
+	if(error_message.empty())
+	{
+		auto	tasks_finish_later = GetValuesFromDB("SELECT `timecard_tasks_id` FROM `timecard_task_assignment` WHERE `contract_sow_id`=\"" + sow_id + "\" AND `period_end` > \"" + sow_end + "\";", db);
+
+		if(tasks_finish_later.size())
+		{
+			auto task_names = GetValuesFromDB("SELECT `title` FROM `timecard_tasks` WHERE `id` IN (" + join(tasks_finish_later) + ")", db);
+
+			error_message = gettext("there are tasks that end after SoW end") + " ("s + join(task_names) + ")";
+		}
+	}
+	
+
+	MESSAGE_DEBUG("", "", "finish (error_message = " + error_message + ")");
+
+	return error_message;
+}

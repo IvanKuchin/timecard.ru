@@ -1417,40 +1417,57 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 					}
 					else if(action == "AJAX_updateSoWStartDate")
 					{
-						if(db->Query("SELECT `end_date` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";"))
+						if(db->Query("SELECT `status`, `end_date` FROM `contracts_sow` WHERE `id`=\"" + sow_id + "\";"))
 						{
-							auto		string_start = new_value;
-							auto		string_end = db->Get(0, "end_date");
-							auto		tm_start = GetTMObject(string_start);
-							auto		tm_end = GetTMObject(string_end);
+							auto		string_status	= db->Get(0, "status");
+							auto		string_end		= db->Get(0, "end_date");
 
-							if(tm_start <= tm_end)
+
+							if(string_status != "expired")
 							{
-								if(db->Query("SELECT `period_start`, `period_end` FROM `timecards` where `contract_sow_id`=\"" + sow_id + "\" ORDER BY `period_start` ASC LIMIT 0,1;"))
-								{
-									auto	string_timecard_report_date = db->Get(0, "period_start");
-									auto	tm_timecard_report_date = GetTMObject(string_timecard_report_date);
 
-									if(tm_start <= tm_timecard_report_date)
+								auto		string_start	= new_value;
+								auto		tm_start		= GetTMObject(string_start);
+								auto		tm_end			= GetTMObject(string_end);
+
+								if(tm_start <= tm_end)
+								{
+									if(db->Query("SELECT `period_start`, `period_end` FROM `timecards` where `contract_sow_id`=\"" + sow_id + "\" ORDER BY `period_start` ASC LIMIT 0,1;"))
 									{
-										// --- good to go
+										auto	string_timecard_report_date = db->Get(0, "period_start");
+										auto	tm_timecard_report_date = GetTMObject(string_timecard_report_date);
+
+										if(tm_start <= tm_timecard_report_date)
+										{
+											// --- good to go
+										}
+										else
+										{
+											error_message = gettext("Subcontractor reported time on") + " "s + PrintDate(tm_timecard_report_date);
+											MESSAGE_DEBUG("", "", "Subcontractor reported time on " + PrintDate(tm_timecard_report_date) + " earlier than SoW start " + PrintDate(tm_start));
+										}
 									}
 									else
 									{
-										error_message = gettext("Subcontractor reported time on") + " "s + PrintDate(tm_timecard_report_date);
-										MESSAGE_DEBUG("", "", "Subcontractor reported time on " + PrintDate(tm_timecard_report_date) + " earlier than SoW start " + PrintDate(tm_start));
+										// --- good to go
+										MESSAGE_DEBUG("", "", "No timecards subcontractor reported time on this SoW start ");
+									}
+
+									if(error_message.empty())
+									{
+										error_message = isThereAreSowTasksOutsideOfDates(sow_id, PrintSQLDate(tm_start), PrintSQLDate(tm_end), db);
 									}
 								}
 								else
 								{
-									// --- good to go
-									MESSAGE_DEBUG("", "", "No timecards subcontractor reported time on this SoW start ");
+									error_message = gettext("period start have to precede period end") + " ("s + string_start + " - " +  string_end + ")";
+									MESSAGE_DEBUG("", "", "period start have to precede period end (" + string_start + " - " + string_end + ")");
 								}
 							}
 							else
 							{
-								error_message = gettext("period start have to precede period end") + " ("s + string_start + " - " +  string_end + ")";
-								MESSAGE_DEBUG("", "", "period start have to precede period end (" + string_start + " - " + string_end + ")");
+								error_message = gettext("contract already expired") + ", "s + gettext("changes prohibited") + ". ";
+								MESSAGE_DEBUG("", "", error_message);
 							}
 						}
 						else
@@ -1496,6 +1513,11 @@ string	CheckNewValueByAction(string action, string id, string sow_id, string new
 									{
 										// --- good to go
 										MESSAGE_DEBUG("", "", "No timecards subcontractor reported time on this SoW start ");
+									}
+
+									if(error_message.empty())
+									{
+										error_message = isThereAreSowTasksOutsideOfDates(sow_id, PrintSQLDate(tm_start), PrintSQLDate(tm_end), db);
 									}
 								}
 								else
