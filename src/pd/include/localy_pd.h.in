@@ -5,7 +5,7 @@
 
 #define ARCHIVE_FILE_EXTENSION			".zip"s
 
-#define CONTRACTS_SOW_PER_PAGE        	5
+#define CONTRACTS_SOW_PER_PAGE        	20
 #define HOLIDAY_RANGE_FROM_TODAY        31	// --- +/- days to look for holidays
 #define SOW_EXPIRATION_BUFFER			31	// --- +   days to look one SoW expired
 
