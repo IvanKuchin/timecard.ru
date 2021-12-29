@@ -1088,7 +1088,7 @@ int main(void)
 																				+ "`agency_company_id`=\"" + agency_id + "\" "
 																				+ (limit_page.length() ? " ORDER BY `end_date` DESC, `id` DESC LIMIT " + to_string(stol(limit_page) * CONTRACTS_SOW_PER_PAGE) + "," + to_string(CONTRACTS_SOW_PER_PAGE) : "")
 																			    + ";", &db);
-						auto		sow_ids					= (join(_sow_ids) == "" ? "\"\"" : join(_sow_ids)); // --- trick to make SQL-query with empty list successfull
+						auto		sow_ids					= (join(_sow_ids) == "" ? "\"\"" : join(_sow_ids)); // --- trick to make SQL-query with empty list successful
 
 						ostResult << "{"
 										"\"result\":\"success\","
