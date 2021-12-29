@@ -1068,6 +1068,8 @@ int main(void)
 				bool			include_cost_centers 	= indexPage.GetVarsHandler()->Get("include_cost_centers") == "true";
 				auto			sow_id 					= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("sow_id"));
 
+				auto			limit_page				= CheckHTTPParam_Number(indexPage.GetVarsHandler()->Get("page"));
+
 				auto			date					= CheckHTTPParam_Date(indexPage.GetVarsHandler()->Get("date"));
 				auto			date_filter				= date.length() ? Get_SoWDateFilter_sqlquery(PrintSQLDate(GetTMObject(date))) + " AND " : "";
 
@@ -1075,36 +1077,27 @@ int main(void)
 
 				if(user.GetType() == "agency")
 				{
-					if(db.Query("SELECT `id` FROM `company` WHERE `type`=\"agency\" AND `id`=(" + Get_CompanyIDByCompanyEmployeeUserID_sqlquery(user.GetID()) + ");"))
+					auto		agency_id				= GetValueFromDB(Get_AgencyIDByUserID_sqlquery(user.GetID()), &db);
+
+					if(agency_id.length())
 					{
 						auto		include_subc_company	= true;
-						auto		agency_id				= db.Get(0, "id");
+						auto		_sow_ids				= GetValuesFromDB("SELECT `id` FROM `contracts_sow` WHERE"
+																				+ (sow_id.length() ? string("`id`=\"" + sow_id + "\" AND ") : "")
+																				+ date_filter 
+																				+ "`agency_company_id`=\"" + agency_id + "\" "
+																				+ (limit_page.length() ? " ORDER BY `end_date` DESC, `id` DESC LIMIT " + to_string(stol(limit_page) * CONTRACTS_SOW_PER_PAGE) + "," + to_string(CONTRACTS_SOW_PER_PAGE) : "")
+																			    + ";", &db);
+						auto		sow_ids					= (join(_sow_ids) == "" ? "\"\"" : join(_sow_ids)); // --- trick to make SQL-query with empty list successfull
 
 						ostResult << "{"
 										"\"result\":\"success\","
-										"\"sow\":[" << GetSOWInJSONFormat(
-												"SELECT * FROM `contracts_sow` WHERE "
-													+ (sow_id.length() ? string("`id`=\"" + sow_id + "\" AND ") : "")
-													+ date_filter + 
-													"`agency_company_id`=\"" + agency_id + "\" "
-												";", &db, &user, include_tasks, include_bt, include_cost_centers, include_subc_company) << "]";
+										"\"sow\":[" << GetSOWInJSONFormat("SELECT * FROM `contracts_sow` WHERE `id` IN (" + sow_ids + ");", &db, &user, include_tasks, include_bt, include_cost_centers, include_subc_company) << "]";
 
 						if(include_tasks)
-							ostResult <<	","
-											"\"task_assignments\":[" << GetTimecardTaskAssignmentInJSONFormat(
-													"SELECT * FROM `timecard_task_assignment` WHERE "
-														+ (sow_id.length() ? string("`contract_sow_id`=\"" + sow_id + "\" AND ") : "") +
-														"`contract_sow_id` IN (SELECT `id` FROM `contracts_sow` WHERE "
-															"`agency_company_id`=\"" + agency_id + "\" "
-													");", &db, &user) << "]";
+							ostResult <<	",\"task_assignments\":[" << GetTimecardTaskAssignmentInJSONFormat("SELECT * FROM `timecard_task_assignment` WHERE `contract_sow_id` IN (" + sow_ids + ");", &db, &user) << "]";
 						if(include_bt)
-							ostResult <<	","
-											"\"bt_expense_assignments\":[" << GetBTExpenseAssignmentInJSONFormat(
-													"SELECT * FROM `bt_sow_assignment` WHERE "
-														+ (sow_id.length() ? string("`sow_id`=\"" + sow_id + "\" AND ") : "") +
-														"`sow_id` IN (SELECT `id` FROM `contracts_sow` WHERE "
-															"`agency_company_id`=\"" + agency_id + "\" "
-													");", &db, &user) << "]";
+							ostResult <<	",\"bt_expense_assignments\":[" << GetBTExpenseAssignmentInJSONFormat("SELECT * FROM `bt_sow_assignment` WHERE `sow_id` IN (" + sow_ids + ");", &db, &user) << "]";
 						ostResult << "}";
 					}
 					else
