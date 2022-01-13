@@ -17,6 +17,7 @@ name: QA testing
 #######################################
 on:
   push:
+    branches: ['development']
   pull_request:
     branches: ['master']
 
