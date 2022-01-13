@@ -17,9 +17,9 @@ name: QA testing
 #######################################
 on:
   push:
-    branches: ['development']
   pull_request:
     branches: ['master']
+    types: [opened, reopened, synchronize]
 
 ###############
 # Set the Job #
