@@ -11,6 +11,7 @@ name: SAST
 #######################################
 on:
   push:
+    branches-ignore: [master]
   pull_request:
     branches: ['master']
     types: [opened, reopened, synchronize]
