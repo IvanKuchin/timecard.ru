@@ -4024,7 +4024,8 @@ string	GetBTsInJSONFormat(string sqlQuery, CMysql *db, CUser *user, bool isExten
 			if(isExtended)
 			{
 				result += "\"customers\":[" + GetCustomersInJSONFormat("SELECT * FROM `timecard_customers` WHERE `id`=\"" + item.customer_id + "\";", db, user) + "],";
-				result += "\"sow\":[" + GetSOWInJSONFormat("SELECT * FROM `contracts_sow` WHERE `id`=\"" + item.contract_sow_id + "\";", db, user, INCLUDE_TIMECARD_TASKS, INCLUDE_BT_EXPENSE_TEMPLATES) + "],";
+				// --- INCLUDE_SUBC_COMPANY required only for Invoicing -> BT-s -> open collapsible of a single BT -> company name
+				result += "\"sow\":[" + GetSOWInJSONFormat("SELECT * FROM `contracts_sow` WHERE `id`=\"" + item.contract_sow_id + "\";", db, user, INCLUDE_TIMECARD_TASKS, INCLUDE_BT_EXPENSE_TEMPLATES, DO_NOT_INCLUDE_COST_CENTER, INCLUDE_SUBC_COMPANY) + "],";
 				result += "\"expenses\":[" + GetBTExpensesInJSONFormat("SELECT * FROM `bt_expenses` WHERE `bt_id`=\"" + item.id + "\";", db, user) + "],";
 				result += "\"approvers\":[" + GetApproversInJSONFormat("SELECT * FROM `bt_approvers` WHERE `contract_psow_id` IN (SELECT DISTINCT(`id`) FROM `contracts_psow` WHERE `contract_sow_id`=\"" + item.contract_sow_id + "\");", db, user, DO_NOT_INCLUDE_PSOW_INFO) + "],";
 				result += "\"approvals\":[" + GetBTApprovalsInJSONFormat("SELECT * FROM `bt_approvals` WHERE `bt_id`=\"" + item.id + "\";", db, user) + "],";

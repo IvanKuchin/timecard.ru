@@ -25,6 +25,10 @@
 #define	DO_NOT_INCLUDE_TIMECARDS					false
 #define	INCLUDE_TIMECARD_TASKS						true
 #define	DO_NOT_INCLUDE_TIMECARD_TASKS				false
+#define INCLUDE_COST_CENTER							true
+#define DO_NOT_INCLUDE_COST_CENTER					false
+#define INCLUDE_SUBC_COMPANY						true
+#define DO_NOT_INCLUDE_SUBC_COMPANY					false
 
 
 // --- notification types
