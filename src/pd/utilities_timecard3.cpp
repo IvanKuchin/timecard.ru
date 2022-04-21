@@ -743,10 +743,10 @@ static auto __GetBTList(const string &sow_where_statement, const string &sow_lim
 	auto	sow_ids			= GetValuesFromDB(sow_statement, db);
 
 	return 
-		"\"sow\":[" + (sow_ids.size() ? GetSOWInJSONFormat("SELECT * FROM `contracts_sow` WHERE `id` IN (" + join(sow_ids, ",") + ");", db, user, true, false, false, true)
+		"\"sow\":[" + (sow_ids.size()	? GetSOWInJSONFormat("SELECT * FROM `contracts_sow` WHERE `id` IN (" + join(sow_ids, ",") + ");", db, user, true, false, false, true)
 										: "") 
 				+ "],"
-		"\"bt\":["  + (sow_ids.size() ? GetBTsInJSONFormat(
+		"\"bt\":["  + (sow_ids.size()	? GetBTsInJSONFormat(
 										"SELECT * FROM `bt` WHERE "
 											"`contract_sow_id` IN (" + join(sow_ids, ",") + ")"
 											+ bt_where_statement +
@@ -797,15 +797,20 @@ static auto __GetTimecardList(const string &sow_where_statement, const string &s
 	auto	sow_ids			= GetValuesFromDB(sow_statement, db);
 
 	return 
-		"\"sow\":[" + (sow_ids.size() ? GetSOWInJSONFormat("SELECT * FROM `contracts_sow` WHERE `id` IN (" + join(sow_ids, ",") + ");", db, user, false, false, false, true) : "") + "],"
-		"\"timecards\":[" + (sow_ids.size() ? 
-			GetTimecardsInJSONFormat(
-				"SELECT * FROM `timecards` WHERE "
-					"`contract_sow_id` IN (" + join(sow_ids, ",") + ")"
-					+ timecard_where_statement +
-				";", db, user) 
-			: "") + "],"
-		"\"holiday_calendar\":[" + (sow_ids.size() ? GetHolidayCalendarInJSONFormat("SELECT * FROM `holiday_calendar` WHERE `agency_company_id` IN (SELECT `agency_company_id` FROM `contracts_sow` WHERE " + sow_where_statement + ");", db, user) : "") + "]"
+		"\"sow\":["			+ (sow_ids.size()	? GetSOWInJSONFormat("SELECT * FROM `contracts_sow` WHERE `id` IN (" + join(sow_ids, ",") + ");", db, user, false, false, false, true) 
+												: "") 
+				+ "],"
+		"\"timecards\":[" 	+ (sow_ids.size()	? 
+												GetTimecardsInJSONFormat(
+													"SELECT * FROM `timecards` WHERE "
+														"`contract_sow_id` IN (" + join(sow_ids, ",") + ")"
+														+ timecard_where_statement +
+													";", db, user) 
+												: "") 
+				+ "],"
+		"\"holiday_calendar\":[" + (sow_ids.size()	? GetHolidayCalendarInJSONFormat("SELECT * FROM `holiday_calendar` WHERE `agency_company_id` IN (SELECT `agency_company_id` FROM `contracts_sow` WHERE " + sow_where_statement + ");", db, user) 
+													: "") 
+				+ "]"
 		;
 }
 
