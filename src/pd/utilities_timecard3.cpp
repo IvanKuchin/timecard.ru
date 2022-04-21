@@ -743,12 +743,16 @@ static auto __GetBTList(const string &sow_where_statement, const string &sow_lim
 	auto	sow_ids			= GetValuesFromDB(sow_statement, db);
 
 	return 
-		"\"sow\":[" + GetSOWInJSONFormat("SELECT * FROM `contracts_sow` WHERE `id` IN (" + join(sow_ids, ",") + ");", db, user, true, false, false, true) + "],"
-		"\"bt\":[" + GetBTsInJSONFormat(
-				"SELECT * FROM `bt` WHERE "
-					"`contract_sow_id` IN (" + join(sow_ids, ",") + ")"
-					+ bt_where_statement +
-				";", db, user, isExtended) + "]"
+		"\"sow\":[" + (sow_ids.size() ? GetSOWInJSONFormat("SELECT * FROM `contracts_sow` WHERE `id` IN (" + join(sow_ids, ",") + ");", db, user, true, false, false, true)
+										: "") 
+				+ "],"
+		"\"bt\":["  + (sow_ids.size() ? GetBTsInJSONFormat(
+										"SELECT * FROM `bt` WHERE "
+											"`contract_sow_id` IN (" + join(sow_ids, ",") + ")"
+											+ bt_where_statement +
+										";", db, user, isExtended)
+										: "")
+				+ "]"
 		;
 }
 
