@@ -26,7 +26,7 @@ int main(void)
 		indexPage.ParseURL();
 		indexPage.AddCookie("lng", "ru", nullptr, "", "/");
 
-		if(!indexPage.SetTemplate("index.htmlt"))
+		if(!indexPage.SetProdTemplate("index.htmlt"))
 		{
 			MESSAGE_ERROR("", action, "template file was missing");
 			throw CException("Template file was missing");
@@ -75,7 +75,7 @@ int main(void)
 			{
 				string		template_name = action.substr(0, action.length() - 9) + ".htmlt";
 
-				if(!indexPage.SetTemplate(template_name))
+				if(!indexPage.SetProdTemplate(template_name))
 				{
 					MESSAGE_ERROR("", action, "can't find template " + template_name);
 				}
@@ -131,7 +131,7 @@ int main(void)
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
-				if(!indexPage.SetTemplate(template_name))
+				if(!indexPage.SetProdTemplate(template_name))
 				{
 					MESSAGE_ERROR("", action, "can't find template " + template_name);
 				}
@@ -183,7 +183,7 @@ int main(void)
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
 
-			if(!indexPage.SetTemplate(template_name))
+			if(!indexPage.SetProdTemplate(template_name))
 			{
 				MESSAGE_ERROR("", action, "can't find template " + template_name);
 			}
@@ -310,7 +310,7 @@ int main(void)
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
-				if(!indexPage.SetTemplate(template_name))
+				if(!indexPage.SetProdTemplate(template_name))
 				{
 					MESSAGE_ERROR("", action, "can't find template " + template_name);
 				}
@@ -818,7 +818,7 @@ int main(void)
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
-				if(!indexPage.SetTemplate(template_name))
+				if(!indexPage.SetProdTemplate(template_name))
 				{
 					MESSAGE_ERROR("", action, "can't find template " + template_name);
 				}
@@ -896,7 +896,7 @@ int main(void)
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
-				if(!indexPage.SetTemplate(template_name))
+				if(!indexPage.SetProdTemplate(template_name))
 				{
 					MESSAGE_ERROR("", action, "can't find template " + template_name);
 				}
@@ -945,7 +945,7 @@ int main(void)
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
-				if(!indexPage.SetTemplate(template_name))
+				if(!indexPage.SetProdTemplate(template_name))
 				{
 					MESSAGE_ERROR("", action, "can't find template " + template_name);
 				}
@@ -994,7 +994,7 @@ int main(void)
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
-				if(!indexPage.SetTemplate(template_name))
+				if(!indexPage.SetProdTemplate(template_name))
 				{
 					MESSAGE_ERROR("", action, "can't find template " + template_name);
 				}
@@ -1043,7 +1043,7 @@ int main(void)
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
-				if(!indexPage.SetTemplate(template_name))
+				if(!indexPage.SetProdTemplate(template_name))
 				{
 					MESSAGE_ERROR("", action, "can't find template " + template_name);
 				}
@@ -1124,7 +1124,7 @@ int main(void)
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
-				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+				if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
@@ -1180,7 +1180,7 @@ int main(void)
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
-				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+				if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
@@ -1316,7 +1316,7 @@ int main(void)
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
-				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+				if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
@@ -1449,7 +1449,7 @@ int main(void)
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
-				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+				if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
@@ -1943,7 +1943,7 @@ int main(void)
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
-				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+				if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
@@ -2044,7 +2044,7 @@ int main(void)
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
-				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+				if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
@@ -2240,7 +2240,7 @@ int main(void)
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
-				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+				if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
@@ -2334,7 +2334,7 @@ int main(void)
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
-				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+				if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
@@ -2459,7 +2459,7 @@ int main(void)
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
-				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+				if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
@@ -2552,7 +2552,7 @@ int main(void)
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
-				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+				if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
@@ -2645,7 +2645,7 @@ int main(void)
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
-				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+				if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
@@ -2765,7 +2765,7 @@ int main(void)
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
-				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+				if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
@@ -2852,7 +2852,7 @@ int main(void)
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
-				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+				if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
@@ -2938,7 +2938,7 @@ int main(void)
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
-				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+				if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
@@ -3014,7 +3014,7 @@ int main(void)
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
-				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+				if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
@@ -3096,7 +3096,7 @@ int main(void)
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
-				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+				if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
@@ -3177,7 +3177,7 @@ int main(void)
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
-				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+				if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
@@ -3258,7 +3258,7 @@ int main(void)
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
-				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+				if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
@@ -3384,7 +3384,7 @@ int main(void)
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
-				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+				if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
@@ -3511,7 +3511,7 @@ int main(void)
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
-				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+				if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
@@ -3561,7 +3561,7 @@ int main(void)
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
-				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+				if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
@@ -3658,7 +3658,7 @@ int main(void)
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
-				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+				if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
@@ -3706,7 +3706,7 @@ int main(void)
 
 			indexPage.RegisterVariableForce("result", "[" + success_message + "]");
 
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 		}
 
 		if(action == "AJAX_getUnemployedAgentAutocompleteList")
@@ -3766,7 +3766,7 @@ int main(void)
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
 
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 		}
 
 		if(action == "AJAX_addNewEmployee")
@@ -3865,7 +3865,7 @@ int main(void)
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
 
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 		}
 
 		if(	action == "AJAX_addTimecardApproverToPSoW" ||
@@ -4081,7 +4081,7 @@ int main(void)
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
-				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+				if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
@@ -4135,7 +4135,7 @@ int main(void)
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
-				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+				if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
@@ -4198,7 +4198,7 @@ int main(void)
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
-				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+				if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
@@ -4252,7 +4252,7 @@ int main(void)
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
-				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+				if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
@@ -4305,7 +4305,7 @@ int main(void)
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
-				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+				if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
@@ -4362,7 +4362,7 @@ int main(void)
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
-				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+				if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
@@ -4418,7 +4418,7 @@ int main(void)
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
-				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+				if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
@@ -4487,7 +4487,7 @@ int main(void)
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
-				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+				if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
@@ -4552,7 +4552,7 @@ int main(void)
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
-				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+				if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
@@ -4606,7 +4606,7 @@ int main(void)
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
 
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 		}
 
 		if(action == "AJAX_addSoW")
@@ -4716,7 +4716,7 @@ int main(void)
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
 
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 		}
 
 		if(action == "AJAX_deleteSoW")
@@ -4843,7 +4843,7 @@ int main(void)
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
 
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 		}
 
 		if(action == "AJAX_getTemplateAgreementFiles")
@@ -4910,7 +4910,7 @@ int main(void)
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
 
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 		}
 
 		if(action == "AJAX_addTemplateAgreementFile")
@@ -5026,7 +5026,7 @@ int main(void)
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
 
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 		}
 
 		if(
@@ -5137,7 +5137,7 @@ int main(void)
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
-				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+				if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
@@ -5263,7 +5263,7 @@ int main(void)
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
-				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+				if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
@@ -5435,7 +5435,7 @@ int main(void)
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
-				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+				if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
@@ -5958,7 +5958,7 @@ int main(void)
 
 		MESSAGE_DEBUG("", action, "catch CExceptionHTML: DEBUG exception reason: [" + c.GetReason() + "]");
 
-		if(!indexPage.SetTemplate(c.GetTemplate()))
+		if(!indexPage.SetProdTemplate(c.GetTemplate()))
 		{
 			MESSAGE_ERROR("", "", "template (" + c.GetTemplate() + ") not found");
 			return(-1);

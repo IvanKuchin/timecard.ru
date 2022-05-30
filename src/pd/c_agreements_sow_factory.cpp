@@ -76,7 +76,7 @@ auto C_Agreements_SoW_Factory::GenerateDocumentArchive() -> string
 					++i;
 				} while(isFileExists(output_filename));
 
-				template2pdf_printer.SetTemplate(agreement.GetFilename());
+				template2pdf_printer.SetProdTemplate(agreement.GetFilename());
 				template2pdf_printer.SetFilename(output_filename);
 
 				if((error_message = template2pdf_printer.RenderTemplate()).length())
