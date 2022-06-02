@@ -26,7 +26,7 @@ int main()
 		indexPage.ParseURL();
 		indexPage.AddCookie("lng", "ru", "", "", "/");
 
-		if(!indexPage.SetTemplate("index.htmlt"))
+		if(!indexPage.SetProdTemplate("index.htmlt"))
 		{
 			CLog	log;
 
@@ -351,7 +351,7 @@ int main()
 			if(id.length()) indexPage.RegisterVariableForce("id", id);
 			if(link.length()) indexPage.RegisterVariableForce("link", link);
 
-			if(!indexPage.SetTemplate("view_company_profile.htmlt"))
+			if(!indexPage.SetProdTemplate("view_company_profile.htmlt"))
 			{
 				CLog	log;
 
@@ -422,12 +422,12 @@ int main()
 	        											"\"feed\":[" + result + "]"
 	        											"}");
 
-	        if(!indexPage.SetTemplate("json_response.htmlt"))
+	        if(!indexPage.SetProdTemplate("json_response.htmlt"))
 	        {
 	            CLog    log;
 	            log.Write(ERROR, string(__func__) + string("[") + to_string(__LINE__) + "]: action == AJAX_getCompanyWall:ERROR: can't find template json_response.htmlt");
 	            throw CExceptionHTML("company not activated");
-	        } // if(!indexPage.SetTemplate("json_response.htmlt"))
+	        } // if(!indexPage.SetProdTemplate("json_response.htmlt"))
 	    }
 
 		if(action == "JSON_getCompanyProfile")
@@ -475,13 +475,13 @@ int main()
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
 
-			if(!indexPage.SetTemplate("json_response.htmlt"))
+			if(!indexPage.SetProdTemplate("json_response.htmlt"))
 			{
 				CLog	log;
 
 				log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: template file json_response.htmlt was missing");
 				throw CException("Template file json_response.htmlt was missing");
-			}  // if(!indexPage.SetTemplate("AJAX_precreateNewOpenVacancy.htmlt"))
+			}  // if(!indexPage.SetProdTemplate("AJAX_precreateNewOpenVacancy.htmlt"))
 
 			{
 				CLog	log;
@@ -541,13 +541,13 @@ int main()
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
 
-			if(!indexPage.SetTemplate("json_response.htmlt"))
+			if(!indexPage.SetProdTemplate("json_response.htmlt"))
 			{
 				CLog	log;
 
 				log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: template file json_response.htmlt was missing");
 				throw CException("Template file json_response.htmlt was missing");
-			}  // if(!indexPage.SetTemplate("AJAX_precreateNewOpenVacancy.htmlt"))
+			}  // if(!indexPage.SetProdTemplate("AJAX_precreateNewOpenVacancy.htmlt"))
 
 			{
 				CLog	log;
@@ -627,13 +627,13 @@ int main()
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
 
-			if(!indexPage.SetTemplate("json_response.htmlt"))
+			if(!indexPage.SetProdTemplate("json_response.htmlt"))
 			{
 				CLog	log;
 
 				log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: template file json_response.htmlt was missing");
 				throw CException("Template file json_response.htmlt was missing");
-			}  // if(!indexPage.SetTemplate("AJAX_precreateNewOpenVacancy.htmlt"))
+			}  // if(!indexPage.SetProdTemplate("AJAX_precreateNewOpenVacancy.htmlt"))
 
 			{
 				CLog	log;
@@ -1074,13 +1074,13 @@ int main()
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
 
-			if(!indexPage.SetTemplate("json_response.htmlt"))
+			if(!indexPage.SetProdTemplate("json_response.htmlt"))
 			{
 				CLog	log;
 
 				log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: template file json_response.htmlt was missing");
 				throw CException("Template file json_response.htmlt was missing");
-			}  // if(!indexPage.SetTemplate("AJAX_precreateNewOpenVacancy.htmlt"))
+			}  // if(!indexPage.SetProdTemplate("AJAX_precreateNewOpenVacancy.htmlt"))
 
 			{
 				CLog	log;
@@ -1210,13 +1210,13 @@ int main()
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
 
-			if(!indexPage.SetTemplate("json_response.htmlt"))
+			if(!indexPage.SetProdTemplate("json_response.htmlt"))
 			{
 				CLog	log;
 
 				log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: template file json_response.htmlt was missing");
 				throw CException("Template file json_response.htmlt was missing");
-			}  // if(!indexPage.SetTemplate("AJAX_rejectCandidate.htmlt"))
+			}  // if(!indexPage.SetProdTemplate("AJAX_rejectCandidate.htmlt"))
 
 			{
 				CLog	log;
@@ -1295,13 +1295,13 @@ int main()
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
 
-			if(!indexPage.SetTemplate("json_response.htmlt"))
+			if(!indexPage.SetProdTemplate("json_response.htmlt"))
 			{
 				CLog	log;
 
 				log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: template file json_response.htmlt was missing");
 				throw CException("Template file json_response.htmlt was missing");
-			}  // if(!indexPage.SetTemplate("AJAX_getCandidatesAppliedToPosition.htmlt"))
+			}  // if(!indexPage.SetProdTemplate("AJAX_getCandidatesAppliedToPosition.htmlt"))
 
 			{
 				CLog	log;
@@ -1344,13 +1344,13 @@ int main()
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
 
-			if(!indexPage.SetTemplate("json_response.htmlt"))
+			if(!indexPage.SetProdTemplate("json_response.htmlt"))
 			{
 				CLog	log;
 
 				log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: template file json_response.htmlt was missing");
 				throw CException("Template file json_response.htmlt was missing");
-			}  // if(!indexPage.SetTemplate("AJAX_amIAppliedToVacancy.htmlt"))
+			}  // if(!indexPage.SetProdTemplate("AJAX_amIAppliedToVacancy.htmlt"))
 
 			{
 				CLog	log;
@@ -1799,13 +1799,13 @@ int main()
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
 
-			if(!indexPage.SetTemplate("json_response.htmlt"))
+			if(!indexPage.SetProdTemplate("json_response.htmlt"))
 			{
 				CLog	log;
 
 				log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: template file json_response.htmlt was missing");
 				throw CException("Template file json_response.htmlt was missing");
-			}  // if(!indexPage.SetTemplate("AJAX_updateOpenVacancy.htmlt"))
+			}  // if(!indexPage.SetProdTemplate("AJAX_updateOpenVacancy.htmlt"))
 
 			{
 				CLog	log;
@@ -1964,13 +1964,13 @@ int main()
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
 
-			if(!indexPage.SetTemplate("json_response.htmlt"))
+			if(!indexPage.SetProdTemplate("json_response.htmlt"))
 			{
 				CLog	log;
 
 				log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]:ERROR: template file json_response.htmlt was missing");
 				throw CException("Template file json_response.htmlt was missing");
-			}  // if(!indexPage.SetTemplate("AJAX_applyToVacancy.htmlt"))
+			}  // if(!indexPage.SetProdTemplate("AJAX_applyToVacancy.htmlt"))
 
 			{
 				CLog	log;
@@ -2072,12 +2072,12 @@ int main()
 			}
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
-			if(!indexPage.SetTemplate("json_response.htmlt"))
+			if(!indexPage.SetProdTemplate("json_response.htmlt"))
 			{
 				CLog	log;
 				log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]: action == AJAX_companyTakeOwnership:ERROR: can't find template json_response.htmlt");
 				throw CExceptionHTML("user not activated");
-			} // if(!indexPage.SetTemplate("AJAX_getNewsFeed.htmlt"))
+			} // if(!indexPage.SetProdTemplate("AJAX_getNewsFeed.htmlt"))
 
 			{
 				CLog	log;
@@ -2217,12 +2217,12 @@ int main()
 			}
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
-			if(!indexPage.SetTemplate("json_response.htmlt"))
+			if(!indexPage.SetProdTemplate("json_response.htmlt"))
 			{
 				CLog	log;
 				log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]: action == AJAX_companyPossessionRequest:ERROR: can't find template json_response.htmlt");
 				throw CExceptionHTML("user not activated");
-			} // if(!indexPage.SetTemplate("AJAX_getNewsFeed.htmlt"))
+			} // if(!indexPage.SetProdTemplate("AJAX_getNewsFeed.htmlt"))
 
 			{
 				CLog	log;
@@ -2383,12 +2383,12 @@ int main()
 			}
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
-			if(!indexPage.SetTemplate("json_response.htmlt"))
+			if(!indexPage.SetProdTemplate("json_response.htmlt"))
 			{
 				CLog	log;
 				log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]: action == AJAX_grantPossessionRequest:ERROR: can't find template json_response.htmlt");
 				throw CExceptionHTML("user not activated");
-			} // if(!indexPage.SetTemplate("AJAX_getNewsFeed.htmlt"))
+			} // if(!indexPage.SetProdTemplate("AJAX_getNewsFeed.htmlt"))
 
 			{
 				CLog	log;
@@ -2458,12 +2458,12 @@ int main()
 			}
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
-			if(!indexPage.SetTemplate("json_response.htmlt"))
+			if(!indexPage.SetProdTemplate("json_response.htmlt"))
 			{
 				CLog	log;
 				log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]: action == AJAX_dropCompanyPossession:ERROR: can't find template json_response.htmlt");
 				throw CExceptionHTML("user not activated");
-			} // if(!indexPage.SetTemplate("AJAX_getNewsFeed.htmlt"))
+			} // if(!indexPage.SetProdTemplate("AJAX_getNewsFeed.htmlt"))
 
 			{
 				CLog	log;
@@ -2616,12 +2616,12 @@ int main()
 			}
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
-			if(!indexPage.SetTemplate("json_response.htmlt"))
+			if(!indexPage.SetProdTemplate("json_response.htmlt"))
 			{
 				CLog	log;
 				log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]: action == AJAX_rejectPossessionRequest:ERROR: can't find template json_response.htmlt");
 				throw CExceptionHTML("user not activated");
-			} // if(!indexPage.SetTemplate("AJAX_getNewsFeed.htmlt"))
+			} // if(!indexPage.SetProdTemplate("AJAX_getNewsFeed.htmlt"))
 
 			{
 				CLog	log;
@@ -2693,7 +2693,7 @@ int main()
 
 			indexPage.RegisterVariableForce("result", ostFinal.str());
 
-			if(!indexPage.SetTemplate("json_response.htmlt"))
+			if(!indexPage.SetProdTemplate("json_response.htmlt"))
 			{
 				CLog	log;
 
@@ -2738,12 +2738,12 @@ int main()
 			}
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
-			if(!indexPage.SetTemplate("json_response.htmlt"))
+			if(!indexPage.SetProdTemplate("json_response.htmlt"))
 			{
 				CLog	log;
 				log.Write(ERROR, string(__func__) + "[" + to_string(__LINE__) + "]: action == AJAX_SubscribeOnCompany:ERROR: can't find template json_response.htmlt");
 				throw CExceptionHTML("user not activated");
-			} // if(!indexPage.SetTemplate("AJAX_getNewsFeed.htmlt"))
+			} // if(!indexPage.SetProdTemplate("AJAX_getNewsFeed.htmlt"))
 
 			{
 				CLog	log;
@@ -2774,7 +2774,7 @@ int main()
 
 		c.SetDB(&db);
 
-		if(!indexPage.SetTemplate(c.GetTemplate())) {
+		if(!indexPage.SetProdTemplate(c.GetTemplate())) {
 
 			ost.str("");
 			ost << string(__func__) + ":: catch CRedirectHTML: ERROR, template redirect.htmlt not found";
@@ -2795,7 +2795,7 @@ int main()
 
 		MESSAGE_DEBUG("", action, "catch CExceptionHTML: DEBUG exception reason: [" + c.GetReason() + "]");
 
-		if(!indexPage.SetTemplate(c.GetTemplate()))
+		if(!indexPage.SetProdTemplate(c.GetTemplate()))
 		{
 			MESSAGE_ERROR("", "", "template (" + c.GetTemplate() + ") not found");
 			return(-1);

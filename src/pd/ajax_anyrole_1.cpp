@@ -24,7 +24,7 @@ int main(void)
 
 		indexPage.ParseURL();
 
-		if(!indexPage.SetTemplate("index.htmlt"))
+		if(!indexPage.SetProdTemplate("index.htmlt"))
 		{
 			MESSAGE_ERROR("", action, "template file was missing");
 			throw CException("Template file was missing");
@@ -79,7 +79,7 @@ int main(void)
 			{
 				string		template_name = action.substr(0, action.length() - 9) + ".htmlt";
 
-				if(!indexPage.SetTemplate(template_name))
+				if(!indexPage.SetProdTemplate(template_name))
 				{
 					MESSAGE_ERROR("", action, "can't find template " + template_name);
 				}
@@ -148,7 +148,7 @@ int main(void)
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
 
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 		}
 		if(action == "AJAX_isCompanyExists")
 		{
@@ -203,7 +203,7 @@ int main(void)
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
 
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 		}
 
 		if(action == "AJAX_getGeoRegionName")
@@ -244,7 +244,7 @@ int main(void)
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
 
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 		}
 
 		if(action == "AJAX_getGeoRegionAndLocalityNames")
@@ -298,7 +298,7 @@ int main(void)
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
 
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 		}
  
 		if(action == "AJAX_getRegionAutocompleteList")
@@ -355,7 +355,7 @@ int main(void)
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
 
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 		}
 
 		if(action == "AJAX_getLocalityAutocompleteList")
@@ -415,7 +415,7 @@ int main(void)
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
 
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 		}
 
 		if(action == "AJAX_getLocalityAutocompleteList_2")
@@ -448,7 +448,7 @@ int main(void)
 			}
 
 			indexPage.RegisterVariableForce("result", "[" + success_message + "]");
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 
 			MESSAGE_DEBUG("", action, "finish");
 		}
@@ -503,7 +503,7 @@ int main(void)
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
 
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 		}
 
 		if(action == "AJAX_getAgencyAutocompleteList")
@@ -553,7 +553,7 @@ int main(void)
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
 
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 		}
 
 		if(action == "AJAX_getAviaBonusAutocompleteList")
@@ -603,7 +603,7 @@ int main(void)
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
 
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 		}
 
 		if(action == "AJAX_getSmartwayAirportAutocompleteList")
@@ -638,7 +638,7 @@ int main(void)
 
 			indexPage.RegisterVariableForce("result", "[" + success_message + "]");
 
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 		}
 
 		if(action == "AJAX_getAirportAutocompleteList")
@@ -669,7 +669,7 @@ int main(void)
 
 			indexPage.RegisterVariableForce("result", "[" + success_message + "]");
 
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 		}
 
 		if(action == "AJAX_getAirportCountryAutocompleteList")
@@ -701,7 +701,7 @@ int main(void)
 
 			indexPage.RegisterVariableForce("result", "[" + success_message + "]");
 
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 		}
 
 		if(action == "AJAX_getCountryAutocompleteList")
@@ -733,7 +733,7 @@ int main(void)
 
 			indexPage.RegisterVariableForce("result", "[" + success_message + "]");
 
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 		}
 
 		if(action == "AJAX_submitNewGeoZip")
@@ -889,7 +889,7 @@ int main(void)
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
 
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 		}
 
 		if(action == "AJAX_getBankInfoByBIK")
@@ -1004,7 +1004,7 @@ int main(void)
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
 
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 		}
 
 		if(action == "AJAX_addNewCompany")
@@ -1080,7 +1080,7 @@ int main(void)
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
 
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 		}
 
 		if(action == "AJAX_getAbsenceTypesList")
@@ -1108,7 +1108,7 @@ int main(void)
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
 
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 		}
 
 		if(action == "AJAX_submitUnknownLocality")
@@ -1191,7 +1191,7 @@ int main(void)
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
-				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+				if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
@@ -1256,7 +1256,7 @@ int main(void)
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
-				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+				if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
@@ -1321,7 +1321,7 @@ int main(void)
 
 				indexPage.RegisterVariableForce("result", ostResult.str());
 
-				if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+				if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 			}
 
 			MESSAGE_DEBUG("", action, "finish");
@@ -1361,7 +1361,7 @@ int main(void)
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
 
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 
 			MESSAGE_DEBUG("", action, "finish");
 		}
@@ -1400,7 +1400,7 @@ int main(void)
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
 
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 
 			MESSAGE_DEBUG("", action, "finish");
 		}
@@ -1439,7 +1439,7 @@ int main(void)
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
 
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 
 			MESSAGE_DEBUG("", action, "finish");
 		}
@@ -1487,7 +1487,7 @@ int main(void)
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
 
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 
 			MESSAGE_DEBUG("", action, "finish");
 		}
@@ -1535,7 +1535,7 @@ int main(void)
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
 
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 
 			MESSAGE_DEBUG("", action, "finish");
 		}
@@ -1583,7 +1583,7 @@ int main(void)
 
 			indexPage.RegisterVariableForce("result", ostResult.str());
 
-			if(!indexPage.SetTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
+			if(!indexPage.SetProdTemplate(template_name)) MESSAGE_ERROR("", action, "can't find template " + template_name);
 
 			MESSAGE_DEBUG("", action, "finish");
 		}
@@ -1601,7 +1601,7 @@ int main(void)
 
 		MESSAGE_DEBUG("", action, "catch CExceptionHTML: DEBUG exception reason: [" + c.GetReason() + "]");
 
-		if(!indexPage.SetTemplate(c.GetTemplate()))
+		if(!indexPage.SetProdTemplate(c.GetTemplate()))
 		{
 			MESSAGE_ERROR("", "", "template (" + c.GetTemplate() + ") not found");
 			return(-1);

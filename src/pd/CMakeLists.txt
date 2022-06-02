@@ -7,7 +7,6 @@ set(EXECUTABLE_CGIs_with_PD_PI_LIBS
     initial_wizard.cgi
     index.cgi
     ajax_anyrole_1.cgi
-    admin.cgi
     system.cgi
     )
 set(EXECUTABLE_CGIs_with_PI_LIBS
@@ -156,27 +155,25 @@ endforeach()
 # --- actual linker options are -Wl,-rpath,/path/to/dynamic/library
 # --- https://gitlab.kitware.com/cmake/community/wikis/doc/cmake/RPATH-handling
 # set         (CMAKE_INSTALL_RPATH    ${XL_LIBRARY_DIR})
-foreach(EXECUTABLE_CGI ${EXECUTABLE_CGIs_with_INVOICE_PD_PI_LIBS})
-    set_target_properties(${EXECUTABLE_CGI}     PROPERTIES
-                                                BUILD_WITH_INSTALL_RPATH TRUE
-                                                INSTALL_RPATH_USE_LINK_PATH TRUE
-                                                INSTALL_RPATH "${XL_LIBRARY_DIR}"
-                                                )
-endforeach()
-message(STATUS  "configure libxl RPATH to ${XL_LIBRARY_DIR}")
+#foreach(EXECUTABLE_CGI ${EXECUTABLE_CGIs_with_INVOICE_PD_PI_LIBS})
+#    set_target_properties(${EXECUTABLE_CGI}     PROPERTIES
+#                                                BUILD_WITH_INSTALL_RPATH TRUE
+#                                                INSTALL_RPATH_USE_LINK_PATH TRUE
+#                                                INSTALL_RPATH "${XL_LIBRARY_DIR}"
+#                                                )
+#endforeach()
+#message(STATUS  "configure libxl RPATH to ${XL_LIBRARY_DIR}")
 
 # --- Install part
 
-install(TARGETS index.cgi			DESTINATION		${CGIDIR})
-install(TARGETS approver.cgi		DESTINATION		${CGIDIR})
-install(TARGETS agency.cgi			DESTINATION		${CGIDIR})
-install(TARGETS subcontractor.cgi	DESTINATION		${CGIDIR})
-install(TARGETS ajax_anyrole_1.cgi	DESTINATION		${CGIDIR})
-install(TARGETS initial_wizard.cgi  DESTINATION     ${CGIDIR})
-install(TARGETS system.cgi          DESTINATION     ${CGIDIR})
+install(TARGETS index.cgi			DESTINATION		${CGIDIR} COMPONENT app)
+install(TARGETS approver.cgi		DESTINATION		${CGIDIR} COMPONENT app)
+install(TARGETS agency.cgi			DESTINATION		${CGIDIR} COMPONENT app)
+install(TARGETS subcontractor.cgi	DESTINATION		${CGIDIR} COMPONENT app)
+install(TARGETS ajax_anyrole_1.cgi	DESTINATION		${CGIDIR} COMPONENT app)
+install(TARGETS initial_wizard.cgi  DESTINATION     ${CGIDIR} COMPONENT app)
+install(TARGETS system.cgi          DESTINATION     ${CGIDIR} COMPONENT app)
 
-install(TARGETS admin.cgi           DESTINATION     ${CGIADMINDIR})
-
-install(TARGETS cron_daily_pd		DESTINATION		${CRON_INSTALL_DIR})
+install(TARGETS cron_daily_pd		DESTINATION		${CRON_INSTALL_DIR} COMPONENT cron)
 
 # print_all_variables()
