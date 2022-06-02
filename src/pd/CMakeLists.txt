@@ -166,14 +166,14 @@ endforeach()
 
 # --- Install part
 
-install(TARGETS index.cgi			DESTINATION		${CGIDIR})
-install(TARGETS approver.cgi		DESTINATION		${CGIDIR})
-install(TARGETS agency.cgi			DESTINATION		${CGIDIR})
-install(TARGETS subcontractor.cgi	DESTINATION		${CGIDIR})
-install(TARGETS ajax_anyrole_1.cgi	DESTINATION		${CGIDIR})
-install(TARGETS initial_wizard.cgi  DESTINATION     ${CGIDIR})
-install(TARGETS system.cgi          DESTINATION     ${CGIDIR})
+install(TARGETS index.cgi			DESTINATION		${CGIDIR} COMPONENT app)
+install(TARGETS approver.cgi		DESTINATION		${CGIDIR} COMPONENT app)
+install(TARGETS agency.cgi			DESTINATION		${CGIDIR} COMPONENT app)
+install(TARGETS subcontractor.cgi	DESTINATION		${CGIDIR} COMPONENT app)
+install(TARGETS ajax_anyrole_1.cgi	DESTINATION		${CGIDIR} COMPONENT app)
+install(TARGETS initial_wizard.cgi  DESTINATION     ${CGIDIR} COMPONENT app)
+install(TARGETS system.cgi          DESTINATION     ${CGIDIR} COMPONENT app)
 
-install(TARGETS cron_daily_pd		DESTINATION		${CRON_INSTALL_DIR})
+install(TARGETS cron_daily_pd		DESTINATION		${CRON_INSTALL_DIR} COMPONENT cron)
 
 # print_all_variables()
