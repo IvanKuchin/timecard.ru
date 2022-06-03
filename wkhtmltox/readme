@@ -1,0 +1,1 @@
+This folder instructs Docker to install wkhtmltox library, otherwise it won't be installed.
