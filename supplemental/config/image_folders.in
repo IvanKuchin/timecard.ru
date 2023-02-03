@@ -1,5 +1,6 @@
 avatar                                  = ${IMAGEROOTDIR}/html/images/avatars
 company_profile_logo                    = ${IMAGEROOTDIR}/html/images/companies
+temp                                    = ${IMAGEROOTDIR}/html/images/temp
 
 template_agreement_company              = ${IMAGEROOTDIR}/html/templates_agreement_company/
 template_sow                            = ${IMAGEROOTDIR}/html/templates_sow/
